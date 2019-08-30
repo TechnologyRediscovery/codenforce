@@ -28,7 +28,6 @@ public class MoneyOccPeriodFeeAssigned extends FeeAssigned {
    
    public MoneyOccPeriodFeeAssigned() {
     
-    
 }
 
     public int getOccPeriodID() {

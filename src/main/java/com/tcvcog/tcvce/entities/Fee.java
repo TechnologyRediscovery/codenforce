@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.Municipality;
 import java.time.LocalDateTime;
 
 /**
@@ -27,8 +26,8 @@ public class Fee {
     private int occupancyInspectionFeeID;
     private Municipality muni;
 
-    private String feeName;
-    private double feeAmount;
+    private String name;
+    private double amount;
     private LocalDateTime effectiveDate;
     private LocalDateTime expiryDate;
     private String notes;
@@ -65,20 +64,20 @@ public class Fee {
         this.muni = muni;
     }
 
-    public String getFeeName() {
-        return feeName;
+    public String getName() {
+        return name;
     }
 
-    public void setFeeName(String feeName) {
-        this.feeName = feeName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public double getFeeAmount() {
-        return feeAmount;
+    public double getAmount() {
+        return amount;
     }
 
-    public void setFeeAmount(double feeAmount) {
-        this.feeAmount = feeAmount;
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
     public LocalDateTime getEffectiveDate() {

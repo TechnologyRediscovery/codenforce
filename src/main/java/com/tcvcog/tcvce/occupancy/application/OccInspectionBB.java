@@ -13,13 +13,13 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
-import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
@@ -47,6 +47,7 @@ import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -109,8 +110,8 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private OccLocationDescriptor selectedLocation;
     private List<OccLocationDescriptor> workingLocationList;
     
-    private List<OccChecklistTemplate> inspectionTemplateCandidateList;
-    private OccChecklistTemplate selectedInspectionTemplate;
+//    private List<OccChecklistTemplate> inspectionTemplateCandidateList;
+//    private OccChecklistTemplate selectedInspectionTemplate;
     
     private List<OccPeriodType> occPeriodTypeList;
     private List<OccEvent> filteredEventList;
@@ -156,11 +157,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private Person selectedPerson;
     
     // payments
-    private List<Payment> existingPaymentList;
-    private List<Payment> workingPaymentList;
+    private List<Payment> paymentList;
     private List<Payment> filteredPaymentList;
     private Payment selectedPayment;
     
+    //fees
+    private List<Fee> feeList;
+    private List<Fee> filteredFeeList;
+    private Fee selectedFee;
     
     /**
      * Creates a new instance of InspectionsBB
@@ -174,6 +178,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         PropertyIntegrator pi = getPropertyIntegrator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        PaymentIntegrator pai = getPaymentIntegrator();
         
         // set our blank lists used only by elements on this page
         spacesInTypeList = new ArrayList<>();
@@ -234,7 +239,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
         
         try {
-            inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessionMuni());
+//            inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessionMuni());
             reportConfigOccInspec =
                     oc.getOccInspectionReportConfigDefault(
                             currentInspection,
@@ -243,6 +248,21 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        
+        try {
+           paymentList = pai.getPaymentList(currentOccPeriod);
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+     /*
+        try {
+            feeList = pai.
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+       */ 
     }
     
     public void loadSpacesInType(){
@@ -579,7 +599,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public void rejectProposal(){
         
     }
-    
+ /*   
     public void implementNewInspectionChecklist(ActionEvent ev){
         if(selectedInspectionTemplate != null){
             OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -603,7 +623,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             
         }
     }
-    
+   */ 
     public void initiateNoteOnInspection(ActionEvent ev){
         formNoteText = null;
     }
@@ -1600,33 +1620,50 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         this.itemFilterOptions = itemFilterOptions;
     }
 
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
+    }
+
+    public List<Payment> getFilteredPaymentList() {
+        return filteredPaymentList;
+    }
+
+    public void setFilteredPaymentList(List<Payment> filteredPaymentList) {
+        this.filteredPaymentList = filteredPaymentList;
+    }
+
+
     /**
      * @return the inspectionTemplateCandidateList
      */
-    public List<OccChecklistTemplate> getInspectionTemplateCandidateList() {
-        return inspectionTemplateCandidateList;
-    }
+//    public List<OccChecklistTemplate> getInspectionTemplateCandidateList() {
+//        return inspectionTemplateCandidateList;
+//    }
 
     /**
      * @param inspectionTemplateCandidateList the inspectionTemplateCandidateList to set
      */
-    public void setInspectionTemplateCandidateList(List<OccChecklistTemplate> inspectionTemplateCandidateList) {
-        this.inspectionTemplateCandidateList = inspectionTemplateCandidateList;
-    }
+//    public void setInspectionTemplateCandidateList(List<OccChecklistTemplate> inspectionTemplateCandidateList) {
+//        this.inspectionTemplateCandidateList = inspectionTemplateCandidateList;
+//    }
 
     /**
      * @return the selectedInspectionTemplate
      */
-    public OccChecklistTemplate getSelectedInspectionTemplate() {
-        return selectedInspectionTemplate;
-    }
+//   public OccChecklistTemplate getSelectedInspectionTemplate() {
+//        return selectedInspectionTemplate;
+//    }
 
     /**
      * @param selectedInspectionTemplate the selectedInspectionTemplate to set
      */
-    public void setSelectedInspectionTemplate(OccChecklistTemplate selectedInspectionTemplate) {
-        this.selectedInspectionTemplate = selectedInspectionTemplate;
-    }
+//   public void setSelectedInspectionTemplate(OccChecklistTemplate selectedInspectionTemplate) {
+//    this.selectedInspectionTemplate = selectedInspectionTemplate;
+//    }
 
     /**
      * @return the selectedInspectedElementAddValue
@@ -1654,8 +1691,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setInspectedElementAddValueCandidateList(OccInspectionStatusEnum[] inspectedElementAddValueCandidateList) {
         this.inspectedElementAddValueCandidateList = inspectedElementAddValueCandidateList;
-    }
-
+   }
     
     public Payment getSelectedPayment() {
         return selectedPayment;
@@ -1665,6 +1701,30 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         this.selectedPayment = selectedPayment;
     }
 
+    public List<Fee> getFeeList() {
+        return feeList;
+    }
+
+    public void setFeeList(List<Fee> feeList) {
+        this.feeList = feeList;
+    }
+
+    public List<Fee> getFilteredFeeList() {
+        return filteredFeeList;
+    }
+
+    public void setFilteredFeeList(List<Fee> filteredFeeList) {
+        this.filteredFeeList = filteredFeeList;
+    }
+
+    public Fee getSelectedFee() {
+        return selectedFee;
+    }
+
+    public void setSelectedFee(Fee selectedFee) {
+        this.selectedFee = selectedFee;
+    }
+    
 }
 
 //

@@ -22,8 +22,88 @@ import java.io.Serializable;
  *
  * @author Nathan Dietz
  */
-public class FeeAssigned extends Fee implements Serializable {
-    
-    
-    
+public class FeeAssigned  extends EntityUtils implements Serializable {
+
+    private List<Payment> paymentList;
+    private int moneyFeeAssigned;
+    private User assignedBy;
+    private int waivedBy;
+    private LocalDateTime lastModified;
+    private double reducedBy;
+    private User reducedByUser;
+    private String notes;
+    private Fee fee;
+
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
+    }
+
+    public int getMoneyFeeAssigned() {
+        return moneyFeeAssigned;
+    }
+
+    public void setMoneyFeeAssigned(int moneyFeeAssigned) {
+        this.moneyFeeAssigned = moneyFeeAssigned;
+    }
+
+    public User getAssignedBy() {
+        return assignedBy;
+    }
+
+    public void setAssignedBy(User assignedBy) {
+        this.assignedBy = assignedBy;
+    }
+
+    public int getWaivedBy() {
+        return waivedBy;
+    }
+
+    public void setWaivedBy(int waivedBy) {
+        this.waivedBy = waivedBy;
+    }
+
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(LocalDateTime lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public double getReducedBy() {
+        return reducedBy;
+    }
+
+    public void setReducedBy(double reducedBy) {
+        this.reducedBy = reducedBy;
+    }
+
+    public User getReducedByUser() {
+        return reducedByUser;
+    }
+
+    public void setReducedByUser(User reducedByUser) {
+        this.reducedByUser = reducedByUser;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public Fee getFee() {
+        return fee;
+    }
+
+    public void setFee(Fee fee) {
+        this.fee = fee;
+    }
+        
 }

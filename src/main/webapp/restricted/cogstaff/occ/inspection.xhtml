@@ -982,6 +982,117 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </h:form>
                                 </p:panel>
 
+                                <p:panel id="occperiod-fees"
+                                         toggleable="true"
+                                         collapsed="false"
+                                         header="Fees"
+                                         rendered="true">
+
+                                    <h:form id="occperiod-fees-form-messages">
+                                        <h:messages id="occperiod-fees-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
+
+                                    <h:form id="occperiod-fees-form">
+
+                                        <p:dataTable
+                                            id="feeTable"
+                                            var="fee"
+                                            value="#{occInspectionBB.feeList}"
+                                            rowKey="#{fee.occupancyInspectionFeeID}"
+                                            tableStyleClass="primeDataTable"
+                                            rowExpandMode="single"
+                                            expandedRow="false"
+                                            filteredValue="#{occInspectionBB.filteredFeeList}"
+                                            >
+
+                                            <p:column width="3%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Exp"/>
+                                                </f:facet>
+                                                <p:rowToggler/>
+                                            </p:column>
+                                            <p:column width="8%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="ID" />
+                                                </f:facet>
+                                                <h:outputText value="#{fee.occupancyInspectionFeeID}"/>
+                                            </p:column>
+
+
+                                            <p:column width="10%" sortBy="#{fee.name}"
+                                                      filterBy="#{fee.name}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Fee Name" />
+                                                </f:facet>
+                                                <h:outputText value="#{fee.name}"/>
+                                            </p:column>
+
+                                            <p:column width="10%" sortBy="#{fee.amount}"
+                                                      filterBy="#{fee.amount}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Amount" />
+                                                </f:facet>
+                                                <h:outputText value="#{fee.amount}"/>
+                                            </p:column>
+
+                                            <p:column width="15%" filterBy="#{fee.effectiveDate}"
+                                                      sortBy="#{fee.effectiveDate}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Effective" />
+                                                </f:facet>
+                                                <h:outputText value="#{fee.effectiveDate}"/>
+                                            </p:column>
+
+                                            <p:column width="15%" filterBy="#{fee.expiryDate}"
+                                                      sortBy="#{fee.expiryDate}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Expiry" />
+                                                </f:facet>
+                                                <h:outputText value="#{fee.expiryDate}"/>
+                                            </p:column>
+                                            <p:rowExpansion>
+                                                <div class="outlinedBox">
+                                                    <h2>Full fee listing for fee <h:outputText value="#{fee.occupancyInspectionFeeID}"/> </h2>
+                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Municipality"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.muni.muniName}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.notes}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <ui:remove>
+                                                            <h:panelGroup>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <p:commandButton value="Edit this payment" action="#{occInspectionBB.editOnePayment(payment)}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+                                                        </ui:remove>
+                                                    </h:panelGrid>
+                                                </div>
+                                            </p:rowExpansion>
+
+                                        </p:dataTable>
+                                        <ui:remove>
+                                            <p:commandButton value="Edit this payment list" action="#{occInspectionBB.editOccPeriodPayments()}"/>
+                                        </ui:remove>
+                                    </h:form>
+                                </p:panel>
+
                                 <p:panel id="occperiod-payments"
                                          toggleable="true"
                                          collapsed="false"
@@ -999,7 +1110,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <p:dataTable
                                             id="paymentTable"
                                             var="payment"
-                                            value="#{occInspectionBB.workingPaymentList}"
+                                            value="#{occInspectionBB.paymentList}"
                                             rowKey="#{payment.paymentID}"
                                             tableStyleClass="primeDataTable"
                                             rowExpandMode="single"
@@ -1244,8 +1355,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                           value="configure inspection"  
                                                           icon="fa fa-gears"
                                                           update="inspectionsettings-form-messages
-                                                          inspectionsettings-form-configureinspections
+
                                                           form-dialog-inspectionmetadata"/>
+
+                                        <!--The update statement above had "inspectionsettings-form-configureinspections" in it, 
+                                            but it had to be removed.-->
 
                                         <p:commandButton  id="occperiod-checklist-button-certifyinspection"
                                                           ajax="true"
@@ -1531,7 +1645,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </h:panelGroup>
                                                     <h:panelGroup>
 
-                                                        <f:subview      id="occperiod-inspectedspace-subview-compliancedata"
+                                                        <f:subview      id="occperiod-inspectedspace-subview-compliancedata2"
                                                                         rendered="#{!(empty inelement.complianceGrantedTS)}">
 
                                                             <h:outputText value="Compliance granted by: " 
@@ -1976,101 +2090,106 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             </h:messages>
 
                         </h:form>
-                        <h:form id="inspectionsettings-form-configureinspections">
+
+                        <ui:remove> <!-- REMOVE THIS UI:REMOVE ELEMENT BEFORE PUSH. 
+                                         LOOK FOR ANOTHER COMMENT ABOVE, THIS FORM HAS AN UPDATE STATEMENT. -->
+
+                            <h:form id="inspectionsettings-form-configureinspections">
 
 
-                            <p:selectOneMenu id="configureinspections-som-templates" required="false" 
-                                             value="#{occInspectionBB.selectedInspectionTemplate}">
-                                <f:selectItem itemLabel="select a checklist..." noSelectionOption="true" />
-                                <f:selectItems value="#{occInspectionBB.inspectionTemplateCandidateList}"  var="template" itemValue="#{template}" 
-                                               itemLabel="#{template.title} (ID:#{template.inspectionChecklistID}, #{template.muni.muniName})"/>
-                                <f:converter converterId="occChecklistTemplateConverter"/>
-                                <p:ajax update="configureinspections-button-newinspection" />
-                            </p:selectOneMenu>
+                                <p:selectOneMenu id="configureinspections-som-templates" required="false" 
+                                                 value="#{occInspectionBB.selectedInspectionTemplate}">
+                                    <f:selectItem itemLabel="select a checklist..." noSelectionOption="true" />
+                                    <f:selectItems value="#{occInspectionBB.inspectionTemplateCandidateList}"  var="template" itemValue="#{template}" 
+                                                   itemLabel="#{template.title} (ID:#{template.inspectionChecklistID}, #{template.muni.muniName})"/>
+                                    <f:converter converterId="occChecklistTemplateConverter"/>
+                                    <p:ajax update="configureinspections-button-newinspection" />
+                                </p:selectOneMenu>
 
-                            <p:commandButton id="configureinspections-button-newinspection" 
-                                             ajax="true"
-                                             value="attach new inspection" 
-                                             actionListener="#{occInspectionBB.implementNewInspectionChecklist}"
-                                             disabled="#{empty occInspectionBB.selectedInspectionTemplate}"
-                                             icon="fa fa-plus" 
-                                             tabindex="1"
-                                             oncomplete="PF('occperiod-dialog-inspectionsettings-var"
-                                             update="occperiod-checklist-form-settings
-                                             inspectionsettings-form-messages
-                                             form-inspecteditems
-                                             occperiod-inspecteditems-form-messages"
-                                             />
+                                <p:commandButton id="configureinspections-button-newinspection" 
+                                                 ajax="true"
+                                                 value="attach new inspection" 
+                                                 actionListener="#{occInspectionBB.implementNewInspectionChecklist}"
+                                                 disabled="#{empty occInspectionBB.selectedInspectionTemplate}"
+                                                 icon="fa fa-plus" 
+                                                 tabindex="1"
+                                                 oncomplete="PF('occperiod-dialog-inspectionsettings-var"
+                                                 update="occperiod-checklist-form-settings
+                                                 inspectionsettings-form-messages
+                                                 form-inspecteditems
+                                                 occperiod-inspecteditems-form-messages"
+                                                 />
 
-                            <p:spacer height="5px" />
+                                <p:spacer height="5px" />
 
-                            <p:dataTable
-                                id="occperiod-inspectionconfig-inspectionlist"
-                                widgetVar="occperiod-inspectionconfig-inspectionlist-var"
-                                var="inspection"
-                                value="#{occInspectionBB.currentOccPeriod.inspectionList}"
-                                rowIndexVar="#{inspection.inspectionID}">
+                                <p:dataTable
+                                    id="occperiod-inspectionconfig-inspectionlist"
+                                    widgetVar="occperiod-inspectionconfig-inspectionlist-var"
+                                    var="inspection"
+                                    value="#{occInspectionBB.currentOccPeriod.inspectionList}"
+                                    rowIndexVar="#{inspection.inspectionID}">
 
-                                <p:column width="5%">
-                                    <f:facet name="header">
-                                        <h:outputText styleClass="ui-label-inline" value="ID" />
-                                    </f:facet>
-                                    <h:outputText styleClass="data-text" value="#{inspection.inspectionID}" />
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText styleClass="ui-label-inline" value="Date created" />
-                                    </f:facet>
-                                    <h:outputText styleClass="data-text" value="#{occInspectionBB.getPrettyDateNoTime(inspection.creationTS)}" />
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText styleClass="ui-label-inline" value="Checklist" />
-                                    </f:facet>
-                                    <h:outputText styleClass="data-text" value="#{inspection.checklistTemplate.title} (#{inspection.checklistTemplate.inspectionChecklistID})" />
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText styleClass="ui-label-inline" value="Status" />
-                                    </f:facet>
-                                    <h:outputText styleClass="data-text" value="#{empty inspection.passedInspectionTS ? 'incomplete' : occInspectionBB.getPrettyDateNoTime(inspection.passedInspectionTS)}" />
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText styleClass="ui-label-inline" value="Inspector" />
-                                    </f:facet>
-                                    <h:outputText styleClass="data-text" value="#{inspection.inspector.person.firstName} #{inspection.inspector.person.lastName}" />
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText styleClass="ui-label-inline" value="Active?" />
-                                    </f:facet>
-                                    <h:outputText styleClass="data-text" value="#{inspection.active}" />
-                                </p:column>
+                                    <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText styleClass="ui-label-inline" value="ID" />
+                                        </f:facet>
+                                        <h:outputText styleClass="data-text" value="#{inspection.inspectionID}" />
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText styleClass="ui-label-inline" value="Date created" />
+                                        </f:facet>
+                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.getPrettyDateNoTime(inspection.creationTS)}" />
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText styleClass="ui-label-inline" value="Checklist" />
+                                        </f:facet>
+                                        <h:outputText styleClass="data-text" value="#{inspection.checklistTemplate.title} (#{inspection.checklistTemplate.inspectionChecklistID})" />
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText styleClass="ui-label-inline" value="Status" />
+                                        </f:facet>
+                                        <h:outputText styleClass="data-text" value="#{empty inspection.passedInspectionTS ? 'incomplete' : occInspectionBB.getPrettyDateNoTime(inspection.passedInspectionTS)}" />
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText styleClass="ui-label-inline" value="Inspector" />
+                                        </f:facet>
+                                        <h:outputText styleClass="data-text" value="#{inspection.inspector.person.firstName} #{inspection.inspector.person.lastName}" />
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText styleClass="ui-label-inline" value="Active?" />
+                                        </f:facet>
+                                        <h:outputText styleClass="data-text" value="#{inspection.active}" />
+                                    </p:column>
 
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText styleClass="ui-label-inline" value="tools" />
-                                    </f:facet>
-                                    <p:commandButton   id="occperiod-inspectionconfig-button-activateinspection"
-                                                       ajax="true" 
-                                                       value="activate"
-                                                       disabled="false"
-                                                       actionListener="#{occInspectionBB.activateOccInspection(inspection)}"
-                                                       rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                       icon="fa fa-bolt"
-                                                       update="form-dialog-inspectionmetadata
-                                                       @this
-                                                       occperiod-inspecteditems-form-messages
-                                                       occperiod-checklist-form-settings
-                                                       form-inspecteditems
-                                                       occperiod-checklisttemplate-form-settings
-                                                       occperiod-checklisttemplate-form-spacetype"
-                                                       />
-                                </p:column>
-                            </p:dataTable>
-                        </h:form>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText styleClass="ui-label-inline" value="tools" />
+                                        </f:facet>
+                                        <p:commandButton   id="occperiod-inspectionconfig-button-activateinspection"
+                                                           ajax="true" 
+                                                           value="activate"
+                                                           disabled="false"
+                                                           actionListener="#{occInspectionBB.activateOccInspection(inspection)}"
+                                                           rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                           icon="fa fa-bolt"
+                                                           update="form-dialog-inspectionmetadata
+                                                           @this
+                                                           occperiod-inspecteditems-form-messages
+                                                           occperiod-checklist-form-settings
+                                                           form-inspecteditems
+                                                           occperiod-checklisttemplate-form-settings
+                                                           occperiod-checklisttemplate-form-spacetype"
+                                                           />
+                                    </p:column>
+                                </p:dataTable>
+                            </h:form>
 
+                        </ui:remove>
 
                         <h:form id="form-dialog-inspectionmetadata">
 
