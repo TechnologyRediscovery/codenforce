@@ -618,13 +618,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <p:spacer height="5px" />
 
                                         <p:commandButton    id="occperiod-template-button-addallrequiredspacetypes"
-<<<<<<< HEAD
-                                                            ajax="true"
-                                                            actionListener="#{occInspectionBB.addAllRequiredSpaceTypes}"
-=======
                                                             ajax="true" 
                                                             actionListener="#{occInspectionBB.checklistAction_addAllRequiredSpaceTypes}"
->>>>>>> b741b392736aa84c1b014dcac5911092e8a28da1
                                                             rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                             value="add all required spaces"
                                                             icon="fa fa-clone"
@@ -661,18 +656,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     required="true"
                                                                     value="#{occInspectionBB.selectedOccSpace}"
                                                                     tabindex="2">
-<<<<<<< HEAD
-                                                    <p:ajax update="occperiod-checklisttemplate-scroller-elementlist
-                                                            occperiod-checklisttemplate-button-addwithcompliance
-                                                            occperiod-checklisttemplate-button-addasuninspected"
-                                                            listener="#{occInspectionBB.loadElementsInSpace}"
-                                                            />
-                                                    <f:converter converterId="occSpaceConverter" />
-                                                    <f:selectItems value="#{occInspectionBB.spacesInTypeList}"
-                                                                   var="sp" itemLabel="#{sp.name}" />
-
-                                                </p:selectOneListbox>
-=======
                                                         <p:ajax update="occperiod-checklisttemplate-scroller-elementlist
                                                                 occperiod-checklisttemplate-button-addwithcompliance
                                                                 occperiod-checklisttemplate-button-addasuninspected"
@@ -726,78 +709,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     value="#{occInspectionBB.elementsInSpaceList}"
                                                     rowIndexVar="#{codeElement.elementID}">
 
->>>>>>> b741b392736aa84c1b014dcac5911092e8a28da1
-
-                                            </h:panelGroup>
-                                            <h:panelGroup>
-
-<<<<<<< HEAD
-                                                <p:commandButton       id="occperiod-checklisttemplate-button-addwithcompliance"
-                                                                       ajax="true"
-                                                                       actionListener="#{occInspectionBB.addSpaceToChecklist(occInspectionBB.selectedOccSpace)}"
-                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                       disabled="#{empty occInspectionBB.selectedOccSpace}"
-                                                                       value="mark added items with compliance"
-                                                                       icon="fa fa-check"
-                                                                       update=" form-inspecteditems
-                                                                       occperiod-inspecteditems-form-messages">
-                                                    <f:param name="occperiod-elementstatusonadd" value="#{comp}"/>
-                                                </p:commandButton>
-
-                                                <p:spacer height="5px" />
-
-                                                <p:commandButton       id="occperiod-checklisttemplate-button-addasuninspected"
-                                                                       ajax="true"
-                                                                       actionListener="#{occInspectionBB.addSpaceToChecklist(occInspectionBB.selectedOccSpace)}"
-                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                       disabled="#{empty occInspectionBB.selectedOccSpace}"
-                                                                       value="add items as uninspected"
-                                                                       icon="fa fa-circle-o"
-                                                                       update=" form-inspecteditems
-                                                                       occperiod-inspecteditems-form-messages">
-                                                    <f:param name="occperiod-elementstatusonadd" value="uninsp"/>
-                                                </p:commandButton>
-
-                                                <ui:remove>
-                                                    <p:spacer height="5px" />
-
-
-                                                    <h:outputText     value="Record location with add? "
-                                                                      styleClass="ui-label-inline"/>
-
-                                                    <p:selectBooleanCheckbox    id="occperiod-template-switch-promptforlocation"
-                                                                                styleClass="hover-none"
-                                                                                value="#{occInspectionBB.promptForSpaceLocationUponAdd}"/>
-
-                                                </ui:remove>
-                                            </h:panelGroup>
-                                        </h:panelGrid>
-                                        <h:outputText styleClass="ui-label" value="Elements in this space:" />
-
-                                        <p:dataScroller
-                                            id="occperiod-checklisttemplate-scroller-elementlist"
-                                            widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist-elementlist"
-                                            var="codeElement"
-                                            value="#{occInspectionBB.elementsInSpaceList}"
-                                            rowIndexVar="#{codeElement.elementID}">
-
-                                            <div class="outlinedBox">
-
-                                                <h:outputLabel styleClass="bold" value="Ordindance: "  />
-                                                <p:spacer height="5px" />
-                                                <h:outputText  value="&#167;#{codeElement.ordSecNum}:" />
-                                                <h:outputText  value="#{codeElement.ordSecTitle}; " />
-                                                <h:outputText  value="&#167;&#167;#{codeElement.ordSubSecNum} " />
-                                                <h:outputText  value="#{codeElement.ordSubSecTitle}" />
-                                                <p:spacer height="2px" />
-
-                                            </div>
-                                        </p:dataScroller>
-                                        <p:spacer height="5px" />
-=======
                                                 </p:dataScroller>
                                             <p:spacer height="5px" />
->>>>>>> b741b392736aa84c1b014dcac5911092e8a28da1
+
                                         <p:commandButton    id="occperiod-permits-button-newpermit"
                                                             value="view static template"
                                                             ajax="true"
@@ -1326,13 +1240,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                           ajax="true"
                                                           actionListener="#{occInspectionBB.checklistAction_beginInspectionMetadataEdit}"
                                                           rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-<<<<<<< HEAD
-                                                          onclick="PF('var-dialog-inspectionmetadata').show()"
-                                                          value="configure inspection"
-                                                          icon="fa fa-gears"
-                                                          update="form-dialog-inspectionmetadata"/>
-
-=======
                                                           onclick="PF('occperiod-dialog-inspectionsettings-var').show()"
                                                           value="configure inspection"  
                                                           icon="fa fa-gears"
@@ -1340,7 +1247,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                           inspectionsettings-form-configureinspections
                                                           form-dialog-inspectionmetadata"/>
                                         
->>>>>>> b741b392736aa84c1b014dcac5911092e8a28da1
                                         <p:commandButton  id="occperiod-checklist-button-certifyinspection"
                                                           ajax="true"
                                                           actionListener="#{occInspectionBB.checklistAction_certifyInspection}"
@@ -1353,62 +1259,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                         <h2>Checklist tools</h2>
-<<<<<<< HEAD
-
-                                        <p:commandButton   id="occperiod-checklist-button-configtodolist"
-                                                           ajax="true"
-                                                           actionListener="#{occInspectionBB.reports_initializeOccInspectionReport}"
-                                                           rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
-                                                           onclick="PF('occperiod-configurereport-occinspection-var').show()"
-                                                           value="print inspection to-do list"
-                                                           disabled="false"
-                                                           icon="fa fa-print"
-                                                           update="occperiod-configurereport-occinspection-form"/>
-
-                                        <p:commandButton  id="occperiod-checklist-button-markcomplianceforallelements"
-                                                          ajax="true"
-                                                          actionListener="#{occInspectionBB.checklistAction_recordComplianceForAllElements()}"
-                                                          rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                          value="mark compliance for all items"
-                                                          icon="fa fa-check"
-                                                          update="form-inspecteditems"/>
-
-                                        <p:spacer height="5px" />
-
-                                        <p:commandButton   id="occperiod-checklist-button-showonlyfailedelements"
-                                                           ajax="true"
-                                                           actionListener="#{occInspectionBB.filterChecklist_failedItems}"
-                                                           value="filter: only failed items"
-                                                           disabled="false"
-                                                           icon="fa fa-close"
-                                                           update="form-inspecteditems
-                                                           occperiod-checklisttemplate-form-settings"/>
-
-                                        <p:commandButton   id="occperiod-checklist-button-showonlyuninspectedelements"
-                                                           ajax="true"
-                                                           actionListener="#{occInspectionBB.filterChecklist_uninspectedItems}"
-                                                           value="filter: only uninspected items"
-                                                           disabled="false"
-                                                           icon="fa fa-circle-o"
-                                                           update="form-inspecteditems
-                                                           occperiod-checklisttemplate-form-settings"/>
-
-                                        <p:commandButton   id="occperiod-checklist-button-showall"
-                                                           ajax="true"
-                                                           actionListener="#{occInspectionBB.filterChecklist_allItems}"
-                                                           value="filter: show all items"
-                                                           disabled="false"
-                                                           icon="fa fa-list-alt"
-                                                           style="margin-right: 5px"
-                                                           update="form-inspecteditems
-                                                           occperiod-checklisttemplate-form-settings"/>
-
-                                        <h:outputText class="ui-label-inline" value="include empty spaces?" />
-                                        <p:selectBooleanCheckbox id="occperiod-checklist-boolcb-includeemptyspaces"
-                                                                 value="#{occInspectionBB.currentInspection.includeEmtpySpaces}">
-                                            <p:ajax update="form-inspecteditems"/>
-                                        </p:selectBooleanCheckbox>
-=======
                                         
                                           <p:commandButton   id="occperiod-checklist-button-inspectnewspace"
                                                                ajax="true" 
@@ -1478,7 +1328,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                    value="#{occInspectionBB.currentInspection.includeEmtpySpaces}">
                                               <p:ajax update="form-inspecteditems"/>
                                           </p:selectBooleanCheckbox>
->>>>>>> b741b392736aa84c1b014dcac5911092e8a28da1
                                     </h:form>
 
                                     <p:separator />
@@ -1598,119 +1447,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <h:outputText  styleClass="data-text #{inelement.status.icon.styleClass}" value="#{occInspectionBB.getPrettyDate(inelement.complianceGrantedTS)}" />
                                                             <p:spacer height="5px" />
 
-<<<<<<< HEAD
-                                                        </f:subview>
-
-                                                        <h:outputText styleClass="ui-label-inline" value="Last inspected by: " />
-                                                        <h:outputText  styleClass="data-text" value="#{inelement.lastInspectedBy.person.firstName} #{inelement.lastInspectedBy.person.lastName}" />
-                                                        <h:outputText styleClass="ui-label-inline" value=" on " />
-                                                        <h:outputText  styleClass="data-text" value="#{occInspectionBB.getPrettyDate(inelement.lastInspectedTS)}" />
-
-                                                        <p:spacer height="5px" />
-
-                                                        <h:outputText styleClass="ui-label-inline" value="Notes: " />
-
-                                                        <h:outputText  styleClass="data-text" value="#{inelement.notes}" escape="false"/>
-
-                                                        <p:spacer height="5px" />
-
-                                                        <p:commandButton   id="occperiod-checklist-scroller-inEle-button-notes"
-                                                                           rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                           value="add note"
-                                                                           icon="fa fa-sticky-note-o"
-                                                                           actionListener="#{occInspectionBB.checklistAction_initiateNoteOnInspectedElement(inelement)}"
-                                                                           oncomplete="PF('occperiod-dialog-notes-var').show()"
-                                                                           update="occperiod-dialog-notes-form"/>
-
-
-                                                    </h:panelGroup>
-                                                    <h:panelGroup>
-
-                                                        <f:subview id="occperiod-checklist-inelescroller-subview-compliance"
-                                                                   rendered="#{empty inelement.complianceGrantedTS}">
-
-                                                            <p:commandButton   id="occperiod-checklist-inelescroller-button-compliance"
-                                                                               ajax="true"
-                                                                               actionListener="#{occInspectionBB.checklistAction_recordComplianceWithElement(inelement)}"
-                                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                               disabled="#{!(empty inelement.complianceGrantedTS)}"
-                                                                               value="grant compliance"
-                                                                               icon="fa fa-check-square-o"
-                                                                               update="form-inspecteditems
-                                                                               occperiod-inspecteditems-form-messages
-                                                                               occperiod-checklisttemplate-form-settings"/>
-                                                        </f:subview>
-
-                                                        <p:spacer height="5px" />
-                                                        <f:subview id="occperiod-checklist-subview-reinspect"
-                                                                   rendered="#{empty inelement.complianceGrantedTS}">
-
-
-                                                            <p:commandButton   id="occperiod-checklist-scroller-inEle-button-reinspectionwithoutcompliance"
-                                                                               ajax="true"
-                                                                               actionListener="#{occInspectionBB.checklistAction_inspectElementWithoutCompliance(inelement)}"
-                                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                               disabled="#{!(empty inelement.complianceGrantedTS or empty inelement.complianceGrantedTS)}"
-                                                                               value="inspect; do NOT grant compliance"
-                                                                               icon="fa fa-eye"
-                                                                               update="form-inspecteditems
-                                                                               occperiod-inspecteditems-form-messages
-                                                                               occperiod-checklisttemplate-form-settings"/>
-
-                                                        </f:subview>
-
-                                                        <p:spacer height="5px" />
-                                                        <f:subview id="occperiod-checklist-subview-withdrawcompliance"
-                                                                   rendered="#{!(empty inelement.complianceGrantedTS)}">
-
-                                                            <p:commandButton   id="occperiod-checklist-scroller-inEle-button-removecompliance"
-                                                                               ajax="true"
-                                                                               actionListener="#{occInspectionBB.checklistAction_removeComplianceWithElement(inelement)}"
-                                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                               disabled="#{(empty inelement.complianceGrantedTS)}"
-                                                                               value="withdraw compliance"
-                                                                               icon="fa fa-minus-square-o"
-                                                                               update="form-inspecteditems
-                                                                               occperiod-inspecteditems-form-messages
-                                                                               occperiod-checklisttemplate-form-settings
-                                                                               "/>
-
-
-                                                        </f:subview>
-                                                        <p:spacer height="5px" />
-                                                        <f:subview id="occperiod-checklist-subview-clearinspection"
-                                                                   rendered="#{!(empty inelement.lastInspectedTS)}">
-
-
-                                                            <p:commandButton   id="occperiod-checklist-scroller-inEle-button-clearinspection"
-                                                                               ajax="true"
-                                                                               actionListener="#{occInspectionBB.checklistAction_clearInspectionOfElement(inelement)}"
-                                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                               disabled="#{!(!(empty inelement.lastInspectedTS) or !(empty inelement.complianceGrantedTS))}"
-                                                                               value="clear inspection"
-                                                                               icon="fa fa-eraser"
-                                                                               update="form-inspecteditems
-                                                                               occperiod-inspecteditems-form-messages
-                                                                               "/>
-
-                                                        </f:subview>
-
-                                                        <p:spacer height="5px" />
-
-                                                        <p:fieldset legend="Inspection tips"
-                                                                    toggleable="true"
-                                                                    toggleSpeed="500"
-                                                                    collapsed="true">
-
-                                                            <h:outputText value="Code guide inspection tips:" escape="false" />
-                                                            <h:outputText value="#{inelement.guideEntry.inspectionGuidelines}" escape="false" />
-                                                        </p:fieldset>
-                                                    </h:panelGroup>
-                                                </h:panelGrid>
-
-
-                                                <hr />
-=======
                                                             <h:panelGroup>
 
                                                                 <f:subview id="occperiod-checklist-inelescroller-subview-compliance"
@@ -1836,7 +1572,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                
                                                   
                                                 <hr />  
->>>>>>> b741b392736aa84c1b014dcac5911092e8a28da1
                                             </p:dataScroller>
                                         </p:dataScroller>
                                     </h:form>
@@ -1915,8 +1650,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </h:form>
                     </p:dialog>
 
-<<<<<<< HEAD
-=======
                     <p:dialog   id="occinspection-dialog-addspace"
                                 height="500" width="700"
                                 widgetVar="occinspection-dialog-addspace-var"
@@ -2061,7 +1794,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 </h:form>
                     </p:dialog>
                     
->>>>>>> b741b392736aa84c1b014dcac5911092e8a28da1
                     <p:dialog   id="occperiod-dialog-notes"
                                 height="300" width="650"
                                 widgetVar="occperiod-dialog-notes-var"
@@ -2140,20 +1872,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <h:panelGrid columns="1"
                                          columnClasses="gridTd, gridTd">
 
-<<<<<<< HEAD
-                                <h:panelGroup>
-                                    <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:editor   id="occperiod-inspection-notes-editor"
-                                                value="#{occInspectionBB.formNoteText}"
-                                                controls="bold italic underline strikethrough font size style color
-                                                bullets numbering center undo redo rule link removeformat outdent
-                                                indent link unlink copy cut paste rule alignleft center alignright"
-                                                width="400" required="false"
-                                                height="200"/>
-
-                                    <h:message for="occperiod-inspection-notes-editor" showDetail="false" showSummary="true"
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-=======
                                  <h:panelGroup>
                                         <h:outputText styleClass="ui-label" value="Note text: "/>
                                         <p:editor   id="occperiod-inspection-notes-editor"  
@@ -2166,7 +1884,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         
                                         <h:message for="occperiod-inspection-notes-editor" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
->>>>>>> b741b392736aa84c1b014dcac5911092e8a28da1
 
                                     <p:spacer height="5px" />
 
@@ -3157,7 +2874,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                     </p:dialog>
 
-<<<<<<< HEAD
                     <p:dialog   id="occperiod-inspectionconfig-dialog"
                                 height="650" width="900"
                                 widgetVar="occperiod-inspectionconfig-dialog-var"
@@ -3228,8 +2944,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </h:form>
 
                     </p:dialog>
-=======
->>>>>>> b741b392736aa84c1b014dcac5911092e8a28da1
+
 
                     <p:dialog   id="occperiod-notes-dialog"
                                 height="650" width="900"
