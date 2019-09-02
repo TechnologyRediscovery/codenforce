@@ -1124,7 +1124,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return st;
     }
     
-    private List<OccSpaceTypeInspectionDirective> getOccInspecTemplateSpaceTypeList(int checklistID) throws IntegrationException{
+    public List<OccSpaceTypeInspectionDirective> getOccInspecTemplateSpaceTypeList(int checklistID) throws IntegrationException{
 
         String query = "    SELECT checklistspacetypeid, checklist_id, required, \n" +
                         "       spacetype_typeid, overridespacetyperequired, overridespacetyperequiredvalue, \n" +
@@ -1607,7 +1607,38 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return occInsp;
     }
 
-  
+    public List<OccChecklistTemplate> getOccChecklistTemplatelist()throws IntegrationException{
+        
+        
+        List<OccChecklistTemplate> checklistList = new ArrayList<>();
+        
+        String query = "SELECT checklistid FROM public.occchecklist ";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+
+            while(rs.next()){
+                checklistList.add(getChecklistTemplate(rs.getInt("checklistid")));
+                //checklistList.add(getOccInspection(rs.getInt("checklistid")));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrieve occinspectionlist", ex);
+
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return checklistList;
+    }
 
    
 }

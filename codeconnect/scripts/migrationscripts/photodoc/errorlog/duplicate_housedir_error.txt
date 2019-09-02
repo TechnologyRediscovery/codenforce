@@ -1,0 +1,8 @@
+300, 2019.08.21-01:13.44: Duplicate housesdir: 110 Wallace
+300, 2019.08.21-01:13.44: Duplicate housesdir: 348 Churchill
+300, 2019.08.21-01:13.44: Duplicate housesdir: 344 Churchill
+300, 2019.08.21-01:13.44: Duplicate housesdir: 230 Kingston
+300, 2019.08.21-01:13.44: Duplicate housesdir: 365 Cline
+300, 2019.08.21-01:13.44: Duplicate housesdir: 835 Railroad
+300, 2019.08.21-01:13.44: Duplicate housesdir: 441 Clugston
+300, 2019.08.21-01:13.44: Duplicate housesdir: 543 Clugston

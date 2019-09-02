@@ -107,6 +107,19 @@ h4{
     color: #00b5ec;
 }
 
+.report-title{
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #cde162;
+    
+}
+
+.report-title-sub{
+    font-size: 1.1em;
+    color: #00b5ec;
+    font-style: italic;
+    
+}
 
 
 .darkFont{
@@ -395,21 +408,6 @@ div.headerLink a:before, a:visited{
 
 /* ----------- Printing and reports-------- */
 
-
-.report-title{
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #cde162;
-    
-}
-
-.report-title-sub{
-    font-size: 1.1em;
-    color: #00b5ec;
-    font-style: italic;
-    
-}
-
 .printing-page-break-before{
     page-break-before: always;
     
@@ -620,6 +618,10 @@ div.printer-friendly-report .ui-widget-content{
 .mainContainer{
 }
 
+.mainContainerDashboard{
+
+    display:block;
+}
 
 
 .primaryContentContainer{
@@ -790,23 +792,6 @@ i.status-display-icon-i{
 }
 
 
-span.ui-label{
-    display: block;
-    clear: left;
-    margin-bottom: 10px;
-    font-weight: bold;
-    
-}
-
-span.ui-label-inline{
-    font-weight: bold;
-}
-
-.font-smaller{
-    font-size: 0.8em;
-}
-
-
 /***************** CLOSE TEXT AND SPANS ***********************/
 
 
@@ -816,15 +801,6 @@ span.ui-label-inline{
     white-space: normal;
     overflow-wrap: normal;
     text-align: left;
-}
-
-
-.datum{
-    display: block;
-    padding: 5px;
-    border: #abb solid thin;
-    margin-top: 5px;
-    margin-bottom: 5px;
 }
 
 .wrapText{
@@ -967,33 +943,6 @@ img.headerImg{
     font-weight: bold;
 }
 
-.mainContainerDashboard{
-
-    display:block;
-}
-
-
-
-.ui-panel, div.ui-state-hover {
-                margin: 10px;
-                
-            }
-             
-.ui-dashboard-column {
-    width:33%;
-   
-}
-
-.ui-widget-content{
-    /*background-color: gray;*/
-}
-
-
-.ui-widget, .ui-widget .ui-widget {
-    font-size: 90% !important;
-}
-
-
 
 /*************** END DASHBOARD ****************************/
 
@@ -1097,7 +1046,6 @@ tr.reinspect{
     background-color: rgba(12,12,12,0);
     z-index: 100;
     opacity: 1;
-    vertical-align: top''
 }
 
 .panelGridData{
@@ -1160,17 +1108,6 @@ gridTd-bignum{
 
 /*---------------------BUTTONS & CONTROLS---------------------------*/
 
-.ui-state-hover{
-    
-    
-}
-
-.hover-none:hover{
-    
-    margin: auto;
-    background-color: green;
-    
-}
 
 /* this styling is for use w/ command button on codeSourceManage.xhtml */
 .manButton{
@@ -1241,245 +1178,8 @@ gridTd-bignum{
     margin:5px;
 }
 
-.right-floater{
-    display: block;
-    float: right;
-    clear: none;
-}
-
 /* ****************** CLOSE BUTTON STYLES ********************/
 
-
-
-
-/* -------------------- PROPOSALS AND CHOICES ----------------------- */
-
-.proposal-choice-button{
-    margin-top: 5px;
-    
-}
-
-.proposal-prophead{
-    font-weight: bold;
-    font-size: 1.2em;
-    display: block;
-    float: left;
-}
-
-.proposal-description{
-    font-style: italic;
-    font-size: 0.9em;
-}
-
-.proposal-choicehead{
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
-.proposal-metadata-container{
-    display: block;
-    width: 100%;
-}
-
-.proposal-propbuttoncontainer{
-    display: block;
-    float: right;
-}
-
-
-.proposal-infotable-box{
-    display: block;
-    width: 100%;
-    clear: both;
-}
-
-/* ****************** PROPOSALS AND CHOICES ********************/
-
-
-
-
-/* -------------------- INSPECTION AND OCC PERMIT----------------------- */
-
-.field-lock-status-icon-container{
-    display: inline-block;
-    margin-right: 20px;
-    height: 10px;
-    width: 10px;
-    
-}
-
-.occperiod-inspace-info{
-    display: block;
-    clear: both;
-    
-}
-
-.ui-datascroller-item{
-    clear:both;
-}
-
-.occinsspace-metadata-container{
-    display: block;
-    width: 100%;
-}
-
-.occspace-button-container{
-    display: block;
-    float: right;
-}
-
-
-
-i.inspection-pass{
-    color: forestgreen;
-}
-
-i.inspection-fail{
-    color: #B36A00;
-}
-
-i.inspection-notinspected{
-    color: #1a237e;
-}
-
-.occperiod-inspace-header{
-    font-size: 1.4em;
-    font-weight: bold;
-    color: #163F8A;
-    margin-bottom: 15px;
-    display: block;
-    float: left;
-}
-
-.occperiod-inelement-header{
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    clear:both;
-}
-
-
-.inspection-notinspected{
-    color: #1a237e;
-    font-weight: bold;
-    
-}
-
-.inspection-pass{
-    color: forestgreen;
-    font-weight: bold;
-}
-
-.inspectio-fail{
-    color:#B36A00;
-    font-weight: bold;
-}
-
-
-.occpermit-borderbox{
-    display: block;
-    width: 800px;
-    border: #00637F double medium;
-}
-
-.occpermit-datagrid{
-    
-    
-}
-
-.gridTd-permit {
-    border: none;
-    vertical-align: top;
-    padding: 10px;
-}
-
-
-.occpermit-title{
-    display: block;
-    width: 100%;
-    text-align: center;
-    font-size: 2em;
-    font-weight: bold;
-}
-
-.occpermit-titlesub{
-    display: block;
-    width: 100%;
-    text-align: center;
-    font-size: 1.1em;
-    font-style: italic;
-}
-
-.occpermit-criticaldata-label{
-    display: block;
-    clear: right;
-    font-weight: bold;
-    font-size: 1.2em;
-    
-}
-
-.occpermit-criticaldata-value{
-    font-size: 1.2em;
-}
-
-.occpermit-minordata-label{
-    font-size: 1em;
-    
-}
-
-.occpermit-minordata-value{
-    font-size: 1em;
-    
-}
-
-.occpermit-admindata-label{
-    font-size: .8em;
-    font-weight: bold;
-    color: darkgrey;
-}
-
-.occpermit-admindata-value{
-    font-size: .8em;
-    
-}
-
-.occpermit-additionalnotes{
-    
-}
-
-.occpermit-muniheader{
-    display: block;
-    width: 100%;
-    text-align: center;
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-/*class given to <h:outputText ... components which are nested in an <hx of some kind*/
-.occperiod-periodlabel{
-    font-weight: bold;
-    color: darkgrey;
-    font-size: 1.1em;
-}
-
-.occperiod-periodvalue{
-    
-    
-}
-
-.occperiod-address{
-    font-weight: bold;
-    font-size: 1.3em;
-}
-
-.occinspection-reportheader{
-    
-}
-
-
-
-/* ****************** CLOSE INSPECTION AND OCC PERMIT********************/
 
 /* -------------------- MISC --------------------------------- */
 
@@ -1516,6 +1216,14 @@ a.outputLink{
 
 select.selectOneListbox{   
     margin-bottom: 10px;
+}
+
+span.uiLabel{
+    display: block;
+    clear: left;
+    margin-bottom: 10px;
+    font-weight: bold;
+    
 }
 
 input.selectBooleanCheckbox{
