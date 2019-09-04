@@ -19,7 +19,7 @@ import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
@@ -162,9 +162,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private Payment selectedPayment;
     
     //fees
-    private List<Fee> feeList;
-    private List<Fee> filteredFeeList;
-    private Fee selectedFee;
+    private List<MoneyOccPeriodFeeAssigned> feeList;
+    private List<MoneyOccPeriodFeeAssigned> filteredFeeList;
+    private MoneyOccPeriodFeeAssigned selectedFee;
     
     /**
      * Creates a new instance of InspectionsBB
@@ -255,14 +255,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-     /*
+     
         try {
-            feeList = pai.
+            feeList = pai.getFeeAssigned(currentOccPeriod);
             
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-       */ 
+       
     }
     
     public void loadSpacesInType(){
@@ -1701,27 +1701,27 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         this.selectedPayment = selectedPayment;
     }
 
-    public List<Fee> getFeeList() {
+    public List<MoneyOccPeriodFeeAssigned> getFeeList() {
         return feeList;
     }
 
-    public void setFeeList(List<Fee> feeList) {
+    public void setFeeList(List<MoneyOccPeriodFeeAssigned> feeList) {
         this.feeList = feeList;
     }
 
-    public List<Fee> getFilteredFeeList() {
+    public List<MoneyOccPeriodFeeAssigned> getFilteredFeeList() {
         return filteredFeeList;
     }
 
-    public void setFilteredFeeList(List<Fee> filteredFeeList) {
+    public void setFilteredFeeList(List<MoneyOccPeriodFeeAssigned> filteredFeeList) {
         this.filteredFeeList = filteredFeeList;
     }
 
-    public Fee getSelectedFee() {
+    public MoneyOccPeriodFeeAssigned getSelectedFee() {
         return selectedFee;
     }
 
-    public void setSelectedFee(Fee selectedFee) {
+    public void setSelectedFee(MoneyOccPeriodFeeAssigned selectedFee) {
         this.selectedFee = selectedFee;
     }
     

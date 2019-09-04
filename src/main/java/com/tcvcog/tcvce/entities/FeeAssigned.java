@@ -27,7 +27,7 @@ public class FeeAssigned  extends EntityUtils implements Serializable {
     private List<Payment> paymentList;
     private int moneyFeeAssigned;
     private User assignedBy;
-    private int waivedBy;
+    private User waivedBy;
     private LocalDateTime lastModified;
     private double reducedBy;
     private User reducedByUser;
@@ -58,11 +58,11 @@ public class FeeAssigned  extends EntityUtils implements Serializable {
         this.assignedBy = assignedBy;
     }
 
-    public int getWaivedBy() {
+    public User getWaivedBy() {
         return waivedBy;
     }
 
-    public void setWaivedBy(int waivedBy) {
+    public void setWaivedBy(User waivedBy) {
         this.waivedBy = waivedBy;
     }
 

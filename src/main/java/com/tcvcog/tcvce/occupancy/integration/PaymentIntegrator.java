@@ -291,7 +291,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
             fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
-            fee.setWaivedBy(rs.getInt("waivedby_userid"));
+            fee.setWaivedBy(ui.getUser(rs.getInt("waivedby_userid")));
             fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
             fee.setReducedBy(rs.getDouble("reducedby"));
             fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
@@ -319,7 +319,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
             fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
-            fee.setWaivedBy(rs.getInt("waivedby_userid"));
+            fee.setWaivedBy(ui.getUser(rs.getInt("waivedby_userid")));
             fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
             fee.setReducedBy(rs.getDouble("reducedby"));
             fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
@@ -375,7 +375,14 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt = con.prepareStatement(query);
             stmt.setInt(1, payment.getOccupancyInspectionID());
             stmt.setInt(2, payment.getPaymentType().getPaymentTypeId());
-            //update date received
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateReceived()));
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
+            stmt.setDouble(5, payment.getAmount());
+            stmt.setInt(6, payment.getPayer().getPersonID());
+            stmt.setString(7, payment.getReferenceNum());
+            stmt.setInt(8, payment.getCheckNum());
+            stmt.setBoolean(9, payment.isCleared());
+            stmt.setString(10, payment.getNotes());
             if (payment.getDateReceived() != null) {
                 stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateReceived()));
 
@@ -426,6 +433,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
      *
      * @param period
      * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public List<Payment> getPaymentList(OccPeriod period) throws IntegrationException {
 
@@ -1043,7 +1051,10 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
      */
     public void updateOccupancyInspectionFee(Fee oif) throws IntegrationException {
-        String query = "UPDATE public.occinspectionfee\n" + "   SET muni_municode=?, feename=?, feeamount=?, effectivedate=?, \n" + "       expirydate=?, notes=? \n" + " WHERE feeid=?;";
+        String query = "UPDATE public.occinspectionfee\n" 
+                + "   SET muni_municode=?, feename=?, feeamount=?, effectivedate=?, \n" 
+                + "       expirydate=?, notes=? \n" 
+                + " WHERE feeid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
@@ -1146,13 +1157,22 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return occupancyInspectionFeeList;
     }
 
-    public void insertOccupancyInspectionFee(Fee occupancyInspectionFee) throws IntegrationException {
-        String query = "INSERT INTO public.occinspectionfee(\n" + "            feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n" + "            notes)\n" + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, \n" + "            ?);";
+    public void insertOccupancyInspectionFee(Fee inspectionFee) throws IntegrationException {
+        String query = "INSERT INTO public.occinspectionfee(\n" + 
+                "            feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n" 
+                + "            notes)\n" 
+                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, \n" 
+                + "            ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, occupancyInspectionFee.getMuni().getMuniCode());
+            stmt.setInt(1, inspectionFee.getMuni().getMuniCode());
+            stmt.setString(2, inspectionFee.getName());
+            stmt.setDouble(3, inspectionFee.getAmount());
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(inspectionFee.getEffectiveDate()));
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(inspectionFee.getExpiryDate()));
+            stmt.setString(6, inspectionFee.getNotes());
             System.out.println("OccupancyInspectionFeeIntegrator.occupancyInspectionFeeIntegrator | sql: " + stmt.toString());
             System.out.println("TRYING TO EXECUTE INSERT METHOD");
             stmt.execute();
