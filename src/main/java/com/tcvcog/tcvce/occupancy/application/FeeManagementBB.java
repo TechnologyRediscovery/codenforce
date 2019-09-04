@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
@@ -39,12 +40,23 @@ import javax.faces.event.ActionEvent;
 @ViewScoped
 public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
+    //feeManage.xhtml fields
     private ArrayList<Fee> existingFeeTypeList;
     private Fee selectedFeeType;
     private Municipality formMuni;
+    
+    //feeManage.xhtml fields
     private Fee formFee;
-
+    private Fee selectedFee;
+    private ArrayList<Fee> feeList;
+    
+    private MoneyOccPeriodFeeAssigned occPeriodFormFee;
+    private MoneyOccPeriodFeeAssigned selectedOccPeriodFee;
+    private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFeeList;
+    private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList;
+    
     private boolean editing;
+    private String redirTo;
 
     /**
      * Creates a new instance of NewJSFManagedBean
@@ -58,6 +70,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         formFee.setEffectiveDate(LocalDateTime.now());
         formFee.setExpiryDate(LocalDateTime.now());
         
+        occPeriodFormFee = new MoneyOccPeriodFeeAssigned();
+       
     }
     
     public void editFeeType(ActionEvent e) {
@@ -310,4 +324,62 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.formFee = formFee;
     }
 
+    public Fee getSelectedFee() {
+        return selectedFee;
+    }
+
+    public void setSelectedFee(Fee selectedFee) {
+        this.selectedFee = selectedFee;
+    }
+
+    public ArrayList<Fee> getFeeList() {
+        return feeList;
+    }
+
+    public void setFeeList(ArrayList<Fee> feeList) {
+        this.feeList = feeList;
+    }
+
+    public MoneyOccPeriodFeeAssigned getOccPeriodFormFee() {
+        return occPeriodFormFee;
+    }
+
+    public void setOccPeriodFormFee(MoneyOccPeriodFeeAssigned occPeriodFormFee) {
+        this.occPeriodFormFee = occPeriodFormFee;
+    }
+
+    public MoneyOccPeriodFeeAssigned getSelectedOccPeriodFee() {
+        return selectedOccPeriodFee;
+    }
+
+    public void setSelectedOccPeriodFee(MoneyOccPeriodFeeAssigned selectedOccPeriodFee) {
+        this.selectedOccPeriodFee = selectedOccPeriodFee;
+    }
+
+    public ArrayList<MoneyOccPeriodFeeAssigned> getOccPeriodFeeList() {
+        return occPeriodFeeList;
+    }
+
+    public void setOccPeriodFeeList(ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFeeList) {
+        this.occPeriodFeeList = occPeriodFeeList;
+    }
+
+    public String getRedirTo() {
+        return redirTo;
+    }
+
+    public void setRedirTo(String redirTo) {
+        this.redirTo = redirTo;
+    }
+
+    public ArrayList<MoneyOccPeriodFeeAssigned> getOccPeriodFilteredFeeList() {
+        return occPeriodFilteredFeeList;
+    }
+
+    public void setOccPeriodFilteredFeeList(ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList) {
+        this.occPeriodFilteredFeeList = occPeriodFilteredFeeList;
+    }
+
+    
+    
 }

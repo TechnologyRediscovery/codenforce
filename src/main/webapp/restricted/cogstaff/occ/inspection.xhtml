@@ -1000,7 +1000,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             id="feeTable"
                                             var="fee"
                                             value="#{occInspectionBB.feeList}"
-                                            rowKey="#{fee.occupancyInspectionFeeID}"
+                                            rowKey="#{fee.occPerAssignedFeeID}"
                                             tableStyleClass="primeDataTable"
                                             rowExpandMode="single"
                                             expandedRow="false"
@@ -1017,63 +1017,103 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <f:facet name="header">
                                                     <h:outputText value="ID" />
                                                 </f:facet>
-                                                <h:outputText value="#{fee.occupancyInspectionFeeID}"/>
+                                                <h:outputText value="#{fee.occPerAssignedFeeID}"/>
                                             </p:column>
 
 
-                                            <p:column width="10%" sortBy="#{fee.name}"
-                                                      filterBy="#{fee.name}">
+                                            <p:column width="10%" sortBy="#{fee.fee.name}"
+                                                      filterBy="#{fee.fee.name}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Fee Name" />
                                                 </f:facet>
-                                                <h:outputText value="#{fee.name}"/>
+                                                <h:outputText value="#{fee.fee.name}"/>
                                             </p:column>
 
-                                            <p:column width="10%" sortBy="#{fee.amount}"
-                                                      filterBy="#{fee.amount}">
+                                            <p:column width="10%" sortBy="#{fee.fee.amount}"
+                                                      filterBy="#{fee.fee.amount}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Amount" />
                                                 </f:facet>
-                                                <h:outputText value="#{fee.amount}"/>
+                                                <h:outputText value="#{fee.fee.amount}"/>
                                             </p:column>
 
-                                            <p:column width="15%" filterBy="#{fee.effectiveDate}"
-                                                      sortBy="#{fee.effectiveDate}">
+                                            <p:column width="15%" filterBy="#{fee.fee.effectiveDate}"
+                                                      sortBy="#{fee.fee.effectiveDate}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Effective" />
                                                 </f:facet>
-                                                <h:outputText value="#{fee.effectiveDate}"/>
+                                                <h:outputText value="#{fee.fee.effectiveDate}"/>
                                             </p:column>
 
-                                            <p:column width="15%" filterBy="#{fee.expiryDate}"
-                                                      sortBy="#{fee.expiryDate}">
+                                            <p:column width="15%" filterBy="#{fee.fee.expiryDate}"
+                                                      sortBy="#{fee.fee.expiryDate}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Expiry" />
                                                 </f:facet>
-                                                <h:outputText value="#{fee.expiryDate}"/>
+                                                <h:outputText value="#{fee.fee.expiryDate}"/>
                                             </p:column>
                                             <p:rowExpansion>
                                                 <div class="outlinedBox">
-                                                    <h2>Full fee listing for fee <h:outputText value="#{fee.occupancyInspectionFeeID}"/> </h2>
+                                                    <h2>Full fee listing for fee <h:outputText value="#{fee.fee.occupancyInspectionFeeID}"/> </h2>
                                                     <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                                  columnClasses="gridTd, gridTd, gridTd, gridTd">
-
-                                                        <h:panelGroup>
-                                                            <h:outputLabel styleClass="ui-label-inline" value="Municipality"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{fee.muni.muniName}"/>
-                                                            </div>
-                                                        </h:panelGroup>
 
                                                         <h:panelGroup>
                                                             <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
                                                             <p:spacer height="15px"/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{fee.notes}"/>
+                                                                <h:outputText value="#{fee.fee.notes}"/>
                                                             </div>
                                                         </h:panelGroup>
 
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Assigned By"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                        
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Last Modified"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.lastModified}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                        
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Other notes"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.notes}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                        
+                                                        <h:panelGroup rendered="#{not empty fee.reducedByUser}">
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Amount Reduced By"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="$ #{fee.reducedBy}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                        
+                                                        <h:panelGroup rendered="#{not empty fee.reducedByUser}">
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Reduced By"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.reducedBy.person.firstName} #{fee.reducedBy.person.lastName} (ID: #{fee.reducedBy.userID}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                        
+                                                        <h:panelGroup rendered="#{not empty fee.waivedBy}">
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Waived By"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.waivedBy.person.firstName} #{fee.waivedBy.person.lastName} (ID: #{fee.waivedBy.userID}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                        
                                                         <ui:remove>
                                                             <h:panelGroup>
                                                                 <p:spacer height="15px"/>
