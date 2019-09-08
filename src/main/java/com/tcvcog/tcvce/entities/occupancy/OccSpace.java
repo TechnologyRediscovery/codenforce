@@ -35,9 +35,19 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
     
     protected List<OccSpaceElement> spaceElementList;
 
+    
+    //xiaohong add
+    protected boolean selected;
 
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+    
    
-
     /**
      * @return the spaceID
      */

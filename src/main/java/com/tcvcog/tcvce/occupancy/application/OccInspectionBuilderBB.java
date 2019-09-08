@@ -17,15 +17,17 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
-import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -36,15 +38,18 @@ import javax.faces.application.FacesMessage;
 public class OccInspectionBuilderBB extends BackingBeanUtils implements Serializable {
 
     private List<OccChecklistTemplate> occChecklistTemplateList;
-    private List<OccSpaceTypeInspectionDirective> selectedSpacesInTypeList;
-    private List<OccSpace> occSpaceList;
-
-    private List<OccSpaceElement> occSpaceElementList;
+    private List<OccSpaceTypeInspectionDirective> selectedSpaceTypeList;
+    private List<OccSpace> selectedOccSpaceList;
+    private List<OccSpaceElement> selectedOccSpaceElementList;
 
     private OccChecklistTemplate selectedOccChecklistTemplate;
     private OccSpaceTypeInspectionDirective selectedSpaceType;
     private OccSpace selectedSpace;
     private OccSpaceElement selectedElement;
+
+    private OccSpaceTypeInspectionDirective currentSpaceType;
+    private OccSpace currentSpace;
+    private OccSpaceElement currentElement;
 
     /**
      * Creates a new instance of OccInspectionBuilderBB
@@ -54,33 +59,36 @@ public class OccInspectionBuilderBB extends BackingBeanUtils implements Serializ
 
     @PostConstruct
     public void initBean() {
-        // populate any permanent drop down lists or objects the pages
-        // need for first load
 
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
 
         try {
-            occChecklistTemplateList = oii.getOccChecklistTemplatelist();
-
+            occChecklistTemplateList = oc.getOccChecklistTemplatelist();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
 
     }
 
-    public void onSelectedOccChecklistTemplateChange() {
+    public void onSelectedOccChecklistTitleChange() {
 
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+
+        int selectedChecklistID = selectedOccChecklistTemplate.getInspectionChecklistID();
+
+        selectedSpaceTypeList = new ArrayList<>();
+        selectedOccSpaceList = new ArrayList<>();
+        selectedOccSpaceElementList = new ArrayList<>();
+
+        selectedSpaceType = null;
+        selectedSpace = null;
+        selectedElement = null;
 
         try {
-
-            selectedSpacesInTypeList = oii.getOccInspecTemplateSpaceTypeList(selectedOccChecklistTemplate.getInspectionChecklistID());
-
+            selectedSpaceTypeList = oc.getOccSpaceTypeList(selectedChecklistID);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Loaded check list title!", ""));
-
+                    "Loaded Checklist Title", ""));
         } catch (IntegrationException ex) {
-
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     ex.getMessage(), ""));
         }
@@ -89,57 +97,392 @@ public class OccInspectionBuilderBB extends BackingBeanUtils implements Serializ
 
     public void onSelectedSpaceTypeChange(OccSpaceTypeInspectionDirective spaceType) {
 
-        if (spaceType.isOverrideSpaceTypeRequired() != false) {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+
+        if (spaceType.isSelected() != false) {
+
             selectedSpaceType = spaceType;
-            selectedSpacesInTypeList = new ArrayList<>();
-            selectedSpacesInTypeList.add(spaceType);
-            occSpaceList = spaceType.getSpaceList();
+
+            selectedSpace = null;
+
+            selectedElement = null;
+
+            selectedSpaceTypeList = new ArrayList<>();
+
+            selectedSpaceTypeList.add(spaceType);
+
+            selectedOccSpaceList = new ArrayList<>();
+
+            selectedOccSpaceElementList = new ArrayList<>();
+
+            try {
+
+                selectedOccSpaceList = oc.getSpacelist(selectedSpaceType.getSpaceTypeID());
+            } catch (IntegrationException ex) {
+                Logger.getLogger(OccInspectionBuilderBB.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Loaded space types!", ""));
+                    "Loaded Space Type", ""));
 
         } else {
-            onSelectedOccChecklistTemplateChange();
-            occSpaceList = new ArrayList<>();
-            
+
+            onSelectedOccChecklistTitleChange();
+
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Unload space types!", ""));
+                    "Unload Space Type", ""));
+        }
+    }
+
+    public void editSpaceType(OccSpaceTypeInspectionDirective st) {
+        if (selectedSpaceType == null) {
+            currentSpaceType = st;
+        } else {
+            currentSpaceType = selectedSpaceType;
+        }
+    }
+
+    public void initNewSpaceTypeButton() {
+
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentSpaceType = oc.getOccSpaceTypeSkeleton();
+    }
+
+    public boolean showAddSpaceTypeButton() {
+        return selectedOccChecklistTemplate != null;
+    }
+
+    public boolean showDialogSpaceTypeCreateButton() {
+
+        if (currentSpaceType != null) {
+            return currentSpaceType.getSpaceTypeID() == 0;
+        } else {
+            return false;
+        }
+
+    }
+
+    public boolean showDialogSpaceTypeUpdateButton() {
+        if (currentSpaceType != null) {
+            return currentSpaceType.getSpaceTypeID() != 0;
+        } else {
+            return false;
+        }
+
+    }
+
+    public void createNewSpaceTypeButton() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.addNewChecklistSpacetype(selectedOccChecklistTemplate.getInspectionChecklistID(), currentSpaceType);
+            onSelectedOccChecklistTitleChange();
+            //onSpaceTypeEditChange();
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Created New Space Type", ""));
+
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+        }
+    }
+
+    public void updateSpaceTypeButton() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.updateChecklistSpacetype(currentSpaceType);
+            onSelectedOccChecklistTitleChange();
+            //onSpaceTypeEditChange();
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Updated Space Type", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+        }
+    }
+
+    public void deleteSpaceTypeButton() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.deleteChecklistSpacetype(currentSpaceType);
+            onSelectedOccChecklistTitleChange();
+            //onSpaceTypeEditChange();
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Deleted Space Type", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
         }
     }
 
     public void onSelectedSpaceChange(OccSpace space) {
 
-        if (space.isRequired() != false) {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+
+        if (space.isSelected() != false) {
+
             selectedSpace = space;
-            occSpaceList = new ArrayList<>();
-            occSpaceList.add(space);
-            occSpaceElementList = space.getSpaceElementList();
+
+            selectedElement = null;
+
+            selectedOccSpaceList = new ArrayList<>();
+
+            selectedOccSpaceList.add(space);
+
+            selectedOccSpaceElementList = new ArrayList<>();
+
+            try {
+                selectedOccSpaceElementList = oc.getSpace(space.getSpaceID()).getSpaceElementList();
+            } catch (IntegrationException ex) {
+                Logger.getLogger(OccInspectionBuilderBB.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Loaded space!", ""));
+                    "Loaded Space", ""));
         } else {
 
-            occSpaceList = selectedSpaceType.getSpaceList();
+            onSelectedSpaceTypeChange(selectedSpaceType);
 
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Unload space!", ""));
+                    "Unload Space", ""));
 
         }
     }
 
-    public void onSelectedElementChange(OccSpaceElement element) {
-        if (element.isIsSelected() != false) {
-            occSpaceElementList = new ArrayList<>();
-            occSpaceElementList.add(element);
-
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Loaded elements!", ""));
-
+    public void editSpace(OccSpace os) {
+        currentSpace = selectedSpace;
+        if (selectedSpace == null) {
+            currentSpace = os;
         } else {
-            occSpaceElementList = selectedSpace.getSpaceElementList();
+            currentSpace = selectedSpace;
+        }
+    }
+
+    public void initNewSpaceButton() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentSpace = oc.getOccSpaceSkeleton();
+    }
+
+    public boolean showAddSpaceButton() {
+        return selectedSpaceType != null;
+    }
+
+    public boolean showDialogSpaceCreateButton() {
+        if (currentSpace != null) {
+            return currentSpace.getSpaceID() == 0;
+        } else {
+            return false;
+        }
+
+    }
+
+    public boolean showDialogSpaceUpdateButton() {
+        if (currentSpace != null) {
+            return currentSpace.getSpaceID() != 0;
+        } else {
+            return false;
+        }
+
+    }
+
+    public void createNewSpaceButton() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.addNewChecklistSpace(currentSpace, selectedSpaceType);
+
+            onSelectedSpaceTypeChange(selectedSpaceType);
+            //onSpaceEditChange();
 
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Unload elements!", ""));
+                    "Created New Space ", ""));
+
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+        }
+    }
+
+    public void updateSpaceButton() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.updateChecklistSpace(currentSpace);
+
+            onSelectedSpaceTypeChange(selectedSpaceType);
+            //onSpaceEditChange();
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Updated Space Type", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+        }
+    }
+
+    public void deleteSpaceButton() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.deleteChecklistSpace(currentSpace);
+
+            onSelectedSpaceTypeChange(selectedSpaceType);
+            //onSpaceEditChange();
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Deleted Space Type", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+        }
+    }
+
+    public void editSpaceElement(OccSpaceElement ose) {
+        if (selectedElement == null) {
+            currentElement = ose;
+        } else {
+            currentElement = selectedElement;
+        }
+    }
+
+    public void initNewElementButton() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentElement = oc.getOccSpaceElementSkeleton();
+    }
+
+    public boolean showAddElementButton() {
+        return selectedSpace != null;
+    }
+
+    public boolean showDialogElementCreateButton() {
+        if (currentElement != null) {
+            return currentElement.getSpaceElementID() == 0;
+        } else {
+            return false;
+        }
+
+    }
+
+    public boolean showDialogElementDeleteButton() {
+        if (currentElement != null) {
+            return currentElement.getSpaceElementID() != 0;
+        } else {
+            return false;
+        }
+
+    }
+
+    public void createNewElementButton() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.createChecklistElement(selectedSpace, currentElement.getElementID());
+            onSelectedSpaceChange(selectedSpace);
+            //onSpaceElementEditChange();
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Create Space Element", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+        }
+    }
+
+    public void deleteNewElementButton() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.deleteChecklistElement(selectedSpace, currentElement.getElementID());
+
+            onSelectedSpaceChange(selectedSpace);
+            //onSpaceElementEditChange();
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Deleted Space Element", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+        }
+    }
+
+    //invalid(for updating)
+    public void onSpaceTypeEditChange() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        selectedSpaceType = null;
+        selectedSpace = null;
+        selectedElement = null;
+
+        selectedOccSpaceList = new ArrayList<>();
+        selectedOccSpaceElementList = new ArrayList<>();
+        selectedSpaceTypeList = new ArrayList<>();
+
+        try {
+            int checklistId = selectedOccChecklistTemplate.getInspectionChecklistID();
+            selectedOccChecklistTemplate = oc.getChecklistTemplate(checklistId);
+            selectedSpaceTypeList = oc.getOccSpaceTypeList(checklistId);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+
+    //invalid(for updating)
+    public void onSpaceEditChange() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        selectedElement = null;
+        selectedSpace = null;
+
+        selectedOccSpaceElementList = new ArrayList<>();
+        selectedOccSpaceList = new ArrayList<>();
+        selectedSpaceTypeList = new ArrayList<>();
+
+        try {
+            int checklistId = selectedOccChecklistTemplate.getInspectionChecklistID();
+            selectedOccChecklistTemplate = oc.getChecklistTemplate(checklistId);
+            selectedSpaceTypeList = oc.getOccSpaceTypeList(checklistId);
+
+            int spacetypeid = selectedSpaceType.getSpaceTypeID();
+            selectedOccSpaceList = oc.getSpacelist(spacetypeid);
+            selectedSpaceType = oc.getSpaceType(spacetypeid);
+            selectedSpaceType.setSelected(true);
+
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+
+    //invalid(for updating)
+    public void onSpaceElementEditChange() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        selectedElement = null;
+
+        selectedOccSpaceElementList = new ArrayList<>();
+        selectedSpaceTypeList = new ArrayList<>();
+        selectedOccSpaceList = new ArrayList<>();
+
+        try {
+            int checklistId = selectedOccChecklistTemplate.getInspectionChecklistID();
+            selectedOccChecklistTemplate = oc.getChecklistTemplate(checklistId);
+            selectedSpaceTypeList = oc.getOccSpaceTypeList(checklistId);
+
+            int spacetypeid = selectedSpaceType.getSpaceTypeID();
+            selectedOccSpaceList = oc.getSpacelist(spacetypeid);
+            selectedSpaceType = oc.getSpaceType(spacetypeid);
+            selectedSpaceType.setSelected(true);
+
+            int spaceid = selectedSpace.getSpaceID();
+            selectedSpace = oc.getSpace(spaceid);
+            selectedOccSpaceElementList = selectedSpace.getSpaceElementList();
+            selectedSpace.setSelected(true);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+
+    public boolean lockSpaceType() {
+        if (selectedSpaceType == null) {
+            return false;
+        } else {
+            return selectedSpaceType.isSelected() != false;
+        }
+    }
+
+    public boolean lockSpace() {
+        if (selectedSpace == null) {
+            return false;
+        } else {
+            return selectedSpace.isSelected() != false;
         }
     }
 
@@ -157,38 +500,78 @@ public class OccInspectionBuilderBB extends BackingBeanUtils implements Serializ
 
     public void setOccChecklistTemplateList(List<OccChecklistTemplate> occChecklistTemplateList) {
         this.occChecklistTemplateList = occChecklistTemplateList;
-
     }
 
-    public List<OccSpaceTypeInspectionDirective> getSpacesInTypeList() {
-        return selectedSpacesInTypeList;
+    public List<OccSpaceTypeInspectionDirective> getSelectedSpaceTypeList() {
+        return selectedSpaceTypeList;
     }
 
-    public void setSpacesInTypeList(List<OccSpaceTypeInspectionDirective> spacesInTypeList) {
-        this.selectedSpacesInTypeList = spacesInTypeList;
+    public void setSelectedSpaceTypeList(List<OccSpaceTypeInspectionDirective> selectedSpaceTypeList) {
+        this.selectedSpaceTypeList = selectedSpaceTypeList;
     }
 
-    public List<OccSpace> getOccSpaceList() {
-        return occSpaceList;
+    public List<OccSpace> getSelectedOccSpaceList() {
+        return selectedOccSpaceList;
     }
 
-    public void setOccSpaceList(List<OccSpace> occSpaceList) {
-        this.occSpaceList = occSpaceList;
+    public void setSelectedOccSpaceList(List<OccSpace> selectedOccSpaceList) {
+        this.selectedOccSpaceList = selectedOccSpaceList;
     }
 
-    public List<OccSpaceElement> getOccSpaceElementList() {
-        return occSpaceElementList;
+    public List<OccSpaceElement> getSelectedOccSpaceElementList() {
+        return selectedOccSpaceElementList;
     }
 
-    public void setOccSpaceElementList(List<OccSpaceElement> occSpaceElementList) {
-        this.occSpaceElementList = occSpaceElementList;
+    public void setSelectedOccSpaceElementList(List<OccSpaceElement> selectedOccSpaceElementList) {
+        this.selectedOccSpaceElementList = selectedOccSpaceElementList;
     }
 
-    public List<OccSpaceTypeInspectionDirective> getSelectedSpacesInTypeList() {
-        return selectedSpacesInTypeList;
+    public OccSpaceTypeInspectionDirective getSelectedSpaceType() {
+        return selectedSpaceType;
     }
 
-    public void setSelectedSpacesInTypeList(List<OccSpaceTypeInspectionDirective> selectedSpacesInTypeList) {
-        this.selectedSpacesInTypeList = selectedSpacesInTypeList;
+    public void setSelectedSpaceType(OccSpaceTypeInspectionDirective selectedSpaceType) {
+        this.selectedSpaceType = selectedSpaceType;
     }
+
+    public OccSpace getSelectedSpace() {
+        return selectedSpace;
+    }
+
+    public void setSelectedSpace(OccSpace selectedSpace) {
+        this.selectedSpace = selectedSpace;
+    }
+
+    public OccSpaceElement getSelectedElement() {
+        return selectedElement;
+    }
+
+    public void setSelectedElement(OccSpaceElement selectedElement) {
+        this.selectedElement = selectedElement;
+    }
+
+    public OccSpaceTypeInspectionDirective getCurrentSpaceType() {
+        return currentSpaceType;
+    }
+
+    public void setCurrentSpaceType(OccSpaceTypeInspectionDirective currentSpaceType) {
+        this.currentSpaceType = currentSpaceType;
+    }
+
+    public OccSpace getCurrentSpace() {
+        return currentSpace;
+    }
+
+    public void setCurrentSpace(OccSpace currentSpace) {
+        this.currentSpace = currentSpace;
+    }
+
+    public OccSpaceElement getCurrentElement() {
+        return currentElement;
+    }
+
+    public void setCurrentElement(OccSpaceElement currentElement) {
+        this.currentElement = currentElement;
+    }
+
 }

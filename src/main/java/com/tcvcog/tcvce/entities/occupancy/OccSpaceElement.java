@@ -17,9 +17,7 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
-import com.tcvcog.tcvce.entities.CodeSource;
-import java.time.LocalDateTime;
+
 
 /**
  *
@@ -28,6 +26,19 @@ import java.time.LocalDateTime;
 public class OccSpaceElement extends CodeElement {
     protected int spaceElementID;
     
+    
+    //xiaohong add
+    protected boolean selected;
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+    
+        
     public OccSpaceElement(CodeElement ele){
         this.elementID = ele.getElementID();
 

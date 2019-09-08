@@ -30,6 +30,19 @@ public class OccSpaceTypeInspectionDirective extends OccSpaceType {
     protected boolean overrideSpaceTypeRequireAllSpaces;
     protected List<OccSpace> spaceList;
     
+    
+    //xiaohong add
+    protected boolean selected;
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+    
+    
     public OccSpaceTypeInspectionDirective(OccSpaceType type){
         this.spaceTypeID = type.getSpaceTypeID();
         this.spaceTypeTitle = type.getSpaceTypeTitle();

@@ -27,7 +27,7 @@ public class OccSpaceType {
     protected String spaceTypeTitle;
     protected String spaceTypeDescription;
     protected boolean required;
-
+    
     /**
      * @return the spaceTypeID
      */

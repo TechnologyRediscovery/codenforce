@@ -50,16 +50,6 @@ public class CodeElement implements Serializable {
     
     protected String headerString;
 
-    //xiaohong
-    protected boolean isSelected;
-
-    public boolean isIsSelected() {
-        return isSelected;
-    }
-
-    public void setIsSelected(boolean isSelected) {
-        this.isSelected = isSelected;
-    }
     
     /**
      * @return the elementID

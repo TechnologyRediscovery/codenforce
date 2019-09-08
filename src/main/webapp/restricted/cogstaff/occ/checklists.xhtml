@@ -16,9 +16,7 @@
 
                     <div class="mainContainer">
 
-
-
-                        <h1>Occupancy inspection checklist builder</h1>
+                        <h1>Occupancy Inspection Checklist Builder</h1>
 
                         <h:form id="form-messages-global">
 
@@ -26,166 +24,229 @@
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                         </h:form>
-                        
+
                         <div class ="two-column-page-flex-container">
 
                             <div class="list-column">
-                                
 
-                                <p:panel id = "occInspectionBuilder-panel-listchoice"
-                                         toggleable = "false"
-                                         header = "Choice to Select">
+                                <p:panel id = "occInspectionBuilder-panel-selectchecklisttitle"
+                                         toggleable = "true"
+                                         collapsed ="false"
+                                         header = "Step 1: Select an occupancy checklist title"
+                                         >
 
-                                    <p:panel id = "occInspectionBuilder-panel-selectchecklisttitle"
-                                             toggleable = "true"
-                                             collapsed ="false"
-                                             header = "Step 1: Select an occupancy checklist title"
-                                             >
-
-                                        <h:form id="occInspectionBuilder-form-selectchecklisttitle">
-
-                                            <p:spacer height="10px"/>
-
-                                            <p:outputLabel value="Select checklist title:  "/>
-                                            <p:spacer height="10px"/>
-
-
-                                            <p:selectOneMenu id="checklisttitle" 
-                                                             value="#{occInspectionBuilderBB.selectedOccChecklistTemplate}"
-                                                             tabindex="2">
-
-                                                <f:selectItem itemLabel="Select" noSelectionOption="true"/>
-
-                                                <f:selectItems value="#{occInspectionBuilderBB.occChecklistTemplateList}" 
-                                                               var="clt" 
-                                                               itemLabel="#{clt.title}"
-                                                               itemValue="#{clt}"
-                                                               />
-
-                                                <f:converter converterId="checklistTitleConverter"/>
-
-                                                <p:ajax update="spacetype space spaceElement form-messages-global" 
-                                                        listener="#{occInspectionBuilderBB.onSelectedOccChecklistTemplateChange()}"/>
-
-                                            </p:selectOneMenu>
-
-                                            <p:spacer height="10px"/>
-
-
-
-                                        </h:form>
-
-                                    </p:panel>
-
-                                    <p:panel id = "occInspectionBuilder-panel-selectspacetype"
-                                             toggleable = "true"
-                                             collapsed ="false"
-                                             header = "Step 2: Select an occupancy space type"
-                                             >
+                                    <h:form id="occInspectionBuilder-form-selectchecklisttitle">
 
                                         <p:spacer height="10px"/>
 
-                                        <p:dataTable id="spacetype" 
-                                                     var="st" 
-                                                     value="#{occInspectionBuilderBB.selectedSpacesInTypeList}" 
-                                                     >
-
-                                            <p:column headerText="Occupancy Space Type" 
-                                                      styleClass="centeredColumnContent"
-                                                      >
-
-                                                <h:outputText value="#{st.spaceTypeTitle}"/>
-
-                                            </p:column>
-
-                                            <p:column headerText ="Select" 
-                                                      styleClass="centeredColumnContent"
-                                                      >
-
-                                                <h:form >
-
-                                                    <p:selectBooleanButton onLabel="Deselect" 
-                                                                           offLabel="Select"
-                                                                           value="#{st.overrideSpaceTypeRequired}"
-                                                                           >
-                                                        <p:ajax update="space spacetype form-messages-global" 
-                                                                listener="#{occInspectionBuilderBB.onSelectedSpaceTypeChange(st)}"/>
-
-                                                    </p:selectBooleanButton>
-
-                                                </h:form>
-
-                                            </p:column>
-
-                                        </p:dataTable> 
-
-                                    </p:panel>
-
-                                    <p:panel id = "occInspectionBuilder-panel-selectspace"
-                                             toggleable = "true"
-                                             collapsed ="false"
-                                             header = "Step 3: Select an occupancy space item"
-                                             >
+                                        <p:outputLabel value="Select checklist title:  "/>
 
                                         <p:spacer height="10px"/>
 
+                                        <p:selectOneMenu id="checklisttitle" 
+                                                         value="#{occInspectionBuilderBB.selectedOccChecklistTemplate}"
+                                                         >
 
+                                            <f:selectItem itemLabel="Select..." noSelectionOption="true"/>
 
-                                        <p:dataTable id="space" 
-                                                     var="sa" 
+                                            <f:selectItems value="#{occInspectionBuilderBB.occChecklistTemplateList}" 
+                                                           var="ocltl" 
+                                                           itemLabel="#{ocltl.title}"
+                                                           itemValue="#{ocltl}"
+                                                           />
 
-                                                     value="#{occInspectionBuilderBB.occSpaceList}" 
-                                                     >
+                                            <f:converter converterId="checklistTitleConverter"/>
 
+                                            <p:ajax update="form-messages-global
+                                                    occInspectionBuilder-panel-selectspacetype
+                                                    occInspectionBuilder-panel-selectspace
+                                                    occInspectionBuilder-panel-selectspaceelement
+                                                    occbuilder-dialog-addspacetype
+                                                    " 
+                                                    listener="#{occInspectionBuilderBB.onSelectedOccChecklistTitleChange()}"/>
 
-                                            <p:column headerText="Occupancy Space " 
-                                                      styleClass="centeredColumnContent"
-                                                      >
-
-                                                <h:outputText value="#{sa.name}"/>
-
-
-                                            </p:column>
-
-                                            <p:column headerText="Select " 
-                                                      styleClass="centeredColumnContent"
-                                                      >
-                                                <h:form >
-                                                    <p:selectBooleanButton onLabel="Deselect" 
-                                                                           offLabel="Select"
-                                                                           value="#{sa.required}"
-                                                                           >
-
-                                                        <p:ajax update="space spaceElement form-messages-global" 
-                                                                listener="#{occInspectionBuilderBB.onSelectedSpaceChange(sa)}"/>
-
-                                                    </p:selectBooleanButton>
-                                                </h:form>
-
-                                            </p:column>
-
-
-
-                                        </p:dataTable> 
-
+                                        </p:selectOneMenu>
 
                                         <p:spacer height="10px"/>
 
+                                    </h:form>
 
-                                    </p:panel>
+                                </p:panel>
+
+
+                                <p:panel id = "occInspectionBuilder-panel-selectspacetype"
+                                         toggleable = "true"
+                                         collapsed ="false"
+                                         header = "Step 2: Select an occupancy space type"
+                                         >
+
+                                    <p:spacer height="10px"/>
+
+                                    <p:dataTable id="spacetype" 
+                                                 value="#{occInspectionBuilderBB.selectedSpaceTypeList}" 
+                                                 var="st" 
+                                                 >
+
+                                        <p:column headerText="Occupancy Space Type" 
+                                                  styleClass="centeredColumnContent"
+                                                  >
+
+                                            <h:outputText value="#{st.spaceTypeTitle}"/>
+
+                                        </p:column>
+
+                                        <p:column headerText ="Option" 
+                                                  styleClass="centeredColumnContent"
+                                                  style="width: 80px"
+                                                  >
+
+                                            <h:form >
+
+                                                <p:selectBooleanButton onLabel="Deselect" 
+                                                                       offLabel="Select"
+                                                                       value="#{st.selected}"
+
+                                                                       >
+                                                    <p:ajax update="form-messages-global
+                                                            occInspectionBuilder-panel-selectspacetype
+                                                            occInspectionBuilder-panel-selectspace
+                                                            occInspectionBuilder-panel-selectspaceelement
+                                                            occbuilder-dialog-addspacetype"
+                                                            listener="#{occInspectionBuilderBB.onSelectedSpaceTypeChange(st)}"/>
+
+                                                </p:selectBooleanButton>
+
+                                            </h:form>
+
+                                        </p:column>
+
+                                        <p:column headerText="Edit"
+                                                  styleClass="centeredColumnContent"
+                                                  style="width: 80px"
+                                                  >
+
+                                            <p:commandButton id="button-editspacetype" ajax="true"
+                                                             value="Edit" 
+                                                             actionListener="#{occInspectionBuilderBB.editSpaceType(st)}"
+                                                             icon="fa fa-pencil" 
+                                                             oncomplete="PF('occbuilder-dialog-addspacetype-var').show();"
+                                                             update="occbuilder-dialog-addspacetype-form"
+                                                             disabled="#{occInspectionBuilderBB.lockSpaceType()}"
+                                                             />
+
+                                        </p:column>
+
+                                    </p:dataTable> 
+
+                                    <p:spacer height="10px"/>
+
+                                    <p:commandButton id="occInspectionBuilder-button-addspacetype" ajax="true"
+                                                     value="Add New Space Type" 
+                                                     actionListener="#{occInspectionBuilderBB.initNewSpaceTypeButton()}"
+                                                     icon="fa fa-plus" 
+                                                     oncomplete="PF('occbuilder-dialog-addspacetype-var').show();"
+                                                     update="occbuilder-dialog-addspacetype-form"
+                                                     rendered="#{occInspectionBuilderBB.showAddSpaceTypeButton()}"
+                                                     disabled="#{occInspectionBuilderBB.lockSpaceType()}"
+                                                     style="width: 200px"
+                                                     />
+
+                                    <p:spacer height="10px"/>
+
+                                </p:panel>
+
+                                <p:panel id = "occInspectionBuilder-panel-selectspace"
+                                         toggleable = "true"
+                                         collapsed ="false"
+                                         header = "Step 3: Select an occupancy space item"
+                                         >
+
+                                    <p:spacer height="10px"/>
+
+                                    <p:dataTable id="space" 
+                                                 var="s" 
+                                                 value="#{occInspectionBuilderBB.selectedOccSpaceList}" 
+                                                 >
+
+                                        <p:column headerText="Occupancy Space " 
+                                                  styleClass="centeredColumnContent"
+                                                  >
+
+                                            <h:outputText value="#{s.name}"/>
+
+                                        </p:column>
+
+                                        <p:column headerText="Option " 
+                                                  styleClass="centeredColumnContent"
+                                                  style="width: 80px"
+                                                  >
+                                            <h:form >
+                                                <p:selectBooleanButton onLabel="Deselect" 
+                                                                       offLabel="Select"
+                                                                       value="#{s.selected}"
+                                                                       >
+
+                                                    <p:ajax update="occInspectionBuilder-panel-selectspace
+                                                            occInspectionBuilder-panel-selectspaceelement
+                                                            form-messages-global" 
+                                                            listener="#{occInspectionBuilderBB.onSelectedSpaceChange(s)}"/>
+
+                                                </p:selectBooleanButton>
+                                            </h:form>
+
+                                        </p:column>
+
+                                        <p:column headerText="Edit"
+                                                  styleClass="centeredColumnContent"
+                                                  style="width: 80px"
+                                                  >
+
+                                            <p:commandButton id="button-editspace" ajax="true"
+                                                             value="Edit" 
+                                                             actionListener="#{occInspectionBuilderBB.editSpace(s)}"
+                                                             icon="fa fa-pencil" 
+                                                             oncomplete="PF('occbuilder-dialog-addspace-var').show();"
+                                                             update="occbuilder-dialog-addspace-form"
+                                                             disabled="#{occInspectionBuilderBB.lockSpace()}"
+
+                                                             />
+
+                                        </p:column>
+
+                                    </p:dataTable> 
+
+                                    <p:spacer height="10px"/>
+
+                                    <p:commandButton id="button-addspace" ajax="true"
+                                                     value="Add New Space           " 
+                                                     actionListener="#{occInspectionBuilderBB.initNewSpaceButton()}"
+                                                     icon="fa fa-plus" 
+                                                     oncomplete="PF('occbuilder-dialog-addspace-var').show();"
+                                                     update="occbuilder-dialog-addspace-form"
+                                                     rendered="#{occInspectionBuilderBB.showAddSpaceButton()}"
+                                                     disabled="#{occInspectionBuilderBB.lockSpace()}"
+                                                     style="width: 200px"
+                                                     />
+
+                                    <p:spacer height="10px"/>
 
                                 </p:panel>
 
                             </div>
 
+
                             <div class ="object-column">
-                                <p:panel id = "occInspectionBuilder-panel-listresult"
-                                         toggleable = "false"
-                                         header = "Elements to Inspect">
+                                <p:panel id = "occInspectionBuilder-panel-selectspaceelement"
+                                         toggleable = "true"
+                                         collapsed ="false"
+                                         header = "Step 4: Select an occupancy space element"
+                                         >
+
+                                    <p:spacer height="10px"/>
 
                                     <p:dataTable id="spaceElement" 
                                                  var="se" 
-                                                 value="#{occInspectionBuilderBB.occSpaceElementList}" 
+                                                 value="#{occInspectionBuilderBB.selectedOccSpaceElementList}" 
                                                  >
 
 
@@ -193,76 +254,112 @@
                                             <p:rowToggler/>
                                         </p:column>
 
-                                        <p:column headerText="ID" styleClass="centeredColumnContent" style="width:60px">
+                                        <p:column headerText="ID" 
+                                                  styleClass="centeredColumnContent" 
+                                                  style="width:60px">
 
                                             <h:outputLabel value="#{se.elementID}"/>
 
                                         </p:column>  
 
-                                        <p:column headerText="Ordinance" styleClass="centeredColumnContent">
+                                        <p:column headerText="Ordinance" 
+                                                  styleClass="centeredColumnContent">
 
                                             <h:outputText value="&#167;#{se.ordSecNum}:"/>
                                             <h:outputText value="#{se.ordSecTitle} | "/>
                                             <h:outputText value="&#167;&#167;#{se.ordSubSecNum}:"/>
                                             <h:outputText value="#{se.ordSubSecTitle}"/>
 
-                                        </p:column>  
+                                        </p:column> 
 
-                                        <p:column headerText="Select" styleClass="centeredColumnContent">
-                                            <h:form >
-                                                <p:selectBooleanButton onLabel="Deselect" 
-                                                                       offLabel="Select"
-                                                                       value="#{se.isSelected}"
-                                                                       >
+                                        <p:column headerText="Edit"
+                                                  styleClass="centeredColumnContent"
+                                                  style="width: 80px"
+                                                  >
 
-                                                    <p:ajax update="spaceElement form-messages-global" 
-                                                            listener="#{occInspectionBuilderBB.onSelectedElementChange(se)}"/>
+                                            <p:commandButton id="button-editelement" ajax="true"
+                                                             value="Edit" 
+                                                             actionListener="#{occInspectionBuilderBB.editSpaceElement(se)}"
+                                                             icon="fa fa-pencil" 
+                                                             oncomplete="PF('occbuilder-dialog-addelement-var').show();"
+                                                             update="occbuilder-dialog-addelement-form"
 
-                                                </p:selectBooleanButton>
-                                            </h:form>
+
+                                                             />
                                         </p:column>
 
                                         <p:rowExpansion>
                                             <div class="outlinedBox">
 
-                                                <h:outputLabel styleClass="bold" value="Ordindance: "  />
-                                                <p:spacer height="5px" />
-                                                <h:outputLabel value="#{se.source.sourceName} 
-                                                               (#{se.source.sourceYear}), " />
+                                                <h:outputLabel styleClass="bold"
+                                                               value="Ordindance: "/>
+
+                                                <p:spacer height="10px" />
+
+                                                <h:outputLabel value="#{se.source.sourceName}" />
                                                 <h:outputText  value="Ch. #{se.ordchapterNo}:" />
                                                 <h:outputText  value="#{se.ordchapterTitle}" />
-                                                <p:spacer height="2px" />
+
+                                                <p:spacer height="5px" />
 
                                                 <h:outputText  value="&#167;#{se.ordSecNum}:" />
                                                 <h:outputText  value="#{se.ordSecTitle}; " />
-                                                <h:outputText  value="&#167;&#167;#{se.ordSubSecNum} " />
+                                                <h:outputText  value="&#167;&#167;#{se.ordSubSecNum}"/>
                                                 <h:outputText  value="#{se.ordSubSecTitle}" />
 
-                                                <p:spacer height="2px" />
+                                                <p:spacer height="5px" />
 
-                                                <h:panelGrid    id="violation-ord-fulltext-pg" 
-                                                                columns="1" 
-                                                                columnClasses="gridTd" 
-                                                                rendered="true">
+                                                <h:panelGrid   id="violation-ord-fulltext-pg" 
+                                                               columns="1" 
+                                                               columnClasses="gridTd" 
+                                                               rendered="true">
+
                                                     <h:panelGroup>
                                                         <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
+
                                                         <div class="ord-text">
                                                             <h:outputText value="#{se.ordTechnicalText}"/>
                                                         </div>
+
                                                     </h:panelGroup>
 
                                                 </h:panelGrid>
+
                                             </div>
+
                                         </p:rowExpansion>
 
                                     </p:dataTable> 
 
-
                                     <p:spacer height="20px"/>
 
-<!--                                    <p:commandButton ajax="true" value="Add Occupancy Space Element" action="">
-                                        
-                                    </p:commandButton>-->
+                                    <p:commandButton id="button-element" ajax="true"
+                                                     value="Add New Space Element           " 
+                                                     actionListener="#{occInspectionBuilderBB.initNewElementButton()}"
+                                                     icon="fa fa-plus" 
+                                                     oncomplete="PF('occbuilder-dialog-addelement-var').show();"
+                                                     update="occbuilder-dialog-addelement-form"
+                                                     rendered="#{occInspectionBuilderBB.showAddElementButton()}"
+                                                     style="width: 200px"
+
+                                                     />
+
+                                    <p:commandButton id="button-element-cancel" ajax="true"
+                                                     value="Cancel          " 
+                                                     actionListener="#{occInspectionBuilderBB.onSelectedOccChecklistTitleChange()}"
+                                                     icon="fa fa-minus" 
+                                                     update="form-messages-global
+                                                     occInspectionBuilder-panel-selectspacetype
+                                                     occInspectionBuilder-panel-selectspace
+                                                     occInspectionBuilder-panel-selectspaceelement
+                                                     occbuilder-dialog-addspacetype
+                                                     " 
+                                                     rendered="#{occInspectionBuilderBB.showAddElementButton()}"
+                                                     style="width: 200px"
+
+                                                     /> 
+
+                                    <p:spacer height="10px"/>
 
                                 </p:panel>
 
@@ -271,6 +368,195 @@
                         </div>
 
                     </div>
+
+                    <p:dialog  id="occbuilder-dialog-addspacetype"
+                               width="600"
+                               widgetVar="occbuilder-dialog-addspacetype-var"
+                               closable="true" 
+                               header="Add Space Type"
+
+                               >
+
+                        <h:form id="occbuilder-dialog-addspacetype-form" >
+
+                            <h:messages id="occbuilder-dialog-addspacetype-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5" width="580" >
+
+                                <h:outputText value="Space Type:"/>
+                                <p:inputText value="#{occInspectionBuilderBB.currentSpaceType.spaceTypeTitle}"/>
+                                <h:outputText value="Space Type Description:"/>
+                                <p:inputText value="#{occInspectionBuilderBB.currentSpaceType.spaceTypeDescription}"/>
+                                <h:outputText value="Space Type Required:"/>
+                                <p:selectBooleanButton onLabel="Ture" offLabel="False" value="#{occInspectionBuilderBB.currentSpaceType.required}"/>
+                                <h:outputText value="Space Type Override Required:"/>
+                                <p:selectBooleanButton onLabel="Ture" offLabel="False" value="#{occInspectionBuilderBB.currentSpaceType.overrideSpaceTypeRequired}"/>
+                                <h:outputText value="Space Type Override Required Value:"/>
+                                <p:selectBooleanButton onLabel="Ture" offLabel="False" value="#{occInspectionBuilderBB.currentSpaceType.overrideSpaceTypeRequiredValue}"/>
+                                <h:outputText value="Space Type Override Required AllSpace:"/>
+                                <p:selectBooleanButton onLabel="Ture" offLabel="False" value="#{occInspectionBuilderBB.currentSpaceType.overrideSpaceTypeRequireAllSpaces}"/>
+
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true"
+                                             value="Create" 
+                                             style="width:100px"
+                                             actionListener="#{occInspectionBuilderBB.createNewSpaceTypeButton()}"
+                                             oncomplete="PF('occbuilder-dialog-addspacetype-var').hide();"
+                                             update="occInspectionBuilder-panel-selectspacetype 
+                                             occInspectionBuilder-panel-selectspace
+                                             occInspectionBuilder-panel-selectspaceelement"
+                                             rendered="#{occInspectionBuilderBB.showDialogSpaceTypeCreateButton()}"
+                                             />
+
+                            <p:commandButton ajax="true"
+                                             value="Update" 
+                                             style="width:100px"
+                                             actionListener="#{occInspectionBuilderBB.updateSpaceTypeButton()}"
+                                             oncomplete="PF('occbuilder-dialog-addspacetype-var').hide();"
+                                             update="occInspectionBuilder-panel-selectspacetype
+                                             occInspectionBuilder-panel-selectspace
+                                             occInspectionBuilder-panel-selectspaceelement"
+                                             rendered="#{occInspectionBuilderBB.showDialogSpaceTypeUpdateButton()}"
+                                             />
+
+                            <p:commandButton ajax="true"
+                                             value="Delete" 
+                                             style="width:100px"
+                                             actionListener="#{occInspectionBuilderBB.deleteSpaceTypeButton()}"
+                                             oncomplete="PF('occbuilder-dialog-addspacetype-var').hide();"
+                                             update="occInspectionBuilder-panel-selectspacetype
+                                             occInspectionBuilder-panel-selectspace
+                                             occInspectionBuilder-panel-selectspaceelement"
+                                             />
+                            <p:commandButton ajax="true"
+                                             value="Cancel" 
+                                             style="width:100px"
+                                             oncomplete="PF('occbuilder-dialog-addspacetype-var').hide();"
+                                             update="occInspectionBuilder-panel-selectspacetype
+                                             occInspectionBuilder-panel-selectspace
+                                             occInspectionBuilder-panel-selectspaceelement"
+                                             />
+                        </h:form>
+                    </p:dialog>  
+
+                    <p:dialog  id="occbuilder-dialog-addspace"
+                               width="600"
+                               widgetVar="occbuilder-dialog-addspace-var"
+                               closable="true" 
+                               header="Add Space "
+                               >
+
+                        <h:form id="occbuilder-dialog-addspace-form">
+
+                            <h:messages id="occbuilder-dialog-addspace-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5" width="580" >
+
+                                <h:outputText value="Space Name:"/>
+                                <p:inputText value="#{occInspectionBuilderBB.currentSpace.name}"/>
+                                <h:outputText value="Space Description:"/>
+                                <p:inputText value="#{occInspectionBuilderBB.currentSpace.description}"/>
+                                <h:outputText value="Space Required:"/>
+                                <p:selectBooleanButton onLabel="Required" offLabel="Unrequire" value="#{occInspectionBuilderBB.currentSpace.required}"/>
+
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true"
+                                             value="Create" 
+                                             style="width:100px"
+                                             actionListener="#{occInspectionBuilderBB.createNewSpaceButton()}"
+                                             oncomplete="PF('occbuilder-dialog-addspace-var').hide();"
+                                             update="
+                                             occInspectionBuilder-panel-selectspace
+                                             occInspectionBuilder-panel-selectspaceelement"
+                                             rendered="#{occInspectionBuilderBB.showDialogSpaceCreateButton()}"
+
+                                             />
+
+                            <p:commandButton ajax="true"
+                                             value="Update" 
+                                             style="width:100px"
+                                             actionListener="#{occInspectionBuilderBB.updateSpaceButton()}"
+                                             oncomplete="PF('occbuilder-dialog-addspace-var').hide();"
+                                             update="
+                                             occInspectionBuilder-panel-selectspace
+                                             occInspectionBuilder-panel-selectspaceelement"
+                                             rendered="#{occInspectionBuilderBB.showDialogSpaceUpdateButton()}"
+                                             />
+
+                            <p:commandButton ajax="true"
+                                             value="Delete" 
+                                             style="width:100px"
+                                             actionListener="#{occInspectionBuilderBB.deleteSpaceButton()}"
+                                             oncomplete="PF('occbuilder-dialog-addspace-var').hide();"
+                                             update="
+                                             occInspectionBuilder-panel-selectspace
+                                             occInspectionBuilder-panel-selectspaceelement"
+                                             />
+                            <p:commandButton ajax="true"
+                                             value="Cancel" 
+                                             style="width:100px"
+                                             oncomplete="PF('occbuilder-dialog-addspace-var').hide();"
+                                             update="
+                                             occInspectionBuilder-panel-selectspace
+                                             occInspectionBuilder-panel-selectspaceelement"
+                                             />
+                        </h:form>
+
+                    </p:dialog>
+
+                    <p:dialog  id="occbuilder-dialog-addelement"
+                               width="600"
+                               widgetVar="occbuilder-dialog-addelement-var"
+                               closable="true" 
+                               header="Add Space Element"
+
+                               >
+
+                        <h:form id="occbuilder-dialog-addelement-form">
+
+                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5" width="580" >
+
+                                <h:outputText value="Space Element ID:"/>
+                                <p:inputText value="#{occInspectionBuilderBB.currentElement.elementID}"/>
+
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true"
+                                             value="Create" 
+                                             style="width:100px"
+                                             actionListener="#{occInspectionBuilderBB.createNewElementButton()}"
+                                             oncomplete="PF('occbuilder-dialog-addelement-var').hide();"
+                                             update="
+                                             occInspectionBuilder-panel-selectspaceelement"
+                                             rendered="#{occInspectionBuilderBB.showDialogElementCreateButton()}"
+                                             />
+
+                            <p:commandButton ajax="true"
+                                             value="Delete" 
+                                             style="width:100px"
+                                             actionListener="#{occInspectionBuilderBB.deleteNewElementButton()}"
+                                             oncomplete="PF('occbuilder-dialog-addelement-var').hide();"
+                                             update="
+                                             occInspectionBuilder-panel-selectspaceelement"
+                                             rendered="#{occInspectionBuilderBB.showDialogElementDeleteButton()}"
+                                             />
+
+                            <h:messages id="occbuilder-dialog-addelement-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                    </p:dialog>
+
                 </f:view>
             </ui:define>
         </ui:composition>
