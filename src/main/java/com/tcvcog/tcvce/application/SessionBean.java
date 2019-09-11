@@ -37,7 +37,6 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
@@ -153,10 +152,12 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private Person activeAnonPerson;
     private OccPermitApplicationReason occPermitApplicationReason;
 
-    /* *** Payment Management Shelves *** */
+    /* *** Payment and Fee Management Shelves *** */
     private Payment sessionPayment;
     private String paymentRedirTo;
     
+    private OccPeriod feeManagementOccPeriod;
+    private String feeRedirTo;
     /* *** Blob Upload Session Shelves *** */
     //linking
 
@@ -920,6 +921,22 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
 
     public void setPaymentRedirTo(String paymentRedirTo) {
         this.paymentRedirTo = paymentRedirTo;
+    }
+
+    public OccPeriod getFeeManagementOccPeriod() {
+        return feeManagementOccPeriod;
+    }
+
+    public void setFeeManagementOccPeriod(OccPeriod feeManagementOccPeriod) {
+        this.feeManagementOccPeriod = feeManagementOccPeriod;
+    }
+
+    public String getFeeRedirTo() {
+        return feeRedirTo;
+    }
+
+    public void setFeeRedirTo(String feeRedirTo) {
+        this.feeRedirTo = feeRedirTo;
     }
     
 }

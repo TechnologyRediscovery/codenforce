@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
@@ -44,19 +45,21 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private ArrayList<Fee> existingFeeTypeList;
     private Fee selectedFeeType;
     private Municipality formMuni;
-    
+
     //feeManage.xhtml fields
     private Fee formFee;
     private Fee selectedFee;
     private ArrayList<Fee> feeList;
-    
+    private ArrayList<Fee> filteredFeeList;
+
     private MoneyOccPeriodFeeAssigned occPeriodFormFee;
     private MoneyOccPeriodFeeAssigned selectedOccPeriodFee;
     private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFeeList;
     private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList;
-    
+
     private boolean editing;
     private String redirTo;
+    private boolean waived;
 
     /**
      * Creates a new instance of NewJSFManagedBean
@@ -65,15 +68,94 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     @PostConstruct
-    public void initBean(){
+    public void initBean() {
         formFee = new Fee();
         formFee.setEffectiveDate(LocalDateTime.now());
         formFee.setExpiryDate(LocalDateTime.now());
-        
+
         occPeriodFormFee = new MoneyOccPeriodFeeAssigned();
-       
+
+        if (getSessionBean().getFeeRedirTo() != null) {
+            redirTo = getSessionBean().getFeeRedirTo();
+
+            PaymentIntegrator pi = getPaymentIntegrator();
+
+            OccPeriod period = getSessionBean().getFeeManagementOccPeriod();
+            
+            if (period != null) {
+                
+                try {
+                    occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(period);
+                    feeList = (ArrayList<Fee>) pi.getFeeTypeList(period.getType());
+                } catch (IntegrationException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Oops! We encountered a problem trying to fetch the fee list!", ""));
+                }
+
+            }
+
+        }
+
     }
-    
+
+    public String finishAndRedir() {
+        getSessionBean().setFeeRedirTo(null);
+
+        return redirTo;
+    }
+
+    public void deleteSelectedOccPeriodFee(ActionEvent e) {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        if (selectedOccPeriodFee != null) {
+            try {
+                pi.deleteOccPeriodFee(selectedOccPeriodFee);
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+            }
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Fee deleted forever!", ""));
+
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a fee from the table to delete", ""));
+        }
+
+    }
+
+    public void editOccPeriodFee(ActionEvent e) {
+        if (selectedOccPeriodFee != null) {
+            occPeriodFormFee.setOccPerAssignedFeeID(selectedOccPeriodFee.getOccPerAssignedFeeID());
+            occPeriodFormFee.setOccPeriodID(selectedOccPeriodFee.getOccPeriodID());
+            occPeriodFormFee.setOccPeriodTypeID(selectedOccPeriodFee.getOccPeriodTypeID());
+            occPeriodFormFee.setPaymentList(selectedOccPeriodFee.getPaymentList());
+            occPeriodFormFee.setMoneyFeeAssigned(selectedOccPeriodFee.getMoneyFeeAssigned());
+            occPeriodFormFee.setAssignedBy(selectedOccPeriodFee.getAssignedBy());
+            occPeriodFormFee.setWaivedBy(selectedOccPeriodFee.getWaivedBy());
+            occPeriodFormFee.setLastModified(selectedOccPeriodFee.getLastModified());
+            occPeriodFormFee.setReducedBy(selectedOccPeriodFee.getReducedBy());
+            occPeriodFormFee.setReducedByUser(selectedOccPeriodFee.getReducedByUser());
+            occPeriodFormFee.setNotes(selectedOccPeriodFee.getNotes());
+            occPeriodFormFee.setFee(selectedOccPeriodFee.getFee());
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select an assigned fee to update", ""));
+        }
+
+    }
+
+    public void intializeNewOccPeriodFee(ActionEvent e) {
+
+        editing = false;
+        occPeriodFormFee = new MoneyOccPeriodFeeAssigned();
+
+    }
+
     public void editFeeType(ActionEvent e) {
         if (getSelectedFeeType() != null) {
             editing = true;
@@ -151,6 +233,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             try {
                 pi.deleteOccupancyInspectionFee(getSelectedFeeType());
             } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -380,6 +463,20 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.occPeriodFilteredFeeList = occPeriodFilteredFeeList;
     }
 
-    
+    public boolean isWaived() {
+        return waived;
+    }
+
+    public void setWaived(boolean waived) {
+        this.waived = waived;
+    }
+
+    public ArrayList<Fee> getFilteredFeeList() {
+        return filteredFeeList;
+    }
+
+    public void setFilteredFeeList(ArrayList<Fee> filteredFeeList) {
+        this.filteredFeeList = filteredFeeList;
+    }
     
 }
