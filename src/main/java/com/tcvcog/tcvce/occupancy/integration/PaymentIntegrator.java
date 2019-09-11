@@ -186,6 +186,54 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return skeleton;
     }
     
+    public List<Fee> getFeeTypeList(OccPeriodType type) throws IntegrationException {
+
+        List<Fee> feeList = new ArrayList<>();
+
+        String query = "SELECT feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes\n"
+                + "FROM moneyfee\n"
+                + "WHERE muni_municode = ?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, type.getMuni().getMuniCode());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                feeList.add(generateFee(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.getFeeTypeList| Unable to retrieve fees associated with muni", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+
+        return feeList;
+    }
+    
     public List<Fee> getFeeList(OccPeriodType type) throws IntegrationException {
 
         List<Fee> feeList = new ArrayList<>();
@@ -891,7 +939,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            //stmt.setInt(1, paymentType.getPaymentTypeId());
             stmt.setString(1, paymentType.getPaymentTypeTitle());
             System.out.println("PaymentTypeIntegrator.paymentTypeIntegrator | sql: " + stmt.toString());
             System.out.println("TRYING TO EXECUTE INSERT METHOD");
@@ -1060,6 +1107,11 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, oif.getMuni().getMuniCode());
+            stmt.setString(2, oif.getName());
+            stmt.setDouble(3, oif.getAmount());
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(oif.getEffectiveDate()));
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(oif.getExpiryDate()));
+            stmt.setString(6, oif.getNotes());
             stmt.setInt(7, oif.getOccupancyInspectionFeeID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -1084,7 +1136,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public void deleteOccupancyInspectionFee(Fee oif) throws IntegrationException {
-        String query = "DELETE FROM public.occinspectionfee\n" + " WHERE feeid= ?;";
+        String query = "DELETE FROM public.moneyfee\n" + " WHERE feeid= ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
@@ -1093,7 +1145,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot delete occupancy inspeciton fee--probably because another" + "part of the database has a reference item.", ex);
+            throw new IntegrationException("Cannot delete occupancy inspection fee--probably because another" + "part of the database has a reference item.", ex);
         } finally {
             if (con != null) {
                 try {
@@ -1112,6 +1164,34 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
+    public void deleteOccPeriodFee(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
+        String query = "DELETE FROM public.moneyoccperiodfeeassigned\n" + " WHERE moneyoccperassignedfeeid= ?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccPerAssignedFeeID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot delete assigned fee", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+    }
     public ArrayList<Fee> getOccupancyInspectionFeeList() throws IntegrationException {
         String query = "SELECT feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n"
                 + "       notes\n"
