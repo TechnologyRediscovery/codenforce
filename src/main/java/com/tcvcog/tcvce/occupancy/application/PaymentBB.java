@@ -200,7 +200,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     public String addPayment() {
         Payment payment = new Payment();
-        PaymentIntegrator paymentIntegrator = new PaymentIntegrator();
+        PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
         payment.setPaymentID(formPayment.getPaymentID());
         payment.setOccupancyInspectionID(formPayment.getOccupancyInspectionID());
         payment.setPaymentType(formPayment.getPaymentType());

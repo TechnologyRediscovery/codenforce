@@ -81,9 +81,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             PaymentIntegrator pi = getPaymentIntegrator();
 
             OccPeriod period = getSessionBean().getFeeManagementOccPeriod();
-            
+
             if (period != null) {
-                
+
                 try {
                     occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(period);
                     feeList = (ArrayList<Fee>) pi.getFeeTypeList(period.getType());
@@ -156,6 +156,61 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    public void addOccPeriodFee() {
+        MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned();
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        skeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
+        skeleton.setOccPeriodID(occPeriodFormFee.getOccPeriodID());
+        skeleton.setOccPeriodTypeID(occPeriodFormFee.getOccPeriodTypeID());
+        skeleton.setPaymentList(occPeriodFormFee.getPaymentList());
+        skeleton.setMoneyFeeAssigned(occPeriodFormFee.getMoneyFeeAssigned());
+        skeleton.setAssignedBy(getSessionBean().getSessionUser());
+        skeleton.setAssigned(LocalDateTime.now());
+        skeleton.setLastModified(LocalDateTime.now());
+        skeleton.setNotes(occPeriodFormFee.getNotes());
+        skeleton.setFee(occPeriodFormFee.getFee());
+
+        if (waived == true) {
+            skeleton.setWaivedBy(getSessionBean().getSessionUser());
+        }
+
+        if (occPeriodFormFee.getReducedBy() != 0) {
+
+            skeleton.setReducedBy(occPeriodFormFee.getReducedBy());
+            skeleton.setReducedByUser(getSessionBean().getSessionUser());
+
+        }
+
+        try {
+            pi.insertOccPeriodFee(skeleton);
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add fee to database, sorry!", "Check server print out..."));
+        }
+
+    }
+
+    public void commitOccPeriodFeeUpdates(ActionEvent e) {
+        PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
+        MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned();
+        
+        
+        try {
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to update fee in database.",
+                            "This must be corrected by the System Administrator"));
+        }
+    }
+    
     public void editFeeType(ActionEvent e) {
         if (getSelectedFeeType() != null) {
             editing = true;
@@ -477,6 +532,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public void setFilteredFeeList(ArrayList<Fee> filteredFeeList) {
         this.filteredFeeList = filteredFeeList;
+    }
+
+    public boolean editingOccPeriod() {
+        return (redirTo != null && getSessionBean().getFeeManagementOccPeriod() != null);
     }
     
 }

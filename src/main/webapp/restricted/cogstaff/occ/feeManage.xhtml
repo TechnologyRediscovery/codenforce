@@ -272,16 +272,17 @@
                                     </h:panelGroup>
 
                                     <p:spacer height="10px"/>
-                                    <p:commandButton ajax="false" rendered="#{!paymentBB.editing}" value="Add Payment" action="#{paymentBB.addPayment}" />
-                                    <p:commandButton ajax="false" rendered="#{paymentBB.editing}" actionListener="#{paymentBB.commitPaymentUpdates}"
+                                    <p:commandButton ajax="false" rendered="#{!feeManagementBB.editing}" value="Assign Fee" action="#{feeManagementBB.addOccPeriodFee()}" />
+                                    <p:commandButton ajax="false" rendered="#{feeManagementBB.editing}" actionListener="#{paymentBB.commitPaymentUpdates}"
                                                      value="Commit Updates" tabindex="14"/>
                                     <p:commandButton    id="cancel-cb"
                                                         ajax="true"  tabindex="27"
                                                         value="Cancel" 
                                                         icon="fa fa-stop" 
                                                         immediate="true"
-                                                        onclick="PF('feeAddDialogVar').hide()"
+                                                        onclick="PF('occPeriodFeeAddDialogVar').hide()"
                                                         />
+                                </h:panelGrid>
                             </h:form>
                         </p:dialog>
 
