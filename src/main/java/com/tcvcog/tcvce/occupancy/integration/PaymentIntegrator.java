@@ -139,9 +139,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public Fee getFee(int feeID) throws IntegrationException{
+    public Fee getFee(int feeID) throws IntegrationException {
         Fee skeleton = new Fee();
-        
+
         String query = "SELECT feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes\n"
                 + "FROM moneyfee\n"
                 + "WHERE feeid = ?;";
@@ -182,10 +182,10 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                     /* ignored */ }
             }
         } // close finally
-        
+
         return skeleton;
     }
-    
+
     public List<Fee> getFeeTypeList(OccPeriodType type) throws IntegrationException {
 
         List<Fee> feeList = new ArrayList<>();
@@ -233,7 +233,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         return feeList;
     }
-    
+
     public List<Fee> getFeeList(OccPeriodType type) throws IntegrationException {
 
         List<Fee> feeList = new ArrayList<>();
@@ -330,6 +330,54 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return feeList;
     }
 
+    public void insertOccPeriodFee(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
+        String query = "INSERT INTO public.moneyoccperiodfeeassigned(\n"
+                + "    moneyoccperassignedfeeid, moneyfeeassigned_assignedid, occperiod_periodid,"
+                + "    assignedby_userid, assignedbyts, waivedby_userid, lastmodifiedts, reduceby,"
+                + "    reduceby_userid, notes, fee_feeid, occperiodtype_typeid)\n"
+                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getMoneyFeeAssigned());
+            stmt.setInt(2, fee.getOccPeriodID());
+            stmt.setInt(3, fee.getAssignedBy().getUserID());
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
+            stmt.setInt(5, fee.getWaivedBy().getUserID());
+            stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
+            stmt.setDouble(7, fee.getReducedBy());
+            stmt.setInt(8, fee.getReducedByUser().getUserID());
+            stmt.setString(9, fee.getNotes());
+            stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
+            stmt.setInt(11, fee.getOccPeriodTypeID());
+            System.out.println("PaymentTypeIntegrator.insertOccPeriodFee | sql: " + stmt.toString());
+            System.out.println("TRYING TO EXECUTE INSERT METHOD");
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert OccPeriodFee", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+
+    }
+
     public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
 
         UserIntegrator ui = getUserIntegrator();
@@ -345,7 +393,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
             fee.setNotes(rs.getString("notes"));
             fee.setFee(getFee(rs.getInt("fee_feeid")));
-
+            fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
+            
             fee.setOccPeriodID(rs.getInt("occperiod_periodid"));
             fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
             fee.setOccPerAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
@@ -1098,9 +1147,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
      */
     public void updateOccupancyInspectionFee(Fee oif) throws IntegrationException {
-        String query = "UPDATE public.occinspectionfee\n" 
-                + "   SET muni_municode=?, feename=?, feeamount=?, effectivedate=?, \n" 
-                + "       expirydate=?, notes=? \n" 
+        String query = "UPDATE public.occinspectionfee\n"
+                + "   SET muni_municode=?, feename=?, feeamount=?, effectivedate=?, \n"
+                + "       expirydate=?, notes=? \n"
                 + " WHERE feeid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1192,6 +1241,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             }
         } // close finally
     }
+
     public ArrayList<Fee> getOccupancyInspectionFeeList() throws IntegrationException {
         String query = "SELECT feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n"
                 + "       notes\n"
@@ -1238,10 +1288,10 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public void insertOccupancyInspectionFee(Fee inspectionFee) throws IntegrationException {
-        String query = "INSERT INTO public.occinspectionfee(\n" + 
-                "            feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n" 
-                + "            notes)\n" 
-                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, \n" 
+        String query = "INSERT INTO public.occinspectionfee(\n"
+                + "            feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n"
+                + "            notes)\n"
+                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, \n"
                 + "            ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
