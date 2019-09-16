@@ -1029,7 +1029,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      
      public String editOccPeriodFees(){
          getSessionBean().setFeeManagementOccPeriod(currentOccPeriod);
-         getSessionBean().setPaymentRedirTo("inspection");
+         getSessionBean().setFeeRedirTo("inspection");
          
          return "editFees";
      }

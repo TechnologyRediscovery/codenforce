@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -186,7 +187,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return skeleton;
     }
 
-    public List<Fee> getFeeTypeList(OccPeriodType type) throws IntegrationException {
+    public List<Fee> getFeeTypeList(Municipality muni) throws IntegrationException {
 
         List<Fee> feeList = new ArrayList<>();
 
@@ -200,7 +201,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, type.getMuni().getMuniCode());
+            stmt.setInt(1, muni.getMuniCode());
             rs = stmt.executeQuery();
             while (rs.next()) {
                 feeList.add(generateFee(rs));
@@ -233,7 +234,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         return feeList;
     }
-
+    
     public List<Fee> getFeeList(OccPeriodType type) throws IntegrationException {
 
         List<Fee> feeList = new ArrayList<>();
@@ -378,6 +379,54 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+    public void updateOccPeriodFee(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
+        String query = "UPDATE public.moneyoccperiodfeeassigned\n" +
+                       "SET moneyfeeassigned_assignedid=?, occperiod_periodid=?, assignedby_userid=?,\n" +
+                   "    assignedbyts=?, waivedby_userid=?, lastmodifiedts=?, reduceby=?, reduceby_userid=?,\n" +
+                   "    notes=?, fee_feeid=?, occperiodtype_typeid=?\n" +
+                       "WHERE moneyoccperassignedfeeid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getMoneyFeeAssigned());
+            stmt.setInt(2, fee.getOccPeriodID());
+            stmt.setInt(3, fee.getAssignedBy().getUserID());
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
+            stmt.setInt(5, fee.getWaivedBy().getUserID());
+            stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
+            stmt.setDouble(7, fee.getReducedBy());
+            stmt.setInt(8, fee.getReducedByUser().getUserID());
+            stmt.setString(9, fee.getNotes());
+            stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
+            stmt.setInt(11, fee.getOccPeriodTypeID());
+            stmt.setInt(12, fee.getOccPerAssignedFeeID());
+            System.out.println("PaymentTypeIntegrator.updateOccPeriodFee | sql: " + stmt.toString());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot update OccPeriodFee", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+
+    }
+    
     public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
 
         UserIntegrator ui = getUserIntegrator();
