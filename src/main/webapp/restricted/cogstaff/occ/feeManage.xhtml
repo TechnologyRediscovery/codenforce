@@ -21,7 +21,7 @@
                     <p>View, create, and manage fees</p>
                     <f:view>
                         <h:form id="occPeriodFeeDisplay">
-                            <h2>Recorded Fees</h2>
+                            <h2>Recorded Fees <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/></h2>
                             <p:dataTable
                                 id="occPeriodFeeTable"
                                 var="fee"
@@ -158,7 +158,7 @@
                                 actionListener="#{feeManagementBB.editOccPeriodFee}"
                                 oncomplete="PF('paymentAddDialogVar').show()"
                                 ajax="true"
-                                update="paymentAddForm messages"
+                                update="occPeriodFeeAddForm messages"
                                 value="Update Selected Fee" tabindex="2"/>
                             <p:commandButton ajax="false" 
                                              actionListener="#{feeManagementBB.deleteSelectedOccPeriodFee}"
@@ -210,79 +210,79 @@
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
                                     <p:spacer height="10px"/>
-
-                                    <h:outputLabel value="Fee:" for="feeFeeTable"/>
-                                    <h:panelGroup>
-                                        <p:dataTable
-                                            id="feeFeeTable"
-                                            var="o"
-                                            selectionMode="single"
-                                            selection="#{feeManagementBB.occPeriodFormFee.fee}"
-                                            rowKey="#{o.occupancyInspectionFeeID}"
-                                            value="#{feeManagementBB.feeList}"
-                                            tableStyleClass="primeDataTable"
-                                            filteredValue="#{feeManagementBB.filteredFeeList}">
-
-                                            <p:column width="10%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="ID" />
-                                                </f:facet>
-                                                <h:outputText value="#{o.occupancyInspectionFeeID}"/>
-                                            </p:column>
-
-                                            <p:column width="25%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Municipality" />
-                                                </f:facet>
-                                                <h:outputText value="#{o.muni.muniName}"/>
-                                            </p:column>
-
-                                            <p:column width="25%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Name" />
-                                                </f:facet>
-                                                <h:outputText value="#{o.name}"/>
-                                            </p:column>
-
-                                            <p:column width="25%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Amount" />
-                                                </f:facet>
-                                                <h:outputText value="#{o.amount}"/>
-                                            </p:column>
-
-                                            <p:column width="25%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Effective Date" />
-                                                </f:facet>
-                                                <h:outputText value="#{o.effectiveDate}"/>
-                                            </p:column>
-
-                                            <p:column width="25%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Expire Date" />
-                                                </f:facet>
-                                                <h:outputText value="#{o.expiryDate}"/>
-                                            </p:column>
-
-                                        </p:dataTable>
-
-                                        <h:message for="feeFeeTable" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <p:spacer height="10px"/>
-                                    <p:commandButton ajax="false" rendered="#{!feeManagementBB.editing}" value="Assign Fee" action="#{feeManagementBB.addOccPeriodFee()}" />
-                                    <p:commandButton ajax="false" rendered="#{feeManagementBB.editing}" actionListener="#{paymentBB.commitPaymentUpdates}"
-                                                     value="Commit Updates" tabindex="14"/>
-                                    <p:commandButton    id="cancel-cb"
-                                                        ajax="true"  tabindex="27"
-                                                        value="Cancel" 
-                                                        icon="fa fa-stop" 
-                                                        immediate="true"
-                                                        onclick="PF('occPeriodFeeAddDialogVar').hide()"
-                                                        />
                                 </h:panelGrid>
+                                <h:outputLabel value="Fee:" for="feeFeeTable"/>
+                                <h:panelGroup>
+                                    <p:dataTable
+                                        id="feeFeeTable"
+                                        var="o"
+                                        selectionMode="single"
+                                        selection="#{feeManagementBB.occPeriodFormFee.fee}"
+                                        rowKey="#{o.occupancyInspectionFeeID}"
+                                        value="#{feeManagementBB.feeList}"
+                                        tableStyleClass="primeDataTable"
+                                        filteredValue="#{feeManagementBB.filteredFeeList}">
+
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{o.occupancyInspectionFeeID}"/>
+                                        </p:column>
+
+                                        <p:column width="25%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Municipality" />
+                                            </f:facet>
+                                            <h:outputText value="#{o.muni.muniName}"/>
+                                        </p:column>
+
+                                        <p:column width="25%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Name" />
+                                            </f:facet>
+                                            <h:outputText value="#{o.name}"/>
+                                        </p:column>
+
+                                        <p:column width="25%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Amount" />
+                                            </f:facet>
+                                            <h:outputText value="#{o.amount}"/>
+                                        </p:column>
+
+                                        <p:column width="25%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Effective Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{o.effectiveDate}"/>
+                                        </p:column>
+
+                                        <p:column width="25%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Expire Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{o.expiryDate}"/>
+                                        </p:column>
+
+                                    </p:dataTable>
+
+                                    <h:message for="feeFeeTable" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <p:spacer height="10px"/>
+                                <p:commandButton ajax="false" rendered="#{!feeManagementBB.editing}" value="Assign Fee" action="#{feeManagementBB.addOccPeriodFee()}" />
+                                <p:commandButton ajax="false" rendered="#{feeManagementBB.editing}" actionListener="#{feeManagementBB.commitOccPeriodFeeUpdates(e)}"
+                                                 value="Commit Updates" tabindex="14"/>
+                                <p:commandButton    id="cancel-cb"
+                                                    ajax="true"  tabindex="27"
+                                                    value="Cancel" 
+                                                    icon="fa fa-stop" 
+                                                    immediate="true"
+                                                    onclick="PF('occPeriodFeeAddDialogVar').hide()"
+                                                    />
+
                             </h:form>
                         </p:dialog>
 
