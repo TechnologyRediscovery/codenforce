@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
@@ -176,8 +177,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         PaymentIntegrator pi = getPaymentIntegrator();
 
         skeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
-        skeleton.setOccPeriodID(occPeriodFormFee.getOccPeriodID());
-        skeleton.setOccPeriodTypeID(occPeriodFormFee.getOccPeriodTypeID());
+        skeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
+        skeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeid());
         skeleton.setPaymentList(occPeriodFormFee.getPaymentList());
         skeleton.setMoneyFeeAssigned(occPeriodFormFee.getMoneyFeeAssigned());
         skeleton.setAssignedBy(getSessionBean().getSessionUser());
@@ -188,6 +189,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         if (waived == true) {
             skeleton.setWaivedBy(getSessionBean().getSessionUser());
+        } else {
+            skeleton.setWaivedBy(new User());
         }
 
         if (occPeriodFormFee.getReducedBy() != 0) {
@@ -195,6 +198,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             skeleton.setReducedBy(occPeriodFormFee.getReducedBy());
             skeleton.setReducedByUser(getSessionBean().getSessionUser());
 
+        } else {
+            skeleton.setReducedByUser(new User());
         }
 
         try {
