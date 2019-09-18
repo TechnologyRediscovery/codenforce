@@ -336,7 +336,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 + "    moneyoccperassignedfeeid, moneyfeeassigned_assignedid, occperiod_periodid,"
                 + "    assignedby_userid, assignedbyts, waivedby_userid, lastmodifiedts, reduceby,"
                 + "    reduceby_userid, notes, fee_feeid, occperiodtype_typeid)\n"
-                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?::numeric::money, ?, ?, ?, ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -382,7 +382,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     public void updateOccPeriodFee(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
         String query = "UPDATE public.moneyoccperiodfeeassigned\n" +
                        "SET moneyfeeassigned_assignedid=?, occperiod_periodid=?, assignedby_userid=?,\n" +
-                   "    assignedbyts=?, waivedby_userid=?, lastmodifiedts=?, reduceby=?, reduceby_userid=?,\n" +
+                   "    assignedbyts=?, waivedby_userid=?, lastmodifiedts=?, reduceby=(?::numeric::money), reduceby_userid=?,\n" +
                    "    notes=?, fee_feeid=?, occperiodtype_typeid=?\n" +
                        "WHERE moneyoccperassignedfeeid=?;";
         Connection con = getPostgresCon();
@@ -510,7 +510,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     public void updatePayment(Payment payment) throws IntegrationException {
         String query = "UPDATE public.moneypayment\n"
                 + "   SET occinspec_inspectionid=?, paymenttype_typeid=?, \n"
-                + "       datereceived=?, datedeposited=?, amount=?, payer_personid=?, referencenum=?, \n"
+                + "       datereceived=?, datedeposited=?, amount=(?::numeric::money), payer_personid=?, referencenum=?, \n"
                 + "       checkno=?, cleared=?, notes=?\n"
                 + " WHERE paymentid=?;";
 
@@ -728,7 +728,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 + " datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes, \n"
                 + " recordedby_userid, entrytimestamp)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
-                + "            ?, ?, ?, ?, ?, DEFAULT, ?, ?, NOW());";
+                + "            ?, ?::numeric::money, ?, ?, ?, DEFAULT, ?, ?, NOW());";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -1197,7 +1197,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
      */
     public void updateOccupancyInspectionFee(Fee oif) throws IntegrationException {
         String query = "UPDATE public.occinspectionfee\n"
-                + "   SET muni_municode=?, feename=?, feeamount=?, effectivedate=?, \n"
+                + "   SET muni_municode=?, feename=?, feeamount=(?::numeric::money), effectivedate=?, \n"
                 + "       expirydate=?, notes=? \n"
                 + " WHERE feeid=?;";
         Connection con = getPostgresCon();
@@ -1340,7 +1340,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         String query = "INSERT INTO public.occinspectionfee(\n"
                 + "            feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n"
                 + "            notes)\n"
-                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, \n"
+                + "    VALUES (DEFAULT, ?, ?, ?::numeric::money, ?, ?, \n"
                 + "            ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;

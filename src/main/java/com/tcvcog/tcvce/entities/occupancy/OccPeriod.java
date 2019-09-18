@@ -6,14 +6,10 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
-import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
-import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -23,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import com.tcvcog.tcvce.entities.Openable;
 import com.tcvcog.tcvce.entities.Payment;
-import java.util.Collections;
 
 /**
  *
