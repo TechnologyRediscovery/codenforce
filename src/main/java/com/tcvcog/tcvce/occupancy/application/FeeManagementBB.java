@@ -120,7 +120,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return redirTo;
     }
 
-    public void deleteSelectedOccPeriodFee(ActionEvent e) {
+    public String deleteSelectedOccPeriodFee(ActionEvent e) {
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
@@ -139,7 +139,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a fee from the table to delete", ""));
         }
-
+        return "";
     }
 
     public void editOccPeriodFee(ActionEvent e) {
@@ -156,6 +156,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             occPeriodFormFee.setReducedByUser(selectedOccPeriodFee.getReducedByUser());
             occPeriodFormFee.setNotes(selectedOccPeriodFee.getNotes());
             occPeriodFormFee.setFee(selectedOccPeriodFee.getFee());
+            editing = true;
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -171,7 +172,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public void addOccPeriodFee() {
+    public String addOccPeriodFee() {
         MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned();
 
         PaymentIntegrator pi = getPaymentIntegrator();
@@ -212,9 +213,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                             "Unable to add fee to database, sorry!", "Check server print out..."));
         }
 
+        return "";
+        
     }
 
-    public void commitOccPeriodFeeUpdates(ActionEvent e) {
+    public String commitOccPeriodFeeUpdates(ActionEvent e) {
         PaymentIntegrator pi = getPaymentIntegrator();
         MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned();
         
@@ -231,12 +234,16 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         if (waived == true) {
             skeleton.setWaivedBy(getSessionBean().getSessionUser());
+        } else {
+            skeleton.setWaivedBy(new User());
         }
 
         if (occPeriodFormFee.getReducedBy() != 0) {
             skeleton.setReducedBy(occPeriodFormFee.getReducedBy());
             skeleton.setReducedByUser(getSessionBean().getSessionUser());
 
+        } else {
+            skeleton.setReducedByUser(new User());
         }
         
         try {
@@ -248,6 +255,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                             "Unable to update fee in database.",
                             "This must be corrected by the System Administrator"));
         }
+        
+        return "";
     }
     
     public void editFeeType(ActionEvent e) {
@@ -296,6 +305,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         editing = false;
         formFee = new Fee();
+        formFee.setEffectiveDate(LocalDateTime.now());
+        formFee.setExpiryDate(LocalDateTime.now());
     }
 
     public String saveNewFeeType() {

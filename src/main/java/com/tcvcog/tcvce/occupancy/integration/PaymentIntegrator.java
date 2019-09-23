@@ -438,7 +438,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
             fee.setWaivedBy(ui.getUser(rs.getInt("waivedby_userid")));
             fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
-            fee.setReducedBy(rs.getDouble("reducedby"));
+            fee.setReducedBy(rs.getDouble("reduceby"));
             fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
             fee.setNotes(rs.getString("notes"));
             fee.setFee(getFee(rs.getInt("fee_feeid")));
