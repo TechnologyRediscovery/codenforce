@@ -30,6 +30,8 @@
                                 tableStyleClass="primeDataTable"
                                 rowExpandMode="single"
                                 expandedRow="true"
+                                selectionMode="single"
+                                selection="#{feeManagementBB.selectedOccPeriodFee}"
                                 filteredValue="#{feeManagementBB.occPeriodFilteredFeeList}"
                                 >
 
@@ -80,7 +82,7 @@
                                 </p:column>
                                 <p:rowExpansion>
                                     <div class="outlinedBox">
-                                        <h2>Full fee listing for fee <h:outputText value="#{fee.fee.occupancyInspectionFeeID}"/> </h2>
+                                        <h2>Full fee listing for fee <h:outputText value="#{fee.occPerAssignedFeeID}"/> </h2>
                                         <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                      columnClasses="gridTd, gridTd, gridTd, gridTd">
 
@@ -164,7 +166,7 @@
                                              actionListener="#{feeManagementBB.deleteSelectedOccPeriodFee}"
                                              value="Nuke Selected Record Forever" tabindex="3"/>
                             <p:commandButton    id="newFeeDialogButton"
-                                                actionListener="#{feeManagementBB.deleteSelectedOccPeriodFee}"
+                                                actionListener="#{feeManagementBB.initializeNewFee(e)}"
                                                 oncomplete="PF('paymentAddDialogVar').show()"
                                                 ajax="true"
                                                 update="occPeriodFeeAddForm"
@@ -205,7 +207,7 @@
                                     <h:outputLabel value="Notes:" for="feeNotes"/>
                                     <h:panelGroup>
                                         <p:inputText id="feeNotes" value="#{feeManagementBB.occPeriodFormFee.notes}" 
-                                                     style="width: 250px;" tabindex="10" required="true" styleClass="inputText"/>
+                                                     style="width: 250px;" tabindex="10" required="false" styleClass="inputText"/>
                                         <h:message for="feeNotes" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
@@ -272,8 +274,10 @@
                                 </h:panelGroup>
 
                                 <p:spacer height="10px"/>
-                                <p:commandButton ajax="false" rendered="#{!feeManagementBB.editing}" value="Assign Fee" action="#{feeManagementBB.addOccPeriodFee()}" />
-                                <p:commandButton ajax="false" rendered="#{feeManagementBB.editing}" actionListener="#{feeManagementBB.commitOccPeriodFeeUpdates(e)}"
+                                <p:commandButton ajax="false" rendered="#{!feeManagementBB.editing}" 
+                                                 value="Assign Fee" action="#{feeManagementBB.addOccPeriodFee()}" />
+                                <p:commandButton ajax="false" rendered="#{feeManagementBB.editing}" 
+                                                 actionListener="#{feeManagementBB.commitOccPeriodFeeUpdates(e)}"
                                                  value="Commit Updates" tabindex="14"/>
                                 <p:commandButton    id="cancel-cb"
                                                     ajax="true"  tabindex="27"
