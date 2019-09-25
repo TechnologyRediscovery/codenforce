@@ -234,7 +234,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         return feeList;
     }
-    
+
     public List<Fee> getFeeList(OccPeriodType type) throws IntegrationException {
 
         List<Fee> feeList = new ArrayList<>();
@@ -380,11 +380,11 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public void updateOccPeriodFee(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
-        String query = "UPDATE public.moneyoccperiodfeeassigned\n" +
-                       "SET moneyfeeassigned_assignedid=?, occperiod_periodid=?, assignedby_userid=?,\n" +
-                   "    assignedbyts=?, waivedby_userid=?, lastmodifiedts=?, reduceby=(?::numeric::money), reduceby_userid=?,\n" +
-                   "    notes=?, fee_feeid=?, occperiodtype_typeid=?\n" +
-                       "WHERE moneyoccperassignedfeeid=?;";
+        String query = "UPDATE public.moneyoccperiodfeeassigned\n"
+                + "SET moneyfeeassigned_assignedid=?, occperiod_periodid=?, assignedby_userid=?,\n"
+                + "    assignedbyts=?, waivedby_userid=?, lastmodifiedts=?, reduceby=(?::numeric::money), reduceby_userid=?,\n"
+                + "    notes=?, fee_feeid=?, occperiodtype_typeid=?\n"
+                + "WHERE moneyoccperassignedfeeid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -426,7 +426,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
 
     }
-    
+
     public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
 
         UserIntegrator ui = getUserIntegrator();
@@ -443,10 +443,11 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee.setNotes(rs.getString("notes"));
             fee.setFee(getFee(rs.getInt("fee_feeid")));
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
-            
+
             fee.setOccPeriodID(rs.getInt("occperiod_periodid"));
             fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
             fee.setOccPerAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
+            fee.setPaymentList(getPaymentList(fee));
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error generating OccPeriodFeeAssigned from ResultSet", ex);
@@ -584,10 +585,10 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     public List<Payment> getPaymentList(OccPeriod period) throws IntegrationException {
 
         String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
-                + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
+                + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
-                + "FROM public.moneypayment, moneyoccperiodfeepayment\n"
-                + "WHERE occperiodassignedfee_id = ? AND payment_paymentid = paymentid;";
+                + "FROM moneyoccperiodfeeassigned, moneyoccperiodfeepayment, public.moneypayment\n"
+                + "WHERE occperiod_periodid = ? AND moneyoccperassignedfeeid = occperiodassignedfee_id AND payment_paymentid = paymentid;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -596,6 +597,54 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, period.getPeriodID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                paymentList.add(generatePayment(rs));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Payment List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return paymentList;
+    }
+
+    public List<Payment> getPaymentList(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
+
+        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
+                + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
+                + "recordedby_userid, entrytimestamp\n"
+                + "FROM moneyoccperiodfeepayment, public.moneypayment\n"
+                + "WHERE occperiodassignedfee_id = ? AND payment_paymentid = paymentid;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<Payment> paymentList = new ArrayList();
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccPerAssignedFeeID());
             rs = stmt.executeQuery();
             while (rs.next()) {
                 paymentList.add(generatePayment(rs));
@@ -778,7 +827,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public void insertPaymentPeriodJoin(Payment payment, OccPeriod occPeriod) throws IntegrationException {
+    public void insertPaymentPeriodJoin(Payment payment, MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
         String query = "INSERT INTO public.moneyoccperiodfeepayment(\n"
                 + "    payment_paymentid, occperiodassignedfee_id)\n"
                 + "    VALUES (?, ?);";
@@ -788,7 +837,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, payment.getPaymentID());
-            stmt.setInt(2, occPeriod.getPeriodID());
+            stmt.setInt(2, fee.getOccPerAssignedFeeID());
             System.out.println("PaymentIntegrator.insertPaymentPeriodJoin | sql: " + stmt.toString());
             System.out.println("TRYING TO EXECUTE INSERT METHOD");
             stmt.execute();

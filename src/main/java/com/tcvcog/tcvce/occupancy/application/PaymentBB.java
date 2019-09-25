@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
@@ -51,7 +52,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     private PaymentType formPaymentType;
     private PaymentType newSelectedPaymentType;
     private PaymentType newPaymentType;
+
     private OccPeriod currentOccPeriod;
+    private MoneyOccPeriodFeeAssigned selectedOccPeriodFee;
+    private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFeeList;
+    private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList;
 
     private boolean editing;
     private String redirTo;
@@ -68,9 +73,17 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             if (getSessionBean().getSessionPayment() != null) {
                 paymentList = new ArrayList<>();
                 paymentList.add(getSessionBean().getSessionPayment());
+                try {
+                    occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) paymentIntegrator.getFeeAssigned(currentOccPeriod);
+                } catch (IntegrationException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Oops! We encountered a problem trying to fetch the fee list!", ""));
+                }
             } else if (currentOccPeriod != null) {
                 try {
                     paymentList = (ArrayList<Payment>) paymentIntegrator.getPaymentList(getSessionBean().getSessionOccPeriod());
+                    occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) paymentIntegrator.getFeeAssigned(currentOccPeriod);
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -111,33 +124,40 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public void commitPaymentUpdates(ActionEvent e) {
-        PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
-        Payment payment = selectedPayment;
-
-        payment.setPaymentType(formPayment.getPaymentType());
-        payment.setOccupancyInspectionID(formPayment.getOccupancyInspectionID());
-        payment.setDateDeposited(formPayment.getDateDeposited());
-        payment.setDateReceived(formPayment.getDateReceived());
-        payment.setAmount(formPayment.getAmount());
-        payment.setPayer(formPayment.getPayer());
-        payment.setReferenceNum(formPayment.getReferenceNum());
-        payment.setCheckNum(formPayment.getCheckNum());
-        payment.setCleared(formPayment.isCleared());
-        payment.setNotes(formPayment.getNotes());
-        //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
-        try {
-            paymentIntegrator.updatePayment(payment);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Payment record updated!", ""));
-            editing = false;
-            formPayment = new Payment();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
+        if (selectedOccPeriodFee == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to update payment record in database.",
-                            "This must be corrected by the System Administrator"));
+                            "Please select a fee to assign this payment to.", " "));
+            formPayment.setPayer(new Person());
+        } else {
+            PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
+            Payment payment = selectedPayment;
+
+            payment.setPaymentType(formPayment.getPaymentType());
+            payment.setOccupancyInspectionID(formPayment.getOccupancyInspectionID());
+            payment.setDateDeposited(formPayment.getDateDeposited());
+            payment.setDateReceived(formPayment.getDateReceived());
+            payment.setAmount(formPayment.getAmount());
+            payment.setPayer(formPayment.getPayer());
+            payment.setReferenceNum(formPayment.getReferenceNum());
+            payment.setCheckNum(formPayment.getCheckNum());
+            payment.setCleared(formPayment.isCleared());
+            payment.setNotes(formPayment.getNotes());
+            //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
+            try {
+                paymentIntegrator.updatePayment(payment);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Payment record updated!", ""));
+                editing = false;
+                formPayment = new Payment();
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to update payment record in database.",
+                                "This must be corrected by the System Administrator"));
+            }
         }
     }
 
@@ -199,6 +219,14 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public String addPayment() {
+        if (selectedOccPeriodFee == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a fee to assign this payment to.", " "));
+            formPayment.setPayer(new Person());
+            return "";
+        }
+
         Payment payment = new Payment();
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
         payment.setPaymentID(formPayment.getPaymentID());
@@ -234,7 +262,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             paymentIntegrator.insertPayment(payment);
             if (editingOccPeriod()) {
                 payment = paymentIntegrator.getMostRecentPayment();
-                paymentIntegrator.insertPaymentPeriodJoin(payment, currentOccPeriod);
+                paymentIntegrator.insertPaymentPeriodJoin(payment, selectedOccPeriodFee);
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -620,6 +648,30 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     public void setRedirTo(String redirTo) {
         this.redirTo = redirTo;
+    }
+
+    public MoneyOccPeriodFeeAssigned getSelectedOccPeriodFee() {
+        return selectedOccPeriodFee;
+    }
+
+    public void setSelectedOccPeriodFee(MoneyOccPeriodFeeAssigned selectedOccPeriodFee) {
+        this.selectedOccPeriodFee = selectedOccPeriodFee;
+    }
+
+    public ArrayList<MoneyOccPeriodFeeAssigned> getOccPeriodFeeList() {
+        return occPeriodFeeList;
+    }
+
+    public void setOccPeriodFeeList(ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFeeList) {
+        this.occPeriodFeeList = occPeriodFeeList;
+    }
+
+    public ArrayList<MoneyOccPeriodFeeAssigned> getOccPeriodFilteredFeeList() {
+        return occPeriodFilteredFeeList;
+    }
+
+    public void setOccPeriodFilteredFeeList(ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList) {
+        this.occPeriodFilteredFeeList = occPeriodFilteredFeeList;
     }
 
 }

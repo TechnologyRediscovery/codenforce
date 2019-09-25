@@ -77,7 +77,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         formFee = new Fee();
         formFee.setEffectiveDate(LocalDateTime.now());
         formFee.setExpiryDate(LocalDateTime.now());
-        
+
         PaymentIntegrator pi = getPaymentIntegrator();
 
         occPeriodFormFee = new MoneyOccPeriodFeeAssigned();
@@ -104,14 +104,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         if (feeList == null) {
             try {
-                    feeList = (ArrayList<Fee>) pi.getFeeTypeList(getSessionBean().getSessionMuni());
-                } catch (IntegrationException ex) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to fetch the fee list!", ""));
-                }
+                feeList = (ArrayList<Fee>) pi.getFeeTypeList(getSessionBean().getSessionMuni());
+            } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Oops! We encountered a problem trying to fetch the fee list!", ""));
+            }
         }
-        
+
     }
 
     public String finishAndRedir() {
@@ -127,12 +127,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         if (selectedOccPeriodFee != null) {
             try {
                 pi.deleteOccPeriodFee(selectedOccPeriodFee);
+                occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Fee deleted forever!", ""));
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());
             }
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Fee deleted forever!", ""));
 
         } else {
             getFacesContext().addMessage(null,
@@ -205,7 +206,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         try {
             pi.insertOccPeriodFee(skeleton);
-            
+            occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -214,13 +215,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
 
         return "";
-        
+
     }
 
     public String commitOccPeriodFeeUpdates(ActionEvent e) {
         PaymentIntegrator pi = getPaymentIntegrator();
         MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned();
-        
+
         skeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
         skeleton.setOccPeriodID(occPeriodFormFee.getOccPeriodID());
         skeleton.setOccPeriodTypeID(occPeriodFormFee.getOccPeriodTypeID());
@@ -245,9 +246,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         } else {
             skeleton.setReducedByUser(new User());
         }
-        
+
         try {
             pi.updateOccPeriodFee(skeleton);
+            occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -255,10 +257,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                             "Unable to update fee in database.",
                             "This must be corrected by the System Administrator"));
         }
-        
+
         return "";
     }
-    
+
     public void editFeeType(ActionEvent e) {
         if (getSelectedFeeType() != null) {
             editing = true;
@@ -591,7 +593,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     public void setCurrentOccPeriod(OccPeriod currentOccPeriod) {
         this.currentOccPeriod = currentOccPeriod;
     }
-    
+
     public boolean editingOccPeriod() {
         return (redirTo != null && currentOccPeriod != null);
     }
@@ -613,11 +615,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return prop;
 
     }
-    
+
     public String getOccPeriodAddress() {
 
         return getOccPeriodProperty().getAddress();
 
     }
-    
+
 }
