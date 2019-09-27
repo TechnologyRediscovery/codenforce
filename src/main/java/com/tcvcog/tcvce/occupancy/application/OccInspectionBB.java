@@ -248,7 +248,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        
+        /*
         try {
            paymentList = pai.getPaymentList(currentOccPeriod);
             
@@ -262,7 +262,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-       
+       */
+        
+        try {
+            feeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pai.getFeeAssigned(currentOccPeriod);
+            paymentList = new ArrayList<>();
+            
+            for (MoneyOccPeriodFeeAssigned skeleton : feeList) {
+                paymentList.addAll(skeleton.getPaymentList());
+            }
+                    
+        } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                }
+        
     }
     
     public void loadSpacesInType(){

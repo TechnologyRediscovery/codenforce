@@ -50,6 +50,13 @@
 
                                 <p:column width="25%">
                                     <f:facet name="header">
+                                        <h:outputText value="Assigned Fee ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.assignedFeeID} (#{p.assignedTo})"/>
+                                </p:column>                            
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
                                         <h:outputText value="Payment Type" />
                                     </f:facet>
                                     <h:outputText value="#{p.paymentType.paymentTypeTitle}"/>
@@ -103,8 +110,8 @@
                                     </f:facet>
                                     <h:outputText value="#{p.cleared}"/>
                                 </p:column>
-                                
-                                
+
+
 
                             </p:dataTable>
                             <p:spacer height="10px"/>
@@ -270,7 +277,7 @@
                                         rowKey="#{fee.occPerAssignedFeeID}"
                                         tableStyleClass="primeDataTable"
                                         rowExpandMode="single"
-                                        expandedRow="true"
+                                        expandedRow="false"
                                         selectionMode="single"
                                         selection="#{paymentBB.selectedOccPeriodFee}"
                                         filteredValue="#{paymentBB.occPeriodFilteredFeeList}"

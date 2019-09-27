@@ -1223,6 +1223,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             </div>
                                                         </h:panelGroup>
 
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Assigned Fee ID"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.assignedFeeID} (#{payment.assignedTo})"/>
+                                                            </div>
+                                                        </h:panelGroup>
 
                                                         <h:panelGroup>
                                                             <h:outputLabel styleClass="ui-label-inline" value="Payment Type"/>

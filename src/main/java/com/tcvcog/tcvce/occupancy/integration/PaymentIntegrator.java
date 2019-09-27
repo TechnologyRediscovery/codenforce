@@ -647,7 +647,11 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(1, fee.getOccPerAssignedFeeID());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                paymentList.add(generatePayment(rs));
+                Payment p = generatePayment(rs);
+                p.setAssignedFeeID(fee.getOccPerAssignedFeeID());
+                p.setAssignedTo("OccPeriod");
+                paymentList.add(p);
+                
             }
 
         } catch (SQLException ex) {
