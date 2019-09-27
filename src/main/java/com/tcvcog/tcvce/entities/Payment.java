@@ -37,7 +37,9 @@ public class Payment {
     private String notes;
     private User recordedBy;
     private LocalDateTime entryTimestamp;
-
+    private int assignedFeeID;
+    private String assignedTo;
+    
    public Payment() {
        
        notes = " ";
@@ -174,7 +176,7 @@ public class Payment {
     }
 
     /**
-     * @param paymentPayerID the paymentPayerID to set
+     * @param payer The person object of the payer.
      */
     public void setPayer(Person payer) {
         this.payer = payer;
@@ -223,5 +225,20 @@ public class Payment {
     public void setEntryTimestamp(LocalDateTime entryTimestamp) {
         this.entryTimestamp = entryTimestamp;
     }
-    
+
+    public int getAssignedFeeID() {
+        return assignedFeeID;
+    }
+
+    public void setAssignedFeeID(int assignedFeeID) {
+        this.assignedFeeID = assignedFeeID;
+    }
+
+    public String getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
+    }
 }

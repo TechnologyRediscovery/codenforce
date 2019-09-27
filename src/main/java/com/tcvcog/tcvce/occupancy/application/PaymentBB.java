@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -82,8 +83,13 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                 }
             } else if (currentOccPeriod != null) {
                 try {
-                    paymentList = (ArrayList<Payment>) paymentIntegrator.getPaymentList(getSessionBean().getSessionOccPeriod());
                     occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) paymentIntegrator.getFeeAssigned(currentOccPeriod);
+                    paymentList = new ArrayList<>();
+                    
+                    for (MoneyOccPeriodFeeAssigned skeleton : occPeriodFeeList) {
+                        paymentList.addAll(skeleton.getPaymentList());
+                    }
+                    
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
