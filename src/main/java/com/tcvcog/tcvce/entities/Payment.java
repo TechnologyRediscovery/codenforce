@@ -38,7 +38,7 @@ public class Payment {
     private User recordedBy;
     private LocalDateTime entryTimestamp;
     private int assignedFeeID;
-    private String assignedTo;
+    private FeeAssignedType assignedTo;
     
    public Payment() {
        
@@ -234,11 +234,11 @@ public class Payment {
         this.assignedFeeID = assignedFeeID;
     }
 
-    public String getAssignedTo() {
+    public FeeAssignedType getAssignedTo() {
         return assignedTo;
     }
 
-    public void setAssignedTo(String assignedTo) {
+    public void setAssignedTo(FeeAssignedType assignedTo) {
         this.assignedTo = assignedTo;
     }
 }

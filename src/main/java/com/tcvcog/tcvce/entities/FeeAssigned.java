@@ -114,6 +114,5 @@ public class FeeAssigned  extends EntityUtils implements Serializable {
     public void setAssigned(LocalDateTime assigned) {
         this.assigned = assigned;
     }
-        
-    
+
 }

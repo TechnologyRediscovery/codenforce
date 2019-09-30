@@ -61,6 +61,8 @@ import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import java.time.LocalDateTime;
@@ -254,6 +256,18 @@ public class BackingBeanUtils implements Serializable{
          
             
          return controlCode;
+    }
+    
+    public boolean hasColumn(ResultSet rs, String column) throws SQLException {
+        ResultSetMetaData meta = rs.getMetaData();
+        int columns = meta.getColumnCount();
+        for(int index = 1; index <= columns; index++){
+            if(column.equals(meta.getColumnName(index))) {
+                return true;
+            }
+        
+        }
+        return false;
     }
     
     public CodeCoordinator getCodeCoordinator() {

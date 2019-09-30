@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
@@ -62,6 +63,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFeeList;
     private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList;
 
+    //feePermissions.xhtml fields
+    private ArrayList<OccPeriodType> typeList;
+    private ArrayList<OccPeriodType> filteredTypeList;
+    private OccPeriodType selectedPeriodType;
+    
     private boolean editing;
     private String redirTo;
     private boolean waived;
@@ -91,7 +97,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
                 try {
                     occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-                    feeList = (ArrayList<Fee>) pi.getFeeTypeList(getOccPeriodProperty().getMuni());
+                    feeList = (ArrayList<Fee>) currentOccPeriod.getPermittedFees();
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -111,7 +117,18 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                                 "Oops! We encountered a problem trying to fetch the fee list!", ""));
             }
         }
-
+        
+        if(typeList == null){
+            OccupancyIntegrator oi = getOccupancyIntegrator();
+            try {
+                typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessionMuni().getMuniCode());
+            } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Oops! We encountered a problem trying to fetch the OccPeriodType List!", ""));
+            }
+        }
+        
     }
 
     public String finishAndRedir() {
@@ -120,6 +137,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return redirTo;
     }
 
+    public String goToFeePermissions(){
+        return "feePermissions";
+    }
+    
     public String deleteSelectedOccPeriodFee(ActionEvent e) {
 
         PaymentIntegrator pi = getPaymentIntegrator();
@@ -598,6 +619,30 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return (redirTo != null && currentOccPeriod != null);
     }
 
+    public ArrayList<OccPeriodType> getTypeList() {
+        return typeList;
+    }
+
+    public void setTypeList(ArrayList<OccPeriodType> typeList) {
+        this.typeList = typeList;
+    }
+
+    public OccPeriodType getSelectedPeriodType() {
+        return selectedPeriodType;
+    }
+
+    public void setSelectedPeriodType(OccPeriodType selectedPeriodType) {
+        this.selectedPeriodType = selectedPeriodType;
+    }
+
+    public ArrayList<OccPeriodType> getFilteredTypeList() {
+        return filteredTypeList;
+    }
+
+    public void setFilteredTypeList(ArrayList<OccPeriodType> filteredTypeList) {
+        this.filteredTypeList = filteredTypeList;
+    }
+    
     public Property getOccPeriodProperty() {
 
         PropertyIntegrator pi = getPropertyIntegrator();

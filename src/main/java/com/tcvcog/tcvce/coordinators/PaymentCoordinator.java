@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import java.util.List;
 
 /**
  * Implements business logic related to payments.
@@ -34,10 +33,11 @@ public class PaymentCoordinator {
     public PaymentCoordinator() {
     }
     
+    /*
     public OccPeriod configureOccPeriodFees(OccPeriod op){
         // look up the set of fees associated with 
     }
-    
+    */
     
     /**
      * Container for business logic related to an individual Payment instance
