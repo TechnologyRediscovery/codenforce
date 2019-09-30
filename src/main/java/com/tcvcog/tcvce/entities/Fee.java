@@ -31,6 +31,7 @@ public class Fee {
     private LocalDateTime effectiveDate;
     private LocalDateTime expiryDate;
     private String notes;
+    private boolean autoAssigned;
 
     public Fee(){
         
@@ -104,5 +105,12 @@ public class Fee {
         this.notes = notes;
     }
 
-    
+       public boolean isAutoAssigned() {
+        return autoAssigned;
+    }
+
+    public void setAutoAssigned(boolean autoAssigned) {
+        this.autoAssigned = autoAssigned;
+    }
+
 }

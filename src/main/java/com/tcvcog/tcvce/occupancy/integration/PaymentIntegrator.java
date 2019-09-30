@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.FeeAssignedType;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -239,7 +240,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         List<Fee> feeList = new ArrayList<>();
 
-        String query = "SELECT moneyfee.feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes\n"
+        String query = "SELECT moneyfee.feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes, autoassign\n"
                 + "FROM moneyfee, moneyoccperiodtypefee\n"
                 + "WHERE moneyfee.feeid = moneyoccperiodtypefee.fee_feeid AND moneyoccperiodtypefee.occperiodtype_typeid = ?;";
 
@@ -499,6 +500,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee.setEffectiveDate(rs.getTimestamp("effectivedate").toLocalDateTime());
             fee.setExpiryDate(rs.getTimestamp("expirydate").toLocalDateTime());
             fee.setNotes(rs.getString("notes"));
+            if(hasColumn(rs,"autoassign")) fee.setAutoAssigned(rs.getBoolean("autoassign"));
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error generating Fee from ResultSet", ex);
@@ -649,7 +651,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             while (rs.next()) {
                 Payment p = generatePayment(rs);
                 p.setAssignedFeeID(fee.getOccPerAssignedFeeID());
-                p.setAssignedTo("OccPeriod");
+                p.setAssignedTo(FeeAssignedType.OccPeriod);
                 paymentList.add(p);
                 
             }
