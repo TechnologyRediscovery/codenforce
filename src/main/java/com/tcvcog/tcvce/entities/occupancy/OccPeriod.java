@@ -10,7 +10,6 @@ import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
 import com.tcvcog.tcvce.entities.Fee;
-import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
@@ -58,7 +57,6 @@ public class OccPeriod
     private List<Integer> blobIDList;
     
     private List<Payment> paymentList;
-    private List<Fee> permittedFees;
     
     private User manager;
      
@@ -693,14 +691,6 @@ public class OccPeriod
      */
     public void setGoverningInspection(OccInspection governingInspection) {
         this.governingInspection = governingInspection;
-    }
-
-    public List<Fee> getPermittedFees() {
-        return permittedFees;
-    }
-
-    public void setPermittedFees(List<Fee> permittedFees) {
-        this.permittedFees = permittedFees;
     }
     
 }

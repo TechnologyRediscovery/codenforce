@@ -473,7 +473,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setEventRuleOccPeriodList(ei.getEventRuleOccPeriodList(op));
         
         op.setPaymentList(payInt.getPaymentList(op));
-        op.setPermittedFees(payInt.getFeeList(op.getType()));
         
         op.setPermitList(getOccPermitList(op));
         op.setBlobIDList(getBlobList(op));
@@ -1009,7 +1008,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     private OccPeriodType generateOccPeriodType(ResultSet rs) throws IntegrationException {
         OccPeriodType opt = new OccPeriodType();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-
+        PaymentIntegrator pi = getPaymentIntegrator();
+        
         try {
             opt.setTypeid(rs.getInt("typeid"));
             opt.setMuni(mi.getMuni(rs.getInt("muni_municode")));
@@ -1038,6 +1038,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             
             opt.setPermitTitle(rs.getString("permittitle"));
             opt.setPermitTitleSub(rs.getString("permittitlesub"));
+            
+            opt.setPermittedFees(pi.getFeeList(opt));
 
             // wire up when nathan is done
             // opt.setFeeList(fee);

@@ -30,13 +30,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -645,7 +642,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         StringBuilder description = new StringBuilder("It is required that you have these types of people: ");
 
-        List<String> descList = new ArrayList<String>();
+        List<String> descList = new ArrayList<>();
 
         for (PersonType type : required) {
 
@@ -783,13 +780,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         try {
             existingProp = pri.getPropertyWithLists(prop.getPropertyID(), getSessionBean().getSessionUser());
                     
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        } catch (CaseLifecycleException ex) {
-            System.out.println(ex);
-        } catch (EventException ex) {
-            System.out.println(ex);
-        } catch (AuthorizationException ex) {
+        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
         }
         
