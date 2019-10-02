@@ -34,6 +34,7 @@ public class OccPeriodType {
     private String authorizeduses;
     private String description;
     private boolean userassignable;
+    private List<Fee> permittedFees;
     
     /**
      * Used to build a checklist template for the occperiod
@@ -380,10 +381,7 @@ public class OccPeriodType {
             return false;
         }
         final OccPeriodType other = (OccPeriodType) obj;
-        if (this.typeid != other.typeid) {
-            return false;
-        }
-        return true;
+        return this.typeid == other.typeid;
     }
 
     /**
@@ -426,6 +424,14 @@ public class OccPeriodType {
      */
     public void setChecklistID(int checklistID) {
         this.checklistID = checklistID;
+    }
+    
+    public List<Fee> getPermittedFees() {
+        return permittedFees;
+    }
+
+    public void setPermittedFees(List<Fee> permittedFees) {
+        this.permittedFees = permittedFees;
     }
     
 }

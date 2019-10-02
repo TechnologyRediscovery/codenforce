@@ -67,6 +67,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private ArrayList<OccPeriodType> typeList;
     private ArrayList<OccPeriodType> filteredTypeList;
     private OccPeriodType selectedPeriodType;
+    private List<Fee> existingFeeList;
+    private ArrayList<Fee> workingFeeList;
+    private Fee selectedWorkingFee;
+    private List<Fee> allFees;
     
     private boolean editing;
     private String redirTo;
@@ -97,7 +101,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
                 try {
                     occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-                    feeList = (ArrayList<Fee>) currentOccPeriod.getPermittedFees();
+                    feeList = (ArrayList<Fee>) currentOccPeriod.getType().getPermittedFees();
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -108,14 +112,18 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         }
 
-        if (feeList == null) {
+        if (allFees == null) {
             try {
-                feeList = (ArrayList<Fee>) pi.getFeeTypeList(getSessionBean().getSessionMuni());
+                allFees = pi.getFeeTypeList(getSessionBean().getSessionMuni());
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Oops! We encountered a problem trying to fetch the fee list!", ""));
             }
+        }
+        
+        if (feeList == null) {
+            feeList = (ArrayList<Fee>) allFees;
         }
         
         if(typeList == null){
@@ -392,6 +400,21 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
     }
 
+    public void editOccPeriodFees(){
+            existingFeeList = selectedPeriodType.getPermittedFees();
+            workingFeeList = new ArrayList<>();
+            workingFeeList.addAll(existingFeeList);
+
+    }
+    
+    public void removeOccPeriodFee(Fee selectedFee){
+        workingFeeList.remove(selectedFee);
+    }
+    
+    public void addFeeToPermittedFees(){
+        workingFeeList.add(selectedFee);
+    }
+    
     /**
      * @param existingFeeTypeList the existingFeeTypeList to set
      */
@@ -641,6 +664,38 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public void setFilteredTypeList(ArrayList<OccPeriodType> filteredTypeList) {
         this.filteredTypeList = filteredTypeList;
+    }
+
+    public List<Fee> getExistingFeeList() {
+        return existingFeeList;
+    }
+
+    public void setExistingFeeList(List<Fee> existingFeeList) {
+        this.existingFeeList = existingFeeList;
+    }
+
+    public ArrayList<Fee> getWorkingFeeList() {
+        return workingFeeList;
+    }
+
+    public void setWorkingFeeList(ArrayList<Fee> workingFeeList) {
+        this.workingFeeList = workingFeeList;
+    }
+
+    public Fee getSelectedWorkingFee() {
+        return selectedWorkingFee;
+    }
+
+    public void setSelectedWorkingFee(Fee selectedWorkingFee) {
+        this.selectedWorkingFee = selectedWorkingFee;
+    }
+
+    public List<Fee> getAllFees() {
+        return allFees;
+    }
+
+    public void setAllFees(List<Fee> allFees) {
+        this.allFees = allFees;
     }
     
     public Property getOccPeriodProperty() {
