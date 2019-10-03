@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Choose a property</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="occPermitApplicationFlowView">
+                    
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <h1>Step 1/5: Select a property in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
+                        
+                        
+                        
+                        <h:form id="occPermitApplicationChoosePropertyForm">                          
+                            <p:panel>
+                            
+                                <h2 id="currentStep">Step 1: Select Property</h2>
+
+                             <p>Please search for and select the property of concern using this search tool.</p>
+
+                            <p:spacer height="10px"/>
+
+                            <p:panelGrid columns="3" layout="grid">
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="propSearchHouseNumIT">
+                                        <h:outputText value="House number:"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="propSearchHouseNumIT" value="#{occPermitApplicationBB.houseNum}" 
+                                                  tabindex="2" required="false" styleClass="inputText">
+                                    </p:inputText>
+                                    <h:message for="propSearchHouseNumIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="propSearchStreetIT">
+                                        <h:outputText value="Street name:"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="propSearchStreetIT" value="#{occPermitApplicationBB.streetName}" 
+                                                  tabindex="3" required="false" styleClass="inputText">
+                                    </p:inputText>
+                                    <h:message for="propSearchStreetIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:commandButton
+                                        value="Search in Selected Municipality" tabindex="4" ajax="false" icon="fa fa-search"
+                                        action="#{occPermitApplicationBB.searchForPropertiesSingleMuni}" 
+                                        update=    "propSearchHouseNumIT
+                                                    propSearchStreetIT
+                                                    propertyResultTable"/>
+                                </h:panelGroup>
+                            </p:panelGrid> 
+
+                            <h3>Search Results:</h3>
+                            <p>If the property you are looking for is not below, try searching again.
+                               If it is, please select it and click the button labeled 
+                               "Confirm and Continue" at the bottom of the page.</p>
+
+                            <p:dataTable
+                                id="propertyResultTable"
+                                var="prop" 
+                                value="#{occPermitApplicationBB.propList}"
+                                selectionMode="single" tabindex="5"
+                                scrollable="true" scrollHeight="200" 
+                                selection="#{occPermitApplicationBB.selectedProperty}"
+                                rowKey="#{prop.propertyID}">
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Address" />
+                                    </f:facet>
+                                    <h:outputText value="#{prop.address}"/>
+                                </p:column>
+                                
+
+                                <p:column>
+
+                                    <f:facet name="header">
+                                        <h:outputText value="Type" />
+                                    </f:facet>
+                                    <h:outputText value="#{prop.propertyUseTypeString}"/>
+
+                                </p:column>
+
+                            </p:dataTable>
+                            
+                            </p:panel>
+
+
+                           <h3>Step 2: Configure Unit List</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                           
+                           <h3>Step 3: Select Units For Application</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                           
+                           <h3>Step 4: Choose Reason For Application</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                           
+                           <h3>Step 5: Add People To Application</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                                      
+
+                            <p:spacer height="10px"/>
+                                <p:commandButton ajax="false" value="Confirm and continue" action="#{occPermitApplicationBB.selectProperty}" />
+                                
+                        </h:form>
+                        
+                        
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

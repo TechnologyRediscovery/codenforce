@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Update Code Element</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:outputLink value="codeElementList.xhtml">&lt;-- Back to element manager</h:outputLink>
+                    <h1>Update existing code element</h1>
+                    <f:view>
+
+                        <h:messages globalOnly="false"></h:messages>
+
+                        <h2>This Element's Code Source:</h2>
+
+                        <p>
+                            <span class="bold">Source ID: </span><h:outputText value="#{codeElementBB.currentElement.source.sourceID} | "/>
+                            <span class="bold">Source Name: </span> <h:outputText value="#{codeElementBB.currentElement.source.sourceName} | "/>
+                            <span class="bold">Year: </span><h:outputText value="#{codeElementBB.currentElement.source.sourceYear}"/>   
+                        </p>
+
+                        <hr/>
+
+                        <h:form id="updateCodeElementForm">
+                            <h2>Update Code Element ID: <h:outputText value="#{codeElementBB.currentElement.elementID}"/> </h2>
+                            <p>Adjust the fields as needed and click "Update" at the bottom. 
+                                All fields will be overwritten, so leave untouched those you wish to remain unchanged.</p>
+
+
+                            <h:panelGrid columns="4" cellpadding="10"  
+                                         columnClasses="gridTd, gridTd, gridTd,">
+
+
+
+                                <h:outputLabel for="cdelOrdChapterNo" >
+                                    <h:outputText value="Ordiance chapter number (numbers only)" styleClass="uiLabel" />
+                                </h:outputLabel>
+                                <h:panelGroup>
+
+                                    <p:inputText id="cdelOrdChapterNo" value="#{codeElementBB.formOrdChapterNo}" 
+                                                 style="width: 100%;" tabindex="2" required="true" styleClass="inputText"/>
+                                    <h:message for="cdelOrdChapterNo" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:outputLabel for="cdelOrdChapterTitle" >
+                                    <h:outputText value="Chapter title" styleClass="uiLabel" />
+                                </h:outputLabel>
+
+                                <h:panelGroup>
+                                    <p:inputText id="cdelOrdChapterTitle" value="#{codeElementBB.formOrdChapterTitle}" 
+                                                 style="width: 100%;" tabindex="3" required="true" styleClass="inputText"/>
+                                    <h:message for="cdelOrdChapterTitle" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:outputLabel for="cdelOrdSecNum" >
+                                    <h:outputText value="Section number (may contain letters)" styleClass="uiLabel" />
+                                </h:outputLabel>
+                                <h:panelGroup>
+                                    <p:inputText id="cdelOrdSecNum" value="#{codeElementBB.formOrdSecNum}" 
+                                                 style="width: 100%;" tabindex="4" required="true" styleClass="inputText"/>
+                                    <h:message for="cdelOrdSecNum" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:outputLabel for="ccdelOrdSecTitle" >
+                                    <h:outputText value="Section title" styleClass="uiLabel" />
+                                </h:outputLabel>
+
+                                <h:panelGroup>
+                                    <p:inputText id="ccdelOrdSecTitle" value="#{codeElementBB.formOrdSecTitle}" 
+                                                 style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
+                                    <h:message for="ccdelOrdSecTitle" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:outputLabel for="cdelordSubSecNum" >
+                                    <h:outputText value="Subsection number (may contain letters)" styleClass="uiLabel" />
+                                </h:outputLabel>
+
+                                <h:panelGroup>
+
+                                    <p:inputText id="cdelordSubSecNum" value="#{codeElementBB.formOrdSubSecNum}" 
+                                                 style="width: 100%;" tabindex="6" required="false" styleClass="inputText"/>
+                                    <h:message for="cdelordSubSecNum" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:outputLabel for="cdelOrdSubSecTitle" >
+                                    <h:outputText value="Subsection title" styleClass="uiLabel" />
+                                </h:outputLabel>
+
+
+                                <h:panelGroup>
+                                    <p:inputText id="cdelOrdSubSecTitle" value="#{codeElementBB.formOrdSubSecTitle}" 
+                                                 style="width: 100%;" tabindex="7" required="false" styleClass="inputText"/>
+                                    <h:message for="cdelOrdSubSecTitle" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:outputLabel for="cdelIsActive" >
+                                    <h:outputText value="Toggle active element'" styleClass="uiLabel" />
+                                </h:outputLabel>
+                                <h:panelGroup>
+
+                                    <p:selectBooleanCheckbox id="cdelIsActive" value="#{codeElementBB.formIsActive}" 
+                                                             tabindex="11" required="true" styleClass="selectOneRadio"/>
+                                    <h:message for="cdelIsActive" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:outputLabel for="cdelUrl" >
+                                    <h:outputText value="Web address of element resource" styleClass="uiLabel" />
+                                </h:outputLabel>
+
+                                <h:panelGroup>
+
+                                    <p:inputText id="cdelUrl" value="#{codeElementBB.formResourceURL}" 
+                                                 style="width: 100%;" tabindex="13" required="false" styleClass="inputText"/>
+                                    <h:message for="cdelUrl" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                
+                                <h:outputLabel for="cdElGuideID" >
+                                    <h:outputText value="Code Guide entry ID" styleClass="uiLabel" />
+                                </h:outputLabel>
+
+                                <h:panelGroup>
+
+                                    <p:inputText id="cdElGuideID" value="#{codeElementBB.formGuideEntryID}" 
+                                                 style="width: 100%;" tabindex="13" required="false" styleClass="inputText"/>
+                                    <h:message for="cdElGuideID" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                            </h:panelGrid>
+
+                            <h:outputLabel for="cdelOrdTechnicalText" >
+                                <h:outputText value="Enter the technical text of this ordinance" styleClass="uiLabel" />
+                            </h:outputLabel>
+
+                            <h:panelGroup>
+                                <p:editor   id="cdelOrdTechnicalText" value="#{codeElementBB.formOrdTechnicalText}" 
+                                                    controls="bold italic underline strikethrough font size style color 
+                                                    bullets numbering center undo redo rule link removeformat outdent 
+                                                    indent link unlink copy cut paste rule alignleft center alignright"
+                                                    width="1000" required="true"
+                                                    height="200"/>
+                                <h:message for="cdelOrdTechnicalText" showDetail="true" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:panelGroup>
+
+
+                            <h:outputLabel for="cdelOrdHumanFriendlyText" >
+                                <h:outputText value="Compose a human-friendly version of this ordinance" styleClass="uiLabel" />
+                            </h:outputLabel>
+
+                            <h:panelGroup>
+
+                                <p:editor   id="cdelOrdHumanFriendlyText" value="#{codeElementBB.formOrdHumanFriendlyText}" 
+                                                    controls="bold italic underline strikethrough font size style color 
+                                                    bullets numbering center undo redo rule link removeformat outdent 
+                                                    indent link unlink copy cut paste rule alignleft center alignright"
+                                                    width="1000" required="true"
+                                                    height="200"/>
+                                <h:message for="cdelOrdHumanFriendlyText" showDetail="true" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:panelGroup>
+
+
+
+                            <p:spacer height="15px"/>
+
+                            <p:commandButton 
+                                id="insertCodeElement"  ajax="false"
+                                value="Update code element" 
+                                tabindex="15" icon="fa fa-edit"
+                                action="#{codeElementBB.commitUpdatesToCodeElement()}"/>
+
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

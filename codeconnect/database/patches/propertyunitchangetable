@@ -1,0 +1,29 @@
+﻿/*changes to occupancypermitapplication table*/
+
+
+ALTER TABLE public.occupancypermitapplication ADD COLUMN rental boolean;
+
+
+/* new propertyunitchange table*/
+
+CREATE TABLE public.propertyunitchange
+(
+  unitchangeid integer NOT NULL DEFAULT nextval('propertunit_unitid_seq'::regclass),
+  unitnumber text,
+  unit_unitid integer NOT NULL,
+  otherknownaddress text,
+  notes text,
+  rental boolean,
+  removed boolean,
+  added boolean,
+  changedon timestamp with time zone,
+  approvedon timestamp with time zone,
+  approvedby integer,
+  changedby text,
+  property_propertyid integer,
+  active boolean,
+  CONSTRAINT unitchangeid_pk PRIMARY KEY (unitchangeid)
+)
+WITH (
+  OIDS=FALSE
+);

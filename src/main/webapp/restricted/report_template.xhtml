@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="css/style.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <title>Report</title>
+    </h:head>
+    <h:body>
+         <ui:insert name="report-header">
+                <f:view id="report-header">
+                <div class="flexing-box-topbar">
+                        <div class="logoBox">
+                            <div class="logo-image-wrapper">
+                                <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
+                            </div>
+                            <div class="logo-title-wrapper">
+                                <div class="report-title">
+                                    <h:outputText id="report-title-ot"  value="#{reportingBB.currentReport.title}"/> 
+                                </div>
+                                <div class="report-title-sub">
+                                    
+                                     <h:outputText id="report-subtitle-ot"  value="#{reportingBB.currentReport.muni.muniName}, #{reportingBB.currentReport.muni.address_state}"/> 
+                                    
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                        
+                    
+                    </f:view>
+        </ui:insert>
+        
+        <div class="flexing-box-pagecontent">
+            <ui:insert name="print-content">
+                
+                <p>I am the not content in the template content placeholder. I am not aware of any way for this particular element to ever be displayed to anybody.</p>
+                
+            </ui:insert>
+        </div>
+
+
+    </h:body>
+</html>
+

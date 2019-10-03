@@ -1,0 +1,246 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Select Violated Code Element</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view>
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+                        <h1>Select Violated Code Element</h1>
+
+                        <p>Select an enforcable code element to add to this case and then click "Add Selected Violation to current case". Your current code set is: 
+                            <h:outputText value="#{sessionBean.activeCodeSet.codeSetName}"/></p>
+
+                        <h:form id="selectViolatedElementForm">
+                            
+                            
+                            <p:commandButton ajax="false" 
+                                             action="#{violationSelectElementBB.useSelectedElement}"
+                                             value="Add selected violation to current case" icon="fa fa-edit"/>
+                            <p:spacer height="5px"/>
+
+                             <p:dataTable
+                                id="enforcableCodeSetElementTable"
+                                var="cse"
+                                value="#{violationSelectElementBB.enfElementList}"
+                                rowKey="#{cse.codeSetElementID}"
+                                tableStyleClass="primeDataTable"
+                                scrollable="true"
+                                resizableColumns="true"
+                                draggableColumns="false"
+                                rowExpandMode="single"
+                                expandedRow="false"
+                                filteredValue="#{violationSelectElementBB.filteredElementList}"
+                                widgetVar="codeSetElementListTable">
+                                
+                               <p:column width="3%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Exp"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+                                
+                                <p:column width="6%" >
+                                    <f:facet name="header">
+                                        <h:outputText value="Select" />
+                                    </f:facet>
+                                    <p:commandButton id="selectviolation-cb" 
+                                                     ajax="false" value="select"
+                                                     icon="fa fa-hand-o-right"
+                                                     action="#{violationSelectElementBB.useSelectedElement(cse)}" />
+                                    
+                                </p:column>
+                                
+                                <p:column width="4%" >
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                          <h:outputText value="#{cse.codeSetElementID}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{cse.codeElement.source.sourceName}"
+                                          filterBy="#{cse.codeElement.source.sourceName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Source" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.source.sourceName}(#{cse.codeElement.source.sourceYear})"/>
+                                </p:column>
+                                
+                                <p:column width="5%" sortBy="#{cse.codeElement.ordchapterNo}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Chap#"/>
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.ordchapterNo}"/>
+                                </p:column>
+                                
+                                <p:column width="15%" sortBy="#{cse.codeElement.ordchapterTitle}"
+                                          filterBy="#{cse.codeElement.ordchapterTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Chapter"/>
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.ordchapterTitle}"/>
+                                </p:column>
+                                
+                                <p:column width="5%" sortBy="#{cse.codeElement.ordSecNum}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sec#" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.ordSecNum}"/>
+                                </p:column>
+                                
+                                <p:column width="15%" sortBy="#{cse.codeElement.ordSecTitle}"
+                                          filterBy="#{cse.codeElement.ordSecTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Section" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.ordSecTitle}"/>
+                                </p:column>
+                                
+                                <p:column width="5%" sortBy="#{cse.codeElement.ordSubSecNum}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sub#" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.ordSubSecNum}"/>
+                                </p:column>
+                                
+                                <p:column sortBy="#{cse.codeElement.ordSubSecTitle}" 
+                                          filterBy="#{cse.codeElement.ordSubSecTitle}"
+                                          width="15%">
+                                    <f:facet name="header">
+                                        <h:outputText value="SubSec. Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.ordSubSecTitle}"/>
+                                </p:column>
+                                
+                                 <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.category}"
+                                          filterBy="#{cse.codeElement.guideEntry.category}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.guideEntry.category}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.subCategory}"
+                                          filterBy="#{cse.codeElement.guideEntry.subCategory}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sub Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.guideEntry.subCategory}"/>
+                                </p:column>
+                                
+                                
+                                <p:rowExpansion>
+                                    <div class="outlinedBox">
+                                        <h2>Enforcability Info</h2>
+                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd">
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Munimum Penalty"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="$#{cse.minPenalty}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Norm Penalty"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="$#{cse.normPenalty}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Maximum Penalty"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="$#{cse.maxPenalty}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Penalty Notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.penaltyNotes}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Default days to comply"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.normDaysToComply}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Compliance timeframe Notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.daysToComplyNotes}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            
+                                            <f:facet name="footer">
+                                                <h:outputLabel styleClass="bold" value="Municipality specific implementation notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.muniSpecificNotes}"/>
+                                                </div>
+                                            </f:facet>
+                                            
+                                        </h:panelGrid>
+                                    </div>
+                                    
+                                    <div class="outlinedBox">
+                                        <h2>Code Element Content</h2>
+                                        
+                                        <h:outputLabel styleClass="bold" value="Technical Text"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.codeElement.ordTechnicalText}"/>
+                                        </div>
+                                        
+                                        <p:spacer height="15px"/>
+                                        
+                                        <h:outputLabel styleClass="bold" value="Human friendly text"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.codeElement.ordHumanFriendlyText}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.codeElement.guideEntry.enforcementGuidelines}"/>
+                                        </div>
+                                        
+                                        <p:spacer height="15px"/>
+                                        
+                                        <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.codeElement.guideEntry.inspectionGuidelines}"/>
+                                        </div>
+                                    </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

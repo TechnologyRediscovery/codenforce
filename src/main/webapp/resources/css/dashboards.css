@@ -1,0 +1,29 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Jun 14, 2019, 6:49:46 AM
+    Author     : sylvia
+*/
+
+
+
+.ui-panel, div.ui-state-hover {
+                margin: 10px;
+                width:200px;
+            }
+             
+.ui-dashboard-column {
+    width:33%;
+    background-color: blue;
+   
+}
+
+.ui-panel-content{
+    background-color: gray;
+}
+
+
+

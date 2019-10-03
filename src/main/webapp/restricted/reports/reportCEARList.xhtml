@@ -1,0 +1,265 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="css/style.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" />
+        <title>Code enforcement action requests</title>
+    </h:head>
+    <h:body>
+        <ui:insert name="report-header">
+            <f:view id="report-header">
+                <div class="flexing-box-topbar">
+                    <div class="logoBox">
+                        <div class="logo-image-wrapper">
+                            <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
+                        </div>
+                        <div class="logo-title-wrapper">
+                            <div class="report-title">
+                                <h:outputText id="report-title-ot"  value="#{cEActionRequestsReportBB.reportConfig.title}"/> 
+                            </div>
+                            <div class="report-title-sub">
+                                <h:outputText id="report-subtitle-ot"  value="#{cEActionRequestsReportBB.reportConfig.muni.muniName}, #{cEActionRequestsReportBB.reportConfig.muni.address_state}"/> 
+                                <h:outputText value=" | " />
+                                <h:outputText id="date-ot" value="printed on: #{cEActionRequestsReportBB.reportConfig.generationTimestampPretty}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </f:view>
+        </ui:insert>
+        <f:view>
+            <div class="flexing-box-pagecontent">
+                <ui:insert name="print-content">
+                    <div class="report-header-info">
+                        <h:panelGrid columns="2" rendered="true"
+                                     columnClasses="event-list-halfwidth, event-list-halfwidth"
+                                     footerClass="no-border">
+
+                            <h:panelGroup>
+                                <p>
+                                    <h:outputLabel id="report-creator-ol" for="report-creator-ot" styleClass="bold" value="printed by: " />
+                                    <h:outputText id="report-creator-ot"  value="#{cEActionRequestsReportBB.reportConfig.creator.person.firstName} 
+                                                  #{cEActionRequestsReportBB.reportConfig.creator.person.lastName}"/>
+                                    <h:outputText styleClass="bold" value=" | " />
+                                    <h:outputText id="report-username-ot"  value="username: #{cEActionRequestsReportBB.reportConfig.creator.username}, 
+                                                  id: #{cEActionRequestsReportBB.reportConfig.creator.userID}, " />
+                                    <h:outputText id="report-role-cred-ot"  value="role: #{cEActionRequestsReportBB.reportConfig.creator.roleType.label}" />
+
+
+                                </p>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{cEActionRequestsReportBB.reportConfig.printFullCEARQueue}">
+                                <h:outputText styleClass="bold" value="number of requests in report: " />
+                                <h:outputText styleClass="bold" value="#{cEActionRequestsReportBB.reportConfig.BOBQuery.BOBResultList.size()}" />
+                                <br />
+                                <h:outputLabel id="report-notes-ol" for="report-notes-ot" styleClass="bold" value="report notes: "/>
+                                <h:outputText id="report-notes-ot"  value="#{cEActionRequestsReportBB.reportConfig.notes}"/>
+                            </h:panelGroup>
+
+                        </h:panelGrid>
+
+                    </div>
+
+
+                    <div id="report-cear-datascroller-container">
+
+
+                        <p:dataScroller
+                            id="cears-datascroller"
+                            var="cear"
+                            value="#{cEActionRequestsReportBB.reportConfig.BOBQuery.results}"
+                            widgetVar="cears-datascroller-var">
+
+                            <div class="report-cear-requestbox">
+                                <h:form id="req-details-form">
+                                    <div class="#{cear.insertPageBreakBefore ? 'printing-page-break-before' : ''}">
+                                        
+                                        <h1>
+                                            Code enforcement request
+                                        </h1>
+
+
+                                        <h2>
+
+                                            <h:outputText id="header-type-ot" value="#{cear.issueTypeString}"/>
+                                            <h:outputText   id="header-id-ot" value=" (id: #{cear.requestID})"/>:
+                                            <br />
+                                            <h:outputText id="header-addr-ot" value="#{cear.requestProperty.address}, "/>  
+                                            <h:outputText id="header-muni-ot" value="#{cear.requestProperty.muni.muniName}"/>  
+
+                                        </h2>
+
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd" id="selectedRequestDetails">
+
+                                            <h:panelGroup>
+                                                <h:outputLabel class="bold" value="Date Submitted" />
+                                                <p:spacer height="5px"/>
+                                                <div class="wrapText">
+                                                    <h:outputText id="selr-submitted-ts"  value="#{cear.formattedSubmittedTimeStamp}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel class="bold" value="Issue Type" />
+                                                <p:spacer height="5px"/>
+                                                <div class="wrapText">
+                                                    <h:outputText id="selr-issueType" value="#{cear.issueTypeString}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Status: "/>
+                                                <h:outputText id="selr-status-ot" value="#{cEActionRequestsBB.selectedRequest.requestStatus.statusTitle}"/>
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel class="bold" value="Attached to CE case:  " />
+                                                <div class="wrapText">
+                                                    <h:outputText id="selr-attachedCase" 
+                                                                  value="#{cear.caseID == 0 ? 'No' : cear.caseID}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel class="bold" value="Address" />
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selr-prop-address" value="#{cear.requestProperty.address}"/><br />
+                                                    <h:outputText id="selr-prop-muni" value="#{cear.requestProperty.muni.muniName}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel class="bold" value="Public access reference num" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selr-pacc" value="#{cear.requestPublicCC}"/>
+                                                </div>
+                                                <p:spacer height="5px"/>
+
+                                            </h:panelGroup>
+
+
+                                            <h:panelGroup>
+                                                <div class="wrapText">
+                                                    <h:outputLabel styleClass="bold" value="Human safety issue?"/>
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText id="selr-isurgent"  value="#{cear.isUrgent}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+
+                                                <div class="wrapText">
+                                                    <h:outputLabel id="selr-persontype" styleClass="bold" value="Requestor ID:#{cear.requestor.personID} 
+                                                                   (#{cear.requestor.personType.label}): "/>
+                                                    <p:spacer height="5px"/>
+
+                                                    <h:outputText id="selr-pers-fn" value="#{cear.requestor.firstName}" />
+                                                    <h:outputText id="selr-pers-ln" value="#{cear.requestor.lastName}"/><br /> 
+                                                    <h:outputText id="selr-pers-str" value="#{cear.requestor.addressStreet}"/> <br />
+                                                    <h:outputText id="selr-pers-city" value="#{cear.requestor.addressCity}, "/> 
+                                                    <h:outputText id="selr-pers-state" value="#{cear.requestor.addressState}"/>                                            
+                                                    <h:outputText id="selr-pers-zip" value="#{cear.requestor.addressZip}"/> 
+
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Contact: "/>
+                                                <p:spacer height="5px"/>
+                                                <div class="wrapText"> 
+                                                    <h:outputText value="Phone (cell): "/>
+                                                    <h:outputText id="selr-pers-phone-cell" value="#{cear.requestor.phoneCell}"/> <br />
+                                                    <h:outputText value="Phone (work): "/>
+                                                    <h:outputText id="selr-pers-phone-work" value="#{cear.requestor.phoneWork}"/> 
+                                                    <h:outputText value="Phone (home): "/>
+                                                    <h:outputText id="selr-pers-phone-home" value="#{cear.requestor.phoneHome}"/> <br />
+                                                    <h:outputText value="Email: "/>
+                                                    <h:outputText id="selr-pers-email" value="#{cear.requestor.email}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+
+
+                                            <f:facet name="footer" class="leftalign">
+                                                <h:outputLabel styleClass="bold" value="Request description:"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selr-descr" escape="false" value="#{cear.requestDescription}"/>
+                                                </div>
+
+                                                <p:spacer height="5px"/>
+                                                <hr />
+                                                <p:spacer height="5px"/>
+
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputLabel styleClass="bold" value="Staff notes (not public)"/>
+                                                    <h:outputText id="selr-notes-muni" escape="false" value="#{cear.muniNotes}"/>
+                                                </div>
+
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputLabel styleClass="bold" value="Public notes"/>
+                                                    <h:outputText id="selr-notes-public" escape="false" value="#{cear.publicExternalNotes}"/>
+                                                </div>
+                                            </f:facet>
+                                        </h:panelGrid>
+                                    </div>
+
+                                </h:form>
+
+                                <f:subview id="photo-subview"
+                                           rendered="#{cEActionRequestsReportBB.reportConfig.includePhotos and cear.photoList.size()>0}"
+                                           >
+
+                                    <h:form id="cear-photo-form" >
+
+
+                                        <h3 class="printing-page-break-before">Photos</h3>
+                                        <h:outputLabel id="selr-photos" styleClass="bold" value="Photos on request: #{cear.photoList.size()}"/>
+
+                                        <p:dataTable
+                                            id="violation-photo-table"
+                                            var="photoid"
+                                            value="#{cear.photoList}"
+                                            rowKey="#{photoid}"
+                                            tableStyleClass="primeDataTable"
+                                            draggableRows="false" tabindex="6">
+                                            <p:column width="80%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Photo"/>
+                                                </f:facet>
+                                                <p:graphicImage width="100%" value="#{imageServices.image}">
+                                                    <f:param name="photoID" value="#{photoid}"/>
+                                                </p:graphicImage>
+                                            </p:column>
+                                            <p:column width="20%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Description"/>
+                                                </f:facet>
+                                                <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                            </p:column>
+                                        </p:dataTable>
+
+                                    </h:form>
+                                </f:subview>
+                            </div>
+                        </p:dataScroller>
+                    </div>
+                </ui:insert>
+            </div>
+        </f:view>
+    </h:body>
+</html>
+

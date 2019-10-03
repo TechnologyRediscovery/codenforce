@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Describe code enforcement concern</title>
+
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="occPermitApplicationFlowView">
+
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <h1>Step 2/5: Configure unit list</h1>
+
+                        <h:form id="occPermitApplicationAddPropertyUnitForm">
+
+                            <p:panel>
+                                <h3>Step 1: Select Property</h3>
+                                <p:outputLabel>Chosen property:</p:outputLabel>
+                                <p:dataTable
+                                    id="chosenPropertyTable"
+                                    var="prop" 
+                                    value="#{sessionBean.activePropWithLists}"
+                                    rowKey="#{prop.propertyID}">
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Address" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.address}"/>
+                                    </p:column>
+
+
+                                    <p:column>
+
+                                        <f:facet name="header">
+                                            <h:outputText value="Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyUseTypeString}"/>
+
+                                    </p:column>
+
+                                </p:dataTable>
+
+                            </p:panel>
+
+                            <p:panel>
+
+                                <h2 id="currentStep">Step 2: Configure Unit List</h2>
+
+                                <p:outputLabel value="Before applying for occupancy, 
+                                               please create a complete list of 
+                                               all the units in the property, including 
+                                               those that you do not want to apply for.
+                                               Press &quot;Add Unit&quot; to add
+                                               an empty unit, and click the pencil 
+                                               in the edit column to fill out the information.
+                                               The Unit Number is required, a 
+                                               description may be left blank. 
+                                               The description should just 
+                                               describe what the room is (e.g. basement)" />
+                                <p:dataTable
+                                    id="propertyUnitsToAddTable"
+                                    widgetVar="datatable"
+                                    rowIndexVar="rowIndex"
+                                    var="unit"
+                                    value="#{occPermitApplicationBB.workingPropUnits}"
+                                    selectionMode="single" tabindex="1"
+                                    selection="#{occPermitApplicationBB.selectedUnit}"
+                                    rowKey="#{unit.unitID}"
+                                    editable="true">                                         
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Number" />
+                                        </f:facet>
+                                        <p:cellEditor>
+                                            <f:facet name="output"><h:outputText value="#{unit.unitNumber}" /></f:facet>
+                                            <f:facet name="input">
+                                                <p:inputText value="#{unit.unitNumber}"
+                                                             onkeydown="PF('datatable').onKeyDown(event)"
+                                                             onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                            </f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Rental?" />
+                                        </f:facet>
+                                        <p:cellEditor>
+                                            <f:facet name="output">
+                                                <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                            </f:facet>
+                                            <f:facet name="input"> 
+                                                <h:selectBooleanCheckbox value="#{unit.rental}"/> 
+                                            </f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Description" />
+                                        </f:facet>
+                                        <p:cellEditor>
+                                            <f:facet name="output">
+                                                <h:outputText value="#{unit.notes}" />
+                                            </f:facet>
+                                            <f:facet name="input">
+                                                <p:inputText value="#{unit.notes}" 
+                                                             onkeydown="PF('datatable').onKeyDown(event)"
+                                                             onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                            </f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+
+                                    <p:column style="width:40px">
+                                        <f:facet name="header">
+                                            <h:outputText value="Edit?" />
+                                        </f:facet>
+                                        <p:rowEditor/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Remove?" />
+                                        </f:facet>
+                                        <p:commandButton ajax="true" value="Remove" 
+                                                         action="#{occPermitApplicationBB.removeSelectedUnit(unit)}"
+                                                         update="#{p:component('propertyUnitsToAddTable')}
+                                                         occPermitApplicationAddPropertyUnitForm"/>                                      
+                                    </p:column>
+
+                                </p:dataTable>
+
+                                
+                                <script type="text/javascript">
+
+                                    $(function () {
+                                        $.extend(PF("datatable"), {
+                                            onKeyDown: function (e) {
+                                                var key = e.which,
+                                                        keyCode = $.ui.keyCode;
+
+                                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                    e.preventDefault();
+                                                }
+                                            },
+
+                                            onKeyUp: function (e, rowIndex) {
+                                                var key = e.which,
+                                                        keyCode = $.ui.keyCode;
+                                                //.ui-row-editor-check .ui-icon-check .ui-c
+                                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                    this.tbody
+                                                            .find('.ui-row-editor .ui-icon-check')
+                                                            .eq(rowIndex)
+                                                            .click();
+                                                }
+
+                                                if (key === keyCode.ESCAPE) {
+                                                    this.tbody
+                                                            .find('.ui-row-editor .ui-icon-close')
+                                                            .eq(rowIndex)
+                                                            .click();
+                                                }
+                                            }
+                                        });
+                                    });
+
+                                </script>
+
+                                <p:spacer height="10px"/>
+                                
+                                <p:commandButton ajax="true"                                                   
+                                                 action="#{occPermitApplicationBB.addUnitToNewPropUnits}" 
+                                                 update="propertyUnitsToAddTable"
+                                                 value="Add unit"/>
+
+                                <p:spacer width="10px"/>
+
+                                <h3>Step 3: Select Units For Application</h3>
+
+                                <p:outputLabel>...</p:outputLabel>
+
+                                <h3>Step 4: Choose Reason For Application</h3>
+
+                                <p:outputLabel>...</p:outputLabel>
+
+                                <h3>Step 5: Add People To Application</h3>
+
+                                <p:outputLabel>...</p:outputLabel>
+
+                                <p:spacer height="10px"/>
+
+                                <p:commandButton ajax="false"                                                   
+                                                 action="#{occPermitApplicationBB.finalizeUnitList()}" 
+                                                 value="Confirm and Continue"/>
+
+                            </p:panel>
+                            <h:message for="notesInputText" showDetail="true" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />   
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+
+</html>

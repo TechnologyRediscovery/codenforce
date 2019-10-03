@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <h:outputStylesheet name="css/style.css"/>
+        <title>TCVCOG Code Enforcement Home</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../navContainer_public.xhtml">
+
+            <ui:define name="content">
+                <f:view id="sysHomeView">
+
+                    <div class="mainContainer">
+
+                        <h:messages id="personSearchPublicMessages" globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+                        <h1>Search for a(n) #{sessionBean.activePersonType.label}</h1>
+
+                        <h:form id="personSearchPublicForm">
+                            
+                            <h:panelGrid columns="1" cellpadding="10" columnClasses="gridTd-solid-back" style="width:100%">
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter">
+                                        <h:panelGroup>
+                                            <p:outputLabel id="last-name-ol" for="last-name-chkbx" value="Filter by last name?" />
+                                            <p:selectBooleanCheckbox id="last-name-chkbx" value="#{personSearchPublicBB.params.filterByLastName}" >
+                                                <p:ajax update="last-name-it"/>
+                                            </p:selectBooleanCheckbox>               
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <p:inputText id="last-name-it" value="#{personSearchPublicBB.params.lastNameSS}" disabled="#{!personSearchPublicBB.params.filterByLastName}"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel id="first-name-ol" for="first-name-chkbx" value="Filter by first name?" />
+                                            <p:selectBooleanCheckbox id="first-name-chkbx" value="#{personSearchPublicBB.params.filterByFirstName}" >
+                                                <p:ajax update="first-name-it"/>
+                                            </p:selectBooleanCheckbox>               
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <p:inputText id="first-name-it" value="#{personSearchPublicBB.params.firstNameSS}" disabled="#{!personSearchPublicBB.params.filterByFirstName}"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel id="email-ol" for="email-chkbx" value="Filter by email?" />
+                                            <p:selectBooleanCheckbox id="email-chkbx" value="#{personSearchPublicBB.params.filterByEmail}" >
+                                                <p:ajax update="email-it"/>
+                                            </p:selectBooleanCheckbox>               
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <p:inputText id="email-it" value="#{personSearchPublicBB.params.emailSS}" disabled="#{!personSearchPublicBB.params.filterByEmail}"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel id="phone-number-ol" for="phone-number-chkbx" value="Filter by phone?" />
+                                            <p:selectBooleanCheckbox id="phone-number-chkbx" value="#{personSearchPublicBB.params.filterByPhoneNumber}" >
+                                                <p:ajax update="phone-number-it"/>
+                                            </p:selectBooleanCheckbox>               
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <p:inputText id="phone-number-it" value="#{personSearchPublicBB.params.phoneNumber}" disabled="#{!personSearchPublicBB.params.filterByPhoneNumber}"/>
+                                        </h:panelGroup>
+                                        
+                                        <h:panelGroup>
+                                            <p:outputLabel id="street-ol" for="street-chkbx" value="Filter by street?" />
+                                            <p:selectBooleanCheckbox id="street-chkbx" value="#{personSearchPublicBB.params.filterByAddressStreet}" >
+                                                <p:ajax update="street-it"/>
+                                            </p:selectBooleanCheckbox>               
+                                        </h:panelGroup>                                        
+                                        <h:panelGroup>
+                                            <p:inputText id="street-it" value="#{personSearchPublicBB.params.addrStreetSS}" disabled="#{!personSearchPublicBB.params.filterByAddressStreet}"/>
+                                        </h:panelGroup>
+
+                                    </h:panelGrid>
+                                        <p:commandButton value= "Search" action="#{personSearchPublicBB.queryPersons(personSearchPublicBB.params)}" 
+                                            update="results-dt" ajax="true"/>
+                                        
+                                        <p:dataTable id="results-dt" var="person" value="#{personSearchPublicBB.personSearchResults}">
+                                            <p:column headerText="Last Name">
+                                                <h:outputText value="#{person.lastName}" />
+                                            </p:column>
+                                            
+                                            <p:column headerText="First Name">
+                                                <h:outputText value="#{person.firstName}" />
+                                            </p:column>
+                                            
+                                            <p:column headerText="Street Address">
+                                                <h:outputText value="#{person.addressStreet}" />
+                                            </p:column>
+                                            
+                                            <p:column headerText="Home Phone">
+                                                <h:outputText value="#{person.phoneHome}" />
+                                            </p:column>
+                                            
+                                            <p:column headerText="Cell Phone">
+                                                <h:outputText value="#{person.phoneCell}" />
+                                            </p:column>
+                                            
+                                            <p:column headerText="Work Phone">
+                                                <h:outputText value="#{person.phoneWork}" />
+                                            </p:column>
+                                            
+                                            <p:column headerText="Email">
+                                                <h:outputText value="#{person.email}" />
+                                            </p:column>
+                                            
+                                            <p:column>
+                                                <p:commandButton id="attach-person-cb" value="Attach" action="#{occPermitApplicationBB.addPersonToApplication(person)}"/>
+                                            </p:column>
+                                            
+                                            <p:column>
+                                                <p:commandButton id="edit-person-cb" value="Edit" action="#{occPermitApplicationBB.editPersonInfo(person)}"/>
+                                            </p:column>
+                                            
+                                        </p:dataTable>
+
+                                        <p:outputLabel> Can't find the person you are looking for? </p:outputLabel>
+                                        <p:commandButton value="Add a new person" action="#{occPermitApplicationBB.addANewPerson}" />
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:form>                  
+                        
+                    </div>
+                </f:view>
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

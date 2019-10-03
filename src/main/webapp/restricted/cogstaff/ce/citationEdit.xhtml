@@ -1,0 +1,292 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Citation Editor</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+           
+            <ui:define name="content">
+                <div class="mainContainer">
+                    
+                    <f:view>
+                         <h:form id="citationAdd">
+                            <h1>Citation Editor: Citation ID: <h:outputText value="#{citationBB.currentCitation.citationID}"/></h1>
+                            
+                            <p>Populate fields for a new citation and updated an existing citation.</p>
+                                                    
+                            <p:spacer height="15px"/>
+                            
+                            <h2>Outstanding code violations on Case ID <h:outputText value="#{citationBB.currentCase.caseID}" />
+                                at <h:outputText value="#{citationBB.currentCase.property.address}" /></h2>
+                            
+                                 <p:dataTable
+                                        id="violationTable"
+                                        selectionMode="none"
+                                        value="#{citationBB.currentCitation.violationList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="multiple"
+                                        draggableColumns="true"
+                                        reflow="true"
+                                        var="v"
+                                        rowKey="#{v.violationID}">
+                                    <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Code Element" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                    #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                    #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                    #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                    #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                            </div>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Stipulated Comp. Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.stipulatedComplianceDate}"/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Remove" />
+                                            </f:facet>
+                                            <p:commandButton id="remove-violation-from-violationtable-cb"
+                                                             ajax="true"
+                                                             actionListener="#{citationBB.removeViolationFromCitation(v)}"
+                                                             icon="fa fa-delete"
+                                                             immediate="true"
+                                                             update="citationAdd:violationTable
+                                                             citationAdd:removed-violations-table">
+                                            </p:commandButton>
+                                                             
+                                        </p:column>
+                                    </p:dataTable> 
+                            
+                            <h2>Removed violations</h2>
+                            
+                                 <p:dataTable
+                                        id="removed-violations-table"
+                                        selectionMode="none"
+                                        value="#{citationBB.removedViolationList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="multiple"
+                                        draggableColumns="true"
+                                        reflow="true"
+                                        var="v"
+                                        rowKey="#{v.violationID}">
+                                     
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Code Element" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                    #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                    #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                    #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                    #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                            </div>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Stipulated Comp. Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.stipulatedComplianceDate}"/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Remove" />
+                                            </f:facet>
+                                            <p:commandButton id="restore-violation-cb"
+                                                             ajax="true"
+                                                             actionListener="#{citationBB.returnViolation(v)}"
+                                                             icon="fa fa-plus"
+                                                             immediate="true"
+                                                             update="citationAdd:violationTable
+                                                                    citationAdd:removed-violations-table" >
+                                            </p:commandButton>
+                                                             
+                                        </p:column>
+                                    </p:dataTable> 
+                            
+                            <h2>Citation form fields</h2>
+                            
+                            <h:panelGrid columns="4" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
+                                         footerClass="gridFooter">
+
+                                <h:outputLabel value="Citation Status" for="citationStatusMenu"/>
+                                <h:panelGroup>
+                                    
+                                    <p:selectOneMenu id="citationStatusMenu" required="false" value="#{citationBB.currentCitation.status}">
+                                        <f:converter converterId="citationStatusConverter"/>
+                                        <f:selectItems value="#{citationBB.citationStatusList}"
+                                                       var="cs" itemValue="#{cs}" itemLabel="#{cs.statusTitle}"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="citationStatusMenu" showDetail="false" showSummary="true" 
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:outputLabel value="Citation Number (from Muni form)" for="citationNoIT"/>
+                                
+                                <h:panelGroup>
+                                    <p:inputText id="citationNoIT" value="#{citationBB.currentCitation.citationNo}" 
+                                           style="width: 250px;" tabindex="1" required="true" styleClass="inputText"/>
+                                    <h:message for="citationNoIT" showDetail="false" showSummary="true" 
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:outputLabel value="Date of Record" for="formDateOfRecord"/>
+                                <h:panelGroup>
+                                    <p:calendar value="#{citationBB.currentCitation.dateOfRecordUtilDate}" 
+                                            mode="popup" tabindex="3"
+                                            id="formDateOfRecord"
+                                            showOn="button"
+                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                            navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                            showButtonPanel="true"
+                                            showTodayButton="true"
+                                            required="true"/>
+
+                                    <h:message for="formDateOfRecord" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                
+                                <h:outputLabel value="Active Citation?" for="formIsActiveSwitch"/>
+                                <h:panelGroup>
+                                    <p:inputSwitch tabindex="8" id="formIsActiveSwitch" value="#{citationBB.currentCitation.isActive}" onLabel="Yes" offLabel="No" />
+                                </h:panelGroup>
+                                
+                                  <h:outputLabel value="Court Entity" for="courtEntityMenu"/>
+                                <h:panelGroup>
+                                    
+                                    <p:selectOneMenu id="courtEntityMenu" required="true" value="#{citationBB.currentCitation.origin_courtentity}">
+                                        <f:converter converterId="courtEntityConverter"/>
+                                        <f:selectItems value="#{citationBB.courtEntityList}"
+                                                       var="ce" itemValue="#{ce}" itemLabel="#{ce.courtEntityName}"/>
+                                    </p:selectOneMenu>
+                                    
+                                    <h:message for="courtEntityMenu" showDetail="false" showSummary="true" 
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                
+                                <f:facet name="footer">
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel value="Citation official text:" for="formNotes"/>
+                                        <p:inputTextarea id="formNotes" value="#{citationBB.currentCitation.notes}" 
+                                               style="width: 100%;" tabindex="15" required="true" styleClass="inputText"/>
+                                        <h:message for="formNotes" showDetail="false" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        <p class="italic">note: each of the violations included in the upper table are permanently 
+                                            linked with this citation and need not be enumerated in these notes</p>
+                                    </h:panelGroup>
+                                    
+                                </f:facet>
+                                
+                                
+                            </h:panelGrid>
+                            
+                            <p:spacer height="10px"/>
+                            
+                            <p:commandButton ajax="false" 
+                                             value="Cancel and return to profile" 
+                                             process="@none" immediate="true" 
+                                             action="ceCases" icon="fa fa-arrow-left" />
+                            
+                        </h:form>
+
+                        <p:confirmDialog message="Citiation submission review for case: #{citationBB.currentCase.caseName}" 
+                                         severity="alert" widgetVar="citation-review-var"
+                                         closable="true"
+                                         rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}">
+
+                            <h:form id="citation-review-form">
+                                
+                                <h:outputLabel for="citation-update-event-text-ita" value="Reason for updates:"/>
+                                <p:spacer height="10px"/>
+                                <p:inputTextarea id="citation-update-event-text-ita" style="width: 300px; height: 200px;" value="#{cEActionRequestsBB.muniMessageText}"/>
+                                <p:spacer height="15px"/>
+                                <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
+                                              and attached to #{cEActionRequestsBB.selectedRequest.requestID}"/>
+                                <p:spacer height="15px"/>
+                                
+                                
+                                
+                                
+                                <p:commandButton ajax="true" icon="fa fa-stop"
+                                                 value="Cancel" 
+                                                 onclick="PF('citation-review-var').hide()"/>
+
+                                <p:commandButton ajax="false" value="Commit updates" icon="fa fa-edit" 
+                                                 action="#{citationBB.updateCitation}" 
+                                                 rendered="#{citationBB.currentCitation.citationID != 0}"/>
+
+                                <p:commandButton ajax="false" value="Submit" icon="fa fa-exclamation-triangle" 
+                                                 action="#{citationBB.insertCitation}" 
+                                                 rendered="#{citationBB.currentCitation.citationID == 0}" />
+                                
+                                <p:spacer height="15px"/>
+                            </h:form>
+                        </p:confirmDialog>
+                        
+
+                        <p:confirmDialog message="Citiation submission review for case: #{citationBB.currentCase.caseName}" 
+                                         severity="alert" widgetVar="citation-review-var"
+                                         closable="true"
+                                         rendered="#{sessionBeasessionUserer.keyCard.hasEnfOfficialPermissions}">
+
+                            <h:form id="citation-review-form">
+                                
+                                <h:outputLabel for="citation-update-event-text-ita" value="Reason for updates:"/>
+                                <p:spacer height="10px"/>
+                                <p:inputTextarea id="citation-update-event-text-ita" style="width: 300px; height: 200px;" value="#{cEActionRequestsBB.muniMessageText}"/>
+                                <p:spacer height="15px"/>
+                                <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
+                                              and attached to #{cEActionRequestsBB.selectedRequest.requestID}"/>
+                                <p:spacer height="15px"/>
+                                
+                                
+                                
+                                
+                                <p:commandButton ajax="true" icon="fa fa-stop"
+                                                 value="Cancel" 
+                                                 onclick="PF('citation-review-var').hide()"/>
+
+                                <p:commandButton ajax="false" value="Commit updates" icon="fa fa-edit" 
+                                                 action="#{citationBB.updateCitation}" 
+                                                 rendered="#{citationBB.currentCitation.citationID != 0}"/>
+
+                                <p:commandButton ajax="false" value="Submit" icon="fa fa-exclamation-triangle" 
+                                                 action="#{citationBB.insertCitation}" 
+                                                 rendered="#{citationBB.currentCitation.citationID == 0}" />
+                                
+                                <p:spacer height="15px"/>
+                            </h:form>
+                        </p:confirmDialog>
+
+
+
+
+                        
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

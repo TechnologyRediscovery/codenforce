@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Error</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../public/navContainer_public.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <f:view id="erroPageView">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                            
+                            <h1>Oops, we've got an error!</h1>
+                            <h:form id="errorPageForm">
+                                <h:outputText value="Application root: #{request.contextPath}/restricted/"/>
+                                <h:outputText value="#{systemServicesBB.logSub}"/>
+                                
+                                
+                                <p>No fear, the Back button is...up there! Please click Back (or alt + left arrow) and try another pathway.</p>
+                                
+                                <h2>Reporting errors</h2>
+                                <p>You are encouraged to log all errors you find troublesome through our trusty error reporting form:</p>
+                                
+                                     <p:commandLink ajax="false" value="Bug reporting form" action="improvementSuggestion"
+                                                    styleClass="sblink" style="font-weight:bold"/>
+                                     
+                                <h2>Troubleshooting</h2>
+                                    
+                                <p>A common source of page load errors may be not having an appropriate business object activated 
+                                    when trying to view its details (i.e. trying to view a Property's profile 
+                                    without having searched for and selected an active property.</p>
+
+                                    <p>Check the entries in your system status bar above for details on which Property, Case, Municipality, etc., are active 
+                                during your session.</p>
+                                <h2>Talk to a human!</h2>
+                                    <p>In the event the error you are receiving is debilitating to your work, 
+                                        please call system administrator Eric Darsow at 412.923.9907 (c).</p>
+                                    <p>Messages are checked periodically throughout a workday.</p>
+                                    <p>Email is not a reliable way to work through errors: please use our reporting form or the telephone.</p>
+                                
+                                
+                            </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

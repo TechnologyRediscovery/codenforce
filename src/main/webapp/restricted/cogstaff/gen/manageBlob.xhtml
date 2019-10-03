@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Manage uploaded photographs and documents</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="manageBlobView">
+                    
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        
+                        <p:spacer height="5px"/>
+                        <hr />
+                        <p:spacer height="5px"/>
+                                  
+                        
+                        <h:form id="manage-blob-form">
+                            
+                                <p:dataTable
+                                id="blobTable"
+                                var="blob"
+                                value="#{manageBlobBB.blobList}"
+                                rowKey="#{blob.blobID}"
+                                tableStyleClass="primeDataTable"
+                                draggableRows="false" tabindex="6">
+                                    
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="File Type"/>
+                                        </f:facet>
+                                        <h:outputText value="#{blob.type.typeID}"/>
+                                        <!-- type icon here -->
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Filename"/>
+                                        </f:facet>
+                                        <h:outputText value="#{blob.filename}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="70%">
+                                        <f:facet name="header">
+                                            <h:outputText value="File"/>
+                                        </f:facet>
+                                        <p:graphicImage width="50%" value="#{blobCoordinator.image}">
+                                            <f:param name="blobID" value="#{blob.blobID}" />
+                                        </p:graphicImage>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Description"/>
+                                        </f:facet>
+                                        <h:outputText id="desc" value="#{blob.description}"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="View File"/>
+                                        </f:facet>
+                                        <p:commandLink value="#{blob.filename}" action="#{manageBlobBB.downloadBlob(blob)}"/>
+                                    </p:column>
+                                    
+                                </p:dataTable>
+                            
+                        </h:form>
+                        
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

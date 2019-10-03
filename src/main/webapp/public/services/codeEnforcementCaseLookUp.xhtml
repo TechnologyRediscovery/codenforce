@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+<!--        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+        <h:outputStylesheet name="public_style.css" library="css"/>
+
+        <title>View public information bundles</title>
+
+    </h:head>
+
+    <h:body>
+        <ui:composition template="../tempPublicPortal.xhtml">
+
+
+
+            <ui:define name="content">
+
+
+                <f:view>
+                    <!--### OLD NAVBAR, PRE-BOOTSTRAP CLASSES
+                    <div class="container">
+                        <div class="navMenu">
+                            <ul>
+                                <li><a href="#">Home</a></li>
+                                <li><a href="#">Link 1</a></li>
+                                <li><a href="#">Link 2</a></li>
+                                <li><a href="#">Link 3</a></li>
+                                <li><a href="#">Link 4</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    -->
+
+
+
+                    <div class="container">
+                        <div class="header">            
+                            <h2>Action request control code look-up</h2>
+                        </div>  
+                    </div>
+
+                    <div class="container">                
+                        <div class="userInput">
+                            <h:form>
+                                <h:outputLabel value="Enter Code: "/>
+                                <p:inputText id="formEntry" styleClass="controlCodeInput"/>
+                                <h:message for="formCodeElementID" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:form>
+
+                            <h:form>
+                                <p:spacer height="50px"/>
+                                <p:commandButton ajax="false" value="Search"/>
+                            </h:form>
+                        </div>
+                    </div>    
+
+
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>

@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Contact</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="docHomeView">
+                    
+                    <div class="mainContainer">
+
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+                        <h1>Contact CodeConnect</h1>
+                        <h:form id="contactForm">
+                            
+                            <p>Contact the Turtle Creek Valley Council of Governments for
+                            non-technical inquiries related to CodeConnect. All support inquiries
+                            and technical issues can be directed to Technology Rediscovery LLC.</p>
+                        
+                           <p:panelGrid columns="2" layout="grid"
+                                      columnClasses="gridTd, gridTd">
+                               
+                               <h:panelGroup>
+                                    <p:graphicImage width="250px" value="/resources/tcvcoglogo.png"/>
+                               </h:panelGroup>  
+                               
+                               <h:panelGroup>
+                                   <h2>Turtle Creek Valley Council of Governments</h2>
+                                   <p>Phone: 412.858.5115</p>
+                                   <p>2700 Monroeville Boulevard<br />Monroeville, PA 15146 </p>
+                                   <h:outputLink value="http://tcvcog.com">TCVCOG Homepage</h:outputLink>
+                               </h:panelGroup>  
+                               
+                               <h:panelGroup>
+                                    <p:graphicImage width="250px" value="/resources/techredllclogo.png"/>
+                               </h:panelGroup>  
+                               <h:panelGroup>
+                                   <h2>Technology Rediscovery LLC</h2>
+                                   <p>Phone: 412.894.3020</p>
+                                   <p>2209 S Braddock Ave<br />Pittsburgh, PA 15218</p>
+                                   <h:outputLink value="http://technologyrediscovery.net">TechnologyRediscovery.net</h:outputLink>
+                               </h:panelGroup>  
+                               
+                               
+                           </p:panelGrid>
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

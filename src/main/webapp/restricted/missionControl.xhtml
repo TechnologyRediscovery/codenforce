@@ -1,0 +1,321 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        
+        <h:outputStylesheet name="css/dashboards.css"/>
+        
+    <title>CodeNForce Dashboard</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="missionControlView">
+                    <div class="mainContainer">
+                        <h:messages id="missionControlMessages" globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        
+                        <h:form id="missionControlForm">
+                            <h1><h:outputText value="codeNforce Dashboard: #{sessionBean.sessionMuni.muniName}"/> </h1>
+                        
+                            <p:dashboard model="#{missionControlBB.mainDash}">
+                            
+                                <p:panel id="dashpanel-ce-cears"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Requests for code enforcement"
+                                         footer="x requests processed past 30 days"
+                                         toggleableHeader="true"
+                                         menuTitle="I have a title in the bar"
+                                         >
+                                    <p:panelGrid columns="2" layout="tabular"
+                                        columnClasses="gridTd-bignum, gridTd-bignum">
+                                        <h:panelGroup >
+                                            <div class="dashboard-bignum">
+                                                <h:outputText styleClass="bignum" value="#{cEActionRequestsBB.requestList.size()}"/>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <div class="dashboard-rightof-bignum">
+                                                <h:outputText styleClass="bignum-header" value="New action requests"/>
+                                                <p:spacer height="5px"/>
+                                                <p:commandButton styleClass="nofill" value="Manage requests" action="cEActionRequests" ajax="false"/>
+                                            </div>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                </p:panel>
+                                
+                                <p:panel id="dashpanel-ce-cecases"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Active Code enforcement cases"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    <p:panelGrid    columns="2" 
+                                                    layout="tabular"
+                                                    columnClasses="gridTd-bignum, gridTd-bignum">
+                                        <h:panelGroup >
+                                            <div class="dashboard-bignum">
+                                                <h:outputText styleClass="bignum" value="-"/>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <div class="dashboard-rightof-bignum">
+                                                <h:outputText styleClass="bignum-header" value="Open code enforcement"/>
+                                                <br />
+                                                <h:outputText styleClass="bignum-header" value="cases"/>
+                                                <p:spacer height="5px"/>
+                                                <p:commandButton styleClass="nofill" value="View cases" action="ceCases" ajax="false"/>
+                                            </div>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                </p:panel>
+                                
+                                <p:panel id="dashpanel-ce-todo"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Code enforcement tasks"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    
+                                    <p:dataScroller id="dash-datascroller-cetodo"
+                                                    value="#{missionControlBB.ceProposalList}">
+                                    
+                                        
+                                    
+                                    </p:dataScroller>
+                                    
+                                </p:panel>
+                                
+                                <p:panel id="dashpanel-properties"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Active Properties"
+                                         footer="3947 total properties"
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    <div class="datum">
+                                        <h:outputText value="Active property: " />
+                                        <h:outputText value="#{sessionBean.sessionProperty.address}" />
+                                        <h:outputText value=" (" />
+                                        <h:outputText value="#{sessionBean.sessionProperty.muni.muniName}" />
+                                        <h:outputText value=")" />
+                                        <p:commandButton  value="view property" 
+                                                          action="properties"
+                                                          styleClass="noFill" 
+                                                          icon="fa fa-home"/>
+                                    </div>
+                                    <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                                </p:panel>
+                                
+                                <p:panel id="dashpanel-persons"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Active Persons"
+                                         footer="3947 total properties"
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    <div class="datum">
+                                        <h:outputText value="Active Person " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.firstName}" />
+                                        <h:outputText value=" " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.lastName}" />
+                                        <h:outputText value=" (ID: " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.personID}" />
+                                        <h:outputText value=" )" />
+                                        <p:commandButton  value="view property" 
+                                                          action="persons"
+                                                          styleClass="noFill" 
+                                                          icon="fa fa-home"/>
+                                    </div>
+                                    
+                                     <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                                </p:panel>
+                                
+                                
+                                
+                                
+                                <p:panel id="dashpanel-occ-periods"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Active occ periods"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    
+                                    
+                                    
+                                </p:panel>
+                                
+                                <p:panel id="dashpanel-occ-inspections"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Scheduled occ inspections"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    
+                                    <div class="datum">
+                                        <h:outputText value="Active Inspection " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.firstName}" />
+                                        <h:outputText value=" " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.lastName}" />
+                                        <h:outputText value=" (ID: " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.personID}" />
+                                        <h:outputText value=" )" />
+                                        <p:commandButton  value="view property" 
+                                                          action="inspection"
+                                                          styleClass="noFill" 
+                                                          icon="fa fa-home"/>
+                                    </div>
+                                    
+                                </p:panel>
+                                
+                                <p:panel id="dashpanel-sys-events"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Recent events"
+                                         footer="x events muniwide in past 24 hours"
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    
+                                </p:panel>
+                                
+                                <p:panel id="dashpanel-sys-switchmuni"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Switch session municipality"
+                                         rendered="#{missionControlBB.currentUser.keyCard.hasMuniReaderPermissions }"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+
+                                    <p:selectOneListbox id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems id="muniNameList" 
+                                                       value="#{sessionBean.userAuthMuniList}" 
+                                                       var="m" 
+                                                       itemValue="#{m}" 
+                                                       itemLabel="#{m.muniName}" />
+                                        <p:ajax update="dash-switchmuni-button-switch" />
+                                    </p:selectOneListbox>
+                                    <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    <p:commandButton    id="dash-switchmuni-button-switch"
+                                                        disabled="#{empty missionControlBB.selectedMuni}"
+                                                        value="switch to #{missionControlBB.selectedMuni.muniName}" 
+                                                        styleClass="button" 
+                                                        action="#{sessionInitializer.configureSession(missionControlBB.currentUser, missionControlBB.selectedMuni)}" 
+                                                        icon="fa fa-exchange" />
+                                </p:panel>
+                                
+                                  
+                                <p:panel id="dashpanel-sys-switchuser"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Switch your user"
+                                         rendered="#{missionControlBB.currentUser.keyCard.hasSysAdminPermissions}"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+
+                                    <p:selectOneMenu id="dash-switchuser-solb-chooseuser" tabindex="12" value="#{missionControlBB.selectedUser}">
+                                        <f:converter converterId="userConverter"/>
+                                        <f:selectItem itemLabel="select a user..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems id="dash-switchuser-si-username" 
+                                                       value="#{missionControlBB.userList}"
+                                                       var="u" itemValue="#{u}" itemLabel="#{u.username} (#{u.userID})" />
+                                        <p:ajax update="dash-switchuser-button-switch" />
+                                    </p:selectOneMenu>>
+                                    <h:message for="dash-switchuser-solb-chooseuser" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    <p:commandButton    id="dash-switchuser-button-switch"
+                                                        disabled="#{empty missionControlBB.selectedUser}"
+                                                        value="become #{missionControlBB.selectedUser.username}" 
+                                                        styleClass="button" 
+                                                        action="#{sessionInitializer.configureSession(missionControlBB.selectedUser, null)}" 
+                                                        icon="fa fa-universal-access" />
+                                </p:panel>
+                                
+                            </p:dashboard>
+
+                        </h:form>
+                        
+                        <h:form id="dashboardHelpLinksForm">
+
+                            <p:spacer height="15px"/>
+                            <p:dialog header="About page: Mission Control" 
+                                      widgetVar="helpdlg" 
+                                      responsive="true" 
+                                      width="400"
+                                      modal="false"
+                                      height="600">
+                                <h2>Help Topic: Dashboard</h2>
+
+                                <p>The dashboard is both a set of links to various system tools and a display of key data metrics of the system.</p>
+
+                                <h3>You current municipality</h3>
+
+                                <p>You are always navigating the system from the standpoint of a certain municipality, which is 
+                                    always listed in the dark blue top banner bar. You cannot be in an "all municipalities" view mode. </p>
+
+                                <p>CodeConnects looks up your current municipality to decide which case lists to show you when 
+                                    viewing code enforcement data. On pages for searching or creating muni-specific data, your current
+                                    municipality is used to set the default values.</p>
+
+                                <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
+
+                                <h4>Switching municipalities</h4>
+
+                                <p>If you are authorized to change your municipality, you can do so with this drop down box and command button. After issuing
+                                    the command to switch to a new municipality, the page will reload and both the listing on this page
+                                    and in the header bar will reflect these changes.</p>
+
+                                <h4>What is COG Land?</h4>
+
+                                <p>COG Land is a dream world where all mistakes are allowed and nothing bad ever happens. 
+                                    If you make a mistake, nobody cares so you can tinker and explore and experiment with freedom and ease. All
+                                    data stored in COG Land behaves just like a non-dreamland municipality but impacts no actual humans.</p>
+
+                                <h3>User info verification</h3>
+
+                                <p>CodeConnect is built on a system called Java ServerFaces(JSF) and the PrimeFaces library that works with JSF.
+                                    The entire system runs inside a web server called Wildfly. Page control is managed by Glassfish but all other
+                                    data in the system is linked to your user that's managed by JSF, hence the heading: 
+                                    <span class="italic">Authenticated Faces User</span>.</p>
+
+                                <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
+
+
+                            </p:dialog>
+                           
+                            <p:spacer height="10px"/>
+
+
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

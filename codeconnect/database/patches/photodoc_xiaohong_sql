@@ -1,0 +1,1 @@
+ALTER TABLE public.photodoctype ADD column donotstoretype BOOLEAN;

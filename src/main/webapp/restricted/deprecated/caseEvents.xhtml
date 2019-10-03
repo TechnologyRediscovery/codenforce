@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Event History</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <f:view id="caseEventView">
+
+                        <h:messages globalOnly="true" showDetail="false" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <h1>Create new case event</h1>
+                        <h:outputText value="Current Case: #{caseProfileBB.currentCase.caseName}"/>
+
+                        <h2>Select event type &amp; category</h2>
+
+                        <h:form id="formEventAddAjax">
+
+                            <h:panelGrid columns="3" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
+                                         footerClass="gridFooter" style="vertical-align: top;">
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="newEventTypeMenu">
+                                        <h:outputText value="Select an event type:"/>
+                                    </h:outputLabel>
+
+                                    <p:selectOneListbox id="newEventTypeMenu" required="true" value="#{eventAddBB.selectedEventType}" tabindex="10">
+                                        <p:ajax update="categoryList" immediate="true"/> 
+                                        <f:selectItems value="#{eventAddBB.userAdminEventTypeList}"/>
+                                    </p:selectOneListbox>
+
+                                    <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel for="categoryList">
+                                        <h:outputText value="Event Categories of selected type:"/>
+                                    </h:outputLabel>
+
+                                    <p:selectOneListbox style="width: 300px;" id="categoryList" value="#{eventAddBB.selectedEventCategory}" tabindex="10">
+                                        <p:ajax update="selectedEventCategoryDescription, selectedEventCategoryDescription, selectedEventCateogryRequiresViewConfirm, selectedEventCateogryNotifiesCaseMonitors" immediate="true"/>
+                                        <f:converter converterId="eventCategoryConverter"/>
+                                        <f:selectItems  id="catItemsList" value="#{eventAddBB.eventCategoryList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                    </p:selectOneListbox>
+
+                                    <h:message for="categoryList" showDetail="false" showSummary="true"  
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    
+                                    <p:commandButton ajax="false" action="#{eventAddBB.startNewEvent}"
+                                                     value="Create new event of this category"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputText value="Event Cateogry Description: #{eventAddBB.selectedEventCateogryDescription}" id="selectedEventCategoryDescription"/>
+                                    <p:spacer height="10px"/>
+                                    <h:outputText value="Requires View Confirmation: #{eventAddBB.selectedEventrequestsAction}" id="selectedEventCateogryRequiresViewConfirm"/>
+                                    <p:spacer height="10px"/>
+                                    <h:outputText value="Triggers notification of case monitor subscribers: #{eventAddBB.selectedEventNotifiesCaseMonitors}" id="selectedEventCateogryNotifiesCaseMonitors"/>
+
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:form>
+                        
+                        <p:spacer height="10px"/>
+
+                        
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

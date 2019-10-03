@@ -1,0 +1,31 @@
+Specifications:
+
+Error type number 100 represent that the directory's name of house stored in the Wilkins folders does not
+match with the house address stored in property table in the database. Error information is stored in the
+unmatched_housedir_error.txt file.
+
+Error type number 200 represent that the wrong type photo files were found. Error information is stored in
+the unmatched_filetype_error.txt file.
+
+Error type number 300 represent that the house address stored in property table in the database, which match
+with the directory's name of house stored in the Wilkins folders, is duplicated. Error information is stored
+in the duplicate_housedir_error.txt file.
+
+Error type number 400 represent that the street directory stored in the Wilkins folders is vacant. Error
+information is stored in the vacant_streetdir_error.txt file.
+
+Error type number 500 represent that the street directory contains other files instead of house directory
+alone. Error information is stored in the impure_streetdir_error.txt file.
+
+Error type number 600 represent that the house directory stored in the Wilkins folders is vacant. Error
+information is stored in the vacant_housedir_error.txt file.
+
+Error type number 700 represent that duplicate error is occurred after the disposal of 100 error, which
+means that the house address stored in property table in the database, which match with the directory's
+name of house stored in the Wilkins folders, is still duplicated after dealing with the 100 error. Error
+information is stored in the unmatched_duplicate_housedir.txt file.
+
+Error type number 800 represent that duplicate error is occurred after the disposal of 300 error, which
+means that the house address stored in property table in the database, which match
+with the directory's name of house stored in the Wilkins folders, is still duplicated after dealing with
+the 300 error. Error information is stored in the duplicate_duplicate_housedir.txt file.

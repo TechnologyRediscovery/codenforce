@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <h:outputStylesheet name="css/style.css"/>
+        <title>TCVCOG Code Enforcement Home</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="sysHomeView">
+
+                    <div class="mainContainer">
+
+                        <h:messages id="personAddPublicMessages" globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+                        <h1>Add a person</h1>
+
+                        <h:form id="personAddPublicForm">
+                            
+                            <p:panelGrid styleClass="ui-panelgrid-blank" style="padding: 10px">
+                                
+                                <p:row>
+                                    
+                                    <p:column>
+                                        <h:outputLabel for="first-name-it" value="First Name:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="first-name-it" styleClass="dataText" value="#{personAddBB.formFirstName}"/>
+                                    </p:column>
+                                </p:row>                                
+                                
+                                <p:row>
+
+                                    <p:column>
+                                        <h:outputLabel for="last-name-it" styleClass="uiLabel" value="Last Name:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="last-name-it" styleClass="dataText" value="#{personAddBB.formLastName}"/>
+                                    </p:column>
+                                </p:row>
+                                
+                                <p:row>
+                                    
+                                    <p:column>
+                                        <h:outputLabel for="address-street-it" value="Street:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="address-street-it" styleClass="dataText" value="#{personAddBB.formAddress_street}" />
+                                    </p:column>
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>
+                                        <h:outputLabel for="address-city-it" value="City:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="address-city-it" styleClass="dataText" 
+                                                     value="#{personAddBB.formAddress_city}"/>
+                                    </p:column>
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>
+                                        <h:outputLabel for="address-state-it" value="State:"/>
+                                    </p:column>
+                                        
+                                    <p:column>
+                                        <h:inputText id="address-state-it" styleClass="dataText" 
+                                                     value="#{personAddBB.formAddress_state}"/>
+                                    </p:column>
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>
+                                        <h:outputLabel for="address-zip-it" value="Zip Code:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="address-zip-it" styleClass="dataText" 
+                                                     value="#{personAddBB.formAddress_zip}"/>
+                                    </p:column>
+                                </p:row>
+                                
+                                <p:row>
+                                    
+                                    <p:column>
+                                        <h:outputLabel for="home-phone-it" value="Home Phone:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="home-phone-it" styleClass="dataText" value="#{personAddBB.formPhoneHome}"/>
+                                    </p:column>
+                                    
+                                </p:row>
+
+                                <p:row>
+                                    
+                                    <p:column>
+                                        <h:outputLabel for="cell-phone-it" value="Cell Phone:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="cell-phone-it" styleClass="dataText" value="#{personAddBB.formPhoneCell}"/>
+                                    </p:column>
+                                </p:row>
+                                
+                                <p:row>
+                                    
+                                    <p:column>
+                                        <h:outputLabel for="work-phone-it" value="Work Phone:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="work-phone-it" styleClass="dataText" value="#{personAddBB.formPhoneWork}"/>
+                                    </p:column>
+                                </p:row>
+                                
+                                <p:row>
+                                    
+                                    <p:column>
+                                        <h:outputLabel for="email-it" value="Email:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="email-it" styleClass="dataText" value="#{personAddBB.formEmail}"/>  
+                                    </p:column>
+                                </p:row>  
+                                
+                                <p:row>
+                                    <p:column style="text-align: center">
+                                        <p:commandButton value="Add person to application" action="#{personAddBB.addPerson}"/>
+                                    </p:column>
+                                </p:row>
+                            </p:panelGrid>      
+                        </h:form>                   
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

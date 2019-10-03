@@ -1,0 +1,8 @@
+postgres=# CREATE USER sylvia WITH PASSWORD 'c0d3';
+​
+-- Create DB:
+postgres=#  CREATE DATABASE cogdb ENCODING 'UTF8'  LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
+CREATE DATABASE
+
+-- Grant privileges to user:
+GRANT ALL PRIVILEGES ON DATABASE cogdb to sylvia;

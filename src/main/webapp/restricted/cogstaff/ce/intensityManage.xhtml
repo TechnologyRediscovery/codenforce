@@ -1,0 +1,283 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title></title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <!--../navContainer_restricted.xhtml-->
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages  id="messages" globalOnly="true" showDetail="false" showSummary="true"
+                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+
+                    <f:view>
+
+                        <h1>Intensity Profile</h1>
+                        <p>Edit, create, and remove Intensity Classes.</p>
+                        <p:spacer height="10px"/>
+                        <p>Choose an Intensity Schema:</p>
+
+                        <p:spacer height="5px"/>
+
+                        <h:form id="classesViewForm">
+
+                            <p:selectOneMenu id="intensitySchemaMenu" value="#{intensityBB.selectedSchema}" 
+                                             converter="intensitySchemaConverter" required="true">
+                                <p:ajax event="change" update="@this"/>
+                                <f:selectItem itemLabel="Select a schema..." itemDisabled="true"/>
+                                
+                                <f:selectItems id="paymentTypeList" value="#{intensityBB.schemaList}" var="ct" itemValue="#{ct}" itemLabel="#{ct.label}"/>
+                            </p:selectOneMenu>
+                            <p:commandButton id="queryClassesButton"
+                                             value="Get Intensity Classes" ajax="true"
+                                             action="#{intensityBB.queryIntensityClasses()}"
+                                             update="classTable"/>
+
+                            <p:spacer height="10px"/>
+
+
+                            <h3>Create new Schema:</h3>
+                            <p:outputLabel>If you would like to use a Schema that doesn't exist for the
+                                class you are creating/editing, type its name in the box below
+                                and click "Add Schema". The schema should then appear in the list above.
+
+                                <p><em>Note: Schemas must be attached to a class in order to be saved in the database.
+                                        If you create a schema but do not add your Class to the database or commit your updates
+                                        your schema will not will be saved.</em></p>
+                            </p:outputLabel>
+
+                            <h:panelGrid columns="2" border="0"
+                                         columnClasses="gridTd, gridTd,"
+                                         footerClass="gridFooter">
+                                <p:inputText id="workingSchemaLabel" value="#{intensityBB.workingSchema.label}"
+                                             style="width: 500px;" required="false" styleClass="inputText" maxlength="100"/>
+
+                                <p:commandButton id="addSchemaButton"
+                                                 value="Add Schema to List" ajax="true"
+                                                 action="#{intensityBB.addIntensitySchema()}"
+                                                 update="intensitySchemaMenu messages workingSchemaLabel"/>
+                            </h:panelGrid>
+
+
+
+                            <p:spacer height="10px"/>
+
+                            <hr/>
+                            <p:spacer height="10px"/>
+
+
+                            <h2>Intensity Classes for the selected Schema</h2>
+
+
+                            <p:spacer height="10px"/>
+                            <p:dataTable
+                                id="classTable"
+                                var="c"
+                                rowKey="#{c.classID}"
+                                value="#{intensityBB.existingIntensityList}"
+                                tableStyleClass="primeDataTable"
+                                selectionMode="single"
+                                selection="#{intensityBB.selectedIntensityClass}">
+
+
+
+                                <p:column width="5%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Class ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{c.classID}"/>
+                                </p:column>
+                                <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Icon" />
+                                    </f:facet>
+                                    <div class="#{c.icon.styleClass}">
+                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{c.icon.materialIcon}"/></i>
+                                    </div>
+                                </p:column>
+                                <p:column width="15%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{c.title}"/>
+                                </p:column>
+                                <p:column width="15%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Municipality" />
+                                    </f:facet>
+                                    <h:outputText value="#{c.muni.muniName}"/>
+                                </p:column>
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Numeric Rating" />
+                                    </f:facet>
+                                    <h:outputText value="#{c.numericRating}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Active" />
+                                    </f:facet>
+                                    <h:outputText value="#{c.active}"/>
+                                </p:column>
+
+
+                            </p:dataTable>
+                            <p:spacer height="10"/>
+
+                            <p:commandButton ajax="false"
+                                             actionListener="#{intensityBB.editIntensity}"
+                                             value="Update Selected Intensity Class" tabindex="2"/>
+                            <ui:remove>
+                                <p:commandButton ajax="false"
+                                                 actionListener="#{paymentBB.deleteSelectedPayment}"
+                                                 value="Nuke Selected Class Forever" tabindex="3"/>
+                            </ui:remove>
+                        </h:form>
+
+
+
+                        <p:spacer height="10px"/>
+                        <hr/>
+                        <p:spacer height="10px"/>
+
+                        <h:form id="classEditForm">
+
+                            <h2>Form</h2>
+
+                            <p:outputLabel rendered="#{!intensityBB.editing}">
+                                You are currently creating an Intensity class. Please fill out the form below to specify the details
+                                of the class. The drop down box above is used to choose the Intensity Schema.
+
+                                <p>If you would like to edit an existing class, please select its schema,
+                                    click the button labeled "Get Intensity Classes", select the class, and finally click
+                                    "Update Selected Intensity Class".</p>
+                            </p:outputLabel>
+
+
+                            <p:outputLabel rendered="#{intensityBB.editing}">
+                                You are currently editing an Intensity class. Please fill out the form below to specify the details
+                                of the class. The drop down box above is used to choose the Intensity Schema.
+
+                                <p>If you would like to apply your edits, you can click the button below that says "Commit Updates".
+                                    If you would like to cancel your updates instead, please click the button labeled "Cancel Updates".</p>
+                            </p:outputLabel>
+
+                            <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
+
+                            <h:panelGrid columns="4" border="0"
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
+                                         footerClass="gridFooter">
+
+                                <h:outputLabel value="Class ID:" for="ClassID"/>
+                                <h:panelGroup>
+                                    <p:inputText id="classID" value="#{intensityBB.workingIntensityClass.classID}" disabled="true"
+                                                 style="width: 250px;" tabindex="4" required="true" styleClass="inputText" maxlength="100"/>
+                                    <h:message for="classID" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                
+                                    <p:outputLabel for="classTitle">
+                                        <h:outputText value="Class Title:"/>
+                                    </p:outputLabel>
+                                    <h:panelGroup>
+                                        <p:inputText id="classTitle" value="#{intensityBB.workingIntensityClass.title}"
+                                                     style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
+                                    </h:panelGroup>
+                                
+
+                                <h:outputLabel value="Municipality:" for="classMuni"/>
+                                <h:panelGroup id="classMuni">
+
+                                    <p:selectOneMenu
+                                        id="muniSM" tabindex="6"
+                                        value="#{intensityBB.workingIntensityClass.muni}">
+
+                                        <f:selectItem itemLabel="select a municipality..." itemDisabled="true"/>
+
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="muniNameList" value="#{muniBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+
+                                    </p:selectOneMenu>
+
+                                    <h:message for="classMuni" showDetail="true" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </h:panelGroup>
+
+                                <h:outputLabel value="Numeric Rating" for="classRating"/>
+                                <h:panelGroup>
+
+                                    <p:inputText id="classRating" value="#{intensityBB.workingIntensityClass.numericRating}"
+                                                 style="width: 250px;" tabindex="4" required="true" styleClass="inputText" maxlength="100"/>
+
+
+                                    <h:message for="classRating" showDetail="true" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </h:panelGroup>
+
+                                <h:outputLabel value="Icon:" for="classIcon"/>
+                                <h:panelGroup id="classIcon">
+
+                                    <p:selectOneMenu
+                                        id="iconSM" tabindex="6"
+                                        value="#{intensityBB.workingIntensityClass.icon}">
+
+                                        <f:selectItem itemLabel="select an icon..." itemDisabled="true"/>
+
+                                        <f:converter converterId="iconConverter"/>
+                                        <f:selectItems id="uconNameList" value="#{intensityBB.iconList}" var="i" itemValue="#{i}" itemLabel="#{i.name}" />
+
+                                    </p:selectOneMenu>
+
+                                    <h:message for="classIcon" showDetail="true" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </h:panelGroup>
+                                
+                                <h:outputLabel value="Active?" for="classActive"/>
+                                <h:panelGroup>
+                                    <p:inputSwitch id="classActive" value="#{intensityBB.workingIntensityClass.active}"
+                                                   tabindex="13" onLabel="Yes" offLabel="No"/>
+                                    <h:message for="classActive" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <p:spacer height="10"/>
+
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="false" rendered="#{intensityBB.editing}"
+                                             actionListener="#{intensityBB.commitEdits()}"
+                                             value="Commit Updates" tabindex="2"/>
+
+                            <p:commandButton ajax="false" rendered="#{intensityBB.editing}"
+                                             actionListener="#{intensityBB.cancelEdits()}"
+                                             value="Cancel Updates" tabindex="2"/>
+
+
+                            <p:commandButton ajax="false" rendered="#{!intensityBB.editing}"
+                                             actionListener="#{intensityBB.createIntensityClass()}"
+                                             value="Add Intensity Class" tabindex="2"/>
+
+                            <p:spacer height="15"/>
+
+                        </h:form>
+
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

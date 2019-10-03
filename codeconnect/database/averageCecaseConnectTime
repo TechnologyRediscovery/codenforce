@@ -1,0 +1,3 @@
+﻿SELECT AVG((EXTRACT(epoch FROM age(caseattachmenttimestamp, submittedtimestamp))/3600)/24) AS average_days_to_connect 
+FROM ceactionrequest 
+WHERE caseattachment_userid IS NOT NULL  ;

@@ -1,0 +1,21 @@
+TODO per page pass:
+- Titles
+- template url
+- icons on buttons
+- tabstops
+- prime faces components
+- data table: 
+	Column resize
+	Appropriate selectability
+- Message bar at top
+- Sensible form and view names
+- license headers
+- organized headers/sections with spacers
+- 
+
+
+ <managed-bean>
+        <managed-bean-name>sessionBean</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.SessionBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>fire

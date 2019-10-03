@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"  dir="                           "
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Code Connect Documentation</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="docHomeView">
+                    
+                    <div class="docContainer">
+
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+                        <h1 id="top">"How-To" guides</h1>
+
+                        <p>Browse the contents to jump down to a step-by-step guide. Keyword links jump you to topic-specific
+                            explanations. Topics within a section are designed to be useful one at a time
+                        and also informative to be read sequentially from top to bottom to get a feel for
+                        the system's configuration.</p>
+                        
+                        <h2 id="ce">Code enforcement case management</h2>
+                            
+                            <ul class="pageContentsList">
+                                <li><a href="#propsCasesEvents">About properties, cases, and events</a></li>
+                                <li><a href="#openingACase">Opening a code enforcement case</a></li>
+                                <li><a href="#phases1">Code enforcement case phases: first glance</a></li>
+                                <li><a href="#events">Working with case events to document casework</a></li>
+                                <li><a href="#violations">Attaching <span class="bold">violations</span> to a case</a></li>
+                                <li><a href="#noticesCreate">Creating notices of violation</a></li>
+                                <li><a href="#noticesSend">Sending notices of violation</a></li>
+                                <li><a href="#citations">Issuing a citation</a></li>
+                                <li><a href="#court">Documenting the court process</a></li>
+                                <li><a href="#phases2">Case phases: detail</a></li>
+                            </ul>
+                        
+                        <h2 id="municipalCode">Municipal code tools</h2>
+                            <ul class="pageContentsList">
+                                <li><a href="#">About properties, cases, and events</a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        
+                        <h2 id="municipalCode">data</h2>
+                            <ul class="pageContentsList">
+                                <li><a href="#">c</a></li>
+                                <li><a href="#">c</a></li>
+                            </ul>
+                        
+                        <h2 id="municipalCode">data</h2>
+                            <ul class="pageContentsList">
+                                <li><a href="#">c</a></li>
+                                <li><a href="#">c</a></li>
+                            </ul>
+                        
+                        <h2 id="municipalCode">data</h2>
+                            <ul class="pageContentsList">
+                                <li><a href="#">c</a></li>
+                                <li><a href="#">c</a></li>
+                            </ul>
+                        
+                        
+                        
+                        <h3>Opening a code enforcement case</h3>
+                        
+                        <ol>
+                            <li>Open the profile of the property to which you wish to attach the new case. 
+                                <button id="button2">Check the key to the operators challenge</button>
+                                <h:graphicImage id="testToggle" value="/images/bees.jpeg" style="display:none;"/>
+                            </li>
+                            
+                            
+                            <li>Click the button: "Open a new code enforcement case" </li>
+                        </ol>
+                        
+                        <script type="text/javascript">
+	                        var i = 0;
+	                        $( "#button2").click(function() {
+	                                $( "#testToggle" ).toggle(1000);
+	                        });
+	                </script>
+                        
+                        
+                        
+                        
+                        
+                        
+                        <h2>Municipal code</h2>
+                        
+                            <p:accordionPanel>
+                                <p:tab title="Adding a borough ordinance">
+                                    <p>A specific chunk of text from a borough ordinance is stored inside a <span class="bold">code element </span>. 
+                                        All code elements live inside a <span class="bold">code source</span>. Thus, to add a code element, you must
+                                    first </p>
+                                </p:tab>
+                                
+                                <p:tab title="Recording violations of municipal code">
+                                    <p>CodeConnect stores ordinances as <span class="bold">code element </span>). These code chunks are
+                                    grouped by their source. Before we can enforce a violation, we must add </p>
+                                </p:tab>
+                                
+                                <p:tab title="What is the difference between a code sources. a code elment, and a codebook?">
+                                    
+                                    <p>A <span class="bold">code source</span> is a set of of <span class="bold">code elements</span> from a single creator at a single time. 
+                                        In our example, the code source is the IPMC 2015 which is made of five code elements, each with its own chapter, section, and subsection listing.</p>
+                                    
+                                    <h:graphicImage id="codeElementGI" value="/resources/diagrams/codeElementComposition.jpg" width="100%"/>
+                                    
+                                    <p>A particular code element in any source does not contain any enforcement data, such as the standard 
+                                        compliance window length. We add this data to a copy of a code element when we add that code element 
+                                        to a code binder. We can only enforce a particular chunk of code once it has been added to a binder 
+                                        (which also must be an active binder. Setting new binders to active is the default behavior.).</p>
+                                </p:tab>
+                                
+                            </p:accordionPanel>
+                        
+
+                        <h2>Code enforcement</h2>
+                        
+                            <p:accordionPanel>
+                                <p:tab title="Code Enforcement Action Requests">
+                                    <p>Code enforcement action requests initiate the code enforcement case management 
+                                    process. An action request consists of the following information:</p>
+                                    
+                                    <ul>
+                                        <li>Municipality designation</li>
+                                        <li>Parcel/property identifier in that municipality</li>
+                                        <li>Description of the code enforcement concern, including a concern category</li>
+                                        <li>Contact information for the requesting person</li>
+                                    </ul>
+                                    
+                                    
+                                    <h3>Public vs. internal code enforcement action requests</h3>
+                                    
+                                    <p>Both non-logged in (i.e. public) users and internal users can submit a code enforcement 
+                                    action requests for processing by a code enforcement officer. The exact same form
+                                    is used by both types of users. CodeConnect automatically enters the 
+                                    Contact information for users already logged into the system, thus streamlining
+                                    the process and preserving data integrity for staff who may submit many action requests.</p>
+                                    
+                                    
+                                    
+                                    <h3>request management life cycle</h3>
+                                    
+                                    <ol>
+                                        <li>A public or internal user completes a code enforcement action request and immediately 
+                                        receives a public access control code (PACC) which allows the user to check on the status of 
+                                        that request via the public information portal. </li>
+                                        <li>A code officer reviews the request and takes on of the following actions, reflected
+                                        in the request's status:</li>
+                                        <li>
+                                            <ul>
+                                                <li>Opens a new code enforcement case based</li>
+                                            </ul>
+                                        </li>
+                                        <li></li>
+                                    </ol>
+                                    
+                                    <h3>Public access to code enforcement request statuses</h3>
+                                    
+                                    <p>After submitting a code enforcement request, site users are provided with 
+                                        a six-digit number that called a Public Access Control Code. 
+                                        All significant case events are generally
+                                        released by officers and thus viewable by people via their PACC, including events related to
+                                        a code enforcement case that is opened in response to that request.</p>
+                                    
+                                </p:tab>
+                                
+                                <p:tab title="A property is in violation of a borough ordinance. How do I record this violation?">
+                                </p:tab>
+                                
+                                <p:tab title="What is the difference between a code sources. a code elment, and a codebook?">
+                                </p:tab>
+                                
+                            </p:accordionPanel>
+                        
+                        <h2>System administration</h2>
+                        
+                            <p:accordionPanel>
+                                <p:tab title="Adding and configuring new system users">
+                                </p:tab>
+                                
+                                <p:tab title="Managing municipalities">
+                                </p:tab>
+                                
+                                <p:tab title="What is the difference between a code sources. a code elment, and a codebook?">
+                                </p:tab>
+                                
+                            </p:accordionPanel>
+                        
+                        
+                        
+                      
+
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -1,0 +1,1651 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Jul 14, 2017, 7:53:01 AM
+    Author     : cedba
+*/
+
+/* colors
+
+// original dark blue/green, and orange
+
+COG green: #7fb337
+COG red: #a0270f
+COG blue: #2d66cd
+COG yellow: #e3b73d
+
+// new TCVCOG logo colors
+
+// yellow-ish
+#cde162
+
+// skyish blue
+#00b5ec
+
+//earthy:
+#5a5754
+
+
+*/
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('https://fonts.googleapis.com/css?family=Montserrat');
+}
+
+body{
+    margin: 0 auto;
+    font-family: sans-serif;
+    
+   
+}
+
+/*---------------- HEADERS -------------------*/
+
+h1{
+    font-family: 'roboto', sans-serif;
+    font-size: 1.5em;
+    color: #5a5754;
+    font-weight: normal;
+    display: block;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom: 3px solid #5a5754;
+    
+}
+
+h2{
+    font-size: 1.4em;
+    /* color: #00b5ec;  sky blue*/
+    
+    /*darker sky*/
+    color: #00637F; 
+    font-weight: bold;
+}
+
+h3{
+    font-size: 1em;
+    font-style: italic;
+    font-weight: bold;
+    color: #4F361E;
+    font-weight: normal;
+    
+    
+}
+
+h4{
+    color: darkgray;
+    font-style: italic;
+}
+
+
+.logoBox{
+    float:left;
+    clear:none;
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 10px;
+       
+}
+
+.logoBox h2{
+    color: white;
+}
+
+.sys-title{
+    font-size: 1.3em;
+    color: #cde162;
+}
+
+.sys-title-sub{
+    font-size: 1.1em;
+    font-style: italic;
+    color: #00b5ec;
+}
+
+.report-title{
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #cde162;
+    
+}
+
+.report-title-sub{
+    font-size: 1.1em;
+    color: #00b5ec;
+    font-style: italic;
+    
+}
+
+
+.darkFont{
+    color:#163F8A;
+}
+
+.property-blue{
+    color: #03305C;
+    
+}
+
+.person-maroon{
+    color: #710040;
+}
+
+.code-enforcement-orange{
+    color: #B36A00;
+}
+
+.occupancy-green{
+    
+}
+
+.action-request-header{
+    display: block;
+    font-weight: bold;
+    font-size: 1.2em;
+    padding-left:5px;
+    
+    
+    
+}
+
+.action-request-subheader{
+    display: block;
+    clear: both;
+    font-size: 1.1em;
+    
+}
+
+.logoBox{
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding:5px;
+}
+
+.logo-image-wrapper{
+    margin-right: 15px;
+}
+
+
+
+
+
+/*************** END HEADERS ****************/
+
+/*********** MENUS and TABS*********************/
+.ui-panelmenu-header {
+    font-size: 0.8em;
+    font-weight: normal;
+    font-style: normal;
+    background-color: #04284A;
+    color: green;
+    
+    
+}
+
+.tabText{
+    color:orange;
+}
+
+.menuLabel{
+    color:white;
+    
+}
+
+
+/* Main accordion menu on left */
+.ui-panelmenu .ui-panelmenu-header a{
+    text-shadow: none;
+    color:white;
+}
+
+/*Case profile coloring */
+.ui-tabs-nav li a {
+    color: black;
+}
+
+.bold-menu-item{
+    color:green;
+}
+
+.ui-menu .ui-menuitem-text{
+    font-weight: bold;
+    
+}
+
+
+
+
+
+/*--------------- ICONS --------------------*/ 
+
+i.material-icons{
+    color: #57ACFF;
+    width: 100%;
+}
+
+.icon-box-centered .material-icons{
+    font-size: 250%;
+}
+
+/* PrimeFaces icon reset */
+.ui-widget .ui-icon.fa, 
+.ui-icon.fa {
+    background-image: none;
+    text-indent: 0px;
+    background-repeat: no-repeat;
+    display: block;
+    overflow: visible;
+    text-indent: 0px;
+}
+
+.ui-menu .ui-menuitem-link .ui-menuitem-icon, .ui-menu .ui-submenu-icon{
+    padding-right: 8px;
+    
+}
+
+/*
+.icon-box-centered{
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 100%;
+    min-width: 100%;
+    width: 100%;
+    box-sizing: content-box;
+    
+}*/
+
+.userToolBar-icon{
+    font-size: 1.5em;
+    
+}
+
+/*used from demo on Mozilla site*/
+/*https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content*/
+
+.icon-container {
+  display: grid;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  clear: none;
+}
+
+.icon-box-centered {
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  
+}
+
+
+/***************** end icons *******************/
+
+
+/* ------------LINKS ------------------------- */
+
+
+a:link{
+    text-decoration: none;
+    color: #181F36;
+}
+
+a:visited{
+    color: #181F36;
+}
+
+a:hover{
+    color:#04284A;
+    text-decoration: underline;
+}
+
+.sblink{
+    text-decoration: none;
+    font-size: 11pt;
+}
+
+a.sblink:link{
+    color: #57ACFF;
+}
+
+a.sblink:visited{
+    color: #4774A0;
+}
+
+a.sblink:hover{
+    color:gray;
+}
+
+
+
+
+.headerLink{
+    font-weight: bold;
+    font-size: 11px;
+    float:left;
+    clear:none;
+    
+}
+
+
+a.headerLink:link {
+    color: #57ACFF;
+    text-decoration: none;
+}
+
+a.headerLink:hover {
+    color: white;
+    text-decoration: none;
+}
+
+a.headerLink:visited {
+    color: white;
+    text-decoration: none; 
+}
+
+a.headerLinks {
+    display: inline-block;
+    float: left;
+}
+
+
+div.headerLink a:before, a:visited{
+    /*color: green;*/
+
+    
+}
+
+/************** END LINKS ******************/
+
+
+/* ------------------- START PAGE LAYOUT  ------------------- */
+
+
+
+.two-column-page-flex-container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding:5px;
+      
+}
+
+.list-column{
+    flex-basis:auto;
+    flex-shrink: 1;
+    min-width: 550px;
+    max-width: 550px;
+    padding-right:10px;
+    
+    
+}
+
+.list-column-persons{
+    flex-basis:auto;
+    flex-shrink: 1;
+    min-width: 600px;
+    max-width: 600px;
+    padding-right:10px;
+    
+    
+}
+
+.object-column{
+    flex-basis: auto;
+    flex-grow: 1;
+    padding-left: 10px;
+
+    
+}
+
+/* **************** END PAGE LAYOUT  *********************/
+
+
+/* ----------- Printing and reports-------- */
+
+.printing-page-break-before{
+    page-break-before: always;
+    
+}
+
+.printing-page-break-after{
+    page-break-after: always;
+}
+
+
+div.printer-friendly-report .ui-widget-content{
+    border: none;
+    
+}
+
+.event-ds-box-report{
+    font-size: .7em;
+    margin: 3px;
+    padding: 5px;
+    border: thin solid #4774A0;
+    background-color: white;
+}
+
+.event-list-halfwidth{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
+.report-header-info{
+    font-size: small;
+    font-family: sans-serif;
+}
+
+.report-cear-requestbox{
+    font-size: .7em;
+    padding: 5px;
+    background-color: white;
+    margin: 15px;
+    border: thin solid #4774A0;
+    padding: 10px;
+/*    These two attributes are taken from .rowExpansion to see if we can use
+    only .outlinedBox divs for the row expansion*/
+    white-space: normal;
+    overflow-wrap: normal;
+}
+
+.ui-widget-content{
+    border: none;
+}
+
+.cear-request-titlehead{
+    font-size: 2em;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.reportconfig-header{
+    text-align: left;
+    
+}
+/* *********** end Printing and reports******** */
+
+
+
+
+/* ----------- Horizontal bars: LAYOUT BOXES  (OLD)-------- */
+
+
+
+.flex-box-container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 100%;  
+    
+    justify-content: flex-start;
+    
+    font-family: 'roboto', sans-serif;
+    margin-left: 0px;
+    margin-right:0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0px;
+    
+}
+
+.flex-box-container-interior{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    
+     justify-content: flex-start;
+    
+    font-family: 'roboto', sans-serif;
+    margin-left: 0px;
+    margin-right:0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0px;
+    
+}
+
+.narrow-content-container{
+    max-width: 800px;
+}
+
+.flexing-box-topbar{
+    
+    flex-grow: 1;
+    flex-basis: 100%;
+    flex-shrink: 1;
+    
+    height: 75px;
+    background-color: #5a5754;
+    
+}
+
+
+
+.flexing-box-sidebar{
+    
+    flex-grow: 0;
+    flex-basis: 200px;
+    flex-shrink: 1;
+    
+    background-color: #04284A;
+    padding: 10px;
+    
+}
+
+.flexing-box-sessioninfo{
+    
+    flex-grow: 1;
+    flex-basis: 100%;
+    flex-shrink: 1;
+    height: 50px;
+    
+    background-color: #181F36;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-left: 0px;
+    color: white;
+    font-weight: normal;
+    
+}
+
+.flexing-box-pagecontent{
+    
+    
+    flex-grow: 1;
+    flex-basis: max-content;
+    flex-shrink: 1;
+    
+    
+    margin-left: 0px;
+    padding: 10px;
+}
+
+.flexing-box-footer{
+    
+    flex-grow: 1;
+    flex-basis: 100%;
+    flex-shrink: 1;
+    
+    background-color: #1B1D20;
+    
+    color: white;
+    
+}
+
+.flexing-box-interior{
+    
+    
+    flex-grow: 1;
+    flex-basis: 80%;
+    flex-shrink: 3;
+    
+    
+}
+
+.split-page-panelgrid{
+    width: 100%;
+}
+
+.split-page-list-side{
+    width: 40%;
+}
+
+.split-page-manage-side{
+    width: 60%;
+}
+
+
+    
+
+#logoHeader{
+    margin-top: 3px;
+    color: #FFA35A;
+}
+
+.clearFix{
+    clear: both;
+}
+
+.plainText{
+    font-weight: normal;
+    
+}
+
+/*this mainContainer class is the containing bins on each user page*/
+.mainContainer{
+}
+
+.mainContainerDashboard{
+
+    display:block;
+}
+
+
+.primaryContentContainer{
+  
+}
+
+.footer{
+    font-family: 'roboto', sans-serif;
+    color: grey;
+}
+
+.foot{
+    height: 100px;
+}
+
+
+p.note{
+    font-size: .9em;
+    font-style: italic;
+}
+
+div.headerLinkCont{
+    display: inline-block;
+    float: right;
+    clear: none;
+    /*width: 100px;*/
+    height: 100%;
+    margin-left: 15px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-right: 15px;
+    
+    
+    
+}
+
+.userToolBar{
+    display: block;
+    float: right;
+    clear: none; 
+   height: 90px;
+}
+
+.gridTd-splitPage{
+    max-width: 600px;
+    vertical-align: top;
+}
+
+
+/* *********END MAIN PAGE LAYOUT BOXES ***************/
+
+/* --------- BUSINESS OBJECTS AND STATUS ------------------- */
+.mced-status-investigation{
+    font-weight: bold;
+    color:blue;
+}
+.mced-status-enforcement{
+    font-weight: bold;
+    color: blueviolet;
+    
+}
+.mced-status-citation{
+    font-weight: bold;
+    color: red;
+    
+}
+.mced-status-closed{
+    font-weight: bold;
+    color: black;
+}
+.mced-status-holding{
+    
+}
+
+.status-list{
+    list-style-type: none;
+    padding-top: 0px;
+    padding-left: 0px;
+    margin-left: 10px;
+    margin-top: 0px;
+    
+}
+
+i.status-display-icon-i{
+    color: inherit;
+}
+
+.status-display-container{
+	display: flex;
+	flex-direction: row;
+	flex-basis: auto;
+
+}
+
+.status-display-icon-container{
+	width: auto;
+	margin-right: 5px;
+
+
+}
+
+.action-request-icon i.material-icons{
+    font-size: 3em;
+    display: block;
+    margin-right: 15px;
+}
+
+
+.status-display-icon-container i.material-icons{
+        font-size: 5em;
+}
+
+
+.status-display-status-list-container{
+	flex-grow: 1;
+	flex-basis: auto;
+
+
+}
+
+.status-item{
+	font-size: 1em;
+        color: gray;
+        font-weight: normal;
+    
+}
+
+.stage-inactive{
+    font-weight: normal;
+    color:grey;
+}
+
+
+
+
+
+/* ********* end BUSINESS OBJECTS AND STATUS *******************
+
+/*----------------  TEXT AND SPANS ----------------------------*/
+
+
+.mono{
+    font-family: mono;
+}
+
+
+.bold {
+    font-weight: bold;
+}
+
+.note{
+    font-style: italic;
+    font-size: 0.8em;
+}
+
+.italic{
+    font-style: italic;
+}
+
+.infoBarData{
+    font-size: .9em;
+    font-family: mono;
+    font-weight: normal;
+}
+
+.weight-normal{
+    font-weight:normal;
+}
+
+
+/***************** CLOSE TEXT AND SPANS ***********************/
+
+
+/* --------------- DIVS---------------------------*/
+
+.rowExpansion{
+    white-space: normal;
+    overflow-wrap: normal;
+    text-align: left;
+}
+
+.wrapText{
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: break-all;
+}
+
+.roomy-top-margin{
+    margin-top: 15px;
+}
+
+.outlinedBox{
+    margin: 15px;
+    border: thin solid #4774A0;
+    padding: 10px;
+    background-color: white;
+/*    These two attributes are taken from .rowExpansion to see if we can use
+    only .outlinedBox divs for the row expansion*/
+    white-space: normal;
+    overflow-wrap: normal;
+}
+
+.activeObjectBox{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 15px;
+    margin-right: 15px;
+    border: thin solid #4774A0;
+    padding: 5px;
+    font-size:small;
+    display: inline-block;
+    
+    
+}
+.compact-violation-list-container{
+    margin-top: 5px;
+    
+}
+
+.activeObjectBox h4{
+    margin-top: 3px;
+    margin-bottom: 8px;
+   
+}
+
+.publicInfoBundleContainer{
+    margin: 15px;
+    border: #04284A solid thick;
+    padding: 10px;
+    
+}
+
+
+
+
+div.headerLinks{
+    display: block;
+    height:40px;
+    width: 100%;
+    /*height: 100px;*/
+    margin: 10px 10px 10px 10px;
+}
+
+.ord-text{
+    font-weight: normal;
+    font-style: italic;
+    font-family: mono;
+    white-space: normal;
+    overflow-wrap: normal;
+    padding: 20px;
+    line-height: 105%;
+       
+}
+
+
+
+
+
+/*will be deprecated when Adams public pages come online*/
+/*control code green box*/
+div.ccBox{
+    height: 25%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 2em;
+    font-weight: bold;
+    background-color: green;
+    border-color: darkgray;
+    border-width: 1px;
+    text-align: center;
+    padding: 15px;
+    border-top: 30px;
+    border-bottom: 30px;
+}
+
+
+/* ****************** CLOSE DIVS ************************/
+
+
+
+
+/* --------------- IMAGES ---------------------------*/
+
+
+img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+img.header{
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+
+img.headerImg{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+
+
+
+/*************** END IMAGES ****************************/
+
+
+
+/* ------------------ Primefaces Overrides ----------------------*/
+
+
+.ui-widget, .ui-widget .ui-widget {
+    font-size: 90% !important;
+}
+
+
+.ui-state-hover{
+    
+}
+
+/* ****************** END Primefaces Overrides ***********************/
+
+
+/* ------------------DASHBOARD STYLES ----------------------*/
+
+.bignum{
+    font-size: 600%;
+    font-weight: bold;
+}
+
+.bignum-header{
+    font-weight: bold;
+}
+
+.mainContainerDashboard{
+
+    display:block;
+}
+
+
+
+.ui-panel {
+                margin: 10px;
+}
+             
+.ui-dashboard-column {
+    width:33%;
+   
+}
+
+.ui-widget-content{
+    /*background-color: gray;*/
+}
+
+
+/*************** END DASHBOARD ****************************/
+
+
+/* ------------------TABLE STYLES ----------------------*/
+
+
+.td-dense{
+    padding: 1px;
+    margin: 0px;
+}
+
+.cases-report-citations-2cols{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
+
+.object-info-box thead{
+    text-align: left;
+    font-weight: normal;
+}
+
+.no-border{
+    border: none;
+    
+}
+
+.ui-expanded-row-content{
+    background-color: #04284A;
+    
+}
+
+.spacier-rows{
+    height: 150%;
+    
+}
+
+
+table.primeDataTable td{
+    font-size: small;
+    white-space: normal;
+    word-wrap: normal;
+}
+
+
+table.borders{
+    
+}
+
+table.borders {
+    border-collapse: collapse;
+}
+
+table.borders th, td {
+    border: 1px solid black;
+    padding: 5px;
+}
+
+table.borders th{
+    background-color: lightblue;
+}
+
+tr.resolved{
+    background-color: lightgreen;
+    
+}
+
+tr.pending{
+    background-color: lightyellow;
+    
+}
+
+tr.pastdeadline{
+    background-color: lightpink;
+}
+
+tr.reinspect{
+    background-color: lightpink
+}
+
+/*td.gridTd {*/
+.gridTd {
+    border: none;
+    vertical-align: top;
+    padding: 7px;
+}
+
+.topbottom-lines-left{
+    text-align: right;
+    border-right: none;
+    color: black;
+    margin:0;
+    
+}
+    
+.topbottom-lines-right{
+    text-align: left;
+    border-left: none;
+    color:black;
+}
+
+
+.gridTd-solid-back{
+    border:none;
+    background-color: rgba(12,12,12,0);
+    z-index: 100;
+    opacity: 1;
+}
+
+.panelGridData{
+    border-collapse: collapse;
+    margin: 0px;
+    border: 1px solid black;
+}
+
+td.gridFooter {
+    border: none;
+    
+}
+
+td.userBarTd{
+    align-content: center;
+    border: none;
+    
+}
+
+td.centeredColumnContent{
+    text-align: center;
+}
+
+.userBarTd .material-icons{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.leftalign{
+    text-align: left;
+}
+
+gridTd-bignum{
+}
+
+.gridTd-mccontainer{
+    background-color: #181F36;
+    
+}
+
+.action-requests-search{
+    background-color: bisque;
+}
+
+
+/***********************CLOSE TABLE STYLES**********************/
+
+
+/*---------------------CHARTS ---------------------------*/
+
+.jqplot-table-legend{
+    border: none;
+}
+
+
+/***********************CLOSE CHARTS **********************/
+
+
+
+/*---------------------BUTTONS & CONTROLS---------------------------*/
+
+.ui-state-hover{
+    
+    
+}
+
+.full-width{
+    width:100%;
+}
+
+.hover-none:hover{
+    
+    margin: auto;
+    background-color: green;
+    
+}
+
+/* this styling is for use w/ command button on codeSourceManage.xhtml */
+.manButton{
+    margin-bottom: 15px;
+}
+
+.inline-button{
+    margin-left:10px;
+    
+}
+
+/* formatting command buttons completeCodeSourceList & codeSourceTable on codeSourceManage.xhtml  */
+.buttonOwnLine1{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* formatting command buttons for inspectableCodeElementManage.xhtml */
+.iceButton{
+    margin-top: 10px;
+}
+
+
+.commandButton{
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+        
+}
+
+.button-size-small {
+    font-size: small;
+    font-weight: normal;
+}
+
+.cear-actions-button {
+    
+}
+
+
+.buttonOwnLine{
+    display: block;
+    margin-bottom: 10px;
+    margin-top: 5px;
+    clear: left;
+/*    color: blue;
+    background-color: green;*/
+}
+
+.noFill{
+    background-color: white;
+}
+
+.button-float-right{
+    display: block;
+    float:right;
+}
+.sessionInfoButton{
+    background: none;
+    
+}
+
+.sessionInfoButton span{
+    color: white;
+}
+
+.ui-chkbox-box{
+    margin:5px;
+}
+
+/* ****************** CLOSE BUTTON STYLES ********************/
+
+
+
+
+/* -------------------- PROPOSALS AND CHOICES ----------------------- */
+
+.proposal-choice-button{
+    margin-top: 5px;
+    
+}
+
+.proposal-prophead{
+    font-weight: bold;
+    font-size: 1.2em;
+    display: block;
+    float: left;
+}
+
+.proposal-description{
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+.proposal-choicehead{
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.proposal-metadata-container{
+    display: block;
+    width: 100%;
+}
+
+.proposal-propbuttoncontainer{
+    display: block;
+    float: right;
+}
+
+
+.proposal-infotable-box{
+    display: block;
+    width: 100%;
+    clear: both;
+}
+
+/* ****************** PROPOSALS AND CHOICES ********************/
+
+
+
+
+/* -------------------- INSPECTION AND OCC PERMIT----------------------- */
+
+.field-lock-status-icon-container{
+    display: inline-block;
+    margin-right: 20px;
+    height: 10px;
+    width: 10px;
+    
+}
+
+.occperiod-inspace-info{
+    display: block;
+    clear: both;
+    
+}
+
+.ui-datascroller-item{
+    clear:both;
+}
+
+.occinsspace-metadata-container{
+    display: block;
+    width: 100%;
+}
+
+.occspace-button-container{
+    display: block;
+    float: right;
+}
+
+
+
+i.inspection-pass{
+    color: forestgreen;
+}
+
+i.inspection-fail{
+    color: #B36A00;
+}
+
+i.inspection-notinspected{
+    color: #1a237e;
+}
+
+.occperiod-inspace-header{
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #163F8A;
+    margin-bottom: 15px;
+    display: block;
+    float: left;
+}
+
+.occperiod-inelement-header{
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    clear:both;
+}
+
+
+.inspection-notinspected{
+    color: #1a237e;
+    font-weight: bold;
+    
+}
+
+.inspection-pass{
+    color: forestgreen;
+    font-weight: bold;
+}
+
+.inspectio-fail{
+    color:#B36A00;
+    font-weight: bold;
+}
+
+
+.occpermit-borderbox{
+    display: block;
+    width: 800px;
+    border: #00637F double medium;
+}
+
+.occpermit-datagrid{
+    
+    
+}
+
+.gridTd-permit {
+    border: none;
+    vertical-align: top;
+    padding: 10px;
+}
+
+
+.occpermit-title{
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.occpermit-titlesub{
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 1.1em;
+    font-style: italic;
+}
+
+.occpermit-criticaldata-label{
+    display: block;
+    clear: right;
+    font-weight: bold;
+    font-size: 1.2em;
+    
+}
+
+.occpermit-criticaldata-value{
+    font-size: 1.2em;
+}
+
+.occpermit-minordata-label{
+    font-size: 1em;
+    
+}
+
+.occpermit-minordata-value{
+    font-size: 1em;
+    
+}
+
+.occpermit-admindata-label{
+    font-size: .8em;
+    font-weight: bold;
+    color: darkgrey;
+}
+
+.occpermit-admindata-value{
+    font-size: .8em;
+    
+}
+
+.occpermit-additionalnotes{
+    
+}
+
+.occpermit-muniheader{
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/*class given to <h:outputText ... components which are nested in an <hx of some kind*/
+.occperiod-periodlabel{
+    font-weight: bold;
+    color: darkgrey;
+    font-size: 1.1em;
+}
+
+.occperiod-periodvalue{
+    
+    
+}
+
+.occperiod-address{
+    font-weight: bold;
+    font-size: 1.3em;
+}
+
+.occinspection-reportheader{
+    
+}
+
+
+
+/* ****************** CLOSE INSPECTION AND OCC PERMIT********************/
+
+
+
+
+/* -------------------- MISC --------------------------------- */
+
+.nov-chosen-recipeint{
+    margin: 10px;
+    font-family: monospace;
+}
+
+
+p.footer{
+    font-style: italic;
+    size: 0.8em;
+    color: #e3b73d;
+}
+
+/* UI Controls Styling*/
+
+.inputText{
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+a.outputLink{
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+.textArea{
+    width: 400px;
+    margin-bottom: 10px;
+}
+
+select.selectOneListbox{   
+    margin-bottom: 10px;
+}
+
+span.uiLabel{
+    display: block;
+    clear: left;
+    margin-bottom: 10px;
+    font-weight: bold;
+    
+}
+
+input.selectBooleanCheckbox{
+    display: inline-block;
+    float: left;
+}
+
+div.checkBoxLabel{
+    display: block;
+    float: left;
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+.requested-action-status {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.action-needed{
+    color:red;
+    
+}
+
+.action-complete{
+    color:blue;
+}
+
+.nov-builder-halfwidth{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
+.preview-violations-box{
+    display: block;
+    width:1000px;
+}
+
+
+/* ******************** CLOSE MISC ********************************/
+
+
+
+/* Error Styling */
+
+.msgWarn{
+    color: darkgoldenrod;
+}
+
+.msgInfo{
+    color: blue;
+}
+
+.msgFatal{
+    color: orange;
+}
+
+.msgError{
+    color: orangered;
+}
+
+/* Property Profile Styling */
+
+table.cases{
+    border-collapse: collapse;
+    border: 1px solid black;
+    
+}
+
+table.cases th{
+    text-align: left;
+    border: 1px solid blue;
+    background-color: green;
+}
+
+table.cases td{
+    text-align: left;
+    border: 1px solid blue;
+    padding: 5px;
+}
+
+tr.caseClosed{
+    background-color: #66ff66;
+}
+
+tr.caseOpen{
+    background-color: #9999ff;
+}
+
+
+/* fieldset */
+
+.ui-fieldset-toggleable .ui-fieldset-legend{
+    background-color: white;
+    font-weight: normal;
+    
+}
+
+.ui-fieldset-legend{
+    background-color: white;
+    font-weight: normal;
+    
+}
+
+/* tab views */
+.ui-tabs-nav{
+    color:black;
+    background-color: green;
+}
+
+
+/* Documentation styling */
+.docContainer{
+    max-width: 800px;
+    
+}
+
+.pageContentsList{
+    list-style-type: none;
+}
+    
+    
+.pageContentsList li{
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}

@@ -1,0 +1,112 @@
+/*
+Styling for notices of violation printing only
+*/
+/* 
+    Created on : Apr 25, 2019, 8:20:32 PM
+    Author     : Ms. Loretta
+*/
+
+
+
+.body{
+    
+    
+}
+
+.nov-container{
+    margin: 0px;
+    
+}
+
+.header{
+    display: block;
+    
+}
+
+.header-image{
+    
+}
+
+.addressee{
+    display: block;
+    position: absolute;
+    
+    
+    
+}
+
+.ui-datascroller-content{
+    border:none;
+}
+
+.date-of-record{
+    margin-top: 15px;
+    margin-bottom: 15px;
+    
+}
+
+.property-of-concern{
+    margin-top: 15px;
+    margin-bottom: 15px;
+    
+}
+
+.text-insert{
+    
+}
+
+.signature{
+    margin-top:30px;
+    
+}
+
+.signature-image{
+    
+}
+
+.violation{
+    
+    
+}
+
+.compliance-date{
+    
+}
+
+.violation-image{
+    
+}
+
+.violation-image-header{
+    
+    
+}
+
+p{
+    
+    
+}
+
+.violation-photo-attachments{
+    page-break-before: always;
+    
+}
+
+.violation-photo{
+    
+}
+
+.nov-header-image{
+    margin-left: 5px;
+}
+
+nov-image-caption{
+    display: block;
+    margin-top:0px;
+    
+}
+
+
+
+
+
