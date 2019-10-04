@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -50,6 +51,8 @@ public class UserManageBB extends BackingBeanUtils implements Serializable{
     
     private User currentUser;
     
+    private List<UserAuthorized> userList;
+    
     private RoleType selectedRoleType;
     private List<RoleType> roleTypeCandidateList;
     
@@ -61,7 +64,8 @@ public class UserManageBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
-        roleTypeCandidateList = uc.getPermittedRoleTypes(getSessionBean().getSessionUser());
+        selectedMuni = getSessionBean().getSessionMuni();
+        roleTypeCandidateList = uc.getPermittedRoleTypesToGrant(getSessionBean().getSessionUser());
         try {
             muniCandidateList = sc.getPermittedMunicipalityList(getSessionBean().getSessionUser());
         } catch (IntegrationException ex) {
@@ -69,7 +73,16 @@ public class UserManageBB extends BackingBeanUtils implements Serializable{
         }
     }
     
-    public String commitUpdatesToUser(){
+    public void initiateCreateNewUser(){
+        UserCoordinator uc = getUserCoordinator();
+        currentUser = uc.getUserSkeleton();
+        
+    }
+    
+    /**
+     *
+     */
+    public void commitUpdatesToUser(){
         UserIntegrator ui = getUserIntegrator();
         User u = new User();
         u.setUserID(currentUser.getUserID());
@@ -85,15 +98,19 @@ public class UserManageBB extends BackingBeanUtils implements Serializable{
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to update person", "This issue requires administrator attention, sorry"));
         }
-        return "userManage";
+        
     }
+    
+    public void resetCurrentUserPassword(){
+        
+    }
+    
  
     /**
      * @return the currentUser
      */
     public User getCurrentUser() {
         
-        currentUser = getSessionBean().getUtilityUserToUpdate();
         return currentUser;
     }
 
@@ -101,7 +118,6 @@ public class UserManageBB extends BackingBeanUtils implements Serializable{
      * @return the selectedRoleType
      */
     public RoleType getSelectedRoleType() {
-        // BROKEN
         return selectedRoleType;
     }
   
@@ -164,6 +180,20 @@ public class UserManageBB extends BackingBeanUtils implements Serializable{
      */
     public void setMuniCandidateList(List<Municipality> muniCandidateList) {
         this.muniCandidateList = muniCandidateList;
+    }
+
+    /**
+     * @return the userList
+     */
+    public List<UserAuthorized> getUserList() {
+        return userList;
+    }
+
+    /**
+     * @param userList the userList to set
+     */
+    public void setUserList(List<UserAuthorized> userList) {
+        this.userList = userList;
     }
     
     

@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,16 @@ public class UserAuthorized extends User{
     private Map<Municipality, UserAuthorizationPeriod> muniAuthPerMap;
     private final AccessKeyCard keyCard;
     
+
+    
+    /**
+     * This constructor is the only way of setting the internals of this
+     * security-critical BOB, so all must be assembled by the coordinator
+     * and then only read from
+     * @param u
+     * @param uap
+     * @param akc 
+     */
     public UserAuthorized(  User u, 
                             UserAuthorizationPeriod uap, 
                             AccessKeyCard akc){
@@ -43,6 +54,12 @@ public class UserAuthorized extends User{
         this.governingAuthPeriod = uap;
         this.keyCard = akc;
         
+        this.active = u.isActive();
+        this.createdByUserId = u.getCreatedByUserId();
+        this.createdTS = u.getCreatedTS();
+        this.noLoginVirtualUser = u.isNoLoginVirtualUser();
+        this.pswdLastUpdated = u.getPswdLastUpdated();
+        this.forcePasswordResetTS = u.getForcePasswordResetTS();
     }
     
     /**
@@ -104,5 +121,6 @@ public class UserAuthorized extends User{
     public void setMuniAuthPerMap(Map<Municipality, UserAuthorizationPeriod> muniAuthPerMap) {
         this.muniAuthPerMap = muniAuthPerMap;
     }
+
     
 }

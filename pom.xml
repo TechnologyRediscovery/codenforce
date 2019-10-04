@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.tcvcog.codeenforcement</groupId>
-    <artifactId>tcvce_mvn2</artifactId>
-    <version>1.0</version>
+    <artifactId>codenforce</artifactId>
+    <version>0.9</version>
     <packaging>war</packaging>
 
-    <name>tcvce_mvn2</name>
+    <name>codenforce</name>
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>

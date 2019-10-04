@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -30,9 +31,12 @@ import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  *
@@ -48,10 +52,107 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     }    
     
+    private Municipality determineDefaultMuni(  User u, 
+                                                Map<Municipality, UserAuthorizationPeriod> muniPerMap) 
+                                                        throws AuthorizationException{
+        
+        UserAuthorizationPeriod  userAuthPeriod;
+        UserAuthorized authUser = null;
+        Municipality defMuni = null;
+        
+        if(muniPerMap == null || muniPerMap.isEmpty()){
+            throw new AuthorizationException("Suspicious call to configInitialUserAuth; no auths supplied");
+        }
+        
+        for(UserAuthorizationPeriod uap: muniPerMap.values()){
+            if(uap.isDefaultmuni()){ // take our first muni declared default
+                defMuni = uap.getMuni();
+            }
+        }
+        // backup logic for when no muni is declared default; pick one
+        if(defMuni == null){
+            List<UserAuthorizationPeriod> lst;
+            lst = new ArrayList<>(muniPerMap.values());
+            defMuni = lst.get(0).getMuni();
+        } 
+        return defMuni;
+    }
+    
+    public String generateRandomPassword(){
+        java.math.BigInteger bigInt = new BigInteger(1024, new Random());
+        String randB64 = Base64.encode(bigInt.toByteArray());
+        StringBuilder sb = new StringBuilder();
+        sb.append(randB64.substring(0,3));
+        sb.append("-");
+        sb.append(randB64.substring(randB64.length()-3,randB64.length()));
+        sb.append("-");
+        sb.append(randB64.substring(randB64.length()-3,randB64.length()));
+        return sb.toString();
+        
+    }
+    
+    private UserAuthorized generateUserAuthorized(  User u, 
+                                                    UserAuthorizationPeriod uap) throws AuthorizationException{
+        
+        UserAuthorized ua = null;
+        if(u.getUserID() == uap.getUserID()){
+            AccessKeyCard acc = generateAccessKeyCard(uap);
+            ua = new UserAuthorized(u, uap, acc);
+            ua.setGoverningAuthPeriod(uap);
+        } else {
+            throw new AuthorizationException("incorrect User and AuthorizationPeriod pairing; No UserAuthorized will be generated.");
+        }
+        return ua;
+    }
+    
+    /**
+     * Primary logic container for determining authorization statuses for a given User
+     * across ALL existing municipalities
+     * @param u
+     * @return A Map of all Municipalities for which the passed in User has a valid
+     * authentication period record, meaning the period start/end dates include today
+     * and there is not a deactivation timestamp
+     * @throws IntegrationException
+     * @throws AuthorizationException 
+     */
+    private Map<Municipality, UserAuthorizationPeriod> assembleValidAuthPeriodMap(User u) 
+                                                throws  IntegrationException, 
+                                                        AuthorizationException{
+        UserIntegrator ui = getUserIntegrator();
+        List<UserAuthorizationPeriod> candidatePeriods;
+        Map<Municipality, UserAuthorizationPeriod> muniPerMap = new HashMap<>();
+        
+        candidatePeriods = ui.getUserAuthorizationPeriods(u);
+        if(!candidatePeriods.isEmpty()){
+            for(UserAuthorizationPeriod uap: candidatePeriods){
+                // Filter out deactivated records and expired records
+                if(uap.getRecorddeactivatedTS() == null 
+                        && uap.getAccessgranteddatestart().isBefore(LocalDateTime.now())
+                        && uap.getAccessgranteddatestop().isAfter(LocalDateTime.now())){
+                    //  check for existing muni periods and use the most recent valid period
+                    if(muniPerMap.containsKey(uap.getMuni())){
+                        UserAuthorizationPeriod existingRecord = muniPerMap.get(uap.getMuni());
+                        if(uap.getCreatedTS().isAfter(existingRecord.getCreatedTS())){
+                            // we found a newer record, so swap it out
+                            muniPerMap.put(uap.getMuni(), uap);
+                        }
+                    } else {
+                        // no existing record for that muni, so add it to the map
+                        muniPerMap.put(uap.getMuni(), uap);
+                    }
+                }
+            } // close for over candidates
+        } else {
+            throw new AuthorizationException("No candidate authorization periods exist for user");
+        }
+        return muniPerMap;
+    }
+    
+    
     /**
      * Primary user retrieval method: Note that there aren't as many checks here
      * since the jboss container is managing the lookup of authenticated users. 
-     * We are pulling the login name from the already authenticated glassfish user 
+     * We are pulling the login name from the already authenticated jboss session user 
      * and just grabbing their profile from the db
      * 
      * @param loginName
@@ -66,14 +167,41 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         UserIntegrator ui = getUserIntegrator();
         // convert the login name given to us by the JBoss container into a local ID num
         int authUserID = ui.getUserID(loginName);
-        // use this id number to figure out which muni to grant initial auth to
-        Municipality m = ui.getUserDefaultMunicipality(authUserID);
-        // retrieve the access record from the DB for use in computing access permissions
-        authenticatedUser = ui.getUserWithAccessData(authUserID, m);
-        // now configure the user's permissions for this specific muni
-        configureUserMuniAccess(authenticatedUser, m);
-        // send back our lovely fancy UserWithAccessData
-        return authenticatedUser;
+        usr = ui.getUser(authUserID);
+        
+        if(usr != null){ // make sure we have a real user in the system
+            muniAuthMap = assembleValidAuthPeriodMap(usr);
+            if(targetMuni == null){ // from a session initialization
+                targetMuni = determineDefaultMuni(usr, muniAuthMap);
+            } 
+            au = generateUserAuthorized(usr, muniAuthMap.get(targetMuni));
+            au.setMuniAuthPerMap(muniAuthMap);
+        } else {
+            throw new AuthorizationException("The database could not retrieve the User skeleton");
+        }
+        
+        return au;
+    }
+    
+    /**
+     * Generates a list of what role types a given user can assign to new users 
+     * they create. As of Oct 2019, this logic said you can add somebody of lesser 
+     * in your municipaltiy. Developers have all power.
+     * @param user
+     * @return 
+     */
+    public List<RoleType> getPermittedRoleTypesToGrant(UserAuthorized user){
+        List<RoleType> rtl;
+        List<RoleType> rtlAuthorized = new ArrayList<>();
+        rtl = new ArrayList<>(Arrays.asList(RoleType.values()));
+        for(RoleType rt: rtl){
+            // only allow users to add new users of roles of lesser ranks
+            if(rt.getRank() < user.getKeyCard().getAuthRole().getRank()
+                    || user.getKeyCard().getAuthRole() == RoleType.Developer){
+                rtlAuthorized.add(rt);
+            }
+        }
+        return rtlAuthorized;
     }
     
     private User configureUserMuniAccess(UserWithAccessData userWAccess, Municipality m) throws AuthorizationException{
@@ -179,9 +307,20 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
    
     
-    public Municipality getDefaultyMuni(User u) throws IntegrationException, AuthorizationException{
-        UserIntegrator ui = getUserIntegrator();
-        return ui.getUserDefaultMunicipality(u.getUserID());
+     public UserAuthorizationPeriod initializeNewAuthPeriod( UserAuthorized requestor, 
+                                                            User requestee, 
+                                                            Municipality m){
+        UserAuthorizationPeriod per = null;
+
+        // Only Users who have sys admin permission in the requested muni or are devs
+        if((requestor.getGoverningAuthPeriod().getMuni().getMuniCode() == m.getMuniCode()
+                && requestor.getKeyCard().isHasSysAdminPermissions())
+                || requestor.getKeyCard().isHasDeveloperPermissions()){
+            per = new UserAuthorizationPeriod(m);
+            per.setAccessgranteddatestart(LocalDateTime.now());
+            per.setAccessgranteddatestop(LocalDateTime.now().plusYears(1));
+        }
+        return per;
     }
     
     public boolean setDefaultMuni(User u, Municipality m) throws IntegrationException, AuthorizationException{
