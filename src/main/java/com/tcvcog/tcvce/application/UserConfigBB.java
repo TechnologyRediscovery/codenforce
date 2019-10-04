@@ -16,21 +16,26 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorizationPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -55,6 +60,21 @@ public class UserConfigBB extends BackingBeanUtils{
     
     private Municipality selectedMuni;
     private List<Municipality> muniCandidateList;
+    
+     private int formUserID;
+    private RoleType formRoleType;
+    private RoleType[] roleTypeArray;
+    private String formUsername;
+    
+    private String formPassword;
+    
+    private Municipality formMuni;
+    
+    private Person formUserPerson;
+    
+    private List<Person> userPersonList;
+    private Person selectedUserPerson;
+    
 
     
     @PostConstruct
@@ -62,12 +82,28 @@ public class UserConfigBB extends BackingBeanUtils{
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
         setSelectedMuni(getSessionBean().getSessionMuni());
+        SearchCoordinator searchCoord = getSearchCoordinator();
+        
+        
         roleTypeCandidateList = uc.getPermittedRoleTypesToGrant(getSessionBean().getSessionUser());
         try {
+            userList = uc.getUserListForConfig(getSessionBean().getSessionUser());
             muniCandidateList = sc.getPermittedMunicipalityList(getSessionBean().getSessionUser());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        
+         // user our fancy specialized query to get all Persons who are delcared to 
+        // be user types
+        QueryPerson qp = searchCoord.assembleQueryPerson(QueryPersonEnum.USER_PERSONS, getSessionBean().getSessionUser(), null, null );
+        try {
+            qp = searchCoord.runQuery(qp);
+            userPersonList = qp.getResults();
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        
         
     }
     
@@ -79,7 +115,7 @@ public class UserConfigBB extends BackingBeanUtils{
     
     public void initiateCreateNewAuthPeriod(){
         UserCoordinator uc = getUserCoordinator();
-        currentUAP = uc.initializeNewAuthPeriod(getSessionBean().getSessionUser(), currentUser, selectedMuni);
+        currentUAP = uc.initializeNewAuthPeriod(getSessionBean().getSessionUser(), currentUser, getSelectedMuni());
         
         
     }
@@ -88,7 +124,102 @@ public class UserConfigBB extends BackingBeanUtils{
         UserCoordinator uc = getUserCoordinator();
         
         
+        
     }
+    
+     public void initiateUserUpdates(User usr){
+        currentUser = usr;
+    }
+    
+    public String editUserPersonRecord(){
+        getSessionBean().setSessionPerson(currentUser.getPerson());
+        return "persons";
+    }
+
+    public void updateUser(UserAuthorized u) {
+        
+        currentUser = u;
+
+    }
+    
+    
+    public void commitUsernameUpdates(ActionEvent ev){
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            uc.updateUser(currentUser);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully udpated user", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update user", ""));
+            
+        }
+    }
+    public void commitUserInsert(ActionEvent ev) {
+        System.out.println("UserBB.commitInsert");
+        UserCoordinator uc = getUserCoordinator();
+        int newUserID;
+        
+        try {
+            newUserID = uc.insertNewUser(currentUser);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully added user with id" + newUserID
+                            + " to the system and this person can now login and get to work!", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add user to system, my apologies",
+                            "This is a system-level error that msut be corrected by an administrator"));
+        }
+
+    }
+
+    
+    
+    public void commitUserPersonUpdates(ActionEvent ev){
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            uc.updateUser(currentUser);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully udpated your person link", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update person link, sorry!", ""));
+        }
+    }
+    
+    public void commitPasswordUpdates(ActionEvent ev){
+        
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            uc.updateUserPassword(currentUser, formPassword);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully udpated your password to --> " + formPassword 
+                                    + " <-- Please write this down in a safe place; "
+                                    + "If you lose it, you'll have to make a new one.", ""));
+            formPassword = "";
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update password in DB", ""));
+            
+        } catch (AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Authorization error on password update", ""));
+        }
+    }
+    
     
     /**
      *
@@ -259,6 +390,132 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void setCurrentUAP(UserAuthorizationPeriod currentUAP) {
         this.currentUAP = currentUAP;
+    }
+
+    /**
+     * @return the formUserID
+     */
+    public int getFormUserID() {
+        return formUserID;
+    }
+
+    /**
+     * @return the formRoleType
+     */
+    public RoleType getFormRoleType() {
+        return formRoleType;
+    }
+
+    /**
+     * @return the roleTypeArray
+     */
+    public RoleType[] getRoleTypeArray() {
+        return roleTypeArray;
+    }
+
+    /**
+     * @return the formUsername
+     */
+    public String getFormUsername() {
+        return formUsername;
+    }
+
+    /**
+     * @return the formPassword
+     */
+    public String getFormPassword() {
+        return formPassword;
+    }
+
+    /**
+     * @return the formMuni
+     */
+    public Municipality getFormMuni() {
+        return formMuni;
+    }
+
+    /**
+     * @param formUserID the formUserID to set
+     */
+    public void setFormUserID(int formUserID) {
+        this.formUserID = formUserID;
+    }
+
+    /**
+     * @param formRoleType the formRoleType to set
+     */
+    public void setFormRoleType(RoleType formRoleType) {
+        this.formRoleType = formRoleType;
+    }
+
+    /**
+     * @param roleTypeArray the roleTypeArray to set
+     */
+    public void setRoleTypeArray(RoleType[] roleTypeArray) {
+        this.roleTypeArray = roleTypeArray;
+    }
+
+    /**
+     * @param formUsername the formUsername to set
+     */
+    public void setFormUsername(String formUsername) {
+        this.formUsername = formUsername;
+    }
+
+    /**
+     * @param formPassword the formPassword to set
+     */
+    public void setFormPassword(String formPassword) {
+        this.formPassword = formPassword;
+    }
+
+    /**
+     * @param formMuni the formMuni to set
+     */
+    public void setFormMuni(Municipality formMuni) {
+        this.formMuni = formMuni;
+    }
+
+    /**
+     * @return the formUserPerson
+     */
+    public Person getFormUserPerson() {
+        return formUserPerson;
+    }
+
+    /**
+     * @return the userPersonList
+     */
+    public List<Person> getUserPersonList() {
+        return userPersonList;
+    }
+
+    /**
+     * @return the selectedUserPerson
+     */
+    public Person getSelectedUserPerson() {
+        return selectedUserPerson;
+    }
+
+    /**
+     * @param formUserPerson the formUserPerson to set
+     */
+    public void setFormUserPerson(Person formUserPerson) {
+        this.formUserPerson = formUserPerson;
+    }
+
+    /**
+     * @param userPersonList the userPersonList to set
+     */
+    public void setUserPersonList(List<Person> userPersonList) {
+        this.userPersonList = userPersonList;
+    }
+
+    /**
+     * @param selectedUserPerson the selectedUserPerson to set
+     */
+    public void setSelectedUserPerson(Person selectedUserPerson) {
+        this.selectedUserPerson = selectedUserPerson;
     }
     
 }

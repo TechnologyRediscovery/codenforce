@@ -107,7 +107,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     /**
      * Primary logic container for determining authorization statuses for a given User
-     * across ALL existing municipalities
+     * across ALL existing municipalities for which the User has a record
      * @param u
      * @return A Map of all Municipalities for which the passed in User has a valid
      * authentication period record, meaning the period start/end dates include today
@@ -323,9 +323,10 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return per;
     }
     
-    public boolean setDefaultMuni(User u, Municipality m) throws IntegrationException, AuthorizationException{
+    public List<UserAuthorized> getUserListForConfig(UserAuthorized usr) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
-        return ui.setDefaultMunicipality(u, m);
+        return ui.getCompleteActiveUserList();
+        
         
     }
     

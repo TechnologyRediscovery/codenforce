@@ -353,8 +353,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         }
         
     }
-    
-    
    
     
     public String viewPersonProfile(Person p){
