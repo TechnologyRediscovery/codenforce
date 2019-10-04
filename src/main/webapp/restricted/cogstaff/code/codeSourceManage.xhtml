@@ -4,107 +4,1044 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
     <h:head>
         <title>Code Source Management</title>
     </h:head>
+
     <h:body>
+
         <ui:composition template="../../navContainer_restricted.xhtml">
+
             <ui:define name="content">
+
                 <f:view id="codeSourceManageView">
+
                     <div class="mainContainer">
+
+                        <h1>Manage Municipal Code Sources</h1>
+
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"></h:messages>
-                        <h1>Manage municipal code sources</h1>
 
-                        <h:form id="codeSourceManageForm"> 
-                            <p:commandButton id="newCodeSourceButton" ajax="false" 
-                                             value="Add a new code source" icon="fa fa-plus" action="#{codeSourceBB.addNewSource}" />
-                            
-                            <p:spacer height="15px"/>
-                            
-                            <p:dataTable
-                                id="codeSourceTable"
-                                var="source"
-                                value="#{codeSourceBB.codeSourceList}"
-                                selectionMode="single"
-                                selection="#{codeSourceBB.selectedCodeSource}"
-                                rowKey="#{source.sourceID}"
-                                tableStyleClass="primeDataTable">
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Source ID" />
-                                    </f:facet>
-                                    <h:outputText value="#{source.sourceID}"/>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Source Name" />
-                                    </f:facet>
-                                    <h:outputText value="#{source.sourceName}"/>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Year" />
-                                    </f:facet>
-                                    <h:outputText value="#{source.sourceYear}"/>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Description" />
-                                    </f:facet>
-                                    <h:outputText value="#{source.sourceDescription}"/>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Active?" />
-                                    </f:facet>
-                                    <h:outputText value="#{source.isActive}"/>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Link" />
-                                    </f:facet>
-                                    <h:outputText value="#{source.URL}"/>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Notes" />
-                                    </f:facet>
-                                    <h:outputText value="#{source.sourceNotes}"/>
-                                </p:column>
-                            </p:dataTable>
+                        <div class ="two-column-page-flex-container">
 
-                            <p:spacer height="15px"/>
-                            <p class="note">Updating or viewing elements by source 
-                                will make the selected source your active source, 
-                                enabling the "list elements by source" option.</p>
+                            <div class="list-column">
 
-                            <p:commandButton 
-                                id="codeSourceUpdateButton" ajax="false"
-                                value="Update source metatdata" icon="fa fa-edit"
-                                styleClass="codeSourceUpdate"
-                                action="#{codeSourceBB.updateCodeSource}"/>
+                                <p:panel id = "codesourcemanage-panel-selectcodesource"
+                                         toggleable = "true"
+                                         collapsed ="false"
+                                         header = "Municipal Code Sources"
+                                         >
 
-                            <p:commandButton
-                                id="addElementToSourceButton" ajax="false"
-                                value="Add Element to Source"
-                                styleClass="buttonOwnLine" icon="fa fa-plus"
-                                action="#{codeSourceBB.addElementToSource}" />
+                                    <p:spacer height="10px"/>
 
-                            <p:commandButton
-                                id="viewElementsInSourceButton" ajax="false"
-                                value="View list of elements in source"
-                                styleClass="buttonOwnLine" icon="fa fa-list"
-                                action="#{codeSourceBB.viewElementsInSource}" />
-                            
-                            <p:commandButton
-                                id="linkElementsToGuideEntries" ajax="false"
-                                value="Link elements in source to Code Guide"
-                                styleClass="buttonOwnLine" icon="fa fa-link"
-                                action="#{codeSourceBB.linkElementsToCodeGuide}" />
+                                    <h:form id="codesourcemanage-form-selectcodesource">
 
-                        </h:form>
+                                        <p:dataTable id="codeSourceTable"
+                                                     var="source"
+                                                     value="#{codeSourceBB.codeSourceList}"
+                                                     rowKey="#{source.sourceID}"
+                                                     tableStyleClass="primeDataTable"
+                                                     >
+
+                                            <p:column style="width:30px" >
+                                                <p:rowToggler/>
+                                            </p:column>
+
+                                            <p:column headerText="Source Name"
+                                                      styleClass="centeredColumnContent">
+
+                                                <h:outputText value="#{source.sourceName}"/>
+
+                                            </p:column>
+
+                                            <p:column headerText="Edit"
+                                                      styleClass="centeredColumnContent"
+                                                      style="width: 80px"
+                                                      >
+
+                                                <p:commandButton id="button-editcodesource" ajax="true"
+                                                                 value="Edit" 
+                                                                 actionListener="#{codeSourceBB.updateCodeSource}"
+                                                                 icon="fa fa-pencil" 
+                                                                 oncomplete="PF('codesourcemanage-dialog-updatesource-var').show();"
+                                                                 update="codesourcemanage-dialog-updatesource"
+                                                                 disabled="#{codeSourceBB.activeCodeSourceEdit()}"
+                                                                 />
+
+                                            </p:column>
+
+                                            <p:column headerText="Option"
+                                                      styleClass="centeredColumnContent"
+                                                      style="width: 80px"
+                                                      >
+
+                                                <p:selectBooleanButton onLabel="Deselect" 
+                                                                       offLabel="Select"
+                                                                       value="#{codeSourceBB.codeSourceSelected}"
+                                                                       >
+                                                    <p:ajax update="
+                                                            codesourcemanage-panel-selectcodesource
+                                                            codesourcemanage-panel-listcodesource
+                                                            codesourcemanage-dialog-updatesource
+                                                            "
+                                                            listener="#{codeSourceBB.onselectedCodeSourceChange(source)}"/>
+
+                                                </p:selectBooleanButton>
+
+                                            </p:column>
+
+
+                                            <p:rowExpansion>
+
+                                                <h:panelGrid id="codesourcemanage-expansion-sourcedetail"
+                                                             columns="4"
+                                                             cellpadding="5"
+                                                             >
+                                                    <h:outputText value="Source ID"/>
+                                                    <h:outputText value="#{source.sourceID}"/>
+
+                                                    <h:outputText value="Source Name"/>
+                                                    <h:outputText value="#{source.sourceName}"/>
+
+                                                    <h:outputText value="Year"/>
+                                                    <h:outputText value="#{source.sourceYear}"/>
+
+                                                    <h:outputText value="Description"/>
+                                                    <h:outputText value="#{source.sourceDescription}"/>
+
+                                                    <h:outputText value="Active"/>
+                                                    <h:outputText value="#{source.isActive}"/>
+
+                                                    <h:outputText value="Link"/>
+                                                    <h:outputText value="#{source.URL}"/>
+
+                                                    <h:outputText value="Notes"/>
+                                                    <h:outputText value="#{source.sourceNotes}"/>
+
+                                                </h:panelGrid>
+
+                                            </p:rowExpansion>
+
+                                        </p:dataTable>
+
+                                        <p:spacer height="20px"/>
+
+                                        <p class="note">Updating or viewing elements by source 
+                                            will make the selected source your active source, 
+                                            enabling the "list elements by source" option.</p>
+
+                                        <p:commandButton id="newCodeSourceButton"
+                                                         ajax="true" 
+                                                         value="Add a new code source" 
+                                                         icon="fa fa-plus" 
+                                                         actionListener="#{codeSourceAddUpdateBB.initCodeSourceForm()}"
+                                                         oncomplete="PF('codesourcemanage-dialog-updatesource-var').show();"
+                                                         update="codesourcemanage-dialog-updatesource"
+                                                         disabled="#{codeSourceBB.activeCodeSourceAddSource()}"
+                                                         style="width: 49.5%"
+                                                         />
+
+                                        <p:commandButton id="addElementToSourceButton"
+                                                         ajax="true" 
+                                                         value="Add element to source" 
+                                                         icon="fa fa-plus" 
+                                                         actionListener="#{codeSourceBB.addElementToSource}"
+                                                         oncomplete="PF('codesourcemanage-dialog-addelementtosource-var').show();"
+                                                         update="codesourcemanage-dialog-addelementtosource"
+                                                         style="width: 49.5%"
+                                                         disabled="#{codeSourceBB.activeCodeSourceEdit()}"
+
+                                                         />
+                                        <p:spacer height="20px"/>
+
+                                        <p:commandButton id="linkElementsToGuideEntries"
+                                                         ajax="true" 
+                                                         value="Link elements in source to Code Guide" 
+                                                         icon="fa fa-link" 
+                                                         actionListener="#{codeSourceBB.linkElementsToCodeGuide}"
+                                                         oncomplete="PF('codesourcemanage-dialog-linkElementsToGuideEntries-var').show();"
+                                                         update="codesourcemanage-dialog-linkElementsToGuideEntries"
+                                                         style="width: 99%"
+                                                         disabled="true"
+
+                                                         />
+
+                                    </h:form>
+
+
+                                </p:panel>
+
+
+                            </div>
+
+                            <div class ="object-column">
+
+                                <p:panel id="codesourcemanage-panel-listcodesource"
+                                         toggleable="true"
+                                         collapsed="false"
+                                         header="Code Elements in #{sessionBean.activeCodeSource.sourceName} (#{sessionBean.activeCodeSource.sourceYear})"
+                                         >
+
+                                    <p:spacer height="10px"/>
+
+                                    <h:form id="codeElementsBySource">
+
+                                        <h:messages globalOnly="false"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
+
+
+
+
+
+                                        <p:spacer height="5px"/>
+
+                                        <p:dataTable
+                                            id="codeElementTable"
+                                            var="element"
+                                            value="#{codeElementListBB.codeElementList}"
+                                            
+                                            rowKey="#{element.elementID}"
+                                            tableStyleClass="primeDataTable"
+                                            scrollable="true"
+                                            resizableColumns="true"
+                                            rowExpandMode="multiple"
+                                            expandedRow="false"
+                                            filteredValue="#{codeElementListBB.filteredCodeElementList}"
+                                            widgetVar="codeElementListTable"
+
+                                            scrollHeight="400">
+
+                                            <p:column width="3%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Expand"/>
+                                                </f:facet>
+                                                <p:rowToggler/>
+                                            </p:column>
+
+                                            <p:column width="5%" sortBy="#{element.elementID}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="ID#" />
+                                                </f:facet>
+                                                <h:outputText value="#{element.elementID}"/>
+                                            </p:column>
+
+                                            <p:column width="10%" sortBy="#{element.guideEntry.category}"
+                                                      filterBy="#{element.guideEntry.category}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Category" />
+                                                </f:facet>
+                                                <h:outputText value="#{element.guideEntry.category}"/>
+                                            </p:column>
+
+                                            <p:column width="10%" sortBy="#{element.guideEntry.subCategory}"
+                                                      filterBy="#{element.guideEntry.subCategory}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Sub Category" />
+                                                </f:facet>
+                                                <h:outputText value="#{element.guideEntry.subCategory}"/>
+                                            </p:column>
+
+                                            <p:column width="5%" sortBy="#{element.ordchapterNo}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Chap"/>
+                                                </f:facet>
+                                                <h:outputText value="#{element.ordchapterNo}"/>
+                                            </p:column>
+
+                                            <p:column width="15%" sortBy="#{element.ordchapterTitle}"
+                                                      filterBy="#{element.ordchapterTitle}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Chapter"/>
+                                                </f:facet>
+                                                <h:outputText value="#{element.ordchapterTitle}"/>
+                                            </p:column>
+
+                                            <p:column width="5%" sortBy="#{element.ordSecNum}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Sec" />
+                                                </f:facet>
+                                                <h:outputText value="#{element.ordSecNum}"/>
+                                            </p:column>
+
+                                            <p:column width="15%" sortBy="#{element.ordSecTitle}"
+                                                      filterBy="#{element.ordSecTitle}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Sec. Title" />
+                                                </f:facet>
+                                                <h:outputText value="#{element.ordSecTitle}"/>
+                                            </p:column>
+
+                                            <p:column width="5%" sortBy="#{element.ordSubSecNum}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="SubSec" />
+                                                </f:facet>
+                                                <h:outputText value="#{element.ordSubSecNum}"/>
+                                            </p:column>
+
+                                            <p:column sortBy="#{element.ordSubSecTitle}" 
+                                                      filterBy="#{element.ordSubSecTitle}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="SubSec. Title" />
+                                                </f:facet>
+                                                <h:outputText value="#{element.ordSubSecTitle}"/>
+                                            </p:column>
+
+                                            <p:column headerText="Edit"
+                                                      styleClass="centeredColumnContent"
+                                                      style="width: 80px"
+                                                      >
+
+                                                <p:commandButton id="button-editcodesourceelement" ajax="true"
+                                                                 value="Edit" 
+                                                                 actionListener="#{codeElementListBB.onEditCodeElementButtonChange(element)}"
+                                                                 icon="fa fa-pencil" 
+                                                                 oncomplete="PF('codesourcemanage-dialog-editcodeelement-var').show();"
+                                                                 update="codesourcemanage-dialog-editcodeelement"
+
+                                                                 />
+
+                                            </p:column>
+
+                                            <p:rowExpansion>
+                                                <div class="outlinedBox">
+                                                    <h3>Code element detail:</h3>
+
+                                                    <h:outputLabel styleClass="bold" value="Technical Text"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText escape="false" value="#{element.ordTechnicalText}"/>
+                                                    </div>
+                                                    <p:spacer height="15px"/>
+                                                    <h:outputLabel styleClass="bold" value="Human friendly text"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText escape="false" value="#{element.ordHumanFriendlyText}"/>
+                                                    </div>
+                                                    <p:spacer height="15px"/>
+                                                    <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText escape="false" value="#{element.guideEntry.enforcementGuidelines}"/>
+                                                    </div>
+                                                    <p:spacer height="15px"/>
+                                                    <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText escape="false" value="#{element.guideEntry.inspectionGuidelines}"/>
+                                                    </div>
+                                                </div>
+                                            </p:rowExpansion>
+
+                                        </p:dataTable>
+
+                                        <p:spacer height="15px"/>
+
+                                    </h:form>
+                                </p:panel>
+
+
+
+
+                            </div>
+
+
+                            <p:dialog  id="codesourcemanage-dialog-updatesource"
+                                       width="1100"
+                                       widgetVar="codesourcemanage-dialog-updatesource-var"
+                                       closable="true" 
+                                       header="Update &amp; Add Code Source"
+
+                                       >
+
+                                <p>Current code source: <h:outputText value="#{codeSourceAddUpdateBB.currentCodeSource.sourceName} (#{codeSourceAddUpdateBB.currentCodeSource.sourceYear})(Blank means Add New Source)"/></p>
+
+                                <h:form id="addUpdateSourceForm">
+
+                                    <div style="font-size: inherit;">Source ID Number: 
+                                        <h:outputText value="#{codeSourceAddUpdateBB.formSourceID}"/>
+                                    </div>
+
+                                    <p:spacer height="15"/>
+
+                                    <p:outputLabel for="selectedSourceName">
+                                        <h:outputText value="Code Source Name"/>
+                                    </p:outputLabel>
+                                    
+                                    <p:inputText id="selectedSourceName" 
+                                                 value="#{codeSourceAddUpdateBB.formSourceName}" 
+                                                 style="width: 20%;" 
+                                                 required="true" 
+                                                 styleClass="inputText"/>
+                                    
+                                    <h:message for="selectedSourceName" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    <p:spacer height="15"/>
+                                    
+                                    <p:outputLabel for="selectedSourceYear">
+                                        <h:outputText value="Year"/>
+                                    </p:outputLabel>
+                                    
+                                    <p:inputText id="selectedSourceYear" 
+                                                 value="#{codeSourceAddUpdateBB.formSourceYear}" 
+                                                 style="width: 20%;" 
+                                                 required="true" 
+                                                 styleClass="inputText"/>
+                                    
+                                    <h:message for="selectedSourceYear" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    
+                                    <p:spacer height="15"/>
+                                    
+                                    <p:outputLabel for="selectedSourceIsActive">
+                                        <h:outputText value="Active Source?"/>
+                                    </p:outputLabel>
+                                    
+                                    <p:selectBooleanButton id="selectedSourceIsActive"
+                                                           value="#{codeSourceAddUpdateBB.formSourceIsActive}"
+                                                           required="true"
+                                                           onLabel="Yes"
+                                                           offLabel="No"/> 
+                                    
+                                    <h:message for="selectedSourceIsActive" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    <p:spacer height="15"/>
+                                    
+                                    <p:outputLabel for="selectedSourceDescription">
+                                        <h:outputText value="Description of Code Source"/>
+                                    </p:outputLabel>
+                                    
+                                    <p:inputTextarea id="selectedSourceDescription" 
+                                                     value="#{codeSourceAddUpdateBB.formSourceDescription}" 
+                                                     style="width: 100%;"
+                                                     required="true"
+                                                     styleClass="inputTextarea" />
+                                    
+                                    <h:message for="selectedSourceDescription" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    
+                                    <p:spacer height="15"/>
+
+                                    <p:outputLabel for="selectedSourceURL">
+                                        <h:outputText value="Web link to source specification"/>
+                                    </p:outputLabel>
+                                    
+                                    <p:inputText id="selectedSourceURL" 
+                                                 value="#{codeSourceAddUpdateBB.formSourceURL}" 
+                                                 style="width: 100%;" 
+                                                 required="true"
+                                                 styleClass="inputText"/>
+                                    
+                                    <h:message for="selectedSourceURL" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    
+                                    <p:spacer height="15"/>
+
+                                    <p:outputLabel for="selectedSourceNotes">
+                                        <h:outputText value="Notes on Source (i.e. Who approved it? When does it expire?)"/>
+                                    </p:outputLabel>
+                                    
+                                    <p:inputTextarea id="selectedSourceNotes" 
+                                                     value="#{codeSourceAddUpdateBB.formSourceNotes}" 
+                                                     style="width: 100%;" 
+                                                     required="true" 
+                                                     styleClass="inputText"/>
+                                    
+                                    <h:message for="selectedSourceNotes" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    <p:commandButton 
+                                        id="commitButton" 
+                                        ajax="false"
+                                        value="Commit updates" 
+                                        icon="fa fa-edit"
+                                        styleClass="buttonOwnLine" 
+                                        disabled="#{codeSourceBB.activeCodeSourceEdit()}"
+                                        action="#{codeSourceAddUpdateBB.commitCodeSourceUpdates}"/>
+
+                                    <p:commandButton 
+                                        id="addNewButton" 
+                                        ajax="false"
+                                        value="Add new source"
+                                        icon="fa fa-plus"
+                                        styleClass="buttonOwnLine" 
+                                        disabled="#{codeSourceBB.activeCodeSourceAddSource()}"
+                                        action="#{codeSourceAddUpdateBB.addNewSource}"/>
+                                    
+                                </h:form>
+                                
+                            </p:dialog> 
+
+                            <p:dialog  id="codesourcemanage-dialog-addelementtosource"
+                                       width="1100"
+                                       widgetVar="codesourcemanage-dialog-addelementtosource-var"
+                                       closable="true" 
+                                       header="Add Element to Source"
+                                       height="80vh"
+
+                                       >
+                                <p:panel header="New Element Form"
+                                         toggleable="true"
+                                         collapsed="false">
+
+                                    <h:form id="addCodeElement">
+
+                                        <p class='note'>Populate the following fields to add an element to the above code source</p>
+
+                                        <h:panelGrid columns="4" border="0" 
+                                                     cellspacing="5" 
+                                                     cellpadding="5" 
+                                                     columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                     footerClass="gridFooter">
+
+                                            <h:outputLabel value="Ordiance chapter number (numbers only):"/>
+
+                                            <h:panelGroup>  
+
+                                                <p:inputText id="cdelOrdChapterNo" 
+                                                             value="#{codeElementBB.newElement.ordchapterNo}"
+                                                             style="width: 100%;" 
+                                                             required="true"
+                                                             styleClass="inputText"/>
+
+                                                <h:message for="cdelOrdChapterNo" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:panelGroup>
+
+                                            <h:outputLabel value="Chapter title:"/>
+
+                                            <h:panelGroup>
+                                                <p:inputText id="cdelOrdChapterTitle" 
+                                                             value="#{codeElementBB.newElement.ordchapterTitle}"
+                                                             
+                                                             style="width: 100%;" 
+                                                             required="true"
+                                                             styleClass="inputText"/>
+
+                                                <h:message for="cdelOrdChapterTitle" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:panelGroup>
+
+                                            <h:outputLabel value="Section number (may contain letters):"/>
+
+                                            <h:panelGroup>
+
+                                                <p:inputText id="cdelOrdSecNum" 
+                                                             value="#{codeElementBB.newElement.ordSecNum}"
+                                                            
+                                                             style="width: 100%;" 
+                                                             required="true"
+                                                             styleClass="inputText"/>
+
+                                                <h:message for="cdelOrdSecNum" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
+
+                                            </h:panelGroup>
+
+                                            <h:outputLabel value="Section title:"/>
+
+                                            <h:panelGroup>
+
+                                                <p:inputText id="ccdelOrdSecTitle" 
+                                                             value="#{codeElementBB.newElement.ordSecTitle}"
+                                                             style="width: 100%;" 
+                                                             required="true" 
+                                                             styleClass="inputText"/>
+                                                <h:message for="ccdelOrdSecTitle" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:panelGroup>
+
+                                            <h:outputLabel value="Subsection number (may contain letters):"/>
+
+                                            <h:panelGroup>
+
+                                                <p:inputText id="cdelordSubSecNum" 
+                                                             value="#{codeElementBB.newElement.ordSubSecNum}"
+                                                             
+                                                             style="width: 100%;" 
+                                                             required="false" 
+                                                             styleClass="inputText"/>
+
+                                                <h:message for="cdelordSubSecNum" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:panelGroup>
+
+                                            <h:outputLabel value="Subsection title:"/>
+
+                                            <h:panelGroup>
+
+                                                <p:inputText id="cdelOrdSubSecTitle" 
+                                                             value="#{codeElementBB.newElement.ordSubSecTitle}"
+                                                              
+                                                             style="width: 100%;" 
+                                                             required="false" 
+                                                             styleClass="inputText"/>
+
+                                                <h:message for="cdelOrdSubSecTitle" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:panelGroup>    
+
+                                            <h:outputLabel value="Toggle active element:"/>
+
+                                            <h:panelGroup>
+
+                                                <p:selectBooleanButton id="cdelIsActive"
+                                                                       value="#{codeElementBB.newElement.isActive}" 
+                                                                       onLabel="Yes" 
+                                                                       offLabel="No"
+                                                                       style="width:50px"
+                                                                       />
+
+
+                                                <h:message for="cdelIsActive" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:panelGroup>
+
+                                            <f:facet name="footer">
+
+                                                <h:outputLabel value="Web address of element resource:"/>
+
+                                                <h:panelGroup>
+
+                                                    <p:inputText id="cdelUrl" 
+                                                                 value="#{codeElementBB.newElement.resourceURL}" 
+                                                                 style="width: 100%;" 
+                                                                 required="false" 
+                                                                 styleClass="inputText"/>
+
+                                                    <h:message for="cdelUrl" showDetail="true" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </h:panelGroup>
+
+                                                <p:spacer height="15px"/>
+
+                                                <h:outputLabel value="Enter the technical text of this ordinance:"/> 
+
+                                                <h:panelGroup>
+                                                    <p:editor id="cdelOrdTechnicalText"  
+                                                              value="#{codeElementBB.newElement.ordTechnicalText}" 
+                                                              controls="bold italic underline strikethrough font size style color 
+                                                              bullets numbering center undo redo rule link removeformat outdent 
+                                                              indent link unlink copy cut paste rule alignleft center alignright"
+                                                              width="1000" 
+                                                              required="true"
+                                                              height="150"/>
+
+                                                    <h:message for="cdelOrdTechnicalText" showDetail="true" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </h:panelGroup>  
+
+                                                <p:spacer height="15px"/>
+
+                                                <h:outputLabel value="Human-friendly text:"/>
+
+                                                <h:panelGroup>   
+                                                    <p:editor   id="cdelOrdHumanFriendlyText"  
+                                                                value="#{codeElementBB.newElement.ordHumanFriendlyText}" 
+                                                                controls="bold italic underline strikethrough font size style color 
+                                                                bullets numbering center undo redo rule link removeformat outdent 
+                                                                indent link unlink copy cut paste rule alignleft center alignright"
+                                                                width="1000" 
+                                                                required="false"
+                                                                height="150"/>
+
+                                                    <h:message for="cdelOrdHumanFriendlyText" showDetail="true" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </h:panelGroup> 
+
+                                            </f:facet>    
+
+                                        </h:panelGrid>
+
+                                        <p:spacer height="15px"/>
+
+                                        <p:commandButton 
+                                            id="insertCodeElement" 
+                                            value="Add New Code Element" 
+                                            ajax="true" 
+                                            icon="fa fa-plus" 
+
+                                            actionListener="#{codeElementBB.onAddElementToSourceButtonChange()}"
+                                            oncomplete="PF('codesourcemanage-dialog-addelementtosource-var').hide();"
+                                            update="codesourcemanage-panel-listcodesource
+                                                    codesourcemanage-dialog-addelementtosource
+                                                    "
+                                            />
+
+                                    </h:form>
+
+                                </p:panel>
+
+                            </p:dialog>
+
+                            <p:dialog  id="codesourcemanage-dialog-linkElementsToGuideEntries"
+                                       width="1100"
+                                       widgetVar="codesourcemanage-dialog-linkElementsToGuideEntries-var"
+                                       closable="true" 
+                                       header="Link code guide entries to code elements"
+
+                                       >
+
+
+
+
+                                <p>Each row in this table contains data about a single code element in 
+                                    <h:outputText value="#{codeElementGuideBB.currentSource.sourceName} 
+                                                  (#{codeElementGuideBB.currentSource.sourceYear})"/>
+                                    Click the little pencil icon in the rightmost column to edit that 
+                                    particular element's code guide ID, which must correspond to the 
+                                    ID number of a guide entry in our Code Guide. Best to open that page in
+                                    its own browser window and split your screen so you can see both at the same time.</p>
+
+                                <h:form id="guideBuilderForm">
+
+                                    <p:dataTable
+                                        id="codeElementTable"
+                                        var="element"
+                                        value="#{codeElementGuideBB.elementList}"
+                                        selectionMode="single"
+                                        selection="#{codeElementGuideBB.selectedElement}"
+                                        rowKey="#{element.elementID}"
+                                        tableStyleClass="primeDataTable"
+                                        scrollable="true"
+                                        scrollHeight="300"
+                                        resizableColumns="true"
+                                        rowExpandMode="multiple"
+                                        expandedRow="false"
+                                        filteredValue="#{codeElementGuideBB.filteredElementList}"
+                                        widgetVar="codeElementListTable"
+                                        editable="true">
+
+                                        <p:column width="3%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Expand"/>
+                                            </f:facet>
+                                            <p:rowToggler/>
+                                        </p:column>
+
+                                        <p:column width="3%">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID#" />
+                                            </f:facet>
+                                            <h:outputText value="#{element.elementID}"/>
+                                        </p:column>
+
+                                        <p:column width="10%" sortBy="#{element.guideEntry.category}"
+                                                  filterBy="#{element.guideEntry.category}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Category" />
+                                            </f:facet>
+                                            <h:outputText value="#{element.guideEntry.category}"/>
+                                        </p:column>
+
+                                        <p:column width="10%" sortBy="#{element.guideEntry.subCategory}"
+                                                  filterBy="#{element.guideEntry.subCategory}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Sub Category" />
+                                            </f:facet>
+                                            <h:outputText value="#{element.guideEntry.subCategory}"/>
+                                        </p:column>
+
+                                        <p:column width="5%" sortBy="#{element.ordchapterNo}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Chap"/>
+                                            </f:facet>
+                                            <h:outputText value="#{element.ordchapterNo}"/>
+                                        </p:column>
+
+                                        <p:column width="10%" sortBy="#{element.ordchapterTitle}"
+                                                  filterBy="#{element.ordchapterTitle}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Chapter"/>
+                                            </f:facet>
+                                            <h:outputText value="#{element.ordchapterTitle}"/>
+                                        </p:column>
+
+                                        <p:column width="5%" sortBy="#{element.ordSecNum}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Sec" />
+                                            </f:facet>
+                                            <h:outputText value="#{element.ordSecNum}"/>
+                                        </p:column>
+
+                                        <p:column width="10%" sortBy="#{element.ordSecTitle}"
+                                                  filterBy="#{element.ordSecTitle}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Sec. Title" />
+                                            </f:facet>
+                                            <h:outputText value="#{element.ordSecTitle}"/>
+                                        </p:column>
+
+                                        <p:column width="5%" sortBy="#{element.ordSubSecNum}">
+                                            <f:facet name="header">
+                                                <h:outputText value="SubSec" />
+                                            </f:facet>
+                                            <h:outputText value="#{element.ordSubSecNum}"/>
+                                        </p:column>
+
+                                        <p:column sortBy="#{element.ordSubSecTitle}" 
+                                                  filterBy="#{element.ordSubSecTitle}"
+                                                  width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="SubSec. Title" />
+                                            </f:facet>
+                                            <h:outputText value="#{element.ordSubSecTitle}"/>
+                                        </p:column>
+
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value="GuideID" />
+                                            </f:facet>
+                                            <p:cellEditor>
+                                                <f:facet name="output">
+                                                    <h:outputText value="#{element.guideEntryID}"/>
+                                                </f:facet>
+                                                <f:facet name="input">
+                                                    <h:inputText value="#{element.guideEntryID}"/>
+                                                </f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column>
+                                            <p:rowEditor />
+                                        </p:column>
+
+                                        <p:rowExpansion>
+                                            <div class="outlinedBox">
+
+                                                <h:outputLabel styleClass="bold" value="Technical Text"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{element.ordTechnicalText}"/>
+                                                </div>
+                                                <p:spacer height="15px"/>
+                                                <h:outputLabel styleClass="bold" value="Human friendly text"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{element.ordHumanFriendlyText}"/>
+                                                </div>
+                                                <p:spacer height="15px"/>
+                                                <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{element.guideEntry.enforcementGuidelines}"/>
+                                                </div>
+                                                <p:spacer height="15px"/>
+                                                <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{element.guideEntry.inspectionGuidelines}"/>
+                                                </div>
+                                            </div>
+                                        </p:rowExpansion>
+
+                                    </p:dataTable>
+
+                                    <p:spacer height="15px"/>
+
+                                    <p:commandButton ajax="false" value="Update all code element - guide links" icon="fa fa-plus" tabindex="5"
+                                                     action="#{codeElementGuideBB.updateCodeGuideLinks}"/>
+                                    <p class="note">To view the updated element list with their linked code guide entries, reload the element list through the "Manage Source" list at left.</p>
+
+                                </h:form>
+
+
+                            </p:dialog>
+
+                            <p:dialog  id="codesourcemanage-dialog-editcodeelement"
+                                       width="1100"
+                                       widgetVar="codesourcemanage-dialog-editcodeelement-var"
+                                       closable="true" 
+                                       header="Edit Existing Code Element (Code Element ID: #{codeElementBB.currentElement.elementID})"
+                                       height="85vh"
+                                       >
+
+                                <p>
+                                    <span class="bold">Source ID: </span><h:outputText value="#{codeElementBB.currentElement.source.sourceID} | "/>
+                                    <span class="bold">Source Name: </span> <h:outputText value="#{codeElementBB.currentElement.source.sourceName} | "/>
+                                    <span class="bold">Year: </span><h:outputText value="#{codeElementBB.currentElement.source.sourceYear}"/>   
+                                </p>
+
+                                <hr/>
+
+                                <h:form id="updateCodeElementForm">
+
+                                    <p>Adjust the fields as needed and click "Update" at the bottom. 
+                                        All fields will be overwritten, so leave untouched those you wish to remain unchanged.</p>
+
+                                    <h:panelGrid columns="4" cellpadding="10"  
+                                                 columnClasses="gridTd, gridTd, gridTd,gridTd">
+
+
+
+                                        <h:outputLabel for="cdelOrdChapterNo" >
+                                            <h:outputText value="Ordiance chapter number (numbers only)" styleClass="uiLabel" />
+                                        </h:outputLabel>
+                                        <h:panelGroup>
+
+                                            <p:inputText id="cdelOrdChapterNo" value="#{codeElementBB.formOrdChapterNo}" 
+                                                         style="width: 100%;" tabindex="2" required="true" styleClass="inputText"/>
+                                            <h:message for="cdelOrdChapterNo" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+
+                                        <h:outputLabel for="cdelOrdChapterTitle" >
+                                            <h:outputText value="Chapter title" styleClass="uiLabel" />
+                                        </h:outputLabel>
+
+                                        <h:panelGroup>
+                                            <p:inputText id="cdelOrdChapterTitle" value="#{codeElementBB.formOrdChapterTitle}" 
+                                                         style="width: 100%;" tabindex="3" required="true" styleClass="inputText"/>
+                                            <h:message for="cdelOrdChapterTitle" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+
+                                        <h:outputLabel for="cdelOrdSecNum" >
+                                            <h:outputText value="Section number (may contain letters)" styleClass="uiLabel" />
+                                        </h:outputLabel>
+                                        <h:panelGroup>
+                                            <p:inputText id="cdelOrdSecNum" value="#{codeElementBB.formOrdSecNum}" 
+                                                         style="width: 100%;" tabindex="4" required="true" styleClass="inputText"/>
+                                            <h:message for="cdelOrdSecNum" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+
+                                        <h:outputLabel for="ccdelOrdSecTitle" >
+                                            <h:outputText value="Section title" styleClass="uiLabel" />
+                                        </h:outputLabel>
+
+                                        <h:panelGroup>
+                                            <p:inputText id="ccdelOrdSecTitle" value="#{codeElementBB.formOrdSecTitle}" 
+                                                         style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
+                                            <h:message for="ccdelOrdSecTitle" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                        <h:outputLabel for="cdelordSubSecNum" >
+                                            <h:outputText value="Subsection number (may contain letters)" styleClass="uiLabel" />
+                                        </h:outputLabel>
+
+                                        <h:panelGroup>
+
+                                            <p:inputText id="cdelordSubSecNum" value="#{codeElementBB.formOrdSubSecNum}" 
+                                                         style="width: 100%;" tabindex="6" required="false" styleClass="inputText"/>
+                                            <h:message for="cdelordSubSecNum" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+
+                                        <h:outputLabel for="cdelOrdSubSecTitle" >
+                                            <h:outputText value="Subsection title" styleClass="uiLabel" />
+                                        </h:outputLabel>
+
+
+                                        <h:panelGroup>
+                                            <p:inputText id="cdelOrdSubSecTitle" value="#{codeElementBB.formOrdSubSecTitle}" 
+                                                         style="width: 100%;" tabindex="7" required="false" styleClass="inputText"/>
+                                            <h:message for="cdelOrdSubSecTitle" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                        <h:outputLabel for="cdelIsActive" >
+                                            <h:outputText value="Toggle active element'" styleClass="uiLabel" />
+                                        </h:outputLabel>
+                                        <h:panelGroup>
+
+                                            <p:selectBooleanCheckbox id="cdelIsActive" value="#{codeElementBB.formIsActive}" 
+                                                                     tabindex="11" required="true" styleClass="selectOneRadio"/>
+                                            <h:message for="cdelIsActive" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+
+                                        <h:outputLabel for="cdelUrl" >
+                                            <h:outputText value="Web address of element resource" styleClass="uiLabel" />
+                                        </h:outputLabel>
+
+                                        <h:panelGroup>
+
+                                            <p:inputText id="cdelUrl" value="#{codeElementBB.formResourceURL}" 
+                                                         style="width: 100%;" tabindex="13" required="false" styleClass="inputText"/>
+                                            <h:message for="cdelUrl" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                        <h:outputLabel for="cdElGuideID" >
+                                            <h:outputText value="Code Guide entry ID" styleClass="uiLabel" />
+                                        </h:outputLabel>
+
+                                        <h:panelGroup>
+
+                                            <p:inputText id="cdElGuideID" value="#{codeElementBB.formGuideEntryID}" 
+                                                         style="width: 100%;" tabindex="13" required="false" styleClass="inputText"/>
+                                            <h:message for="cdElGuideID" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                    </h:panelGrid>
+
+                                    <h:outputLabel for="cdelOrdTechnicalText" >
+                                        <h:outputText value="Enter the technical text of this ordinance" styleClass="uiLabel" />
+                                    </h:outputLabel>
+
+                                    <h:panelGroup>
+                                        <p:editor   id="cdelOrdTechnicalText" value="#{codeElementBB.formOrdTechnicalText}" 
+                                                    controls="bold italic underline strikethrough font size style color 
+                                                    bullets numbering center undo redo rule link removeformat outdent 
+                                                    indent link unlink copy cut paste rule alignleft center alignright"
+                                                    width="1000" required="true"
+                                                    height="200"/>
+                                        <h:message for="cdelOrdTechnicalText" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+
+                                    <h:outputLabel for="cdelOrdHumanFriendlyText" >
+                                        <h:outputText value="Compose a human-friendly version of this ordinance" styleClass="uiLabel" />
+                                    </h:outputLabel>
+
+                                    <h:panelGroup>
+
+                                        <p:editor   id="cdelOrdHumanFriendlyText" value="#{codeElementBB.formOrdHumanFriendlyText}" 
+                                                    controls="bold italic underline strikethrough font size style color 
+                                                    bullets numbering center undo redo rule link removeformat outdent 
+                                                    indent link unlink copy cut paste rule alignleft center alignright"
+                                                    width="1000" required="true"
+                                                    height="200"/>
+                                        <h:message for="cdelOrdHumanFriendlyText" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+
+
+                                    <p:spacer height="15px"/>
+
+                                    <p:commandButton 
+                                        id="insertCodeElement"  
+                                        ajax="true"
+                                        value="Update code element" 
+                                        icon="fa fa-edit"
+                                        actionListener="#{codeElementBB.commitUpdatesToCodeElement()}"
+                                        oncomplete="PF('codesourcemanage-dialog-editcodeelement-var').hide()"
+                                        update='codesourcemanage-panel-listcodesource'/>
+
+                                </h:form>
+
+                            </p:dialog>
+
+                        </div>
+
+
                     </div>
                 </f:view>
             </ui:define>

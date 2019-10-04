@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeSource;
 import java.io.Serializable;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -40,7 +41,7 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
     
     private boolean updateDisabled;
     private boolean addDisabled;
-
+    
     /**
      * Creates a new instance of CodeSourceBB
      */
@@ -65,6 +66,8 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully updated code source", ""));
+            //xiaohong add
+            getSessionBean().setActiveCodeSource(null);
             return "codeSourceManage";
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
@@ -72,10 +75,14 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
                             "Unable to UpdateCodeSource", 
                             "Ensure the sourceID matches an existing code source from the table above"));
         }
+        
+        
         return "";
     }
     
     public String addNewSource(){
+        
+         
         System.out.println("codesourceBB.addNewSource");
         CodeSource newCodeSource = new CodeSource();
         newCodeSource.setSourceName(formSourceName);
@@ -91,7 +98,9 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
                             "Successfully added new code source", 
                             ""));
         
-            return "success";
+            //xiaohong change
+            return "codeSourceManage";
+            
         } catch (IntegrationException ex) {
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -274,4 +283,16 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
     }
     
     
+    //xiaohong add
+    public void initCodeSourceForm(){
+        
+        currentCodeSource = null;
+        formSourceName ="";
+        formSourceYear =0;
+        formSourceDescription="";
+        formSourceIsActive=false;
+        formSourceURL="";
+        formSourceNotes="";
+    }
+   
 }

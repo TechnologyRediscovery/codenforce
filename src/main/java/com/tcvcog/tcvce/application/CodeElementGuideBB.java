@@ -91,7 +91,7 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
         CodeIntegrator codeIntegrator = getCodeIntegrator();
         try {
             elList = codeIntegrator.getCodeElements(source.getSourceID());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | NullPointerException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             "Unable to populate list of code elements, sorry!", 

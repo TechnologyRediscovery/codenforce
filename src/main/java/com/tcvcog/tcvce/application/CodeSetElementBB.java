@@ -84,6 +84,7 @@ public class CodeSetElementBB extends BackingBeanUtils implements Serializable{
      */
     public void setSelectedECE(EnforcableCodeElement selectedECE) {
         this.selectedECE = selectedECE;
+        System.out.println(this.selectedECE.getCodeSetElementID());
     }
 
     /**

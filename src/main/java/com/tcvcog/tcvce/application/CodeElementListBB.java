@@ -54,7 +54,9 @@ public class CodeElementListBB extends BackingBeanUtils implements Serializable 
         CodeIntegrator codeIntegrator = getCodeIntegrator();
         try {
             elList = codeIntegrator.getCodeElements(source.getSourceID());
-        } catch (IntegrationException ex) {
+            //xiaohong add
+        } catch (IntegrationException | NullPointerException ex) {
+            
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             "Unable to populate list of code elements, sorry!", 
@@ -127,10 +129,11 @@ public class CodeElementListBB extends BackingBeanUtils implements Serializable 
     /**
      * @return the codeElementList
      */
+    //xiaohong change
     public ArrayList<CodeElement> getCodeElementList() {
-        if(codeElementList == null){
+        
             codeElementList = loadCodeElementList();
-        } 
+         
         return codeElementList;
     }
 
@@ -169,4 +172,14 @@ public class CodeElementListBB extends BackingBeanUtils implements Serializable 
         this.filteredCodeElementList = filteredCodeElementList;
     }
 
+    //xiaohong add
+    public void onEditCodeElementButtonChange(CodeElement ce){
+        System.out.println("CodeElementListBB.moveToUpdateCodeElement | selectedElement: " + ce.getOrdchapterTitle());
+        
+            getSessionBean().setActiveCodeElement(ce);
+         
+            
+              
+        
+    }
 }

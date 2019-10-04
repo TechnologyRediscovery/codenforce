@@ -50,11 +50,80 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         try {
             muniNameIDMap = mi.getMunicipalityStringIDMap();
+            
+            //xiaohong add
+            getSessionBean().setActiveCodeSet(null);
+            currentcodeSetMap=getCodeSetMap();
+            
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         
     }
+    
+    
+    //xiaohong add
+    private boolean selected;
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+    
+    private Map<String, Integer> currentcodeSetMap;
+    
+
+    public Map<String, Integer> getCurrentcodeSetMap() {
+        return currentcodeSetMap;
+    }
+
+    public void setCurrentcodeSetMap(Map<String, Integer> currentcodeSetMap) {
+        this.currentcodeSetMap = currentcodeSetMap;
+    }
+    
+    
+    
+    public void onSelectCodeSetsChange(String name, int codesetid){
+        if(selected==true){
+            currentcodeSetMap = new HashMap<>();
+            currentcodeSetMap.put(name, codesetid);
+            selectedCodeSetID = codesetid;
+            manageCodeSetElements();
+            
+        }else if(selected == false){
+            initSelectcodesetpanel();
+            
+        }
+        
+    }
+    
+    public boolean activeEdit(){
+        return !selected;
+    }
+    
+    public void initSelectcodesetpanel(){
+        currentcodeSetMap = getCodeSetMap();
+        selectedCodeSetID = null;
+        formNewCodeSetName= null;
+        formNewCodeSetDescription = null;
+        formCodeSetName = null;
+        formCodeSetDescription = null;
+        selected = false;
+        
+        getSessionBean().setActiveCodeSet(null);
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
 
     private Municipality selectedMuni;
     private ArrayList<CodeSet> codeSetList;
@@ -94,6 +163,7 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
             }
             return "codeSetElementList";
         } else {
+            System.out.println("nnnn");
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Please select a code set to view", ""));
@@ -109,7 +179,7 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
-            return "codeSetBuilder";
+            return "";
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -128,6 +198,10 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
         CodeIntegrator codeInt = getCodeIntegrator();
         try {
             codeInt.updateCodeSetMetadata(setToUpdate);
+            
+            //xiaohong add
+            initSelectcodesetpanel();
+            
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
@@ -159,6 +233,10 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
 
         try {
             codeInt.insertCodeSetMetadata(cs);
+            
+            //xiaohong add
+            initSelectcodesetpanel();
+            
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,

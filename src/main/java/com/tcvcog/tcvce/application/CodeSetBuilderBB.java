@@ -114,7 +114,7 @@ public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Success! Added " 
                         + selectedElementsToAddToSet.size() + " elements to code set: " 
                         + currentCodeSet.getCodeSetName(), ""));
-        return "";
+        return "codeSetManage";
     }
 
     public String nukeCodeSetElement() {
@@ -149,8 +149,13 @@ public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
     public CodeSet getCurrentCodeSet() {
         CodeIntegrator ci = getCodeIntegrator();
         CodeSet cs = getSessionBean().getActiveCodeSet();
+        //xiaohong add
         try {
-            currentCodeSet = ci.getCodeSetBySetID(cs.getCodeSetID());
+            if(cs != null){
+                currentCodeSet = ci.getCodeSetBySetID(cs.getCodeSetID());
+            }else{
+                currentCodeSet = null;
+            }
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
