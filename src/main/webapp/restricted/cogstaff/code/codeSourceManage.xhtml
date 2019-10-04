@@ -166,7 +166,7 @@
                                                          oncomplete="PF('codesourcemanage-dialog-linkElementsToGuideEntries-var').show();"
                                                          update="codesourcemanage-dialog-linkElementsToGuideEntries"
                                                          style="width: 99%"
-                                                         disabled="true"
+                                                         disabled="#{codeSourceBB.activeCodeSourceEdit()}"
 
                                                          />
 
@@ -203,7 +203,7 @@
                                             id="codeElementTable"
                                             var="element"
                                             value="#{codeElementListBB.codeElementList}"
-                                            
+
                                             rowKey="#{element.elementID}"
                                             tableStyleClass="primeDataTable"
                                             scrollable="true"
@@ -367,88 +367,88 @@
                                     <p:outputLabel for="selectedSourceName">
                                         <h:outputText value="Code Source Name"/>
                                     </p:outputLabel>
-                                    
+
                                     <p:inputText id="selectedSourceName" 
                                                  value="#{codeSourceAddUpdateBB.formSourceName}" 
                                                  style="width: 20%;" 
                                                  required="true" 
                                                  styleClass="inputText"/>
-                                    
+
                                     <h:message for="selectedSourceName" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     <p:spacer height="15"/>
-                                    
+
                                     <p:outputLabel for="selectedSourceYear">
                                         <h:outputText value="Year"/>
                                     </p:outputLabel>
-                                    
+
                                     <p:inputText id="selectedSourceYear" 
                                                  value="#{codeSourceAddUpdateBB.formSourceYear}" 
                                                  style="width: 20%;" 
                                                  required="true" 
                                                  styleClass="inputText"/>
-                                    
+
                                     <h:message for="selectedSourceYear" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    
+
                                     <p:spacer height="15"/>
-                                    
+
                                     <p:outputLabel for="selectedSourceIsActive">
                                         <h:outputText value="Active Source?"/>
                                     </p:outputLabel>
-                                    
+
                                     <p:selectBooleanButton id="selectedSourceIsActive"
                                                            value="#{codeSourceAddUpdateBB.formSourceIsActive}"
                                                            required="true"
                                                            onLabel="Yes"
                                                            offLabel="No"/> 
-                                    
+
                                     <h:message for="selectedSourceIsActive" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     <p:spacer height="15"/>
-                                    
+
                                     <p:outputLabel for="selectedSourceDescription">
                                         <h:outputText value="Description of Code Source"/>
                                     </p:outputLabel>
-                                    
+
                                     <p:inputTextarea id="selectedSourceDescription" 
                                                      value="#{codeSourceAddUpdateBB.formSourceDescription}" 
                                                      style="width: 100%;"
                                                      required="true"
                                                      styleClass="inputTextarea" />
-                                    
+
                                     <h:message for="selectedSourceDescription" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    
+
                                     <p:spacer height="15"/>
 
                                     <p:outputLabel for="selectedSourceURL">
                                         <h:outputText value="Web link to source specification"/>
                                     </p:outputLabel>
-                                    
+
                                     <p:inputText id="selectedSourceURL" 
                                                  value="#{codeSourceAddUpdateBB.formSourceURL}" 
                                                  style="width: 100%;" 
                                                  required="true"
                                                  styleClass="inputText"/>
-                                    
+
                                     <h:message for="selectedSourceURL" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    
+
                                     <p:spacer height="15"/>
 
                                     <p:outputLabel for="selectedSourceNotes">
                                         <h:outputText value="Notes on Source (i.e. Who approved it? When does it expire?)"/>
                                     </p:outputLabel>
-                                    
+
                                     <p:inputTextarea id="selectedSourceNotes" 
                                                      value="#{codeSourceAddUpdateBB.formSourceNotes}" 
                                                      style="width: 100%;" 
                                                      required="true" 
                                                      styleClass="inputText"/>
-                                    
+
                                     <h:message for="selectedSourceNotes" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
@@ -469,9 +469,9 @@
                                         styleClass="buttonOwnLine" 
                                         disabled="#{codeSourceBB.activeCodeSourceAddSource()}"
                                         action="#{codeSourceAddUpdateBB.addNewSource}"/>
-                                    
+
                                 </h:form>
-                                
+
                             </p:dialog> 
 
                             <p:dialog  id="codesourcemanage-dialog-addelementtosource"
@@ -516,7 +516,7 @@
                                             <h:panelGroup>
                                                 <p:inputText id="cdelOrdChapterTitle" 
                                                              value="#{codeElementBB.newElement.ordchapterTitle}"
-                                                             
+
                                                              style="width: 100%;" 
                                                              required="true"
                                                              styleClass="inputText"/>
@@ -532,7 +532,7 @@
 
                                                 <p:inputText id="cdelOrdSecNum" 
                                                              value="#{codeElementBB.newElement.ordSecNum}"
-                                                            
+
                                                              style="width: 100%;" 
                                                              required="true"
                                                              styleClass="inputText"/>
@@ -562,7 +562,7 @@
 
                                                 <p:inputText id="cdelordSubSecNum" 
                                                              value="#{codeElementBB.newElement.ordSubSecNum}"
-                                                             
+
                                                              style="width: 100%;" 
                                                              required="false" 
                                                              styleClass="inputText"/>
@@ -578,7 +578,7 @@
 
                                                 <p:inputText id="cdelOrdSubSecTitle" 
                                                              value="#{codeElementBB.newElement.ordSubSecTitle}"
-                                                              
+
                                                              style="width: 100%;" 
                                                              required="false" 
                                                              styleClass="inputText"/>
@@ -675,8 +675,8 @@
                                             actionListener="#{codeElementBB.onAddElementToSourceButtonChange()}"
                                             oncomplete="PF('codesourcemanage-dialog-addelementtosource-var').hide();"
                                             update="codesourcemanage-panel-listcodesource
-                                                    codesourcemanage-dialog-addelementtosource
-                                                    "
+                                            codesourcemanage-dialog-addelementtosource
+                                            "
                                             />
 
                                     </h:form>
@@ -690,10 +690,8 @@
                                        widgetVar="codesourcemanage-dialog-linkElementsToGuideEntries-var"
                                        closable="true" 
                                        header="Link code guide entries to code elements"
-
+                                       height="80vh"
                                        >
-
-
 
 
                                 <p>Each row in this table contains data about a single code element in 
@@ -813,7 +811,7 @@
                                             </p:cellEditor>
                                         </p:column>
                                         <p:column>
-                                            <p:rowEditor />
+                                            <p:rowEditor/>
                                         </p:column>
 
                                         <p:rowExpansion>
@@ -851,6 +849,98 @@
                                     <p class="note">To view the updated element list with their linked code guide entries, reload the element list through the "Manage Source" list at left.</p>
 
                                 </h:form>
+                                
+                                <hr/>
+
+
+                                <p:fieldset 
+                                    legend="Show Code Guide"
+                                    toggleable="true"
+                                    collapsed="true"
+                                    style="border:1px solid black">
+
+                                    <h:form id="codeGuideViewForm">
+
+                                        <p:dataTable
+                                            id="violationTable"
+                                            value="#{codeElementGuideBB.entryList}"
+                                            tableStyleClass="primeDataTable"
+                                            draggableColumns="true"
+                                            rowKey="#{cege.guideEntryID}"
+                                            reflow="true"
+                                            var="cege"
+                                            rowExpandMode="multiple"
+                                            expandedRow="false">
+
+                                            <p:column width="3%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Expand" />
+                                                </f:facet>
+                                                <p:rowToggler />
+                                            </p:column>
+
+                                            <p:column width="3%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="no." />
+                                                </f:facet>
+                                                <h:outputText value="#{cege.guideEntryID}"/>
+                                            </p:column>
+
+                                            <p:column width="15%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Category" />
+                                                </f:facet>
+                                                <h:outputText value="#{cege.category}"/>
+                                            </p:column>
+
+                                            <p:column width="15%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Sub Category" />
+                                                </f:facet>
+                                                <h:outputText value="#{cege.subCategory}"/>
+                                            </p:column>
+
+                                            <p:column width="20%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Description" />
+                                                </f:facet>
+                                                <h:outputText value="#{cege.description}"/>
+                                            </p:column>
+
+                                            <p:column width="8%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Priority?" />
+                                                </f:facet>
+                                                <h:outputText value="#{cege.priority}"/>
+                                            </p:column>
+
+
+                                            <p:rowExpansion>
+                                                <div class="outlinedBox">
+
+
+                                                    <h:outputLabel styleClass="bold" value="Enforcement Gudielines:"/>
+                                                    <p:spacer height="10px"/>
+                                                    <h:outputText value="#{cege.enforcementGuidelines}" escape="false"/>
+                                                    <p:spacer height="15px"/>
+                                                    <h:outputLabel styleClass="bold" value="Inspection Gudielines:"/>
+                                                    <p:spacer height="10px"/>
+                                                    <h:outputText value="#{cege.inspectionGuidelines}" escape="false"/>
+                                                </div>
+
+                                            </p:rowExpansion>
+
+                                        </p:dataTable> 
+
+                                    </h:form>
+
+                                </p:fieldset>
+
+
+
+
+
+
 
 
                             </p:dialog>

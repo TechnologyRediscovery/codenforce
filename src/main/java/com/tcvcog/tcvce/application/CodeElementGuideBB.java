@@ -101,10 +101,11 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
         
     }
     
+    //xiaohong edit
      public ArrayList<CodeElement> getElementList() {
-        if(elementList == null){
-            elementList = loadCodeElementList();
-        } 
+        
+        elementList = loadCodeElementList();
+         
         return elementList;
     }
     
