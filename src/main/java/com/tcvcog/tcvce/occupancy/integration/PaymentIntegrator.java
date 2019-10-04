@@ -500,7 +500,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee.setEffectiveDate(rs.getTimestamp("effectivedate").toLocalDateTime());
             fee.setExpiryDate(rs.getTimestamp("expirydate").toLocalDateTime());
             fee.setNotes(rs.getString("notes"));
-            if(hasColumn(rs,"autoassign")) fee.setAutoAssigned(rs.getBoolean("autoassign"));
+            if (hasColumn(rs, "autoassign")) {
+                fee.setAutoAssigned(rs.getBoolean("autoassign"));
+            }
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error generating Fee from ResultSet", ex);
@@ -653,7 +655,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 p.setAssignedFeeID(fee.getOccPerAssignedFeeID());
                 p.setAssignedTo(FeeAssignedType.OccPeriod);
                 paymentList.add(p);
-                
+
             }
 
         } catch (SQLException ex) {
@@ -830,6 +832,114 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 }
             }
         } // close finally
+
+    }
+
+    public void insertFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
+        String query = "INSERT INTO public.moneyoccperiodtypefee(\n"
+                + "    fee_feeid, occperiodtype_typeid, autoassign)\n"
+                + "    VALUES (?, ?,?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, type.getTypeid());
+            stmt.setBoolean(3, fee.isAutoAssigned());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.insertFeePeriodTypeJoin | Error: ", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+    }
+
+    public void deleteFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
+
+        String query = "DELETE FROM public.moneyoccperiodtypefee\n"
+                + " WHERE fee_feeid=? AND occperiodtype_typeid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, type.getTypeid());
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot Fee Occ Period Type join", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+    }
+
+    public void updateFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
+
+        String query = "UPDATE public.moneyoccperiodtypefee\n"
+                + "   SET autoassign=?\n"
+                + "   WHERE fee_feeid=? AND occperiodtype_typeid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setBoolean(1, fee.isAutoAssigned());
+            stmt.setInt(2, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(3, type.getTypeid());
+            System.out.println("TRYING TO EXECUTE UPDATE METHOD");
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update fee and occperiod join", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        }
 
     }
 

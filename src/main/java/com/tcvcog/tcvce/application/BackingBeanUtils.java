@@ -32,7 +32,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
 import java.sql.Connection;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
@@ -59,6 +58,7 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.sql.ResultSet;
@@ -117,6 +117,7 @@ public class BackingBeanUtils implements Serializable{
     private OccInspectionIntegrator occInspectionIntegrator;
     private OccupancyIntegrator occupancyIntegrator;
     private PaymentIntegrator paymentIntegrator;
+    private PaymentCoordinator paymentCoordinator;
     private OccupancyCoordinator occupancyCoordinator;
     private DataCoordinator dataCoordinator;
     
@@ -258,6 +259,13 @@ public class BackingBeanUtils implements Serializable{
          return controlCode;
     }
     
+    /**
+     * Checks if the given resultSet contains the given column. Can be used to prevent SQL errors.
+     * @param rs The resultSet to be tested
+     * @param column The column which will be checked for
+     * @return True if resultSet contains the given column, false if not.
+     * @throws SQLException
+     */
     public boolean hasColumn(ResultSet rs, String column) throws SQLException {
         ResultSetMetaData meta = rs.getMetaData();
         int columns = meta.getColumnCount();
@@ -563,6 +571,14 @@ public class BackingBeanUtils implements Serializable{
         return paymentIntegrator;
     }
 
+    public PaymentCoordinator getPaymentCoordinator(){
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{paymentCoordinator}", PaymentCoordinator.class);
+        paymentCoordinator = (PaymentCoordinator) ve.getValue(context.getELContext());
+        return paymentCoordinator;
+    }
+    
     /**
      * @param courtEntityIntegrator the courtEntityIntegrator to set
      */
