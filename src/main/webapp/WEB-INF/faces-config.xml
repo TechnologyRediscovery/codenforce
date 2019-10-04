@@ -357,12 +357,6 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>userUpdateBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.UserManageBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    
-    <managed-bean>
         <managed-bean-name>violationAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ViolationAddBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
@@ -449,6 +443,13 @@
     <managed-bean>
         <managed-bean-name>intensityBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.IntensityBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+ 
+    
+    <managed-bean>
+        <managed-bean-name>userManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.userManageBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
  
@@ -1615,4 +1616,8 @@
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBuilderBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>userConfigBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.UserConfigBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
 </faces-config>

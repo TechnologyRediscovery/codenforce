@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -31,6 +32,7 @@ import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  *
@@ -79,6 +82,18 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return defMuni;
     }
     
+    public String generateRandomPassword(){
+        java.math.BigInteger bigInt = new BigInteger(1024, new Random());
+        String randB64 = Base64.encode(bigInt.toByteArray());
+        StringBuilder sb = new StringBuilder();
+        sb.append(randB64.substring(0,3));
+        sb.append("-");
+        sb.append(randB64.substring(randB64.length()-3,randB64.length()));
+        sb.append("-");
+        sb.append(randB64.substring(randB64.length()-3,randB64.length()));
+        return sb.toString();
+        
+    }
     
     private UserAuthorized generateUserAuthorized(  User u, 
                                                     UserAuthorizationPeriod uap) throws AuthorizationException{
@@ -141,7 +156,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * Primary user retrieval method: Note that there aren't as many checks here
      * since the jboss container is managing the lookup of authenticated users. 
-     * We are pulling the login name from the already authenticated glassfish user 
+     * We are pulling the login name from the already authenticated jboss session user 
      * and just grabbing their profile from the db
      * 
      * @param loginName
@@ -181,7 +196,14 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return au;
     }
     
-    public List<RoleType> getPermittedRoleTypes(UserAuthorized user){
+    /**
+     * Generates a list of what role types a given user can assign to new users 
+     * they create. As of Oct 2019, this logic said you can add somebody of lesser 
+     * in your municipaltiy. Developers have all power.
+     * @param user
+     * @return 
+     */
+    public List<RoleType> getPermittedRoleTypesToGrant(UserAuthorized user){
         List<RoleType> rtl;
         List<RoleType> rtlAuthorized = new ArrayList<>();
         rtl = new ArrayList<>(Arrays.asList(RoleType.values()));
@@ -427,14 +449,14 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
     
      public UserAuthorizationPeriod initializeNewAuthPeriod( UserAuthorized requestor, 
-                                                            UserAuthorized requestee, 
+                                                            User requestee, 
                                                             Municipality m){
         UserAuthorizationPeriod per = null;
 
         // Only Users who have sys admin permission in the requested muni or are devs
-        if((requestee.getGoverningAuthPeriod().getMuni().getMuniCode() == m.getMuniCode()
-                && requestee.getKeyCard().isHasSysAdminPermissions())
-                || requestee.getKeyCard().isHasDeveloperPermissions()){
+        if((requestor.getGoverningAuthPeriod().getMuni().getMuniCode() == m.getMuniCode()
+                && requestor.getKeyCard().isHasSysAdminPermissions())
+                || requestor.getKeyCard().isHasDeveloperPermissions()){
             per = new UserAuthorizationPeriod(m);
             per.setAccessgranteddatestart(LocalDateTime.now());
             per.setAccessgranteddatestop(LocalDateTime.now().plusYears(1));
