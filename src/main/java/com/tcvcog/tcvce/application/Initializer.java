@@ -190,6 +190,8 @@ public class Initializer implements ServletContextListener{
         ChoiceIntegrator choiceInt = new ChoiceIntegrator();
         servletContext.setAttribute("choiceIntegrator", choiceInt);
         
+        
+        
          
         
 //        SessionBean sb = new SessionBean();

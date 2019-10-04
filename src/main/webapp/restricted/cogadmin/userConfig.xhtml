@@ -1,0 +1,415 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>User Manager</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:form id="usermanage-messages-form">
+                        <h:messages id="usermanage-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                    </h:form>
+ 
+                   <h1>System User Manager</h1>
+                    <f:view>
+                        <h:form id="userManageForm">
+
+                            <p:commandButton ajax="true" value="Add new user" 
+                                             icon="fa fa-plus" 
+                                             actionListener="#{userConfigBB.initiateCreateNewUser()}"
+                                             oncomplete="PF('user-addupdate-dialog').show()"
+                                             rendered="#{sessionBean.sessionUser.keyCard.hasSysAdminPermissions}"
+                                             update="
+                                            "/>
+
+                            <p:spacer height="15px"/>
+
+                            <p:dataTable
+                                id="userTable"
+                                var="user"
+                                value="#{userConfigBB.userList}"
+                                rowKey="#{user.userID}"
+                                tableStyleClass="primeDataTable">
+
+                                <p:column width="3%" exportable="false">
+                                    <f:facet name="header">
+                                        <h:outputText value="Exp"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.userID}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="username" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.username}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Person" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.person.firstName}"/>
+                                    <h:outputText value=" "/>
+                                    <h:outputText value="#{user.person.lastName}"/>
+                                    <h:outputText value=", ID: #{user.person.personID} "/>
+                                </p:column>
+
+                                <p:column>
+                                    <p:commandButton ajax="true"
+                                                     id="updateUser" value="edit" icon="fa fa-edit"
+                                                     styleClass="multiButtonLineButton" 
+                                                     actionListener="#{userConfigBB.initiateUserUpdates(user)}"
+                                                     oncomplete="PF('user-addupdate-dialog').show()"
+                                                     update="userconfig-dialog-updateuser
+                                                     " />
+                                </p:column>
+                                
+                                <p:rowExpansion>
+                                    <div class="outlinedBox">
+                                         <p:dataTable
+                                            id="userTable"
+                                            var="user"
+                                            value="#{}"
+                                            rowKey="#{user.userID}"
+                                            tableStyleClass="primeDataTable">
+
+                                            <p:column width="3%" >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Exp"/>
+                                                </f:facet>
+                                            </p:column>
+                                             
+                                         </p:dataTable>
+
+
+
+
+                                     
+                                    </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+
+                            <p:spacer height="15px"/>
+                            <hr/>
+                            <p:spacer height="15px"/>
+
+
+                        </h:form>
+
+                        <p:dialog      height="650" width="800"
+                                       widgetVar="user-authorizations-dialog"
+                                       closable="true" 
+                                       rendered="#{sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}">
+                            <h:form id="user-addauthrecord-form">
+
+                                <h2>Add authorization record</h2>
+                                <p><h:outputText id="useradd-userid-ot" value="userid: #{userBB.currentUser.userID}"/></p>
+
+                                <h:panelGrid columns="4" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
+                                             footerClass="gridFooter">
+                                                 
+                            
+                            
+                                </h:panelGrid>
+                            </h:form>
+                        </p:dialog>
+
+                        <p:dialog   height="750" width="1000"
+                                    widgetVar="userconfig-dialog-addauthperiod"
+                                    closable="true" 
+                                    rendered="#{sessionBeasessionUserer.keyCard.hasSysAdminPermissions}">
+                            <h:form id="user-form-addauthperiod">
+
+                                <h2>Add new user authorization period</h2>
+                                
+                                <h:panelGrid columns="2" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd"
+                                             footerClass="gridFooter">
+                                    <h:panelGroup>
+                                        
+                                     <h:outputLabel value="Access Start Date*" for="startDateCal"/>
+                                     <p:calendar value="#{userConfigBB.currentUAP.accessgranteddatestart}" 
+                                                    mode="popup" 
+                                                    id="aup-cal-staretdate"
+                                                    showOn="button"
+                                                    pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true"
+                                                    tabindex="5"
+                                                    showButtonPanel="true"
+                                                    showTodayButton="true"
+                                                    required="true"/>
+
+                                        <h:message for="startDateCal" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel value="Access Termination Date*" for="aup-cal-stopdate"/>
+                                        <p:calendar value="#{userConfigBB.currentUAP.accessgranteddatestop}" 
+                                                    mode="popup" tabindex="6"
+                                                    id="aup-cal-stopdate"
+                                                    showOn="button"
+                                                    pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true"
+                                                    showButtonPanel="true"
+                                                    showTodayButton="true"
+                                                    required="true"/>
+
+                                        <h:message for="aup-cal-stopdate" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        
+                                         <p:outputLabel  for="aup-roletype-som" value="Role type"/>
+                                            <p:selectOneMenu id="aup-roletype-som" 
+                                                             required="true" 
+                                                             value="#{userConfigBB.currentUAP.authorizedRole}">
+                                                <f:selectItem itemLabel="select a role..." noSelectionOption="true" />
+                                                <f:selectItems value="#{userConfigBB.roleTypeCandidateList}"  var="rt" itemValue="#{rt}" 
+                                                               itemLabel="#{rt.label}, rank #{rt.rank}"/>
+                                            </p:selectOneMenu>
+                                            <h:message for="aup-roletype-som" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup>
+                                    
+                                    
+                                    <h:panelGroup>
+                                        
+                                         <p:outputLabel  for="aup-muni-ol" value="Muni"/>
+                                            <p:selectOneMenu id="aup-muni-som" 
+                                                             required="true" 
+                                                             value="#{userConfigBB.selectedMuni}">
+                                                <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
+                                                <f:selectItems value="#{userConfigBB.muniCandidateList}"  var="mu" itemValue="#{mu}" 
+                                                               itemLabel="#{mu.muniName}"/>
+                                            </p:selectOneMenu>
+                                            <h:message for="aup-muni-som" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+
+                                        <p:outputLabel id="aup-defaultmuni-ol" for="aup-defaultmuni-sbcb" value="Make default muni"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="aup-defaultmuni-sbcb" value="#{userConfigBB.currentUAP.defaultmuni}" />
+
+                                        
+                                    </h:panelGroup>
+                            
+                                   
+                                </h:panelGrid>
+
+                                <p:spacer height="15px"/>
+                                <p:commandButton ajax="true" tabindex="2"
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('userconfig-dialog-addauthperiod').hide()"/>
+
+                                <p:commandButton    id="userconfig-button-commituap"
+                                                    ajax="true" value="Commit new auth period" icon="fa fa-plus" 
+                                                    tabindex="11" 
+                                                    actionListener="#{userConfigBB.commitNewAuthPeriod}"
+                                                    oncomplete="PF('userconfig-dialog-addauthperiod').hide()"
+                                                    update=""
+                                                    />
+
+                            </h:form>
+                        </p:dialog>
+                        
+                        
+                        
+                        
+                              <p:dialog 
+                                    id="userconfig-dialog-updateuser"
+                                    header="User settings" 
+                                    widgetVar="navcontainer-dialog-usersettings" 
+                                    responsive="true" 
+                                    width="400"
+                                    modal="false"
+                                    height="600">
+                             
+                                          
+                                 <h2>User settings for <h:outputText value="#{userConfigBB.currentUser.username}" /></h2>
+                                 
+                                 
+                                 
+                                 <p>
+                                     <h:outputText value="Notes: " styleClass="bold"/>
+                                     <h:outputText value="#{userConfigBB.currentUser.notes}" escape="false" />
+                                 </p>
+                                 
+                                    <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+                                             
+
+                                    <h:panelGroup>
+                                        
+                                        <h:form id="usersettings-messages-form-username">
+                                          <h:messages id="usersettings-messages-username"
+                                                      globalOnly="true" showDetail="true" showSummary="true"
+                                                      warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                          </h:messages>
+                                      </h:form>
+                                        <h:form id="usersettings-form">
+
+                                            <p:outputLabel for="usersettings-it-username">
+                                                <h:outputText value="User name"/>
+                                            </p:outputLabel>
+                                            <p:inputText id="usersettings-it-username" value="#{userConfigBB.currentUser.username}" 
+                                                         size="12"
+                                                         maxlength="20"
+                                                         tabindex="3" 
+                                                         required="true" 
+                                                         validatorMessage="Length must be between 5 and 20 characters"
+                                                         styleClass="inputText">
+                                                <f:validateLength minimum="5" maximum="20" />
+                                            </p:inputText>
+                                            <h:message for="usersettings-it-username" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:commandButton    id="usersettings-button-updateusername"
+                                                                ajax="true"
+                                                                actionListener="#{userConfigBB.commitUsernameUpdates}"
+                                                                icon="fa fa-thumbs-o-up"
+                                                                update="usersettings-messages-form-username"
+                                                                value="Update username" 
+                                                                tabindex="3"/>
+                                        </h:form>
+
+                                    </h:panelGroup>
+                                        
+                                    <h:panelGroup>
+                                        <h:form id="usersettings-messages-form-personlink">
+                                          <h:messages id="usersettings-messages-personlink"
+                                                      globalOnly="true" showDetail="true" showSummary="true"
+                                                      warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                          </h:messages>
+                                      </h:form>
+                                        
+                                        <h:form id="usersettings-form-userpersonlink">
+
+                                            <h:outputText value="Your user is currently mapped to: " />
+                                            <p:spacer height="5px" />
+                                            <h:outputText value="#{userConfigBB.currentUser.person.firstName}" />
+                                            <h:outputText value=" " />
+                                            <h:outputText value="#{userConfigBB.currentUser.person.lastName}" />
+                                            <h:outputText value=" (ID: #{userConfigBB.currentUser.person.personID})" />
+                                            <h:outputText value=" " />
+
+
+                                            <p:spacer height="5px" />
+
+                                            <p:outputLabel  for="usersettings-som-userpersons" value="Available User-type persons:"/>
+                                            <p:selectOneMenu id="usersettings-som-userpersons" 
+                                                             required="true" 
+                                                             value="#{userConfigBB.currentUser.person}">
+                                                <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                                <f:selectItems value="#{userConfigBB.userPersonList}"  var="p" itemValue="#{p}" 
+                                                               itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                                <f:converter converterId="personConverter"/>
+                                            </p:selectOneMenu>
+                                            <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:commandButton    id="usersettings-button-updatepersonlink"
+                                                                ajax="true"
+                                                                actionListener="#{userConfigBB.commitUserPersonUpdates}"
+                                                                update="usersettings-messages-form-personlink
+                                                                usersettings-form-userpersonlink"
+                                                                icon="fa fa-thumbs-0-up"
+                                                                value="Update person link" 
+                                                                tabindex="3"/>
+
+                                        </h:form>
+                                    </h:panelGroup>
+                                        
+                                       
+
+                                    <h:panelGroup>
+                                        
+                                        <h:form id="usersettings-messages-form-updatepassword">
+                                          <h:messages id="usersettings-messages-updategepassword"
+                                                      globalOnly="true" showDetail="true" showSummary="true"
+                                                      warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                          </h:messages>
+                                      </h:form>
+                                        
+                                        
+                                        <h:form id="usersettings-form-updatepassword">
+                                            <p:outputLabel for="usersettings-it-password">
+                                                <h:outputText value="New password (use letters and numbers; at least 8 chars please! "/>
+                                            </p:outputLabel>
+                                            <p:inputText id="usersettings-it-password" value="#{userConfigBB.formPassword}" 
+                                                         size="15"
+                                                         maxlength="80"
+                                                         tabindex="3" 
+                                                         required="true" 
+                                                         validatorMessage="Length must be between 8 and 50 characters"
+                                                         styleClass="inputText">
+                                                <f:validateLength minimum="8" maximum="50" />
+                                            </p:inputText>
+                                            <h:message for="usersettings-it-password" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            <p:commandButton    id="usersettings-button-updatepassword"
+                                                                ajax="true"
+                                                                actionListener="#{userBB.commitPasswordUpdates}"
+                                                                update="usersettings-messages-form-updatepassword
+                                                                usersettings-form-updatepassword"
+                                                                icon="fa fa-thumbs-0-up"
+                                                                value="Update password" 
+                                                                tabindex="3"/>
+                                        </h:form>
+                                    </h:panelGroup>
+                             
+                             
+                                </h:panelGrid>
+                                 
+                                 <h:form id="usersettings-form-close">                             
+
+
+                                <p:commandButton ajax="true" 
+                                              value="Cancel" icon="fa fa-stop" 
+                                              onclick="PF('userconfig-dialog-updateuser').hide()"
+                                              tabindex="4"/>
+
+
+                                <p:commandButton ajax="true" 
+                                              value="Done!" icon="fa thumbs-up" 
+                                              onclick="PF('userconfig-dialog-updateuser').hide()"
+                                              tabindex="4"/>
+                             </h:form>
+                             
+                         </p:dialog>
+                        
+                        
+                        
+                        
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

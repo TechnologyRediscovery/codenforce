@@ -199,36 +199,8 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     public void commitUserUpdates(ActionEvent ev){
     }
 
-    /**
-     * TODO: finish and deal with new UserAuthorized subclass
-     * @param ev 
-     */
-    public void addUser(ActionEvent ev) {
-        UserCoordinator uc = getUserCoordinator();
-        System.out.println("UserBB.addUser");
-//        currentUser = uc.getUserSkeleton();
-    }
 
-    public void commitInsert(ActionEvent ev) {
-        System.out.println("UserBB.commitInsert");
-        UserCoordinator uc = getUserCoordinator();
-        int newUserID;
-        
-        try {
-            newUserID = uc.insertNewUser(currentUser);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully added user with id" + newUserID
-                            + " to the system and this person can now login and get to work!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to add user to system, my apologies",
-                            "This is a system-level error that msut be corrected by an administrator"));
-        }
-
-    }
-
+    
     /**
      * @return the userList
      */

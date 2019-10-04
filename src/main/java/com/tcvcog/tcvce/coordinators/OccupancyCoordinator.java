@@ -419,10 +419,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public int insertNewOccPeriod(OccPeriod op, UserAuthorized u) throws IntegrationException, InspectionException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         EventIntegrator ei = getEventIntegrator();
+        
         if(op.getType().getEventRuleSetID() != 0){
             EventRuleSet ers = ei.rules_getEventRuleSet(op.getType().getEventRuleSetID());
         }
         int freshOccPeriodID = oi.insertOccPeriod(op); 
+        
        System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);
         try {
             inspectionAction_commenceOccupancyInspection(null, null, oi.getOccPeriod(freshOccPeriodID, u),  u);
