@@ -204,7 +204,7 @@
                                   widgetVar="feePermissionsDialogVar"
                                   closable="true">   
                             <h:form id="feePermissionsForm">
-                                <h2>Edit Fee Permissions</h2>
+                                <h2>Edit Fee Permissions for fee ID #<p:outputLabel value="#{feeManagementBB.lockedPeriodType.typeid}"/></h2>
                                 <p>Here you can remove or add permitted fees, and even choose which fees are automatically 
                                     applied to an Occupancy Period.</p>
 
@@ -228,6 +228,7 @@
                                             </f:facet>
                                             <p:cellEditor>
                                                 <f:facet name="output"><h:outputText value="#{fee.occupancyInspectionFeeID}" /></f:facet>
+                                                <f:facet name="input"><h:outputText value="#{fee.occupancyInspectionFeeID}" /></f:facet>
                                             </p:cellEditor>
                                         </p:column>
 
@@ -237,6 +238,7 @@
                                             </f:facet>
                                             <p:cellEditor>
                                                 <f:facet name="output"><h:outputText value="#{fee.name}" /></f:facet>
+                                                <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
                                             </p:cellEditor>
                                         </p:column>
 
@@ -246,6 +248,7 @@
                                             </f:facet>
                                             <p:cellEditor>
                                                 <f:facet name="output"><h:outputText value="#{fee.amount}" /></f:facet>
+                                                <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
                                             </p:cellEditor>
                                         </p:column>
 
@@ -255,6 +258,7 @@
                                         </f:facet>
                                         <p:cellEditor>
                                             <f:facet name="output"><h:outputText value="#{fee.effectiveDate}" /></f:facet>
+                                            <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
                                         </p:cellEditor>
                                         </p:column>
                                         
@@ -264,6 +268,7 @@
                                         </f:facet>
                                         <p:cellEditor>
                                             <f:facet name="output"><h:outputText value="#{fee.expiryDate}" /></f:facet>
+                                            <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
                                         </p:cellEditor>
                                         </p:column>
                                         
@@ -293,7 +298,7 @@
                                                 <h:outputText value="Remove?" />
                                             </f:facet>
                                             <p:commandButton ajax="true" value="Remove" 
-                                                             action="#{occPermitApplicationBB.removeSelectedUnit(unit)}"
+                                                             action="#{feeManagementBB.removeOccPeriodFee(fee)}"
                                                              update="#{p:component('permittedFeeTable')}
                                                              feePermissionsForm"/>                                      
                                         </p:column>
@@ -362,11 +367,11 @@
                                 </h:panelGroup>
 
                                 <p:spacer height="5px"/>
-                                <p:commandButton ajax="true" update="#{p:component('permittedFeeTable')} feePermissionsForm"
+                                <p:commandButton ajax="true" update="#{p:component('permittedFeeTable')} feePermissionsForm messages"
                                                  value="Add Selected Fee to Permitted Fees" action="#{feeManagementBB.addFeeToPermittedFees()}" />
                                 <p:spacer height="10px"/>
                                 <p:commandButton ajax="false" 
-                                                 actionListener="#{feeManagementBB.commitOccPeriodFeeUpdates(e)}"
+                                                 action="#{feeManagementBB.commitPermissionUpdates()}"
                                                  value="Commit Updates" tabindex="14"/>
                                 <p:commandButton    id="cancel-cb"
                                                     ajax="true"  tabindex="27"

@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @author Adam Gutonski and Sylvia
  */
-public class OccPeriodType {
+public class OccPeriodType implements Cloneable {
     private int typeid;
     private Municipality muni;
     private String title;
@@ -63,6 +63,12 @@ public class OccPeriodType {
     private String permitTitleSub;
 
     private List<Fee> feeList;
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone(); //To change body of generated methods, choose Tools | Templates.
+    }
+    
     /**
      * @return the typeid
      */

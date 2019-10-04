@@ -67,11 +67,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private ArrayList<OccPeriodType> typeList;
     private ArrayList<OccPeriodType> filteredTypeList;
     private OccPeriodType selectedPeriodType;
+    private OccPeriodType lockedPeriodType;
     private List<Fee> existingFeeList;
     private ArrayList<Fee> workingFeeList;
     private Fee selectedWorkingFee;
     private List<Fee> allFees;
-    
+
     private boolean editing;
     private String redirTo;
     private boolean waived;
@@ -121,22 +122,22 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                                 "Oops! We encountered a problem trying to fetch the fee list!", ""));
             }
         }
-        
+
         if (feeList == null) {
             feeList = (ArrayList<Fee>) allFees;
         }
-        
-        if(typeList == null){
+
+        if (typeList == null) {
             OccupancyIntegrator oi = getOccupancyIntegrator();
             try {
-                typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessionMuni().getMuniCode());
+                typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessionMuni().getProfile().getProfileID());
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Oops! We encountered a problem trying to fetch the OccPeriodType List!", ""));
             }
         }
-        
+
     }
 
     public String finishAndRedir() {
@@ -145,10 +146,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return redirTo;
     }
 
-    public String goToFeePermissions(){
+    public String goToFeePermissions() {
         return "feePermissions";
     }
-    
+
     public String deleteSelectedOccPeriodFee(ActionEvent e) {
 
         PaymentIntegrator pi = getPaymentIntegrator();
@@ -400,21 +401,128 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-    public void editOccPeriodFees(){
-            existingFeeList = selectedPeriodType.getPermittedFees();
+    public void editOccPeriodFees() {
+
+        try {
+            lockedPeriodType = (OccPeriodType) selectedPeriodType.clone();
+        } catch (CloneNotSupportedException ex) {
+            System.out.println("OccPeriodType had a problem cloning. Oops!");
+        }
+
+        try {
+            existingFeeList = lockedPeriodType.getPermittedFees();
+            workingFeeList = new ArrayList<>(existingFeeList);
+        } catch (NullPointerException e) {
+            System.out.println("OccPeriodType has no existing permitted fee list, making new ArrayList...");
             workingFeeList = new ArrayList<>();
-            workingFeeList.addAll(existingFeeList);
+        }
 
     }
-    
-    public void removeOccPeriodFee(Fee selectedFee){
+
+    public void removeOccPeriodFee(Fee selectedFee) {
         workingFeeList.remove(selectedFee);
     }
-    
-    public void addFeeToPermittedFees(){
-        workingFeeList.add(selectedFee);
+
+    public void addFeeToPermittedFees() {
+
+        Iterator itr = workingFeeList.iterator();
+        boolean duplicate = false;
+        Fee test = null;
+        while (itr.hasNext()) {
+            test = (Fee) itr.next();
+            duplicate = test.getOccupancyInspectionFeeID() == selectedFee.getOccupancyInspectionFeeID();
+            if (duplicate) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "You cannot permit the same fee twice.", ""));
+                break;
+            }
+
+        }
+        if (!duplicate) {
+            workingFeeList.add(selectedFee);
+        }
     }
-    
+
+    public void commitPermissionUpdates() {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        if (existingFeeList == null) {
+
+            for (Fee workingFee : workingFeeList) {
+
+                try {
+                    pi.insertFeePeriodTypeJoin(workingFee, lockedPeriodType);
+                } catch (IntegrationException ex) {
+                    System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: ");
+                }
+
+            }
+
+        } else {
+
+            int notThisFee = 0;
+
+            for (Fee existingFee : existingFeeList) {
+                notThisFee = 0;
+                for (Fee workingFee : workingFeeList) {
+                    if (existingFee.getOccupancyInspectionFeeID() != workingFee.getOccupancyInspectionFeeID()) {
+                        notThisFee++;
+                    }
+
+                }
+
+                if (notThisFee == workingFeeList.size()) {
+
+                    try {
+                        pi.deleteFeePeriodTypeJoin(existingFee, lockedPeriodType);
+                    } catch (IntegrationException ex) {
+                        System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: ");
+                    }
+
+                }
+
+            }
+
+            for (Fee workingFee : workingFeeList) {
+                notThisFee = 0;
+                for (Fee existingFee : existingFeeList) {
+
+                    if (existingFee.getOccupancyInspectionFeeID() == workingFee.getOccupancyInspectionFeeID()) {
+                        try {
+                            pi.updateFeePeriodTypeJoin(workingFee, lockedPeriodType);
+                        } catch (IntegrationException ex) {
+                            System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: ");
+                        }
+                        break;
+                    } else {
+                        notThisFee++;
+                    }
+
+                }
+
+                if (notThisFee == existingFeeList.size()) {
+                    try {
+                        pi.insertFeePeriodTypeJoin(workingFee, lockedPeriodType);
+                    } catch (IntegrationException ex) {
+                        System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: ");
+                    }
+
+                }
+
+            }
+        }
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        try {
+            typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessionMuni().getProfile().getProfileID());
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Oops! We encountered a problem trying to fetch the OccPeriodType List!", ""));
+        }
+    }
+
     /**
      * @param existingFeeTypeList the existingFeeTypeList to set
      */
@@ -697,7 +805,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     public void setAllFees(List<Fee> allFees) {
         this.allFees = allFees;
     }
-    
+
     public Property getOccPeriodProperty() {
 
         PropertyIntegrator pi = getPropertyIntegrator();
@@ -720,6 +828,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         return getOccPeriodProperty().getAddress();
 
+    }
+
+    public OccPeriodType getLockedPeriodType() {
+        return lockedPeriodType;
+    }
+
+    public void setLockedPeriodType(OccPeriodType lockedPeriodType) {
+        this.lockedPeriodType = lockedPeriodType;
     }
 
 }

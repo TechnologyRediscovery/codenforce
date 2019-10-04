@@ -39,7 +39,6 @@ import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 
@@ -50,6 +49,7 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -157,6 +157,9 @@ public class Initializer implements ServletContextListener{
         
         PaymentIntegrator pmtInt = new PaymentIntegrator();
         servletContext.setAttribute("paymentIntegrator", pmtInt);
+        
+        PaymentCoordinator pmtCrd = new PaymentCoordinator();
+        servletContext.setAttribute("paymentCoordinator", pmtCrd);
         
         SystemIntegrator sysInt = new SystemIntegrator();
         servletContext.setAttribute("systemIntegrator", sysInt);
