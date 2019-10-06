@@ -242,7 +242,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         String query = "SELECT moneyfee.feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes, autoassign\n"
                 + "FROM moneyfee, moneyoccperiodtypefee\n"
-                + "WHERE moneyfee.feeid = moneyoccperiodtypefee.fee_feeid AND moneyoccperiodtypefee.occperiodtype_typeid = ?;";
+                + "WHERE moneyfee.feeid = moneyoccperiodtypefee.fee_feeid AND moneyoccperiodtypefee.occperiodtype_typeid = ? AND moneyoccperiodtypefee.active = true;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -837,8 +837,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     public void insertFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
         String query = "INSERT INTO public.moneyoccperiodtypefee(\n"
-                + "    fee_feeid, occperiodtype_typeid, autoassign)\n"
-                + "    VALUES (?, ?,?);";
+                + "    fee_feeid, occperiodtype_typeid, autoassign, active)\n"
+                + "    VALUES (?, ?, ?, true);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -870,10 +870,11 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
-    public void deleteFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
+    public void deactivateFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
 
-        String query = "DELETE FROM public.moneyoccperiodtypefee\n"
-                + " WHERE fee_feeid=? AND occperiodtype_typeid=?;";
+        String query = "UPDATE public.moneyoccperiodtypefee\n"
+                + "   SET active=false\n"
+                + "   WHERE fee_feeid=? AND occperiodtype_typeid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -905,6 +906,43 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
+    public void reactivateFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
+
+        String query = "UPDATE public.moneyoccperiodtypefee\n"
+                + "   SET active=true\n"
+                + "   WHERE fee_feeid=? AND occperiodtype_typeid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, type.getTypeid());
+            System.out.println("TRYING TO EXECUTE UPDATE METHOD");
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to reactivate fee and occperiod join", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        }
+
+    }
+    
     public void updateFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
 
         String query = "UPDATE public.moneyoccperiodtypefee\n"

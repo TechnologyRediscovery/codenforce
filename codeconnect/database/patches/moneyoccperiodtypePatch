@@ -1,0 +1,2 @@
+﻿ALTER TABLE moneyoccperiodtypefee ADD COLUMN active boolean;
+ALTER TABLE moneyoccperiodtypefee ADD COLUMN autoassign boolean;
