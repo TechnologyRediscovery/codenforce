@@ -448,14 +448,29 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
+        boolean failed = false;
+
         if (existingFeeList == null) {
 
             for (Fee workingFee : workingFeeList) {
 
+                failed = false;
+
                 try {
                     pi.insertFeePeriodTypeJoin(workingFee, lockedPeriodType);
                 } catch (IntegrationException ex) {
-                    System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: ");
+                    System.out.println("Failed inserting occperiod fee join, trying to reactivate.");
+                    failed = true;
+                }
+
+                if (failed) {
+
+                    try {
+                        pi.reactivateFeePeriodTypeJoin(workingFee, lockedPeriodType);
+                    } catch (IntegrationException ex) {
+                        System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
+                    }
+
                 }
 
             }
@@ -476,9 +491,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 if (notThisFee == workingFeeList.size()) {
 
                     try {
-                        pi.deleteFeePeriodTypeJoin(existingFee, lockedPeriodType);
+                        pi.deactivateFeePeriodTypeJoin(existingFee, lockedPeriodType);
                     } catch (IntegrationException ex) {
-                        System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: ");
+                        System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
                     }
 
                 }
@@ -487,13 +502,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             for (Fee workingFee : workingFeeList) {
                 notThisFee = 0;
+                failed = false;
                 for (Fee existingFee : existingFeeList) {
 
                     if (existingFee.getOccupancyInspectionFeeID() == workingFee.getOccupancyInspectionFeeID()) {
                         try {
                             pi.updateFeePeriodTypeJoin(workingFee, lockedPeriodType);
                         } catch (IntegrationException ex) {
-                            System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: ");
+                            System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
                         }
                         break;
                     } else {
@@ -506,7 +522,18 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                     try {
                         pi.insertFeePeriodTypeJoin(workingFee, lockedPeriodType);
                     } catch (IntegrationException ex) {
-                        System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: ");
+                        System.out.println("Failed inserting occperiod fee join, trying to reactivate.");
+                        failed=true;
+                    }
+
+                }
+                
+                if (failed) {
+
+                    try {
+                        pi.reactivateFeePeriodTypeJoin(workingFee, lockedPeriodType);
+                    } catch (IntegrationException ex) {
+                        System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
                     }
 
                 }
