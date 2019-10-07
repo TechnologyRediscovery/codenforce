@@ -356,6 +356,10 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable {
      * @return the formGuideEntryID
      */
     public int getFormGuideEntryID() {
+        //xiaohong add
+        if (currentElement != null) {
+            formGuideEntryID = currentElement.getGuideEntryID();
+        }
         return formGuideEntryID;
     }
 

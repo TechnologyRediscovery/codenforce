@@ -128,12 +128,7 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable {
     //xiaohong add
     @PostConstruct
     public void initBean() {
-        CodeIntegrator codeInt = getCodeIntegrator();
-        try {
-            codeSourceList = codeInt.getCompleteCodeSourceList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+        initselectedCodeSourcePanel();
 
     }
 
@@ -143,10 +138,18 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable {
             codeSourceList = new ArrayList();
             codeSourceList.add(selectedCodeSource);
             
-           
+            setSelectedCodeSource(selectedCodeSource);
             
-            listCodeSourceElement(selectedCodeSource);
+            activeSessionCodeSource(selectedCodeSource);
+            
+            getSessionBean().setActiveCodeSource(selectedCodeSource);
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Code Source Selected", ""));
+            
         } else if (codeSourceSelected == false) {
+            
             initselectedCodeSourcePanel();
             
         }
@@ -157,16 +160,17 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable {
         try {
             CodeIntegrator codeInt = getCodeIntegrator();
             codeSourceList = codeInt.getCompleteCodeSourceList();
-            selectedCodeSource = null;
-            listCodeSourceElement(selectedCodeSource);
+            
+            setSelectedCodeSource(null);
+            
+            activeSessionCodeSource(null);
             
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
     }
     
-    public void listCodeSourceElement(CodeSource selectedCodeSource){
-        setSelectedCodeSource(selectedCodeSource);
+    public void activeSessionCodeSource(CodeSource selectedCodeSource){
         getSessionBean().setActiveCodeSource(selectedCodeSource);
     }
     

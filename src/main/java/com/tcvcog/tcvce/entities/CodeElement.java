@@ -259,7 +259,7 @@ public class CodeElement implements Serializable {
      * @return the guideEntryID
      */
     public int getGuideEntryID() {
-        System.out.println(guideEntryID);
+        
         return guideEntryID;
     }
 
@@ -267,7 +267,7 @@ public class CodeElement implements Serializable {
      * @param guideEntryID the guideEntryID to set
      */
     public void setGuideEntryID(int guideEntryID) {
-        System.out.println("set"+guideEntryID);
+        
         this.guideEntryID = guideEntryID;
     }
 

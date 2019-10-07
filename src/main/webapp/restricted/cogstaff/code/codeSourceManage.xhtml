@@ -23,8 +23,12 @@
 
                         <h1>Manage Municipal Code Sources</h1>
 
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"></h:messages>
+                        <h:form id="form-messages-global">
+
+                            <h:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                        </h:form>
 
                         <div class ="two-column-page-flex-container">
 
@@ -43,7 +47,6 @@
                                         <p:dataTable id="codeSourceTable"
                                                      var="source"
                                                      value="#{codeSourceBB.codeSourceList}"
-                                                     rowKey="#{source.sourceID}"
                                                      tableStyleClass="primeDataTable"
                                                      >
 
@@ -63,9 +66,9 @@
                                                       style="width: 80px"
                                                       >
 
-                                                <p:commandButton id="button-editcodesource" ajax="true"
+                                                <p:commandButton id="button-editcodesource" 
+                                                                 ajax="true"
                                                                  value="Edit" 
-                                                                 actionListener="#{codeSourceBB.updateCodeSource}"
                                                                  icon="fa fa-pencil" 
                                                                  oncomplete="PF('codesourcemanage-dialog-updatesource-var').show();"
                                                                  update="codesourcemanage-dialog-updatesource"
@@ -84,6 +87,7 @@
                                                                        value="#{codeSourceBB.codeSourceSelected}"
                                                                        >
                                                     <p:ajax update="
+                                                            form-messages-global
                                                             codesourcemanage-panel-selectcodesource
                                                             codesourcemanage-panel-listcodesource
                                                             codesourcemanage-dialog-updatesource
@@ -94,35 +98,77 @@
 
                                             </p:column>
 
-
                                             <p:rowExpansion>
 
-                                                <h:panelGrid id="codesourcemanage-expansion-sourcedetail"
-                                                             columns="4"
-                                                             cellpadding="5"
+                                                <p:panelGrid id="codesourcemanage-expansion-sourcedetail"
                                                              >
-                                                    <h:outputText value="Source ID"/>
-                                                    <h:outputText value="#{source.sourceID}"/>
 
-                                                    <h:outputText value="Source Name"/>
-                                                    <h:outputText value="#{source.sourceName}"/>
+                                                    <p:row>
+                                                        <p:column colspan="1">
+                                                            <h:outputText value="ID"/>
+                                                        </p:column>
+                                                        <p:column colspan="4">
+                                                            <h:outputText value="#{source.sourceID}"/>
+                                                        </p:column>
+                                                    </p:row>
 
-                                                    <h:outputText value="Year"/>
-                                                    <h:outputText value="#{source.sourceYear}"/>
+                                                    <p:row>
+                                                        <p:column colspan="1">
+                                                            <h:outputText value="Name"/>
+                                                        </p:column>
+                                                        <p:column colspan="4">
+                                                            <h:outputText value="#{source.sourceName}"/>
+                                                        </p:column>
+                                                    </p:row>
 
-                                                    <h:outputText value="Description"/>
-                                                    <h:outputText value="#{source.sourceDescription}"/>
+                                                    <p:row>
+                                                        <p:column colspan="1">
+                                                            <h:outputText value="Year"/>
+                                                        </p:column>
+                                                        <p:column colspan="4">
+                                                            <h:outputText value="#{source.sourceYear}"/>
+                                                        </p:column>
+                                                    </p:row>
 
-                                                    <h:outputText value="Active"/>
-                                                    <h:outputText value="#{source.isActive}"/>
+                                                    <p:row>
+                                                        <p:column colspan="1">
+                                                            <h:outputText value="Active"/>
+                                                        </p:column>
+                                                        <p:column colspan="4">
+                                                            <h:outputText value="#{source.isActive}"/>
+                                                        </p:column>
+                                                    </p:row>
 
-                                                    <h:outputText value="Link"/>
-                                                    <h:outputText value="#{source.URL}"/>
+                                                    <p:row>
+                                                        <p:column colspan="1">
+                                                            <h:outputText value="Link"/>
+                                                        </p:column>
+                                                        <p:column colspan="4">
+                                                            <h:outputText value="#{source.URL}"/>
+                                                        </p:column>
+                                                    </p:row>
 
-                                                    <h:outputText value="Notes"/>
-                                                    <h:outputText value="#{source.sourceNotes}"/>
+                                                    <p:row>
+                                                        <p:column colspan="1">
+                                                            <h:outputText value="Notes"/>
+                                                        </p:column>
+                                                        <p:column colspan="4">
+                                                            <h:outputText value="#{source.sourceNotes}"/>
+                                                        </p:column>
+                                                    </p:row>
 
-                                                </h:panelGrid>
+                                                    <p:row>
+                                                        <p:column colspan="1"
+                                                                  rowspan="2">
+                                                            <h:outputText value="Description"/>
+                                                        </p:column>
+                                                        <p:column colspan="4"
+                                                                  rowspan="2">
+                                                            <h:outputText value="#{source.sourceDescription}"/>
+                                                        </p:column>
+                                                    </p:row>
+
+                                                </p:panelGrid>
 
                                             </p:rowExpansion>
 
@@ -190,21 +236,12 @@
 
                                     <h:form id="codeElementsBySource">
 
-                                        <h:messages globalOnly="false"
-                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
-
-
-
-
-
                                         <p:spacer height="5px"/>
 
                                         <p:dataTable
                                             id="codeElementTable"
                                             var="element"
                                             value="#{codeElementListBB.codeElementList}"
-
-                                            rowKey="#{element.elementID}"
                                             tableStyleClass="primeDataTable"
                                             scrollable="true"
                                             resizableColumns="true"
@@ -340,18 +377,13 @@
                                     </h:form>
                                 </p:panel>
 
-
-
-
                             </div>
-
 
                             <p:dialog  id="codesourcemanage-dialog-updatesource"
                                        width="1100"
                                        widgetVar="codesourcemanage-dialog-updatesource-var"
                                        closable="true" 
                                        header="Update &amp; Add Code Source"
-
                                        >
 
                                 <p>Current code source: <h:outputText value="#{codeSourceAddUpdateBB.currentCodeSource.sourceName} (#{codeSourceAddUpdateBB.currentCodeSource.sourceYear})(Blank means Add New Source)"/></p>
@@ -686,7 +718,7 @@
                             </p:dialog>
 
                             <p:dialog  id="codesourcemanage-dialog-linkElementsToGuideEntries"
-                                       width="1100"
+                                       width="1400"
                                        widgetVar="codesourcemanage-dialog-linkElementsToGuideEntries-var"
                                        closable="true" 
                                        header="Link code guide entries to code elements"
@@ -721,14 +753,14 @@
                                         widgetVar="codeElementListTable"
                                         editable="true">
 
-                                        <p:column width="3%">
+                                        <p:column width="5%">
                                             <f:facet name="header">
                                                 <h:outputText value="Expand"/>
                                             </f:facet>
                                             <p:rowToggler/>
                                         </p:column>
 
-                                        <p:column width="3%">
+                                        <p:column width="5%">
                                             <f:facet name="header">
                                                 <h:outputText value="ID#" />
                                             </f:facet>
@@ -758,7 +790,7 @@
                                             <h:outputText value="#{element.ordchapterNo}"/>
                                         </p:column>
 
-                                        <p:column width="10%" sortBy="#{element.ordchapterTitle}"
+                                        <p:column width="15%" sortBy="#{element.ordchapterTitle}"
                                                   filterBy="#{element.ordchapterTitle}">
                                             <f:facet name="header">
                                                 <h:outputText value="Chapter"/>
@@ -773,7 +805,7 @@
                                             <h:outputText value="#{element.ordSecNum}"/>
                                         </p:column>
 
-                                        <p:column width="10%" sortBy="#{element.ordSecTitle}"
+                                        <p:column width="15%" sortBy="#{element.ordSecTitle}"
                                                   filterBy="#{element.ordSecTitle}">
                                             <f:facet name="header">
                                                 <h:outputText value="Sec. Title" />
@@ -790,7 +822,7 @@
 
                                         <p:column sortBy="#{element.ordSubSecTitle}" 
                                                   filterBy="#{element.ordSubSecTitle}"
-                                                  width="10%">
+                                                  width="15%">
                                             <f:facet name="header">
                                                 <h:outputText value="SubSec. Title" />
                                             </f:facet>
@@ -849,7 +881,7 @@
                                     <p class="note">To view the updated element list with their linked code guide entries, reload the element list through the "Manage Source" list at left.</p>
 
                                 </h:form>
-                                
+
                                 <hr/>
 
 
@@ -1130,7 +1162,6 @@
                             </p:dialog>
 
                         </div>
-
 
                     </div>
                 </f:view>
