@@ -162,7 +162,7 @@
                                                          ajax="true" 
                                                          value="Link elements in source to Code Guide" 
                                                          icon="fa fa-link" 
-                                                         actionListener="#{codeSourceBB.linkElementsToCodeGuide}"
+                                                         actionListener="#{codeElementGuideBB.onLinkElementButtonChange()}"
                                                          oncomplete="PF('codesourcemanage-dialog-linkElementsToGuideEntries-var').show();"
                                                          update="codesourcemanage-dialog-linkElementsToGuideEntries"
                                                          style="width: 99%"
@@ -805,8 +805,8 @@
                                                 <f:facet name="output">
                                                     <h:outputText value="#{element.guideEntryID}"/>
                                                 </f:facet>
-                                                <f:facet name="input">
-                                                    <h:inputText value="#{element.guideEntryID}"/>
+                                                <f:facet name="input" >
+                                                    <h:inputText value="#{element.guideEntryID}" />
                                                 </f:facet>
                                             </p:cellEditor>
                                         </p:column>
