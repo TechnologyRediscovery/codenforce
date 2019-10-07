@@ -1003,8 +1003,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
                 + "SET ordchapterno=?, ordchaptertitle=?, ordsecnum=?, ordsectitle=?, \n"
                 + "ordsubsecnum=?, ordsubsectitle=?, ordtechnicaltext=?, ordhumanfriendlytext=?, \n"
                 + "isactive=?, resourceurl=?, \n"
-                + "datecreated=now(),\n"
-                + "guideentryid=?\n"
+                + "datecreated=now()\n"
                 + " WHERE elementid=?;";
 
         Connection con = null;
@@ -1030,8 +1029,8 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(9, element.isIsActive());
             stmt.setString(10, element.getResourceURL());
 
-            stmt.setInt(11, element.getGuideEntryID());
-            stmt.setInt(12, element.getElementID());
+            
+            stmt.setInt(11, element.getElementID());
 
             System.out.println("CodeIntegrator.updateCodeElement | update statement: " + stmt.toString());
 

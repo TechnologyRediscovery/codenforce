@@ -492,6 +492,7 @@
                                         styleClass="buttonOwnLine" 
                                         disabled="#{codeSourceBB.activeCodeSourceEdit()}"
                                         action="#{codeSourceAddUpdateBB.commitCodeSourceUpdates}"/>
+                                    
 
                                     <p:commandButton 
                                         id="addNewButton" 
@@ -1104,8 +1105,8 @@
 
                                         <h:panelGroup>
 
-                                            <p:inputText id="cdElGuideID" value="#{codeElementBB.formGuideEntryID}" 
-                                                         style="width: 100%;" tabindex="13" required="false" styleClass="inputText"/>
+                                            <p:outputLabel id="cdElGuideID" value="#{codeElementBB.formGuideEntryID}" 
+                                                         style="width: 100%;" tabindex="13" styleClass="inputText"/>
                                             <h:message for="cdElGuideID" showDetail="true" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                         </h:panelGroup>

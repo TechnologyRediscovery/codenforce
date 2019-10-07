@@ -53,6 +53,7 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
   
     
     public String commitCodeSourceUpdates(){
+        
         currentCodeSource.setSourceID(formSourceID);
         currentCodeSource.setSourceName(formSourceName);
         currentCodeSource.setSourceYear(formSourceYear);
@@ -60,7 +61,6 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
         currentCodeSource.setIsActive(formSourceIsActive);
         currentCodeSource.setURL(formSourceURL);
         currentCodeSource.setSourceNotes(formSourceNotes);
-        
         try {
             getCodeCoordinator().updateCodeSource(currentCodeSource);
             getFacesContext().addMessage(null,
@@ -74,6 +74,7 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Unable to UpdateCodeSource", 
                             "Ensure the sourceID matches an existing code source from the table above"));
+            
         }
         
         
