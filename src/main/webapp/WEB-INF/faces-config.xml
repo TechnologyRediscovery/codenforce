@@ -1392,10 +1392,10 @@
     <!--System and internal pages-->
     
     <navigation-rule>
-        <from-view-id>/restricted/cogadmin/userManage.xhtml</from-view-id>
+        <from-view-id>*</from-view-id>
         <navigation-case>
-            <from-outcome>userUpdate</from-outcome>
-            <to-view-id>/restricted/cogadmin/userUpdate.xhtml</to-view-id>
+            <from-outcome>userConfig</from-outcome>
+            <to-view-id>/restricted/cogadmin/userConfig.xhtml</to-view-id>
         </navigation-case>
         <navigation-case>
             <from-outcome>userAdd</from-outcome>

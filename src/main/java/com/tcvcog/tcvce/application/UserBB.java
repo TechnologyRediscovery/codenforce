@@ -84,6 +84,22 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean(){
         currentUser = getSessionBean().getSessionUser();
+        
+        // user our fancy specialized query to get all Persons who are delcared to 
+        // be user types
+        QueryPerson qp = sc.assembleQueryPerson(QueryPersonEnum.USER_PERSONS, currentUser, null, null );
+        try {
+            qp = sc.runQuery(qp);
+            userPersonList = qp.getResults();
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+    }
+
+    public void initializeNewAuthPeriod(User u){
+        
+        
     }
     
 

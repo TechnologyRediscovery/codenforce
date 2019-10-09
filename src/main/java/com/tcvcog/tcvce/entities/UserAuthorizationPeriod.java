@@ -25,14 +25,14 @@ import java.time.LocalDateTime;
  */
 public class UserAuthorizationPeriod extends EntityUtils implements Serializable {
     
-  private int muniloginrecordid;
+  private int munLoginRecordID;
   
   private Municipality muni;
   private int userID;
-  private boolean defaultmuni;
+  private boolean defaultMuni;
   
-  private LocalDateTime accessgranteddatestart;
-  private LocalDateTime accessgranteddatestop;
+  private LocalDateTime startDate;
+  private LocalDateTime stopDate;
   
   private LocalDateTime recorddeactivatedTS;
   private RoleType authorizedRole;
@@ -64,24 +64,24 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
     }
 
     /**
-     * @return the defaultmuni
+     * @return the defaultMuni
      */
-    public boolean isDefaultmuni() {
-        return defaultmuni;
+    public boolean isDefaultMuni() {
+        return defaultMuni;
     }
 
     /**
-     * @return the accessgranteddatestart
+     * @return the startDate
      */
-    public LocalDateTime getAccessgranteddatestart() {
-        return accessgranteddatestart;
+    public LocalDateTime getStartDate() {
+        return startDate;
     }
 
     /**
-     * @return the accessgranteddatestop
+     * @return the stopDate
      */
-    public LocalDateTime getAccessgranteddatestop() {
-        return accessgranteddatestop;
+    public LocalDateTime getStopDate() {
+        return stopDate;
     }
 
    
@@ -101,10 +101,10 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
     }
 
     /**
-     * @return the muniloginrecordid
+     * @return the munLoginRecordID
      */
-    public int getMuniloginrecordid() {
-        return muniloginrecordid;
+    public int getMunLoginRecordID() {
+        return munLoginRecordID;
     }
 
    
@@ -116,24 +116,24 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
     }
 
     /**
-     * @param defaultmuni the defaultmuni to set
+     * @param defaultMuni the defaultMuni to set
      */
-    public void setDefaultmuni(boolean defaultmuni) {
-        this.defaultmuni = defaultmuni;
+    public void setDefaultMuni(boolean defaultMuni) {
+        this.defaultMuni = defaultMuni;
     }
 
     /**
-     * @param accessgranteddatestart the accessgranteddatestart to set
+     * @param startDate the startDate to set
      */
-    public void setAccessgranteddatestart(LocalDateTime accessgranteddatestart) {
-        this.accessgranteddatestart = accessgranteddatestart;
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
     }
 
     /**
-     * @param accessgranteddatestop the accessgranteddatestop to set
+     * @param stopDate the stopDate to set
      */
-    public void setAccessgranteddatestop(LocalDateTime accessgranteddatestop) {
-        this.accessgranteddatestop = accessgranteddatestop;
+    public void setStopDate(LocalDateTime stopDate) {
+        this.stopDate = stopDate;
     }
 
    
@@ -152,10 +152,10 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
     }
 
     /**
-     * @param muniloginrecordid the muniloginrecordid to set
+     * @param munLoginRecordID the munLoginRecordID to set
      */
-    public void setMuniloginrecordid(int muniloginrecordid) {
-        this.muniloginrecordid = muniloginrecordid;
+    public void setMunLoginRecordID(int munLoginRecordID) {
+        this.munLoginRecordID = munLoginRecordID;
     }
 
    

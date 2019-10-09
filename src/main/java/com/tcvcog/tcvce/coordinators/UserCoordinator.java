@@ -27,7 +27,9 @@ import com.tcvcog.tcvce.entities.RoleType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserWithAccessData;
+import com.tcvcog.tcvce.entities.UserAuthorizationPeriod;
+import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.UserListified;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -65,7 +67,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         for(UserAuthorizationPeriod uap: muniPerMap.values()){
-            if(uap.isDefaultmuni()){ // take our first muni declared default
+            if(uap.isDefaultMuni()){ // take our first muni declared default
                 defMuni = uap.getMuni();
             }
         }
@@ -127,8 +129,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             for(UserAuthorizationPeriod uap: candidatePeriods){
                 // Filter out deactivated records and expired records
                 if(uap.getRecorddeactivatedTS() == null 
-                        && uap.getAccessgranteddatestart().isBefore(LocalDateTime.now())
-                        && uap.getAccessgranteddatestop().isAfter(LocalDateTime.now())){
+                        && uap.getStartDate().isBefore(LocalDateTime.now())
+                        && uap.getStopDate().isAfter(LocalDateTime.now())){
                     //  check for existing muni periods and use the most recent valid period
                     if(muniPerMap.containsKey(uap.getMuni())){
                         UserAuthorizationPeriod existingRecord = muniPerMap.get(uap.getMuni());
@@ -204,7 +206,135 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return rtlAuthorized;
     }
     
-    private User configureUserMuniAccess(UserWithAccessData userWAccess, Municipality m) throws AuthorizationException{
+    public void insertNewUserAuthorizationPeriod(User requestingUser, User usee, UserAuthorizationPeriod uap) throws AuthorizationException, IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        if(uap != null && requestingUser != null && usee != null && uap.getMuni() != null){
+            if(uap.getStartDate() != null && !uap.getStartDate().isAfter(LocalDateTime.now().minusYears(1))){
+                if(uap.getStopDate() != null && !uap.getStopDate().isAfter(LocalDateTime.now())){
+                    uap.setCreatedBy(requestingUser);
+                    uap.setUserID(usee.getUserID());
+                    ui.insertNewUserAuthorizationPeriod(uap);
+                } else {
+                    throw new AuthorizationException("Stop date must be not null and in the future");
+                }
+            } else {
+                throw new AuthorizationException("Start date must not be or dated more than a year past");
+            }
+        } else {
+            throw new AuthorizationException("One or more required objects is null");
+        }
+        
+        
+    }
+    
+    
+     /**
+     * Container for all access control mechanism authorization switches
+     * 
+     * Design goal: have boolean type getters on users for use by the View
+     * to turn on and off rendering and enabling as needed.
+     * 
+     * NOTE: This is the ONLY method system wide that calls any setters for
+     * access permissions
+     * 
+     * @param rt
+     * @return a User object whose access controls switches are configured
+     */
+    private AccessKeyCard generateAccessKeyCard(UserAuthorizationPeriod uap){
+        AccessKeyCard card = null;
+        
+        switch(uap.getAuthorizedRole()){
+            case Developer: 
+                card = new AccessKeyCard(   uap.getUserID(),
+                                            uap.getMuni(),
+                                            uap.getAuthorizedRole(),
+                                            true,   //developer
+                                            true,   // sysadmin
+                                            true,   // cogstaff
+                                            true,   // enfOfficial
+                                            true,   // muniStaff
+                                            true);  // muniReader
+               break;
+            
+            case SysAdmin:
+                card = new AccessKeyCard(   uap.getUserID(),
+                                            uap.getMuni(),
+                                            uap.getAuthorizedRole(),
+                                            false,   //developer
+                                            true,   // sysadmin
+                                            true,   // cogstaff
+                                            true,   // enfOfficial
+                                            true,   // muniStaff
+                                            true);  // muniReader
+               break;               
+               
+            case CogStaff:
+                card = new AccessKeyCard(   uap.getUserID(),
+                                            uap.getMuni(),
+                                            uap.getAuthorizedRole(),
+                                            false,   //developer
+                                            false,   // sysadmin
+                                            true,   // cogstaff
+                                            false,   // enfOfficial
+                                            true,   // muniStaff
+                                            true);  // muniReader
+               break;               
+               
+            case EnforcementOfficial:
+                card = new AccessKeyCard(   uap.getUserID(),
+                                            uap.getMuni(),
+                                            uap.getAuthorizedRole(),
+                                            false,   //developer
+                                            false,   // sysadmin
+                                            false,   // cogstaff
+                                            true,   // enfOfficial
+                                            true,   // muniStaff
+                                            true);  // muniReader
+               break;
+               
+            case MuniStaff:
+                card = new AccessKeyCard(   uap.getUserID(),
+                                            uap.getMuni(),
+                                            uap.getAuthorizedRole(),
+                                            false,   //developer
+                                            false,   // sysadmin
+                                            false,   // cogstaff
+                                            false,   // enfOfficial
+                                            true,   // muniStaff
+                                            true);  // muniReader
+               break;
+               
+            case MuniReader:
+                card = new AccessKeyCard(   uap.getUserID(),
+                                            uap.getMuni(),
+                                            uap.getAuthorizedRole(),
+                                            false,   //developer
+                                            false,   // sysadmin
+                                            false,   // cogstaff
+                                            false,   // enfOfficial
+                                            false,   // muniStaff
+                                            true);  // muniReader
+               break;               
+            default:
+        }        
+        return card;
+    }    
+    
+    /**
+     * First whack at a logic implementation to determine session authorizations
+     * given the access record from the DB
+     * 
+     * @deprecated much too combersome to work with date pairs for each role type!
+     * Method now maintained as an archive of the development process
+     * @param userWAccess
+     * @param m
+     * @return
+     * @throws AuthorizationException 
+     */
+    private User configureUserMuniAccess(UserAuthorized userWAccess, Municipality m) throws AuthorizationException{
+        
+        
+        /**
         
         if(userWAccess == null || m == null){
             throw new AuthorizationException("UserCoordinator.configureUserMuniAccess | Incoming user or muni is null");
@@ -317,101 +447,50 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                 && requestor.getKeyCard().isHasSysAdminPermissions())
                 || requestor.getKeyCard().isHasDeveloperPermissions()){
             per = new UserAuthorizationPeriod(m);
-            per.setAccessgranteddatestart(LocalDateTime.now());
-            per.setAccessgranteddatestop(LocalDateTime.now().plusYears(1));
+            per.setStartDate(LocalDateTime.now());
+            per.setStopDate(LocalDateTime.now().plusYears(1));
         }
         return per;
     }
-    
-    public List<UserAuthorized> getUserListForConfig(UserAuthorized usr) throws IntegrationException{
+     
+
+     
+    public void invalidateUserAuthPeriod(UserAuthorizationPeriod aup, User u) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
-        return ui.getCompleteActiveUserList();
-        
+        ui.invalidateUserAuthRecord(aup);
         
     }
     
+   
+     /**
+      * Given a single user, coordinates the creation of a list of Users who 
+      * that user can configure.
+      * @param u
+      * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+      */
+     public List<UserListified> getUsersForConfiguration(User u) throws IntegrationException{
+         UserIntegrator ui = getUserIntegrator();
+         List<User> uListComp = ui.getCompleteActiveUserList();
+         List<UserListified> uListConfig = new ArrayList<>();
+         for(User usr: uListComp){
+             uListConfig.add(ui.getUserListified(usr));
+         }
+         return uListConfig;
+     }
+    
+     /**
+      * Coordinates the creation of a list of all a particular user's Authorized
+      * municipalities
+      * @param userID
+      * @return
+      * @throws IntegrationException 
+      */
     public List<Municipality> getUserAuthMuniList(int userID) throws IntegrationException{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         List<Municipality> ml = mi.getUserAuthMunis(userID);
         return ml;
     }
-    
-    
-    /**
-     * Container for all access control mechanism authorization switches
-     * 
-     * Design goal: have boolean type getters on users for use by the View
-     * to turn on and off rendering and enabling as needed.
-     * 
-     * NOTE: This is the ONLY method system wide that calls any setters for
-     * access permissions
-     * 
-     * @param rt
-     * @return a User object whose access controls switches are configured
-     */
-    private AccessKeyCard getAccessKeyCard(RoleType rt){
-        AccessKeyCard card = null;
-        
-        switch(rt){
-            case Developer:
-                card = new AccessKeyCard( true,   //developer
-                                    true,   // sysadmin
-                                    true,   // cogstaff
-                                    true,   // enfOfficial
-                                    true,   // muniStaff
-                                    true);  // muniReader
-               break;
-            
-            case SysAdmin:
-                card = new AccessKeyCard( false,   //developer
-                                    true,   // sysadmin
-                                    true,   // cogstaff
-                                    true,   // enfOfficial
-                                    true,   // muniStaff
-                                    true);  // muniReader
-               break;               
-               
-            case CogStaff:
-                card = new AccessKeyCard( false,   //developer
-                                    false,   // sysadmin
-                                    true,   // cogstaff
-                                    false,   // enfOfficial
-                                    true,   // muniStaff
-                                    true);  // muniReader
-               break;               
-               
-            case EnforcementOfficial:
-                card = new AccessKeyCard( false,   //developer
-                                    false,   // sysadmin
-                                    false,   // cogstaff
-                                    true,   // enfOfficial
-                                    true,   // muniStaff
-                                    true);  // muniReader
-               break;
-               
-            case MuniStaff:
-                card = new AccessKeyCard( false,   //developer
-                                    false,   // sysadmin
-                                    false,   // cogstaff
-                                    false,   // enfOfficial
-                                    true,   // muniStaff
-                                    true);  // muniReader
-               break;
-               
-            case MuniReader:
-                card = new AccessKeyCard( false,   //developer
-                                    false,   // sysadmin
-                                    false,   // cogstaff
-                                    false,   // enfOfficial
-                                    false,   // muniStaff
-                                    true);  // muniReader
-               break;               
-               
-            default:
-               
-        }        
-        return card;
-    }    
     
     /**
      * Return a list of Municipalities that User u does not currently have the
