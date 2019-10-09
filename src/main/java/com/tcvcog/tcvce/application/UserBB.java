@@ -104,7 +104,6 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         
     }
 
-
     public void initializeNewAuthPeriod(User u){
         
         

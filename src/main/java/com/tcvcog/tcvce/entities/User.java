@@ -65,10 +65,6 @@ public class User implements Serializable{
     public void setUserID(int uid){
         userID = uid;
     }
-    
-    
-    
-    
 
     /**
      * @return the userID

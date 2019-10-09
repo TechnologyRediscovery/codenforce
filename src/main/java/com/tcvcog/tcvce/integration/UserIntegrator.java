@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorizationPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.UserListified;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -250,17 +251,17 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         UserIntegrator ui = getUserIntegrator();
         UserAuthorizationPeriod rec = new UserAuthorizationPeriod();
         
-        rec.setMuniloginrecordid(rs.getInt("muniauthperiodid"));
+        rec.setMunLoginRecordID(rs.getInt("muniauthperiodid"));
         
         rec.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         rec.setUserID(rs.getInt("authuser_userid"));
-        rec.setDefaultmuni(rs.getBoolean("defaultmuni"));
+        rec.setDefaultMuni(rs.getBoolean("defaultmuni"));
         
         if(rs.getTimestamp("accessgranteddatestart") != null){
-            rec.setAccessgranteddatestart(rs.getTimestamp("accessgranteddatestart").toLocalDateTime());
+            rec.setStartDate(rs.getTimestamp("accessgranteddatestart").toLocalDateTime());
         }
         if(rs.getTimestamp("accessgranteddatestop") != null){
-            rec.setAccessgranteddatestop(rs.getTimestamp("accessgranteddatestop").toLocalDateTime());
+            rec.setStopDate(rs.getTimestamp("accessgranteddatestop").toLocalDateTime());
         }
         if(rs.getTimestamp("recorddeactivatedts") != null){
             rec.setRecorddeactivatedTS(rs.getTimestamp("recorddeactivatedts").toLocalDateTime());
@@ -277,18 +278,60 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return rec;
     }
     
-//    SELECT muniauthperiodid, muni_municode, authuser_userid, defaultmuni, 
-//       accessgranteddatestart, accessgranteddatestop, recorddeactivatedts, 
-//       authorizedrole, createdts, createdby_userid, notes
-//  FROM public.loginmuniauthperiod;
 
     
+    public void insertNewUserAuthorizationPeriod(UserAuthorizationPeriod uap) throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query =  "INSERT INTO public.loginmuniauthperiod(\n" +
+                        "            muniauthperiodid, muni_municode, authuser_userid, defaultmuni, \n" +
+                        "            accessgranteddatestart, accessgranteddatestop, recorddeactivatedts, \n" +
+                        "            authorizedrole, createdts, createdby_userid, notes, supportassignedby)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
+                        "            ?, ?, ?, \n" +
+                        "            CAST (? as role), now(), ?, ?, ?);";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, uap.getMuni().getMuniCode());
+            stmt.setInt(2, uap.getUserID());
+            stmt.setBoolean(3, uap.isDefaultMuni());
+            
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(uap.getStartDate()));
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(uap.getStopDate()));
+            if(uap.getRecorddeactivatedTS() != null){
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(uap.getRecorddeactivatedTS())); 
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            stmt.setString(7, uap.getAuthorizedRole().toString());
+            // created TS by postgres now()
+            stmt.setInt(8, uap.getCreatedBy().getUserID());
+            stmt.setString(9, uap.getNotes());
+            
+            // set support assigned to null until functionality implemented
+            stmt.setNull(10, java.sql.Types.NULL);
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting new authorization period", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+    }
     
     
     public int insertUser(User userToInsert) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query =  "IINSERT INTO public.login(\n" +
+        String query =  "INSERT INTO public.login(\n" +
                         "            userid, username, notes, personlink, \n" +
                         "            active, forcepasswordreset, createdby, createdts, nologinvirtualonly)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
@@ -444,6 +487,27 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return defaultSet;
     }
     
+      public void invalidateUserAuthRecord(UserAuthorizationPeriod uap) throws IntegrationException{
+         Connection con = getPostgresCon();
+        
+         String query = "UPDATE loginmuniauthperiod SET recorddeactivatedts = now() WHERE muniauthperiodid=?";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, uap.getMunLoginRecordID());
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error updating password", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
     
     /**
      * As of September 2019, this method will hash incoming passwords with MD5 before writing to the 
@@ -467,7 +531,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(1, psswd);
             stmt.setInt(2, user.getUserID());
             
-            stmt.execute();
+            stmt.executeUpdate();
             
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -632,12 +696,24 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         }
     }        
     
+    
+    public UserListified getUserListified(User u) throws IntegrationException{
+        UserListified uwl = new UserListified(u);
+        uwl.setUserAuthPeriodList(getUserAuthorizationPeriods(u));
+        return uwl;
+        
+        
+    }
+    
+   
+    
+    
     /**
      * For use by system administrators to manage user data
      * @return
      * @throws IntegrationException 
      */
-    public List getCompleteActiveUserList() throws IntegrationException{
+    public List<User> getCompleteActiveUserList() throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         ArrayList<User> userList = new ArrayList();

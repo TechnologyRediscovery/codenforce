@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorizationPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.UserListified;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.UserIntegrator;
@@ -53,7 +54,7 @@ public class UserConfigBB extends BackingBeanUtils{
     private UserAuthorizationPeriod currentUAP;
     private String freshPasswordCleartext;
     
-    private List<UserAuthorized> userList;
+    private List<UserListified> userList;
     
     private RoleType selectedRoleType;
     private List<RoleType> roleTypeCandidateList;
@@ -64,13 +65,11 @@ public class UserConfigBB extends BackingBeanUtils{
      private int formUserID;
     private RoleType formRoleType;
     private RoleType[] roleTypeArray;
+    
     private String formUsername;
-    
-    private String formPassword;
-    
     private Municipality formMuni;
-    
     private Person formUserPerson;
+    private String formInvalidateRecordReason;
     
     private List<Person> userPersonList;
     private Person selectedUserPerson;
@@ -85,10 +84,10 @@ public class UserConfigBB extends BackingBeanUtils{
         SearchCoordinator searchCoord = getSearchCoordinator();
         
         
-        roleTypeCandidateList = uc.getPermittedRoleTypesToGrant(getSessionBean().getSessionUser());
         try {
-            userList = uc.getUserListForConfig(getSessionBean().getSessionUser());
+            userList = uc.getUsersForConfiguration(getSessionBean().getSessionUser());
             muniCandidateList = sc.getPermittedMunicipalityList(getSessionBean().getSessionUser());
+            roleTypeCandidateList = uc.getPermittedRoleTypesToGrant(getSessionBean().getSessionUser());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -103,8 +102,6 @@ public class UserConfigBB extends BackingBeanUtils{
             System.out.println(ex);
         }
         
-        
-        
     }
     
     public void initiateCreateNewUser(){
@@ -113,18 +110,44 @@ public class UserConfigBB extends BackingBeanUtils{
         
     }
     
+    public void initiateInvalidateUserAuthPeriod(User u, UserAuthorizationPeriod uap){
+        currentUAP = uap;
+        currentUser = u;
+    }
+    
+    public void invalidateAuthPeriod(){
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            uc.invalidateUserAuthPeriod(currentUAP, getSessionBean().getSessionUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully invalidated auth period id" + currentUAP.getMunLoginRecordID(), ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        }
+        
+    }
+    
     public void initiateCreateNewAuthPeriod(){
         UserCoordinator uc = getUserCoordinator();
         currentUAP = uc.initializeNewAuthPeriod(getSessionBean().getSessionUser(), currentUser, getSelectedMuni());
-        
-        
     }
     
     public void commitNewAuthPeriod(){
         UserCoordinator uc = getUserCoordinator();
-        
-        
-        
+        try {
+            uc.insertNewUserAuthorizationPeriod(getSessionBean().getSessionUser(), currentUser, currentUAP);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully added new auth period!", ""));
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        }
     }
     
      public void initiateUserUpdates(User usr){
@@ -195,30 +218,6 @@ public class UserConfigBB extends BackingBeanUtils{
         }
     }
     
-    public void commitPasswordUpdates(ActionEvent ev){
-        
-        UserCoordinator uc = getUserCoordinator();
-        try {
-            uc.updateUserPassword(currentUser, formPassword);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully udpated your password to --> " + formPassword 
-                                    + " <-- Please write this down in a safe place; "
-                                    + "If you lose it, you'll have to make a new one.", ""));
-            formPassword = "";
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update password in DB", ""));
-            
-        } catch (AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Authorization error on password update", ""));
-        }
-    }
     
     
     /**
@@ -262,14 +261,20 @@ public class UserConfigBB extends BackingBeanUtils{
     
     public void resetCurrentUserPassword(){
         UserCoordinator uc = getUserCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
         freshPasswordCleartext = uc.generateRandomPassword();
         try {
             uc.updateUserPassword(currentUser, freshPasswordCleartext);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Password update success! New password for " 
+                        "Password reset success! New password for " 
                                 + currentUser.getUsername() 
                                 + " is now " + freshPasswordCleartext, ""));
+            formInvalidateRecordReason = "";
+            currentUser.setNotes(   sc.formatAndAppendNote(getSessionBean().getSessionUser(), 
+                                    formInvalidateRecordReason, 
+                                    currentUser.getNotes()));
+            uc.updateUser(currentUser);
         } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -283,14 +288,14 @@ public class UserConfigBB extends BackingBeanUtils{
     /**
      * @return the userList
      */
-    public List<UserAuthorized> getUserList() {
+    public List<UserListified> getUserList() {
         return userList;
     }
 
     /**
      * @param userList the userList to set
      */
-    public void setUserList(List<UserAuthorized> userList) {
+    public void setUserList(List<UserListified> userList) {
         this.userList = userList;
     }
 
@@ -420,12 +425,6 @@ public class UserConfigBB extends BackingBeanUtils{
         return formUsername;
     }
 
-    /**
-     * @return the formPassword
-     */
-    public String getFormPassword() {
-        return formPassword;
-    }
 
     /**
      * @return the formMuni
@@ -460,13 +459,6 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void setFormUsername(String formUsername) {
         this.formUsername = formUsername;
-    }
-
-    /**
-     * @param formPassword the formPassword to set
-     */
-    public void setFormPassword(String formPassword) {
-        this.formPassword = formPassword;
     }
 
     /**
@@ -516,6 +508,20 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void setSelectedUserPerson(Person selectedUserPerson) {
         this.selectedUserPerson = selectedUserPerson;
+    }
+
+    /**
+     * @return the formInvalidateRecordReason
+     */
+    public String getFormInvalidateRecordReason() {
+        return formInvalidateRecordReason;
+    }
+
+    /**
+     * @param formInvalidateRecordReason the formInvalidateRecordReason to set
+     */
+    public void setFormInvalidateRecordReason(String formInvalidateRecordReason) {
+        this.formInvalidateRecordReason = formInvalidateRecordReason;
     }
     
 }
