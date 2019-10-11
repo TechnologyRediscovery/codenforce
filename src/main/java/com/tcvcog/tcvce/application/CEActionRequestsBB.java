@@ -956,7 +956,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      */
     public boolean isDisablePACCControl() {
         disablePACCControl = false;
-        if (getSessionBean().getSessionUser().getKeyCard().isHasMuniStaffPermissions() == false) {
+        if (getSessionBean().getSessionUser().getCredential().isHasMuniStaffPermissions() == false) {
             disablePACCControl = true;
         }
         return disablePACCControl;

@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorizationPeriod;
+import com.tcvcog.tcvce.entities.UserAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
@@ -55,7 +55,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     private List<User> userList;
     private UserAuthorized currentUser;
     
-    private UserAuthorizationPeriod currentUserAuthPeriod;
+    private UserAuthPeriod currentUserAuthPeriod;
     
     private int formUserID;
     private RoleType formRoleType;
@@ -447,14 +447,14 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the currentUserAuthPeriod
      */
-    public UserAuthorizationPeriod getCurrentUserAuthPeriod() {
+    public UserAuthPeriod getCurrentUserAuthPeriod() {
         return currentUserAuthPeriod;
     }
 
     /**
      * @param currentUserAuthPeriod the currentUserAuthPeriod to set
      */
-    public void setCurrentUserAuthPeriod(UserAuthorizationPeriod currentUserAuthPeriod) {
+    public void setCurrentUserAuthPeriod(UserAuthPeriod currentUserAuthPeriod) {
         this.currentUserAuthPeriod = currentUserAuthPeriod;
     }
 

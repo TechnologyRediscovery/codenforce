@@ -71,26 +71,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("unable to generate icon", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return styleMap;
     }    
@@ -118,26 +101,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("unable to generate icon", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return style;
 
@@ -185,26 +151,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("unable to generate icon", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return i;
 
@@ -229,20 +178,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("unable to update icon", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
         } // close finally
     }
 
@@ -265,20 +203,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("unable to insert icon", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
         } // close finally
     }
 
@@ -308,26 +235,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to generate icon", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return i;
 
@@ -351,26 +261,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to generate icon", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return iList;
     }
@@ -439,26 +332,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return impList;
     }
@@ -569,26 +445,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return hm;
     }
@@ -642,24 +501,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
             throw new IntegrationException("Exception in MunicipalityIntegrator.getCaseCountsByPhase", ex);
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return caseCountMap;
@@ -693,24 +537,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return bs;
     }
@@ -773,26 +602,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("SystemIntegrator.getIntensityClassList | Unable to get Intensity List", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+          if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return inList;
@@ -823,20 +635,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to update Intensity", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
         }
 
     }
@@ -863,20 +664,8 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             throw new IntegrationException("Cannot insert Intensity Class", ex);
 
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+                if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
 
     }
@@ -896,20 +685,8 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             throw new IntegrationException("Cannot delete Intensity Class", ex);
 
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
 
     }
@@ -934,26 +711,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("SystemIntegrator.getIntensitySchemaList | Unable to get Intensity Schema List", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return inList;

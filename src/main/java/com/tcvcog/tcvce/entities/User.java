@@ -41,11 +41,7 @@ public class User implements Serializable{
     protected String oriNumber;
     
     protected boolean active;
-    protected int createdByUserId;
-    protected LocalDateTime createdTS;
     protected boolean noLoginVirtualUser;
-    protected LocalDateTime pswdLastUpdated;    
-    protected LocalDateTime forcePasswordResetTS;
     
     
     /**
@@ -209,25 +205,8 @@ public class User implements Serializable{
     }
 
     /**
-     * @return the createdByUserId
-     */
-    public int getCreatedByUserId() {
-        return createdByUserId;
-    }
-
-    /**
-     * @return the createdTS
-     */
-    public LocalDateTime getCreatedTS() {
-        return createdTS;
-    }
-
-    /**
      * @return the pswdLastUpdated
      */
-    public LocalDateTime getPswdLastUpdated() {
-        return pswdLastUpdated;
-    }
 
     /**
      * @return the active
@@ -250,19 +229,6 @@ public class User implements Serializable{
         this.active = active;
     }
 
-    /**
-     * @param createdByUserId the createdByUserId to set
-     */
-    public void setCreatedByUserId(int createdByUserId) {
-        this.createdByUserId = createdByUserId;
-    }
-
-    /**
-     * @param createdTS the createdTS to set
-     */
-    public void setCreatedTS(LocalDateTime createdTS) {
-        this.createdTS = createdTS;
-    }
 
     /**
      * @param noLoginVirtualUser the noLoginVirtualUser to set
@@ -270,34 +236,21 @@ public class User implements Serializable{
     public void setNoLoginVirtualUser(boolean noLoginVirtualUser) {
         this.noLoginVirtualUser = noLoginVirtualUser;
     }
-
     /**
      * @param pswdLastUpdated the pswdLastUpdated to set
      */
-    public void setPswdLastUpdated(LocalDateTime pswdLastUpdated) {
-        this.pswdLastUpdated = pswdLastUpdated;
-    }
-
-    
-
     /**
      * @return the forcePasswordResetTS
      */
-    public LocalDateTime getForcePasswordResetTS() {
-        return forcePasswordResetTS;
-    }
-
     /**
      * @param forcePasswordResetTS the forcePasswordResetTS to set
      */
-    public void setForcePasswordResetTS(LocalDateTime forcePasswordResetTS) {
-        this.forcePasswordResetTS = forcePasswordResetTS;
-    }
     /**
      * @return the accessRecord
      */
     /**
      * @param accessRecord the accessRecord to set
      */
+
 
 }

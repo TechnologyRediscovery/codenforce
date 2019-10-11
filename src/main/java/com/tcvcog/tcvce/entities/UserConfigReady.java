@@ -16,28 +16,24 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.domain.AuthorizationException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author sylvia
  */
-public class UserAuthorized extends User{
+public class UserConfigReady extends User{
     
-    private UserAuthCredential credential;
-
-    private Map<Municipality, UserAuthPeriod> muniAuthPeriodMap;
+    private List<UserAuthPeriod> userFullAuthPeriodList;
     
     protected LocalDateTime pswdLastUpdated;
     protected LocalDateTime forcePasswordResetTS;
+    
     protected int createdByUserId;
     protected LocalDateTime createdTS;
 
-    
-    /**
+     /**
      * This constructor is the only way of setting the internals of this
      * security-critical BOB, so all must be assembled by the coordinator
      * and then only read from
@@ -45,7 +41,7 @@ public class UserAuthorized extends User{
      * @param uap
      * @param akc 
      */
-    public UserAuthorized(  User u ){
+    public UserConfigReady(  User u){
         this.userID = u.getUserID();
         this.username = u.getUsername();
         this.person = u.getPerson();
@@ -59,54 +55,17 @@ public class UserAuthorized extends User{
     }
     
     /**
-     * Convenience method for accessing the governingAuthPeriod's
-     * authorized role field
-     * @return 
+     * @return the userFullAuthPeriodList
      */
-    public RoleType getRoleType(){
-        if(credential != null){
-            if(credential.getGoverningAuthPeriod() != null){
-                return credential.getGoverningAuthPeriod().getRole();
-            } 
-        } 
-        return null;
-    }
-
-
-    public void setCredential(UserAuthCredential cr) throws AuthorizationException{
-        if(cr != null && cr.getGoverningAuthPeriod().getUserID() == userID){
-            credential = cr;
-        }
-        else {
-            throw new AuthorizationException("cannot set a credential to NULL or one without matching userID in AuthPeriod");
-        }
-    }
-    /**
-     * @return the credential
-     */
-    public UserAuthCredential getCredential() {
-        return credential;
+    public List<UserAuthPeriod> getUserFullAuthPeriodList() {
+        return userFullAuthPeriodList;
     }
 
     /**
-     * @param validAuthPeriodList the validAuthPeriodList to set
+     * @param userFullAuthPeriodList the userFullAuthPeriodList to set
      */
-    public void setValidAuthPeriodList(Map<Municipality, UserAuthPeriod>validAuthPeriodList) {
-        this.setMuniAuthPeriodMap(validAuthPeriodList);
-    }
-
-    /**
-     * @return the muniAuthPeriodMap
-     */
-    public Map<Municipality, UserAuthPeriod> getMuniAuthPeriodMap() {
-        return muniAuthPeriodMap;
-    }
-
-    /**
-     * @param muniAuthPeriodMap the muniAuthPeriodMap to set
-     */
-    public void setMuniAuthPeriodMap(Map<Municipality, UserAuthPeriod> muniAuthPeriodMap) {
-        this.muniAuthPeriodMap = muniAuthPeriodMap;
+    public void setUserFullAuthPeriodList(List<UserAuthPeriod> userFullAuthPeriodList) {
+        this.userFullAuthPeriodList = userFullAuthPeriodList;
     }
 
     /**
@@ -173,6 +132,8 @@ public class UserAuthorized extends User{
     /**
      * @param accessRecord the accessRecord to set
      */
-
+            
+            
+    
     
 }

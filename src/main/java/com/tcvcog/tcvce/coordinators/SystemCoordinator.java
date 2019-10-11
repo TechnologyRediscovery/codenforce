@@ -106,20 +106,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable{
         return muniCodeNameMap;
     }
     
-    
-      public List<Municipality> getPermittedMunicipalityList(UserAuthorized user) throws IntegrationException{
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        List<Municipality> muniList = new ArrayList<>();
-        if(user.getKeyCard().getAuthRole() == RoleType.Developer){
-            muniList.addAll(mi.getMuniList());
-        } else {
-            muniList.add(user.getGoverningAuthPeriod().getMuni());
-        }
-        
-        return muniList;
-    }
-    
-  
+   
 
     /**
      * @param muniCodeNameMap the muniCodeNameMap to set

@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.MuniCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
@@ -125,6 +126,7 @@ public class BackingBeanUtils implements Serializable{
     private SystemIntegrator systemIntegrator;
     private SystemCoordinator systemCoordinator;
     private LogIntegrator logIntegrator;
+    private MuniCoordinator muniCoordinator;
     
     private SearchCoordinator searchCoordinator;
     
@@ -881,6 +883,25 @@ public class BackingBeanUtils implements Serializable{
      */
     public void setBlobIntegrator(BlobIntegrator blobIntegrator) {
         this.blobIntegrator = blobIntegrator;
+    }
+
+    /**
+     * @return the muniCoordinator
+     */
+    public MuniCoordinator getMuniCoordinator() {
+        
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{muniCoordinator}", MuniCoordinator.class);
+        muniCoordinator = (MuniCoordinator) ve.getValue(context.getELContext());
+        return muniCoordinator;
+    }
+
+    /**
+     * @param muniCoordinator the muniCoordinator to set
+     */
+    public void setMuniCoordinator(MuniCoordinator muniCoordinator) {
+        this.muniCoordinator = muniCoordinator;
     }
 
        

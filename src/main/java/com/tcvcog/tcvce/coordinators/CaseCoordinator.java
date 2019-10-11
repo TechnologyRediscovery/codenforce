@@ -723,7 +723,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     public void novResetMailing(NoticeOfViolation nov, UserAuthorized user) throws IntegrationException, PermissionsException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
-        if(user.getKeyCard().isHasSysAdminPermissions()){
+        if(user.getCredential().isHasSysAdminPermissions()){
             cvi.novResetMailingFieldsToNull(nov);
         } else {
             throw new PermissionsException("User does not have sufficient acces righst to clear notice mailing fields");
@@ -739,7 +739,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         try {
-            nov.setStyle(si.getPrintStyle(mi.getMuniComplete(m.getMuniCode()).getDefaultNOVStyleID()));
+            nov.setStyle(si.getPrintStyle(mi.getMuniListified(m.getMuniCode()).getDefaultNOVStyleID()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -947,13 +947,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
    public boolean determineCEActionRequestRoutingActionEnabledStatus(
                                                         CEActionRequest req,
                                                         UserAuthorized u ){
-       if(req != null && u.getKeyCard() != null){
+       if(req != null && u.getCredential() != null){
             if((
                     req.getRequestStatus().getStatusID() == 
                     Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                             .getString("actionRequestInitialStatusCode")))
                     && 
-                    u.getKeyCard().isHasEnfOfficialPermissions()
+                    u.getCredential().isHasEnfOfficialPermissions()
                 ){
                 return true;
             }

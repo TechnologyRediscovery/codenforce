@@ -18,29 +18,33 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
  * @author sylvia
  */
-public class UserAuthorizationPeriod extends EntityUtils implements Serializable {
+public class UserAuthPeriod extends EntityUtils implements Serializable {
     
-  private int munLoginRecordID;
+  private int userAuthPeriodID;
   
   private Municipality muni;
   private int userID;
-  private boolean defaultMuni;
-  
+
+  private List<UserAuthCredentialLogEntry> useLog;
+
   private LocalDateTime startDate;
   private LocalDateTime stopDate;
   
   private LocalDateTime recorddeactivatedTS;
-  private RoleType authorizedRole;
+  private RoleType role;
   
   private LocalDateTime createdTS;
 
-  private User createdBy;
+  private int createdByUserID;
   private String notes;
+  
+  private int assignmentRank;
   
   
     /**
@@ -48,11 +52,11 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
      * mischevious activities by downstream users
      * @param m 
      */
-    public UserAuthorizationPeriod(Municipality m){
+    public UserAuthPeriod(Municipality m){
         muni = m;
     }
 
-    public UserAuthorizationPeriod() {
+    public UserAuthPeriod() {
     }
   
   
@@ -61,13 +65,6 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
      */
     public int getUserID() {
         return userID;
-    }
-
-    /**
-     * @return the defaultMuni
-     */
-    public boolean isDefaultMuni() {
-        return defaultMuni;
     }
 
     /**
@@ -94,17 +91,17 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
     }
 
     /**
-     * @return the authorizedRole
+     * @return the role
      */
-    public RoleType getAuthorizedRole() {
-        return authorizedRole;
+    public RoleType getRole() {
+        return role;
     }
 
     /**
-     * @return the munLoginRecordID
+     * @return the userAuthPeriodID
      */
-    public int getMunLoginRecordID() {
-        return munLoginRecordID;
+    public int getUserAuthPeriodID() {
+        return userAuthPeriodID;
     }
 
    
@@ -115,12 +112,6 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
         this.userID = userID;
     }
 
-    /**
-     * @param defaultMuni the defaultMuni to set
-     */
-    public void setDefaultMuni(boolean defaultMuni) {
-        this.defaultMuni = defaultMuni;
-    }
 
     /**
      * @param startDate the startDate to set
@@ -145,17 +136,17 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
     }
 
     /**
-     * @param authorizedRole the authorizedRole to set
+     * @param role the role to set
      */
-    public void setAuthorizedRole(RoleType authorizedRole) {
-        this.authorizedRole = authorizedRole;
+    public void setRole(RoleType role) {
+        this.role = role;
     }
 
     /**
-     * @param munLoginRecordID the munLoginRecordID to set
+     * @param userAuthPeriodID the userAuthPeriodID to set
      */
-    public void setMunLoginRecordID(int munLoginRecordID) {
-        this.munLoginRecordID = munLoginRecordID;
+    public void setUserAuthPeriodID(int userAuthPeriodID) {
+        this.userAuthPeriodID = userAuthPeriodID;
     }
 
    
@@ -189,22 +180,6 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
         this.createdTS = createdTS;
     }
 
-   
-  
-
-    /**
-     * @return the createdBy
-     */
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    /**
-     * @param createdBy the createdBy to set
-     */
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
-    }
 
     /**
      * @return the notes
@@ -218,6 +193,48 @@ public class UserAuthorizationPeriod extends EntityUtils implements Serializable
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the useLog
+     */
+    public List<UserAuthCredentialLogEntry> getUseLog() {
+        return useLog;
+    }
+
+    /**
+     * @param useLog the useLog to set
+     */
+    public void setUseLog(List<UserAuthCredentialLogEntry> useLog) {
+        this.useLog = useLog;
+    }
+
+    /**
+     * @return the createdByUserID
+     */
+    public int getCreatedByUserID() {
+        return createdByUserID;
+    }
+
+    /**
+     * @param createdByUserID the createdByUserID to set
+     */
+    public void setCreatedByUserID(int createdByUserID) {
+        this.createdByUserID = createdByUserID;
+    }
+
+    /**
+     * @return the assignmentRank
+     */
+    public int getAssignmentRank() {
+        return assignmentRank;
+    }
+
+    /**
+     * @param assignmentRank the assignmentRank to set
+     */
+    public void setAssignmentRank(int assignmentRank) {
+        this.assignmentRank = assignmentRank;
     }
     
 }

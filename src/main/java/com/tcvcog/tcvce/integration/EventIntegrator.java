@@ -734,7 +734,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if(event.getOwner() != null){
                 stmt.setInt(4, event.getOwner().getUserID());
             } else {
-                stmt.setInt(4, uc.getRobotUser().getUserID());
+                stmt.setInt(4, uc.getUserRobot().getUserID());
             }
             stmt.setBoolean(5, event.isDiscloseToMunicipality());
 
@@ -1588,7 +1588,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if(erop.getAttachedBy() != null){
                 stmt.setInt(4, erop.getAttachedBy().getUserID());
             } else {
-                stmt.setInt(4, uc.getRobotUser().getUserID());
+                stmt.setInt(4, uc.getUserRobot().getUserID());
              
             }
             

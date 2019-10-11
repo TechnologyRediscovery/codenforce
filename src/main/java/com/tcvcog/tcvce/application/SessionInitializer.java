@@ -86,8 +86,8 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @throws com.tcvcog.tcvce.domain.CaseLifecycleException
      */
     public String initiateInternalSession() throws IntegrationException, CaseLifecycleException, SQLException{
-        String authUserName = getContainerAuthenticatedUser();
-        return configureSession(authUserName, null);
+        UserCoordinator uc = getUserCoordinator();
+        return configureSession(uc.getUser(uc.getUserID(getContainerAuthenticatedUser())), null);
     }
 
     /**
@@ -107,42 +107,45 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * and subsequent changes to the current municipality. It does the work
      * of gathering all necessary info for session config
      * 
-     * @param userName
+     * @param u
      * @param muni
      * @return nav string
      * @throws CaseLifecycleException
      * @throws IntegrationException 
      */
-    public String configureSession(String userName, Municipality muni) throws CaseLifecycleException, IntegrationException{
+    public String configureSession(User u, Municipality muni) throws CaseLifecycleException, IntegrationException{
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         try {
             // The central call which initiates the User's session for a particular municipality
-            UserAuthorized authUser = uc.requestUserMuniAuthorization(userName, muni);
+            UserAuthorized authUser = uc.authorizeUser(u, muni);
             
             // as long as we have an actual user, proceed with session config
             if(authUser != null){
                 // The stadnard Municipality object is simple, but we need the full deal
-                MunicipalityListified muniComplete = mi.getMuniComplete(authUser.getKeyCard().getMuni().getMuniCode());
+                MunicipalityListified muniListified = 
+                        mi.getMuniListified(authUser.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode());
                 
                 // load up our SessionBean with its key objects
-                getSessionBean().setSessionMuni(muniComplete);
+                getSessionBean().setSessionMuni(muniListified);
                 getSessionBean().setSessionUser(authUser);
-                getSessionBean().setActiveCodeSet(muniComplete.getCodeSet());
+                getSessionBean().setActiveCodeSet(muniListified.getCodeSet());
                 
                 // our new UserAuthorized has a Map of municipalities as keys
                 // and the MuniAuthPeriod record as the value. Grab the keys as a set
                 // and turn them into a List which we can display to the UI
-                getSessionBean().setUserAuthMuniList(new ArrayList<>(authUser.getMuniAuthPerMap().keySet()));
+                getSessionBean().setUserAuthMuniList(new ArrayList<>(authUser.getMuniAuthPeriodMap().keySet()));
                 
-                populateSessionObjectQueues(authUser, muniComplete);
+                populateSessionObjectQueues(authUser, muniListified);
                 
                 getLogIntegrator().makeLogEntry(authUser.getUserID(), getSessionID(), 
                         Integer.parseInt(getResourceBundle(Constants.LOGGING_CATEGORIES).getString("login")), 
                          "SessionInitializer.initiateInternalSession | Created internal session", false, false);
-                System.out.println("SessionInitializer.initiateInternalSession | auth user: " + authUser.getKeyCard().getAuthRole());
+               return "success";
+            } else {
+                return "noAuth";
             }
         
         } catch (IntegrationException ex) {
@@ -153,14 +156,13 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, 
                     "Integration module error. Unable to connect your server user to the COG system user.", 
                     "Please contact system administrator Eric Darsow at 412.923.9907"));
-            return "failure";
+            return "";
         } catch (AuthorizationException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Auth exception");
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
-            return "failure";
+            return "";
         }
-        return "success";
     }
     
         
@@ -190,7 +192,6 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 //        
 //        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         
-//        sessionBean.setSessionCECase(caseInt.getCECase(ua.getGoverningAuthPeriod().getDefaultCECaseID()));
         sessionBean.setSessionProperty(propI.getProperty(m.getMuniOfficePropertyId()));
         sessionBean.setSessionPerson(ua.getPerson());
         

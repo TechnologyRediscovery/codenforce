@@ -28,7 +28,7 @@
                                              icon="fa fa-plus" 
                                              actionListener="#{userConfigBB.initiateCreateNewUser}"
                                              oncomplete="PF('user-addupdate-dialog').show()"
-                                             rendered="#{sessionBean.sessionUser.keyCard.hasSysAdminPermissions}"
+                                             rendered="#{sessionBean.sessionUser.credential.hasSysAdminPermissions}"
                                              update="
                                             "/>
 
@@ -136,14 +136,14 @@
                                              icon="fa fa-plus" 
                                              actionListener="#{userConfigBB.initiateCreateNewAuthPeriod}"
                                              oncomplete="PF('user-authorizations-dialog-var').show()"
-                                             rendered="#{sessionBean.sessionUser.keyCard.hasSysAdminPermissions}"
+                                             rendered="#{sessionBean.sessionUser.credential.hasSysAdminPermissions}"
                                              update="user-authorizations-dialog"/>
                                         
 
                                          <p:dataTable
                                             id="userTable"
                                             var="period"
-                                            value="#{user.userAuthPeriodList}"
+                                            value="#{user.userFullAuthPeriodList}"
                                             rowKey="#{period.muniLoginRecordID}"
                                             tableStyleClass="primeDataTable">
                                                 <p:column>
@@ -302,7 +302,7 @@
                                          <p:outputLabel  for="aup-roletype-som" value="Role type"/>
                                             <p:selectOneMenu id="aup-roletype-som" 
                                                              required="true" 
-                                                             value="#{userConfigBB.currentUAP.authorizedRole}">
+                                                             value="#{userConfigBB.currentUAP.role}">
                                                 <f:selectItem itemLabel="select a role..." noSelectionOption="true" />
                                                 <f:selectItems value="#{userConfigBB.roleTypeCandidateList}"  var="rt" itemValue="#{rt}" 
                                                                itemLabel="#{rt.label}, rank #{rt.rank}"/>

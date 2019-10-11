@@ -510,6 +510,7 @@
 
 
     <navigation-rule> 
+        <from-view-id>/restricted/initiateInternalSession.xhtml</from-view-id>  
         <navigation-case>
             <from-outcome>success</from-outcome>
             <to-view-id>/restricted/missionControl.xhtml</to-view-id>
@@ -517,8 +518,8 @@
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>failure</from-outcome>
-            <to-view-id>/restricted/error.xhtml</to-view-id>
+            <from-outcome>noAuth</from-outcome>
+            <to-view-id>/restricted/noAuth.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
@@ -1620,4 +1621,9 @@
         <managed-bean-name>userConfigBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.UserConfigBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>muniCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.MuniCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
 </faces-config>

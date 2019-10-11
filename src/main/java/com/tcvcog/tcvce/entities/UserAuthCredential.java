@@ -14,11 +14,10 @@ import java.io.Serializable;
  *  
  * @author Ellen Bascomb
  */
-public class AccessKeyCard implements Serializable{
+public class UserAuthCredential implements Serializable{
 
-    private final int userID;
-    private final Municipality muni;
-    private final RoleType authRole;
+    private final UserAuthPeriod governingAuthPeriod;
+    
     private final boolean hasDeveloperPermissions;
     private final boolean hasSysAdminPermissions;
     private final boolean hasCOGStaffPermissions;
@@ -26,25 +25,23 @@ public class AccessKeyCard implements Serializable{
     private final boolean hasMuniStaffPermissions;
     private final boolean hasMuniReaderPermissions;
 
-    public AccessKeyCard(   int uid,
-                            Municipality m, 
-                            RoleType rt,
-                            boolean dev,
-                            boolean admin,
-                            boolean cogstaff,
-                            boolean ceo,
-                            boolean munistaff,
-                            boolean munireader){
-        userID = uid;
-        muni = m;
-        authRole = rt;
+    public UserAuthCredential(  UserAuthPeriod uap,
+                                boolean dev,
+                                boolean admin,
+                                boolean cogstaff,
+                                boolean ceo,
+                                boolean munistaff,
+                                boolean munireader){
+        
+        governingAuthPeriod = uap;
+        
         hasDeveloperPermissions = dev;
         hasSysAdminPermissions = admin;
         hasCOGStaffPermissions = cogstaff;
         hasEnfOfficialPermissions = ceo;
         hasMuniStaffPermissions = munistaff;
         hasMuniReaderPermissions = munireader;
-        
+    
     }
 
 
@@ -91,27 +88,10 @@ public class AccessKeyCard implements Serializable{
     }
 
     /**
-     * @return the muni
+     * @return the governingAuthPeriod
      */
-    public Municipality getMuni() {
-        return muni;
+    public UserAuthPeriod getGoverningAuthPeriod() {
+        return governingAuthPeriod;
     }
-
-    /**
-     * @return the authRole
-     */
-    public RoleType getAuthRole() {
-        return authRole;
-    }
-
-    /**
-     * @return the userID
-     */
-    public int getUserID() {
-        return userID;
-    }
-    
-    
-    
     
 }

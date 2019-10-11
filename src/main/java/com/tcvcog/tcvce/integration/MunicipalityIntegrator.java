@@ -18,6 +18,7 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.MuniCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -88,7 +89,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
     }
     
-    public MunicipalityListified getMuniComplete(int muniCode) throws IntegrationException{
+    public MunicipalityListified getMuniListified(int muniCode) throws IntegrationException{
         PreparedStatement stmt = null;
         MunicipalityListified muniComplete = null;
         Connection con = null;
@@ -142,6 +143,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         UserIntegrator ui = getUserIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
         PropertyIntegrator pi = getPropertyIntegrator();
+        MuniCoordinator mc = getMuniCoordinator();
         
         MunicipalityListified muni = new MunicipalityListified(generateMuni(rs));
         
@@ -407,6 +409,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     /**
      * Users are permitted access to a set of municipalities which are all dumped
      * into a List by this method during the user lookup process.
+     * @deprecated 
      * @param uid
      * @return A list of Municipalities to which the user should be granted data-related
      * access within their user type domain

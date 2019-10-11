@@ -112,8 +112,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
         try {
             eventList = ec.queryEvents( searchParams, 
-                                        getSessionBean().getSessionUser(), 
-                                        getSessionBean().getUserAuthMuniList());
+                                        getSessionBean().getSessionUser());
             if(eventList != null){
                 Collections.sort(eventList);
                 Collections.reverse(eventList);
