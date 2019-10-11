@@ -24,17 +24,12 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
 import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Icon;
-import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityListified;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
@@ -42,7 +37,6 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.Proposable;
 import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectableStatus;
@@ -75,14 +69,10 @@ import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sound.midi.SysexMessage;
 
 /**
  *
@@ -349,7 +339,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * Updates DB to mark the passed in OccInspection the governing one in the 
      * given OccPeriod
      * @param period
-     * @param insp to be made governing
      * @return the governing Inspection
      * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
      */
@@ -444,10 +433,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @param in A skeleton of an OccInspection without an ID number
      * @param tem
      * @param period the OccPeriod to which the OccInspection should be linked
-     * @param templ The template from which the Inspection will draw its
-     * SpaceTypes
      * @param user The current user who will become the Inspector
-     * @param muni The current Muni
      * @return An OccInspection object with the ID given in the DB and a
      * configured Template inside
      * @throws InspectionException

@@ -17,15 +17,20 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.Payment;
-import java.util.List;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
+import java.util.ArrayList;
 
 /**
  * Implements business logic related to payments.
  * 
  * @author NADGIT and SYLVIA
  */
-public class PaymentCoordinator {
+public class PaymentCoordinator extends BackingBeanUtils {
 
     /**
      * Creates a new instance of PaymentCoordinator
@@ -45,5 +50,14 @@ public class PaymentCoordinator {
         
         
     }
+    
+    public void insertAutoAssignedFees(OccPeriod period) throws IntegrationException{
+
+    PaymentIntegrator pi = getPaymentIntegrator();
+        
+    ArrayList<Fee> feeList = (ArrayList<Fee>) pi.getFeeList(period.getType());
+    
+    }
+    
     
 }

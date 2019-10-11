@@ -25,8 +25,6 @@ import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
