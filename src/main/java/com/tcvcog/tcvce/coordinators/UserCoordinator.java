@@ -30,6 +30,8 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.UserConfigReady;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -73,7 +75,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
          return ui.getUserID(userName);
      }
     
-    private Municipality determineDefaultMuni(  UserAuthorized ua, 
+    private Municipality determineInitMuni(  UserAuthorized ua, 
                                                 Map<Municipality, UserAuthPeriod> muniPerMap) 
                                                         throws AuthorizationException{
         Municipality initMuni = null;
@@ -84,6 +86,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         if(ua ==  null || muniPerMap == null || muniPerMap.isEmpty()){
             throw new AuthorizationException("Suspicious call to configInitialUserAuth; no AuthUser supplied");
         }
+        // interate over each municipality to which the user has a valid AuthPeriod
         for (Municipality mu : muniPerMap.keySet()) {
             workingUAP = muniPerMap.get(mu);
             if(initMuni == null || workingUAP.getAssignmentRank() > maxRank) {
@@ -92,6 +95,16 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
         return initMuni;
+    }
+    
+    public boolean validateUserMuniAuthPeriod(UserAuthPeriod uap){
+        boolean valid = true;
+        if(         uap.getRecorddeactivatedTS() == null 
+                ||  uap.getStartDate().isBefore(LocalDateTime.now())
+                ||  uap.getStopDate().isAfter(LocalDateTime.now())){
+            valid = false;
+        }
+        return valid;
     }
     
     public String generateRandomPassword(){
@@ -134,7 +147,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                 wuap = muniAuthMap.get(muni);
             } else {
                 // first authorization so figure out which muni to load up first
-                wuap = muniAuthMap.get(determineDefaultMuni(usrAuth, muniAuthMap));
+                wuap = muniAuthMap.get(determineInitMuni(usrAuth, muniAuthMap));
             }
             // setup our UserAuthorized for letting lose
             usrAuth.setCredential(generateCredential(wuap));
@@ -162,13 +175,11 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         List<UserAuthPeriod> candidatePeriods;
         Map<Municipality, UserAuthPeriod> muniPerMap = new HashMap<>();
         
-        candidatePeriods = ui.getUserAuthorizationPeriods(u);
+        candidatePeriods = ui.getUserAuthPeriods(u);
         if(!candidatePeriods.isEmpty()){
             for(UserAuthPeriod uap: candidatePeriods){
                 // Filter out deactivated records and expired records
-                if(uap.getRecorddeactivatedTS() == null 
-                        && uap.getStartDate().isBefore(LocalDateTime.now())
-                        && uap.getStopDate().isAfter(LocalDateTime.now())){
+                if(validateUserMuniAuthPeriod(uap)){
                     //  check for existing muni periods and use the most recent valid period
                     if(muniPerMap.containsKey(uap.getMuni())){
                         UserAuthPeriod existingRecord = muniPerMap.get(uap.getMuni());
@@ -210,6 +221,19 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
         return rtlAuthorized;
+    }
+    
+    public UserMuniAuthPeriodLogEntry assembleUserMuniAuthPeriodLogEntrySkeleton(
+                                        UserAuthorized ua, 
+                                        UserMuniAuthPeriodLogEntryCatEnum cat){
+        UserMuniAuthPeriodLogEntry skel = new UserMuniAuthPeriodLogEntry();
+        skel.setAuthPeriod(ua.getCredential().getGoverningAuthPeriod());
+        return skel;
+    }
+    
+    public void logCredentialInvocation(UserMuniAuthPeriodLogEntry entry) throws IntegrationException, AuthorizationException{
+        UserIntegrator ui = getUserIntegrator();
+        ui.insertMuniAuthPeriodLogEntry(entry);
     }
     
     public void insertNewUserAuthorizationPeriod(User requestingUser, User usee, UserAuthPeriod uap) throws AuthorizationException, IntegrationException{
@@ -403,6 +427,19 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return ui.getUser(userID);
     }
     
+    public List<UserAuthorized> getUserList(Municipality m) throws IntegrationException, AuthorizationException{
+        UserIntegrator ui = getUserIntegrator();
+        List<UserAuthorized> ual = ui.getUserAuthorizedList(m);
+        for(UserAuthorized usrAuth: ual){
+            if(validateUserMuniAuthPeriod(usrAuth.getCredential().getGoverningAuthPeriod())){
+                if(!ual.contains(usrAuth)){
+                    ual.add(usrAuth);
+                }
+            }
+        }
+        return ual;
+    }
+    
    
      /**
       * Given a single user, coordinates the creation of a list of Users who 
@@ -424,17 +461,21 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                     case SysAdmin:
                         if(u.getRoleType() != RoleType.Developer){
                             userAllowedList.add(ui.getUserConfigReady(u));
+                            break;
                         } else {
                             break;
-                            
                         }
-
+                    
+                    case Developer:
+                        userAllowedList.add(ui.getUserConfigReady(u));
+                        break;
+                    
+                    default:
+                        break;
                 }
-             
-                 
              } // user for
          } // muni for
-         return uListConfig;
+         return userAllowedList;
      }
     
      /**

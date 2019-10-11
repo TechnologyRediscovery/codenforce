@@ -31,7 +31,7 @@ public class UserAuthPeriod extends EntityUtils implements Serializable {
   private Municipality muni;
   private int userID;
 
-  private List<UserAuthCredentialLogEntry> useLog;
+  private List<UserMuniAuthPeriodLogEntry> useLog;
 
   private LocalDateTime startDate;
   private LocalDateTime stopDate;
@@ -198,14 +198,14 @@ public class UserAuthPeriod extends EntityUtils implements Serializable {
     /**
      * @return the useLog
      */
-    public List<UserAuthCredentialLogEntry> getUseLog() {
+    public List<UserMuniAuthPeriodLogEntry> getUseLog() {
         return useLog;
     }
 
     /**
      * @param useLog the useLog to set
      */
-    public void setUseLog(List<UserAuthCredentialLogEntry> useLog) {
+    public void setUseLog(List<UserMuniAuthPeriodLogEntry> useLog) {
         this.useLog = useLog;
     }
 

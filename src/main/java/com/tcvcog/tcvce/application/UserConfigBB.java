@@ -81,7 +81,7 @@ public class UserConfigBB extends BackingBeanUtils{
     public void initBean(){
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
-        setSelectedMuni(getSessionBean().getSessionMuni());
+        setSelectedMuni(getSessionBean().getSessionMuniHeavy());
         SearchCoordinator searchCoord = getSearchCoordinator();
         MuniCoordinator mc = getMuniCoordinator();
         
@@ -89,7 +89,7 @@ public class UserConfigBB extends BackingBeanUtils{
             userList = uc.getUsersForConfiguration(getSessionBean().getSessionUser());
             muniCandidateList = mc.getPermittedMunicipalityList(getSessionBean().getSessionUser());
             roleTypeCandidateList = uc.getPermittedRoleTypesToGrant(getSessionBean().getSessionUser());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
         }
         

@@ -22,7 +22,7 @@
                         </h:messages>
                         
                         <h:form id="missionControlForm">
-                            <h1><h:outputText value="codeNforce Dashboard: #{sessionBean.sessionMuni.muniName}"/> </h1>
+                            <h1><h:outputText value="codeNforce Dashboard: #{sessionBean.sessionMuniHeavy.muniName}"/> </h1>
                         
                             <p:dashboard model="#{missionControlBB.mainDash}">
                             
@@ -202,7 +202,7 @@
                                          closable="true"
                                          toggleable="true"
                                          header="Switch session municipality"
-                                         rendered="#{missionControlBB.currentUser.keyCard.hasMuniReaderPermissions }"
+                                         rendered="true"
                                          footer=""
                                          toggleableHeader="true"
                                          menuTitle="">
@@ -233,7 +233,7 @@
                                          closable="true"
                                          toggleable="true"
                                          header="Switch your user"
-                                         rendered="#{missionControlBB.currentUser.keyCard.hasSysAdminPermissions}"
+                                         rendered="true"
                                          footer=""
                                          toggleableHeader="true"
                                          menuTitle="">

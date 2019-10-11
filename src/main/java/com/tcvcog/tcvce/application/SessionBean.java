@@ -58,7 +58,9 @@ import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Stores member vars of pretty much all our custom types
@@ -79,9 +81,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<Municipality> userAuthMuniList;
 
     // BOB individual object session shelves - NOT NULL
-    private MunicipalityListified sessionMuni;
+    private MunicipalityDataHeavy sessionMuniHeavy;
     private UserAuthorized sessionUser;
-    
     
     private CECase sessionCECase;
     private Property sessionProperty;
@@ -202,13 +203,22 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     public NoticeOfViolation getSessionNotice() {
         return sessionNotice;
     }
+    
+    public void setActiveCodeSet(CodeSet cs){
+        activeCodeSet = cs;
+    }
 
     
 
     /**
+     * Adaptor method to preserve backward compatability;
+     * The MuniHeavy stores the active copy of these 
      * @return the activeCodeSet
      */
     public CodeSet getActiveCodeSet() {
+//        if(sessionMuniHeavy != null){
+//            activeCodeSet = sessionMuniHeavy.getCodeSet();
+//        }
         return activeCodeSet;
     }
 
@@ -278,14 +288,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.sessionNotice = sessionNotice;
     }
 
- 
-
-    /**
-     * @param activeCodeSet the activeCodeSet to set
-     */
-    public void setActiveCodeSet(CodeSet activeCodeSet) {
-        this.activeCodeSet = activeCodeSet;
-    }
 
     /**
      * @param sessionCitation the sessionCitation to set
@@ -351,17 +353,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the sessionMuni
+     * @return the sessionMuniHeavy
      */
-    public MunicipalityListified getSessionMuni() {
-        return sessionMuni;
+    public MunicipalityDataHeavy getSessionMuniHeavy() {
+        return sessionMuniHeavy;
     }
 
     /**
-     * @param sessionMuni the sessionMuni to set
+     * @param sessionMuniHeavy the sessionMuniHeavy to set
      */
-    public void setSessionMuni(MunicipalityListified sessionMuni) {
-        this.sessionMuni = sessionMuni;
+    public void setSessionMuniHeavy(MunicipalityDataHeavy sessionMuniHeavy) {
+        this.sessionMuniHeavy = sessionMuniHeavy;
     }
 
     /**
@@ -460,15 +462,18 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      * @return the userAuthMuniList
      */
     public List<Municipality> getUserAuthMuniList() {
+        Set<Municipality> muniSet;
+        List<Municipality> muniList;
+        if(sessionUser != null && sessionUser.getMuniAuthPeriodMap() != null){
+            muniSet = sessionUser.getMuniAuthPeriodMap().keySet();
+            muniList = new ArrayList<>(muniSet);
+            userAuthMuniList = muniList;
+        }
+        
         return userAuthMuniList;
     }
 
-    /**
-     * @param userAuthMuniList the userAuthMuniList to set
-     */
-    public void setUserAuthMuniList(List<Municipality> userAuthMuniList) {
-        this.userAuthMuniList = userAuthMuniList;
-    }
+   
 
     /**
      * @return the sessionCEAR

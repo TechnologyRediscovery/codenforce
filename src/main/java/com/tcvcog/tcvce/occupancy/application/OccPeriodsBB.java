@@ -55,7 +55,7 @@ public class OccPeriodsBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
+        occPeriodTypeList = getSessionBean().getSessionMuniHeavy().getProfile().getOccPeriodTypeList();
     }
     
      public void commenceOccInspection(){

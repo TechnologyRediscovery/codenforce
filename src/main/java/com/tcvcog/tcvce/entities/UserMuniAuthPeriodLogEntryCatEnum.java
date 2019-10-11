@@ -14,27 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.util;
+package com.tcvcog.tcvce.entities;
 
 /**
  *
  * @author sylvia
  */
-public enum UserCredentialExClassesEnum {
+public enum UserMuniAuthPeriodLogEntryCatEnum {
+    SESSION_INIT("Session initialized", 
+            100, 
+            "User has been authenticated by JBoss and authorized by codeNforce coordinator");
     
-    CREATE_INITIAL_SESSION,
-    CREATE_SECONDARY_SESSION;
+    private final String title;
+    private final int logLevel;
+    private final String desc;
     
-    /**
-     *
-     */
-    public final boolean pinkFlag;
-    public final boolean redFlag;
-    
-    UserCredentialExClassesEnum(boolean pink, boolean red){
-        pinkFlag = pink;
-        redFlag = red;
-        
+    private UserMuniAuthPeriodLogEntryCatEnum(String t, int ll, String d){
+        this.title = t;
+        this.logLevel = ll;
+        this.desc = d;
     }
+    
     
 }

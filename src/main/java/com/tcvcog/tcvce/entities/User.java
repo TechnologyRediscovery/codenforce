@@ -43,6 +43,9 @@ public class User implements Serializable{
     protected boolean active;
     protected boolean noLoginVirtualUser;
     
+    protected int createdByUserId;
+    protected LocalDateTime createdTS;
+    
     
     /**
      * Creates a new instance of User
@@ -236,6 +239,43 @@ public class User implements Serializable{
     public void setNoLoginVirtualUser(boolean noLoginVirtualUser) {
         this.noLoginVirtualUser = noLoginVirtualUser;
     }
+
+    /**
+     * @return the createdByUserId
+     */
+    public int getCreatedByUserId() {
+        return createdByUserId;
+    }
+
+    /**
+     * @return the createdTS
+     */
+    public LocalDateTime getCreatedTS() {
+        return createdTS;
+    }
+
+    /**
+     * @return the pswdLastUpdated
+     */
+    /**
+     * @param createdByUserId the createdByUserId to set
+     */
+    public void setCreatedByUserId(int createdByUserId) {
+        this.createdByUserId = createdByUserId;
+    }
+
+    /**
+     * @param createdTS the createdTS to set
+     */
+    public void setCreatedTS(LocalDateTime createdTS) {
+        this.createdTS = createdTS;
+    }
+    /**
+     * @return the accessRecord
+     */
+    /**
+     * @param accessRecord the accessRecord to set
+     */
     /**
      * @param pswdLastUpdated the pswdLastUpdated to set
      */

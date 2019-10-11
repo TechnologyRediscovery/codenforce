@@ -22,9 +22,9 @@ import java.time.LocalDateTime;
  *
  * @author sylvia
  */
-public class UserAuthCredentialLogEntry {
+public class UserMuniAuthPeriodLogEntry {
     
-    private int authCredentialLogEntryID;
+    private int muniAuthPeriodID;
     private UserAuthPeriod authPeriod;
     private String category;
     private LocalDateTime entryTS;
@@ -43,10 +43,10 @@ public class UserAuthCredentialLogEntry {
     private int audit_muni_municode;    
 
     /**
-     * @return the authCredentialLogEntryID
+     * @return the muniAuthPeriodID
      */
-    public int getAuthCredentialLogEntryID() {
-        return authCredentialLogEntryID;
+    public int getMuniAuthPeriodID() {
+        return muniAuthPeriodID;
     }
 
     
@@ -137,10 +137,10 @@ public class UserAuthCredentialLogEntry {
     }
 
     /**
-     * @param authCredentialLogEntryID the authCredentialLogEntryID to set
+     * @param muniAuthPeriodID the muniAuthPeriodID to set
      */
-    public void setAuthCredentialLogEntryID(int authCredentialLogEntryID) {
-        this.authCredentialLogEntryID = authCredentialLogEntryID;
+    public void setMuniAuthPeriodID(int muniAuthPeriodID) {
+        this.muniAuthPeriodID = muniAuthPeriodID;
     }
 
    

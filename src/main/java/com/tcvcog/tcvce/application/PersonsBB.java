@@ -76,7 +76,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         PersonCoordinator pc = getPersonCoordinator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessionMuni());
+        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessionMuniHeavy());
         // the selected person should be initiated using logic in getSelectedPerson
         selectedPerson = getSessionBean().getSessionPerson();
         try {
@@ -153,7 +153,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     public void initiatePersonCreation(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        selectedPerson = pc.getNewPersonSkeleton(getSessionBean().getSessionMuni());
+        selectedPerson = pc.getNewPersonSkeleton(getSessionBean().getSessionMuniHeavy());
         System.out.println("PersonsBB.initiatePersonCreation : selected person id: " + selectedPerson.getPersonID());
     }
     
@@ -217,7 +217,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     public void searchForPersonsByNameOnly(ActionEvent event){
         System.out.println("PersonBB.searchForPersonsByNameOnly");
         PersonCoordinator pc = getPersonCoordinator();
-        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessionMuni());
+        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessionMuniHeavy());
         // clear past search results on bean and on the session
         personList = null;
         getSessionBean().setSessionPersonList(null);

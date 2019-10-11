@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class MunicipalityListified extends Municipality{
+public class MunicipalityDataHeavy extends Municipality{
     
     private String address_street;
     private String address_city;
@@ -61,7 +61,7 @@ public class MunicipalityListified extends Municipality{
     private List<CourtEntity> courtEntities;
     private List<Integer> photoDocList;
     
-    public MunicipalityListified(Municipality m){
+    public MunicipalityDataHeavy(Municipality m){
         this.muniName = m.getMuniName();
         this.muniCode = m.getMuniCode();
     }

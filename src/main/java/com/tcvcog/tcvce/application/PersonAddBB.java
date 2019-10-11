@@ -88,7 +88,7 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         if (formMuni != null){
             p.setMuniCode(formMuni.getMuniCode());
         } else {
-            p.setMuniCode(getSessionBean().getSessionMuni().getMuniCode());
+            p.setMuniCode(getSessionBean().getSessionMuniHeavy().getMuniCode());
         }
         
         

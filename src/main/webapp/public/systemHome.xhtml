@@ -18,14 +18,12 @@
                     <div class="mainContainer">
                         <h1>codeNforce system access portal</h1>
                         
-
-                        
                         <h:form id="sysHomeForm">
                             <h2>Staff access</h2>
                             <p>TCVCOG staff, code enforcement officials, and other authorized users access tools
                                 via mission control</p>
                                 <p:commandButton ajax="false" value="Log in to mission control" 
-                                                 action="#{missionControlBB.loginToMissionControl}"/>
+                                                 action="#{loginBB.loginToMissionControl}"/>
                                             
                                 <p:spacer height="5px" />
                                 
@@ -35,10 +33,7 @@
                                     Download the evolving system user guide v.0.9
                                 </a>
                                
-
                         </h:form>
-                        
-                       
                         
                     </div>
                 </f:view>
