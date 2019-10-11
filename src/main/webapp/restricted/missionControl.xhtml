@@ -22,7 +22,7 @@
                         </h:messages>
                         
                         <h:form id="missionControlForm">
-                            <h1><h:outputText value="codeNforce Dashboard: #{sessionBean.sessionMuni.muniName}"/> </h1>
+                            <h1><h:outputText value="codeNforce Dashboard: #{sessionBean.sessionMuniHeavy.muniName}"/> </h1>
                         
                             <p:dashboard model="#{missionControlBB.mainDash}">
                             
@@ -202,6 +202,7 @@
                                          closable="true"
                                          toggleable="true"
                                          header="Switch session municipality"
+                                         rendered="true"
                                          footer=""
                                          toggleableHeader="true"
                                          menuTitle="">
@@ -213,7 +214,41 @@
                                     </p:selectOneListbox>
                                     <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    <p:commandButton value="switch to this muni" styleClass="button" action="#{missionControlBB.switchMuni}" icon="fa fa-long-arrow-right" />
+                                    <p:commandButton    id="dash-switchmuni-button-switch"
+                                                        disabled="#{empty missionControlBB.selectedMuni}"
+                                                        value="switch to #{missionControlBB.selectedMuni.muniName}" 
+                                                        styleClass="button" 
+                                                        action="#{sessionInitializer.configureSession(missionControlBB.currentUser, missionControlBB.selectedMuni)}" 
+                                                        icon="fa fa-exchange" />
+                                </p:panel>
+                                
+                                  
+                                <p:panel id="dashpanel-sys-switchuser"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Switch your user"
+                                         rendered="true"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+
+                                    <p:selectOneMenu id="dash-switchuser-solb-chooseuser" tabindex="12" value="#{missionControlBB.selectedUser}">
+                                        <f:converter converterId="userConverter"/>
+                                        <f:selectItem itemLabel="select a user..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems id="dash-switchuser-si-username" 
+                                                       value="#{missionControlBB.userList}"
+                                                       var="u" itemValue="#{u}" itemLabel="#{u.username} (#{u.userID})" />
+                                        <p:ajax update="dash-switchuser-button-switch" />
+                                    </p:selectOneMenu>>
+                                    <h:message for="dash-switchuser-solb-chooseuser" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    <p:commandButton    id="dash-switchuser-button-switch"
+                                                        disabled="#{empty missionControlBB.selectedUser}"
+                                                        value="become #{missionControlBB.selectedUser.username}" 
+                                                        styleClass="button" 
+                                                        action="#{sessionInitializer.configureSession(missionControlBB.selectedUser, null)}" 
+                                                        icon="fa fa-universal-access" />
                                 </p:panel>
                                 
                             </p:dashboard>

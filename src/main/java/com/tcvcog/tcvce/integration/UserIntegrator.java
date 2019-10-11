@@ -27,7 +27,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthCredentialLogEntry;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.UserConfigReady;
@@ -160,12 +160,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 user.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
             }
             user.setNoLoginVirtualUser(rs.getBoolean("nologinvirtualonly"));
-            if(rs.getTimestamp("pswdlastupdated") != null){
-                user.setPswdLastUpdated(rs.getTimestamp("pswdlastupdated").toLocalDateTime());
-            }
-            if(rs.getTimestamp("forcepasswordreset") != null){
-                user.setForcePasswordResetTS(rs.getTimestamp("forcepasswordreset").toLocalDateTime());
-            }
             
         } catch (SQLException ex) {
             throw new IntegrationException("Cannot create user", ex);
@@ -174,19 +168,23 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return user;
     }
     
-    private UserConfigReady generateUserConfigReady(UserConfigReady u, ResultSet rs) throws IntegrationException{
-        UserConfigReady uwl = new UserConfigReady(u);
-        uwl.setUserFullAuthPeriodList(getUserAuthorizationPeriods(u));
-        uwl.setCreatedByUserId(rs.getInt("createdby"));
+    private UserConfigReady generateUserConfigReady(UserConfigReady u, ResultSet rs) throws IntegrationException, SQLException{
+        UserConfigReady ucr = new UserConfigReady(u);
+        ucr.setUserFullAuthPeriodList(getUserAuthPeriods(u));
        
-        
-        
+        if(rs.getTimestamp("pswdlastupdated") != null){
+            u.setPswdLastUpdated(rs.getTimestamp("pswdlastupdated").toLocalDateTime());
+        }
+        if(rs.getTimestamp("forcepasswordreset") != null){
+            u.setForcePasswordResetTS(rs.getTimestamp("forcepasswordreset").toLocalDateTime());
+        }
+        return ucr;
     }
     
  
     
     
-    public List<UserAuthPeriod> getUserAuthorizationPeriods(User u) throws IntegrationException{
+    public List<UserAuthPeriod> getUserAuthPeriods(User u) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         List<UserAuthPeriod> perList = new ArrayList<>();
@@ -200,7 +198,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, u.getUserID());
             rs = stmt.executeQuery();
             while(rs.next()){
-                perList.add(getUserAuthorizationPeriod(rs.getInt("muniauthperiodid")));
+                perList.add(getUserAuthPeriod(rs.getInt("muniauthperiodid")));
             }
             
         } catch (SQLException ex) {
@@ -216,7 +214,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private UserAuthPeriod getUserAuthorizationPeriod(int periodID) throws IntegrationException{
+    private UserAuthPeriod getUserAuthPeriod(int periodID) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         UserAuthPeriod per = null;
@@ -224,7 +222,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query = "SELECT muniauthperiodid, muni_municode, authuser_userid, accessgranteddatestart, \n" +
                         "       accessgranteddatestop, recorddeactivatedts, authorizedrole, createdts, \n" +
                         "       createdby_userid, notes, supportassignedby, assignmentrank\n" +
-                        "  FROM public.loginmuniauthperiod;";
+                        "  FROM public.loginmuniauthperiod WHERE muniauthperiodid=?;";
         
         PreparedStatement stmt = null;
         
@@ -286,7 +284,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    public void insertUserAuthCredentialLogEntry(UserAuthCredentialLogEntry uacle) throws IntegrationException, AuthorizationException{
+    public void insertMuniAuthPeriodLogEntry(UserMuniAuthPeriodLogEntry uacle) throws IntegrationException, AuthorizationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         UserAuthPeriod per = null;
@@ -344,10 +342,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    public List<UserAuthCredentialLogEntry> getUserAuthCredentialLogEntryList(UserAuthPeriod uap) throws IntegrationException{
+    public List<UserMuniAuthPeriodLogEntry> getMuniAuthPeriodLogEntryList(UserAuthPeriod uap) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        List<UserAuthCredentialLogEntry> uacleList = new ArrayList<>();
+        List<UserMuniAuthPeriodLogEntry> uacleList = new ArrayList<>();
         // broken query
         String query = "SELECT authperiodlogentryid" +
                         "  FROM public.loginmuniauthperiodlog WHERE authperiod_periodid=?;";
@@ -359,7 +357,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, uap.getUserAuthPeriodID());
             rs = stmt.executeQuery();
             while(rs.next()){
-                uacleList.add(getUserAuthCredentialLogEntry(rs.getInt("authperiodlogentryid")));
+                uacleList.add(getUserMuniAuthPeriodLogEntry(rs.getInt("authperiodlogentryid")));
             }
             
         } catch (SQLException ex) {
@@ -375,10 +373,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    public UserAuthCredentialLogEntry getUserAuthCredentialLogEntry(int logEntryID) throws IntegrationException{
+    public UserMuniAuthPeriodLogEntry getUserMuniAuthPeriodLogEntry(int logEntryID) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        UserAuthCredentialLogEntry uacle = null;
+        UserMuniAuthPeriodLogEntry uacle = null;
         // broken query
         String query = "SELECT authperiodlogentryid, authperiod_periodid, category, entryts, \n" +
                         "       entrydateofecord, disputedby_userid, disputedts, notes, cookie_jsessionid, \n" +
@@ -394,7 +392,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, logEntryID);
             rs = stmt.executeQuery();
             while(rs.next()){
-                uacle = generateUserAuthCredentialLogEntry(rs);
+                uacle = generateMuniAuthPeriodLogEntry(rs);
             }
             
         } catch (SQLException ex) {
@@ -411,11 +409,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    private UserAuthCredentialLogEntry generateUserAuthCredentialLogEntry(ResultSet rs) throws SQLException, IntegrationException{
+    private UserMuniAuthPeriodLogEntry generateMuniAuthPeriodLogEntry(ResultSet rs) throws SQLException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         
         
-        UserAuthCredentialLogEntry uacle = new UserAuthCredentialLogEntry();
+        UserMuniAuthPeriodLogEntry uacle = new UserMuniAuthPeriodLogEntry();
         
 //        SELECT authperiodlogentryid, authperiod_periodid, category, entryts, \n" +
 //                        "       entrydateofecord, disputedby_userid, disputedts, notes, cookie_jsessionid, \n" +
@@ -424,8 +422,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
 //                        "       audit_muni_municode\n" +
 //                        "  FROM public.loginmuniauthperiodlog WHERE authperiodlogentryid=?;";
         
-        uacle.setAuthCredentialLogEntryID(rs.getInt("authperiodlogentryid"));
-        uacle.setAuthPeriod(getUserAuthorizationPeriod(rs.getInt("authperiod_periodid")));
+        uacle.setMuniAuthPeriodID(rs.getInt("authperiodlogentryid"));
+        uacle.setAuthPeriod(getUserAuthPeriod(rs.getInt("authperiod_periodid")));
         uacle.setCategory(rs.getString("category"));
         
         if(rs.getTimestamp("entrydateofrecord") != null){
@@ -456,8 +454,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return uacle;
     }
     
-    
-    public void updateUserAuthCredentialLogEntry(UserAuthCredentialLogEntry uacle) throws IntegrationException{
+    /**
+     * Remember that the notion of a Credential only exists in Java land, since a User 
+     * is never "in" the database, doing stuff.
+     * @param uacle
+     * @throws IntegrationException 
+     */
+    public void updateUserAuthCredentialLogEntry(UserMuniAuthPeriodLogEntry uacle) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         UserAuthPeriod per = null;
@@ -472,11 +475,19 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             stmt.setString(1, uacle.getCategory());
             stmt.setTimestamp(2, java.sql.Timestamp.valueOf(uacle.getEntryDateOfRecord()));
-            stmt.setInt(3, uacle.getDisputedBy().getUserID());
-            stmt.setTimestamp(4,  java.sql.Timestamp.valueOf(uacle.getDisputedts()));
+            if(uacle.getDisputedBy() != null){
+                stmt.setInt(3, uacle.getDisputedBy().getUserID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            if(uacle.getDisputedts() != null){
+                stmt.setTimestamp(4,  java.sql.Timestamp.valueOf(uacle.getDisputedts()));
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
             stmt.setString(5, uacle.getNotes());
             
-            stmt.setInt(6, uacle.getAuthCredentialLogEntryID());
+            stmt.setInt(6, uacle.getMuniAuthPeriodID());
             stmt.executeUpdate();
             
         } catch (SQLException ex) {
@@ -544,9 +555,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         String query =  "INSERT INTO public.login(\n" +
                         "            userid, username, notes, personlink, \n" +
-                        "            active, forcepasswordreset, createdby, createdts, nologinvirtualonly)\n" +
+                        "            active, createdby, createdts, nologinvirtualonly \n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, ?);";
+                        "            ?, ?, now(), ?);";
         
         PreparedStatement stmt = null;
         
@@ -562,15 +573,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             }
             
             stmt.setBoolean(4, userToInsert.isActive());
-            if(userToInsert.getForcePasswordResetTS() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(userToInsert.getForcePasswordResetTS()));
-            }
-            stmt.setInt(6, userToInsert.getCreatedByUserId());
             
-            if(userToInsert.getCreatedTS() !=  null){
-                stmt.setTimestamp(7, java.sql.Timestamp.valueOf(userToInsert.getCreatedTS()));
-            }
-            stmt.setBoolean(8, userToInsert.isNoLoginVirtualUser());
+            stmt.setInt(5, userToInsert.getCreatedByUserId());
+            
+            // created ts from db's now()
+            stmt.setBoolean(6, userToInsert.isNoLoginVirtualUser());
             
             stmt.execute();
             
@@ -591,98 +598,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
               if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
     }
-    
-    public Municipality getUserDefaultMunicipality(int userID) throws IntegrationException, AuthorizationException{
-        Connection con = getPostgresCon();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        ResultSet rs = null;
-        String query = "SELECT muni_municode FROM public.munilogin "
-                + "WHERE userid=? AND defaultmuni=? AND recorddeactivatedts IS NULL "
-                + "             AND accessgranteddatestart < now() "
-                + "             AND accessgranteddatestop > now() "
-                + "             ORDER BY recordcreatedts DESC;";
-        Municipality m = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query, 
-                    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setInt(1, userID);
-            stmt.setBoolean(2, true);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                m = mi.getMuni(rs.getInt("muni_municode"));
-            }
-//            if(!rs.first()){
-//                stmt = con.prepareStatement(query);
-//                stmt.setInt(1, userID);
-//                stmt.setBoolean(2, true);
-//                rs = stmt.executeQuery();
-//                while(rs.next()){
-//                    m = mi.getMuni(rs.getInt("muni_municode"));
-//                }
-//                
-//            }
-                
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error getting default muni", ex);
-        } finally{
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        if(m == null){
-            throw new AuthorizationException("Could not load a default muni");
-        }
-        return m;
-    }
-    
-    /**
-     * @throws com.tcvcog.tcvce.domain.AuthorizationException
-     * @deprecated 
-     * @param u
-     * @param m
-     * @return
-     * @throws IntegrationException 
-     */
-    public boolean setDefaultMunicipality(User u, Municipality m) throws IntegrationException, AuthorizationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        boolean defaultSet = false;
-        String queryTurnOffDefaults = "UPDATE munilogin SET defaultmuni = FALSE "
-                + "WHERE USERID = ?;";
-        String query = "UPDATE munilogin SET defaultmuni = TRUE "
-                + "WHERE USERID = ? AND MUNI_MUNICODE = ?;";
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(queryTurnOffDefaults);
-            stmt.setInt(1, u.getUserID());
-            stmt.executeUpdate();
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, u.getUserID());
-            stmt.setInt(2, m.getMuniCode());
-            stmt.executeUpdate();
-            
-            if(getUserDefaultMunicipality(u.getUserID()).equals(m)){
-                defaultSet = true;
-            }
-            
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error setting default muni for user " + u.getUserID(), ex);
-        } finally{
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return defaultSet;
-    }
-    
     
     /**
      * Invalidating an Authorization period is effectively deleting that record. This action
@@ -770,17 +685,14 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             }
             
             stmt.setBoolean(4, usr.isActive());
-            
-            
-            stmt.setBoolean(8, usr.isNoLoginVirtualUser());
-            
-            stmt.setInt(9, usr.getUserID());
+            stmt.setBoolean(5, usr.isNoLoginVirtualUser());
+            stmt.setInt(6, usr.getUserID());
             
             stmt.executeUpdate();
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Error inserting new person", ex);
+            throw new IntegrationException("UserIntegrator.updateUser:Error updating User", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -791,13 +703,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     public void updateUserAuthorized(UserAuthorized usr) throws IntegrationException{
         Connection con = getPostgresCon();
-        
         String query =  "UPDATE public.login\n" +
                         "   SET forcepasswordreset=? " +
                         " WHERE userid=?;";
-        
         PreparedStatement stmt = null;
-        	
+        
         try {
             
             stmt = con.prepareStatement(query);
@@ -815,9 +725,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
-    
-   
-    
     
     /**
      * Primary access point for the entire User system: Called during SessionInitializer actions
@@ -921,14 +828,21 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         }
     }        
     
-    
+    /**
+     * This integrator method gets the other half of our fields from the login table, and adds
+     * calls the generator to insert the list of authperiodlogs
+     * @param u
+     * @return
+     * @throws IntegrationException 
+     */
     public UserConfigReady getUserConfigReady(User u) throws IntegrationException{
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
         UserConfigReady ucr = new UserConfigReady(u);
         // broken query
-        String query = "";
+        String query = "SELECT userid, pswdlastupdated, forcepasswordreset "
+                + "FROM public.login WHERE userid=?;";
         
         PreparedStatement stmt = null;
         
@@ -937,7 +851,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, u.getUserID());
             rs = stmt.executeQuery();
             while(rs.next()){
-                perList.add(getUserAuthorizationPeriod(rs.getInt("muniauthperiodid")));
                 ucr = generateUserConfigReady(ucr, rs);
             }
             
@@ -950,7 +863,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        return perList;
+        return ucr;
         
     }
     

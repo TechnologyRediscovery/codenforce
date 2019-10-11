@@ -146,7 +146,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         
-        queryList = sc.buildQueryCECaseList(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser());
+        queryList = sc.buildQueryCECaseList(getSessionBean().getSessionMuniHeavy(), getSessionBean().getSessionUser());
         selectedCECaseQuery = getSessionBean().getQueryCECase();
         searchParams = selectedCECaseQuery.getSearchParamsList().get(0);
         if(!selectedCECaseQuery.isExecutedByIntegrator()){
@@ -338,7 +338,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         reportCECase.setCse(currentCase);
 
         reportCECase.setCreator(getSessionBean().getSessionUser());
-        reportCECase.setMuni(getSessionBean().getSessionMuni());
+        reportCECase.setMuni(getSessionBean().getSessionMuniHeavy());
         reportCECase.setGenerationTimestamp(LocalDateTime.now());
 
         try {
@@ -375,7 +375,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     public String generateReportCECaseList() {
         reportCECaseList.setCreator(getSessionBean().getSessionUser());
-        reportCECaseList.setMuni(getSessionBean().getSessionMuni());
+        reportCECaseList.setMuni(getSessionBean().getSessionMuniHeavy());
         reportCECaseList.setGenerationTimestamp(LocalDateTime.now());
         
         getSessionBean().setReportConfigCECaseList(reportCECaseList);
@@ -763,7 +763,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                 getSessionBean().getSessionPropertyList().add(0, currentCase.getProperty());
                 getSessionBean().setSessionProperty(currentCase.getProperty());
                 positionCurrentCaseAtHeadOfQueue();
-                nov = cc.novGetNewNOVSkeleton(currentCase, getSessionBean().getSessionMuni());
+                nov = cc.novGetNewNOVSkeleton(currentCase, getSessionBean().getSessionMuniHeavy());
                 nov.setCreationBy(getSessionBean().getSessionUser());
                 getSessionBean().setSessionNotice(nov);
                 return "noticeOfViolationBuilder";

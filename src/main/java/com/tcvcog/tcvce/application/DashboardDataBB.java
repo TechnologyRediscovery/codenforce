@@ -118,7 +118,7 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
         SystemCoordinator ssc = getSystemCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         try {
-             caseCountMap = si.getCaseCountsByPhase(getSessionBean().getSessionMuni().getMuniCode());
+             caseCountMap = si.getCaseCountsByPhase(getSessionBean().getSessionMuniHeavy().getMuniCode());
         } catch (IntegrationException ex) {
             Logger.getLogger(DashboardDataBB.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("DashboardDataBB.getCaseCountMap");

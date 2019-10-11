@@ -31,7 +31,7 @@ import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.MunicipalityComplete;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
@@ -264,8 +264,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
         rpt.setCreator(usr);
-        rpt.setMuni(getSessionBean().getSessionMuni());
-        
+        rpt.setMuni(getSessionBean().getSessionMuniHeavy());
+
         rpt.setDefaultItemIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()))));
         
@@ -374,7 +374,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                                             PropertyUnit pu, 
                                             OccPeriodType perType,
                                             User u, 
-                                            MunicipalityComplete muni) throws IntegrationException{
+                                            MunicipalityDataHeavy muni) throws IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
         OccPeriod period = new OccPeriod();
         

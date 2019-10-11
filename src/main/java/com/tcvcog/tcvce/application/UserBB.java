@@ -50,25 +50,15 @@ import javax.faces.event.ActionEvent;
 
 public class UserBB extends BackingBeanUtils implements Serializable {
 
-    private List<User> userList;
     private UserAuthorized currentUser;
     
     private UserAuthPeriod currentUserAuthPeriod;
     
-    private int formUserID;
-    private RoleType formRoleType;
-    private RoleType[] roleTypeArray;
     private String formUsername;
     private String formPassword;
     
-    private Municipality formMuni;
-    
     private String formNotes;
-    private Date formActivityStartDate;
-    private Date formActivityStopDate;
-    private boolean formAccessPermitted;
     
-    private boolean formIsEnfOfficial;
     private String formBadgeNum;
     private String formOriNum;
     
@@ -130,31 +120,8 @@ public class UserBB extends BackingBeanUtils implements Serializable {
 
 
     
-    /**
-     * @return the userList
-     */
-    public List<User> getUserList() {
-        UserIntegrator ui = getUserIntegrator();
-        try {
-            userList = ui.getCompleteActiveUserList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Unable to acquire list of users",
-                            "This is a system-level error that msut be corrected by an administrator"));
-        }
-        return userList;
-    }
+   
 
-    
-
-    /**
-     * @return the formRoleType
-     */
-    public RoleType getFormRoleType() {
-        return formRoleType;
-    }
 
     /**
      * @return the formUsername
@@ -179,43 +146,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         return formNotes;
     }
 
-    /**
-     * @return the formActivityStartDate
-     */
-    public Date getFormActivityStartDate() {
-        return formActivityStartDate;
-    }
-
-    /**
-     * @return the formActivityStopDate
-     */
-    public Date getFormActivityStopDate() {
-        return formActivityStopDate;
-    }
-
-    /**
-     * @return the formAccessPermitted
-     */
-    public boolean isFormAccessPermitted() {
-        formAccessPermitted = true;
-        return formAccessPermitted;
-    }
-
-    /**
-     * @param userList the userList to set
-     */
-    public void setUserList(ArrayList<User> userList) {
-        this.userList = userList;
-    }
-
-   
-    /**
-     * @param formRoleType the formRoleType to set
-     */
-    public void setFormRoleType(RoleType formRoleType) {
-        this.formRoleType = formRoleType;
-    }
-
+    
     /**
      * @param formUsername the formUsername to set
      */
@@ -238,69 +169,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         this.formNotes = formNotes;
     }
 
-    /**
-     * @param formActivityStartDate the formActivityStartDate to set
-     */
-    public void setFormActivityStartDate(Date formActivityStartDate) {
-        this.formActivityStartDate = formActivityStartDate;
-    }
-
-    /**
-     * @param formActivityStopDate the formActivityStopDate to set
-     */
-    public void setFormActivityStopDate(Date formActivityStopDate) {
-        this.formActivityStopDate = formActivityStopDate;
-    }
-
-    /**
-     * @param formAccessPermitted the formAccessPermitted to set
-     */
-    public void setFormAccessPermitted(boolean formAccessPermitted) {
-        this.formAccessPermitted = formAccessPermitted;
-    }
-
-    /**
-     * @return the roleTypeArray
-     */
-    public RoleType[] getRoleTypeArray() {
-        roleTypeArray = RoleType.values();
-        return roleTypeArray;
-    }
-
-    /**
-     * @param roleTypeArray the roleTypeArray to set
-     */
-    public void setRoleTypeArray(RoleType[] roleTypeArray) {
-        this.roleTypeArray = roleTypeArray;
-    }
-
-    /**
-     * @return the formUserID
-     */
-    public int getFormUserID() {
-        return formUserID;
-    }
-
-    /**
-     * @param formUserID the formUserID to set
-     */
-    public void setFormUserID(int formUserID) {
-        this.formUserID = formUserID;
-    }
-
-    /**
-     * @return the formIsEnfOfficial
-     */
-    public boolean isFormIsEnfOfficial() {
-        return formIsEnfOfficial;
-    }
-
-    /**
-     * @param formIsEnfOfficial the formIsEnfOfficial to set
-     */
-    public void setFormIsEnfOfficial(boolean formIsEnfOfficial) {
-        this.formIsEnfOfficial = formIsEnfOfficial;
-    }
+   
 
     /**
      * @return the formBadgeNum
@@ -344,19 +213,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         this.formUserPerson = formUserPerson;
     }
 
-    /**
-     * @return the formMuni
-     */
-    public Municipality getFormMuni() {
-        return formMuni;
-    }
-
-    /**
-     * @param formMuni the formMuni to set
-     */
-    public void setFormMuni(Municipality formMuni) {
-        this.formMuni = formMuni;
-    }
+   
 
     /**
      * @return the currentUser

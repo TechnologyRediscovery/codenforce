@@ -510,7 +510,6 @@
 
 
     <navigation-rule> 
-        <from-view-id>/restricted/initiateInternalSession.xhtml</from-view-id>  
         <navigation-case>
             <from-outcome>success</from-outcome>
             <to-view-id>/restricted/missionControl.xhtml</to-view-id>
@@ -657,7 +656,7 @@
     <navigation-rule>
         <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit.xhtml</from-view-id>
         <navigation-case>
-            <from-outcome>success</from-outcome>
+            <from-outcome>successCEAR</from-outcome>
             <to-view-id>/public/services/actionReqSubConf.xhtml</to-view-id>
         </navigation-case>
         <navigation-case>
@@ -1603,5 +1602,10 @@
         <managed-bean-name>muniCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.MuniCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>loginBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.LoginBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

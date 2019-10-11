@@ -30,8 +30,7 @@ public class UserConfigReady extends User{
     protected LocalDateTime pswdLastUpdated;
     protected LocalDateTime forcePasswordResetTS;
     
-    protected int createdByUserId;
-    protected LocalDateTime createdTS;
+  
 
      /**
      * This constructor is the only way of setting the internals of this
@@ -52,6 +51,9 @@ public class UserConfigReady extends User{
         
         this.active = u.isActive();
         this.noLoginVirtualUser = u.isNoLoginVirtualUser();
+        
+        this.createdByUserId = u.getCreatedByUserId();
+        this.createdTS = u.getCreatedTS();
     }
     
     /**

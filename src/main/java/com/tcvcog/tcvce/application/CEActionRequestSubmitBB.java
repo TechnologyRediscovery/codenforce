@@ -148,7 +148,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         disabledPersonFormFields = false;
         actionRequestorAssignmentMethod = 1;
         if(usr != null){
-            selectedMuni = getSessionBean().getSessionMuni();
+            selectedMuni = getSessionBean().getSessionMuniHeavy();
         }
     }
     
@@ -404,7 +404,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO, 
                        "Success! Your request has been submitted and passed to our code enforcement team.", ""));
-            return "success";
+            return "successCEAR";
 
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());

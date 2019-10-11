@@ -244,7 +244,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public List<TextBlock> getBlockList() {
         ViolationIntegrator cvi = getCodeViolationIntegrator();
-        Municipality m = getSessionBean().getSessionMuni();
+        Municipality m = getSessionBean().getSessionMuniHeavy();
         if(blockList == null){
             try {
                 if(showTextBlocksAllMuni){

@@ -27,14 +27,16 @@ import java.util.Map;
  */
 public class UserAuthorized extends User{
     
+    /**
+     * Remember that the notion of a Credential only exists in Java land, since a User 
+     * is never "in" the database, doing stuff.
+     */
     private UserAuthCredential credential;
 
     private Map<Municipality, UserAuthPeriod> muniAuthPeriodMap;
     
     protected LocalDateTime pswdLastUpdated;
     protected LocalDateTime forcePasswordResetTS;
-    protected int createdByUserId;
-    protected LocalDateTime createdTS;
 
     
     /**
@@ -137,36 +139,6 @@ public class UserAuthorized extends User{
         this.forcePasswordResetTS = forcePasswordResetTS;
     }
 
-    /**
-     * @return the createdByUserId
-     */
-    public int getCreatedByUserId() {
-        return createdByUserId;
-    }
-
-    /**
-     * @return the createdTS
-     */
-    public LocalDateTime getCreatedTS() {
-        return createdTS;
-    }
-    /**
-     * @return the pswdLastUpdated
-     */
-
-    /**
-     * @param createdByUserId the createdByUserId to set
-     */
-    public void setCreatedByUserId(int createdByUserId) {
-        this.createdByUserId = createdByUserId;
-    }
-
-    /**
-     * @param createdTS the createdTS to set
-     */
-    public void setCreatedTS(LocalDateTime createdTS) {
-        this.createdTS = createdTS;
-    }
     /**
      * @return the accessRecord
      */

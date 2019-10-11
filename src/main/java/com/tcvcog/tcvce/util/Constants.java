@@ -59,6 +59,10 @@ public class Constants implements Serializable {
     
     public final static String STYLE_CLASS_INACTIVE_CASE_PHASE = "stage-inactive";
     
+//    SESSION REQUEST KEYS
+    public final static String PARAM_JSESS = "JSESSIONID";
+    public final static String PARAM_USERAGENT = "User-Agent";
+    public final static String PARAM_DATERAW = "Date";
      
     
     

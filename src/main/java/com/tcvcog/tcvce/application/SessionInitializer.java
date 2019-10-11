@@ -27,10 +27,12 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.MunicipalityComplete;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserWithAccessData;
+import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
@@ -51,7 +53,10 @@ import javax.servlet.http.HttpServletRequest;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 import javax.annotation.PostConstruct;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -102,6 +107,10 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         return request.getRemoteUser();
     }
     
+    public String switchUser(UserAuthorized ua, Municipality m) throws CaseLifecycleException, IntegrationException{
+        return configureSession(ua, m);
+    }
+    
     /**
      * Core configuration method for sessions; called both during an initial login
      * and subsequent changes to the current municipality. It does the work
@@ -120,36 +129,32 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         PersonIntegrator persInt = getPersonIntegrator();
         CaseIntegrator caseint = getCaseIntegrator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        UserMuniAuthPeriodLogEntry umaple;
         
         try {
             // The central call which initiates the User's session for a particular municipality
+            // Muni will be null when called from initiateInternalSession
             UserAuthorized authUser = uc.authorizeUser(u, muni);
             
             // as long as we have an actual user, proceed with session config
             if(authUser != null){
                 // The stadnard Municipality object is simple, but we need the full deal
-                MunicipalityListified muniListified = 
+                MunicipalityDataHeavy muniHeavy = 
                         mi.getMuniListified(authUser.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode());
                 
                 // load up our SessionBean with its key objects
-                getSessionBean().setSessionMuni(muniListified);
+                getSessionBean().setSessionMuniHeavy(muniHeavy);
                 getSessionBean().setSessionUser(authUser);
-                getSessionBean().setActiveCodeSet(muniListified.getCodeSet());
                 
-                // our new UserAuthorized has a Map of municipalities as keys
-                // and the MuniAuthPeriod record as the value. Grab the keys as a set
-                // and turn them into a List which we can display to the UI
-                getSessionBean().setUserAuthMuniList(new ArrayList<>(authUser.getMuniAuthPeriodMap().keySet()));
+                populateSessionObjectQueues(authUser, muniHeavy);
                 
-                populateSessionObjectQueues(authUser, muniListified);
-                
-                // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
-                //and then and store in sessionBean
-                getSessionBean().setActiveCodeSet(muniComplete.getCodeSet());
-                populateSessionObjectQueues(extractedUser, muniComplete);
-                getLogIntegrator().makeLogEntry(extractedUser.getUserID(), getSessionID(), 
-                        Integer.parseInt(getResourceBundle(Constants.LOGGING_CATEGORIES).getString("login")), 
-                         "SessionInitializer.initiateInternalSession | Created internal session", false, false);
+                umaple = uc.assembleUserMuniAuthPeriodLogEntrySkeleton(
+                                authUser, 
+                                UserMuniAuthPeriodLogEntryCatEnum.SESSION_INIT);
+        
+                umaple = assembleSessionInfo(umaple);
+                uc.logCredentialInvocation(umaple);
+             
                return "success";
             } else {
                 return "noAuth";
@@ -171,16 +176,33 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
             return "";
         }
     }
-
-    /**
-     * @return the username string of an authenticated user from the container
-     */
-    private String getContainerAuthenticatedUser() {
+    
+    private UserMuniAuthPeriodLogEntry assembleSessionInfo(UserMuniAuthPeriodLogEntry umaple){
         FacesContext fc = getFacesContext();
-        ExternalContext ec = fc.getExternalContext();
-        HttpServletRequest request = (HttpServletRequest) ec.getRequest();
-        return request.getRemoteUser();
+        HttpServletRequest req = (HttpServletRequest) fc.getExternalContext().getRequest();
+        HttpServletResponse res = (HttpServletResponse) fc.getExternalContext().getResponse();
+
+        Map<String, String[]> headMap = req.getParameterMap();
+
+        umaple.setHeader_remoteaddr(req.getRemoteAddr());
+        StringBuilder sb = new StringBuilder();
+        for(String s: headMap.get(Constants.PARAM_USERAGENT)){
+            sb.append(s);
+            sb.append("|");
+        }
+        umaple.setHeader_useragent(sb.toString());
+        umaple.setHeader_dateraw(res.getHeader(Constants.PARAM_DATERAW));
+        
+        Cookie[] cooks = req.getCookies();
+        for(Cookie ckie: cooks){
+            if(ckie.getName().equals(Constants.PARAM_JSESS)){
+                umaple.setCookie_jsessionid(ckie.getValue());
+                break;
+            }
+        }
+        return umaple;
     }
+    
         
     /**
      * With an active User and Municipality, we're ready to load up our
@@ -192,7 +214,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @throws IntegrationException
      * @throws CaseLifecycleException 
      */
-    private void populateSessionObjectQueues(UserWithAccessData u, MunicipalityComplete m) throws IntegrationException, CaseLifecycleException{
+    private void populateSessionObjectQueues(UserAuthorized ua, MunicipalityDataHeavy m) throws IntegrationException, CaseLifecycleException{
         SessionBean sessionBean = getSessionBean();
         
         PersonCoordinator persCoord = getPersonCoordinator();

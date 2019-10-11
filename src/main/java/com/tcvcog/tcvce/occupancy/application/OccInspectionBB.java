@@ -216,8 +216,19 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
         }
         
-        availableEventTypeList = oc.getPermittedEventTypes(currentOccPeriod, getSessionBean().getSessionUser());
-        occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
+        
+        // general setting of drop-down box lists
+        try {
+            eventTypeListUserAllowed = ec.getPermittedEventTypesForOcc(currentOccPeriod, getSessionBean().getSessionUser());
+            eventTypeListAll = new ArrayList();
+            eventTypeListAll = ec.getEventTypesAll();
+            eventCategoryListAllActive = ec.getEventCategoryListActive();
+            occPeriodTypeList = getSessionBean().getSessionMuniHeavy().getProfile().getOccPeriodTypeList();
+            currentEventRuleAbstract = ec.rules_getInitializedEventRuleAbstract();
+            eventRuleSetList = ec.rules_getEventRuleSetList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         
         if(workingLocationList == null){
             workingLocationList = new ArrayList<>();
@@ -239,7 +250,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
         
         try {
-//            inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessionMuni());
+            inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessionMuniHeavy());
             reportConfigOccInspec =
                     oc.getOccInspectionReportConfigDefault(
                             currentInspection,

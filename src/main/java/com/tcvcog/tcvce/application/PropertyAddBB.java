@@ -31,8 +31,8 @@ public class PropertyAddBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         SessionBean sb = getSessionBean();
         this.prop = new PropertyWithLists();
-        this.prop.setMuni(sb.getSessionMuni());
-        this.prop.setMuniCode(sb.getSessionMuni().getMuniCode());
+        this.prop.setMuni(sb.getSessionMuniHeavy());
+        this.prop.setMuniCode(sb.getSessionMuniHeavy().getMuniCode());
     }
     
     public String insertProp(){

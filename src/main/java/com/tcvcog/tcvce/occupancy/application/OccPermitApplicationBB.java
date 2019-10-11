@@ -100,7 +100,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             
             // internal user procedure
             
-            selectedMuni = getSessionBean().getSessionMuni();
+            selectedMuni = getSessionBean().getSessionMuniHeavy();
             Property p = getSessionBean().getSessionProperty();
             workingPropUnits = p.getUnitList();
             
@@ -213,7 +213,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void searchForPropertiesSingleMuni() {
         PropertyIntegrator pi = getPropertyIntegrator();
-        Municipality activeMuni = getSessionBean().getSessionMuni();
+        Municipality activeMuni = getSessionBean().getSessionMuniHeavy();
 
         try {
             propList = pi.searchForProperties(houseNum, streetName, activeMuni.getMuniCode());

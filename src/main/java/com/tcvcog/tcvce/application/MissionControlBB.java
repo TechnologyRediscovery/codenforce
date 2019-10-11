@@ -15,6 +15,7 @@ Council of Governments, PA
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -36,16 +37,22 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
-import com.tcvcog.tcvce.entities.MunicipalityComplete;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
+import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
  
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 import org.primefaces.model.DashboardModel;
@@ -64,6 +71,9 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private Municipality currentMuni;
     private Municipality selectedMuni;
     
+    private List<UserAuthorized> userList;
+    private User selectedUser;
+    
     private DashboardModel mainDash;
     
     private List<EventCECaseCasePropBundle> timelineEventList;
@@ -73,10 +83,6 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private List<ProposalCECase> ceProposalList;
     private List<ProposalOccPeriod> occProposalList;
     
- 
-    
-    
-    
     /**
      * Creates a new instance of InitiateSessionBB
      */
@@ -84,9 +90,17 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
     
     @PostConstruct
-    public void initBean(){
+    public void initBean() {
+        UserCoordinator uc = getUserCoordinator();
+        currentUser = getSessionBean().getSessionUser();
         generateMainDash();
-        
+        if(currentUser.getCredential().isHasDeveloperPermissions()){
+            try {
+                userList = uc.getUserList(getSessionBean().getSessionMuniHeavy());
+            } catch (AuthorizationException | IntegrationException ex) {
+                System.out.println(ex);
+            }
+        }
     }
     
     private void generateMainDash(){
@@ -105,6 +119,11 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         
         column3.addWidget("dashpanel-sys-events");
         column3.addWidget("dashpanel-sys-switchmuni");
+//        if(     currentUser != null 
+//            &&  currentUser.getCredential() != null
+//            && currentUser.getCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
+        column3.addWidget("dashpanel-sys-switchuser");
+        
 
         mainDash.addColumn(column1);
         mainDash.addColumn(column2);
@@ -141,16 +160,16 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
             System.out.println("MissionControlBB.testPDF");
             System.out.println(ex);
         }
- 
-        
     }
+    
+   
     
     
     public String switchMuni() throws IntegrationException, SQLException{
         CodeIntegrator ci = getCodeIntegrator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        MunicipalityListified muniComp = mi.getMuniListified(selectedMuni.getMuniCode());
-        getSessionBean().setSessionMuni(muniComp);
+        MunicipalityDataHeavy muniComp = mi.getMuniListified(selectedMuni.getMuniCode());
+        getSessionBean().setSessionMuniHeavy(muniComp);
         try {
             getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
         } catch (IntegrationException ex) {
@@ -170,14 +189,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         return "publicPortal";
     }
     
-    public String loginToMissionControl(){
-        System.out.println("MissionControlBB.loginToMissionControl");
-        
-        return "startInitiationProcess";
-    }
    
-    
-
     /**
      * @return the user
      */
@@ -200,7 +212,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      * @return the currentMuni
      */
     public Municipality getCurrentMuni() {
-        currentMuni = getSessionBean().getSessionMuni();
+        currentMuni = getSessionBean().getSessionMuniHeavy();
         return currentMuni;
     }
 
@@ -236,7 +248,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         EventIntegrator ei = getEventIntegrator();
         try {
             timelineEventList = 
-                    (ArrayList<EventCECaseCasePropBundle>) ei.getUpcomingTimelineEvents(getSessionBean().getSessionMuni(), 
+                    (ArrayList<EventCECaseCasePropBundle>) ei.getUpcomingTimelineEvents(getSessionBean().getSessionMuniHeavy(), 
                             LocalDateTime.now(), LocalDateTime.now().plusDays(365));
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -322,7 +334,35 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         this.ceProposalList = ceProposalList;
     }
 
-   
+    /**
+     * @return the userList
+     */
+    public List<UserAuthorized> getUserList() {
+        return userList;
+    }
+
+    /**
+     * @return the selectedUser
+     */
+    public User getSelectedUser() {
+        return selectedUser;
+    }
+
+    /**
+     * @param userList the userList to set
+     */
+    public void setUserList(List<UserAuthorized> userList) {
+        this.userList = userList;
+    }
+
+    /**
+     * @param selectedUser the selectedUser to set
+     */
+    public void setSelectedUser(User selectedUser) {
+        this.selectedUser = selectedUser;
+    }
+
+    
 
    
     

@@ -113,7 +113,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             }
             selectedQueryCEAR = sessionQuery;
             searchParams = sessionQuery.getParmsList().get(0);
-            queryList = sc.buildQueryCEARList(getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
+            queryList = sc.buildQueryCEARList(getSessionBean().getSessionUser(), getSessionBean().getSessionMuniHeavy());
         } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -123,13 +123,13 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();
         ReportCEARList rpt = cc.getInitializedReportConficCEARs(
-                getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
+                getSessionBean().getSessionUser(), getSessionBean().getSessionMuniHeavy());
         rpt.setPrintFullCEARQueue(false);
         try {
             QueryCEAR query = searchCoord.assembleQueryCEAR(
                                                 QueryCEAREnum.CUSTOM, 
                                                 getSessionBean().getSessionUser(), 
-                                                getSessionBean().getSessionMuni(), 
+                                                getSessionBean().getSessionMuniHeavy(), 
                                                 null);
             List<CEActionRequest> singleReqList = new ArrayList<>();
             if(selectedRequest != null){
@@ -197,7 +197,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             selectedQueryCEAR = searchCoord.assembleQueryCEAR(
                                                     QueryCEAREnum.CUSTOM,
                                                     getSessionBean().getSessionUser(), 
-                                                    getSessionBean().getSessionMuni(), 
+                                                    getSessionBean().getSessionMuniHeavy(), 
                                                     searchParams);
             requestList =searchCoord.runQuery(selectedQueryCEAR).getResults();
             
@@ -221,7 +221,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SearchCoordinator searchCoord = getSearchCoordinator();
         
         ReportCEARList rpt = cc.getInitializedReportConficCEARs(
-                getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
+                getSessionBean().getSessionUser(), getSessionBean().getSessionMuniHeavy());
         
         rpt.setPrintFullCEARQueue(true);
         if (selectedQueryCEAR != null) {
