@@ -21,21 +21,25 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.io.Serializable;
-import com.tcvcog.tcvce.entities.AccessKeyCard;
+import com.tcvcog.tcvce.entities.UserAuthCredential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorizationPeriod;
+import com.tcvcog.tcvce.entities.UserAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.UserListified;
+import com.tcvcog.tcvce.entities.UserConfigReady;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -54,30 +58,40 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     }    
     
-    private Municipality determineDefaultMuni(  User u, 
-                                                Map<Municipality, UserAuthorizationPeriod> muniPerMap) 
+    
+    /**
+     * Pass-through method to the converter method on the Integrator which
+     * returns a userid from a String username. Used only on first session auth
+     * when JBoss gives us a username from the login system
+     * 
+     * @param userName
+     * @return
+     * @throws IntegrationException 
+     */
+    public int getUserID(String userName) throws IntegrationException{
+         UserIntegrator ui = getUserIntegrator();
+         return ui.getUserID(userName);
+     }
+    
+    private Municipality determineDefaultMuni(  UserAuthorized ua, 
+                                                Map<Municipality, UserAuthPeriod> muniPerMap) 
                                                         throws AuthorizationException{
+        Municipality initMuni = null;
         
-        UserAuthorizationPeriod  userAuthPeriod;
-        UserAuthorized authUser = null;
-        Municipality defMuni = null;
+        UserAuthPeriod workingUAP = null;
+        int maxRank = Integer.MIN_VALUE;
         
-        if(muniPerMap == null || muniPerMap.isEmpty()){
-            throw new AuthorizationException("Suspicious call to configInitialUserAuth; no auths supplied");
+        if(ua ==  null || muniPerMap == null || muniPerMap.isEmpty()){
+            throw new AuthorizationException("Suspicious call to configInitialUserAuth; no AuthUser supplied");
         }
-        
-        for(UserAuthorizationPeriod uap: muniPerMap.values()){
-            if(uap.isDefaultMuni()){ // take our first muni declared default
-                defMuni = uap.getMuni();
+        for (Municipality mu : muniPerMap.keySet()) {
+            workingUAP = muniPerMap.get(mu);
+            if(initMuni == null || workingUAP.getAssignmentRank() > maxRank) {
+                initMuni = muniPerMap.get(mu).getMuni();
+                maxRank = workingUAP.getAssignmentRank();
             }
         }
-        // backup logic for when no muni is declared default; pick one
-        if(defMuni == null){
-            List<UserAuthorizationPeriod> lst;
-            lst = new ArrayList<>(muniPerMap.values());
-            defMuni = lst.get(0).getMuni();
-        } 
-        return defMuni;
+        return initMuni;
     }
     
     public String generateRandomPassword(){
@@ -93,20 +107,44 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private UserAuthorized generateUserAuthorized(  User u, 
-                                                    UserAuthorizationPeriod uap) throws AuthorizationException{
+    
+     /**
+     * Primary user retrieval method: Note that there aren't as many checks here
+     * since the jboss container is managing the lookup of authenticated users. 
+     * We are pulling the login name from the already authenticated jboss session user 
+     * and just grabbing their profile from the db
+     * 
+     * @param usr
+     * @param muni
+     * @return the fully baked cog user
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException occurs if the user
+     * has been retrieved from the database but their access has been toggled off
+     */
+    public UserAuthorized authorizeUser(User usr, Municipality muni) throws AuthorizationException, IntegrationException{
+        UserIntegrator ui = getUserIntegrator();    
+        UserAuthorized usrAuth;
+        Map<Municipality, UserAuthPeriod> muniAuthMap = assembleValidAuthPeriodMap(usr);
+        UserAuthPeriod wuap;
         
-        UserAuthorized ua = null;
-        if(u.getUserID() == uap.getUserID()){
-            AccessKeyCard acc = generateAccessKeyCard(uap);
-            ua = new UserAuthorized(u, uap, acc);
-            ua.setGoverningAuthPeriod(uap);
+        if(!muniAuthMap.isEmpty()){
+            usrAuth = ui.getUserAuthorized(new UserAuthorized(usr));
+            if(muni != null){
+                // Meaning we have an internal switch from the initial muni to a new one
+                wuap = muniAuthMap.get(muni);
+            } else {
+                // first authorization so figure out which muni to load up first
+                wuap = muniAuthMap.get(determineDefaultMuni(usrAuth, muniAuthMap));
+            }
+            // setup our UserAuthorized for letting lose
+            usrAuth.setCredential(generateCredential(wuap));
         } else {
-            throw new AuthorizationException("incorrect User and AuthorizationPeriod pairing; No UserAuthorized will be generated.");
+            return null;
         }
-        return ua;
+        return usrAuth;
     }
     
+   
     /**
      * Primary logic container for determining authorization statuses for a given User
      * across ALL existing municipalities for which the User has a record
@@ -117,23 +155,23 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws AuthorizationException 
      */
-    private Map<Municipality, UserAuthorizationPeriod> assembleValidAuthPeriodMap(User u) 
+    private Map<Municipality, UserAuthPeriod> assembleValidAuthPeriodMap(User u) 
                                                 throws  IntegrationException, 
                                                         AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
-        List<UserAuthorizationPeriod> candidatePeriods;
-        Map<Municipality, UserAuthorizationPeriod> muniPerMap = new HashMap<>();
+        List<UserAuthPeriod> candidatePeriods;
+        Map<Municipality, UserAuthPeriod> muniPerMap = new HashMap<>();
         
         candidatePeriods = ui.getUserAuthorizationPeriods(u);
         if(!candidatePeriods.isEmpty()){
-            for(UserAuthorizationPeriod uap: candidatePeriods){
+            for(UserAuthPeriod uap: candidatePeriods){
                 // Filter out deactivated records and expired records
                 if(uap.getRecorddeactivatedTS() == null 
                         && uap.getStartDate().isBefore(LocalDateTime.now())
                         && uap.getStopDate().isAfter(LocalDateTime.now())){
                     //  check for existing muni periods and use the most recent valid period
                     if(muniPerMap.containsKey(uap.getMuni())){
-                        UserAuthorizationPeriod existingRecord = muniPerMap.get(uap.getMuni());
+                        UserAuthPeriod existingRecord = muniPerMap.get(uap.getMuni());
                         if(uap.getCreatedTS().isAfter(existingRecord.getCreatedTS())){
                             // we found a newer record, so swap it out
                             muniPerMap.put(uap.getMuni(), uap);
@@ -143,7 +181,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                         muniPerMap.put(uap.getMuni(), uap);
                     }
                 }
-            } // close for over candidates
+            } // close for over period candidates
         } else {
             throw new AuthorizationException("No candidate authorization periods exist for user");
         }
@@ -151,40 +189,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     
-    /**
-     * Primary user retrieval method: Note that there aren't as many checks here
-     * since the jboss container is managing the lookup of authenticated users. 
-     * We are pulling the login name from the already authenticated jboss session user 
-     * and just grabbing their profile from the db
-     * 
-     * @param loginName
-     * @return the fully baked cog user
-     * @throws IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.AuthorizationException occurs if the user
-     * has been retrieved from the database but their access has been toggled off
-     */
-    public UserWithAccessData getUserWithAccessData(String loginName) throws IntegrationException, AuthorizationException{
-        System.out.println("UserCoordinator.getUser | given by jboss: " + loginName );
-        UserWithAccessData authenticatedUser = null;
-        UserIntegrator ui = getUserIntegrator();
-        // convert the login name given to us by the JBoss container into a local ID num
-        int authUserID = ui.getUserID(loginName);
-        usr = ui.getUser(authUserID);
-        
-        if(usr != null){ // make sure we have a real user in the system
-            muniAuthMap = assembleValidAuthPeriodMap(usr);
-            if(targetMuni == null){ // from a session initialization
-                targetMuni = determineDefaultMuni(usr, muniAuthMap);
-            } 
-            au = generateUserAuthorized(usr, muniAuthMap.get(targetMuni));
-            au.setMuniAuthPerMap(muniAuthMap);
-        } else {
-            throw new AuthorizationException("The database could not retrieve the User skeleton");
-        }
-        
-        return au;
-    }
-    
+   
+   
     /**
      * Generates a list of what role types a given user can assign to new users 
      * they create. As of Oct 2019, this logic said you can add somebody of lesser 
@@ -198,20 +204,20 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         rtl = new ArrayList<>(Arrays.asList(RoleType.values()));
         for(RoleType rt: rtl){
             // only allow users to add new users of roles of lesser ranks
-            if(rt.getRank() < user.getKeyCard().getAuthRole().getRank()
-                    || user.getKeyCard().getAuthRole() == RoleType.Developer){
+            if(rt.getRank() < user.getCredential().getGoverningAuthPeriod().getRole().getRank()
+                    || user.getCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
                 rtlAuthorized.add(rt);
             }
         }
         return rtlAuthorized;
     }
     
-    public void insertNewUserAuthorizationPeriod(User requestingUser, User usee, UserAuthorizationPeriod uap) throws AuthorizationException, IntegrationException{
+    public void insertNewUserAuthorizationPeriod(User requestingUser, User usee, UserAuthPeriod uap) throws AuthorizationException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         if(uap != null && requestingUser != null && usee != null && uap.getMuni() != null){
             if(uap.getStartDate() != null && !uap.getStartDate().isAfter(LocalDateTime.now().minusYears(1))){
                 if(uap.getStopDate() != null && !uap.getStopDate().isAfter(LocalDateTime.now())){
-                    uap.setCreatedBy(requestingUser);
+                    uap.setCreatedByUserID(requestingUser.getUserID());
                     uap.setUserID(usee.getUserID());
                     ui.insertNewUserAuthorizationPeriod(uap);
                 } else {
@@ -240,159 +246,85 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param rt
      * @return a User object whose access controls switches are configured
      */
-    private AccessKeyCard generateAccessKeyCard(UserAuthorizationPeriod uap){
-        AccessKeyCard card = null;
+    private UserAuthCredential generateCredential(UserAuthPeriod uap){
+        UserAuthCredential cred = null;
         
-        switch(uap.getAuthorizedRole()){
+        switch(uap.getRole()){
             case Developer: 
-                card = new AccessKeyCard(   uap.getUserID(),
-                                            uap.getMuni(),
-                                            uap.getAuthorizedRole(),
-                                            true,   //developer
-                                            true,   // sysadmin
-                                            true,   // cogstaff
-                                            true,   // enfOfficial
-                                            true,   // muniStaff
-                                            true);  // muniReader
+                cred = new UserAuthCredential(  uap,
+                                                true,   //developer
+                                                true,   // sysadmin
+                                                true,   // cogstaff
+                                                true,   // enfOfficial
+                                                true,   // muniStaff
+                                                true);  // muniReader
                break;
             
             case SysAdmin:
-                card = new AccessKeyCard(   uap.getUserID(),
-                                            uap.getMuni(),
-                                            uap.getAuthorizedRole(),
-                                            false,   //developer
-                                            true,   // sysadmin
-                                            true,   // cogstaff
-                                            true,   // enfOfficial
-                                            true,   // muniStaff
-                                            true);  // muniReader
+                cred = new UserAuthCredential(  uap,
+                                                false,   //developer
+                                                true,   // sysadmin
+                                                true,   // cogstaff
+                                                true,   // enfOfficial
+                                                true,   // muniStaff
+                                                true);  // muniReader
                break;               
                
             case CogStaff:
-                card = new AccessKeyCard(   uap.getUserID(),
-                                            uap.getMuni(),
-                                            uap.getAuthorizedRole(),
-                                            false,   //developer
-                                            false,   // sysadmin
-                                            true,   // cogstaff
-                                            false,   // enfOfficial
-                                            true,   // muniStaff
-                                            true);  // muniReader
+                cred = new UserAuthCredential(  uap,
+                                                false,   //developer
+                                                false,   // sysadmin
+                                                true,   // cogstaff
+                                                false,   // enfOfficial
+                                                true,   // muniStaff
+                                                true);  // muniReader
                break;               
                
             case EnforcementOfficial:
-                card = new AccessKeyCard(   uap.getUserID(),
-                                            uap.getMuni(),
-                                            uap.getAuthorizedRole(),
-                                            false,   //developer
-                                            false,   // sysadmin
-                                            false,   // cogstaff
-                                            true,   // enfOfficial
-                                            true,   // muniStaff
-                                            true);  // muniReader
+                cred = new UserAuthCredential(  uap,
+                                                false,   //developer
+                                                false,   // sysadmin
+                                                false,   // cogstaff
+                                                true,   // enfOfficial
+                                                true,   // muniStaff
+                                                true);  // muniReader
                break;
                
             case MuniStaff:
-                card = new AccessKeyCard(   uap.getUserID(),
-                                            uap.getMuni(),
-                                            uap.getAuthorizedRole(),
-                                            false,   //developer
-                                            false,   // sysadmin
-                                            false,   // cogstaff
-                                            false,   // enfOfficial
-                                            true,   // muniStaff
-                                            true);  // muniReader
+                cred = new UserAuthCredential(  uap,
+                                                false,   //developer
+                                                false,   // sysadmin
+                                                false,   // cogstaff
+                                                false,   // enfOfficial
+                                                true,   // muniStaff
+                                                true);  // muniReader
                break;
                
             case MuniReader:
-                card = new AccessKeyCard(   uap.getUserID(),
-                                            uap.getMuni(),
-                                            uap.getAuthorizedRole(),
-                                            false,   //developer
-                                            false,   // sysadmin
-                                            false,   // cogstaff
-                                            false,   // enfOfficial
-                                            false,   // muniStaff
-                                            true);  // muniReader
+                cred = new UserAuthCredential(  uap,
+                                                false,   //developer
+                                                false,   // sysadmin
+                                                false,   // cogstaff
+                                                false,   // enfOfficial
+                                                false,   // muniStaff
+                                                true);  // muniReader
                break;               
             default:
         }        
-        return card;
+        return cred;
     }    
     
+   
+    
     /**
-     * First whack at a logic implementation to determine session authorizations
-     * given the access record from the DB
-     * 
-     * @deprecated much too combersome to work with date pairs for each role type!
-     * Method now maintained as an archive of the development process
-     * @param userWAccess
-     * @param m
+     * @param usr
      * @return
-     * @throws AuthorizationException 
+     * @throws IntegrationException 
      */
-    private User configureUserMuniAccess(UserAuthorized userWAccess, Municipality m) throws AuthorizationException{
-        
-        
-        /**
-        
-        if(userWAccess == null || m == null){
-            throw new AuthorizationException("UserCoordinator.configureUserMuniAccess | Incoming user or muni is null");
-        }
-        
-        if( m.getMuniCode() == userWAccess.getAccessRecord().getMuni_municode()
-                &&
-            userWAccess.getAccessRecord().getAccessgranteddatestart().isBefore(LocalDateTime.now())
-                &&
-            userWAccess.getAccessRecord().getAccessgranteddatestop().isAfter(LocalDateTime.now())
-                &&
-            userWAccess.getAccessRecord().getRecorddeactivatedts() == null){
-            
-                // the current user is allowed access to this muni, so now determine RoleType
-                // based on assigned start and stop dates for various roles as specified in the
-                // current UserAccessRecord
-                if(userWAccess.getAccessRecord().getSupportstartdate() != null
-                        && userWAccess.getAccessRecord().getSupportstopdate() != null
-                        && userWAccess.getAccessRecord().getSupportstartdate().isBefore(LocalDateTime.now())
-                        && userWAccess.getAccessRecord().getSupportstopdate().isAfter(LocalDateTime.now())){
-                    userWAccess.setRoleType(RoleType.Developer);
-                } else if(userWAccess.getAccessRecord().getSysadminstartdate() != null
-                        && userWAccess.getAccessRecord().getSysadminstopdate() != null
-                        && userWAccess.getAccessRecord().getSysadminstartdate().isBefore(LocalDateTime.now())
-                        && userWAccess.getAccessRecord().getSysadminstopdate().isAfter(LocalDateTime.now())){
-                    userWAccess.setRoleType(RoleType.SysAdmin);
-                    
-                } else if(userWAccess.getAccessRecord().getCodeofficerstartdate() != null
-                        && userWAccess.getAccessRecord().getCodeofficerstopdate() != null
-                        && userWAccess.getAccessRecord().getCodeofficerstartdate().isBefore(LocalDateTime.now())
-                        &&userWAccess.getAccessRecord().getCodeofficerstopdate().isAfter(LocalDateTime.now())){
-                    userWAccess.setRoleType(RoleType.EnforcementOfficial);
-                } else if(userWAccess.getAccessRecord().getStaffstartdate() != null
-                        && userWAccess.getAccessRecord().getStaffstopdate() != null
-                        && userWAccess.getAccessRecord().getStaffstartdate().isBefore(LocalDateTime.now())
-                        && userWAccess.getAccessRecord().getStaffstopdate().isAfter(LocalDateTime.now())){
-                    userWAccess.setRoleType(RoleType.MuniStaff);
-                } else {
-                    userWAccess.setRoleType(RoleType.MuniReader);
-                }
-                userWAccess.setKeyCard(getAccessKeyCard(userWAccess.getRoleType()));
-            return userWAccess;
-        } else {
-            throw new AuthorizationException("User exists but access to system "
-                    + "has been switched off. If you believe you are receiving "
-                    + "this message in error, please contact system administrator "
-                    + "Eric Darsow at 412.923.9907.");
-        }
-    }
-    
-    
-    public int insertNewUser(User u) throws IntegrationException{
+    public int insertNewUser(User usr) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
-        String tempPassword = String.valueOf(generateControlCodeFromTime());
-//        u.setPassword(tempPassword);
-        int newUserID = ui.insertUser(u);
+        int newUserID = ui.insertUser(usr);
         return newUserID;
-        
         
     }
     
@@ -405,7 +337,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public User getRobotUser() throws IntegrationException{
+    public User getUserRobot() throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         User u;
         u = ui.getUser(Integer.parseInt(
@@ -431,22 +363,22 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public User getUserSkeleton(){
-        User u = new User();
-        return u;
+    public User getUserSkeleton(User u){
+        User skel = new User();
+        return skel;
     }
    
     
-     public UserAuthorizationPeriod initializeNewAuthPeriod( UserAuthorized requestor, 
+     public UserAuthPeriod initializeNewAuthPeriod( UserAuthorized requestor, 
                                                             User requestee, 
                                                             Municipality m){
-        UserAuthorizationPeriod per = null;
+        UserAuthPeriod per = null;
 
         // Only Users who have sys admin permission in the requested muni or are devs
-        if((requestor.getGoverningAuthPeriod().getMuni().getMuniCode() == m.getMuniCode()
-                && requestor.getKeyCard().isHasSysAdminPermissions())
-                || requestor.getKeyCard().isHasDeveloperPermissions()){
-            per = new UserAuthorizationPeriod(m);
+        if((requestor.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode() == m.getMuniCode()
+                && requestor.getCredential().isHasSysAdminPermissions())
+                || requestor.getCredential().isHasDeveloperPermissions()){
+            per = new UserAuthPeriod(m);
             per.setStartDate(LocalDateTime.now());
             per.setStopDate(LocalDateTime.now().plusYears(1));
         }
@@ -455,27 +387,48 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      
 
      
-    public void invalidateUserAuthPeriod(UserAuthorizationPeriod aup, User u) throws IntegrationException{
+    public void invalidateUserAuthPeriod(UserAuthPeriod aup, User u) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         ui.invalidateUserAuthRecord(aup);
         
+    }
+    
+    public User getUser(int userID) throws IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        return ui.getUser(userID);
     }
     
    
      /**
       * Given a single user, coordinates the creation of a list of Users who 
       * that user can configure.
-      * @param u
+     * @param ua
       * @return 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
       */
-     public List<UserListified> getUsersForConfiguration(User u) throws IntegrationException{
+     public List<UserConfigReady> getUsersForConfiguration(UserAuthorized ua) throws IntegrationException, AuthorizationException{
          UserIntegrator ui = getUserIntegrator();
-         List<User> uListComp = ui.getCompleteActiveUserList();
-         List<UserListified> uListConfig = new ArrayList<>();
-         for(User usr: uListComp){
-             uListConfig.add(ui.getUserListified(usr));
-         }
+         
+         List<UserAuthorized> userAuthInMuniList = new ArrayList<>();
+         List<UserConfigReady> userAllowedList = new ArrayList<>();
+         
+         for(Municipality m: ua.getMuniAuthPeriodMap().keySet()){
+             userAuthInMuniList = ui.getUserAuthorizedList(m);
+             for(UserAuthorized u: userAuthInMuniList){
+                switch(ua.getRoleType()){
+                    case SysAdmin:
+                        if(u.getRoleType() != RoleType.Developer){
+                            userAllowedList.add(ui.getUserConfigReady(u));
+                        } else {
+                            break;
+                            
+                        }
+
+                }
+             
+                 
+             } // user for
+         } // muni for
          return uListConfig;
      }
     

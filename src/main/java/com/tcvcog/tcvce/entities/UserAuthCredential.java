@@ -14,8 +14,10 @@ import java.io.Serializable;
  *  
  * @author Ellen Bascomb
  */
-public class AccessKeyCard implements Serializable{
+public class UserAuthCredential implements Serializable{
 
+    private final UserAuthPeriod governingAuthPeriod;
+    
     private final boolean hasDeveloperPermissions;
     private final boolean hasSysAdminPermissions;
     private final boolean hasCOGStaffPermissions;
@@ -23,12 +25,15 @@ public class AccessKeyCard implements Serializable{
     private final boolean hasMuniStaffPermissions;
     private final boolean hasMuniReaderPermissions;
 
-    public AccessKeyCard(   boolean dev,
-                            boolean admin,
-                            boolean cogstaff,
-                            boolean ceo,
-                            boolean munistaff,
-                            boolean munireader){
+    public UserAuthCredential(  UserAuthPeriod uap,
+                                boolean dev,
+                                boolean admin,
+                                boolean cogstaff,
+                                boolean ceo,
+                                boolean munistaff,
+                                boolean munireader){
+        
+        governingAuthPeriod = uap;
         
         hasDeveloperPermissions = dev;
         hasSysAdminPermissions = admin;
@@ -36,7 +41,7 @@ public class AccessKeyCard implements Serializable{
         hasEnfOfficialPermissions = ceo;
         hasMuniStaffPermissions = munistaff;
         hasMuniReaderPermissions = munireader;
-        
+    
     }
 
 
@@ -81,6 +86,12 @@ public class AccessKeyCard implements Serializable{
     public boolean isHasMuniReaderPermissions() {
         return hasMuniReaderPermissions;
     }
-    
+
+    /**
+     * @return the governingAuthPeriod
+     */
+    public UserAuthPeriod getGoverningAuthPeriod() {
+        return governingAuthPeriod;
+    }
     
 }

@@ -140,8 +140,56 @@ CREATE TABLE public.loginmuniauthperiod
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+ALTER TABLE login ADD COLUMN pswdlastupdated TIMESTAMP WITH TIME ZONE;
+ALTER TABLE login ADD COLUMN active BOOLEAN DEFAULT TRUE;
+ALTER TABLE login ADD COLUMN forcepasswordreset TIMESTAMP WITH TIME ZONE;
+ALTER TABLE login ADD COLUMN createdby INTEGER CONSTRAINT login_createdby_fk REFERENCES login (userid);
+ALTER TABLE login ADD COLUMN createdts TIMESTAMP WITH TIME ZONE;
+ALTER TABLE login ADD COLUMN nologinvirtualonly BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE public.loginmuniauthperiod ADD COLUMN supportassignedby INTEGER CONSTRAINT loginmuniauthperiod_supportassignedby_userid_fk REFERENCES login (userid);
+
+ALTER TABLE public.login ADD COLUMN userrole role DEFAULT 'User'::role;
+
+ALTER TABLE public.login
+   ALTER COLUMN password DROP NOT NULL;
+
+ALTER TABLE public.login ADD COLUMN pswdcleartext TEXT;
+ALTER TABLE public.loginmuniauthperiod ADD COLUMN rank INTEGER DEFAULT 1;
+ALTER TABLE public.loginmuniauthperiod RENAME COLUMN rank to assignmentrank;
+
+ALTER TABLE public.loginmuniauthperiod DROP COLUMN defaultmuni;
+
+-- REMOTE SERVER RUN CURSOR
 
 
+CREATE SEQUENCE IF NOT EXISTS loginmuniauthperiodlog_seq
+  START WITH 2777
+  INCREMENT BY 7
+  MINVALUE 2777
+  NO MAXVALUE 
+  CACHE 1;
+
+CREATE TABLE public.loginmuniauthperiodlog
+(
+  authperiodlogentryid      INTEGER NOT NULL CONSTRAINT logincredentialex_pk PRIMARY KEY DEFAULT nextval('loginmuniauthperiodsession_seq'),
+  authperiod_periodid       INTEGER NOT NULL CONSTRAINT logincredentialex_periodid_fk REFERENCES loginmuniauthperiod (muniauthperiodid),
+  category                  TEXT,
+  entryts                   TIMESTAMP WITH TIME ZONE,
+  entrydateofecord          TIMESTAMP WITH TIME ZONE,
+  disputedby_userid         INTEGER CONSTRAINT loginmuniauthperiodsession_disputedby_userid_fk REFERENCES login (userid),
+  disputedts                TIMESTAMP WITH TIME ZONE,
+  notes                     TEXT,
+  cookie_jsessionid         TEXT,               
+  header_remoteaddr         TEXT,
+  header_useragent          TEXT,
+  header_dateraw            TEXT,
+  header_date               TIMESTAMP WITH TIME ZONE,
+  header_cachectl           TEXT,
+  audit_usersession_userid        INTEGER NOT NULL CONSTRAINT logincredentialex_usersessionid_fk REFERENCES login (userid),
+  audit_usercredential_userid     INTEGER NOT NULL CONSTRAINT logincredentialex_usercredentialid_fk REFERENCES login (userid),
+  audit_muni_municode             INTEGER NOT NULL CONSTRAINT logincredentialex_muni_fk REFERENCES municipality (municode)
+);
 
 
 

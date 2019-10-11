@@ -24,6 +24,10 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthPeriod;
+import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import java.time.ZoneId;
@@ -47,10 +51,9 @@ import javax.faces.event.ActionEvent;
 public class UserBB extends BackingBeanUtils implements Serializable {
 
     private List<User> userList;
-    private User currentUser;
-
-//    @ManagedProperty(value="#{sessionBean}")
-//    private SessionBean subclassSessionBean;
+    private UserAuthorized currentUser;
+    
+    private UserAuthPeriod currentUserAuthPeriod;
     
     private int formUserID;
     private RoleType formRoleType;
@@ -367,6 +370,50 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      */
     public void setCurrentUser(User currentUser) {
         this.currentUser = currentUser;
+    }
+
+   
+
+    /**
+     * @return the currentUserAuthPeriod
+     */
+    public UserAuthPeriod getCurrentUserAuthPeriod() {
+        return currentUserAuthPeriod;
+    }
+
+    /**
+     * @param currentUserAuthPeriod the currentUserAuthPeriod to set
+     */
+    public void setCurrentUserAuthPeriod(UserAuthPeriod currentUserAuthPeriod) {
+        this.currentUserAuthPeriod = currentUserAuthPeriod;
+    }
+
+    /**
+     * @return the userPersonList
+     */
+    public List<Person> getUserPersonList() {
+        return userPersonList;
+    }
+
+    /**
+     * @param userPersonList the userPersonList to set
+     */
+    public void setUserPersonList(List<Person> userPersonList) {
+        this.userPersonList = userPersonList;
+    }
+
+    /**
+     * @return the selectedUserPerson
+     */
+    public Person getSelectedUserPerson() {
+        return selectedUserPerson;
+    }
+
+    /**
+     * @param selectedUserPerson the selectedUserPerson to set
+     */
+    public void setSelectedUserPerson(Person selectedUserPerson) {
+        this.selectedUserPerson = selectedUserPerson;
     }
 
     

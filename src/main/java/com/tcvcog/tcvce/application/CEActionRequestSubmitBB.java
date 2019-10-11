@@ -269,7 +269,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         Municipality m = currentRequest.getMuni();
         Person skel = pc.getNewPersonSkeleton(m);
         try {
-            skel.setCreatorUserID(uc.getRobotUser().getUserID());
+            skel.setCreatorUserID(uc.getUserRobot().getUserID());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

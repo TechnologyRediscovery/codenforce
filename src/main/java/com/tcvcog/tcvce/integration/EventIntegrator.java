@@ -765,7 +765,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             // timestamp is updated with a call to postgres's now()
             stmt.setString(3, event.getDescription());
-            stmt.setInt(4, event.getOwner().getUserID());
+            if(event.getOwner() != null){
+                stmt.setInt(4, event.getOwner().getUserID());
+            } else {
+                stmt.setInt(4, uc.getUserRobot().getUserID());
+            }
             stmt.setBoolean(5, event.isDiscloseToMunicipality());
 
             stmt.setBoolean(6, event.isDiscloseToPublic());
@@ -1269,7 +1273,157 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     public List<OccEvent> getOccEvents(int occPeriodID){
         // TODO: write my guts
         
-        return new ArrayList<>();
+        String query = "INSERT INTO public.occperiodeventrule(\n" +
+                        "            occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
+                        "            lastevaluatedts, passedrulets, passedrule_eventid, active)\n" +
+                        "    VALUES (?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, erop.getOccPeriodID());
+            stmt.setInt(2, erop.getRuleid());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            if(erop.getAttachedBy() != null){
+                stmt.setInt(4, erop.getAttachedBy().getUserID());
+            } else {
+                stmt.setInt(4, uc.getUserRobot().getUserID());
+             
+            }
+            
+            // last evaluated TS
+            stmt.setNull(5, java.sql.Types.NULL);
+            
+            // passed rule TS
+            stmt.setNull(6, java.sql.Types.NULL);
+            
+            if(erop.getPassedRuleEvent() != null){
+                stmt.setInt(7, erop.getPassedRuleEvent().getEventID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            stmt.setBoolean(8, erop.isActiveRuleAbstract());
+            
+            stmt.execute();
+            System.out.println("EventIntegrator.rules_insertEventRuleOccPeriod | inserted rule on OccPeriod ID " + erop.getOccPeriodID());
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert a new event rule occ period into the system", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    public void rules_addEventRuleAbstractToOccPeriodTypeRuleSet(EventRuleAbstract era, int eventRuleSetID) throws IntegrationException{
+        
+        
+        String query = "INSERT INTO public.eventruleruleset(\n" +
+                        "            ruleset_rulesetid, eventrule_ruleid)\n" +
+                        "    VALUES (?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, eventRuleSetID);
+            stmt.setInt(2, era.getRuleid());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot add EventRUleAbstract to an occ period type rule set", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+
+    public void rules_updateEventRuleOccPeriod(EventRuleOccPeriod erop) throws IntegrationException{
+        String query = "UPDATE public.occperiodeventrule\n" +
+                        "   SET occperiod_periodid=?, eventrule_ruleid=?, attachedts=?, attachedby_userid=?, \n" +
+                        "       lastevaluatedts=?, passedrulets=?, passedrule_eventid=?, active=? \n" +
+                        " WHERE occperiod_periodid=? AND eventrule_ruleid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            // note the compound primary key of both the occperiodid and ruleid
+            stmt.setInt(1, erop.getOccPeriodID());
+            stmt.setInt(2, erop.getRuleid());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            if(erop.getAttachedBy() != null){
+                stmt.setInt(4, erop.getAttachedBy().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            
+            stmt.setNull(6, java.sql.Types.NULL);
+            
+            if(erop.getPassedRuleEvent() != null){
+                stmt.setInt(7, erop.getPassedRuleEvent().getEventID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(8, erop.isActiveRuleAbstract());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert OccPeriodEventRule into the system", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    public void rules_insertEventRuleCECase(EventRuleCECase ercec) throws IntegrationException{
+          String query = "INSERT INTO public.cecaseeventrule(\n" +
+                        "            cecase_caseid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
+                        "            lastevaluatedts, passedrulets, passedrule_eventid, active)\n" +
+                        "    VALUES (?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, ercec.getCeCaseID());
+            stmt.setInt(2, ercec.getRuleid());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            if(ercec.getAttachedBy() != null){
+                stmt.setInt(4, ercec.getAttachedBy().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            
+            stmt.setNull(6, java.sql.Types.NULL);
+            
+            if(ercec.getPassedRuleEvent() != null){
+                stmt.setInt(7, ercec.getPassedRuleEvent().getEventID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(8, ercec.isActiveRuleAbstract());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert EventRuleCECase into the system", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
         
         
     }

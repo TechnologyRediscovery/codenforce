@@ -80,9 +80,11 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<Municipality> userAuthMuniList;
 
     // BOB individual object session shelves - NOT NULL
-    private MunicipalityComplete sessionMuni;
+    private MunicipalityListified sessionMuni;
+    private UserAuthorized sessionUser;
+    
+    
     private CECase sessionCECase;
-    private UserWithAccessData sessionUser;
     private Property sessionProperty;
     private Person sessionPerson;
     private OccPeriod sessionOccPeriod;

@@ -69,13 +69,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable{
         return muniCodeNameMap;
     }
     
-    public User getPublicAccessUser(){
-        User u = new User();
-        u.setRoleType(RoleType.Public);
-        return u;
-    }
-    
-    
+   
 
     /**
      * @param muniCodeNameMap the muniCodeNameMap to set

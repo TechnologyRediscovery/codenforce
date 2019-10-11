@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.MuniCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
@@ -128,6 +129,7 @@ public class BackingBeanUtils implements Serializable{
     private SystemIntegrator systemIntegrator;
     private SystemCoordinator systemCoordinator;
     private LogIntegrator logIntegrator;
+    private MuniCoordinator muniCoordinator;
     
     private SearchCoordinator searchCoordinator;
     
@@ -877,4 +879,62 @@ public class BackingBeanUtils implements Serializable{
         ci = (ChoiceIntegrator) ve.getValue(context.getELContext());
         return ci;
     }
+    /**
+     * @return the blobCoordinator
+     */
+    public BlobCoordinator getBlobCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{blobCoordinator}", BlobCoordinator.class);
+        blobCoordinator = (BlobCoordinator) ve.getValue(context.getELContext());
+        return blobCoordinator;
+    }
+
+    /**
+     * @param blobCoordinator the blobCoordinator to set
+     */
+    public void setBlobCoordinator(BlobCoordinator blobCoordinator) {
+        this.blobCoordinator = blobCoordinator;
+    }
+
+    /**
+     * @return the blobIntegrator
+     */
+    public BlobIntegrator getBlobIntegrator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{blobIntegrator}", BlobIntegrator.class);
+        blobIntegrator = (BlobIntegrator) ve.getValue(context.getELContext());
+        return blobIntegrator;
+    }
+
+    /**
+     * @param blobIntegrator the blobIntegrator to set
+     */
+    public void setBlobIntegrator(BlobIntegrator blobIntegrator) {
+        this.blobIntegrator = blobIntegrator;
+    }
+
+    /**
+     * @return the muniCoordinator
+     */
+    public MuniCoordinator getMuniCoordinator() {
+        
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{muniCoordinator}", MuniCoordinator.class);
+        muniCoordinator = (MuniCoordinator) ve.getValue(context.getELContext());
+        return muniCoordinator;
+    }
+
+    /**
+     * @param muniCoordinator the muniCoordinator to set
+     */
+    public void setMuniCoordinator(MuniCoordinator muniCoordinator) {
+        this.muniCoordinator = muniCoordinator;
+    }
+
+       
+
+
 }
