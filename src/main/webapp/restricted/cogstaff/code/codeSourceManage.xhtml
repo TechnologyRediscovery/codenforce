@@ -197,7 +197,8 @@
                                                          icon="fa fa-plus" 
                                                          actionListener="#{codeSourceBB.addElementToSource}"
                                                          oncomplete="PF('codesourcemanage-dialog-addelementtosource-var').show();"
-                                                         update="codesourcemanage-dialog-addelementtosource"
+                                                         update="codesourcemanage-dialog-addelementtosource
+                                                         "
                                                          style="width: 49.5%"
                                                          disabled="#{codeSourceBB.activeCodeSourceEdit()}"
 
@@ -492,7 +493,7 @@
                                         styleClass="buttonOwnLine" 
                                         disabled="#{codeSourceBB.activeCodeSourceEdit()}"
                                         action="#{codeSourceAddUpdateBB.commitCodeSourceUpdates}"/>
-                                    
+
 
                                     <p:commandButton 
                                         id="addNewButton" 
@@ -526,10 +527,11 @@
                                         <h:panelGrid columns="4" border="0" 
                                                      cellspacing="5" 
                                                      cellpadding="5" 
-                                                     columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                     columnClasses="gridTd-fixedcolumn, gridTd-fixedcolumn, gridTd-fixedcolumn, gridTd-fixedcolumn" 
+                                                     
                                                      footerClass="gridFooter">
 
-                                            <h:outputLabel value="Ordiance chapter number (numbers only):"/>
+                                            <p:outputLabel value="Ordiance chapter number (numbers only):"/>
 
                                             <h:panelGroup>  
 
@@ -537,91 +539,95 @@
                                                              value="#{codeElementBB.newElement.ordchapterNo}"
                                                              style="width: 100%;" 
                                                              required="true"
+                                                             label="Ordiance Chapter Number"
                                                              styleClass="inputText"/>
 
-                                                <h:message for="cdelOrdChapterNo" showDetail="true" showSummary="true" 
+                                                <h:message for="cdelOrdChapterNo" showDetail="true" showSummary="false" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                             </h:panelGroup>
 
-                                            <h:outputLabel value="Chapter title:"/>
+                                            <p:outputLabel value="Chapter title:"/>
 
                                             <h:panelGroup>
+                                                
                                                 <p:inputText id="cdelOrdChapterTitle" 
                                                              value="#{codeElementBB.newElement.ordchapterTitle}"
-
                                                              style="width: 100%;" 
+                                                             label="Chapter Title"
                                                              required="true"
                                                              styleClass="inputText"/>
 
-                                                <h:message for="cdelOrdChapterTitle" showDetail="true" showSummary="true" 
+                                                <h:message for="cdelOrdChapterTitle" showDetail="true" showSummary="false" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                             </h:panelGroup>
 
-                                            <h:outputLabel value="Section number (may contain letters):"/>
+                                            <p:outputLabel value="Section number (may contain letters):"/>
 
                                             <h:panelGroup>
 
                                                 <p:inputText id="cdelOrdSecNum" 
                                                              value="#{codeElementBB.newElement.ordSecNum}"
-
                                                              style="width: 100%;" 
+                                                             label="Section Number"
                                                              required="true"
                                                              styleClass="inputText"/>
 
-                                                <h:message for="cdelOrdSecNum" showDetail="true" showSummary="true" 
+                                                <h:message for="cdelOrdSecNum" showDetail="true" showSummary="false" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
 
                                             </h:panelGroup>
 
-                                            <h:outputLabel value="Section title:"/>
+                                            <p:outputLabel value="Section title:"/>
 
                                             <h:panelGroup>
 
                                                 <p:inputText id="ccdelOrdSecTitle" 
                                                              value="#{codeElementBB.newElement.ordSecTitle}"
                                                              style="width: 100%;" 
+                                                             label="Section Title"
                                                              required="true" 
                                                              styleClass="inputText"/>
-                                                <h:message for="ccdelOrdSecTitle" showDetail="true" showSummary="true" 
+                                                
+                                                <h:message for="ccdelOrdSecTitle" showDetail="true" showSummary="false" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                             </h:panelGroup>
 
-                                            <h:outputLabel value="Subsection number (may contain letters):"/>
+                                            <p:outputLabel value="Subsection number (may contain letters):"/>
 
                                             <h:panelGroup>
 
                                                 <p:inputText id="cdelordSubSecNum" 
                                                              value="#{codeElementBB.newElement.ordSubSecNum}"
-
                                                              style="width: 100%;" 
+                                                             label="Subsection Number"
                                                              required="false" 
                                                              styleClass="inputText"/>
 
-                                                <h:message for="cdelordSubSecNum" showDetail="true" showSummary="true" 
+                                                <h:message for="cdelordSubSecNum" showDetail="true" showSummary="false" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                             </h:panelGroup>
 
-                                            <h:outputLabel value="Subsection title:"/>
+                                            <p:outputLabel value="Subsection title:"/>
 
                                             <h:panelGroup>
 
                                                 <p:inputText id="cdelOrdSubSecTitle" 
                                                              value="#{codeElementBB.newElement.ordSubSecTitle}"
-
                                                              style="width: 100%;" 
+                                                             label="Subsection Title"
                                                              required="false" 
                                                              styleClass="inputText"/>
 
-                                                <h:message for="cdelOrdSubSecTitle" showDetail="true" showSummary="true" 
+                                                <h:message for="cdelOrdSubSecTitle" showDetail="true" showSummary="false" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                             </h:panelGroup>    
 
-                                            <h:outputLabel value="Toggle active element:"/>
+                                            <p:outputLabel value="Toggle active element:"/>
 
                                             <h:panelGroup>
 
@@ -630,17 +636,17 @@
                                                                        onLabel="Yes" 
                                                                        offLabel="No"
                                                                        style="width:50px"
+                                                                       label="Active Element"
                                                                        />
 
-
-                                                <h:message for="cdelIsActive" showDetail="true" showSummary="true" 
+                                                <h:message for="cdelIsActive" showDetail="true" showSummary="false" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                             </h:panelGroup>
 
                                             <f:facet name="footer">
 
-                                                <h:outputLabel value="Web address of element resource:"/>
+                                                <p:outputLabel value="Web address of element resource:"/>
 
                                                 <h:panelGroup>
 
@@ -648,18 +654,20 @@
                                                                  value="#{codeElementBB.newElement.resourceURL}" 
                                                                  style="width: 100%;" 
                                                                  required="false" 
-                                                                 styleClass="inputText"/>
+                                                                 styleClass="inputText"
+                                                                 label="Resource URL"/>
 
-                                                    <h:message for="cdelUrl" showDetail="true" showSummary="true" 
+                                                    <h:message for="cdelUrl" showDetail="true" showSummary="false" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                                 </h:panelGroup>
 
                                                 <p:spacer height="15px"/>
 
-                                                <h:outputLabel value="Enter the technical text of this ordinance:"/> 
+                                                <p:outputLabel value="Enter the technical text of this ordinance:" /> 
 
-                                                <h:panelGroup>
+                                                <h:panelGroup >
+                                                    
                                                     <p:editor id="cdelOrdTechnicalText"  
                                                               value="#{codeElementBB.newElement.ordTechnicalText}" 
                                                               controls="bold italic underline strikethrough font size style color 
@@ -667,10 +675,12 @@
                                                               indent link unlink copy cut paste rule alignleft center alignright"
                                                               width="1000" 
                                                               required="true"
-                                                              height="150"/>
-
-                                                    <h:message for="cdelOrdTechnicalText" showDetail="true" showSummary="true" 
+                                                              height="150"
+                                                              requiredMessage="Technical Text: Validation Error: Value is required."
+                                                              />
+                                                    <h:message for="cdelOrdTechnicalText" showDetail="true" showSummary="false" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
 
                                                 </h:panelGroup>  
 
@@ -679,6 +689,7 @@
                                                 <h:outputLabel value="Human-friendly text:"/>
 
                                                 <h:panelGroup>   
+                                                    
                                                     <p:editor   id="cdelOrdHumanFriendlyText"  
                                                                 value="#{codeElementBB.newElement.ordHumanFriendlyText}" 
                                                                 controls="bold italic underline strikethrough font size style color 
@@ -687,9 +698,6 @@
                                                                 width="1000" 
                                                                 required="false"
                                                                 height="150"/>
-
-                                                    <h:message for="cdelOrdHumanFriendlyText" showDetail="true" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                                 </h:panelGroup> 
 
@@ -704,11 +712,10 @@
                                             value="Add New Code Element" 
                                             ajax="true" 
                                             icon="fa fa-plus" 
-
                                             actionListener="#{codeElementBB.onAddElementToSourceButtonChange()}"
-                                            oncomplete="PF('codesourcemanage-dialog-addelementtosource-var').hide();"
+                                            oncomplete="DialogRequest(args)"
                                             update="codesourcemanage-panel-listcodesource
-                                            codesourcemanage-dialog-addelementtosource
+                                            addCodeElement
                                             "
                                             />
 
@@ -717,6 +724,18 @@
                                 </p:panel>
 
                             </p:dialog>
+
+
+                            <script >
+                                function DialogRequest(args) {
+                                    if (args.validationFailed) {
+                                        PF('codesourcemanage-dialog-addelementtosource-var').jq.effect("shake", {times: 3}, 100);
+                                    } else {
+                                        PF('codesourcemanage-dialog-addelementtosource-var').hide();
+                                    }
+                                }
+                            </script>
+
 
                             <p:dialog  id="codesourcemanage-dialog-linkElementsToGuideEntries"
                                        width="1400"
@@ -1106,7 +1125,7 @@
                                         <h:panelGroup>
 
                                             <p:outputLabel id="cdElGuideID" value="#{codeElementBB.formGuideEntryID}" 
-                                                         style="width: 100%;" tabindex="13" styleClass="inputText"/>
+                                                           style="width: 100%;" tabindex="13" styleClass="inputText"/>
                                             <h:message for="cdElGuideID" showDetail="true" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                         </h:panelGroup>
