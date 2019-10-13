@@ -198,8 +198,6 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         }
         return muniPerMap;
     }
-    
-    
    
    
     /**
