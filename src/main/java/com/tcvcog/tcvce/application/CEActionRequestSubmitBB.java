@@ -148,7 +148,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         disabledPersonFormFields = false;
         actionRequestorAssignmentMethod = 1;
         if(usr != null){
-            selectedMuni = getSessionBean().getSessionMuniHeavy();
+            selectedMuni = getSessionBean().getSessionMuni();
         }
     }
     

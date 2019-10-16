@@ -223,7 +223,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             eventTypeListAll = new ArrayList();
             eventTypeListAll = ec.getEventTypesAll();
             eventCategoryListAllActive = ec.getEventCategoryListActive();
-            occPeriodTypeList = getSessionBean().getSessionMuniHeavy().getProfile().getOccPeriodTypeList();
+            occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
             currentEventRuleAbstract = ec.rules_getInitializedEventRuleAbstract();
             eventRuleSetList = ec.rules_getEventRuleSetList();
         } catch (IntegrationException ex) {
@@ -250,7 +250,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
         
         try {
-            inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessionMuniHeavy());
+            inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessionMuni());
             reportConfigOccInspec =
                     oc.getOccInspectionReportConfigDefault(
                             currentInspection,

@@ -123,9 +123,15 @@
                                 </p:submenu>
 
                                 <f:facet name="options">
+                                    
+                                         <h:outputText value="#{systemServicesBB.currentUser.role.label} 
+                                                                | rnk:#{systemServicesBB.currentUser.role.rank} 
+                                                                | username: #{systemServicesBB.currentUser.username} 
+                                                                | id:#{systemServicesBB.currentUser.userID} " />
+                                    
                                     <p:commandButton    id="navcontres-button-logout"
                                                         action="#{systemServicesBB.logout}" 
-                                                        value="Logout: #{sessionBean.sessionUser.person.firstName}"
+                                                        value="Logout #{systemServicesBB.currentUser.person.firstName} "
                                                         ajax="false"/>
                                 </f:facet>
                             </p:menubar>
@@ -136,17 +142,12 @@
                             <h:form id="sessionInfoForm">
                                 <div class="activeObjectBox">
                                     <h:outputText styleClass="infoBarDataLabel" value="muni: "/>
-                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.sessionMuniHeavy.muniName} "/> 
+                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.sessionMuni.muniName} "/> 
                                 </div>
                                 <div class="activeObjectBox">
-                                    <ui:remove>
                                         <h:outputText styleClass="infoBarDataLabel" value="property: "/>
                                         <h:outputText styleClass="infoBarData" value="#{sessionBean.sessionProperty.address} "/> 
                                         <h:outputText styleClass="infoBarData" value="(#{sessionBean.sessionProperty.muni.muniName})  "/>
-
-                                        <p:commandButton styleClass="sessionInfoButton" action="#{navigationBB.gotoPropertyProfile}" value="profile" ajax="false" icon="fa fa-home" disabled="#{navigationBB.noActiveProperty}"/>
-                                        <p:commandButton styleClass="sessionInfoButton" action="propertySearch" value="change prop" ajax="false" icon="fa fa-search"/>
-                                    </ui:remove>
                                 </div>
                                
                                 <ui:remove>
@@ -180,11 +181,11 @@
                                  <h2>User settings for <h:outputText value="#{userBB.currentUser.username}" /></h2>
                                  
                                  <p>
-                                    <h:outputText value="Role: #{systemServicesBB.sessionAuthUser.roleType.label}" />
+                                    <h:outputText value="Role: #{systemServicesBB.currentUser.role.label}" />
                                     <h:outputText value=" | " />
-                                    <h:outputText value="Rank: #{systemServicesBB.sessionAuthUser.roleType.rank}" />
+                                    <h:outputText value="Rank: #{systemServicesBB.currentUser.role.rank}" />
                                     <h:outputText value=" | " />
-                                    <h:outputText value="ID: #{systemServicesBB.sessionAuthUser.userID} " />
+                                    <h:outputText value="ID: #{systemServicesBB.currentUser.userID} " />
                                  </p>
                                  
                                  <p>

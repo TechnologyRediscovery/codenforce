@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +32,12 @@ public class UserAuthorized extends User{
      * Remember that the notion of a Credential only exists in Java land, since a User 
      * is never "in" the database, doing stuff.
      */
-    private UserAuthCredential credential;
-
-    private Map<Municipality, UserAuthPeriod> muniAuthPeriodMap;
+    private Credential credential;
+   
+    /**
+     * Only contains valid auth periods
+     */
+    private Map<Municipality, List<UserMuniAuthPeriod>> muniAuthPeriodsMap;
     
     protected LocalDateTime pswdLastUpdated;
     protected LocalDateTime forcePasswordResetTS;
@@ -65,17 +69,29 @@ public class UserAuthorized extends User{
      * authorized role field
      * @return 
      */
-    public RoleType getRoleType(){
-        if(credential != null){
-            if(credential.getGoverningAuthPeriod() != null){
-                return credential.getGoverningAuthPeriod().getRole();
+    public RoleType getRole(){
+        if(getCredential() != null){
+            if(getCredential().getGoverningAuthPeriod() != null){
+                return getCredential().getGoverningAuthPeriod().getRole();
             } 
         } 
         return null;
     }
+    
+    /**
+     * Convenience method for pulling out Muni keys from the authorized Muni:AuthPeriod map
+     * @return 
+     */
+    public List<Municipality> getAuthMuniList(){
+        return new ArrayList<>(muniAuthPeriodsMap.keySet());
+    }
+    
+    public Credential getKeyCard(){
+        return getCredential();
+    }
 
 
-    public void setCredential(UserAuthCredential cr) throws AuthorizationException{
+    public void setCredential(Credential cr) throws AuthorizationException{
         if(cr != null && cr.getGoverningAuthPeriod().getUserID() == userID){
             credential = cr;
         }
@@ -83,34 +99,7 @@ public class UserAuthorized extends User{
             throw new AuthorizationException("cannot set a credential to NULL or one without matching userID in AuthPeriod");
         }
     }
-    /**
-     * @return the credential
-     */
-    public UserAuthCredential getCredential() {
-        return credential;
-    }
-
-    /**
-     * @param validAuthPeriodList the validAuthPeriodList to set
-     */
-    public void setValidAuthPeriodList(Map<Municipality, UserAuthPeriod>validAuthPeriodList) {
-        this.setMuniAuthPeriodMap(validAuthPeriodList);
-    }
-
-    /**
-     * @return the muniAuthPeriodMap
-     */
-    public Map<Municipality, UserAuthPeriod> getMuniAuthPeriodMap() {
-        return muniAuthPeriodMap;
-    }
-
-    /**
-     * @param muniAuthPeriodMap the muniAuthPeriodMap to set
-     */
-    public void setMuniAuthPeriodMap(Map<Municipality, UserAuthPeriod> muniAuthPeriodMap) {
-        this.muniAuthPeriodMap = muniAuthPeriodMap;
-    }
-
+   
     /**
      * @return the pswdLastUpdated
      */
@@ -138,6 +127,32 @@ public class UserAuthorized extends User{
     public void setForcePasswordResetTS(LocalDateTime forcePasswordResetTS) {
         this.forcePasswordResetTS = forcePasswordResetTS;
     }
+
+    /**
+     * @return the muniAuthPeriodsMap
+     */
+    public Map<Municipality, List<UserMuniAuthPeriod>> getMuniAuthPeriodsMap() {
+        if(muniAuthPeriodsMap != null){
+            System.out.println("UserAuthorized.getMuniAuthPeriodsMap SIZE: " + muniAuthPeriodsMap.keySet().size());
+        }
+        return muniAuthPeriodsMap;
+    }
+
+    /**
+     * @param muniAuthPeriodsMap the muniAuthPeriodsMap to set
+     */
+    public void setMuniAuthPeriodsMap(Map<Municipality, List<UserMuniAuthPeriod>> muniAuthPeriodsMap) {
+        this.muniAuthPeriodsMap = muniAuthPeriodsMap;
+    }
+
+    /**
+     * @return the credential
+     */
+    public Credential getCredential() {
+        return credential;
+    }
+
+   
 
     /**
      * @return the accessRecord

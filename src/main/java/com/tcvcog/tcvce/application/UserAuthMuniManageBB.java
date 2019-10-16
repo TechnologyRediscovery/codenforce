@@ -90,7 +90,7 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
 //                userList = ui.getCompleteActiveUserList();
             }
 //        } catch (IntegrationException ex) {
-//            System.out.println("UserAuthMuniManageBB.getUserList | " + ex.toString());
+//            System.out.println("UserAuthMuniManageBB.getUserAuthorizedList | " + ex.toString());
 //            getFacesContext().addMessage(null,
 //                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
 //                            "Unable to acquire list of users.",

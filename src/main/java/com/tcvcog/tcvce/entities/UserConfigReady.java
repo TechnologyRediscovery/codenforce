@@ -25,11 +25,9 @@ import java.util.List;
  */
 public class UserConfigReady extends User{
     
-    private List<UserAuthPeriod> userFullAuthPeriodList;
+   
     
-    protected LocalDateTime pswdLastUpdated;
-    protected LocalDateTime forcePasswordResetTS;
-    
+   
   
 
      /**
@@ -56,86 +54,6 @@ public class UserConfigReady extends User{
         this.createdTS = u.getCreatedTS();
     }
     
-    /**
-     * @return the userFullAuthPeriodList
-     */
-    public List<UserAuthPeriod> getUserFullAuthPeriodList() {
-        return userFullAuthPeriodList;
-    }
-
-    /**
-     * @param userFullAuthPeriodList the userFullAuthPeriodList to set
-     */
-    public void setUserFullAuthPeriodList(List<UserAuthPeriod> userFullAuthPeriodList) {
-        this.userFullAuthPeriodList = userFullAuthPeriodList;
-    }
-
-    /**
-     * @return the pswdLastUpdated
-     */
-    public LocalDateTime getPswdLastUpdated() {
-        return pswdLastUpdated;
-    }
-
-    /**
-     * @param pswdLastUpdated the pswdLastUpdated to set
-     */
-    public void setPswdLastUpdated(LocalDateTime pswdLastUpdated) {
-        this.pswdLastUpdated = pswdLastUpdated;
-    }
-
-    /**
-     * @return the forcePasswordResetTS
-     */
-    public LocalDateTime getForcePasswordResetTS() {
-        return forcePasswordResetTS;
-    }
-
-    /**
-     * @param forcePasswordResetTS the forcePasswordResetTS to set
-     */
-    public void setForcePasswordResetTS(LocalDateTime forcePasswordResetTS) {
-        this.forcePasswordResetTS = forcePasswordResetTS;
-    }
-
-    /**
-     * @return the createdByUserId
-     */
-    public int getCreatedByUserId() {
-        return createdByUserId;
-    }
-
-    /**
-     * @return the createdTS
-     */
-    public LocalDateTime getCreatedTS() {
-        return createdTS;
-    }
-    /**
-     * @return the pswdLastUpdated
-     */
-
-    /**
-     * @param createdByUserId the createdByUserId to set
-     */
-    public void setCreatedByUserId(int createdByUserId) {
-        this.createdByUserId = createdByUserId;
-    }
-
-    /**
-     * @param createdTS the createdTS to set
-     */
-    public void setCreatedTS(LocalDateTime createdTS) {
-        this.createdTS = createdTS;
-    }
-    /**
-     * @return the accessRecord
-     */
-    /**
-     * @param accessRecord the accessRecord to set
-     */
-            
-            
     
     
 }

@@ -136,7 +136,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             ajax="true"
                                                                             styleClass="noFill"
                                                                             actionListener="#{occInspectionBB.certifyOccPeriodField}"
-                                                                            rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                            rendered="true"
                                                                             disabled="false"
                                                                             value="remove type lock"
                                                                             update="occperiod-form-periodmetadata
@@ -173,8 +173,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             ajax="true"
                                                                             styleClass="noFill"
                                                                             actionListener="#{occInspectionBB.certifyOccPeriodField}"
-                                                                            rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            disabled="#{!occInspectionBB.currentOccPeriod.readyForPeriodAuthorization}"
+                                                                            rendered="true"
+                                                                            disabled="false"
                                                                             value="authorize period"
                                                                             icon="fa fa-shield"
                                                                             update="occperiod-form-periodmetadata
@@ -201,7 +201,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             ajax="true"
                                                                             styleClass="noFill"
                                                                             actionListener="#{occInspectionBB.certifyOccPeriodField}"
-                                                                            rendered="#{sessionBean.sessionUser.keyCard.hasSysAdminPermissions}"
+                                                                            rendered="true"
                                                                             disabled="false"
                                                                             value="withdraw authorization"
                                                                             icon="fa fa-warning"
@@ -251,7 +251,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             ajax="true"
                                                                             styleClass="noFill"
                                                                             actionListener="#{occInspectionBB.certifyOccPeriodField}"
-                                                                            rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                            rendered="true"
                                                                             disabled="false"
                                                                             value="lock start date"
                                                                             icon="fa fa-shield"
@@ -2259,7 +2259,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:selectOneMenu id="cecases-criteria-user" required="false"
                                                      value="#{occInspectionBB.selectedInspector}">
                                         <f:selectItem itemLabel="select an inspector..." noSelectionOption="true" />
-                                        <f:selectItems value="#{userBB.userList}"  var="u" itemValue="#{u}"
+                                        <f:selectItems value="#{occInspectionBB.inspectorCandidateList}"  var="u" itemValue="#{u}" 
                                                        itemLabel="#{u.person.firstName} #{u.person.lastName} (ID:#{u.username})"/>
                                         <f:converter converterId="userConverter"/>
                                     </p:selectOneMenu>

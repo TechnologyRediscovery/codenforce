@@ -35,7 +35,7 @@
                                 <p:commandButton id="propertyAddButton"
                                                  value="Add new property in #{sessionBean.sessionMuni.muniName}" icon="fa fa-plus"
                                                  action="#{propertyProfileBB.addProperty()}"
-                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasCOGStaffPermissions)}"
+                                                 disabled="false"
 
                                                  />
                                 <p:spacer height="10px"/>
@@ -277,7 +277,7 @@
 
                                 <p:commandButton ajax="false" value="Update Selected Property Info" 
                                                  action="#{propertyProfileBB.updateProperty}" icon="fa fa-edit"
-                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasCOGStaffPermissions)}"/>
+                                                 disabled="false"/>
                             </h:form>
 
                             <h:form id="form-propunits-editunits">
@@ -290,7 +290,7 @@
                                                        ajax="true" 
                                                        actionListener="#{propertyProfileBB.beginPropertyUnitChanges}"
                                                        oncomplete="PF('dialog-widvar-unitedit').show()"
-                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                       rendered="true"
                                                        value="Edit unit list"  
                                                        icon="fa fa-edit"
                                                        update="form-unitedit"/>
@@ -331,7 +331,7 @@
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
                                                                ajax="true" 
                                                                actionListener="#{propertyProfileBB.initiateNewOccPeriodCreation(unit)}"
-                                                               rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                               rendered="true"
                                                                disabled="#{!propertyProfileBB.currProp.active}"
                                                                oncomplete="PF('dialog-addoccperiod-var').show()"
                                                                value="Add new occupancy period" 
@@ -380,7 +380,7 @@
                                                 <p:commandButton       id="button-occperiodtable-editperiod"
                                                                        ajax="false" 
                                                                        action="#{propertyProfileBB.manageOccPeriod(period)}"
-                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                       rendered="true"
                                                                        value="manage occupancy period"  
                                                                        icon="fa fa-edit"/>
                                                
@@ -401,7 +401,7 @@
                                 <p:commandButton ajax="false"  icon="fa fa-plus"
                                                  value="Open a new code enforcement case" 
                                                  action="#{propertyProfileBB.openCECase}"
-                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                                 disabled="false"/>
                                 <p:spacer height="10px"/>
                                 <p:dataTable
                                     id="prop-cases-datatable"

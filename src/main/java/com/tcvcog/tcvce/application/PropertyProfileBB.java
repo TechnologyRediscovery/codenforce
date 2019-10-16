@@ -99,7 +99,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             System.out.println(ex);
         }
         propList = getSessionBean().getSessionPropertyList();
-        occPeriodTypeList = getSessionBean().getSessionMuniHeavy().getProfile().getOccPeriodTypeList();
+        occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
         
     }
 
@@ -108,7 +108,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
-            setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSessionBean().getSessionMuniHeavy().getMuniCode()));
+            setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSessionBean().getSessionMuni().getMuniCode()));
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + getPropList().size() + " results", ""));
@@ -309,7 +309,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                                                             currPropUnit, 
                                                             selectedOccPeriodType,
                                                             getSessionBean().getSessionUser(), 
-                                                            getSessionBean().getSessionMuniHeavy());
+                                                            getSessionBean().getSessionMuni());
                 currOccPeriod.setType(selectedOccPeriodType);
                 int newID = 0;
                 System.out.println("PropertyProfileBB.initateNewOccPeriod | currOccPeriod: " + currOccPeriod.getPeriodID());

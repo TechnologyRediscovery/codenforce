@@ -98,11 +98,13 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         if(proposal.getActivatesOn().isBefore(LocalDateTime.now()) && proposal.getExpiresOn().isAfter((LocalDateTime.now()))){
             if(u.getRoleType().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToView()){
                 proposal.setHidden(false);
-                if(u.getRoleType().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToEvaluate()){
-                    proposal.setReadOnlyCurrentUser(false);
-                }
-                // this will only execute if we are unhidden
-                configureChoiceList(proposal, u);
+                
+            }
+        }
+        if(u.getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToView()){
+            proposal.setHidden(false);
+            if(u.getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToEvaluate()){
+                proposal.setReadOnlyCurrentUser(false);
             }
         }
         return proposal;
@@ -129,9 +131,9 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
             return choice;
         }
         
-         if(u.getRoleType().getRank() >= choice.getMinimumRequiredUserRankToView()){
+         if(u.getRole().getRank() >= choice.getMinimumRequiredUserRankToView()){
                 choice.setHidden(false);
-                if(u.getRoleType().getRank() >= choice.getMinimumRequiredUserRankToChoose()){
+                if(u.getRole().getRank() >= choice.getMinimumRequiredUserRankToChoose()){
                     choice.setCanChoose(true);
                 }
             }
@@ -184,7 +186,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
      */
     public void rejectProposal(Proposal p, Openable bob, User u) throws IntegrationException, AuthorizationException, CaseLifecycleException{
         ChoiceIntegrator ci = getChoiceIntegrator();
-        if(u.getRoleType().getRank() >= p.getDirective().getMinimumRequiredUserRankToEvaluate()){
+        if(u.getRole().getRank() >= p.getDirective().getMinimumRequiredUserRankToEvaluate()){
             if(!p.getDirective().isRequiredEvaluationForBOBClose() && bob.isOpen()){
                 // configure our proposal for rejection
                 p.setProposalRejected(true);

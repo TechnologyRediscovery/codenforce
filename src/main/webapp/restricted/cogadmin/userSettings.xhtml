@@ -19,11 +19,11 @@
                <h2>User settings for <h:outputText value="#{userBB.currentUser.username}" /></h2>
 
                <p>
-                  <h:outputText value="Role: #{systemServicesBB.sessionAuthUser.roleType.label}" />
+                  <h:outputText value="Role: #{systemServicesBB.bbSessionUser.role.label}" />
                   <h:outputText value=" | " />
-                  <h:outputText value="Rank: #{systemServicesBB.sessionAuthUser.roleType.rank}" />
+                  <h:outputText value="Rank: #{systemServicesBB.bbSessionUser.role.rank}" />
                   <h:outputText value=" | " />
-                  <h:outputText value="ID: #{systemServicesBB.sessionAuthUser.userID} " />
+                  <h:outputText value="ID: #{systemServicesBB.bbSessionUser.userID} " />
                </p>
 
                <p>

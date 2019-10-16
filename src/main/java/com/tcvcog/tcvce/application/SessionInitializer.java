@@ -141,9 +141,10 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 // The stadnard Municipality object is simple, but we need the full deal
                 MunicipalityDataHeavy muniHeavy = 
                         mi.getMuniListified(authUser.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode());
+                System.out.println("SessionInitializer.configureSession | loaded MuniHeavy: " + muniHeavy.getMuniName());
                 
                 // load up our SessionBean with its key objects
-                getSessionBean().setSessionMuniHeavy(muniHeavy);
+                getSessionBean().setSessionMuni(muniHeavy);
                 getSessionBean().setSessionUser(authUser);
                 
                 populateSessionObjectQueues(authUser, muniHeavy);
@@ -153,7 +154,14 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                                 UserMuniAuthPeriodLogEntryCatEnum.SESSION_INIT);
         
                 umaple = assembleSessionInfo(umaple);
-                uc.logCredentialInvocation(umaple);
+                
+                if(umaple != null){
+                    umaple.setAudit_usersession_userid(getSessionBean().getSessionUser().getUserID());
+                    umaple.setAudit_muni_municode(muniHeavy.getMuniCode());
+                    umaple.setAudit_usercredential_userid(authUser.getCredential().getGoverningAuthPeriod().getUserID());
+                    System.out.println("SessionInitializer.configureSession | loaded UserMuniAuthPeriod: " + umaple);
+                    uc.logCredentialInvocation(umaple);
+                }
              
                return "success";
             } else {
@@ -181,25 +189,33 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         FacesContext fc = getFacesContext();
         HttpServletRequest req = (HttpServletRequest) fc.getExternalContext().getRequest();
         HttpServletResponse res = (HttpServletResponse) fc.getExternalContext().getResponse();
+        StringBuilder sb = null;
 
         Map<String, String[]> headMap = req.getParameterMap();
 
         umaple.setHeader_remoteaddr(req.getRemoteAddr());
-        StringBuilder sb = new StringBuilder();
-        for(String s: headMap.get(Constants.PARAM_USERAGENT)){
-            sb.append(s);
-            sb.append("|");
+        if(headMap != null && headMap.get(Constants.PARAM_USERAGENT) != null){
+             sb = new StringBuilder();
+            for(String s: headMap.get(Constants.PARAM_USERAGENT)){
+                sb.append(s);
+                sb.append("|");
+            }
         }
-        umaple.setHeader_useragent(sb.toString());
+        if(sb != null){
+            umaple.setHeader_useragent(sb.toString());
+        }
+    
         umaple.setHeader_dateraw(res.getHeader(Constants.PARAM_DATERAW));
         
         Cookie[] cooks = req.getCookies();
-        for(Cookie ckie: cooks){
-            if(ckie.getName().equals(Constants.PARAM_JSESS)){
-                umaple.setCookie_jsessionid(ckie.getValue());
-                break;
-            }
-        }
+        if(cooks != null){
+            for(Cookie ckie: cooks){
+                if(ckie.getName().equals(Constants.PARAM_JSESS)){
+                    umaple.setCookie_jsessionid(ckie.getValue());
+                    break;
+                } // close inner if
+            } // close for
+        } // close cooks null check
         return umaple;
     }
     

@@ -24,8 +24,8 @@ import java.time.LocalDateTime;
  */
 public class UserMuniAuthPeriodLogEntry {
     
-    private int muniAuthPeriodID;
-    private UserAuthPeriod authPeriod;
+    private int authperiodlogentryID;
+    private UserMuniAuthPeriod authPeriod;
     private String category;
     private LocalDateTime entryTS;
     private LocalDateTime entryDateOfRecord;
@@ -41,16 +41,6 @@ public class UserMuniAuthPeriodLogEntry {
     private int audit_usersession_userid;
     private int audit_usercredential_userid;
     private int audit_muni_municode;    
-
-    /**
-     * @return the muniAuthPeriodID
-     */
-    public int getMuniAuthPeriodID() {
-        return muniAuthPeriodID;
-    }
-
-    
-
    
     /**
      * @return the disputedBy
@@ -136,13 +126,7 @@ public class UserMuniAuthPeriodLogEntry {
         return audit_muni_municode;
     }
 
-    /**
-     * @param muniAuthPeriodID the muniAuthPeriodID to set
-     */
-    public void setMuniAuthPeriodID(int muniAuthPeriodID) {
-        this.muniAuthPeriodID = muniAuthPeriodID;
-    }
-
+   
    
    
     /**
@@ -274,15 +258,29 @@ public class UserMuniAuthPeriodLogEntry {
     /**
      * @return the authPeriod
      */
-    public UserAuthPeriod getAuthPeriod() {
+    public UserMuniAuthPeriod getAuthPeriod() {
         return authPeriod;
     }
 
     /**
      * @param authPeriod the authPeriod to set
      */
-    public void setAuthPeriod(UserAuthPeriod authPeriod) {
+    public void setAuthPeriod(UserMuniAuthPeriod authPeriod) {
         this.authPeriod = authPeriod;
+    }
+
+    /**
+     * @return the authperiodlogentryID
+     */
+    public int getAuthperiodlogentryID() {
+        return authperiodlogentryID;
+    }
+
+    /**
+     * @param authperiodlogentryID the authperiodlogentryID to set
+     */
+    public void setAuthperiodlogentryID(int authperiodlogentryID) {
+        this.authperiodlogentryID = authperiodlogentryID;
     }
     
 }

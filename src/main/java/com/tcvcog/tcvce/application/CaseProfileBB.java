@@ -146,7 +146,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         
-        queryList = sc.buildQueryCECaseList(getSessionBean().getSessionMuniHeavy(), getSessionBean().getSessionUser());
+        queryList = sc.buildQueryCECaseList(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser());
         selectedCECaseQuery = getSessionBean().getQueryCECase();
         searchParams = selectedCECaseQuery.getSearchParamsList().get(0);
         if(!selectedCECaseQuery.isExecutedByIntegrator()){
@@ -338,7 +338,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         reportCECase.setCse(currentCase);
 
         reportCECase.setCreator(getSessionBean().getSessionUser());
-        reportCECase.setMuni(getSessionBean().getSessionMuniHeavy());
+        reportCECase.setMuni(getSessionBean().getSessionMuni());
         reportCECase.setGenerationTimestamp(LocalDateTime.now());
 
         try {
@@ -375,7 +375,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     public String generateReportCECaseList() {
         reportCECaseList.setCreator(getSessionBean().getSessionUser());
-        reportCECaseList.setMuni(getSessionBean().getSessionMuniHeavy());
+        reportCECaseList.setMuni(getSessionBean().getSessionMuni());
         reportCECaseList.setGenerationTimestamp(LocalDateTime.now());
         
         getSessionBean().setReportConfigCECaseList(reportCECaseList);
@@ -760,13 +760,17 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         NoticeOfViolation nov;
         CaseCoordinator cc = getCaseCoordinator();
             if (!currentCase.getViolationListUnresolved().isEmpty()) {
-                getSessionBean().getSessionPropertyList().add(0, currentCase.getProperty());
-                getSessionBean().setSessionProperty(currentCase.getProperty());
-                positionCurrentCaseAtHeadOfQueue();
-                nov = cc.novGetNewNOVSkeleton(currentCase, getSessionBean().getSessionMuniHeavy());
-                nov.setCreationBy(getSessionBean().getSessionUser());
-                getSessionBean().setSessionNotice(nov);
-                return "noticeOfViolationBuilder";
+                try {
+                    getSessionBean().getSessionPropertyList().add(0, currentCase.getProperty());
+                    getSessionBean().setSessionProperty(currentCase.getProperty());
+                    positionCurrentCaseAtHeadOfQueue();
+                    nov = cc.novGetNewNOVSkeleton(currentCase, getSessionBean().getSessionMuni());
+                    nov.setCreationBy(getSessionBean().getSessionUser());
+                    getSessionBean().setSessionNotice(nov);
+                    return "noticeOfViolationBuilder";
+                } catch (AuthorizationException ex) {
+                    System.out.println(ex);
+                }
             } else {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "No unresolved violations exist for building a letter", ""));

@@ -234,7 +234,58 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ev.setCategory(ec);
         return ev;
     }
+    /**
+     * Implements business rules for determining which event types are allowed
+     * to be attached to the given CECase based on the case's phase and the
+     * user's permissions in the system.
+     *
+     * Used for displaying the appropriate event types to the user on the
+     * cecases.xhtml page
+     *
+     * @param c the CECase on which the event would be attached
+     * @param u the User doing the attaching
+     * @return allowed EventTypes for attaching to the given case
+     */
     
+    public List<EventType> getPermittedEventTypesForCECase(CECase c, UserAuthorized u) {
+        List<EventType> typeList = new ArrayList<>();
+        RoleType role = u.getRole();
+        if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
+            typeList.add(EventType.Action);
+            typeList.add(EventType.Timeline);
+        }
+        if (role != RoleType.MuniReader) {
+            typeList.add(EventType.Communication);
+            typeList.add(EventType.Meeting);
+            typeList.add(EventType.Custom);
+        }
+        return typeList;
+    }
+    
+    
+    public List<EventType> getPermittedEventTypesForOcc(OccPeriod period, UserAuthorized u) {
+        List<EventType> typeList = new ArrayList<>();
+        RoleType role = u.getRole();
+        if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
+            typeList.add(EventType.Action);
+            typeList.add(EventType.Timeline);
+            typeList.add(EventType.Occupancy);
+        }
+        if (role != RoleType.MuniReader) {
+            typeList.add(EventType.Communication);
+            typeList.add(EventType.Meeting);
+            typeList.add(EventType.Custom);
+        }
+        return typeList;
+    }
+    
+    public List<EventType> getEventTypesAll(){
+        List<EventType> typeList = new ArrayList<>();
+        for(EventType et: EventType.values()){
+            typeList.add(et);
+        }
+        return typeList;
+    }
     
     /**
      * Core coordinator method called by all other classes who want to 

@@ -215,9 +215,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     public List<EventType> getPermittedEventTypes(OccPeriod op, User u){
         List<EventType> typeList = new ArrayList<>();
-        int rnk = u.getRoleType().getRank();
-        
-        if(rnk >= MINIMUM_RANK_INSPECTOREVENTS){
+        int rnk = u.getRole().getRank();
+
+        if (rnk >= MINIMUM_RANK_INSPECTOREVENTS) {
             typeList.add(EventType.Action);
             typeList.add(EventType.Timeline);
         }
@@ -264,7 +264,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
         rpt.setCreator(usr);
-        rpt.setMuni(getSessionBean().getSessionMuniHeavy());
+        rpt.setMuni(getSessionBean().getSessionMuni());
 
         rpt.setDefaultItemIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()))));

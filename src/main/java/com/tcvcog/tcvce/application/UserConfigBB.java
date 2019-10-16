@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthPeriod;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.UserConfigReady;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
@@ -51,11 +51,13 @@ public class UserConfigBB extends BackingBeanUtils{
     public UserConfigBB() {
     }
     
-    private User currentUser;
-    private UserAuthPeriod currentUAP;
+    private UserAuthorized currentUser;
     private String freshPasswordCleartext;
     
-    private List<UserConfigReady> userList;
+    private UserMuniAuthPeriod currentUMAP;
+    private List<UserMuniAuthPeriod> umapList;
+    
+    private List<UserAuthorized> userList;
     
     private RoleType selectedRoleType;
     private List<RoleType> roleTypeCandidateList;
@@ -80,14 +82,15 @@ public class UserConfigBB extends BackingBeanUtils{
     @PostConstruct
     public void initBean(){
         UserCoordinator uc = getUserCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
-        setSelectedMuni(getSessionBean().getSessionMuniHeavy());
+        setSelectedMuni(getSessionBean().getSessionMuni());
         SearchCoordinator searchCoord = getSearchCoordinator();
         MuniCoordinator mc = getMuniCoordinator();
         
         try {
-            userList = uc.getUsersForConfiguration(getSessionBean().getSessionUser());
-            muniCandidateList = mc.getPermittedMunicipalityList(getSessionBean().getSessionUser());
+            currentUser = getSessionBean().getSessionUser();
+            currentUMAP = currentUser.getCredential().getGoverningAuthPeriod();
+            userList = (uc.getUserAuthorizedList(getSessionBean().getSessionMuni()));
+            muniCandidateList = mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessionUser());
             roleTypeCandidateList = uc.getPermittedRoleTypesToGrant(getSessionBean().getSessionUser());
         } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
@@ -102,44 +105,52 @@ public class UserConfigBB extends BackingBeanUtils{
         } catch (AuthorizationException | IntegrationException ex) {
             System.out.println(ex);
         }
-        
     }
     
     public void initiateCreateNewUser(){
         UserCoordinator uc = getUserCoordinator();
         currentUser = uc.getUserSkeleton(getSessionBean().getSessionUser());
-        
     }
     
-    public void initiateInvalidateUserAuthPeriod(User u, UserAuthPeriod uap){
-        currentUAP = uap;
+    public void initiateInvalidateUserAuthPeriod(UserAuthorized u, UserMuniAuthPeriod uap){
+        currentUMAP = uap;
         currentUser = u;
     }
     
-    public void invalidateAuthPeriod(){
+    public void invalidateAuthPeriod(UserMuniAuthPeriod uap){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.invalidateUserAuthPeriod(currentUAP, getSessionBean().getSessionUser());
+            uc.invalidateUserAuthPeriod(uap, getSessionBean().getSessionUser(), formInvalidateRecordReason);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully invalidated auth period id" + currentUAP.getUserAuthPeriodID(), ""));
+                            "Successfully invalidated auth period id" + currentUMAP.getUserAuthPeriodID(), ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
+        } catch (AuthorizationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+            
         }
         
     }
     
-    public void initiateCreateNewAuthPeriod(){
+    public void initiateViewAddAuthPeriods(UserAuthorized ua){
         UserCoordinator uc = getUserCoordinator();
-        currentUAP = uc.initializeNewAuthPeriod(getSessionBean().getSessionUser(), currentUser, getSelectedMuni());
+        currentUser = ua;
+        umapList = currentUser.getMuniAuthPeriodsMap().get(currentUser.getCredential().getGoverningAuthPeriod().getMuni()); 
+        System.out.println("UserConfigBB.initiateViewAddAuthPeriods | UMAP list size: " + umapList.size());
+        if(umapList != null){
+            currentUMAP = umapList.get(0);  
+        }
     }
     
     public void commitNewAuthPeriod(){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.insertNewUserAuthorizationPeriod(getSessionBean().getSessionUser(), currentUser, currentUAP);
+            uc.insertNewUserAuthorizationPeriod(getSessionBean().getSessionUser(), currentUser, currentUMAP);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully added new auth period!", ""));
@@ -151,7 +162,7 @@ public class UserConfigBB extends BackingBeanUtils{
         }
     }
     
-     public void initiateUserUpdates(User usr){
+     public void initiateUserUpdates(UserAuthorized usr){
         currentUser = usr;
     }
     
@@ -300,24 +311,11 @@ public class UserConfigBB extends BackingBeanUtils{
         
     }
 
-    /**
-     * @return the userList
-     */
-    public List<UserConfigReady> getUserList() {
-        return userList;
-    }
-
-    /**
-     * @param userList the userList to set
-     */
-    public void setUserList(List<UserConfigReady> userList) {
-        this.userList = userList;
-    }
-
+   
     /**
      * @return the currentUser
      */
-    public User getCurrentUser() {
+    public UserAuthorized getCurrentUser() {
         return currentUser;
     }
 
@@ -352,7 +350,7 @@ public class UserConfigBB extends BackingBeanUtils{
     /**
      * @param currentUser the currentUser to set
      */
-    public void setCurrentUser(User currentUser) {
+    public void setCurrentUser(UserAuthorized currentUser) {
         this.currentUser = currentUser;
     }
 
@@ -399,17 +397,17 @@ public class UserConfigBB extends BackingBeanUtils{
     }
 
     /**
-     * @return the currentUAP
+     * @return the currentUMAP
      */
-    public UserAuthPeriod getCurrentUAP() {
-        return currentUAP;
+    public UserMuniAuthPeriod getCurrentUMAP() {
+        return currentUMAP;
     }
 
     /**
-     * @param currentUAP the currentUAP to set
+     * @param currentUMAP the currentUMAP to set
      */
-    public void setCurrentUAP(UserAuthPeriod currentUAP) {
-        this.currentUAP = currentUAP;
+    public void setCurrentUMAP(UserMuniAuthPeriod currentUMAP) {
+        this.currentUMAP = currentUMAP;
     }
 
     /**
@@ -537,6 +535,34 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void setFormInvalidateRecordReason(String formInvalidateRecordReason) {
         this.formInvalidateRecordReason = formInvalidateRecordReason;
+    }
+
+    /**
+     * @return the userList
+     */
+    public List<UserAuthorized> getUserList() {
+        return userList;
+    }
+
+    /**
+     * @param userList the userList to set
+     */
+    public void setUserList(List<UserAuthorized> userList) {
+        this.userList = userList;
+    }
+
+    /**
+     * @return the umapList
+     */
+    public List<UserMuniAuthPeriod> getUmapList() {
+        return umapList;
+    }
+
+    /**
+     * @param umapList the umapList to set
+     */
+    public void setUmapList(List<UserMuniAuthPeriod> umapList) {
+        this.umapList = umapList;
     }
     
 }
