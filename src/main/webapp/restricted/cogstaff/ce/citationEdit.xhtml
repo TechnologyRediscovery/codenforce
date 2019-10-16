@@ -213,7 +213,7 @@
                         <p:confirmDialog message="Citiation submission review for case: #{citationBB.currentCase.caseName}" 
                                          severity="alert" widgetVar="citation-review-var"
                                          closable="true"
-                                         rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}">
+                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="citation-review-form">
                                 

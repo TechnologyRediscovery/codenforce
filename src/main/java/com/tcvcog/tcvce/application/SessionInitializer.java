@@ -137,7 +137,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
             if(authUser != null){
                 // The stadnard Municipality object is simple, but we need the full deal
                 MunicipalityDataHeavy muniHeavy = 
-                        mi.getMuniListified(authUser.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode());
+                        mi.getMuniListified(authUser.getMyCredential().getGoverningAuthPeriod().getMuni().getMuniCode());
                 System.out.println("SessionInitializer.configureSession | loaded MuniHeavy: " + muniHeavy.getMuniName());
                 
                 // load up our SessionBean with its key objects
@@ -155,7 +155,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 if(umaple != null){
                     umaple.setAudit_usersession_userid(getSessionBean().getSessionUser().getUserID());
                     umaple.setAudit_muni_municode(muniHeavy.getMuniCode());
-                    umaple.setAudit_usercredential_userid(authUser.getCredential().getGoverningAuthPeriod().getUserID());
+                    umaple.setAudit_usercredential_userid(authUser.getMyCredential().getGoverningAuthPeriod().getUserID());
                     System.out.println("SessionInitializer.configureSession | loaded UserMuniAuthPeriod: " + umaple);
                     uc.logCredentialInvocation(umaple);
                 }

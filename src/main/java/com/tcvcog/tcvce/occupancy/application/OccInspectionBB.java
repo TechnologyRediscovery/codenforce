@@ -361,7 +361,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
     public void checklistAction_activateOccInspection(OccInspection ins){
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        if(getSessionBean().getSessionUser().getCredential().isHasEnfOfficialPermissions()){
+        if(getSessionBean().getSessionUser().getMyCredential().isHasEnfOfficialPermissions()){
             try {
                 
                 oc.activateOccInspection(ins);

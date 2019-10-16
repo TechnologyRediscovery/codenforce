@@ -28,7 +28,7 @@
                                              icon="fa fa-plus" 
                                              actionListener="#{userConfigBB.initiateCreateNewUser}"
                                              oncomplete="PF('user-addupdate-dialog').show()"
-                                             rendered="#{systemServicesBB.sessUser.c}"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
                                              update="
                                              "/>
 
@@ -292,7 +292,7 @@
                                                         <p:dataTable
                                                             id="userconfig-muniauthperiods-logentry-table"
                                                             var="entry"
-                                                            value="#{period.useLog}"
+                                                            value="#{period.periodActivityLog}"
                                                             rowKey="#{entry.authperiodlogentryID}"
                                                             tableStyleClass="primeDataTable">
 

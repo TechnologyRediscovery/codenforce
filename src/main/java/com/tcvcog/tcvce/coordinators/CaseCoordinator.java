@@ -723,7 +723,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     public void novResetMailing(NoticeOfViolation nov, UserAuthorized user) throws IntegrationException, PermissionsException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
-        if(user.getCredential().isHasSysAdminPermissions()){
+        if(user.getMyCredential().isHasSysAdminPermissions()){
             cvi.novResetMailingFieldsToNull(nov);
         } else {
             throw new PermissionsException("User does not have sufficient acces righst to clear notice mailing fields");
@@ -947,13 +947,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
    public boolean determineCEActionRequestRoutingActionEnabledStatus(
                                                         CEActionRequest req,
                                                         UserAuthorized u ){
-       if(req != null && u.getCredential() != null){
+       if(req != null && u.getMyCredential() != null){
             if((
                     req.getRequestStatus().getStatusID() == 
                     Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                             .getString("actionRequestInitialStatusCode")))
                     && 
-                    u.getCredential().isHasEnfOfficialPermissions()
+                    u.getMyCredential().isHasEnfOfficialPermissions()
                 ){
                 return true;
             }

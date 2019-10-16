@@ -95,7 +95,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         currentUser = getSessionBean().getSessionUser();
         generateMainDash();
-        if(currentUser.getCredential().isHasDeveloperPermissions()){
+        if(currentUser.getMyCredential().isHasDeveloperPermissions()){
             try {
                 userList = uc.getUserAuthorizedList(getSessionBean().getSessionMuni());
             } catch (AuthorizationException | IntegrationException ex) {
@@ -121,8 +121,8 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         column3.addWidget("dashpanel-sys-events");
         column3.addWidget("dashpanel-sys-switchmuni");
 //        if(     currentUser != null 
-//            &&  currentUser.getCredential() != null
-//            && currentUser.getCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
+//            &&  currentUser.getMyCredential() != null
+//            && currentUser.getMyCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
         column3.addWidget("dashpanel-sys-switchuser");
         
 

@@ -33,6 +33,7 @@ public class UserAuthorized extends User{
      * is never "in" the database, doing stuff.
      */
     private Credential credential;
+    private Credential myCredential;
    
     /**
      * Only contains valid auth periods
@@ -51,7 +52,7 @@ public class UserAuthorized extends User{
      * @param uap
      * @param akc 
      */
-    public UserAuthorized(  User u ){
+    public UserAuthorized(User u ){
         this.userID = u.getUserID();
         this.username = u.getUsername();
         this.person = u.getPerson();
@@ -64,15 +65,35 @@ public class UserAuthorized extends User{
         this.noLoginVirtualUser = u.isNoLoginVirtualUser();
     }
     
+    
+    /**
+     * INJECTION SITE FOR THE USER'S CREDENTIAL OBJECT
+     * 
+     * @param myCredential 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException cannot set a credential
+     * to null or one with an id that doesn't match the userid in AuthPeriod
+     */
+    public void setMyCredential(Credential myCredential) throws AuthorizationException {
+         if(myCredential != null && myCredential.getGoverningAuthPeriod().getUserID() == userID){
+            credential = myCredential;
+        }
+        else {
+            throw new AuthorizationException("cannot set a credential to NULL or one without matching userID in AuthPeriod");
+        }
+        this.myCredential = myCredential;
+    }
+
+    
+    
     /**
      * Convenience method for accessing the governingAuthPeriod's
      * authorized role field
      * @return 
      */
     public RoleType getRole(){
-        if(getCredential() != null){
-            if(getCredential().getGoverningAuthPeriod() != null){
-                return getCredential().getGoverningAuthPeriod().getRole();
+        if(getMyCredential() != null){
+            if(getMyCredential().getGoverningAuthPeriod() != null){
+                return getMyCredential().getGoverningAuthPeriod().getRole();
             } 
         } 
         return null;
@@ -83,20 +104,42 @@ public class UserAuthorized extends User{
      * @return 
      */
     public List<Municipality> getAuthMuniList(){
-        return new ArrayList<>(muniAuthPeriodsMap.keySet());
+        if(muniAuthPeriodsMap != null){
+            return new ArrayList<>(muniAuthPeriodsMap.keySet());
+        } 
+        return new ArrayList<>();
     }
     
+    public List<UserMuniAuthPeriod> getMuniAuthPeriodListForCredMuni(){
+        List<UserMuniAuthPeriod> umapList = muniAuthPeriodsMap.get(myCredential.getGoverningAuthPeriod().getMuni());
+        return umapList;
+        
+    }
+    
+    
+    /**
+     * Preserved for legacy compatability. DO NOT DEPRECATE.
+     * @return the UserAuthorized official access credential object for all system level checks
+     */
     public Credential getKeyCard(){
-        return getCredential();
+        return getMyCredential();
     }
 
 
+    /**
+     * 
+     * Authorization check
+     * @deprecated 
+     * @param cr
+     * @throws AuthorizationException 
+     */
     public void setCredential(Credential cr) throws AuthorizationException{
         if(cr != null && cr.getGoverningAuthPeriod().getUserID() == userID){
             credential = cr;
         }
         else {
-            throw new AuthorizationException("cannot set a credential to NULL or one without matching userID in AuthPeriod");
+            throw new AuthorizationException("cannot set a credential to NULL "
+                    + "or one without matching userID in AuthPeriod");
         }
     }
    
@@ -148,9 +191,11 @@ public class UserAuthorized extends User{
     /**
      * @return the credential
      */
-    public Credential getCredential() {
+    public Credential getMyCredential() {
         return credential;
     }
+
+   
 
    
 

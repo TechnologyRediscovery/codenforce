@@ -20,8 +20,9 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Credential;
 import java.io.Serializable;
-import com.tcvcog.tcvce.entities.UserAuthCredential;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import javax.enterprise.context.ApplicationScoped;
@@ -168,7 +169,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                     maxRank = tmpLst.get(0).getAssignmentRank();
                     credMuni = m;
                 }
-                ua.setCredential(generateCredential(muniPeriodMap.get(credMuni).get(0)));
+                ua.setMyCredential(generateCredential(muniPeriodMap.get(credMuni).get(0)));
                 
             } // close for over period candidates
             
@@ -248,8 +249,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         rtl = new ArrayList<>(Arrays.asList(RoleType.values()));
         for(RoleType rt: rtl){
             // only allow users to add new users of roles of lesser ranks
-            if(rt.getRank() < user.getCredential().getGoverningAuthPeriod().getRole().getRank()
-                    || user.getCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
+            if(rt.getRank() < user.getMyCredential().getGoverningAuthPeriod().getRole().getRank()
+                    || user.getMyCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
                 rtlAuthorized.add(rt);
             }
         }
@@ -261,7 +262,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                         UserMuniAuthPeriodLogEntryCatEnum cat){
         
         UserMuniAuthPeriodLogEntry skel = new UserMuniAuthPeriodLogEntry();
-        skel.setAuthPeriod(ua.getCredential().getGoverningAuthPeriod());
+        skel.setAuthPeriod(ua.getMyCredential().getGoverningAuthPeriod());
         
         return skel;
     }
@@ -305,12 +306,12 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param rt
      * @return a User object whose access controls switches are configured
      */
-    private UserAuthCredential generateCredential(UserMuniAuthPeriod uap){
-        UserAuthCredential cred = null;
+    private Credential generateCredential(UserMuniAuthPeriod uap){
+        Credential cred = null;
         
         switch(uap.getRole()){
             case Developer: 
-                cred = new UserAuthCredential(  uap,
+                cred = new Credential(  uap,
                                                 true,   //developer
                                                 true,   // sysadmin
                                                 true,   // cogstaff
@@ -320,7 +321,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                break;
             
             case SysAdmin:
-                cred = new UserAuthCredential(  uap,
+                cred = new Credential(  uap,
                                                 false,   //developer
                                                 true,   // sysadmin
                                                 true,   // cogstaff
@@ -330,7 +331,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                break;               
                
             case CogStaff:
-                cred = new UserAuthCredential(  uap,
+                cred = new Credential(  uap,
                                                 false,   //developer
                                                 false,   // sysadmin
                                                 true,   // cogstaff
@@ -340,7 +341,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                break;               
                
             case EnforcementOfficial:
-                cred = new UserAuthCredential(  uap,
+                cred = new Credential(  uap,
                                                 false,   //developer
                                                 false,   // sysadmin
                                                 false,   // cogstaff
@@ -350,7 +351,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                break;
                
             case MuniStaff:
-                cred = new UserAuthCredential(  uap,
+                cred = new Credential(  uap,
                                                 false,   //developer
                                                 false,   // sysadmin
                                                 false,   // cogstaff
@@ -360,7 +361,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                break;
                
             case MuniReader:
-                cred = new UserAuthCredential(  uap,
+                cred = new Credential(  uap,
                                                 false,   //developer
                                                 false,   // sysadmin
                                                 false,   // cogstaff
@@ -439,9 +440,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         UserMuniAuthPeriod per = null;
 
         // Only Users who have sys admin permission in the requested muni or are devs
-        if((requestor.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode() == m.getMuniCode()
-                && requestor.getCredential().isHasSysAdminPermissions())
-                || requestor.getCredential().isHasDeveloperPermissions()){
+        if((requestor.getMyCredential().getGoverningAuthPeriod().getMuni().getMuniCode() == m.getMuniCode()
+                && requestor.getMyCredential().isHasSysAdminPermissions())
+                || requestor.getMyCredential().isHasDeveloperPermissions()){
             per = new UserMuniAuthPeriod(m);
             per.setStartDate(LocalDateTime.now());
             per.setStopDate(LocalDateTime.now().plusYears(1));
@@ -454,7 +455,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public void invalidateUserAuthPeriod(UserMuniAuthPeriod aup, UserAuthorized u, String note) throws IntegrationException, AuthorizationException{
         SystemCoordinator sc = getSystemCoordinator();
         UserIntegrator ui = getUserIntegrator();
-        if(aup.getUserAuthPeriodID() == u.getCredential().getGoverningAuthPeriod().getUserAuthPeriodID()){
+        if(aup.getUserAuthPeriodID() == u.getMyCredential().getGoverningAuthPeriod().getUserAuthPeriodID()){
             throw new AuthorizationException("You are unauthorized to invalidate your current authorization period");
         }
         aup.setNotes(sc.appendNoteBlock(new MessageBuilderParams(aup.getNotes(), "INVALIDATION OF AUTH PERIOD", "", note, u)));

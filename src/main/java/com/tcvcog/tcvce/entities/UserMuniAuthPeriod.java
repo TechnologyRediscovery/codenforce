@@ -33,7 +33,7 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
     private Municipality muni;
     private int userID;
 
-    private List<UserMuniAuthPeriodLogEntry> useLog;
+    private List<UserMuniAuthPeriodLogEntry> periodActivityLogBook;
 
     /**
      * For Javaland only since validity is based on the current date/time
@@ -62,7 +62,7 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
         hash = 67 * hash + this.userAuthPeriodID;
         hash = 67 * hash + Objects.hashCode(this.muni);
         hash = 67 * hash + this.userID;
-        hash = 67 * hash + Objects.hashCode(this.useLog);
+        hash = 67 * hash + Objects.hashCode(this.periodActivityLogBook);
         hash = 67 * hash + Objects.hashCode(this.startDate);
         hash = 67 * hash + Objects.hashCode(this.stopDate);
         hash = 67 * hash + Objects.hashCode(this.recorddeactivatedTS);
@@ -104,7 +104,7 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
         if (!Objects.equals(this.muni, other.muni)) {
             return false;
         }
-        if (!Objects.equals(this.useLog, other.useLog)) {
+        if (!Objects.equals(this.periodActivityLogBook, other.periodActivityLogBook)) {
             return false;
         }
         if (!Objects.equals(this.startDate, other.startDate)) {
@@ -298,17 +298,17 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
     }
 
     /**
-     * @return the useLog
+     * @return the periodActivityLogBook
      */
-    public List<UserMuniAuthPeriodLogEntry> getUseLog() {
-        return useLog;
+    public List<UserMuniAuthPeriodLogEntry> getPeriodActivityLogBook() {
+        return periodActivityLogBook;
     }
 
     /**
-     * @param useLog the useLog to set
+     * @param periodActivityLogBook the periodActivityLogBook to set
      */
-    public void setUseLog(List<UserMuniAuthPeriodLogEntry> useLog) {
-        this.useLog = useLog;
+    public void setPeriodActivityLogBook(List<UserMuniAuthPeriodLogEntry> periodActivityLogBook) {
+        this.periodActivityLogBook = periodActivityLogBook;
     }
 
     /**

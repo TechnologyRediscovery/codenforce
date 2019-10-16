@@ -498,7 +498,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @param uacle
      * @throws IntegrationException 
      */
-    public void updateUserAuthCredentialLogEntry(UserMuniAuthPeriodLogEntry uacle) throws IntegrationException{
+    public void updateUserMuniAuthPeriodLogEntry(UserMuniAuthPeriodLogEntry uacle) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         UserMuniAuthPeriod per = null;

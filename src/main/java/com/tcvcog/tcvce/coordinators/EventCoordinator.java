@@ -211,17 +211,17 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         // direct event assignment allows view conf to cut across regular permissions
         // checks
-        if(ev.getOwner().equals(u) || u.getCredential().isHasDeveloperPermissions()){
+        if(ev.getOwner().equals(u) || u.getMyCredential().isHasDeveloperPermissions()){
             return true;
             // check that the event is associated with the user's auth munis
         } else if(isMunicodeInMuniList(ev.getMuniCode(), muniList)){
             // sys admins for a muni can confirm everything
-            if(u.getCredential().isHasSysAdminPermissions()){
+            if(u.getMyCredential().isHasSysAdminPermissions()){
                 return true;
                 // only code officers can enact timeline events
-            } else if(evProp.isDirectPropToDefaultMuniCEO() && u.getCredential().isHasEnfOfficialPermissions()){
+            } else if(evProp.isDirectPropToDefaultMuniCEO() && u.getMyCredential().isHasEnfOfficialPermissions()){
                 return true;
-            } else if(evProp.isDirectPropToDefaultMuniStaffer() && u.getCredential().isHasMuniStaffPermissions()){
+            } else if(evProp.isDirectPropToDefaultMuniStaffer() && u.getMyCredential().isHasMuniStaffPermissions()){
                 return true;
             } 
         }
@@ -231,7 +231,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public void deleteEvent(CECaseEvent ev, UserAuthorized u) throws AuthorizationException{
         EventIntegrator ei = getEventIntegrator();
         try {
-            if(u.getCredential().isHasSysAdminPermissions()){
+            if(u.getMyCredential().isHasSysAdminPermissions()){
                 ei.deleteEvent(ev);
             } else {
                 throw new AuthorizationException("Must have sys admin permissions "

@@ -28,8 +28,10 @@ import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -41,7 +43,7 @@ import java.util.Map;
  *
  * @author Eric C. Darsow
  */
-public class SystemCoordinator extends BackingBeanUtils implements Serializable{
+public class SystemCoordinator extends BackingBeanUtils  implements Serializable{
 
     private Map<Integer, String> muniCodeNameMap;
     private final String SEPARATOR_LINE_TOP =       ">>>>>>>>>>>> NOTE >>>>>>>>>>>>";
@@ -55,6 +57,35 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable{
      * Creates a new instance of LoggingCoordinator
      */
     public SystemCoordinator() {
+    }
+    
+        
+    public String appendNoteBlock(MessageBuilderParams mcc){
+        StringBuilder sb = new StringBuilder();
+        sb.append(mcc.existingContent);
+        sb.append("<br />******************** NOTE ********************<br />");
+        sb.append(mcc.header);
+        sb.append("<br />");
+        if(mcc.explanation != null){
+            sb.append(mcc.explanation);
+            sb.append("<br />");
+        }
+        sb.append("creatd by: ");
+        sb.append(mcc.user.getPerson().getFirstName());
+        sb.append(" ");
+        sb.append(mcc.user.getPerson().getLastName());
+        sb.append(" (username:  ");
+        sb.append(mcc.user.getUsername());
+        sb.append(", id#: ");
+        sb.append(mcc.user.getUserID());
+        sb.append(")");
+        sb.append("<br />");
+        sb.append(" at ");
+        sb.append(getPrettyDate(LocalDateTime.now()));
+        sb.append("<br />----------------note-text-----------------<br />");
+        sb.append(mcc.newMessageContent);
+        sb.append("<br />**************** END NOTE *****************<br />");
+        return sb.toString();
     }
     
     
@@ -113,6 +144,16 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable{
      */
     public void setMuniCodeNameMap(Map<Integer, String> muniCodeNameMap) {
         this.muniCodeNameMap = muniCodeNameMap;
+    }
+
+    public String getPrettyDate(LocalDateTime d) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
+        if (d != null) {
+            String formattedDateTime = d.format(formatter);
+            return formattedDateTime;
+        } else {
+            return "";
+        }
     }
     
     
