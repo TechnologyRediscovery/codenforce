@@ -31,7 +31,7 @@
                                                     oncomplete="PF('person-addupdate-dialog-var').show()"
                                                     update="person-addupdate-form"
                                                     value="Create new Person"
-                                                    rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                     icon="fa fa-plus"
                                                     />
                             </h:form>
@@ -500,7 +500,7 @@
 
                             <p:commandButton    ajax="true" actionListener="#{personsBB.attachNoteToPerson}" tabindex="3"
                                                 value="Submit" icon="fa fa-link" oncomplete="PF('person-note-dialog').hide()"
-                                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                 update="    selected-person-info-form
                                                 messages-left-form:persons-messages-global"/>
                         </h:form>
@@ -510,7 +510,7 @@
                                 height="650" width="900"
                                 widgetVar="person-addupdate-dialog-var"
                                 closable="true" 
-                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                 >
 
 

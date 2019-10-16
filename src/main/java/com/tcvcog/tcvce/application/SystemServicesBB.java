@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -55,7 +56,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     private MunicipalityDataHeavy bbSessionMuni;
     
     private Property bbSessionProperty;
-    private
+    private Person bbSessionPerson;
     
     
     
@@ -377,6 +378,34 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setBbSessionMuni(MunicipalityDataHeavy bbSessionMuni) {
         this.bbSessionMuni = bbSessionMuni;
+    }
+
+    /**
+     * @return the bbSessionProperty
+     */
+    public Property getBbSessionProperty() {
+        return bbSessionProperty;
+    }
+
+    /**
+     * @return the bbSessionPerson
+     */
+    public Person getBbSessionPerson() {
+        return bbSessionPerson;
+    }
+
+    /**
+     * @param bbSessionProperty the bbSessionProperty to set
+     */
+    public void setBbSessionProperty(Property bbSessionProperty) {
+        this.bbSessionProperty = bbSessionProperty;
+    }
+
+    /**
+     * @param bbSessionPerson the bbSessionPerson to set
+     */
+    public void setBbSessionPerson(Person bbSessionPerson) {
+        this.bbSessionPerson = bbSessionPerson;
     }
     
     

@@ -239,7 +239,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
     public void authorizeOccPeriod(OccPeriod period, UserWithAccessData u) throws AuthorizationException, CaseLifecycleException, IntegrationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        if (u.getCredential().isHasEnfOfficialPermissions()) {
+        if (u.getMyCredential().isHasEnfOfficialPermissions()) {
             if (period.isReadyForPeriodAuthorization()) {
                 period.setAuthorizedBy(u);
                 period.setAuthorizedTS(LocalDateTime.now());

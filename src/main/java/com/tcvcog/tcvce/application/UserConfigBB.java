@@ -88,7 +88,7 @@ public class UserConfigBB extends BackingBeanUtils{
         
         try {
             currentUser = getSessionBean().getSessionUser();
-            currentUMAP = currentUser.getCredential().getGoverningAuthPeriod();
+            currentUMAP = currentUser.getMyCredential().getGoverningAuthPeriod();
             userList = (uc.getUserAuthorizedList(getSessionBean().getSessionMuni()));
             muniCandidateList = mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessionUser());
             roleTypeCandidateList = uc.getPermittedRoleTypesToGrant(getSessionBean().getSessionUser());
@@ -140,7 +140,7 @@ public class UserConfigBB extends BackingBeanUtils{
     public void initiateViewAddAuthPeriods(UserAuthorized ua){
         UserCoordinator uc = getUserCoordinator();
         currentUser = ua;
-        umapList = currentUser.getMuniAuthPeriodsMap().get(currentUser.getCredential().getGoverningAuthPeriod().getMuni()); 
+        umapList = currentUser.getMuniAuthPeriodsMap().get(currentUser.getMyCredential().getGoverningAuthPeriod().getMuni()); 
         System.out.println("UserConfigBB.initiateViewAddAuthPeriods | UMAP list size: " + umapList.size());
         if(umapList != null){
             currentUMAP = umapList.get(0);  

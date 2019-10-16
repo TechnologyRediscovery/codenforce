@@ -49,11 +49,11 @@ public class MuniCoordinator extends BackingBeanUtils implements Serializable {
       public List<Municipality> getPermittedMunicipalityListForAdminMuniAssignment(UserAuthorized user) throws IntegrationException{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         List<Municipality> muniList = new ArrayList<>();
-        if(user.getCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
+        if(user.getMyCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
             muniList.addAll(mi.getMuniList());
         } else {
             if(user.getRole() != null && user.getRole() == RoleType.SysAdmin){
-                muniList.add(user.getCredential().getGoverningAuthPeriod().getMuni());
+                muniList.add(user.getMyCredential().getGoverningAuthPeriod().getMuni());
             }
         }
         

@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -69,7 +70,8 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
     
     public String editViolation() throws IntegrationException, CaseLifecycleException{
        CaseCoordinator cc = getCaseCoordinator();
-       EventCoordinator eventCoordinator = getEventCoordinator();       
+       EventCoordinator eventCoordinator = getEventCoordinator();     
+       SystemCoordinator sc = getSystemCoordinator();
        
        EventCategory ec = eventCoordinator.getInitiatlizedEventCategory(
                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
@@ -85,7 +87,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
         mcc.existingContent = currentViolation.getNotes();
         mcc.newMessageContent = formEventNotes;
         mcc.user = getSessionBean().getSessionUser();
-        currentViolation.setNotes(appendNoteBlock(mcc));
+        currentViolation.setNotes(sc.appendNoteBlock(mcc));
         
         try {
             

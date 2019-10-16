@@ -51,8 +51,7 @@ import javax.faces.event.ActionEvent;
 public class UserBB extends BackingBeanUtils implements Serializable {
 
     private UserAuthorized currentUser;
-    
-    private UserMuniAuthPeriod currentUserAuthPeriod;
+   
     
     private String formUsername;
     private String formPassword;
@@ -91,10 +90,6 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         
     }
 
-    public void initializeNewAuthPeriod(User u){
-        
-        
-    }
     
 
     public void updateUser(User u) {
@@ -103,7 +98,14 @@ public class UserBB extends BackingBeanUtils implements Serializable {
 
     }
     
-    public void commitUpdates(ActionEvent ev){
+    public void credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
+        // TODO: finish me!
+        
+        
+    }
+    
+    
+    public void commitUsernameUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
             uc.updateUser(currentUser);
@@ -232,20 +234,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
 
    
 
-    /**
-     * @return the currentUserAuthPeriod
-     */
-    public UserMuniAuthPeriod getCurrentUserAuthPeriod() {
-        return currentUserAuthPeriod;
-    }
-
-    /**
-     * @param currentUserAuthPeriod the currentUserAuthPeriod to set
-     */
-    public void setCurrentUserAuthPeriod(UserMuniAuthPeriod currentUserAuthPeriod) {
-        this.currentUserAuthPeriod = currentUserAuthPeriod;
-    }
-
+  
     /**
      * @return the userPersonList
      */

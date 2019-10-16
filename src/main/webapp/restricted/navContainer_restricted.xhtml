@@ -40,101 +40,111 @@
                     <f:view id="sessionInfoView">
                         <div class="flexing-box-sessioninfo">
                             <h:form id="menu-form">
-                                
-                            <p:menubar>
-                                
-                                <p:submenu icon="fa fa-home" label="Main">
-                                    <p:menuitem value="Dashboard" action="missionControl" ajax="false" icon="fa fa-dashboard" styleClass="bold-menu-item" />
-                                    <p:menuitem value="Properties" action="properties" ajax="false" icon="fa fa-home" />
-                                    <p:menuitem value="Persons" action="persons"  ajax="false" icon="fa fa-female" disabled="false"/>
-                                    <p:menuitem value="Upload files" action="uploadBlob" ajax="false" icon="fa fa-upload"/>
-                                    <p:menuitem value="Manage files" action="manageBlob" ajax="false" icon="ui-icon-wrench"/>
-                                </p:submenu>
-                                <p:submenu label="Code Enf" icon="fa fa-bullhorn">
-                                    <p:menuitem value="CE Requests" action="cEActionRequests"  ajax="false" icon="fa fa-sign-in"/>
-                                    <p:menuitem value="CE Cases" action="ceCases"  ajax="false" icon="fa fa-suitcase"/>
-                                    <p:menuitem value="CE Events" action="ceEvents"  ajax="false" icon="fa fa-calendar"/>
-                                    
-                                    <p:submenu label="CE Configuration">
-                                        <p:menuitem value="CE event config" action="eventManage" ajax="false" icon="fa fa-sliders" />
-                                        <p:menuitem value="Court entities" action="litigationManage"  ajax="false" icon="fa fa-university"/>
-                                        <p:menuitem value="Notice text blocks" action="textBlockManage"  ajax="false" icon="fa fa-edit"/>
-                                        
+
+                                <p:menubar>
+
+                                    <p:submenu icon="fa fa-home" label="Main">
+                                        <p:menuitem value="Dashboard" action="missionControl" ajax="false" icon="fa fa-dashboard" styleClass="bold-menu-item" />
+                                        <p:menuitem value="Properties" action="properties" ajax="false" icon="fa fa-home" />
+                                        <p:menuitem value="Persons" action="persons"  ajax="false" icon="fa fa-female" disabled="false"/>
+                                        <p:menuitem value="Upload files" action="uploadBlob" ajax="false" icon="fa fa-upload"/>
+                                        <p:menuitem value="Manage files" action="manageBlob" ajax="false" icon="ui-icon-wrench"/>
                                     </p:submenu>
-                                </p:submenu>
+                                    <p:submenu label="Code Enf" icon="fa fa-bullhorn">
+                                        <p:menuitem value="CE Requests" action="cEActionRequests"  ajax="false" icon="fa fa-sign-in"/>
+                                        <p:menuitem value="CE Cases" action="ceCases"  ajax="false" icon="fa fa-suitcase"/>
+                                        <p:menuitem value="CE Events" action="ceEvents"  ajax="false" icon="fa fa-calendar"/>
 
-                            <ui:remove>
-                                    
-                                <p:submenu label="Properties &amp; Persons" expanded="true">
-                                    <p:menuitem value="Property search" action="propertySearch" ajax="false" icon="ui-icon-disk" />
-                                    <p:menuitem value="Property profile" action="#{navigationBB.gotoPropertyProfile}" ajax="false" 
-                                                icon="ui-icon-disk" disabled="#{navigationBB.noActiveProperty}"/>
-                                    <p:menuitem value="Person search" action="personSearch"  ajax="false" icon="ui-icon-arrowrefresh-1-w" />
-                                    <p:menuitem value="Person profile" action="#{navigationBB.gotoPersonProfile}"  ajax="false" 
-                                                icon="ui-icon-arrowrefresh-1-w" disabled="#{navigationBB.noActivePerson}"/>
-                                    <p:menuitem value="New person" action="personAdd"  ajax="false" icon="ui-icon-arrowrefresh-1-w" />
-                                </p:submenu>
+                                        <p:submenu label="CE Configuration">
+                                            <p:menuitem value="CE event config" action="eventManage" ajax="false" icon="fa fa-sliders" />
+                                            <p:menuitem value="Court entities" action="litigationManage"  ajax="false" icon="fa fa-university"/>
+                                            <p:menuitem value="Notice text blocks" action="textBlockManage"  ajax="false" icon="fa fa-edit"/>
 
-                            </ui:remove>
+                                        </p:submenu>
+                                    </p:submenu>
+
+                                    <ui:remove>
+
+                                        <p:submenu label="Properties &amp; Persons" expanded="true">
+                                            <p:menuitem value="Property search" action="propertySearch" ajax="false" icon="ui-icon-disk" />
+                                            <p:menuitem value="Property profile" action="#{navigationBB.gotoPropertyProfile}" ajax="false" 
+                                                        icon="ui-icon-disk" disabled="#{navigationBB.noActiveProperty}"/>
+                                            <p:menuitem value="Person search" action="personSearch"  ajax="false" icon="ui-icon-arrowrefresh-1-w" />
+                                            <p:menuitem value="Person profile" action="#{navigationBB.gotoPersonProfile}"  ajax="false" 
+                                                        icon="ui-icon-arrowrefresh-1-w" disabled="#{navigationBB.noActivePerson}"/>
+                                            <p:menuitem value="New person" action="personAdd"  ajax="false" icon="ui-icon-arrowrefresh-1-w" />
+                                        </p:submenu>
+
+                                    </ui:remove>
 
 
-                                <p:submenu label="Occupancy" icon="fa fa-list-alt" >
-                                    <p:menuitem value="Inspections" action="occInspections" ajax="false" icon="ui-icon-home" disabled="false" />
-                                    <p:menuitem value="Checklists"  action="checklists" ajax="false" icon="ui-icon-wrench" disabled="true"/>
-                                    <p:menuitem value="Payments" action="payments" ajax="false" icon="ui-icon-wrench" disabled="false"/>
-                                    <p:menuitem value="Fee config" action="feeManage" ajax="false" icon="ui-icon-wrench" disabled="false"/>
-                                    <p:menuitem value="Permits config"  action="occPermitTypeManage" ajax="false" icon="ui-icon-wrench" disabled="true"/>
-                                </p:submenu>
-                                 
-                                <p:submenu label="Reports" icon="fa fa-book" >
-                                    <p:menuitem value="User activity summary" action="codeGuideView" disabled="true" ajax="false" icon="fa fa-users" />
-                                    <p:menuitem value="Public access metrics" action="codeGuideView" disabled="true" ajax="false" icon="fa fa-heartbeat" />
-                                    <p:menuitem value="Property database stats" action="codeGuideView" disabled="true" ajax="false" icon="fa fa-home" />
-                                    
-                                </p:submenu>
+                                    <p:submenu label="Occupancy" icon="fa fa-list-alt" >
+                                        <p:menuitem value="Inspections" action="occInspections" ajax="false" icon="ui-icon-home" disabled="true" />
+                                        <p:menuitem value="Checklists"  action="checklists" ajax="false" icon="ui-icon-wrench" disabled="false"/>
+                                        <p:menuitem value="Payments" action="payments" ajax="false" icon="ui-icon-wrench" disabled="false"/>
+                                        <p:menuitem value="Fee config" action="feeManage" ajax="false" icon="ui-icon-wrench" disabled="false"/>
+                                        <p:menuitem value="Permits config"  action="occPermitTypeManage" ajax="false" icon="ui-icon-wrench" disabled="true"/>
+                                    </p:submenu>
 
-                                <p:submenu label="Code" icon="fa fa-balance-scale">
-                                    <p:menuitem value="Code guide" action="codeGuideView" ajax="false" icon="ui-icon-arrowthick-1-s" />
-                                    <p:menuitem value="Active CodeBook" action="codeSetElementList" ajax="false" icon="ui-icon-arrowthick-1-s" />
-                                    <p:menuitem value="Code Books" action="codeSetManage" ajax="false" icon="ui-icon-home" />
-                                    <p:menuitem value="Code Sources" action="codeSourceManage" ajax="false" icon="ui-icon-home" />
-                                    <p:menuitem value="Elements by source" action="codeElementList" ajax="false" icon="ui-icon-arrowthick-1-s" 
-                                                disabled="#{navigationBB.noActiveSource}"/>
-                                </p:submenu>
+                                    <p:submenu label="Reports" icon="fa fa-book" >
+                                        <p:menuitem value="User activity summary" action="codeGuideView" disabled="true" ajax="false" icon="fa fa-users" />
+                                        <p:menuitem value="Public access metrics" action="codeGuideView" disabled="true" ajax="false" icon="fa fa-heartbeat" />
+                                        <p:menuitem value="Property database stats" action="codeGuideView" disabled="true" ajax="false" icon="fa fa-home" />
 
-                                <p:submenu label="Public" icon="fa fa-universal-access">
+                                    </p:submenu>
 
-                                    <p:menuitem value="Public Dashboard" action="systemHome" ajax="false" icon="fa fa-sitemap" />
-                                    <p:menuitem value="New CE Request" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard"/>
-                                    <p:menuitem value="PACC Search" action="paccSearch" ajax="false" icon="fa fa-tag"/>
-                                </p:submenu>
+                                    <p:submenu label="Code" icon="fa fa-balance-scale">
+                                        <p:menuitem value="Code guide" action="codeGuideView" ajax="false" icon="ui-icon-arrowthick-1-s" />
+                                        <p:menuitem value="Active CodeBook" action="codeSetElementList" ajax="false" icon="ui-icon-arrowthick-1-s" />
+                                        <p:menuitem value="Code Books" action="codeSetManage" ajax="false" icon="ui-icon-home" />
+                                        <p:menuitem value="Code Sources" action="codeSourceManage" ajax="false" icon="ui-icon-home" />
+                                        <p:menuitem value="Elements by source" action="codeElementList" ajax="false" icon="ui-icon-arrowthick-1-s" 
+                                                    disabled="#{navigationBB.noActiveSource}"/>
+                                    </p:submenu>
 
-                                <p:submenu label="Settings" icon="fa fa-cogs">
-                                    <p:menuitem value="Users" action="userConfig" ajax="false" icon="fa fa-user" />
-                                    <p:menuitem value="User-Munis" action="userMuniMapping" ajax="false" icon="fa fa-id-card" />
-                                    <p:menuitem value="Muni info" action="muniManage" ajax="false" icon="fa fa-univsity" disabled="false"/>
-                                    <p:menuitem value="Request list changes" action="selectItemListChange" ajax="false" icon="fa fa-list" />
-                                    <p:menuitem value="Mange icons" action="iconManage" ajax="false" icon="fa fa-list" />
-                                </p:submenu>
-                                <p:submenu label="Help" icon="fa fa-question-circle">
-                                    <p:menuitem value="Report a bug" action="bugReporting" ajax="false" icon="ui-icon-arrowthick-1-s" />
-                                    <p:menuitem value="View bug list" action="ticketListing" ajax="false" icon="ui-icon-arrowthick-1-s" />
-                                        
-                                </p:submenu>
+                                    <p:submenu label="Public" icon="fa fa-universal-access">
 
-                                <f:facet name="options">
-                                    
-                                         <h:outputText value="#{systemServicesBB.currentUser.role.label} 
-                                                                | rnk:#{systemServicesBB.currentUser.role.rank} 
-                                                                | username: #{systemServicesBB.currentUser.username} 
-                                                                | id:#{systemServicesBB.currentUser.userID} " />
-                                    
-                                    <p:commandButton    id="navcontres-button-logout"
-                                                        action="#{systemServicesBB.logout}" 
-                                                        value="Logout #{systemServicesBB.currentUser.person.firstName} "
-                                                        ajax="false"/>
-                                </f:facet>
-                            </p:menubar>
+                                        <p:menuitem value="Public Dashboard" action="systemHome" ajax="false" icon="fa fa-sitemap" />
+                                        <p:menuitem value="New CE Request" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard"/>
+                                        <p:menuitem value="PACC Search" action="paccSearch" ajax="false" icon="fa fa-tag"/>
+                                    </p:submenu>
+
+                                    <p:submenu label="Settings" icon="fa fa-cogs">
+                                        <p:menuitem value="Users" action="userConfig" ajax="false" icon="fa fa-user" />
+                                        <p:menuitem value="User-Munis" action="userMuniMapping" ajax="false" icon="fa fa-id-card" />
+                                        <p:menuitem value="Muni info" action="muniManage" ajax="false" icon="fa fa-univsity" disabled="false"/>
+                                        <p:menuitem value="Request list changes" action="selectItemListChange" ajax="false" icon="fa fa-list" />
+                                        <p:menuitem value="Mange icons" action="iconManage" ajax="false" icon="fa fa-list" />
+                                    </p:submenu>
+                                    <p:submenu label="Help" icon="fa fa-question-circle">
+                                        <p:menuitem value="Report a bug" action="bugReporting" ajax="false" icon="ui-icon-arrowthick-1-s" />
+                                        <p:menuitem value="View bug list" action="ticketListing" ajax="false" icon="ui-icon-arrowthick-1-s" />
+
+                                    </p:submenu>
+
+                                    <f:facet name="options">
+
+                                        <h:outputText value="#{systemServicesBB.bbSessionUser.role.label} 
+                                                      | rnk:#{systemServicesBB.bbSessionUser.role.rank} 
+                                                      | username: #{systemServicesBB.bbSessionUser.username} 
+                                                      | id:#{systemServicesBB.bbSessionUser.userID} " />
+
+                                        <p:commandButton    id="navcontres-button-logout"
+                                                            action="#{systemServicesBB.logout}" 
+                                                            value="Logout #{systemServicesBB.bbSessionUser.person.firstName} "
+                                                            ajax="false"/>
+
+                                        <p:commandButton        id="navbar-button-usersettings"
+                                                                ajax="true" 
+                                                                actionListener="#{userBB.initiateUserUpdates}"
+                                                                rendered="true"
+                                                                disabled="false"
+                                                                oncomplete="PF('navcontainer-dialog-usersettings').show()"
+                                                                value="settings" 
+                                                                update="usersettings-form"
+                                                                icon="fa fa-gear"/>
+                                    </f:facet>
+                                </p:menubar>
                             </h:form>
 
                         </div>
@@ -142,201 +152,357 @@
                             <h:form id="sessionInfoForm">
                                 <div class="activeObjectBox">
                                     <h:outputText styleClass="infoBarDataLabel" value="muni: "/>
-                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.sessionMuni.muniName} "/> 
+                                    <h:outputText styleClass="infoBarData" value="#{systemServicesBB.bbSessionMuni.muniName} "/> 
                                 </div>
                                 <div class="activeObjectBox">
-                                        <h:outputText styleClass="infoBarDataLabel" value="property: "/>
-                                        <h:outputText styleClass="infoBarData" value="#{sessionBean.sessionProperty.address} "/> 
-                                        <h:outputText styleClass="infoBarData" value="(#{sessionBean.sessionProperty.muni.muniName})  "/>
+                                    <h:outputText styleClass="infoBarDataLabel" value="property: "/>
+                                    <h:outputText styleClass="infoBarData" value="#{systemServicesBB.bbSessionProperty.address} "/> 
+                                    <h:outputText styleClass="infoBarData" value="(#{systemServicesBB.bbSessionProperty.muni.muniName})  "/>
                                 </div>
-                               
-                                <ui:remove>
-                                    
-                                <div class="activeObjectBox">
-                                    <h:outputText styleClass="infoBarDataLabel" value="case: " />
 
-                                    <p:commandButton styleClass="sessionInfoButton" 
-                                                     action="caseEvents" 
-                                                     value="log new event" 
-                                                     ajax="false"
-                                                     disabled="#{navigationBB.noActiveCase}"/>
-                                    <p:commandButton styleClass="sessionInfoButton" 
-                                                     action="caseProfile" 
-                                                     value="view case profile" 
-                                                     ajax="false"
-                                                     disabled="#{navigationBB.noActiveCase}"/>
-                                </div>
+                                <ui:remove>
+
+                                    <div class="activeObjectBox">
+                                        <h:outputText styleClass="infoBarDataLabel" value="case: " />
+
+                                        <p:commandButton styleClass="sessionInfoButton" 
+                                                         action="caseEvents" 
+                                                         value="log new event" 
+                                                         ajax="false"
+                                                         disabled="#{navigationBB.noActiveCase}"/>
+                                        <p:commandButton styleClass="sessionInfoButton" 
+                                                         action="caseProfile" 
+                                                         value="view case profile" 
+                                                         ajax="false"
+                                                         disabled="#{navigationBB.noActiveCase}"/>
+                                    </div>
                                 </ui:remove>
                             </h:form>
                         </div>
-                        
-                         <p:dialog header="User settings" 
-                                      widgetVar="navcontainer-dialog-usersettings" 
-                                      responsive="true" 
-                                      width="800"
-                                      modal="false"
-                                      height="600">
-                             
-                                          
-                                 <h2>User settings for <h:outputText value="#{userBB.currentUser.username}" /></h2>
-                                 
-                                 <p>
-                                    <h:outputText value="Role: #{systemServicesBB.currentUser.role.label}" />
-                                    <h:outputText value=" | " />
-                                    <h:outputText value="Rank: #{systemServicesBB.currentUser.role.rank}" />
-                                    <h:outputText value=" | " />
-                                    <h:outputText value="ID: #{systemServicesBB.currentUser.userID} " />
-                                 </p>
-                                 
-                                 <p>
-                                     <h:outputText value="Notes: " styleClass="bold"/>
-                                     <h:outputText value="#{userBB.currentUser.notes}" escape="false" />
-                                 </p>
-                                 
-                                    <h:panelGrid columns="2" border="0" 
+
+                        <p:dialog header="User settings" 
+                                  widgetVar="navcontainer-dialog-usersettings" 
+                                  responsive="true" 
+                                  width="800"
+                                  modal="false"
+                                  height="600">
+
+
+                            <h2>User settings for <h:outputText value="#{userBB.currentUser.username}" /></h2>
+
+                            <p>
+                                <h:outputText value="Role: #{userBB.currentUser.role.label}" />
+                                <h:outputText value=" | " />
+                                <h:outputText value="Rank: #{userBB.currentUser.role.rank}" />
+                                <h:outputText value=" | " />
+                                <h:outputText value="ID: #{userBB.currentUser.userID} " />
+                            </p>
+
+                            <p>
+                                <h:outputText value="Notes: " styleClass="bold"/>
+                                <h:outputText value="#{userBB.currentUser.notes}" escape="false" />
+                            </p>
+
+                            <h:panelGrid columns="2" border="0" 
                                          cellpadding="5" columnClasses="gridTd, gridTd"
                                          footerClass="gridFooter">
-                                             
 
-                                    <h:panelGroup>
-                                        
-                                        <h:form id="usersettings-messages-form-username">
-                                          <h:messages id="usersettings-messages-username"
-                                                      globalOnly="true" showDetail="true" showSummary="true"
-                                                      warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                          </h:messages>
-                                      </h:form>
-                                        <h:form id="usersettings-form">
 
-                                            <p:outputLabel for="usersettings-it-username">
-                                                <h:outputText value="User name"/>
-                                            </p:outputLabel>
-                                            <p:inputText id="usersettings-it-username" value="#{userBB.currentUser.username}" 
-                                                         size="12"
-                                                         maxlength="20"
-                                                         tabindex="3" 
+                                <h:panelGroup>
+
+                                    <h:form id="usersettings-messages-form-username">
+                                        <h:messages id="usersettings-messages-username"
+                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
+                                    <h:form id="usersettings-form">
+
+                                        <p:outputLabel for="usersettings-it-username">
+                                            <h:outputText value="User name"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="usersettings-it-username" value="#{userBB.currentUser.username}" 
+                                                     size="12"
+                                                     maxlength="20"
+                                                     tabindex="3" 
+                                                     required="true" 
+                                                     validatorMessage="Length must be between 5 and 20 characters"
+                                                     styleClass="inputText">
+                                            <f:validateLength minimum="5" maximum="20" />
+                                        </p:inputText>
+                                        <h:message for="usersettings-it-username" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:commandButton    id="usersettings-button-updateusername"
+                                                            ajax="true"
+                                                            actionListener="#{userBB.commitUsernameUpdates}"
+                                                            icon="fa fa-thumbs-o-up"
+                                                            update="usersettings-messages-form-username"
+                                                            value="Update username" 
+                                                            tabindex="3"/>
+                                    </h:form>
+
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:form id="usersettings-messages-form-personlink">
+                                        <h:messages id="usersettings-messages-personlink"
+                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
+
+                                    <h:form id="usersettings-form-userpersonlink">
+
+                                        <h:outputText value="Your user is currently mapped to: " />
+                                        <p:spacer height="5px" />
+                                        <h:outputText value="#{userBB.currentUser.person.firstName}" />
+                                        <h:outputText value=" " />
+                                        <h:outputText value="#{userBB.currentUser.person.lastName}" />
+                                        <h:outputText value=" (ID: #{userBB.currentUser.person.personID})" />
+                                        <h:outputText value=" " />
+
+
+                                        <p:spacer height="5px" />
+
+                                        <p:outputLabel  for="usersettings-som-userpersons" value="Available User-type persons:"/>
+                                        <p:selectOneMenu id="usersettings-som-userpersons" 
                                                          required="true" 
-                                                         validatorMessage="Length must be between 5 and 20 characters"
-                                                         styleClass="inputText">
-                                                <f:validateLength minimum="5" maximum="20" />
-                                            </p:inputText>
-                                            <h:message for="usersettings-it-username" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                         value="#{userBB.currentUser.person}">
+                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                            <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
+                                                           itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                            <f:converter converterId="personConverter"/>
+                                        </p:selectOneMenu>
+                                        <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                            <p:commandButton    id="usersettings-button-updateusername"
-                                                                ajax="true"
-                                                                actionListener="#{userBB.commitUsernameUpdates}"
-                                                                icon="fa fa-thumbs-o-up"
-                                                                update="usersettings-messages-form-username"
-                                                                value="Update username" 
-                                                                tabindex="3"/>
-                                        </h:form>
+                                        <p:commandButton    id="usersettings-button-updatepersonlink"
+                                                            ajax="true"
+                                                            actionListener="#{userBB.commitUserPersonUpdates}"
+                                                            update="usersettings-messages-form-personlink
+                                                            usersettings-form-userpersonlink"
+                                                            icon="fa fa-thumbs-0-up"
+                                                            value="Update person link" 
+                                                            tabindex="3"/>
 
-                                    </h:panelGroup>
-                                        
-                                    <h:panelGroup>
-                                        <h:form id="usersettings-messages-form-personlink">
-                                          <h:messages id="usersettings-messages-personlink"
-                                                      globalOnly="true" showDetail="true" showSummary="true"
-                                                      warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                          </h:messages>
-                                      </h:form>
-                                        
-                                        <h:form id="usersettings-form-userpersonlink">
-
-                                            <h:outputText value="Your user is currently mapped to: " />
-                                            <p:spacer height="5px" />
-                                            <h:outputText value="#{userBB.currentUser.person.firstName}" />
-                                            <h:outputText value=" " />
-                                            <h:outputText value="#{userBB.currentUser.person.lastName}" />
-                                            <h:outputText value=" (ID: #{userBB.currentUser.person.personID})" />
-                                            <h:outputText value=" " />
+                                    </h:form>
+                                </h:panelGroup>
 
 
-                                            <p:spacer height="5px" />
 
-                                            <p:outputLabel  for="usersettings-som-userpersons" value="Available User-type persons:"/>
-                                            <p:selectOneMenu id="usersettings-som-userpersons" 
-                                                             required="true" 
-                                                             value="#{userBB.currentUser.person}">
-                                                <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                                <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
-                                                               itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
-                                                <f:converter converterId="personConverter"/>
-                                            </p:selectOneMenu>
-                                            <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                <h:panelGroup>
 
-                                            <p:commandButton    id="usersettings-button-updatepersonlink"
-                                                                ajax="true"
-                                                                actionListener="#{userBB.commitUserPersonUpdates}"
-                                                                update="usersettings-messages-form-personlink
-                                                                usersettings-form-userpersonlink"
-                                                                icon="fa fa-thumbs-0-up"
-                                                                value="Update person link" 
-                                                                tabindex="3"/>
+                                    <h:form id="usersettings-messages-form-updatepassword">
+                                        <h:messages id="usersettings-messages-updategepassword"
+                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
 
-                                        </h:form>
-                                    </h:panelGroup>
-                                        
-                                       
 
-                                    <h:panelGroup>
-                                        
-                                        <h:form id="usersettings-messages-form-updatepassword">
-                                          <h:messages id="usersettings-messages-updategepassword"
-                                                      globalOnly="true" showDetail="true" showSummary="true"
-                                                      warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                          </h:messages>
-                                      </h:form>
-                                        
-                                        
-                                        <h:form id="usersettings-form-updatepassword">
-                                            <p:outputLabel for="usersettings-it-password">
-                                                <h:outputText value="New password (use letters and numbers; at least 8 chars please! "/>
-                                            </p:outputLabel>
-                                            <p:inputText id="usersettings-it-password" value="#{userBB.formPassword}" 
-                                                         size="15"
-                                                         maxlength="80"
-                                                         tabindex="3" 
-                                                         required="true" 
-                                                         validatorMessage="Length must be between 8 and 50 characters"
-                                                         styleClass="inputText">
-                                                <f:validateLength minimum="8" maximum="50" />
-                                            </p:inputText>
-                                            <h:message for="usersettings-it-password" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                            <p:commandButton    id="usersettings-button-updatepassword"
-                                                                ajax="true"
-                                                                actionListener="#{userBB.commitPasswordUpdates}"
-                                                                update="usersettings-messages-form-updatepassword
-                                                                usersettings-form-updatepassword"
-                                                                icon="fa fa-thumbs-0-up"
-                                                                value="Update password" 
-                                                                tabindex="3"/>
-                                        </h:form>
-                                    </h:panelGroup>
-                             
-                             
-                                </h:panelGrid>
-                                 
-                                 <h:form id="usersettings-form-close">                             
+                                    <h:form id="usersettings-form-updatepassword">
+                                        <p:outputLabel for="usersettings-it-password">
+                                            <h:outputText value="New password (use letters and numbers; at least 8 chars please! "/>
+                                        </p:outputLabel>
+                                        <p:inputText id="usersettings-it-password" value="#{userBB.formPassword}" 
+                                                     size="15"
+                                                     maxlength="80"
+                                                     tabindex="3" 
+                                                     required="true" 
+                                                     validatorMessage="Length must be between 8 and 50 characters"
+                                                     styleClass="inputText">
+                                            <f:validateLength minimum="8" maximum="50" />
+                                        </p:inputText>
+                                        <h:message for="usersettings-it-password" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        <p:commandButton    id="usersettings-button-updatepassword"
+                                                            ajax="true"
+                                                            actionListener="#{userBB.commitPasswordUpdates}"
+                                                            update="usersettings-messages-form-updatepassword
+                                                            usersettings-form-updatepassword"
+                                                            icon="fa fa-thumbs-0-up"
+                                                            value="Update password" 
+                                                            tabindex="3"/>
+                                    </h:form>
+                                </h:panelGroup>
+
+                                <f:facet name="footer">
+                                      <h:form id="usersettings-umaps-messages-form">
+                                        <h:messages id="usersettings-umaps-messages"
+                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
+
+
+                                    <p:dataTable
+                                        id="usersettings-umaps-table"
+                                        var="period"
+                                        value="#{systemServicesBB.bbSessionUser.muniAuthPeriodListForCredMuni}"
+                                        rowKey="#{period.userAuthPeriodID}"
+                                        tableStyleClass="primeDataTable">
+
+                                        <p:column width="3%" exportable="false">
+                                            <f:facet name="header">
+                                                <h:outputText value="Expand row" 
+                                                              escape="false"/>
+                                            </f:facet>
+                                            <p:rowToggler/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Auth Period ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{period.userAuthPeriodID}"/>
+                                        </p:column>
+
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Access start" />
+                                            </f:facet>
+                                            <h:outputText value="#{userConfigBB.getPrettyDate(period.startDate)}"/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Access stop" />
+                                            </f:facet>
+                                            <h:outputText value="#{userConfigBB.getPrettyDate(period.stopDate)}"/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Role" />
+                                            </f:facet>
+                                            <h:outputText value="#{period.role.label}"/>
+                                            <h:outputText value=" (rank: #{period.role.rank})"/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Deactivated TS" />
+                                            </f:facet>
+                                            <h:outputText value="#{userConfigBB.getPrettyDate(period.recorddeactivatedTS)}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Assignment rank" />
+                                            </f:facet>
+                                            <h:outputText value="#{period.assignmentRank}"/>
+                                        </p:column>
+
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Actions" />
+                                            </f:facet>
+                                            <p:commandButton ajax="true"
+                                                             id="usersettings-umaps-button-credentialize" 
+                                                             value="credentialize" 
+                                                             icon="fa fa-credit-card"
+                                                             styleClass="multiButtonLineButton" 
+                                                             actionListener="#{userBB.credentializeUserMuniAuthPeriod(period)}"
+                                                             update="usersettings-umaps-messages-form" />
+                                        </p:column>
+                                        <p:rowExpansion>
+                                            <div class="outlinedBox">
+
+                                                <h:panelGrid columns="2" border="0" 
+                                                             cellpadding="5" columnClasses="gridTd, gridTd"
+                                                             footerClass="gridFooter">
+                                                    <h:panelGroup>
+
+                                                        <h:outputLabel value="Created by: " />
+                                                        <p:spacer height="0px" />
+                                                        <h:outputLabel value="user id: " />
+                                                        <h:outputText value="#{period.createdByUserID}" />
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Created TS:" />
+                                                        <h:outputText value="#{userConfigBB.getPrettyDate(period.createdTS)}"/>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        
+                                                        <h:outputLabel value="Notes" />
+                                                        <h:outputText value="#{period.notes}" escape="false"/>
+                                                    </h:panelGroup>
+                                                    
+                                                    <f:facet name="footer">
+
+                                                        <h4>Log entries associated with this authorization period</h4>
+
+
+                                                        <p:scrollPanel id="usersettings-umaps-log-scrollpanel"
+                                                                       style="height: 200px;">
+
+                                                            <p:dataTable
+                                                                id="usersettings-umaps-log-table"
+                                                                var="entry"
+                                                                value="#{period.periodActivityLogBook}"
+                                                                rowKey="#{entry.authperiodlogentryID}"
+                                                                tableStyleClass="primeDataTable">
+
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Log entry ID" />
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{entry.authperiodlogentryID}"/>
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="AuthPerID" />
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{entry.authPeriod.periodID}"/>
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Cat" />
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{entry.category}"/>
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="TS" />
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{entry.entryTS}"/>
+                                                                </p:column>
+                                                            </p:dataTable>
+                                                        </p:scrollPanel>
+
+                                                    </f:facet>
+                                                </h:panelGrid>
+                                            </div>
+                                        </p:rowExpansion>
+
+                                    </p:dataTable>
+
+                                </f:facet>
+
+
+
+                            </h:panelGrid>
+
+                            <h:form id="usersettings-form-close">                             
+
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('navcontainer-dialog-usersettings').hide()"
+                                                 tabindex="4"/>
 
 
                                 <p:commandButton ajax="true" 
-                                              value="Cancel" icon="fa fa-stop" 
-                                              onclick="PF('navcontainer-dialog-usersettings').hide()"
-                                              tabindex="4"/>
+                                                 value="Done!" icon="fa thumbs-up" 
+                                                 onclick="PF('navcontainer-dialog-usersettings').hide()"
+                                                 tabindex="4"/>
+                            </h:form>
 
+                        </p:dialog>
 
-                                <p:commandButton ajax="true" 
-                                              value="Done!" icon="fa thumbs-up" 
-                                              onclick="PF('navcontainer-dialog-usersettings').hide()"
-                                              tabindex="4"/>
-                             </h:form>
-                             
-                         </p:dialog>
-                        
                     </f:view>
                     <div class="flexing-box-pagecontent">
                         <ui:insert name="content">

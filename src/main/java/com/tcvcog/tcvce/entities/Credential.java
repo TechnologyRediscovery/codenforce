@@ -22,7 +22,7 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class Credential extends EntityUtils implements Serializable{
+public class Credential implements Serializable{
     
     private final UserMuniAuthPeriod governingAuthPeriod;
     
