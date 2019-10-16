@@ -93,7 +93,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         PropertyIntegrator pi = getPropertyIntegrator();
 
         try {
-            setChangedPropList(pi.searchForChangedProperties(getHouseNum(), getStreetName(), getSessionBean().getSessionMuniHeavy().getMuniCode()));
+            setChangedPropList(pi.searchForChangedProperties(getHouseNum(), getStreetName(), getSessionBean().getSessionMuni().getMuniCode()));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Your search completed with " + getChangedPropList().size() + " results", ""));

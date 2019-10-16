@@ -97,7 +97,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         generateMainDash();
         if(currentUser.getCredential().isHasDeveloperPermissions()){
             try {
-                userList = uc.getUserList(getSessionBean().getSessionMuniHeavy());
+                userList = uc.getUserAuthorizedList(getSessionBean().getSessionMuni());
             } catch (AuthorizationException | IntegrationException ex) {
                 System.out.println(ex);
             }
@@ -167,15 +167,18 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public String switchMuni() throws IntegrationException, SQLException{
         CodeIntegrator ci = getCodeIntegrator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        MunicipalityDataHeavy muniComp = mi.getMuniListified(selectedMuni.getMuniCode());
-        getSessionBean().setSessionMuniHeavy(muniComp);
+        MunicipalityDataHeavy muniComp;
         try {
+            muniComp = mi.getMuniListified(selectedMuni.getMuniCode());
+            getSessionBean().setSessionMuni(muniComp);
             getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
         } catch (IntegrationException ex) {
             FacesContext facesContext = getFacesContext();
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
-        }
+        } catch (AuthorizationException ex) {
+            System.out.println(ex);
+        } 
         System.out.println("MissionControlBB.switchMuni | selected muni: " + selectedMuni.getMuniName());
         FacesContext facesContext = getFacesContext();
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -209,7 +212,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      * @return the currentMuni
      */
     public Municipality getCurrentMuni() {
-        currentMuni = getSessionBean().getSessionMuniHeavy();
+        currentMuni = getSessionBean().getSessionMuni();
         return currentMuni;
     }
 
@@ -245,7 +248,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         EventIntegrator ei = getEventIntegrator();
         try {
             timelineEventList = 
-                    (ArrayList<EventCECaseCasePropBundle>) ei.getUpcomingTimelineEvents(getSessionBean().getSessionMuniHeavy(), 
+                    (ArrayList<EventCECaseCasePropBundle>) ei.getUpcomingTimelineEvents(getSessionBean().getSessionMuni(), 
                             LocalDateTime.now(), LocalDateTime.now().plusDays(365));
         } catch (IntegrationException ex) {
             System.out.println(ex);

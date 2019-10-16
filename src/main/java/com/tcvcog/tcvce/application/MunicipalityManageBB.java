@@ -79,7 +79,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
      * @return the currentMuni
      */
     public Municipality getCurrentMuni() {
-        currentMuni = getSessionBean().getSessionMuniHeavy();
+        currentMuni = getSessionBean().getSessionMuni();
         return currentMuni;
     }
 

@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthPeriod;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
@@ -54,7 +54,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
 
     private UserAuthorized currentUser;
     
-    private UserAuthPeriod currentUserAuthPeriod;
+    private UserMuniAuthPeriod currentUserAuthPeriod;
     
     private String formUsername;
     
@@ -81,16 +81,17 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     public void initBean(){
         SearchCoordinator sc = getSearchCoordinator();
         currentUser = getSessionBean().getSessionUser();
+        userPersonList = new ArrayList<>();
         
         // user our fancy specialized query to get all Persons who are delcared to 
         // be user types
-        QueryPerson qp = sc.assembleQueryPerson(QueryPersonEnum.USER_PERSONS, currentUser, null, null );
-        try {
-            qp = sc.runQuery(qp);
-            userPersonList = qp.getResults();
-        } catch (AuthorizationException | IntegrationException ex) {
-            System.out.println(ex);
-        }
+//        QueryPerson qp = sc.assembleQueryPerson(QueryPersonEnum.USER_PERSONS, currentUser, null, null );
+//        try {
+//            qp = sc.runQuery(qp);
+//            userPersonList = qp.getResults();
+//        } catch (AuthorizationException | IntegrationException ex) {
+//            System.out.println(ex);
+//        }
         
     }
 
@@ -304,14 +305,14 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the currentUserAuthPeriod
      */
-    public UserAuthPeriod getCurrentUserAuthPeriod() {
+    public UserMuniAuthPeriod getCurrentUserAuthPeriod() {
         return currentUserAuthPeriod;
     }
 
     /**
      * @param currentUserAuthPeriod the currentUserAuthPeriod to set
      */
-    public void setCurrentUserAuthPeriod(UserAuthPeriod currentUserAuthPeriod) {
+    public void setCurrentUserAuthPeriod(UserMuniAuthPeriod currentUserAuthPeriod) {
         this.currentUserAuthPeriod = currentUserAuthPeriod;
     }
 

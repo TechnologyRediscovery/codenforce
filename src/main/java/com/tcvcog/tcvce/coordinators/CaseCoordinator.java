@@ -731,7 +731,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
         
-    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m) throws SQLException{
+    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m) throws SQLException, AuthorizationException{
         SystemIntegrator si = getSystemIntegrator();
         NoticeOfViolation nov = new NoticeOfViolation();
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());

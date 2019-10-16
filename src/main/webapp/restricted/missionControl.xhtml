@@ -22,7 +22,7 @@
                         </h:messages>
                         
                         <h:form id="missionControlForm">
-                            <h1><h:outputText value="codeNforce Dashboard: #{sessionBean.sessionMuniHeavy.muniName}"/> </h1>
+                            <h1><h:outputText value="codeNforce Dashboard: #{systemServicesBB.bbSessionMuni.muniName}"/> </h1>
                         
                             <p:dashboard model="#{missionControlBB.mainDash}">
                             
@@ -88,7 +88,6 @@
                                          footer=""
                                          toggleableHeader="true"
                                          menuTitle="">
-                                    
                                     <p:dataScroller id="dash-datascroller-cetodo"
                                                     value="#{missionControlBB.ceProposalList}">
                                     
@@ -108,9 +107,6 @@
                                          menuTitle="">
                                     <div class="datum">
                                         <h:outputText value="Active property: " />
-                                        <h:outputText value="#{sessionBean.sessionProperty.address}" />
-                                        <h:outputText value=" (" />
-                                        <h:outputText value="#{sessionBean.sessionProperty.muni.muniName}" />
                                         <h:outputText value=")" />
                                         <p:commandButton  value="view property" 
                                                           action="properties"
@@ -130,11 +126,6 @@
                                          menuTitle="">
                                     <div class="datum">
                                         <h:outputText value="Active Person " />
-                                        <h:outputText value="#{sessionBean.sessionPerson.firstName}" />
-                                        <h:outputText value=" " />
-                                        <h:outputText value="#{sessionBean.sessionPerson.lastName}" />
-                                        <h:outputText value=" (ID: " />
-                                        <h:outputText value="#{sessionBean.sessionPerson.personID}" />
                                         <h:outputText value=" )" />
                                         <p:commandButton  value="view property" 
                                                           action="persons"
@@ -172,12 +163,6 @@
                                     
                                     <div class="datum">
                                         <h:outputText value="Active Inspection " />
-                                        <h:outputText value="#{sessionBean.sessionPerson.firstName}" />
-                                        <h:outputText value=" " />
-                                        <h:outputText value="#{sessionBean.sessionPerson.lastName}" />
-                                        <h:outputText value=" (ID: " />
-                                        <h:outputText value="#{sessionBean.sessionPerson.personID}" />
-                                        <h:outputText value=" )" />
                                         <p:commandButton  value="view property" 
                                                           action="inspection"
                                                           styleClass="noFill" 
@@ -211,7 +196,7 @@
                                         <f:converter converterId="muniConverter"/>
                                         <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
                                         <f:selectItems id="muniNameList" 
-                                                       value="#{sessionBean.userAuthMuniList}" 
+                                                       value="#{systemServicesBB.bbSessionUser.authMuniList}" 
                                                        var="m" 
                                                        itemValue="#{m}" 
                                                        itemLabel="#{m.muniName}" />

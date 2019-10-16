@@ -262,8 +262,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public List<EventType> getPermittedEventTypesForCECase(CECase c, UserAuthorized u) {
         List<EventType> typeList = new ArrayList<>();
-        RoleType role = u.getRoleType();
-        if (role == RoleType.EnforcementOfficial || u.getRoleType() == RoleType.Developer) {
+        RoleType role = u.getRole();
+        if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
             typeList.add(EventType.Action);
             typeList.add(EventType.Timeline);
         }
@@ -278,8 +278,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public List<EventType> getPermittedEventTypesForOcc(OccPeriod period, UserAuthorized u) {
         List<EventType> typeList = new ArrayList<>();
-        RoleType role = u.getRoleType();
-        if (role == RoleType.EnforcementOfficial || u.getRoleType() == RoleType.Developer) {
+        RoleType role = u.getRole();
+        if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
             typeList.add(EventType.Action);
             typeList.add(EventType.Timeline);
             typeList.add(EventType.Occupancy);

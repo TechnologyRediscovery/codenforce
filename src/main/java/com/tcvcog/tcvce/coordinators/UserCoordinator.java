@@ -27,7 +27,7 @@ import com.tcvcog.tcvce.entities.RoleType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthPeriod;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.UserConfigReady;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -75,37 +76,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
          return ui.getUserID(userName);
      }
     
-    private Municipality determineInitMuni(  UserAuthorized ua, 
-                                                Map<Municipality, UserAuthPeriod> muniPerMap) 
-                                                        throws AuthorizationException{
-        Municipality initMuni = null;
-        
-        UserAuthPeriod workingUAP = null;
-        int maxRank = Integer.MIN_VALUE;
-        
-        if(ua ==  null || muniPerMap == null || muniPerMap.isEmpty()){
-            throw new AuthorizationException("Suspicious call to configInitialUserAuth; no AuthUser supplied");
-        }
-        // interate over each municipality to which the user has a valid AuthPeriod
-        for (Municipality mu : muniPerMap.keySet()) {
-            workingUAP = muniPerMap.get(mu);
-            if(initMuni == null || workingUAP.getAssignmentRank() > maxRank) {
-                initMuni = muniPerMap.get(mu).getMuni();
-                maxRank = workingUAP.getAssignmentRank();
-            }
-        }
-        return initMuni;
-    }
-    
-    public boolean validateUserMuniAuthPeriod(UserAuthPeriod uap){
-        boolean valid = true;
-        if(         uap.getRecorddeactivatedTS() == null 
-                ||  uap.getStartDate().isBefore(LocalDateTime.now())
-                ||  uap.getStopDate().isAfter(LocalDateTime.now())){
-            valid = false;
-        }
-        return valid;
-    }
+   
     
     public String generateRandomPassword(){
         java.math.BigInteger bigInt = new BigInteger(1024, new Random());
@@ -128,7 +99,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * and just grabbing their profile from the db
      * 
      * @param usr
-     * @param muni
+     * @param muni if the desire is the Authorize the user in a particular muni
+     * when null, this method will request a credential for the muni containing
+     * the highest-ranked assignment ranking of its list of 
      * @return the fully baked cog user
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException occurs if the user
@@ -136,26 +109,19 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      */
     public UserAuthorized authorizeUser(User usr, Municipality muni) throws AuthorizationException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();    
-        UserAuthorized usrAuth;
-        Map<Municipality, UserAuthPeriod> muniAuthMap = assembleValidAuthPeriodMap(usr);
-        UserAuthPeriod wuap;
+        UserAuthorized usrAuth = null;
+        List<UserMuniAuthPeriod> safeList = validateAndCleanUserMuniAuthPeriodList(ui.getUserMuniAuthPeriodsRaw(usr));
         
-        if(!muniAuthMap.isEmpty()){
-            usrAuth = ui.getUserAuthorized(new UserAuthorized(usr));
-            if(muni != null){
-                // Meaning we have an internal switch from the initial muni to a new one
-                wuap = muniAuthMap.get(muni);
-            } else {
-                // first authorization so figure out which muni to load up first
-                wuap = muniAuthMap.get(determineInitMuni(usrAuth, muniAuthMap));
-            }
-            // setup our UserAuthorized for letting lose
-            usrAuth.setCredential(generateCredential(wuap));
+        if(!safeList.isEmpty()){
+            usrAuth = ui.getUserAuthorizedSkel(usr);
+            usrAuth = configureUserAuthorized(usrAuth, safeList, muni);
         } else {
-            return null;
+            return usrAuth;
         }
         return usrAuth;
     }
+    
+    
     
    
     /**
@@ -168,35 +134,104 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws AuthorizationException 
      */
-    private Map<Municipality, UserAuthPeriod> assembleValidAuthPeriodMap(User u) 
-                                                throws  IntegrationException, 
-                                                        AuthorizationException{
-        UserIntegrator ui = getUserIntegrator();
-        List<UserAuthPeriod> candidatePeriods;
-        Map<Municipality, UserAuthPeriod> muniPerMap = new HashMap<>();
+    private UserAuthorized configureUserAuthorized( UserAuthorized ua, 
+                                                    List<UserMuniAuthPeriod> umapList, 
+                                                    Municipality requestedMuni)
+                                            throws  IntegrationException, 
+                                                    AuthorizationException{
+        Map<Municipality, List<UserMuniAuthPeriod>> muniPeriodMap = null;
+        List<UserMuniAuthPeriod> tmpLst = null;
+        Municipality m = null;
+        int maxRank = Integer.MIN_VALUE; 
+        Municipality credMuni = null;
+        Collections.sort(umapList);
         
-        candidatePeriods = ui.getUserAuthPeriods(u);
-        if(!candidatePeriods.isEmpty()){
-            for(UserAuthPeriod uap: candidatePeriods){
-                // Filter out deactivated records and expired records
-                if(validateUserMuniAuthPeriod(uap)){
-                    //  check for existing muni periods and use the most recent valid period
-                    if(muniPerMap.containsKey(uap.getMuni())){
-                        UserAuthPeriod existingRecord = muniPerMap.get(uap.getMuni());
-                        if(uap.getCreatedTS().isAfter(existingRecord.getCreatedTS())){
-                            // we found a newer record, so swap it out
-                            muniPerMap.put(uap.getMuni(), uap);
-                        }
-                    } else {
-                        // no existing record for that muni, so add it to the map
-                        muniPerMap.put(uap.getMuni(), uap);
-                    }
+        if(!umapList.isEmpty()){
+            muniPeriodMap = new HashMap<>();
+            for(UserMuniAuthPeriod umap: umapList){
+                m = umap.getMuni();
+                if(muniPeriodMap.containsKey(m)){
+                    tmpLst = muniPeriodMap.get(m);
+                    tmpLst.add(umap);
+                    Collections.sort(tmpLst);
+                    muniPeriodMap.put(umap.getMuni(), tmpLst);
+                } else {
+                    // no existing record for that muni, so make a list, inject, and put
+                    tmpLst = new ArrayList<>();
+                    tmpLst.add(umap);
+                    muniPeriodMap.put(umap.getMuni(), tmpLst);
                 }
+                // Now update our pointer to the 
+                if(requestedMuni != null && muniPeriodMap.containsKey(requestedMuni)){
+                    credMuni = requestedMuni;
+                } else if(tmpLst.get(0).getAssignmentRank() > maxRank){
+                    maxRank = tmpLst.get(0).getAssignmentRank();
+                    credMuni = m;
+                }
+                ua.setCredential(generateCredential(muniPeriodMap.get(credMuni).get(0)));
+                
             } // close for over period candidates
+            
+            // finally, inject the muniPeriodMap into the UA whose credential is set
+            ua.setMuniAuthPeriodsMap(muniPeriodMap);
+           
         } else {
             throw new AuthorizationException("No candidate authorization periods exist for user");
         }
-        return muniPerMap;
+        return ua;
+    }
+    
+    
+    private List<UserMuniAuthPeriod> validateUserMuniAuthPeriodList(List<UserMuniAuthPeriod> umapList){
+        List<UserMuniAuthPeriod> tempList = null;
+        if(umapList != null && !umapList.isEmpty()){
+                tempList = new ArrayList<>();
+            
+            for(UserMuniAuthPeriod umap: umapList){
+                tempList.add(validateUserMuniAuthPeriod(umap));
+            }
+            return tempList;
+        }
+        return tempList;
+    }
+    
+    private UserMuniAuthPeriod validateUserMuniAuthPeriod(UserMuniAuthPeriod uap){
+        // they all get evaluated and stamped
+        LocalDateTime syncNow = LocalDateTime.now();
+        uap.setValidityEvaluatedTS(syncNow);
+        if( 
+                uap.getRecorddeactivatedTS() != null 
+            ||  uap.getStartDate().isAfter(LocalDateTime.now())
+            ||  uap.getStopDate().isBefore(LocalDateTime.now())
+        ){
+            System.out.println("UserCoordinator.validateUserMuniAuthPeriod | declared invalid: " + uap.getUserAuthPeriodID());
+            return uap;
+        }
+        // since we have a valid period, git it the extra valid stamp
+        uap.setValidatedTS(syncNow);
+        return uap;
+    }
+    
+    /**
+     * Convenience adaptor method for checking the validity of a generic list of raw UMAPs
+     * and only returning valid periods
+     * @param rawUMAPList
+     * @return the list of only valid UMAPs
+     */
+    private List<UserMuniAuthPeriod> validateAndCleanUserMuniAuthPeriodList(List<UserMuniAuthPeriod> rawUMAPList){
+        List<UserMuniAuthPeriod> cleanList = null; 
+        if(rawUMAPList != null && !rawUMAPList.isEmpty()){
+            cleanList = new ArrayList<>();
+            for(UserMuniAuthPeriod umap: rawUMAPList){
+                if(validateUserMuniAuthPeriod(umap).getValidatedTS() != null){
+                    cleanList.add(umap);
+                }
+            }
+            if(!cleanList.isEmpty()){
+                Collections.sort(cleanList);
+            }
+        }
+        return cleanList;
     }
    
    
@@ -224,17 +259,19 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public UserMuniAuthPeriodLogEntry assembleUserMuniAuthPeriodLogEntrySkeleton(
                                         UserAuthorized ua, 
                                         UserMuniAuthPeriodLogEntryCatEnum cat){
+        
         UserMuniAuthPeriodLogEntry skel = new UserMuniAuthPeriodLogEntry();
         skel.setAuthPeriod(ua.getCredential().getGoverningAuthPeriod());
+        
         return skel;
     }
     
     public void logCredentialInvocation(UserMuniAuthPeriodLogEntry entry) throws IntegrationException, AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
-        ui.insertMuniAuthPeriodLogEntry(entry);
+        ui.insertUserMuniAuthPeriodLogEntry(entry);
     }
     
-    public void insertNewUserAuthorizationPeriod(User requestingUser, User usee, UserAuthPeriod uap) throws AuthorizationException, IntegrationException{
+    public void insertNewUserAuthorizationPeriod(User requestingUser, User usee, UserMuniAuthPeriod uap) throws AuthorizationException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         if(uap != null && requestingUser != null && usee != null && uap.getMuni() != null){
             if(uap.getStartDate() != null && !uap.getStartDate().isAfter(LocalDateTime.now().minusYears(1))){
@@ -268,7 +305,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param rt
      * @return a User object whose access controls switches are configured
      */
-    private UserAuthCredential generateCredential(UserAuthPeriod uap){
+    private UserAuthCredential generateCredential(UserMuniAuthPeriod uap){
         UserAuthCredential cred = null;
         
         switch(uap.getRole()){
@@ -391,21 +428,21 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         ui.setUserPassword(u, pw);
     }
     
-    public User getUserSkeleton(User u){
-        User skel = new User();
+    public UserAuthorized getUserSkeleton(User u){
+        UserAuthorized skel = new UserAuthorized(u);
         return skel;
     }
     
-     public UserAuthPeriod initializeNewAuthPeriod( UserAuthorized requestor, 
+     public UserMuniAuthPeriod initializeNewAuthPeriod( UserAuthorized requestor, 
                                                             User requestee, 
                                                             Municipality m){
-        UserAuthPeriod per = null;
+        UserMuniAuthPeriod per = null;
 
         // Only Users who have sys admin permission in the requested muni or are devs
         if((requestor.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode() == m.getMuniCode()
                 && requestor.getCredential().isHasSysAdminPermissions())
                 || requestor.getCredential().isHasDeveloperPermissions()){
-            per = new UserAuthPeriod(m);
+            per = new UserMuniAuthPeriod(m);
             per.setStartDate(LocalDateTime.now());
             per.setStopDate(LocalDateTime.now().plusYears(1));
         }
@@ -414,9 +451,16 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      
 
      
-    public void invalidateUserAuthPeriod(UserAuthPeriod aup, User u) throws IntegrationException{
+    public void invalidateUserAuthPeriod(UserMuniAuthPeriod aup, UserAuthorized u, String note) throws IntegrationException, AuthorizationException{
+        SystemCoordinator sc = getSystemCoordinator();
         UserIntegrator ui = getUserIntegrator();
+        if(aup.getUserAuthPeriodID() == u.getCredential().getGoverningAuthPeriod().getUserAuthPeriodID()){
+            throw new AuthorizationException("You are unauthorized to invalidate your current authorization period");
+        }
+        aup.setNotes(sc.appendNoteBlock(new MessageBuilderParams(aup.getNotes(), "INVALIDATION OF AUTH PERIOD", "", note, u)));
         ui.invalidateUserAuthRecord(aup);
+        
+        // We should be logging this action
         
     }
     
@@ -425,69 +469,56 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return ui.getUser(userID);
     }
     
-    public List<UserAuthorized> getUserList(Municipality m) throws IntegrationException, AuthorizationException{
+    
+    /**
+     * Generates a User list that represents allowable users to engage with
+     * for a given muni. This method doesn't return fully-fledged users
+     * @param m
+     * @return
+     * @throws IntegrationException
+     * @throws AuthorizationException 
+     */
+    public List<UserAuthorized> getUserAuthorizedList(Municipality m) throws IntegrationException, AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
-        List<UserAuthorized> ual = ui.getUserAuthorizedList(m);
-        for(UserAuthorized usrAuth: ual){
-            if(validateUserMuniAuthPeriod(usrAuth.getCredential().getGoverningAuthPeriod())){
-                if(!ual.contains(usrAuth)){
-                    ual.add(usrAuth);
+        List<UserMuniAuthPeriod> umapList = null;
+        List<UserAuthorized> ual = null;
+        if(m != null){
+            umapList = ui.getUserMuniAuthPeriodsRaw(m);
+            if(!umapList.isEmpty()){
+                ual = new ArrayList<>();
+                for(UserMuniAuthPeriod umap: umapList){
+                    // note that authorizeUser will got get MuniAuthPeriods by
+                    // user and only return a UseAuthorized if at least one is valid
+                    UserAuthorized ua = authorizeUser(ui.getUser(umap.getUserID()), m);
+                    if(ua != null){
+                        ual.add(ua);
+                    }
                 }
             }
         }
         return ual;
     }
     
-   
-     /**
-      * Given a single user, coordinates the creation of a list of Users who 
-      * that user can configure.
-     * @param ua
-      * @return 
-     * @throws com.tcvcog.tcvce.domain.IntegrationException 
-      */
-     public List<UserConfigReady> getUsersForConfiguration(UserAuthorized ua) throws IntegrationException, AuthorizationException{
-         UserIntegrator ui = getUserIntegrator();
-         
-         List<UserAuthorized> userAuthInMuniList = new ArrayList<>();
-         List<UserConfigReady> userAllowedList = new ArrayList<>();
-         
-         for(Municipality m: ua.getMuniAuthPeriodMap().keySet()){
-             userAuthInMuniList = ui.getUserAuthorizedList(m);
-             for(UserAuthorized u: userAuthInMuniList){
-                switch(ua.getRoleType()){
-                    case SysAdmin:
-                        if(u.getRoleType() != RoleType.Developer){
-                            userAllowedList.add(ui.getUserConfigReady(u));
-                            break;
-                        } else {
-                            break;
-                        }
-                    
-                    case Developer:
-                        userAllowedList.add(ui.getUserConfigReady(u));
-                        break;
-                    
-                    default:
-                        break;
-                }
-             } // user for
-         } // muni for
-         return userAllowedList;
-     }
-    
-     /**
-      * Coordinates the creation of a list of all a particular user's Authorized
-      * municipalities
-      * @param userID
-      * @return
-      * @throws IntegrationException 
-      */
-    public List<Municipality> getUserAuthMuniList(int userID) throws IntegrationException{
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        List<Municipality> ml = mi.getUserAuthMunis(userID);
-        return ml;
+
+    /**
+     * Convenience method for upcasting UserAuthorized to simple User and putting
+     * them in a list
+     * @param uaList
+     * @return 
+     */
+    public List<User> extractUsersFromUserAuthorized(List<UserAuthorized> uaList){
+        List<User> uList = null;
+        if(uaList != null && !uaList.isEmpty()){
+            uList = new ArrayList<>();
+            for(UserAuthorized ua: uaList){
+                uList.add( (User) ua);
+            }
+        }
+        return uList;
     }
+    
+    
+   
     
     /**
      * Return a list of Municipalities that User u does not currently have the

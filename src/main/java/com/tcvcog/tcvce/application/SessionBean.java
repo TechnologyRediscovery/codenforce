@@ -78,10 +78,8 @@ import java.util.Set;
  */
 public class SessionBean extends BackingBeanUtils implements Serializable{
     
-    private List<Municipality> userAuthMuniList;
-
     // BOB individual object session shelves - NOT NULL
-    private MunicipalityDataHeavy sessionMuniHeavy;
+    private MunicipalityDataHeavy sessionMuni;
     private UserAuthorized sessionUser;
     
     private CECase sessionCECase;
@@ -216,8 +214,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      * @return the activeCodeSet
      */
     public CodeSet getActiveCodeSet() {
-//        if(sessionMuniHeavy != null){
-//            activeCodeSet = sessionMuniHeavy.getCodeSet();
+//        if(sessionMuni != null){
+//            activeCodeSet = sessionMuni.getCodeSet();
 //        }
         return activeCodeSet;
     }
@@ -353,17 +351,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the sessionMuniHeavy
+     * @return the sessionMuni
      */
-    public MunicipalityDataHeavy getSessionMuniHeavy() {
-        return sessionMuniHeavy;
+    public MunicipalityDataHeavy getSessionMuni() {
+        return sessionMuni;
     }
 
     /**
-     * @param sessionMuniHeavy the sessionMuniHeavy to set
+     * @param sessionMuni the sessionMuni to set
      */
-    public void setSessionMuniHeavy(MunicipalityDataHeavy sessionMuniHeavy) {
-        this.sessionMuniHeavy = sessionMuniHeavy;
+    public void setSessionMuni(MunicipalityDataHeavy sessionMuni) {
+        this.sessionMuni = sessionMuni;
     }
 
     /**
@@ -458,21 +456,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.ceactionRequestForSubmission = ceactionRequestForSubmission;
     }
 
-    /**
-     * @return the userAuthMuniList
-     */
-    public List<Municipality> getUserAuthMuniList() {
-        Set<Municipality> muniSet;
-        List<Municipality> muniList;
-        if(sessionUser != null && sessionUser.getMuniAuthPeriodMap() != null){
-            muniSet = sessionUser.getMuniAuthPeriodMap().keySet();
-            muniList = new ArrayList<>(muniSet);
-            userAuthMuniList = muniList;
-        }
-        
-        return userAuthMuniList;
-    }
-
+  
    
 
     /**

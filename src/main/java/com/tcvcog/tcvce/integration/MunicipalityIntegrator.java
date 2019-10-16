@@ -19,6 +19,8 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.MuniCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -89,7 +91,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
     }
     
-    public MunicipalityDataHeavy getMuniListified(int muniCode) throws IntegrationException{
+    public MunicipalityDataHeavy getMuniListified(int muniCode) throws IntegrationException, AuthorizationException{
         PreparedStatement stmt = null;
         MunicipalityDataHeavy muniComplete = null;
         Connection con = null;
@@ -137,10 +139,11 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         return muni;
     }
     
-    private MunicipalityDataHeavy generateMuniDataHeavy(ResultSet rs) throws SQLException, IntegrationException{
+    private MunicipalityDataHeavy generateMuniDataHeavy(ResultSet rs) throws SQLException, IntegrationException, AuthorizationException{
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         UserIntegrator ui = getUserIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         
         MunicipalityDataHeavy muni = new MunicipalityDataHeavy(generateMuni(rs));
         
@@ -179,7 +182,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setLastUpdaetdBy(ui.getUser(rs.getInt("lastupdated_userid")));
         muni.setPrimaryStaffContact(ui.getUser(rs.getInt("primarystaffcontact_userid")));
         
-//        muni.setCodeOfficers(ui.getActiveCodeOfficerList(muni.getMuniCode()));
+        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedList(muni)));
         muni.setCourtEntities(cei.getCourtEntityList(muni.getMuniCode()));
         
         return muni;

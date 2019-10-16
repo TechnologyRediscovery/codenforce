@@ -79,8 +79,8 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         
         
-        queryList = sc.buildQueryEventCECaseList(getSessionBean().getSessionMuniHeavy(),getSessionBean().getSessionUser());
-        selectedBOBQuery = sc.getQueryInitialEventCECASE(getSessionBean().getSessionMuniHeavy(), getSessionBean().getSessionUser());
+        queryList = sc.buildQueryEventCECaseList(getSessionBean().getSessionMuni(),getSessionBean().getSessionUser());
+        selectedBOBQuery = sc.getQueryInitialEventCECASE(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser());
         if(!selectedBOBQuery.isExecutedByIntegrator()){
             try {
                 sc.runQuery((QueryEventCECase) selectedBOBQuery);
@@ -96,7 +96,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         // which would have been placed there by the generateReport method in this bean
         reportConfig = getSessionBean().getReportConfigCEEventList();
         try {
-            userList = uc.getUserList(getSessionBean().getSessionMuniHeavy());
+            userList = uc.getUserAuthorizedList(getSessionBean().getSessionMuni());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         } catch (AuthorizationException ex) {
@@ -214,7 +214,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
            
             EventCoordinator ec = getEventCoordinator();
             reportConfig = ec.getDefaultReportConfigCEEventList();
-            reportConfig.setMuni(getSessionBean().getSessionMuniHeavy());
+            reportConfig.setMuni(getSessionBean().getSessionMuni());
             reportConfig.setCreator(getSessionBean().getSessionUser());
             if(selectedBOBQuery != null){
                  reportConfig.setTitle(selectedBOBQuery.getQueryTitle());

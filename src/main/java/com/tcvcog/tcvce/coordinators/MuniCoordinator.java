@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthPeriod;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
@@ -42,27 +42,19 @@ public class MuniCoordinator extends BackingBeanUtils implements Serializable {
     public MuniCoordinator() {
     }
     
+   
     
-    protected Map<Municipality, UserAuthPeriod> assembleMuniAuthPeriodMap(User usr){
-        Map<Municipality, UserAuthPeriod> muniPerMap = new HashMap<>();
-        return muniPerMap;
-        
-    }
-    
-    public List<UserAuthorized> assembleCodeOfficerList(Municipality muni){
-        List<UserAuthorized> uList = new ArrayList<>();
-        return uList;
-    
-    } 
     
      
-      public List<Municipality> getPermittedMunicipalityList(UserAuthorized user) throws IntegrationException{
+      public List<Municipality> getPermittedMunicipalityListForAdminMuniAssignment(UserAuthorized user) throws IntegrationException{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         List<Municipality> muniList = new ArrayList<>();
         if(user.getCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
             muniList.addAll(mi.getMuniList());
         } else {
-            muniList.add(user.getCredential().getGoverningAuthPeriod().getMuni());
+            if(user.getRole() != null && user.getRole() == RoleType.SysAdmin){
+                muniList.add(user.getCredential().getGoverningAuthPeriod().getMuni());
+            }
         }
         
         return muniList;

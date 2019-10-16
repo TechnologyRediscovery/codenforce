@@ -18,5 +18,17 @@ public class MessageBuilderParams {
     public String explanation;
     public String newMessageContent;
     public User user;
+
+    public MessageBuilderParams(String existingContent, String header, String explanation, String newMessageContent, User user) {
+        this.existingContent = existingContent;
+        this.header = header;
+        this.explanation = explanation;
+        this.newMessageContent = newMessageContent;
+        this.user = user;
+    }
+    
+    public MessageBuilderParams(){
+        
+    }
     
 }

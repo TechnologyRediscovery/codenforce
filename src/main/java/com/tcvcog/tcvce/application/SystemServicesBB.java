@@ -21,6 +21,8 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
@@ -45,9 +47,23 @@ import javax.servlet.http.HttpSession;
  */
 public class SystemServicesBB extends BackingBeanUtils implements Serializable{
 
-    private String listItemChangeRequestRText;
     
-    private UserAuthorized sessionAuthUser;
+    // *************************************************************************
+    // ** Master session level objects on this view-scoped bean               **
+    // *************************************************************************
+    
+    private UserAuthorized bbSessionUser;
+    private MunicipalityDataHeavy bbSessionMuni;
+    
+    private Property bbSessionProperty;
+    private
+    
+    
+    
+    // *************************************************************************
+    // **               improvement suggestions, etc.
+    // *************************************************************************
+    private String listItemChangeRequestRText;
     
     private String systemImprovementTicketRText;
     private int selectedImprovementType;
@@ -70,7 +86,9 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         
-        sessionAuthUser = getSessionBean().getSessionUser();
+        bbSessionUser = getSessionBean().getSessionUser();
+        bbSessionMuni = getSessionBean().getSessionMuni();
+        
         
     }
     
@@ -335,17 +353,31 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the sessionAuthUser
+     * @return the bbSessionUser
      */
-    public UserAuthorized getSessionAuthUser() {
-        return sessionAuthUser;
+    public UserAuthorized getBbSessionUser() {
+        return bbSessionUser;
     }
 
     /**
-     * @param sessionAuthUser the sessionAuthUser to set
+     * @param bbSessionUser the bbSessionUser to set
      */
-    public void setSessionAuthUser(UserAuthorized sessionAuthUser) {
-        this.sessionAuthUser = sessionAuthUser;
+    public void setBbSessionUser(UserAuthorized bbSessionUser) {
+        this.bbSessionUser = bbSessionUser;
+    }
+
+    /**
+     * @return the bbSessionMuni
+     */
+    public MunicipalityDataHeavy getBbSessionMuni() {
+        return bbSessionMuni;
+    }
+
+    /**
+     * @param bbSessionMuni the bbSessionMuni to set
+     */
+    public void setBbSessionMuni(MunicipalityDataHeavy bbSessionMuni) {
+        this.bbSessionMuni = bbSessionMuni;
     }
     
     
