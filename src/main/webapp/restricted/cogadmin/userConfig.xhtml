@@ -146,7 +146,7 @@
                                             icon="fa fa-plus" 
                                             actionListener="#{userConfigBB.initiateViewAddAuthPeriods}"
                                             oncomplete="PF('user-authorizations-dialog-var').show()"
-                                            rendered="#{sessionBean.sessionUser.credential.hasSysAdminPermissions}"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
                                             update="user-authorizations-dialog"/>
 
 
@@ -181,9 +181,9 @@
 
                                 <p:dataTable
                                     id="userconfig-muniauthperiods-dt"
-                                    var="period"
-                                    value="#{userConfigBB.umapList}"
-                                    rowKey="#{period.userAuthPeriodID}"
+                                    var="muPeriod"
+                                    value="#{userConfigBB.currentUser.muniAuthPeriodListForCredMuni}"
+                                    rowKey="#{muPeriod.userMuniAuthPeriodID}"
                                     tableStyleClass="primeDataTable">
 
                                     <p:column width="3%" exportable="false">
@@ -198,7 +198,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Auth Period ID" />
                                         </f:facet>
-                                        <h:outputText value="#{period.userAuthPeriodID}"/>
+                                        <h:outputText value="#{muPeriod.userMuniAuthPeriodID}"/>
                                     </p:column>
 
 
@@ -206,29 +206,29 @@
                                         <f:facet name="header">
                                             <h:outputText value="Access start" />
                                         </f:facet>
-                                        <h:outputText value="#{userConfigBB.getPrettyDate(period.startDate)}"/>
+                                        <h:outputText value="#{userConfigBB.getPrettyDate(muPeriod.startDate)}"/>
                                     </p:column>
 
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Access stop" />
                                         </f:facet>
-                                        <h:outputText value="#{userConfigBB.getPrettyDate(period.stopDate)}"/>
+                                        <h:outputText value="#{userConfigBB.getPrettyDate(muPeriod.stopDate)}"/>
                                     </p:column>
 
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Role" />
                                         </f:facet>
-                                        <h:outputText value="#{period.role.label}"/>
-                                        <h:outputText value=" (rank: #{period.role.rank})"/>
+                                        <h:outputText value="#{muPeriod.role.label}"/>
+                                        <h:outputText value=" (rank: #{muPeriod.role.rank})"/>
                                     </p:column>
 
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Deactivated?" />
                                         </f:facet>
-                                        <h:outputText value="#{userConfigBB.getPrettyDate(period.recorddeactivatedTS)}"/>
+                                        <h:outputText value="#{userConfigBB.getPrettyDate(muPeriod.recorddeactivatedTS)}"/>
                                     </p:column>
 
 
@@ -237,7 +237,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Assignment rank" />
                                         </f:facet>
-                                        <h:outputText value="#{period.assignmentRank}"/>
+                                        <h:outputText value="#{muPeriod.assignmentRelativeOrder}"/>
                                     </p:column>
 
                                     <p:column>
@@ -245,7 +245,7 @@
                                             <h:outputText value="Notes" />
                                         </f:facet>
 
-                                        <h:outputText value="#{period.notes}" escape="false"/>
+                                        <h:outputText value="#{muPeriod.notes}" escape="false"/>
                                     </p:column>
 
                                     <p:column>
@@ -257,10 +257,9 @@
                                                          value="invalidate" 
                                                          icon="fa fa-close"
                                                          styleClass="multiButtonLineButton" 
-                                                         actionListener="#{userConfigBB.initiateInvalidateUserAuthPeriod(period)}"
+                                                         actionListener="#{userConfigBB.initiateInvalidateUserAuthPeriod(user, muPeriod)}"
                                                          oncomplete="PF('userconfig-dialog-invalidateperiod-var').show()"
-                                                         update="userconfig-dialog-invalidateperiod
-                                                         " />
+                                                         update="userconfig-dialog-invalidateperiodform" />
                                     </p:column>
                                     <p:rowExpansion>
                                         <div class="outlinedBox">
@@ -273,13 +272,13 @@
                                                     <h:outputLabel value="Created by: " />
                                                     <p:spacer height="0px" />
                                                     <h:outputLabel value="user id: " />
-                                                    <h:outputText value="#{period.createdByUserID}" />
+                                                    <h:outputText value="#{muPeriod.createdByUserID}" />
 
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
                                                     <h:outputLabel value="Created TS:" />
-                                                    <h:outputText value="#{userConfigBB.getPrettyDate(period.createdTS)}"/>
+                                                    <h:outputText value="#{userConfigBB.getPrettyDate(muPeriod.createdTS)}"/>
                                                 </h:panelGroup>
                                                 <f:facet name="footer">
 
@@ -291,34 +290,34 @@
 
                                                         <p:dataTable
                                                             id="userconfig-muniauthperiods-logentry-table"
-                                                            var="entry"
-                                                            value="#{period.periodActivityLog}"
-                                                            rowKey="#{entry.authperiodlogentryID}"
+                                                            var="muEntry"
+                                                            value="#{muPeriod.periodActivityLogBook}"
+                                                            rowKey="#{muEntry.logBookEntryID}"
                                                             tableStyleClass="primeDataTable">
 
                                                             <p:column>
                                                                 <f:facet name="header">
                                                                     <h:outputText value="Log entry ID" />
                                                                 </f:facet>
-                                                                <h:outputText value="#{entry.authperiodlogentryID}"/>
+                                                                <h:outputText value="#{muEntry.logBookEntryID}"/>
                                                             </p:column>
                                                             <p:column>
                                                                 <f:facet name="header">
                                                                     <h:outputText value="AuthPerID" />
                                                                 </f:facet>
-                                                                <h:outputText value="#{entry.authPeriod.periodID}"/>
+                                                                <h:outputText value="#{muEntry.userMuniAuthPeriodID}"/>
                                                             </p:column>
                                                             <p:column>
                                                                 <f:facet name="header">
-                                                                    <h:outputText value="Cat" />
+                                                                    <h:outputText value="Category" />
                                                                 </f:facet>
-                                                                <h:outputText value="#{entry.category}"/>
+                                                                <h:outputText value="#{muEntry.category}"/>
                                                             </p:column>
                                                             <p:column>
                                                                 <f:facet name="header">
                                                                     <h:outputText value="TS" />
                                                                 </f:facet>
-                                                                <h:outputText value="#{entry.entryTS}"/>
+                                                                <h:outputText value="#{muEntry.entryTS}"/>
                                                             </p:column>
                                                         </p:dataTable>
                                                     </p:scrollPanel>
@@ -486,9 +485,10 @@
                                                     value="Invalidate" 
                                                     icon="fa fa-fire" 
                                                     tabindex="11" 
-                                                    actionListener="#{userConfigBB.invalidateAuthPeriod}"
-                                                    update="userManageForm:userconfig-usertable
-                                                    usermanage-messages-form"
+                                                    actionListener="#{userConfigBB.invalidateUserMuniAuthPeriod}"
+                                                    update="userconfig-dialog-invalidateperiod
+                                                         user-authorizations-dialog-messages-form
+                                                         user-authorizations-dialog-periodtable-form"
                                                     />
                                 <p:spacer height="5px" />
                             </h:form>

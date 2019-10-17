@@ -95,13 +95,18 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         // grab previously loaded event config from the session bean
         // which would have been placed there by the generateReport method in this bean
         reportConfig = getSessionBean().getReportConfigCEEventList();
-        try {
-            userList = uc.getUserAuthorizedList(getSessionBean().getSessionMuni());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        } catch (AuthorizationException ex) {
-            System.out.println(ex);
-        }
+//        try {
+//            userList = uc.getUserAuthorizedListForConfig(getSessionBean().getSessionMuni());
+            
+        // **************************************************************
+        // *****FIX ME!!!*********************************************************
+        // **************************************************************
+            userList = new ArrayList<>();
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//        } catch (AuthorizationException ex) {
+//            System.out.println(ex);
+//        }
     }
     
     public void hideEvent(EventCECaseCasePropBundle ev){

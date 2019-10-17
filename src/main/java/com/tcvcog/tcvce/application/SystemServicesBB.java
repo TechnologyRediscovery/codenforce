@@ -89,7 +89,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         
         bbSessionUser = getSessionBean().getSessionUser();
         bbSessionMuni = getSessionBean().getSessionMuni();
-        
+        System.out.println("SystemServicesBB.initBean");
         
     }
     

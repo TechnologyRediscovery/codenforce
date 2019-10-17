@@ -183,9 +183,9 @@
                         <p:dialog header="User settings" 
                                   widgetVar="navcontainer-dialog-usersettings" 
                                   responsive="true" 
-                                  width="800"
+                                  width="1000"
                                   modal="false"
-                                  height="600">
+                                  height="500">
 
 
                             <h2>User settings for <h:outputText value="#{userBB.currentUser.username}" /></h2>
@@ -340,7 +340,7 @@
                                         id="usersettings-umaps-table"
                                         var="period"
                                         value="#{systemServicesBB.bbSessionUser.muniAuthPeriodListForCredMuni}"
-                                        rowKey="#{period.userAuthPeriodID}"
+                                        rowKey="#{period.userMuniAuthPeriodID}"
                                         tableStyleClass="primeDataTable">
 
                                         <p:column width="3%" exportable="false">
@@ -355,7 +355,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Auth Period ID" />
                                             </f:facet>
-                                            <h:outputText value="#{period.userAuthPeriodID}"/>
+                                            <h:outputText value="#{period.userMuniAuthPeriodID}"/>
                                         </p:column>
 
 
@@ -363,14 +363,14 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Access start" />
                                             </f:facet>
-                                            <h:outputText value="#{userConfigBB.getPrettyDate(period.startDate)}"/>
+                                            <h:outputText value="#{systemServicesBB.getPrettyDate(period.startDate)}"/>
                                         </p:column>
 
                                         <p:column>
                                             <f:facet name="header">
                                                 <h:outputText value="Access stop" />
                                             </f:facet>
-                                            <h:outputText value="#{userConfigBB.getPrettyDate(period.stopDate)}"/>
+                                            <h:outputText value="#{systemServicesBB.getPrettyDate(period.stopDate)}"/>
                                         </p:column>
 
                                         <p:column>
@@ -385,13 +385,13 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Deactivated TS" />
                                             </f:facet>
-                                            <h:outputText value="#{userConfigBB.getPrettyDate(period.recorddeactivatedTS)}"/>
+                                            <h:outputText value="#{systemServicesBB.getPrettyDate(period.recorddeactivatedTS)}"/>
                                         </p:column>
                                         <p:column>
                                             <f:facet name="header">
                                                 <h:outputText value="Assignment rank" />
                                             </f:facet>
-                                            <h:outputText value="#{period.assignmentRank}"/>
+                                            <h:outputText value="#{period.assignmentRelativeOrder}"/>
                                         </p:column>
 
 
@@ -424,7 +424,7 @@
 
                                                     <h:panelGroup>
                                                         <h:outputLabel value="Created TS:" />
-                                                        <h:outputText value="#{userConfigBB.getPrettyDate(period.createdTS)}"/>
+                                                        <h:outputText value="#{systemServicesBB.getPrettyDate(period.createdTS)}"/>
                                                     </h:panelGroup>
                                                     <h:panelGroup>
                                                         
@@ -444,20 +444,20 @@
                                                                 id="usersettings-umaps-log-table"
                                                                 var="entry"
                                                                 value="#{period.periodActivityLogBook}"
-                                                                rowKey="#{entry.authperiodlogentryID}"
+                                                                rowKey="#{entry.logBookEntryID}"
                                                                 tableStyleClass="primeDataTable">
 
                                                                 <p:column>
                                                                     <f:facet name="header">
                                                                         <h:outputText value="Log entry ID" />
                                                                     </f:facet>
-                                                                    <h:outputText value="#{entry.authperiodlogentryID}"/>
+                                                                    <h:outputText value="#{entry.logBookEntryID}"/>
                                                                 </p:column>
                                                                 <p:column>
                                                                     <f:facet name="header">
                                                                         <h:outputText value="AuthPerID" />
                                                                     </f:facet>
-                                                                    <h:outputText value="#{entry.authPeriod.periodID}"/>
+                                                                    <h:outputText value="#{entry.userMuniAuthPeriodID}"/>
                                                                 </p:column>
                                                                 <p:column>
                                                                     <f:facet name="header">
@@ -470,6 +470,12 @@
                                                                         <h:outputText value="TS" />
                                                                     </f:facet>
                                                                     <h:outputText value="#{entry.entryTS}"/>
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Client address" />
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{entry.header_remoteaddr}"/>
                                                                 </p:column>
                                                             </p:dataTable>
                                                         </p:scrollPanel>

@@ -92,16 +92,8 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean() {
-        UserCoordinator uc = getUserCoordinator();
         currentUser = getSessionBean().getSessionUser();
         generateMainDash();
-        if(currentUser.getMyCredential().isHasDeveloperPermissions()){
-            try {
-                userList = uc.getUserAuthorizedList(getSessionBean().getSessionMuni());
-            } catch (AuthorizationException | IntegrationException ex) {
-                System.out.println(ex);
-            }
-        }
     }
     
     private void generateMainDash(){

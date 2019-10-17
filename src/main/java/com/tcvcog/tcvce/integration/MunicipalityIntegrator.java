@@ -182,7 +182,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setLastUpdaetdBy(ui.getUser(rs.getInt("lastupdated_userid")));
         muni.setPrimaryStaffContact(ui.getUser(rs.getInt("primarystaffcontact_userid")));
         
-        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedList(muni)));
+        // FIX THIS WHEN WE HAVE STABLE AUTHORIZATION PROCEDURES
+//        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedListForConfig(muni)));
         muni.setCourtEntities(cei.getCourtEntityList(muni.getMuniCode()));
         
         return muni;
