@@ -32,7 +32,7 @@ public class UserAuthorized extends User{
      * Remember that the notion of a Credential only exists in Java land, since a User 
      * is never "in" the database, doing stuff.
      */
-    private Credential credential;
+    
     private Credential myCredential;
    
     /**
@@ -69,18 +69,18 @@ public class UserAuthorized extends User{
     /**
      * INJECTION SITE FOR THE USER'S CREDENTIAL OBJECT
      * 
-     * @param myCredential 
+     * @param mc 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException cannot set a credential
      * to null or one with an id that doesn't match the userid in AuthPeriod
      */
-    public void setMyCredential(Credential myCredential) throws AuthorizationException {
-         if(myCredential != null && myCredential.getGoverningAuthPeriod().getUserID() == userID){
-            credential = myCredential;
+    public void setMyCredential(Credential mc) throws AuthorizationException {
+         if(mc != null && mc.getGoverningAuthPeriod().getUserID() == userID){
+            myCredential = mc;
         }
         else {
             throw new AuthorizationException("cannot set a credential to NULL or one without matching userID in AuthPeriod");
         }
-        this.myCredential = myCredential;
+        this.myCredential = mc;
     }
 
     
@@ -126,22 +126,6 @@ public class UserAuthorized extends User{
     }
 
 
-    /**
-     * 
-     * Authorization check
-     * @deprecated 
-     * @param cr
-     * @throws AuthorizationException 
-     */
-    public void setCredential(Credential cr) throws AuthorizationException{
-        if(cr != null && cr.getGoverningAuthPeriod().getUserID() == userID){
-            credential = cr;
-        }
-        else {
-            throw new AuthorizationException("cannot set a credential to NULL "
-                    + "or one without matching userID in AuthPeriod");
-        }
-    }
    
     /**
      * @return the pswdLastUpdated
@@ -192,7 +176,7 @@ public class UserAuthorized extends User{
      * @return the credential
      */
     public Credential getMyCredential() {
-        return credential;
+        return myCredential;
     }
 
    

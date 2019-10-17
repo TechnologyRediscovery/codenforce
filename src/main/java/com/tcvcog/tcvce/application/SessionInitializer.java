@@ -160,7 +160,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                     umaple.setAudit_muni_municode(muniHeavy.getMuniCode());
                     umaple.setAudit_usercredential_userid(authUser.getMyCredential().getGoverningAuthPeriod().getUserID());
                     System.out.println("SessionInitializer.configureSession | loaded UserMuniAuthPeriod: " + umaple);
-                    uc.logCredentialInvocation(umaple);
+                    uc.logCredentialInvocation(umaple, authUser.getMyCredential().getGoverningAuthPeriod());
                 }
              
                return "success";

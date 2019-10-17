@@ -89,7 +89,7 @@ public class UserConfigBB extends BackingBeanUtils{
         try {
             currentUser = getSessionBean().getSessionUser();
             currentUMAP = currentUser.getMyCredential().getGoverningAuthPeriod();
-            userList = (uc.getUserAuthorizedList(getSessionBean().getSessionMuni()));
+            userList = uc.getUserAuthorizedListForConfig(getSessionBean().getSessionMuni(),currentUser);
             muniCandidateList = mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessionUser());
             roleTypeCandidateList = uc.getPermittedRoleTypesToGrant(getSessionBean().getSessionUser());
         } catch (IntegrationException | AuthorizationException ex) {
@@ -117,13 +117,13 @@ public class UserConfigBB extends BackingBeanUtils{
         currentUser = u;
     }
     
-    public void invalidateAuthPeriod(UserMuniAuthPeriod uap){
+    public void invalidateUserMuniAuthPeriod(){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.invalidateUserAuthPeriod(uap, getSessionBean().getSessionUser(), formInvalidateRecordReason);
+            uc.invalidateUserAuthPeriod(currentUMAP, getSessionBean().getSessionUser(), formInvalidateRecordReason);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully invalidated auth period id" + currentUMAP.getUserAuthPeriodID(), ""));
+                            "Successfully invalidated auth period id" + currentUMAP.getUserMuniAuthPeriodID(), ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

@@ -292,7 +292,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         UserMuniAuthPeriod per = new UserMuniAuthPeriod();
         
-        per.setUserAuthPeriodID(rs.getInt("muniauthperiodid"));
+        per.setUserMuniAuthPeriodID(rs.getInt("muniauthperiodid"));
+        
+        per.setPeriodActivityLogBook(getMuniAuthPeriodLogEntryList(per));
         
         per.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         per.setUserID(rs.getInt("authuser_userid"));
@@ -316,21 +318,22 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         per.setNotes(rs.getString("notes"));
         // do support stuff later
-        per.setAssignmentRank(rs.getInt("assignmentrank"));
+        per.setAssignmentRelativeOrder(rs.getInt("assignmentrank"));
+        
         
         
         return per;
     }
     
     
-    public void insertUserMuniAuthPeriodLogEntry(UserMuniAuthPeriodLogEntry uacle) throws IntegrationException, AuthorizationException{
+    public void insertUserMuniAuthPeriodLogEntry(UserMuniAuthPeriodLogEntry entry) throws IntegrationException, AuthorizationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         UserMuniAuthPeriod per = null;
         // broken query
         String query =  "INSERT INTO public.loginmuniauthperiodlog(\n" +
                         "            authperiodlogentryid, authperiod_periodid, category, entryts, \n" +
-                        "            entrydateofecord, disputedby_userid, disputedts, notes, cookie_jsessionid, \n" +
+                        "            entrydateofrecord, disputedby_userid, disputedts, notes, cookie_jsessionid, \n" +
                         "            header_remoteaddr, header_useragent, header_dateraw, header_date, \n" +
                         "            header_cachectl, audit_usersession_userid, audit_usercredential_userid, \n" +
                         "            audit_muni_municode)\n" +
@@ -345,29 +348,29 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             
-            stmt.setInt(1, uacle.getAuthPeriod().getUserAuthPeriodID());
-            stmt.setString(2, uacle.getCategory());
+            stmt.setInt(1, entry.getUserMuniAuthPeriodID());
+            stmt.setString(2, entry.getCategory());
             // entry ts and dateofrecord set by PG's now()
             
-            if(uacle.getDisputedBy() == null && uacle.getDisputedts() == null){
+            if(entry.getDisputedByUserID()== 0 && entry.getDisputedts() == null){
                 stmt.setNull(3, java.sql.Types.NULL);
                 stmt.setNull(4, java.sql.Types.NULL);
             } else {
                 throw new AuthorizationException("Cannot insert a CredentialLogEntry with not null disputed fields!");
             }
-            stmt.setString(5, uacle.getNotes());
-            stmt.setString(6, uacle.getCookie_jsessionid());
+            stmt.setString(5, entry.getNotes());
+            stmt.setString(6, entry.getCookie_jsessionid());
             
-            stmt.setString(7, uacle.getHeader_remoteaddr());
-            stmt.setString(8, uacle.getHeader_useragent());
-            stmt.setString(9,  uacle.getHeader_dateraw());
+            stmt.setString(7, entry.getHeader_remoteaddr());
+            stmt.setString(8, entry.getHeader_useragent());
+            stmt.setString(9,  entry.getHeader_dateraw());
             
             //header date java type set to NULL in SQL
-            stmt.setString(10, uacle.getHeader_cachectl());
-            stmt.setInt(11, uacle.getAudit_usersession_userid());
-            stmt.setInt(12, uacle.getAudit_usercredential_userid());
+            stmt.setString(10, entry.getHeader_cachectl());
+            stmt.setInt(11, entry.getAudit_usersession_userid());
+            stmt.setInt(12, entry.getAudit_usercredential_userid());
             
-            stmt.setInt(13, uacle.getAudit_muni_municode());
+            stmt.setInt(13, entry.getAudit_muni_municode());
             
             stmt.execute();
             
@@ -381,7 +384,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    public List<UserMuniAuthPeriodLogEntry> getMuniAuthPeriodLogEntrys(UserMuniAuthPeriod uap) throws IntegrationException{
+    public List<UserMuniAuthPeriodLogEntry> getMuniAuthPeriodLogEntryList(UserMuniAuthPeriod uap) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         List<UserMuniAuthPeriodLogEntry> uacleList = new ArrayList<>();
@@ -393,7 +396,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, uap.getUserAuthPeriodID());
+            stmt.setInt(1, uap.getUserMuniAuthPeriodID());
             rs = stmt.executeQuery();
             while(rs.next()){
                 uacleList.add(getUserMuniAuthPeriodLogEntry(rs.getInt("authperiodlogentryid")));
@@ -418,7 +421,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         UserMuniAuthPeriodLogEntry uacle = null;
         // broken query
         String query = "SELECT authperiodlogentryid, authperiod_periodid, category, entryts, \n" +
-                        "       entrydateofecord, disputedby_userid, disputedts, notes, cookie_jsessionid, \n" +
+                        "       entrydateofrecord, disputedby_userid, disputedts, notes, cookie_jsessionid, \n" +
                         "       header_remoteaddr, header_useragent, header_dateraw, header_date, \n" +
                         "       header_cachectl, audit_usersession_userid, audit_usercredential_userid, \n" +
                         "       audit_muni_municode\n" +
@@ -449,26 +452,16 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     
     private UserMuniAuthPeriodLogEntry generateMuniAuthPeriodLogEntry(ResultSet rs) throws SQLException, IntegrationException{
-        UserIntegrator ui = getUserIntegrator();
-        
-        
         UserMuniAuthPeriodLogEntry uacle = new UserMuniAuthPeriodLogEntry();
         
-//        SELECT authperiodlogentryid, authperiod_periodid, category, entryts, \n" +
-//                        "       entrydateofecord, disputedby_userid, disputedts, notes, cookie_jsessionid, \n" +
-//                        "       header_remoteaddr, header_useragent, header_dateraw, header_date, \n" +
-//                        "       header_cachectl, audit_usersession_userid, audit_usercredential_userid, \n" +
-//                        "       audit_muni_municode\n" +
-//                        "  FROM public.loginmuniauthperiodlog WHERE authperiodlogentryid=?;";
-        
-        uacle.setAuthperiodlogentryID(rs.getInt("authperiodlogentryid"));
-        uacle.setAuthPeriod(getUserMuniAuthPeriod(rs.getInt("authperiod_periodid")));
+        uacle.setLogBookEntryID(rs.getInt("authperiodlogentryid"));
+        uacle.setUserMuniAuthPeriodID(rs.getInt("authperiod_periodid"));
         uacle.setCategory(rs.getString("category"));
         
         if(rs.getTimestamp("entrydateofrecord") != null){
             uacle.setEntryTS(rs.getTimestamp("entrydateofrecord").toLocalDateTime());
         }
-        uacle.setDisputedBy(ui.getUser(rs.getInt("disputedby_userid")));
+        uacle.setDisputedByUserID(rs.getInt("disputedby_userid"));
         if(rs.getTimestamp("disputedts") != null){
             uacle.setDisputedts(rs.getTimestamp("disputedts").toLocalDateTime());
         }
@@ -505,7 +498,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         UserMuniAuthPeriod per = null;
         // broken query
         String query = "UPDATE public.loginmuniauthperiodlog\n" +
-                        "   SET category=?, entrydateofecord=?, disputedby_userid=?, disputedts=?, notes=?, \n" +
+                        "   SET category=?, entrydateofrecord=?, disputedby_userid=?, disputedts=?, notes=?, \n" +
                         " WHERE authperiodlogentryid=?;";
         
         PreparedStatement stmt = null;
@@ -514,11 +507,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             stmt.setString(1, uacle.getCategory());
             stmt.setTimestamp(2, java.sql.Timestamp.valueOf(uacle.getEntryDateOfRecord()));
-            if(uacle.getDisputedBy() != null){
-                stmt.setInt(3, uacle.getDisputedBy().getUserID());
-            } else {
-                stmt.setNull(3, java.sql.Types.NULL);
-            }
+            stmt.setInt(3, uacle.getDisputedByUserID());
             if(uacle.getDisputedts() != null){
                 stmt.setTimestamp(4,  java.sql.Timestamp.valueOf(uacle.getDisputedts()));
             } else {
@@ -526,7 +515,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             }
             stmt.setString(5, uacle.getNotes());
             
-            stmt.setInt(6, uacle.getAuthperiodlogentryID());
+            stmt.setInt(6, uacle.getUserMuniAuthPeriodID());
             stmt.executeUpdate();
             
         } catch (SQLException ex) {
@@ -575,7 +564,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(8, uap.getNotes());
             // set support assigned to null until functionality implemented
             stmt.setNull(9, java.sql.Types.NULL);
-            stmt.setInt(10, uap.getAssignmentRank());
+            stmt.setInt(10, uap.getAssignmentRelativeOrder());
             
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -655,7 +644,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, uap.getUserAuthPeriodID());
+            stmt.setInt(1, uap.getUserMuniAuthPeriodID());
             stmt.setString(2, uap.getNotes());
             
             stmt.executeUpdate();

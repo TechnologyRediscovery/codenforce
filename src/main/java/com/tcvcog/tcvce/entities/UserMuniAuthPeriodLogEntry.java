@@ -24,12 +24,12 @@ import java.time.LocalDateTime;
  */
 public class UserMuniAuthPeriodLogEntry {
     
-    private int authperiodlogentryID;
-    private UserMuniAuthPeriod authPeriod;
+    private int logBookEntryID;
+    private int userMuniAuthPeriodID;
     private String category;
     private LocalDateTime entryTS;
     private LocalDateTime entryDateOfRecord;
-    private User disputedBy;
+    private int disputedByUserID;
     private LocalDateTime disputedts;
     private String notes;
     private String cookie_jsessionid;
@@ -41,13 +41,7 @@ public class UserMuniAuthPeriodLogEntry {
     private int audit_usersession_userid;
     private int audit_usercredential_userid;
     private int audit_muni_municode;    
-   
-    /**
-     * @return the disputedBy
-     */
-    public User getDisputedBy() {
-        return disputedBy;
-    }
+  
 
     /**
      * @return the disputedts
@@ -129,13 +123,7 @@ public class UserMuniAuthPeriodLogEntry {
    
    
    
-    /**
-     * @param disputedBy the disputedBy to set
-     */
-    public void setDisputedBy(User disputedBy) {
-        this.disputedBy = disputedBy;
-    }
-
+  
     /**
      * @param disputedts the disputedts to set
      */
@@ -255,32 +243,48 @@ public class UserMuniAuthPeriodLogEntry {
         this.category = category;
     }
 
+ 
     /**
-     * @return the authPeriod
+     * @return the userMuniAuthPeriodID
      */
-    public UserMuniAuthPeriod getAuthPeriod() {
-        return authPeriod;
+    public int getUserMuniAuthPeriodID() {
+        return userMuniAuthPeriodID;
     }
 
     /**
-     * @param authPeriod the authPeriod to set
+     * @param userMuniAuthPeriodID the userMuniAuthPeriodID to set
      */
-    public void setAuthPeriod(UserMuniAuthPeriod authPeriod) {
-        this.authPeriod = authPeriod;
+    public void setUserMuniAuthPeriodID(int userMuniAuthPeriodID) {
+        this.userMuniAuthPeriodID = userMuniAuthPeriodID;
     }
 
     /**
-     * @return the authperiodlogentryID
+     * @return the disputedByUserID
      */
-    public int getAuthperiodlogentryID() {
-        return authperiodlogentryID;
+    public int getDisputedByUserID() {
+        return disputedByUserID;
     }
 
     /**
-     * @param authperiodlogentryID the authperiodlogentryID to set
+     * @param disputedByUserID the disputedByUserID to set
      */
-    public void setAuthperiodlogentryID(int authperiodlogentryID) {
-        this.authperiodlogentryID = authperiodlogentryID;
+    public void setDisputedByUserID(int disputedByUserID) {
+        this.disputedByUserID = disputedByUserID;
     }
+
+    /**
+     * @return the logBookEntryID
+     */
+    public int getLogBookEntryID() {
+        return logBookEntryID;
+    }
+
+    /**
+     * @param logBookEntryID the logBookEntryID to set
+     */
+    public void setLogBookEntryID(int logBookEntryID) {
+        this.logBookEntryID = logBookEntryID;
+    }
+
     
 }

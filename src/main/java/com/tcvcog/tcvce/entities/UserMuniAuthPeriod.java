@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Comparable<UserMuniAuthPeriod> {
 
-    private int userAuthPeriodID;
+    private int userMuniAuthPeriodID;
 
     private Municipality muni;
     private int userID;
@@ -54,12 +54,12 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
     private int createdByUserID;
     private String notes;
 
-    private int assignmentRank;
+    private int assignmentRelativeOrder;
     
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 67 * hash + this.userAuthPeriodID;
+        hash = 67 * hash + this.userMuniAuthPeriodID;
         hash = 67 * hash + Objects.hashCode(this.muni);
         hash = 67 * hash + this.userID;
         hash = 67 * hash + Objects.hashCode(this.periodActivityLogBook);
@@ -70,7 +70,7 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
         hash = 67 * hash + Objects.hashCode(this.createdTS);
         hash = 67 * hash + this.createdByUserID;
         hash = 67 * hash + Objects.hashCode(this.notes);
-        hash = 67 * hash + this.assignmentRank;
+        hash = 67 * hash + this.assignmentRelativeOrder;
         return hash;
     }
 
@@ -86,7 +86,7 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
             return false;
         }
         final UserMuniAuthPeriod other = (UserMuniAuthPeriod) obj;
-        if (this.userAuthPeriodID != other.userAuthPeriodID) {
+        if (this.userMuniAuthPeriodID != other.userMuniAuthPeriodID) {
             return false;
         }
         if (this.userID != other.userID) {
@@ -95,7 +95,7 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
         if (this.createdByUserID != other.createdByUserID) {
             return false;
         }
-        if (this.assignmentRank != other.assignmentRank) {
+        if (this.assignmentRelativeOrder != other.assignmentRelativeOrder) {
             return false;
         }
         if (!Objects.equals(this.notes, other.notes)) {
@@ -127,7 +127,7 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
     
   
     /**
-     * Orders UMAP for session creation by choosing the highest rank 
+     * Orders UMAP for session creation by choosing the highest role rank 
      * in the list. Tied rank valid UMAPs are assigned based on assingment order
      * @param o
      * @return 
@@ -137,12 +137,12 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
         if(this.role.getRank() > o.getRole().getRank()){
             return 1;
         } else if(this.role.getRank() == o.getRole().getRank()){
-            if(this.assignmentRank > o.getAssignmentRank()){
+            if(this.assignmentRelativeOrder > o.getAssignmentRelativeOrder()){
                 return 1;
-            } else if(this.getAssignmentRank() == o.getAssignmentRank()){
+            } else if(this.getAssignmentRelativeOrder() == o.getAssignmentRelativeOrder()){
                 return this.getCreatedTS().compareTo(o.getCreatedTS());
             } else {
-                return 0;
+                return -1;
             }
         } else {
             return 0;
@@ -200,10 +200,10 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
     }
 
     /**
-     * @return the userAuthPeriodID
+     * @return the userMuniAuthPeriodID
      */
-    public int getUserAuthPeriodID() {
-        return userAuthPeriodID;
+    public int getUserMuniAuthPeriodID() {
+        return userMuniAuthPeriodID;
     }
 
    
@@ -245,10 +245,10 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
     }
 
     /**
-     * @param userAuthPeriodID the userAuthPeriodID to set
+     * @param userMuniAuthPeriodID the userMuniAuthPeriodID to set
      */
-    public void setUserAuthPeriodID(int userAuthPeriodID) {
-        this.userAuthPeriodID = userAuthPeriodID;
+    public void setUserMuniAuthPeriodID(int userMuniAuthPeriodID) {
+        this.userMuniAuthPeriodID = userMuniAuthPeriodID;
     }
 
    
@@ -326,17 +326,17 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
     }
 
     /**
-     * @return the assignmentRank
+     * @return the assignmentRelativeOrder
      */
-    public int getAssignmentRank() {
-        return assignmentRank;
+    public int getAssignmentRelativeOrder() {
+        return assignmentRelativeOrder;
     }
 
     /**
-     * @param assignmentRank the assignmentRank to set
+     * @param assignmentRelativeOrder the assignmentRelativeOrder to set
      */
-    public void setAssignmentRank(int assignmentRank) {
-        this.assignmentRank = assignmentRank;
+    public void setAssignmentRelativeOrder(int assignmentRelativeOrder) {
+        this.assignmentRelativeOrder = assignmentRelativeOrder;
     }
 
     /**
