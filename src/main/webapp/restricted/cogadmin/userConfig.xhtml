@@ -27,7 +27,7 @@
                             <p:commandButton ajax="true" value="Add new user" 
                                              icon="fa fa-plus" 
                                              actionListener="#{userConfigBB.initiateCreateNewUser}"
-                                             oncomplete="PF('user-addupdate-dialog').show()"
+                                             oncomplete="PF('userconfig-dialog-addupdate-var').show()"
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
                                              update="
                                              "/>
@@ -498,11 +498,18 @@
                         <p:dialog 
                             id="userconfig-dialog-updateuser"
                             header="User settings" 
-                            widgetVar="userconfig-dialog-addupdate" 
+                            widgetVar="userconfig-dialog-addupdate-var" 
                             responsive="true" 
                             width="800"
                             modal="false"
                             height="600">
+                            
+                            <h:form id="userconfig-messages-form">
+                                <h:messages id="userconfig-messages"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
 
                             <h2>User settings for <h:outputText value="#{userConfigBB.currentUser.username}" /></h2>
 
