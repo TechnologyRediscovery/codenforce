@@ -23,9 +23,23 @@
                         
                         
                         <h:form id="initiateSessionForm">
-                            <h1>Continue to dashboard</h1>
+                            <h1>Authentication successful!</h1>
+                            <f:subview id="initiatesession-subview-header-reloadsession"
+                                       rendered="#{!(empty sessionInitializer.currentMuni)}">
+                                <p>
+                                    <h:outputText value="Requested session municipality: " />
+                                    <h:outputText value="#{sessionInitializer.currentMuni.muniName}" />
+                                </p>
+                            </f:subview>
+                            <f:subview id="initiatesession-subview-header-firstauth"
+                                       rendered="#{empty sessionInitializer.currentMuni}">
+                                <p>
+                                    <h:outputText value="Your session municipality will be determined dynamically by the COGBot" />
+                                </p>
+                            </f:subview>
+                                
                             <p:commandButton ajax="false" 
-                                             value="Go to dashboard" 
+                                             value="Configure session for #{sessionInitializer.jbossUsername}" 
                                              action="#{sessionInitializer.initiateInternalSession}" 
                                              icon="fa fa-chevron-right"
                                              update="init-session-messages"/>

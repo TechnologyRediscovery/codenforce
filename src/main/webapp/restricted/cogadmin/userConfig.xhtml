@@ -27,10 +27,11 @@
                             <p:commandButton ajax="true" value="Add new user" 
                                              icon="fa fa-plus" 
                                              actionListener="#{userConfigBB.initiateCreateNewUser}"
-                                             oncomplete="PF('userconfig-dialog-addupdate-var').show()"
+                                             oncomplete="PF('userconfig-useraddupdate-dialog-var').show()"
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                                             update="
-                                             "/>
+                                             update="userconfig-messages-form
+                            userconfig-useraddupdate-username-messages-form
+                            userconfig-useraddupdate-username-form"/>
 
 
                             <p:spacer height="15px"/>
@@ -98,9 +99,8 @@
                                                      icon="fa fa-gears"
                                                      styleClass="multiButtonLineButton" 
                                                      actionListener="#{userConfigBB.initiateUserUpdates(user)}"
-                                                     oncomplete="PF('user-addupdate-dialog').show()"
-                                                     update="userconfig-dialog-updateuser
-                                                     " />
+                                                     oncomplete="PF('userconfig-useraddupdate-dialog-var').show()"
+                                                     update="userconfig-useraddupdate-dialog" />
                                     <p:commandButton ajax="true"
                                                      id="userconfig-button-configauthperiods" 
                                                      value="configure auth periods" 
@@ -496,42 +496,50 @@
                         </p:dialog>
 
                         <p:dialog 
-                            id="userconfig-dialog-updateuser"
+                            id="userconfig-useraddupdate-dialog"
                             header="User settings" 
-                            widgetVar="userconfig-dialog-addupdate-var" 
+                            widgetVar="userconfig-useraddupdate-dialog-var" 
                             responsive="true" 
                             width="800"
                             modal="false"
                             height="600">
+                            
+                            
                             
                             <h:form id="userconfig-messages-form">
                                 <h:messages id="userconfig-messages"
                                             globalOnly="true" showDetail="true" showSummary="true"
                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                 </h:messages>
+
+                                <f:subview id="userconfig-useraddupdate-subview-header-userupdate"
+                                           rendered="#{userConfigBB.currentUser.userID != 0}">
+                                    
+                                    <h2>User settings for <h:outputText value="#{userConfigBB.currentUser.username}" /></h2>
+                                   
+                                </f:subview>
+                                
+                                <f:subview id="userconfig-useraddupdate-subview-header-newuser"
+                                           rendered="#{userConfigBB.currentUser.userID == 0}">
+                                    <h2>Create new user</h2>
+                                </f:subview>
+                                
                             </h:form>
-
-                            <h2>User settings for <h:outputText value="#{userConfigBB.currentUser.username}" /></h2>
-
-                            <p>
-                                <h:outputText value="Notes: " styleClass="bold"/>
-                                <h:outputText value="#{userConfigBB.currentUser.notes}" escape="false" />
-                            </p>
                             <h:panelGrid columns="2" border="0" 
                                          cellpadding="5" columnClasses="gridTd, gridTd"
                                          footerClass="gridFooter">
                                 <h:panelGroup>
-                                    <h:form id="userconfig-messages-form-username">
-                                        <h:messages id="userconfig-messages-username"
+                                    <h:form id="userconfig-useraddupdate-username-messages-form">
+                                        <h:messages id="userconfig-useraddupdate-username-messages"
                                                     globalOnly="true" showDetail="true" showSummary="true"
                                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                         </h:messages>
                                     </h:form>
-                                    <h:form id="userconfig-form">
-                                        <p:outputLabel for="userconfig-it-username">
+                                    <h:form id="userconfig-useraddupdate-username-form">
+                                        <p:outputLabel for="userconfig-useraddupdate-username-it">
                                             <h:outputText value="User name"/>
                                         </p:outputLabel>
-                                        <p:inputText id="userconfig-it-username" value="#{userConfigBB.currentUser.username}" 
+                                        <p:inputText id="userconfig-useraddupdate-username-it" value="#{userConfigBB.currentUser.username}" 
                                                      size="12"
                                                      maxlength="20"
                                                      tabindex="3" 
@@ -540,32 +548,34 @@
                                                      styleClass="inputText">
                                             <f:validateLength minimum="5" maximum="20" />
                                         </p:inputText>
-                                        <h:message for="userconfig-it-username" showDetail="false" showSummary="true" 
+                                        <h:message for="userconfig-useraddupdate-username-it" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                        <p:commandButton    id="userconfig-button-updateusername"
+                                        <p:commandButton    id="userconfig-useraddupdate-username-button-update"
                                                             ajax="true"
                                                             actionListener="#{userConfigBB.commitUsernameUpdates}"
                                                             icon="fa fa-thumbs-o-up"
-                                                            update="userconfig-messages-form-username
-                                                            userManageForm:userconfig-usertable"
+                                                            update="userconfig-useraddupdate-username-messages-form
+                                                            userManageForm"
                                                             value="Update username" 
                                                             tabindex="3"/>
+                                    
+                                        
                                     </h:form>
 
                                 </h:panelGroup>
 
                                 <h:panelGroup>
-                                    <h:form id="userconfig-messages-form-personlink">
-                                        <h:messages id="userconfig-messages-personlink"
+                                    <h:form id="userconfig-useraddupdate-personlink-messages-form">
+                                        <h:messages id="userconfig-useraddupdate-personlink-messages"
                                                     globalOnly="true" showDetail="true" showSummary="true"
                                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                         </h:messages>
                                     </h:form>
 
-                                    <h:form id="userconfig-form-userpersonlink">
-
-                                        <h:outputText value="Your user is currently mapped to: " />
+                                    <h:form id="userconfig-useraddupdate-personlink-form">
+                                        <h3>User:Person mapping</h3>
+                                        <h:outputText value="This user is currently mapped to: " />
                                         <p:spacer height="5px" />
                                         <h:outputText value="#{userConfigBB.currentUser.person.firstName}" />
                                         <h:outputText value=" " />
@@ -591,8 +601,8 @@
                                         <p:commandButton    id="userconfig-button-updatepersonlink"
                                                             ajax="true"
                                                             actionListener="#{userConfigBB.commitUserPersonUpdates}"
-                                                            update="userconfig-messages-form-personlink
-                                                            userconfig-form-userpersonlink
+                                                            update="userconfig-useraddupdate-personlink-messages-form
+                                                            userconfig-useraddupdate-personlink-form
                                                             userManageForm:userconfig-usertable"
                                                             icon="fa fa-thumbs-0-up"
                                                             value="Update person link" 
@@ -613,14 +623,20 @@
                                         <p:commandButton    id="userconfig-button-newpass"
                                                             ajax="true"
                                                             actionListener="#{userConfigBB.resetCurrentUserPassword}"
-                                                            update="userconfig-messages-form-updatepassword
-                                                            userconfig-form-updatepassword
-                                                            userManageForm:userconfig-usertable"
+                                                            oncomplete="PF('userconfig-newpass-dialog-var').show()"
+                                                            update="userconfig-newpass-dialog"
                                                             icon="fa fa-key"
-                                                            value="Reset password" 
+                                                            value="Generate and assign new random password" 
                                                             tabindex="3"/>
                                     </h:form>
                                 </h:panelGroup>
+                                
+                                <f:facet name="footer">
+                                    <p>
+                                       <h:outputText value="Notes: " styleClass="ui-label"/>
+                                       <h:outputText value="#{userConfigBB.currentUser.notes}" escape="false" />
+                                   </p>
+                               </f:facet>
 
                             </h:panelGrid>
 
@@ -630,7 +646,7 @@
                                 <p:commandButton ajax="true" 
                                                  value="Cancel"
                                                  icon="fa fa-stop" 
-                                                 onclick="PF('userconfig-dialog-updateuser').hide()"
+                                                 onclick="PF('userconfig-useraddupdate-dialog').hide()"
                                                  tabindex="4"
                                                  />
 
@@ -638,15 +654,48 @@
                                 <p:commandButton ajax="true" 
                                                  value="Done!" 
                                                  icon="fa thumbs-up" 
-                                                 onclick="PF('userconfig-dialog-updateuser').hide()"
+                                                 onclick="PF('userconfig-useraddupdate-dialog').hide()"
                                                  tabindex="4"
                                                  update="userManageForm:userconfig-usertable"/>
                             </h:form>
 
                         </p:dialog>
+                        
+                           <p:dialog 
+                            id="userconfig-newpass-dialog"
+                            header="New Password" 
+                            widgetVar="userconfig-newpass-dialog-var" 
+                            responsive="true" 
+                            width="600"
+                            modal="false"
+                            height="300">
+                            
+                               <div class="newpasswd-cont">
+                                   
+                                    <h:outputText value="User #{userConfigBB.currentUser.username} has been assigned " />
+                                    <h:outputText value="the following password. Please safely transfer this password" />
+                                    <h:outputText value="by passing a paper slip directly and/or phoning it over. " />
+                                    <h:outputText value="codeNforce passwords are all cAse SenSiTive." />
+                                    
+                                    <div class="newpasswd-text">
+                                        
+                                        <h:outputText id="userconfig-newpass-ot"
+                                                      value="#{userConfigBB.freshPasswordCleartext}"
+                                                      styleClass="newpsswd" />
+                                    </div>
+                                    
+                                    <h:outputText value="(Please do not email or text the new password, and " />
+                                    <h:outputText value="(generally seek to limit its entry into any computer." />
 
+                                    <p:spacer height="5px" />
+                                    <p:commandButton ajax="true" 
+                                                     value="Done!" 
+                                                     icon="fa thumbs-up" 
+                                                     onclick="PF('userconfig-newpass-dialog-var').hide()"
+                                                     tabindex="4"/>
 
-
+                               </div>
+                           </p:dialog>
 
                     </f:view>
                 </div>

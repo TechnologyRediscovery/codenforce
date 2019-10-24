@@ -90,7 +90,12 @@ public class SystemCoordinator extends BackingBeanUtils  implements Serializable
     
     
     public String formatAndAppendNote(User u, String noteToAppend, String existingText){
-        StringBuilder sb = new StringBuilder(existingText);
+        StringBuilder sb = new StringBuilder();
+        SystemCoordinator sc = SystemCoordinator();
+        
+       
+            
+       
         sb.append(HTML_BREAK);
         sb.append(SEPARATOR_LINE_TOP);
         sb.append(HTML_BREAK);
