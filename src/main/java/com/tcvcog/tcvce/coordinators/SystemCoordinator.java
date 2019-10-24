@@ -81,6 +81,38 @@ public class SystemCoordinator extends BackingBeanUtils  implements Serializable
     }
     
     
+    public String formatAndAppendNote(User u, String noteToAppend, String existingText){
+        StringBuilder sb = new StringBuilder();
+        SystemCoordinator sc = SystemCoordinator();
+        
+       
+            
+       
+        sb.append(HTML_BREAK);
+        sb.append(SEPARATOR_LINE_TOP);
+        sb.append(HTML_BREAK);
+
+        sb.append(noteToAppend);
+        
+        sb.append(INTERNAL_SEPARATOR);
+        sb.append("creator:");
+        sb.append(SPACE);
+        sb.append(u.getPerson().getFirstName());
+        sb.append(SPACE);
+        sb.append(u.getPerson().getLastName());
+        sb.append(SPACE);
+        sb.append("(user: ");
+        sb.append(u.getUsername());
+        sb.append(", id: ");
+        sb.append(u.getUserID());
+        sb.append(")");
+        sb.append(HTML_BREAK);
+        sb.append("timestamp: ");
+        sb.append(getPrettyDate(LocalDateTime.now()));
+        sb.append(SEPARATOR_LINE_BOTTOM);
+        
+        return sb.toString();
+    }
     
     
 

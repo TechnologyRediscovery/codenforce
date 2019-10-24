@@ -1555,6 +1555,28 @@ div.checkBoxLabel{
     width:1000px;
 }
 
+.newpasswd-cont{
+    
+    
+}
+
+.newpsswd-lead{
+    
+    
+}
+
+.newpasswd-text{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+    
+.newpsswd{
+    font-size: 3em;
+    color: darkslateblue;
+    font-weight: bold;
+}
+
 
 /* ******************** CLOSE MISC ********************************/
 

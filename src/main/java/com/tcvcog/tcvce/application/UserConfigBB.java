@@ -65,7 +65,7 @@ public class UserConfigBB extends BackingBeanUtils{
     private Municipality selectedMuni;
     private List<Municipality> muniCandidateList;
     
-     private int formUserID;
+    private int formUserID;
     private RoleType formRoleType;
     private RoleType[] roleTypeArray;
     
@@ -76,8 +76,6 @@ public class UserConfigBB extends BackingBeanUtils{
     
     private List<Person> userPersonList;
     private Person selectedUserPerson;
-    
-
     
     @PostConstruct
     public void initBean(){
@@ -107,9 +105,10 @@ public class UserConfigBB extends BackingBeanUtils{
         }
     }
     
-    public void initiateCreateNewUser(){
+    public void initiateCreateNewUser(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
-        currentUser = uc.getUserSkeleton(getSessionBean().getSessionUser());
+        currentUser = new UserAuthorized(uc.getUserSkeleton(getSessionBean().getSessionUser()));
+        System.out.println("UserConfigBB.initiateCreateNewUser | currentUser " + currentUser.getPswdLastUpdated());
     }
     
     public void initiateInvalidateUserAuthPeriod(UserAuthorized u, UserMuniAuthPeriod uap){

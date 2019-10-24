@@ -97,7 +97,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * Primary user retrieval method: Note that there aren't as many checks here
      * since the jboss container is managing the lookup of authenticated users. 
      * We are pulling the login name from the already authenticated jboss session user 
-     * and just grabbing their profile from the db
+     * and grabbing their list of authorized periods
      * 
      * @param usr
      * @param muni if the desire is the Authorize the user in a particular muni
@@ -438,8 +438,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public UserAuthorized getUserSkeleton(User u){
-        UserAuthorized skel = new UserAuthorized(u);
+    public User getUserSkeleton(User u){
+        User skel = new User();
+        skel.setCreatedByUserId(u.getUserID());
         return skel;
     }
    
@@ -461,7 +462,15 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
      
 
-     
+     /**
+      * Adds a timestamp to the period's invalidation. Normally, a period is not
+      * directly invalidated but rather expires and is updated with a new one
+      * @param aup
+      * @param u
+      * @param note
+      * @throws IntegrationException
+      * @throws AuthorizationException 
+      */
     public void invalidateUserAuthPeriod(UserMuniAuthPeriod aup, UserAuthorized u, String note) throws IntegrationException, AuthorizationException{
         SystemCoordinator sc = getSystemCoordinator();
         UserIntegrator ui = getUserIntegrator();
@@ -475,6 +484,13 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
+    
+    /**
+     * This is NOT a UserAuthorized so we're just passing out objects here
+     * @param userID
+     * @return
+     * @throws IntegrationException 
+     */
     public User getUser(int userID) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         return ui.getUser(userID);
@@ -502,7 +518,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             if(!umapList.isEmpty()){
                 ual = new ArrayList<>();
                 for(UserMuniAuthPeriod umap: umapList){
-                    // note that authorizeUser will got get MuniAuthPeriods by
+                    // note that authorizeUser will get MuniAuthPeriods by
                     // user and only return a UseAuthorized if at least one is valid
                     UserAuthorized ua = authorizeUser(ui.getUser(umap.getUserID()), mu);
                     if(ua == null && adminUser.getRole().getRank() <  RoleType.Developer.getRank()){

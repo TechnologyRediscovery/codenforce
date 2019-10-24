@@ -65,6 +65,9 @@ import javax.servlet.http.HttpServletResponse;
 public class SessionInitializer extends BackingBeanUtils implements Serializable {
 
    
+    private String jbossUsername;
+    private UserAuthorized currentUser;
+    private Municipality currentMuni;
     
     /**
      * Creates a new instance of SessionInitializer
@@ -74,7 +77,21 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     
     @PostConstruct
     public void initBean(){
+        // check to see if we have an internal session created already
+        // to determine which user we authenticate with
+        Municipality mu = getSessionBean().getSessionMuni();
+        UserAuthorized ua = getSessionBean().getSessionUser();
+        if(ua == null){
+            jbossUsername = getContainerAuthenticatedUser();
+            currentUser = null;
+        } else {
+            currentUser = ua;
+            jbossUsername = ua.getUsername();
+        }
         
+        if(mu != null){
+            currentMuni = mu;
+        }
     }
     
     /**
@@ -92,7 +109,13 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      */
     public String initiateInternalSession() throws IntegrationException, CaseLifecycleException, SQLException{
         UserCoordinator uc = getUserCoordinator();
-        return configureSession(uc.getUser(uc.getUserID(getContainerAuthenticatedUser())), null);
+        if(getSessionBean().getSessionUser() == null){
+            return configureSession(uc.getUser(uc.getUserID(getContainerAuthenticatedUser())), null);
+        } else {
+            // if we have an existing session, send in the currentUser and let the
+            // auth logic choose the muni
+            return configureSession(currentUser, currentMuni);
+        }
     }
 
     /**
@@ -117,7 +140,8 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * of gathering all necessary info for session config
      * 
      * @param u
-     * @param muni
+     * @param muni if null, the system will choose the highest ranked role in the
+     * muni record added most recently
      * @return nav string
      * @throws CaseLifecycleException
      * @throws IntegrationException 
@@ -281,8 +305,48 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         
         sessionBean.setQueryOccPeriod(
                 searchCoord.assembleQueryOccPeriod(
-                QueryOccPeriodEnum.CUSTOM, u, m, null));
-        
+                QueryOccPeriodEnum.CUSTOM, ua, m, null));
+    }
 
+    /**
+     * @return the jbossUsername
+     */
+    public String getJbossUsername() {
+        return jbossUsername;
+    }
+
+    /**
+     * @param jbossUsername the jbossUsername to set
+     */
+    public void setJbossUsername(String jbossUsername) {
+        this.jbossUsername = jbossUsername;
+    }
+
+    /**
+     * @return the currentUser
+     */
+    public UserAuthorized getCurrentUser() {
+        return currentUser;
+    }
+
+    /**
+     * @param currentUser the currentUser to set
+     */
+    public void setCurrentUser(UserAuthorized currentUser) {
+        this.currentUser = currentUser;
+    }
+
+    /**
+     * @return the currentMuni
+     */
+    public Municipality getCurrentMuni() {
+        return currentMuni;
+    }
+
+    /**
+     * @param currentMuni the currentMuni to set
+     */
+    public void setCurrentMuni(Municipality currentMuni) {
+        this.currentMuni = currentMuni;
     }
 }
