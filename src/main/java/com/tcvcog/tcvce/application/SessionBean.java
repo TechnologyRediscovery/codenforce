@@ -81,6 +81,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     // BOB individual object session shelves - NOT NULL
     private MunicipalityDataHeavy sessionMuni;
     private UserAuthorized sessionUser;
+    private User sessionUserForReInitSession;
     
     private CECase sessionCECase;
     private Property sessionProperty;
@@ -890,6 +891,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setReportConfigInspection(ReportConfigOccInspection reportConfigInspection) {
         this.reportConfigInspection = reportConfigInspection;
+    }
+
+    /**
+     * @return the sessionUserForReInitSession
+     */
+    public User getSessionUserForReInitSession() {
+        return sessionUserForReInitSession;
+    }
+
+    /**
+     * @param sessionUserForReInitSession the sessionUserForReInitSession to set
+     */
+    public void setSessionUserForReInitSession(User sessionUserForReInitSession) {
+        this.sessionUserForReInitSession = sessionUserForReInitSession;
     }
     
     

@@ -17,8 +17,10 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
@@ -42,6 +44,12 @@ public class MuniCoordinator extends BackingBeanUtils implements Serializable {
     public MuniCoordinator() {
     }
     
+    public MunicipalityDataHeavy getMuniDataHeavy(int muniCode) throws IntegrationException, AuthorizationException{
+        MunicipalityDataHeavy mdh = null;
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        mdh = mi.getMuniListified(muniCode);
+        return mdh;
+    }    
    
     
     

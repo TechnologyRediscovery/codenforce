@@ -45,6 +45,7 @@ import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
@@ -77,16 +78,18 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     
     @PostConstruct
     public void initBean(){
+        currentUser = null;
+        currentMuni = null;
+        UserIntegrator ui = getUserIntegrator();
         // check to see if we have an internal session created already
         // to determine which user we authenticate with
         Municipality mu = getSessionBean().getSessionMuni();
-        UserAuthorized ua = getSessionBean().getSessionUser();
-        if(ua == null){
+        User usrReInit = getSessionBean().getSessionUserForReInitSession();
+        if(usrReInit == null){
             jbossUsername = getContainerAuthenticatedUser();
-            currentUser = null;
         } else {
-            currentUser = ua;
-            jbossUsername = ua.getUsername();
+            currentUser = getSessionBean().getSessionUser();
+            jbossUsername = getContainerAuthenticatedUser();
         }
         
         if(mu != null){

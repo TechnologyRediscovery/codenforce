@@ -39,12 +39,14 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
      * For Javaland only since validity is based on the current date/time
      */
     private LocalDateTime validatedTS;
+
+    /**
+     * For Javaland only since validity is based on the current date/time
+     */
     private LocalDateTime validityEvaluatedTS;
     
     private LocalDateTime startDate;
-    private java.util.Date  startDateUtilDate;
     private LocalDateTime stopDate;
-    private java.util.Date stopDateUtilDate;
 
     private LocalDateTime recorddeactivatedTS;
     private RoleType role;
@@ -55,6 +57,18 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
     private String notes;
 
     private int assignmentRelativeOrder;
+    
+    public boolean isValid(){
+        boolean v = false;
+        if(validityEvaluatedTS != null 
+                &&
+            validatedTS != null
+                &&
+            validityEvaluatedTS.equals(validatedTS)){
+            v = true;
+        }
+        return v;
+    }
     
     @Override
     public int hashCode() {
@@ -259,11 +273,9 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
         return muni;
     }
 
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
+    
+    public void setMuni(Municipality m){
+        muni = m;
     }
 
     /**
@@ -371,6 +383,7 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
      * @return the stopDateUtilDate
      */
     public java.util.Date getStopDateUtilDate() {
+        java.util.Date stopDateUtilDate = null;
         if(stopDate != null){
             stopDateUtilDate = java.util.Date.from(getStopDate().atZone(ZoneId.systemDefault()).toInstant());
         }
@@ -381,8 +394,6 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
      * @param stopDateUtilDate the stopDateUtilDate to set
      */
     public void setStopDateUtilDate(java.util.Date stopDateUtilDate) {
-        
-         this.stopDateUtilDate = stopDateUtilDate;
         if(stopDateUtilDate != null){
             stopDate = stopDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
@@ -392,6 +403,7 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
      * @return the startDateUtilDate
      */
     public java.util.Date getStartDateUtilDate() {
+        java.util.Date startDateUtilDate = null;
         if(startDate != null){
             startDateUtilDate = java.util.Date.from(getStartDate().atZone(ZoneId.systemDefault()).toInstant());
         }
@@ -402,13 +414,9 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
      * @param startDateUtilDate the startDateUtilDate to set
      */
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
-         this.startDateUtilDate = startDateUtilDate;
         if(startDateUtilDate != null){
             startDate = startDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
-        this.startDateUtilDate = startDateUtilDate;
     }
-
-
     
 }

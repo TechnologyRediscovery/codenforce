@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.UserConfigReady;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.util.List;
 import java.util.logging.Level;
@@ -56,6 +57,7 @@ public class UserConfigBB extends BackingBeanUtils{
     
     private UserMuniAuthPeriod currentUMAP;
     private List<UserMuniAuthPeriod> umapList;
+    private String formUmapNotes;
     
     private List<UserAuthorized> userList;
     
@@ -108,7 +110,31 @@ public class UserConfigBB extends BackingBeanUtils{
     public void initiateCreateNewUser(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         currentUser = new UserAuthorized(uc.getUserSkeleton(getSessionBean().getSessionUser()));
-        System.out.println("UserConfigBB.initiateCreateNewUser | currentUser " + currentUser.getPswdLastUpdated());
+        System.out.println("UserConfigBB.createNewUser");
+    }
+    
+    public String reInitSession(UserMuniAuthPeriod umap){
+        UserCoordinator uc = getUserCoordinator();
+        MuniCoordinator mc = getMuniCoordinator();
+        
+        if(uc.verifyReInitSessionRequest(getSessionBean().getSessionUser(), umap)){
+            try {
+                getSessionBean().setSessionMuni(mc.getMuniDataHeavy(umap.getMuni().getMuniCode()));
+                getSessionBean().setSessionUserForReInitSession(uc.getUser(umap.getUserID()));
+            } catch (IntegrationException | AuthorizationException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Could not set your new session's municipality correctly, sorry!", ""));
+            }
+            return "startInitiationProcess";
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Yikes! Improper authorization to become another user in another UMAP; "
+                                    + "Seeing this message itself, in fact, cosntitutes a serious error!", ""));
+            return "";
+        }
+        
     }
     
     public void initiateInvalidateUserAuthPeriod(UserAuthorized u, UserMuniAuthPeriod uap){
@@ -136,7 +162,7 @@ public class UserConfigBB extends BackingBeanUtils{
         
     }
     
-    public void initiateViewAddAuthPeriods(UserAuthorized ua){
+    public void initiateManageAuthPeriods(UserAuthorized ua){
         UserCoordinator uc = getUserCoordinator();
         currentUser = ua;
         umapList = currentUser.getMuniAuthPeriodsMap().get(currentUser.getMyCredential().getGoverningAuthPeriod().getMuni()); 
@@ -146,13 +172,34 @@ public class UserConfigBB extends BackingBeanUtils{
         }
     }
     
-    public void commitNewAuthPeriod(){
+    public void initiateAddAuthPeriod(){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.insertNewUserAuthorizationPeriod(getSessionBean().getSessionUser(), currentUser, currentUMAP);
+            currentUMAP = uc.initializeUserMuniAuthPeriod(  getSessionBean().getSessionUser(), 
+                                                            currentUser, 
+                                                            getSessionBean().getSessionMuni());
+            formUmapNotes = "";
+        } catch (AuthorizationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        }
+    }
+    
+    public void commitNewAuthPeriod(){
+        UserCoordinator uc = getUserCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        try {
+            if(formUmapNotes != null && formUmapNotes.length() > 0){
+                currentUMAP.setNotes(sc.formatAndAppendNote(    getSessionBean().getSessionUser(), 
+                                                                formUmapNotes,
+                                                                currentUMAP.getNotes()));
+            }
+            uc.insertUserMuniAuthorizationPeriod(getSessionBean().getSessionUser(), currentUser, currentUMAP);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully added new auth period!", ""));
+            reloadCurrentUMAP();
         } catch (AuthorizationException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -174,6 +221,27 @@ public class UserConfigBB extends BackingBeanUtils{
         
         currentUser = u;
 
+    }
+    
+    private void reloadCurrentUser(){
+        UserCoordinator uc = getUserCoordinator();
+         getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Reloaded period", ""));
+        
+        
+    }
+    
+    private void reloadCurrentUMAP(){
+        UserIntegrator ui = getUserIntegrator();
+        try {
+            currentUMAP = ui.getUserMuniAuthPeriod(currentUMAP.getUserMuniAuthPeriodID());
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Could not reload UMAP", ""));
+            
+        }
     }
     
     
@@ -562,6 +630,20 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void setUmapList(List<UserMuniAuthPeriod> umapList) {
         this.umapList = umapList;
+    }
+
+    /**
+     * @return the formUmapNotes
+     */
+    public String getFormUmapNotes() {
+        return formUmapNotes;
+    }
+
+    /**
+     * @param formUmapNotes the formUmapNotes to set
+     */
+    public void setFormUmapNotes(String formUmapNotes) {
+        this.formUmapNotes = formUmapNotes;
     }
     
 }

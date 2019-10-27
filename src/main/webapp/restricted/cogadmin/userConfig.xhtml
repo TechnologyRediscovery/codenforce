@@ -8,8 +8,8 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>User Manager</title>
-    </h:head>
+        <title>User Manager</title> 
+   </h:head>
     <h:body>
         <ui:composition template="../navContainer_restricted.xhtml">
             <ui:define name="content">
@@ -30,8 +30,8 @@
                                              oncomplete="PF('userconfig-useraddupdate-dialog-var').show()"
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
                                              update="userconfig-messages-form
-                            userconfig-useraddupdate-username-messages-form
-                            userconfig-useraddupdate-username-form"/>
+                                                    userconfig-useraddupdate-username-messages-form
+                                                    userconfig-useraddupdate-username-form"/>
 
 
                             <p:spacer height="15px"/>
@@ -106,10 +106,9 @@
                                                      value="configure auth periods" 
                                                      icon="fa fa-gears"
                                                      styleClass="multiButtonLineButton" 
-                                                     actionListener="#{userConfigBB.initiateViewAddAuthPeriods(user)}"
+                                                     actionListener="#{userConfigBB.initiateManageAuthPeriods(user)}"
                                                      oncomplete="PF('user-authorizations-dialog-var').show()"
-                                                     update="user-authorizations-dialog-periodtable-form
-                                                     user-addauthrecord-form"
+                                                     update="user-authorizations-dialog-periodtable-form"
                                                      />
                                 </p:column>
 
@@ -140,15 +139,7 @@
                                             </f:facet>
                                         </h:panelGrid>
 
-                                        <p:commandButton 
-                                            ajax="true" 
-                                            value="Create new authorization period" 
-                                            icon="fa fa-plus" 
-                                            actionListener="#{userConfigBB.initiateViewAddAuthPeriods}"
-                                            oncomplete="PF('user-authorizations-dialog-var').show()"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                                            update="user-authorizations-dialog"/>
-
+                                     
 
 
                                     </div>
@@ -169,13 +160,21 @@
                             closable="true" 
                             rendered="true">
 
-                            <h:form id="user-authorizations-dialog-messages-form">
-                                <h:messages id="user-authorizations-dialog-messages" globalOnly="true" showDetail="true" showSummary="true"
-                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                </h:messages>
-                            </h:form>
+                         
 
                             <h:form id="user-authorizations-dialog-periodtable-form">
+                                
+                                
+                                  <p:commandButton ajax="true"
+                                                         id="usersconfig-authperiods-button-new" 
+                                                         value="Add new auth period" 
+                                                         icon="fa fa-plus"
+                                                         styleClass="multiButtonLineButton" 
+                                                         actionListener="#{userConfigBB.initiateAddAuthPeriod}"
+                                                         oncomplete="PF('userconfig-addauthperiod-dialog-var').show()"
+                                                         update="userconfig-addauthperiod-form" />
+                                  
+                                  
 
                                 <h2>Existing User-Muni-Auth-Periods for User <h:outputText value="#{userConfigBB.currentUser.username}" /></h2>
 
@@ -231,8 +230,6 @@
                                         <h:outputText value="#{userConfigBB.getPrettyDate(muPeriod.recorddeactivatedTS)}"/>
                                     </p:column>
 
-
-
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Assignment rank" />
@@ -253,9 +250,22 @@
                                             <h:outputText value="Actions" />
                                         </f:facet>
                                         <p:commandButton ajax="true"
+                                                         id="users-authrecordtable-button-initializenewsession" 
+                                                         value="initialize session" 
+                                                         icon="fa fa-user-circle-o"
+                                                         rendered="#{muPeriod.valid and systemServicesBB.bbSessionUser.keyCard.hasDeveloperPermissions}"
+                                                         styleClass="multiButtonLineButton" 
+                                                         actionListener="#{userConfigBB.reInitSession(muPeriod)}"
+                                                         oncomplete="PF('userconfig-dialog-invalidateperiod-var').show()"
+                                                         update="userconfig-dialog-invalidateperiodform" />
+                                        
+                                        <p:spacer height="3px" />
+                                        
+                                        <p:commandButton ajax="true"
                                                          id="users-authrecordtable-button-invalidate" 
                                                          value="invalidate" 
                                                          icon="fa fa-close"
+                                                         rendered="#{muPeriod.valid}"
                                                          styleClass="multiButtonLineButton" 
                                                          actionListener="#{userConfigBB.initiateInvalidateUserAuthPeriod(user, muPeriod)}"
                                                          oncomplete="PF('userconfig-dialog-invalidateperiod-var').show()"
@@ -330,10 +340,29 @@
                                 </p:dataTable>
                             </h:form>
 
-                            <h:form id="user-addauthrecord-form">
+                        </p:dialog>
 
-                                <h2>Add authorization record</h2>
-                                <p><h:outputText id="useradd-userid-ot" value="userid: #{userConfigBB.currentUser.userID}"/></p>
+                           <p:dialog 
+                            id="userconfig-addauthperiod-dialog"
+                            header="Create new authorization period" 
+                            widgetVar="userconfig-addauthperiod-dialog-var" 
+                            responsive="true" 
+                            width="575"
+                            modal="false"
+                               height="450">
+                               
+                            <h:form id="userconfig-addauthperiod-messages-form">
+                                <h:messages id="userconfig-addauthperiod-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
+                                
+                            <h:form id="userconfig-addauthperiod-form">
+
+                                <h2>
+                                    <h:outputText id="useradd-userid-head1" value="Add authorization record for "/>
+                                    <h:outputText id="useradd-userid-ot" value="userid: #{userConfigBB.currentUser.userID}"/>
+                                </h2>
 
                                 <h:panelGrid columns="2" border="0" 
                                              cellpadding="5" columnClasses="gridTd, gridTd"
@@ -344,7 +373,7 @@
                                         <p:spacer height="5px" />
                                         <p:calendar value="#{userConfigBB.currentUMAP.startDateUtilDate}" 
                                                     mode="popup" 
-                                                    id="aup-cal-staretdate"
+                                                    id="aup-cal-starttdate"
                                                     showOn="button"
                                                     pattern="EEE, dd MMM, yyyy"
                                                     navigator="true"
@@ -353,7 +382,7 @@
                                                     showTodayButton="true"
                                                     required="true"/>
 
-                                        <h:message for="startDateCal" showDetail="false" showSummary="true" 
+                                        <h:message for="aup-cal-starttdate" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     </h:panelGroup>
@@ -379,6 +408,7 @@
                                     <h:panelGroup>
 
                                         <p:outputLabel  for="aup-roletype-som" value="Role type"/>
+                                        <p:spacer height="5px" />
                                         <p:selectOneMenu id="aup-roletype-som" 
                                                          required="true" 
                                                          value="#{userConfigBB.currentUMAP.role}">
@@ -392,10 +422,12 @@
 
 
                                     <h:panelGroup>
-                                        <p:outputLabel  for="aup-muni-som" value="Muni"/>
+                                        <p:outputLabel  for="aup-muni-som" value="Municipality"/>
+                                        <p:spacer height="4px" />
                                         <p:selectOneMenu id="aup-muni-som" 
                                                          required="true" 
-                                                         value="#{userConfigBB.selectedMuni}">
+                                                         value="#{userConfigBB.currentUMAP.muni}">
+                                            <f:converter converterId="muniConverter" />
                                             <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
                                             <f:selectItems value="#{userConfigBB.muniCandidateList}"  var="mu" itemValue="#{mu}" 
                                                            itemLabel="#{mu.muniName}"/>
@@ -403,13 +435,16 @@
                                         <h:message for="aup-muni-som" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
+                                    
                                     <h:panelGroup>
-                                        <p:outputLabel for="authperiod-add-assrank-it">
-                                            <h:outputText value="Assignment rank (higher # = higher precedence)"/>
-                                        </p:outputLabel>
+                                        <p:outputLabel for="authperiod-add-assrank-it"
+                                                       value="Assignment order ranking (higher # = higher precedence)" />
+                                        
+                                        <p:spacer height="5px" />
+                                        
                                         <p:inputText id="authperiod-add-assrank-it" 
-                                                     value="#{userConfigBB.formInvalidateRecordReason}" 
-                                                     style="width: 100px;" 
+                                                     value="#{userConfigBB.currentUMAP.assignmentRelativeOrder}" 
+                                                     style="width: 50px;" 
                                                      tabindex="3" 
                                                       type="number"
                                                      required="true" 
@@ -419,27 +454,45 @@
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                         <p:outputLabel for="userconfig-addauthperiod-notes-it"
+                                                       value="Notes" />
+                                        
+                                        <p:spacer height="5px" />
+                                        
+                                        <p:inputText id="userconfig-addauthperiod-notes-it" 
+                                                     value="#{userConfigBB.formUmapNotes}" 
+                                                     style="width: 250px;" 
+                                                     tabindex="3" 
+                                                     required="false" 
+                                                     styleClass="inputText"/>
+
+                                        <h:message for="authperiod-add-assrank-it" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
 
                                 </h:panelGrid>
 
                                 <p:spacer height="15px"/>
-                                <p:commandButton    ajax="true" tabindex="2"
-                                                    value="Close" icon="fa fa-stop" 
-                                                    onclick="PF('user-authorizations-dialog-var').hide()"/>
+                                <p:commandButton    ajax="true" 
+                                                    tabindex="2"
+                                                    value="Cancel" 
+                                                    icon="fa fa-stop" 
+                                                    onclick="PF('userconfig-addauthperiod-dialog-var').hide()"/>
 
                                 <p:commandButton    id="userconfig-button-commituap"
                                                     ajax="true" 
                                                     value="Commit new authorization period" 
                                                     icon="fa fa-plus" 
-                                                    tabindex="11" 
+                                                    tabindex="3" 
                                                     actionListener="#{userConfigBB.commitNewAuthPeriod}"
-                                                    update="user-authorizations-dialog-messages-form
-                                                    user-authorizations-dialog-periodtable-form"
+                                                    oncomplete="PF('userconfig-addauthperiod-dialog-var').hide()"
+                                                    update="userconfig-addauthperiod-messages-form"
                                                     />
-
                             </h:form>
                         </p:dialog>
-
+                        
                         <p:dialog 
                             id="userconfig-dialog-invalidateperiod"
                             header="Invalidate authorization period" 
@@ -476,20 +529,19 @@
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                 <p:commandButton ajax="true" 
-                                                 value="Done" icon="fa fa-stop" 
+                                                 value="Abort invalidation" icon="fa fa-stop" 
                                                  onclick="PF('userconfig-dialog-invalidateperiod-var').hide()"
-                                                 tabindex="4"/>
+                                                 tabindex="4"/> 
 
                                 <p:commandButton    id="userconfig-invalidateauthper-button-commitinvalidate"
                                                     ajax="true" 
-                                                    value="Invalidate" 
+                                                    value="Invalidate period (undoable!)" 
                                                     icon="fa fa-fire" 
                                                     tabindex="11" 
                                                     actionListener="#{userConfigBB.invalidateUserMuniAuthPeriod}"
-                                                    update="userconfig-dialog-invalidateperiod
-                                                         user-authorizations-dialog-messages-form
-                                                         user-authorizations-dialog-periodtable-form"
-                                                    />
+                                                    update="userconfig-dialog-invalidateperiod" />
+                                                    
+                                                     
                                 <p:spacer height="5px" />
                             </h:form>
 
@@ -559,8 +611,6 @@
                                                             userManageForm"
                                                             value="Update username" 
                                                             tabindex="3"/>
-                                    
-                                        
                                     </h:form>
 
                                 </h:panelGroup>
