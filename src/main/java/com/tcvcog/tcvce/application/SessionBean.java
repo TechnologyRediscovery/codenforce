@@ -81,6 +81,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     // BOB individual object session shelves - NOT NULL
     private MunicipalityDataHeavy sessionMuni;
     private UserAuthorized sessionUser;
+    private User sessionUserForReInitSession;
     
     private CECase sessionCECase;
     private Property sessionProperty;
@@ -885,36 +886,19 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.reportConfigInspection = reportConfigInspection;
     }
 
-    public Payment getSessionPayment() {
-        return sessionPayment;
+    /**
+     * @return the sessionUserForReInitSession
+     */
+    public User getSessionUserForReInitSession() {
+        return sessionUserForReInitSession;
     }
 
-    public void setSessionPayment(Payment sessionPayment) {
-        this.sessionPayment = sessionPayment;
+    /**
+     * @param sessionUserForReInitSession the sessionUserForReInitSession to set
+     */
+    public void setSessionUserForReInitSession(User sessionUserForReInitSession) {
+        this.sessionUserForReInitSession = sessionUserForReInitSession;
     }
-
-    public String getPaymentRedirTo() {
-        return paymentRedirTo;
-    }
-
-    public void setPaymentRedirTo(String paymentRedirTo) {
-        this.paymentRedirTo = paymentRedirTo;
-    }
-
-    public OccPeriod getFeeManagementOccPeriod() {
-        return feeManagementOccPeriod;
-    }
-
-    public void setFeeManagementOccPeriod(OccPeriod feeManagementOccPeriod) {
-        this.feeManagementOccPeriod = feeManagementOccPeriod;
-    }
-
-    public String getFeeRedirTo() {
-        return feeRedirTo;
-    }
-
-    public void setFeeRedirTo(String feeRedirTo) {
-        this.feeRedirTo = feeRedirTo;
-    }
+    
     
 }

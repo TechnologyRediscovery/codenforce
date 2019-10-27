@@ -53,7 +53,11 @@ import java.util.Random;
  * @author cedba
  */
 public class UserCoordinator extends BackingBeanUtils implements Serializable {
+    
     final int MIN_PSSWD_LENGTH = 8;
+    final int DEFAULT_USERMUNIAUTHPERIODLENGTHYEARS = 1;
+    final int DEFAULT_ASSIGNMENT_RANK = 1;
+    
     
     /**
      * Creates a new instance of UserCoordinator
@@ -240,6 +244,14 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
         return cleanList;
+   }
+    
+    public boolean verifyReInitSessionRequest(UserAuthorized ua, UserMuniAuthPeriod umap){
+        boolean v = false;
+        if(ua.getMyCredential().isHasDeveloperPermissions()){
+            v = true;
+        } 
+        return v;
     }
    
    
@@ -287,11 +299,34 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public void insertNewUserAuthorizationPeriod(User requestingUser, User usee, UserMuniAuthPeriod uap) throws AuthorizationException, IntegrationException{
+    public UserMuniAuthPeriod initializeUserMuniAuthPeriod( UserAuthorized requestor, 
+                                                            UserAuthorized userCandidate, 
+                                                            Municipality m) throws AuthorizationException{
+        UserMuniAuthPeriod umap = null;
+        // check that the requestor has at least SysAdmin or better in the requested Muni
+        if(requestor != null 
+                && 
+            requestor.getMuniAuthPeriodsMap().get(m) != null
+                &&
+            requestor.getMuniAuthPeriodsMap().get(m).get(0).getRole().getRank() >= RoleType.SysAdmin.getRank()){
+            umap = new UserMuniAuthPeriod(m);
+            umap.setUserID(userCandidate.getUserID());
+            umap.setStartDate(LocalDateTime.now());
+            umap.setStopDate(LocalDateTime.now().plusYears(DEFAULT_USERMUNIAUTHPERIODLENGTHYEARS));
+            umap.setCreatedByUserID(requestor.getCreatedByUserId());
+            umap.setAssignmentRelativeOrder(DEFAULT_ASSIGNMENT_RANK);
+            umap.setNotes("");
+        } else {
+            throw new AuthorizationException("Requesting user is not authorized to add auth periods in this muni");
+        }
+        return umap;
+    }
+    
+    public void insertUserMuniAuthorizationPeriod(User requestingUser, User usee, UserMuniAuthPeriod uap) throws AuthorizationException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         if(uap != null && requestingUser != null && usee != null && uap.getMuni() != null){
-            if(uap.getStartDate() != null && !uap.getStartDate().isAfter(LocalDateTime.now().minusYears(1))){
-                if(uap.getStopDate() != null && !uap.getStopDate().isAfter(LocalDateTime.now())){
+            if(uap.getStartDate() != null && uap.getStartDate().isBefore(uap.getStopDate())){
+                if(uap.getStopDate() != null && uap.getStopDate().isAfter(LocalDateTime.now())){
                     uap.setCreatedByUserID(requestingUser.getUserID());
                     uap.setUserID(usee.getUserID());
                     ui.insertNewUserAuthorizationPeriod(uap);
@@ -304,8 +339,6 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         } else {
             throw new AuthorizationException("One or more required objects is null");
         }
-        
-        
     }
     
     
@@ -445,22 +478,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
    
     
-     public UserMuniAuthPeriod initializeNewAuthPeriod( UserAuthorized requestor, 
-                                                            User requestee, 
-                                                            Municipality m){
-        UserMuniAuthPeriod per = null;
-
-        // Only Users who have sys admin permission in the requested muni or are devs
-        if((requestor.getMyCredential().getGoverningAuthPeriod().getMuni().getMuniCode() == m.getMuniCode()
-                && requestor.getMyCredential().isHasSysAdminPermissions())
-                || requestor.getMyCredential().isHasDeveloperPermissions()){
-            per = new UserMuniAuthPeriod(m);
-            per.setStartDate(LocalDateTime.now());
-            per.setStopDate(LocalDateTime.now().plusYears(1));
-        }
-        return per;
-    }
-     
+    
 
      /**
       * Adds a timestamp to the period's invalidation. Normally, a period is not

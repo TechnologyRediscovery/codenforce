@@ -253,7 +253,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private UserMuniAuthPeriod getUserMuniAuthPeriod(int periodID) throws IntegrationException{
+    public UserMuniAuthPeriod getUserMuniAuthPeriod(int periodID) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         UserMuniAuthPeriod per = null;
@@ -290,13 +290,12 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     private UserMuniAuthPeriod generateUserMuniAuthPeriod(ResultSet rs) throws SQLException, IntegrationException{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        UserMuniAuthPeriod per = new UserMuniAuthPeriod();
+        UserMuniAuthPeriod per = new UserMuniAuthPeriod(mi.getMuni(rs.getInt("muni_municode")));
         
         per.setUserMuniAuthPeriodID(rs.getInt("muniauthperiodid"));
         
         per.setPeriodActivityLogBook(getMuniAuthPeriodLogEntryList(per));
         
-        per.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         per.setUserID(rs.getInt("authuser_userid"));
         
         
@@ -319,8 +318,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         per.setNotes(rs.getString("notes"));
         // do support stuff later
         per.setAssignmentRelativeOrder(rs.getInt("assignmentrank"));
-        
-        
         
         return per;
     }
@@ -565,6 +562,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             // set support assigned to null until functionality implemented
             stmt.setNull(9, java.sql.Types.NULL);
             stmt.setInt(10, uap.getAssignmentRelativeOrder());
+            
+            stmt.execute();
             
         } catch (SQLException ex) {
             System.out.println(ex);
