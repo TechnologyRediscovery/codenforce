@@ -481,7 +481,7 @@
     <!--we need users to pass through this cycle as soon as they try to access anything in /restricted-->
     
     <navigation-rule>
-        <from-view-id>/public/systemHome.xhtml</from-view-id>
+        <from-view-id>*</from-view-id>
         <navigation-case>
             <from-outcome>publicPortal</from-outcome>
             <to-view-id>/public/publicDashboard.xhtml</to-view-id>

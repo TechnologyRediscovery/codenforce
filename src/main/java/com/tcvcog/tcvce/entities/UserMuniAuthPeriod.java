@@ -103,39 +103,39 @@ public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Com
         if (this.userMuniAuthPeriodID != other.userMuniAuthPeriodID) {
             return false;
         }
-        if (this.userID != other.userID) {
-            return false;
-        }
-        if (this.createdByUserID != other.createdByUserID) {
-            return false;
-        }
-        if (this.assignmentRelativeOrder != other.assignmentRelativeOrder) {
-            return false;
-        }
-        if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.muni, other.muni)) {
-            return false;
-        }
-        if (!Objects.equals(this.periodActivityLogBook, other.periodActivityLogBook)) {
-            return false;
-        }
-        if (!Objects.equals(this.startDate, other.startDate)) {
-            return false;
-        }
-        if (!Objects.equals(this.stopDate, other.stopDate)) {
-            return false;
-        }
-        if (!Objects.equals(this.recorddeactivatedTS, other.recorddeactivatedTS)) {
-            return false;
-        }
-        if (this.role != other.role) {
-            return false;
-        }
-        if (!Objects.equals(this.createdTS, other.createdTS)) {
-            return false;
-        }
+//        if (this.userID != other.userID) {
+//            return false;
+//        }
+//        if (this.createdByUserID != other.createdByUserID) {
+//            return false;
+//        }
+//        if (this.assignmentRelativeOrder != other.assignmentRelativeOrder) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.notes, other.notes)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.muni, other.muni)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.periodActivityLogBook, other.periodActivityLogBook)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.startDate, other.startDate)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.stopDate, other.stopDate)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.recorddeactivatedTS, other.recorddeactivatedTS)) {
+//            return false;
+//        }
+//        if (this.role != other.role) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.createdTS, other.createdTS)) {
+//            return false;
+//        }
         return true;
     }
     

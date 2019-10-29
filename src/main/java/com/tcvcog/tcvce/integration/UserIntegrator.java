@@ -103,7 +103,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public UserAuthorized getUserAuthorizedSkel(User u) throws IntegrationException{
+    public UserAuthorized getUserAuthorizedNoAuthPeriods(User u) throws IntegrationException{
         
         
         Connection con = getPostgresCon();
@@ -186,35 +186,38 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     public List<UserMuniAuthPeriod> getUserMuniAuthPeriodsRaw(User u) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        List<UserMuniAuthPeriod> perList = new ArrayList<>();
+        List<UserMuniAuthPeriod> perList = null;
         // broken query
         String query = "SELECT muniauthperiodid FROM public.loginmuniauthperiod WHERE authuser_userid=?;";
         
         PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, u.getUserID());
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                perList.add(getUserMuniAuthPeriod(rs.getInt("muniauthperiodid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error getting user access record", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
+        if(u != null){
+            perList = new ArrayList<>();
+            try {
+                stmt = con.prepareStatement(query);
+                stmt.setInt(1, u.getUserID());
+                rs = stmt.executeQuery();
+                while(rs.next()){
+                    perList.add(getUserMuniAuthPeriod(rs.getInt("muniauthperiodid")));
+                }
+
+            } catch (SQLException ex) {
+                System.out.println(ex);
+                throw new IntegrationException("Error getting user access record", ex);
+            } finally{
+                 if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+                 if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            } // close finally
+        }
         
         return perList;
         
     }
     
     /**
-     * For use by system administrators to manage user data
+     * For use by system administrators to manage user data. Raw means that even 
+     * expired or invalidated periods are STILL included
      * @param m
      * @return
      * @throws IntegrationException 
@@ -224,7 +227,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         List<UserMuniAuthPeriod> umapList = new ArrayList<>();
-        
         
        String query =  "SELECT muniauthperiodid " +
                         "FROM public.loginmuniauthperiod WHERE muni_municode=?;";

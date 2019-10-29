@@ -55,6 +55,8 @@ import com.tcvcog.tcvce.util.Constants;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -66,9 +68,10 @@ import javax.servlet.http.HttpServletResponse;
 public class SessionInitializer extends BackingBeanUtils implements Serializable {
 
    
-    private String jbossUsername;
-    private UserAuthorized currentUser;
-    private Municipality currentMuni;
+
+    private User userQueuedForSession;
+    private UserAuthorized userAuthorizedQueuedForSession;
+    private Municipality muniQueuedForSession;
     
     /**
      * Creates a new instance of SessionInitializer
@@ -78,22 +81,24 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     
     @PostConstruct
     public void initBean(){
-        currentUser = null;
-        currentMuni = null;
+        userAuthorizedQueuedForSession = null;
+        muniQueuedForSession = null;
         UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         // check to see if we have an internal session created already
         // to determine which user we authenticate with
-        Municipality mu = getSessionBean().getSessionMuni();
-        User usrReInit = getSessionBean().getSessionUserForReInitSession();
-        if(usrReInit == null){
-            jbossUsername = getContainerAuthenticatedUser();
-        } else {
-            currentUser = getSessionBean().getSessionUser();
-            jbossUsername = getContainerAuthenticatedUser();
-        }
-        
-        if(mu != null){
-            currentMuni = mu;
+        muniQueuedForSession = getSessionBean().getSessionMuni();
+        try {
+            if(getSessionBean().getSessionUserForReInitSession() == null){
+                userQueuedForSession = getContainerAuthenticatedUser();
+            } else {
+                 userQueuedForSession = ui.getUser(getSessionBean().getSessionUserForReInitSession().getUserID());
+            }
+            // This significant call to authorizeUser is happy with a null muni
+            // which is the case for all fresh logins with JBOSS
+            userAuthorizedQueuedForSession = uc.authorizeUser(userQueuedForSession, muniQueuedForSession);
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex);
         }
     }
     
@@ -109,15 +114,16 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * or the error page
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.CaseLifecycleException
+     * @throws java.sql.SQLException
      */
     public String initiateInternalSession() throws IntegrationException, CaseLifecycleException, SQLException{
         UserCoordinator uc = getUserCoordinator();
         if(getSessionBean().getSessionUser() == null){
-            return configureSession(uc.getUser(uc.getUserID(getContainerAuthenticatedUser())), null);
+            return configureSession(getContainerAuthenticatedUser(), null);
         } else {
-            // if we have an existing session, send in the currentUser and let the
+            // if we have an existing session, send in the userAuthorizedQueuedForSession and let the
             // auth logic choose the muni
-            return configureSession(currentUser, currentMuni);
+            return configureSession(userAuthorizedQueuedForSession, muniQueuedForSession);
         }
     }
 
@@ -126,16 +132,15 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * matches the query, this method will extract the username from any old request
      * @return the username string of an authenticated user from the container
      */
-    private String getContainerAuthenticatedUser() {
+    private User getContainerAuthenticatedUser() throws IntegrationException {
+        UserIntegrator ui  = getUserIntegrator();
         FacesContext fc = getFacesContext();
         ExternalContext ec = fc.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ec.getRequest();
-        return request.getRemoteUser();
+        return ui.getUser(ui.getUserID(request.getRemoteUser()));
     }
     
-    public String switchUser(UserAuthorized ua, Municipality m) throws CaseLifecycleException, IntegrationException{
-        return configureSession(ua, m);
-    }
+    
     
     /**
      * Core configuration method for sessions; called both during an initial login
@@ -306,45 +311,49 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 QueryOccPeriodEnum.CUSTOM, ua, m, null));
     }
 
+    
+
     /**
-     * @return the jbossUsername
+     * @return the userAuthorizedQueuedForSession
      */
-    public String getJbossUsername() {
-        return jbossUsername;
+    public UserAuthorized getUserAuthorizedQueuedForSession() {
+        return userAuthorizedQueuedForSession;
     }
 
     /**
-     * @param jbossUsername the jbossUsername to set
+     * @param userAuthorizedQueuedForSession the userAuthorizedQueuedForSession to set
      */
-    public void setJbossUsername(String jbossUsername) {
-        this.jbossUsername = jbossUsername;
+    public void setUserAuthorizedQueuedForSession(UserAuthorized userAuthorizedQueuedForSession) {
+        this.userAuthorizedQueuedForSession = userAuthorizedQueuedForSession;
     }
 
     /**
-     * @return the currentUser
+     * @return the muniQueuedForSession
      */
-    public UserAuthorized getCurrentUser() {
-        return currentUser;
+    public Municipality getMuniQueuedForSession() {
+        return muniQueuedForSession;
     }
 
     /**
-     * @param currentUser the currentUser to set
+     * @param muniQueuedForSession the muniQueuedForSession to set
      */
-    public void setCurrentUser(UserAuthorized currentUser) {
-        this.currentUser = currentUser;
+    public void setMuniQueuedForSession(Municipality muniQueuedForSession) {
+        this.muniQueuedForSession = muniQueuedForSession;
+    }
+
+   
+
+    /**
+     * @return the userQueuedForSession
+     */
+    public User getUserQueuedForSession() {
+        return userQueuedForSession;
     }
 
     /**
-     * @return the currentMuni
+     * @param userQueuedForSession the userQueuedForSession to set
      */
-    public Municipality getCurrentMuni() {
-        return currentMuni;
-    }
-
-    /**
-     * @param currentMuni the currentMuni to set
-     */
-    public void setCurrentMuni(Municipality currentMuni) {
-        this.currentMuni = currentMuni;
+    public void setUserQueuedForSession(User userQueuedForSession) {
+        this.userQueuedForSession = userQueuedForSession;
     }
 }

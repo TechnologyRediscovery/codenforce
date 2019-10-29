@@ -197,6 +197,13 @@
                                 <h:outputText value=" | " />
                                 <h:outputText value="ID: #{userBB.currentUser.userID} " />
                             </p>
+                            <p>
+                                <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.userMuniAuthPeriodID}" />
+                                <h:outputText value=" | " />
+                                <h:outputText value="Period created TS:: #{userBB.getPrettyDate(userBB.currentUser.keyCard.governingAuthPeriod.createdTS)}" />
+                                <h:outputText value=" | " />
+                                <h:outputText value="Assignment priority:: #{userBB.currentUser.keyCard.governingAuthPeriod.assignmentRelativeOrder} " />
+                            </p>
 
                             <p>
                                 <h:outputText value="Notes: " styleClass="bold"/>
@@ -206,8 +213,6 @@
                             <h:panelGrid columns="2" border="0" 
                                          cellpadding="5" columnClasses="gridTd, gridTd"
                                          footerClass="gridFooter">
-
-
                                 <h:panelGroup>
 
                                     <h:form id="usersettings-messages-form-username">
@@ -288,8 +293,6 @@
 
                                     </h:form>
                                 </h:panelGroup>
-
-
 
                                 <h:panelGroup>
 

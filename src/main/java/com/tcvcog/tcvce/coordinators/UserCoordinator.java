@@ -57,6 +57,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     final int MIN_PSSWD_LENGTH = 8;
     final int DEFAULT_USERMUNIAUTHPERIODLENGTHYEARS = 1;
     final int DEFAULT_ASSIGNMENT_RANK = 1;
+    final int PERIOD_VALIDITYBUFFERMINUTES = 10;
     
     
     /**
@@ -116,10 +117,10 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public UserAuthorized authorizeUser(User usr, Municipality muni) throws AuthorizationException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();    
         UserAuthorized usrAuth = null;
-        List<UserMuniAuthPeriod> safeList = validateAndCleanUserMuniAuthPeriodList(ui.getUserMuniAuthPeriodsRaw(usr));
+        List<UserMuniAuthPeriod> safeList = cleanUserMuniAuthPeriodList(ui.getUserMuniAuthPeriodsRaw(usr));
         
-        if(!safeList.isEmpty()){
-            usrAuth = ui.getUserAuthorizedSkel(usr);
+        if(safeList != null && !safeList.isEmpty()){
+            usrAuth = ui.getUserAuthorizedNoAuthPeriods(usr);
             usrAuth = configureUserAuthorized(usrAuth, safeList, muni);
         } else {
             return usrAuth;
@@ -194,11 +195,16 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     
+    /**
+     * Convenience method for validating each UMAP in a List
+     * 
+     * @param umapList
+     * @return 
+     */
     private List<UserMuniAuthPeriod> validateUserMuniAuthPeriodList(List<UserMuniAuthPeriod> umapList){
         List<UserMuniAuthPeriod> tempList = null;
         if(umapList != null && !umapList.isEmpty()){
                 tempList = new ArrayList<>();
-            
             for(UserMuniAuthPeriod umap: umapList){
                 tempList.add(validateUserMuniAuthPeriod(umap));
             }
@@ -207,6 +213,16 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return tempList;
     }
     
+    /**
+     * Container for business logic surrounding user period Validation
+     * 
+     * Returns a Period which has been evaluated for validity. The client method
+     * is usually going to assess a Period as Valid if the return value of
+     * getValidatedTS() is not null
+     * 
+     * @param uap the Period to be evaluated for validation
+     * @return 
+     */
     private UserMuniAuthPeriod validateUserMuniAuthPeriod(UserMuniAuthPeriod uap){
         // they all get evaluated and stamped
         LocalDateTime syncNow = LocalDateTime.now();
@@ -226,16 +242,23 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     /**
      * Convenience adaptor method for checking the validity of a generic list of raw UMAPs
-     * and only returning valid periods
+     * and only returning valid periods. This method also calls Collections.sort on its inputted umap list
+     * so that the highest ranked valid period is first
+     * 
      * @param rawUMAPList
      * @return the list of only valid UMAPs
      */
-    private List<UserMuniAuthPeriod> validateAndCleanUserMuniAuthPeriodList(List<UserMuniAuthPeriod> rawUMAPList){
+    private List<UserMuniAuthPeriod> cleanUserMuniAuthPeriodList(List<UserMuniAuthPeriod> rawUMAPList){
+        List<UserMuniAuthPeriod> validatedList = null;
         List<UserMuniAuthPeriod> cleanList = null; 
         if(rawUMAPList != null && !rawUMAPList.isEmpty()){
+            validatedList = validateUserMuniAuthPeriodList(rawUMAPList);
             cleanList = new ArrayList<>();
-            for(UserMuniAuthPeriod umap: rawUMAPList){
-                if(validateUserMuniAuthPeriod(umap).getValidatedTS() != null){
+            for(UserMuniAuthPeriod umap: validatedList){
+                if(umap.getValidatedTS() != null){
+                    if(umap.getValidatedTS().isAfter(LocalDateTime.now().minusMinutes(PERIOD_VALIDITYBUFFERMINUTES))){
+                        umap = validateUserMuniAuthPeriod(umap);
+                    }
                     cleanList.add(umap);
                 }
             }
@@ -245,6 +268,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         }
         return cleanList;
    }
+    
     
     public boolean verifyReInitSessionRequest(UserAuthorized ua, UserMuniAuthPeriod umap){
         boolean v = false;
@@ -524,35 +548,97 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * Generates a User list that represents allowable users to engage with
      * for a given muni. This method doesn't return fully-fledged users
      * @param mu
-     * @param adminUser
+     * @param userRequestor
      * @return
      * @throws IntegrationException
      * @throws AuthorizationException 
      */
-    public List<UserAuthorized> getUserAuthorizedListForConfig(Municipality mu, UserAuthorized adminUser) throws IntegrationException, AuthorizationException{
-        if(adminUser.getRole().getRank() < RoleType.MuniStaff.getRank()){
-            throw new AuthorizationException("Must rank sysadmin or higher to administrate users");
-        }
+    public List<User> assembleUserListForConfig(UserAuthorized userRequestor) throws IntegrationException, AuthorizationException{
+        
+        List<User> usersForConfig = null;
+        
+        if(userRequestor != null){
+            usersForConfig = new ArrayList<>();
+            // build a list of Users who have a valid auth period in any Municipality in which
+            // the passed in adminUser has SysAdmin RoleTYpe
+            for(Municipality mu: userRequestor.getAuthMuniList()){
+                // if the admin's own auth map for the iterated municipality includes a record
+                // with SysAdmin or higher (which it should, since they're on the userConfig.xhtml page
+                if( userRequestor.getMuniAuthPeriodsMap().get(mu) != null 
+                        &&
+                    !userRequestor.getMuniAuthPeriodsMap().get(mu).isEmpty()
+                        &&
+                    (userRequestor.getMuniAuthPeriodsMap().get(mu).get(0).getRole().getRank() >= RoleType.SysAdmin.getRank())
+                ){
+                    usersForConfig = assembleUserListForConfig(mu,userRequestor);
+                } 
+            } //close loop over authmunis 
+        } // close param not null check
+        return usersForConfig;
+    }
+    
+  
+    
+    
+    /**
+     * Assembled Users are those who have had any auth period, 
+     * currently valid OR NOT in the passed in municipality.
+     * This is basically an adapter to convert the raw user IDs that
+     * come from the integrator's list of UMAPs into fully-baked 
+     * User objects. As of OCT 2019 at this method's birth, 
+     * no additional logic is implemented other than the User existing.
+     * 
+     * @param m
+     * @return 
+     */
+    private List<User> assembleUserListForConfig(Municipality m, UserAuthorized uq) throws AuthorizationException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();
-        List<UserMuniAuthPeriod> umapList = null;
-        List<UserAuthorized> ual = null;
-        if(mu != null){
-            umapList = ui.getUserMuniAuthPeriodsRaw(mu);
-            if(!umapList.isEmpty()){
-                ual = new ArrayList<>();
+        
+        List<UserMuniAuthPeriod> umapList;
+        List<Integer> userIDList = null;
+        List<User> userList = null;
+        
+        if(m != null){
+            userList = new ArrayList<>();
+            
+            umapList = ui.getUserMuniAuthPeriodsRaw(m);
+            
+            if(umapList != null && !umapList.isEmpty()){
+                userIDList = new ArrayList<>();
+               
+                // Consider adding a step here to remove invalid periods,
+                // meaning we can restrict to only seeing "active users"
+                // in your municipality to say those Users ranked Dev or better
+//                if(uq.getRole().getRank() == RoleType.SysAdmin.getRank()){
+//                    umapList = cleanUserMuniAuthPeriodList(umapList);
+//                }
                 for(UserMuniAuthPeriod umap: umapList){
-                    // note that authorizeUser will get MuniAuthPeriods by
-                    // user and only return a UseAuthorized if at least one is valid
-                    UserAuthorized ua = authorizeUser(ui.getUser(umap.getUserID()), mu);
-                    if(ua == null && adminUser.getRole().getRank() <  RoleType.Developer.getRank()){
-                        break;
-                    } else { 
-                        ual.add(ua);
+                    if(!userIDList.contains(umap.getUserID())){
+                        userIDList.add(umap.getUserID());
                     }
                 }
-            }
+            } // close build list of user IDs to fetch for passed in muni
+            
+            // as long as we have a userID for fetching
+            if(userIDList != null && !userIDList.isEmpty()){
+                for(Integer i: userIDList){
+                    userList.add(ui.getUser(i));
+                }
+            } // we have a list of Users to return!
+        }
+        return userList;
+    }
+    
+    public List<UserAuthorized> assembleUserAuthorizedListForConfiguration(List<User> users){
+        List<UserAuthorized> ual = null;
+        if(users != null && !users.isEmpty()){
+            ual = new ArrayList<>();
         }
         return ual;
+    }
+    
+    public UserAuthorized transformUserToUserAuthorizedForConfig(UserAuthorized userRequestor, User uToAuth) throws AuthorizationException, IntegrationException{
+        return authorizeUser(uToAuth, null);
     }
     
 
