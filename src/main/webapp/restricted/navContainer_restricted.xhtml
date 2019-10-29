@@ -188,312 +188,356 @@
                                   height="500">
 
 
-                            <h2>User settings for <h:outputText value="#{userBB.currentUser.username}" /></h2>
-
-                            <p>
-                                <h:outputText value="Role: #{userBB.currentUser.role.label}" />
-                                <h:outputText value=" | " />
-                                <h:outputText value="Rank: #{userBB.currentUser.role.rank}" />
-                                <h:outputText value=" | " />
-                                <h:outputText value="ID: #{userBB.currentUser.userID} " />
-                            </p>
-                            <p>
-                                <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.userMuniAuthPeriodID}" />
-                                <h:outputText value=" | " />
-                                <h:outputText value="Period created TS:: #{userBB.getPrettyDate(userBB.currentUser.keyCard.governingAuthPeriod.createdTS)}" />
-                                <h:outputText value=" | " />
-                                <h:outputText value="Assignment priority:: #{userBB.currentUser.keyCard.governingAuthPeriod.assignmentRelativeOrder} " />
-                            </p>
-
-                            <p>
-                                <h:outputText value="Notes: " styleClass="bold"/>
-                                <h:outputText value="#{userBB.currentUser.notes}" escape="false" />
-                            </p>
-
-                            <h:panelGrid columns="2" border="0" 
-                                         cellpadding="5" columnClasses="gridTd, gridTd"
-                                         footerClass="gridFooter">
+                            <h2>
+                                <h:outputText value="User settings:" />
+                                
+                                <h:outputText value=" " />
+                                <h:outputText value="#{userBB.currentUser.person.firstName}" />
+                                <h:outputText value=" " />
+                                <h:outputText value="#{userBB.currentUser.person.lastName}" />
+                                <h:outputText value=" " />
+                                <h:outputText value="("/>
+                                <h:outputText value="#{userBB.currentUser.person.personID})" />
+                                <h:outputText value=")" />
+                                <h:outputText value=" " />
+                                <h:outputText value="+" />
+                                <h:outputText value="#{userBB.currentUser.username}" />
+                                <h:outputText value="("/>
+                                <h:outputText value="#{userBB.currentUser.userID}" />
+                                <h:outputText value=")" />
+                            </h2>
+                            
+                            <h:panelGrid
+                                columns="2"
+                                id="usersettings-grid-outer-twocol">
                                 <h:panelGroup>
+                                    
+                                    
+                                        <p:panelGrid
+                                            columns="1"
+                                            id="usersettings-grid-innerleft"
+                                            layout="grid">
+                                            
+                                            <p:row>
+                                                <p:column>
+                                                        <h:outputText value="#{userBB.currentUser.role.label}" />
+                                                        <h:outputText value=":" />
+                                                        <h:outputText value="rnk" 
+                                                                      class="dtype-label"/>
+                                                        <h:outputText value=":" />
+                                                        <h:outputText value="#{userBB.currentUser.role.rank}" />
+                                                </p:column>
+                                            </p:row>
+                                            
+                                            <p:row>
+                                                <p:column>
+                                                    <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}" />
+                                                    <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}" />
+                                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.userMuniAuthPeriodID}" />
+                                                        <h:outputText value=" | " />
+                                                        <h:outputText value="Period created TS:: #{userBB.getPrettyDate(userBB.currentUser.keyCard.governingAuthPeriod.createdTS)}" />
+                                                        <h:outputText value=" | " />
+                                                        <h:outputText value="Assignment priority:: #{userBB.currentUser.keyCard.governingAuthPeriod.assignmentRelativeOrder} " />
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                
+                                                <p:column>
+                                                     <h:form id="usersettings-messages-form-username">
+                                                        <h:messages id="usersettings-messages-username"
+                                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                                        </h:messages>
+                                                    </h:form>
+                                                    <h:form id="usersettings-form">
 
-                                    <h:form id="usersettings-messages-form-username">
-                                        <h:messages id="usersettings-messages-username"
-                                                    globalOnly="true" showDetail="true" showSummary="true"
-                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                        </h:messages>
-                                    </h:form>
-                                    <h:form id="usersettings-form">
+                                                        <p:outputLabel for="usersettings-it-username">
+                                                            <h:outputText value="User name"/>
+                                                        </p:outputLabel>
+                                                        <p:inputText id="usersettings-it-username" value="#{userBB.currentUser.username}" 
+                                                                     size="12"
+                                                                     maxlength="20"
+                                                                     tabindex="3" 
+                                                                     required="true" 
+                                                                     validatorMessage="Length must be between 5 and 20 characters"
+                                                                     styleClass="inputText">
+                                                            <f:validateLength minimum="5" maximum="20" />
+                                                        </p:inputText>
+                                                        <h:message for="usersettings-it-username" showDetail="false" showSummary="true" 
+                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                        <p:outputLabel for="usersettings-it-username">
-                                            <h:outputText value="User name"/>
-                                        </p:outputLabel>
-                                        <p:inputText id="usersettings-it-username" value="#{userBB.currentUser.username}" 
-                                                     size="12"
-                                                     maxlength="20"
-                                                     tabindex="3" 
-                                                     required="true" 
-                                                     validatorMessage="Length must be between 5 and 20 characters"
-                                                     styleClass="inputText">
-                                            <f:validateLength minimum="5" maximum="20" />
-                                        </p:inputText>
-                                        <h:message for="usersettings-it-username" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        <p:commandButton    id="usersettings-button-updateusername"
+                                                                            ajax="true"
+                                                                            actionListener="#{userBB.commitUsernameUpdates}"
+                                                                            icon="fa fa-thumbs-o-up"
+                                                                            update="usersettings-messages-form-username"
+                                                                            value="Update username" 
+                                                                            tabindex="3"/>
+                                                    </h:form>
+                                                </p:column>
+                                            </p:row>
+                                            
+                                            <p:row>
+                                                <p:column>
+                                                    <h:form id="usersettings-messages-form-personlink">
+                                                        <h:messages id="usersettings-messages-personlink"
+                                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                                        </h:messages>
+                                                    </h:form>
 
-                                        <p:commandButton    id="usersettings-button-updateusername"
-                                                            ajax="true"
-                                                            actionListener="#{userBB.commitUsernameUpdates}"
-                                                            icon="fa fa-thumbs-o-up"
-                                                            update="usersettings-messages-form-username"
-                                                            value="Update username" 
-                                                            tabindex="3"/>
-                                    </h:form>
+                                                    <h:form id="usersettings-form-userpersonlink">
+
+                                                        <h:outputText value="Your user is currently mapped to: " />
+                                                        <p:spacer height="5px" />
+                                                        <h:outputText value="#{userBB.currentUser.person.firstName}" />
+                                                        <h:outputText value=" " />
+                                                        <h:outputText value="#{userBB.currentUser.person.lastName}" />
+                                                        <h:outputText value=" (ID: #{userBB.currentUser.person.personID})" />
+                                                        <h:outputText value=" " />
+
+
+                                                        <p:spacer height="5px" />
+
+                                                        <p:outputLabel  for="usersettings-som-userpersons" value="Available User-type persons:"/>
+                                                        <p:selectOneMenu id="usersettings-som-userpersons" 
+                                                                         required="true" 
+                                                                         value="#{userBB.currentUser.person}">
+                                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                                            <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
+                                                                           itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                                            <f:converter converterId="personConverter"/>
+                                                        </p:selectOneMenu>
+                                                        <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
+                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                        <p:commandButton    id="usersettings-button-updatepersonlink"
+                                                                            ajax="true"
+                                                                            actionListener="#{userBB.commitUserPersonUpdates}"
+                                                                            update="usersettings-messages-form-personlink
+                                                                            usersettings-form-userpersonlink"
+                                                                            icon="fa fa-thumbs-0-up"
+                                                                            value="Update person link" 
+                                                                            tabindex="3"/>
+                                                    </h:form>
+                                                </p:column>
+                                            </p:row>
+                                            
+                                            <p:row>
+                                                <p:column>
+                                                         <h:form id="usersettings-messages-form-updatepassword">
+                                                        <h:messages id="usersettings-messages-updategepassword"
+                                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                                        </h:messages>
+                                                    </h:form>
+
+
+                                                    <h:form id="usersettings-form-updatepassword">
+                                                        <p:outputLabel for="usersettings-it-password">
+                                                            <h:outputText value="New password (use letters and numbers; at least 8 chars please! "/>
+                                                        </p:outputLabel>
+                                                        <p:inputText id="usersettings-it-password" value="#{userBB.formPassword}" 
+                                                                     size="15"
+                                                                     maxlength="80"
+                                                                     tabindex="3" 
+                                                                     required="true" 
+                                                                     validatorMessage="Length must be between 8 and 50 characters"
+                                                                     styleClass="inputText">
+                                                            <f:validateLength minimum="8" maximum="50" />
+                                                        </p:inputText>
+                                                        <h:message for="usersettings-it-password" showDetail="false" showSummary="true" 
+                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        <p:commandButton    id="usersettings-button-updatepassword"
+                                                                            ajax="true"
+                                                                            actionListener="#{userBB.commitPasswordUpdates}"
+                                                                            update="usersettings-messages-form-updatepassword
+                                                                            usersettings-form-updatepassword"
+                                                                            icon="fa fa-thumbs-0-up"
+                                                                            value="Update password" 
+                                                                            tabindex="3"/>
+                                                    </h:form>
+                                                    
+                                                </p:column>
+                                            </p:row>
+                                            
+                                        </p:panelGrid>
+                                    
+                                    </h:panelGroup>
+                                <h:panelGroup>
+                                    
+                                    
+                                        
+                                            <h:outputText value="Notes: " styleClass="bold"/>
+                                            <p:spacer height="3px" />
+                                            <h:outputText value="#{userBB.currentUser.notes}" escape="false" />
 
                                 </h:panelGroup>
+                                
+                                        
+                            
 
-                                <h:panelGroup>
-                                    <h:form id="usersettings-messages-form-personlink">
-                                        <h:messages id="usersettings-messages-personlink"
-                                                    globalOnly="true" showDetail="true" showSummary="true"
-                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                        </h:messages>
-                                    </h:form>
-
-                                    <h:form id="usersettings-form-userpersonlink">
-
-                                        <h:outputText value="Your user is currently mapped to: " />
-                                        <p:spacer height="5px" />
-                                        <h:outputText value="#{userBB.currentUser.person.firstName}" />
-                                        <h:outputText value=" " />
-                                        <h:outputText value="#{userBB.currentUser.person.lastName}" />
-                                        <h:outputText value=" (ID: #{userBB.currentUser.person.personID})" />
-                                        <h:outputText value=" " />
-
-
-                                        <p:spacer height="5px" />
-
-                                        <p:outputLabel  for="usersettings-som-userpersons" value="Available User-type persons:"/>
-                                        <p:selectOneMenu id="usersettings-som-userpersons" 
-                                                         required="true" 
-                                                         value="#{userBB.currentUser.person}">
-                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                            <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
-                                                           itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
-                                            <f:converter converterId="personConverter"/>
-                                        </p:selectOneMenu>
-                                        <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                        <p:commandButton    id="usersettings-button-updatepersonlink"
-                                                            ajax="true"
-                                                            actionListener="#{userBB.commitUserPersonUpdates}"
-                                                            update="usersettings-messages-form-personlink
-                                                            usersettings-form-userpersonlink"
-                                                            icon="fa fa-thumbs-0-up"
-                                                            value="Update person link" 
-                                                            tabindex="3"/>
-
-                                    </h:form>
-                                </h:panelGroup>
-
-                                <h:panelGroup>
-
-                                    <h:form id="usersettings-messages-form-updatepassword">
-                                        <h:messages id="usersettings-messages-updategepassword"
-                                                    globalOnly="true" showDetail="true" showSummary="true"
-                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                        </h:messages>
-                                    </h:form>
-
-
-                                    <h:form id="usersettings-form-updatepassword">
-                                        <p:outputLabel for="usersettings-it-password">
-                                            <h:outputText value="New password (use letters and numbers; at least 8 chars please! "/>
-                                        </p:outputLabel>
-                                        <p:inputText id="usersettings-it-password" value="#{userBB.formPassword}" 
-                                                     size="15"
-                                                     maxlength="80"
-                                                     tabindex="3" 
-                                                     required="true" 
-                                                     validatorMessage="Length must be between 8 and 50 characters"
-                                                     styleClass="inputText">
-                                            <f:validateLength minimum="8" maximum="50" />
-                                        </p:inputText>
-                                        <h:message for="usersettings-it-password" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        <p:commandButton    id="usersettings-button-updatepassword"
-                                                            ajax="true"
-                                                            actionListener="#{userBB.commitPasswordUpdates}"
-                                                            update="usersettings-messages-form-updatepassword
-                                                            usersettings-form-updatepassword"
-                                                            icon="fa fa-thumbs-0-up"
-                                                            value="Update password" 
-                                                            tabindex="3"/>
-                                    </h:form>
-                                </h:panelGroup>
 
                                 <f:facet name="footer">
-                                      <h:form id="usersettings-umaps-messages-form">
-                                        <h:messages id="usersettings-umaps-messages"
-                                                    globalOnly="true" showDetail="true" showSummary="true"
-                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                        </h:messages>
-                                    </h:form>
+
+                                        <h:form id="usersettings-umaps-messages-form">
+                                          <h:messages id="usersettings-umaps-messages"
+                                                      globalOnly="true" showDetail="true" showSummary="true"
+                                                      warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                          </h:messages>
+                                      </h:form>
 
 
-                                    <p:dataTable
-                                        id="usersettings-umaps-table"
-                                        var="period"
-                                        value="#{systemServicesBB.bbSessionUser.muniAuthPeriodListForCredMuni}"
-                                        rowKey="#{period.userMuniAuthPeriodID}"
-                                        tableStyleClass="primeDataTable">
+                                      <p:dataTable
+                                          id="usersettings-umaps-table"
+                                          var="period"
+                                          value="#{systemServicesBB.bbSessionUser.muniAuthPeriodListForCredMuni}"
+                                          rowKey="#{period.userMuniAuthPeriodID}"
+                                          tableStyleClass="primeDataTable">
 
-                                        <p:column width="3%" exportable="false">
-                                            <f:facet name="header">
-                                                <h:outputText value="Expand row" 
-                                                              escape="false"/>
-                                            </f:facet>
-                                            <p:rowToggler/>
-                                        </p:column>
+                                          <p:column width="3%" exportable="false">
+                                              <f:facet name="header">
+                                                  <h:outputText value="Expand row" />
+                                              </f:facet>
+                                              <p:rowToggler/>
+                                          </p:column>
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Auth Period ID" />
-                                            </f:facet>
-                                            <h:outputText value="#{period.userMuniAuthPeriodID}"/>
-                                        </p:column>
-
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Access start" />
-                                            </f:facet>
-                                            <h:outputText value="#{systemServicesBB.getPrettyDate(period.startDate)}"/>
-                                        </p:column>
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Access stop" />
-                                            </f:facet>
-                                            <h:outputText value="#{systemServicesBB.getPrettyDate(period.stopDate)}"/>
-                                        </p:column>
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Role" />
-                                            </f:facet>
-                                            <h:outputText value="#{period.role.label}"/>
-                                            <h:outputText value=" (rank: #{period.role.rank})"/>
-                                        </p:column>
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Deactivated TS" />
-                                            </f:facet>
-                                            <h:outputText value="#{systemServicesBB.getPrettyDate(period.recorddeactivatedTS)}"/>
-                                        </p:column>
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Assignment rank" />
-                                            </f:facet>
-                                            <h:outputText value="#{period.assignmentRelativeOrder}"/>
-                                        </p:column>
+                                          <p:column>
+                                              <f:facet name="header">
+                                                  <h:outputText value="Auth Period ID" />
+                                              </f:facet>
+                                              <h:outputText value="#{period.userMuniAuthPeriodID}"/>
+                                          </p:column>
 
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Actions" />
-                                            </f:facet>
-                                            <p:commandButton ajax="true"
-                                                             id="usersettings-umaps-button-credentialize" 
-                                                             value="credentialize" 
-                                                             icon="fa fa-credit-card"
-                                                             styleClass="multiButtonLineButton" 
-                                                             actionListener="#{userBB.credentializeUserMuniAuthPeriod(period)}"
-                                                             update="usersettings-umaps-messages-form" />
-                                        </p:column>
-                                        <p:rowExpansion>
-                                            <div class="outlinedBox">
+                                          <p:column>
+                                              <f:facet name="header">
+                                                  <h:outputText value="Access start" />
+                                              </f:facet>
+                                              <h:outputText value="#{systemServicesBB.getPrettyDate(period.startDate)}"/>
+                                          </p:column>
 
-                                                <h:panelGrid columns="2" border="0" 
-                                                             cellpadding="5" columnClasses="gridTd, gridTd"
-                                                             footerClass="gridFooter">
-                                                    <h:panelGroup>
+                                          <p:column>
+                                              <f:facet name="header">
+                                                  <h:outputText value="Access stop" />
+                                              </f:facet>
+                                              <h:outputText value="#{systemServicesBB.getPrettyDate(period.stopDate)}"/>
+                                          </p:column>
 
-                                                        <h:outputLabel value="Created by: " />
-                                                        <p:spacer height="0px" />
-                                                        <h:outputLabel value="user id: " />
-                                                        <h:outputText value="#{period.createdByUserID}" />
+                                          <p:column>
+                                              <f:facet name="header">
+                                                  <h:outputText value="Role" />
+                                              </f:facet>
+                                              <h:outputText value="#{period.role.label}"/>
+                                              <h:outputText value=" (rank: #{period.role.rank})"/>
+                                          </p:column>
 
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Created TS:" />
-                                                        <h:outputText value="#{systemServicesBB.getPrettyDate(period.createdTS)}"/>
-                                                    </h:panelGroup>
-                                                    <h:panelGroup>
-                                                        
-                                                        <h:outputLabel value="Notes" />
-                                                        <h:outputText value="#{period.notes}" escape="false"/>
-                                                    </h:panelGroup>
-                                                    
-                                                    <f:facet name="footer">
-
-                                                        <h4>Log entries associated with this authorization period</h4>
+                                          <p:column>
+                                              <f:facet name="header">
+                                                  <h:outputText value="Deactivated TS" />
+                                              </f:facet>
+                                              <h:outputText value="#{systemServicesBB.getPrettyDate(period.recorddeactivatedTS)}"/>
+                                          </p:column>
+                                          <p:column>
+                                              <f:facet name="header">
+                                                  <h:outputText value="Assignment rank" />
+                                              </f:facet>
+                                              <h:outputText value="#{period.assignmentRelativeOrder}"/>
+                                          </p:column>
 
 
-                                                        <p:scrollPanel id="usersettings-umaps-log-scrollpanel"
-                                                                       style="height: 200px;">
+                                          <p:column>
+                                              <f:facet name="header">
+                                                  <h:outputText value="Actions" />
+                                              </f:facet>
+                                              <p:commandButton ajax="true"
+                                                               id="usersettings-umaps-button-credentialize" 
+                                                               value="credentialize" 
+                                                               icon="fa fa-credit-card"
+                                                               styleClass="multiButtonLineButton" 
+                                                               actionListener="#{userBB.credentializeUserMuniAuthPeriod(period)}"
+                                                               update="usersettings-umaps-messages-form" />
+                                          </p:column>
+                                          <p:rowExpansion>
+                                              <div class="outlinedBox">
 
-                                                            <p:dataTable
-                                                                id="usersettings-umaps-log-table"
-                                                                var="entry"
-                                                                value="#{period.periodActivityLogBook}"
-                                                                rowKey="#{entry.logBookEntryID}"
-                                                                tableStyleClass="primeDataTable">
+                                                  <h:panelGrid columns="2" border="0" 
+                                                               cellpadding="5" columnClasses="gridTd, gridTd"
+                                                               footerClass="gridFooter">
+                                                      <h:panelGroup>
 
-                                                                <p:column>
-                                                                    <f:facet name="header">
-                                                                        <h:outputText value="Log entry ID" />
-                                                                    </f:facet>
-                                                                    <h:outputText value="#{entry.logBookEntryID}"/>
-                                                                </p:column>
-                                                                <p:column>
-                                                                    <f:facet name="header">
-                                                                        <h:outputText value="AuthPerID" />
-                                                                    </f:facet>
-                                                                    <h:outputText value="#{entry.userMuniAuthPeriodID}"/>
-                                                                </p:column>
-                                                                <p:column>
-                                                                    <f:facet name="header">
-                                                                        <h:outputText value="Cat" />
-                                                                    </f:facet>
-                                                                    <h:outputText value="#{entry.category}"/>
-                                                                </p:column>
-                                                                <p:column>
-                                                                    <f:facet name="header">
-                                                                        <h:outputText value="TS" />
-                                                                    </f:facet>
-                                                                    <h:outputText value="#{entry.entryTS}"/>
-                                                                </p:column>
-                                                                <p:column>
-                                                                    <f:facet name="header">
-                                                                        <h:outputText value="Client address" />
-                                                                    </f:facet>
-                                                                    <h:outputText value="#{entry.header_remoteaddr}"/>
-                                                                </p:column>
-                                                            </p:dataTable>
-                                                        </p:scrollPanel>
+                                                          <h:outputLabel value="Created by: " />
+                                                          <p:spacer height="0px" />
+                                                          <h:outputLabel value="user id: " />
+                                                          <h:outputText value="#{period.createdByUserID}" />
 
-                                                    </f:facet>
-                                                </h:panelGrid>
-                                            </div>
-                                        </p:rowExpansion>
+                                                      </h:panelGroup>
 
-                                    </p:dataTable>
+                                                      <h:panelGroup>
+                                                          <h:outputLabel value="Created TS:" />
+                                                          <h:outputText value="#{systemServicesBB.getPrettyDate(period.createdTS)}"/>
+                                                      </h:panelGroup>
+                                                      <h:panelGroup>
 
+                                                          <h:outputLabel value="Notes" />
+                                                          <h:outputText value="#{period.notes}" escape="false"/>
+                                                      </h:panelGroup>
+
+                                                      <f:facet name="footer">
+
+                                                          <h4>Log entries associated with this authorization period</h4>
+
+
+                                                          <p:scrollPanel id="usersettings-umaps-log-scrollpanel"
+                                                                         style="height: 200px;">
+
+                                                              <p:dataTable
+                                                                  id="usersettings-umaps-log-table"
+                                                                  var="entry"
+                                                                  value="#{period.periodActivityLogBook}"
+                                                                  rowKey="#{entry.logBookEntryID}"
+                                                                  tableStyleClass="primeDataTable">
+
+                                                                  <p:column>
+                                                                      <f:facet name="header">
+                                                                          <h:outputText value="Log entry ID" />
+                                                                      </f:facet>
+                                                                      <h:outputText value="#{entry.logBookEntryID}"/>
+                                                                  </p:column>
+                                                                  <p:column>
+                                                                      <f:facet name="header">
+                                                                          <h:outputText value="AuthPerID" />
+                                                                      </f:facet>
+                                                                      <h:outputText value="#{entry.userMuniAuthPeriodID}"/>
+                                                                  </p:column>
+                                                                  <p:column>
+                                                                      <f:facet name="header">
+                                                                          <h:outputText value="Cat" />
+                                                                      </f:facet>
+                                                                      <h:outputText value="#{entry.category}"/>
+                                                                  </p:column>
+                                                                  <p:column>
+                                                                      <f:facet name="header">
+                                                                          <h:outputText value="TS" />
+                                                                      </f:facet>
+                                                                      <h:outputText value="#{entry.entryTS}"/>
+                                                                  </p:column>
+                                                                  <p:column>
+                                                                      <f:facet name="header">
+                                                                          <h:outputText value="Client address" />
+                                                                      </f:facet>
+                                                                      <h:outputText value="#{entry.header_remoteaddr}"/>
+                                                                  </p:column>
+                                                              </p:dataTable>
+                                                          </p:scrollPanel>
+
+                                                      </f:facet>
+                                                  </h:panelGrid>
+                                              </div>
+                                          </p:rowExpansion>
+
+                                      </p:dataTable>
                                 </f:facet>
-
-
-
                             </h:panelGrid>
 
                             <h:form id="usersettings-form-close">                             

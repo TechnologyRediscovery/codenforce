@@ -61,7 +61,6 @@ import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.sql.SQLException;
 
 import java.time.LocalDateTime;
@@ -135,6 +134,7 @@ public class BackingBeanUtils implements Serializable{
     private DataSource dataSource;
     private Connection connx;
     
+    
     /**
      * Creates a new instance of BackingBeanUtils
      */
@@ -146,7 +146,6 @@ public class BackingBeanUtils implements Serializable{
         // it should be made by the MBCF
         //System.out.println("Constructing BackingBean Utils");
         //userCoordinator = new UserCoordinator();
-        
     }
     
     public static java.sql.Timestamp getCurrentTimeStamp(){
@@ -214,35 +213,7 @@ public class BackingBeanUtils implements Serializable{
       
     }
     
-    public String appendNoteBlock(MessageBuilderParams mcc){
-        StringBuilder sb = new StringBuilder();
-        sb.append(mcc.existingContent);
-        sb.append("<br />******************** NOTE ********************<br />");
-        sb.append(mcc.header);
-        sb.append("<br />");
-        if(mcc.explanation != null){
-            sb.append(mcc.explanation);
-            sb.append("<br />");
-        }
-        sb.append("creatd by: ");
-        sb.append(mcc.user.getPerson().getFirstName());
-        sb.append(" ");
-        sb.append(mcc.user.getPerson().getLastName());
-        sb.append(" (username:  ");
-        sb.append(mcc.user.getUsername());
-        sb.append(", id#: ");
-        sb.append(mcc.user.getUserID());
-        sb.append(")");
-        sb.append("<br />");
-        sb.append(" at ");
-        sb.append(getPrettyDate(LocalDateTime.now()));
-        sb.append("<br />----------------note-text-----------------<br />");
-        sb.append(mcc.newMessageContent);
-        sb.append("<br />**************** END NOTE *****************<br />");
-        return sb.toString();
-    }
-    
-
+   
     /**
      * Chops up the current time to get seven random digits
      * @return 
