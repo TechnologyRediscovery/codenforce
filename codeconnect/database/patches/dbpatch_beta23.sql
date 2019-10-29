@@ -191,6 +191,10 @@ CREATE TABLE public.loginmuniauthperiodlog
   audit_muni_municode             INTEGER NOT NULL CONSTRAINT logincredentialex_muni_fk REFERENCES municipality (municode)
 );
 
+ALTER TABLE LOGIN ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE;
+ALTER TABLE LOGIN ADD COLUMN deactivated_userid INTEGER CONSTRAINT login_decatedby_userid_fk REFERENCES login (userid);
+
+
 
 
 
