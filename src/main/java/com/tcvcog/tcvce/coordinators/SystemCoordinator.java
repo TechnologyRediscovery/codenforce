@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -44,7 +45,8 @@ import java.util.Map;
 public class SystemCoordinator extends BackingBeanUtils  implements Serializable{
 
     private Map<Integer, String> muniCodeNameMap;
-    
+   
+            
     /**
      * Creates a new instance of LoggingCoordinator
      */
@@ -54,61 +56,61 @@ public class SystemCoordinator extends BackingBeanUtils  implements Serializable
         
     public String appendNoteBlock(MessageBuilderParams mcc){
         StringBuilder sb = new StringBuilder();
-        sb.append(mcc.existingContent);
-        sb.append("<br />******************** NOTE ********************<br />");
-        sb.append(mcc.header);
-        sb.append("<br />");
-        if(mcc.explanation != null){
-            sb.append(mcc.explanation);
-            sb.append("<br />");
+        if(mcc.existingContent != null){
+            sb.append(mcc.existingContent);
         }
-        sb.append("creatd by: ");
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append(Constants.FMT_NOTE_START);
+        if(mcc.header != null){
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(mcc.header);
+        }
+        if(mcc.newMessageContent != null){
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(mcc.newMessageContent);
+        }
+        sb.append(Constants.FMT_HTML_BREAK);
+        if(mcc.explanation != null){
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(mcc.explanation);
+        }
+        sb.append(Constants.FMT_HTML_BREAK);
+        
+        sb.append(Constants.FMT_NOTE_SEP_INTERNAL);
         sb.append(mcc.user.getPerson().getFirstName());
-        sb.append(" ");
+        sb.append(Constants.FMT_SPACE_LITERAL);
         sb.append(mcc.user.getPerson().getLastName());
-        sb.append(" (username:  ");
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(Constants.FMT_DTYPE_SYMB_USERNAME);
         sb.append(mcc.user.getUsername());
-        sb.append(", id#: ");
+        sb.append(Constants.FMT_DTYPE_SYMB_USERNAME);
+        sb.append(Constants.FMT_DTYPE_OBJECTID_INLINEOPEN);
         sb.append(mcc.user.getUserID());
-        sb.append(")");
-        sb.append("<br />");
-        sb.append(" at ");
-        sb.append(getPrettyDate(LocalDateTime.now()));
-        sb.append("<br />----------------note-text-----------------<br />");
-        sb.append(mcc.newMessageContent);
-        sb.append("<br />**************** END NOTE *****************<br />");
+        sb.append(Constants.FMT_DTYPE_OBJECTID_INLINECLOSED);
+        
+        sb.append(Constants.FMT_HTML_BREAK);
+        
+        sb.append(Constants.FMT_DTYPE_KEY_TIMESTAMP_CREATE);
+        sb.append(Constants.FMT_DTYPE_KEYVALDESCSEP);
+        sb.append(stampCurrentTimeForNote());
+        sb.append(Constants.FMT_DTYPE_SYMB_USERNAME);
+        sb.append(mcc.user.getUsername());
+        sb.append(Constants.FMT_DTYPE_OBJECTID_INLINEOPEN);
+        sb.append(mcc.user.getUserID());
+        sb.append(Constants.FMT_DTYPE_OBJECTID_INLINECLOSED);
+        
         return sb.toString();
+    }
+    
+    public String stampCurrentTimeForNote(){
+        return getPrettyDate(LocalDateTime.now());
     }
     
     
     
     public String formatAndAppendNote(User u, String noteToAppend, String existingText){
-        StringBuilder sb = new StringBuilder();
-       
-        sb.append(HTML_BREAK);
-        sb.append(SEPARATOR_LINE_TOP);
-        sb.append(HTML_BREAK);
-
-        sb.append(noteToAppend);
+        return appendNoteBlock(new MessageBuilderParams(existingText, noteToAppend, null, null, u));
         
-        sb.append(INTERNAL_SEPARATOR);
-        sb.append("creator:");
-        sb.append(SPACE);
-        sb.append(u.getPerson().getFirstName());
-        sb.append(SPACE);
-        sb.append(u.getPerson().getLastName());
-        sb.append(SPACE);
-        sb.append("(user: ");
-        sb.append(u.getUsername());
-        sb.append(", id: ");
-        sb.append(u.getUserID());
-        sb.append(")");
-        sb.append(HTML_BREAK);
-        sb.append("timestamp: ");
-        sb.append(getPrettyDate(LocalDateTime.now()));
-        sb.append(SEPARATOR_LINE_BOTTOM);
-        
-        return sb.toString();
     }
     
     

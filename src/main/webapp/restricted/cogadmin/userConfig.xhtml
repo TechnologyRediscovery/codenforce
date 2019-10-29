@@ -127,12 +127,6 @@
 
                                             </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel value="Password last updated:" />
-                                                <p:spacer height="0px" />
-                                                <h:outputText value="#{userConfigBB.getPrettyDate(user.pswdLastUpdated)}" />
-                                            </h:panelGroup>
-
                                             <f:facet name="footer">
                                                 <h:outputLabel value="User notes:" />
                                                 <h:outputLabel value="#{user.notes}" escape="false" />
@@ -185,19 +179,32 @@
                                     rowKey="#{muPeriod.userMuniAuthPeriodID}"
                                     tableStyleClass="primeDataTable">
 
-                                    <p:column width="3%" exportable="false">
+                                    <p:column width="5%" exportable="false">
                                         <f:facet name="header">
-                                            <h:outputText value="Expand row" 
+                                            <h:outputText value="EXP!" 
                                                           escape="false"/>
                                         </f:facet>
                                         <p:rowToggler/>
                                     </p:column>
 
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Municipality" escape="false" />
+                                        </f:facet>
+                                        <h:outputText value="#{muPeriod.muni.muniName}"/>
+                                        <h:outputText value=" " class="spacer-char"/>
+                                        <h:outputText value="#{userConfigBB.formatEnum.text}" class="obid-open"/>
+                                        <h:outputText value="#{muPeriod.muni.muniCode}"/>
+                                        <h:outputText value=")" class="obid-open"/>
+                                    </p:column>
+
                                     <p:column>
                                         <f:facet name="header">
-                                            <h:outputText value="Auth Period ID" />
+                                            <h:outputText value="Period" escape="false" />
                                         </f:facet>
+                                        <h:outputText value="(" class="objectid-open"/>
                                         <h:outputText value="#{muPeriod.userMuniAuthPeriodID}"/>
+                                        <h:outputText value=")" class="objectid-close"/>
                                     </p:column>
 
 
@@ -220,12 +227,19 @@
                                             <h:outputText value="Role" />
                                         </f:facet>
                                         <h:outputText value="#{muPeriod.role.label}"/>
-                                        <h:outputText value=" (rank: #{muPeriod.role.rank})"/>
+                                        <h:outputText value=":"
+                                                      class="separator-role-rank"/>
+                                        <h:outputText value="#{muPeriod.role.rank}"/>
+                                        <h:outputText value=":"
+                                                      class="separator-role-rank"/>
+                                        <h:outputText value="pr"
+                                                      class="separator-role-rank"/>
+                                        <h:outputText value="#{muPeriod.assignmentRelativeOrder}"/>
                                     </p:column>
 
                                     <p:column>
                                         <f:facet name="header">
-                                            <h:outputText value="Deactivated?" />
+                                            <h:outputText value="DeacTS" />
                                         </f:facet>
                                         <h:outputText value="#{userConfigBB.getPrettyDate(muPeriod.recorddeactivatedTS)}"/>
                                     </p:column>
@@ -236,8 +250,6 @@
                                         </f:facet>
                                         <h:outputText value="#{muPeriod.assignmentRelativeOrder}"/>
                                     </p:column>
-
-                                   
 
                                     <p:column>
                                         <f:facet name="header">
