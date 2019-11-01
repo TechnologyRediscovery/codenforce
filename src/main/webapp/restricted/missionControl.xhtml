@@ -208,7 +208,7 @@
                                                         disabled="#{empty missionControlBB.selectedMuni}"
                                                         value="switch to #{missionControlBB.selectedMuni.muniName}" 
                                                         styleClass="button" 
-                                                        action="#{sessionInitializer.configureSession(missionControlBB.currentUser, missionControlBB.selectedMuni)}" 
+                                                        action="#{sessionInitializer.configureSession(missionControlBB.currentUser, missionControlBB.selectedMuni, null)}" 
                                                         icon="fa fa-exchange" />
                                 </p:panel>
                                 
@@ -237,7 +237,7 @@
                                                         disabled="#{empty missionControlBB.selectedUser}"
                                                         value="become #{missionControlBB.selectedUser.username}" 
                                                         styleClass="button" 
-                                                        action="#{sessionInitializer.configureSession(missionControlBB.selectedUser, null)}" 
+                                                        action="#{sessionInitializer.configureSession(missionControlBB.selectedUser, null, null)}" 
                                                         icon="fa fa-universal-access" />
                                 </p:panel>
                                 

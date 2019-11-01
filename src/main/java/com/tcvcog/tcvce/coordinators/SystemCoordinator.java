@@ -54,38 +54,38 @@ public class SystemCoordinator extends BackingBeanUtils  implements Serializable
     }
     
         
-    public String appendNoteBlock(MessageBuilderParams mcc){
+    public String appendNoteBlock(MessageBuilderParams mbp){
         StringBuilder sb = new StringBuilder();
-        if(mcc.existingContent != null){
-            sb.append(mcc.existingContent);
+        if(mbp.getExistingContent() != null){
+            sb.append(mbp.getExistingContent());
         }
         sb.append(Constants.FMT_HTML_BREAK);
         sb.append(Constants.FMT_NOTE_START);
-        if(mcc.header != null){
+        if(mbp.getHeader() != null){
             sb.append(Constants.FMT_HTML_BREAK);
-            sb.append(mcc.header);
+            sb.append(mbp.getHeader());
         }
-        if(mcc.newMessageContent != null){
+        if(mbp.getNewMessageContent() != null){
             sb.append(Constants.FMT_HTML_BREAK);
-            sb.append(mcc.newMessageContent);
+            sb.append(mbp.getNewMessageContent());
         }
         sb.append(Constants.FMT_HTML_BREAK);
-        if(mcc.explanation != null){
+        if(mbp.getExplanation() != null){
             sb.append(Constants.FMT_HTML_BREAK);
-            sb.append(mcc.explanation);
+            sb.append(mbp.getExplanation() );
         }
         sb.append(Constants.FMT_HTML_BREAK);
         
         sb.append(Constants.FMT_NOTE_SEP_INTERNAL);
-        sb.append(mcc.user.getPerson().getFirstName());
+        sb.append(mbp.getUser().getPerson().getFirstName());
         sb.append(Constants.FMT_SPACE_LITERAL);
-        sb.append(mcc.user.getPerson().getLastName());
+        sb.append(mbp.getUser().getPerson().getLastName());
         sb.append(Constants.FMT_SPACE_LITERAL);
         sb.append(Constants.FMT_DTYPE_SYMB_USERNAME);
-        sb.append(mcc.user.getUsername());
+        sb.append(mbp.getUser().getUsername());
         sb.append(Constants.FMT_DTYPE_SYMB_USERNAME);
         sb.append(Constants.FMT_DTYPE_OBJECTID_INLINEOPEN);
-        sb.append(mcc.user.getUserID());
+        sb.append(mbp.getUser().getUserID());
         sb.append(Constants.FMT_DTYPE_OBJECTID_INLINECLOSED);
         
         sb.append(Constants.FMT_HTML_BREAK);
@@ -94,9 +94,9 @@ public class SystemCoordinator extends BackingBeanUtils  implements Serializable
         sb.append(Constants.FMT_DTYPE_KEYVALDESCSEP);
         sb.append(stampCurrentTimeForNote());
         sb.append(Constants.FMT_DTYPE_SYMB_USERNAME);
-        sb.append(mcc.user.getUsername());
+        sb.append(mbp.getUser().getUsername());
         sb.append(Constants.FMT_DTYPE_OBJECTID_INLINEOPEN);
-        sb.append(mcc.user.getUserID());
+        sb.append(mbp.getUser().getUserID());
         sb.append(Constants.FMT_DTYPE_OBJECTID_INLINECLOSED);
         
         return sb.toString();
@@ -142,6 +142,7 @@ public class SystemCoordinator extends BackingBeanUtils  implements Serializable
         this.muniCodeNameMap = muniCodeNameMap;
     }
 
+    @Override
     public String getPrettyDate(LocalDateTime d) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
         if (d != null) {

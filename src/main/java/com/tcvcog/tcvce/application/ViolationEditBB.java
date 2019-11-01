@@ -84,9 +84,9 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
         event.setDiscloseToPublic(formDiscloseToPublic);
         
         MessageBuilderParams mcc = new MessageBuilderParams();
-        mcc.existingContent = currentViolation.getNotes();
-        mcc.newMessageContent = formEventNotes;
-        mcc.user = getSessionBean().getSessionUser();
+        mcc.setExistingContent(currentViolation.getNotes());
+        mcc.setNewMessageContent(formEventNotes);
+        mcc.setUser(getSessionBean().getSessionUser());
         currentViolation.setNotes(sc.appendNoteBlock(mcc));
         
         try {

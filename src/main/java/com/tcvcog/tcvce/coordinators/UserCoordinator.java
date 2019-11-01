@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.Credential;
 import java.io.Serializable;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
@@ -109,19 +110,20 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * when null, this method will request a credential for the muni containing
      * the highest-ranked assignment ranking of its list of authorized period
      * assignment rankings
+     * @param umapReq
      * @return the fully baked cog user
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException occurs if the user
      * has been retrieved from the database but their access has been toggled off
      */
-    public UserAuthorized authorizeUser(User usr, Municipality muni) throws AuthorizationException, IntegrationException{
+    public UserAuthorized authorizeUser(User usr, Municipality muni, UserMuniAuthPeriod umapReq) throws AuthorizationException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();    
         UserAuthorized usrAuth = null;
         List<UserMuniAuthPeriod> safeList = cleanUserMuniAuthPeriodList(ui.getUserMuniAuthPeriodsRaw(usr));
         
         if(safeList != null && !safeList.isEmpty()){
             usrAuth = ui.getUserAuthorizedNoAuthPeriods(usr);
-            usrAuth = configureUserAuthorized(usrAuth, safeList, muni);
+            usrAuth = configureUserAuthorized(usrAuth, safeList, umapReq, muni);
         } else {
             return usrAuth;
         }
@@ -143,54 +145,75 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      */
     private UserAuthorized configureUserAuthorized( UserAuthorized ua, 
                                                     List<UserMuniAuthPeriod> umapList, 
-                                                    Municipality requestedMuni)
+                                                    UserMuniAuthPeriod umapRequested,
+                                                    Municipality muniRequested)
                                             throws  IntegrationException, 
                                                     AuthorizationException{
         
-        Map<Municipality, List<UserMuniAuthPeriod>> muniPeriodMap = null;
+        Map<Municipality, List<UserMuniAuthPeriod>> umapMasterMap = null;
         
         List<UserMuniAuthPeriod> periodList = null;
         Municipality mu = null;
         int maxRelOrder = Integer.MIN_VALUE; 
-        Municipality credMuni = null;
-        Collections.sort(umapList);
+        Municipality muniToCred = null;
+        UserMuniAuthPeriod umapToCred = null;
         
-        if(!umapList.isEmpty()){
-            muniPeriodMap = new HashMap<>();
+        if(umapList != null && !umapList.isEmpty() ){
+            Collections.sort(umapList);
+            umapMasterMap = new HashMap<>();
             for(UserMuniAuthPeriod umap: umapList){
                 mu = umap.getMuni();
-                if(muniPeriodMap.containsKey(mu)){
-                    periodList = muniPeriodMap.get(mu); // pull out our authorized peridos
+                if(umapMasterMap.containsKey(mu)){
+                    periodList = umapMasterMap.get(mu); // pull out our authorized peridos
                     periodList.add(umap); // add our new one
                     Collections.sort(periodList); // sort based first on role rank, then assignment order ACROSS munis
-                    muniPeriodMap.put(umap.getMuni(), periodList); // and overwrite the previous val (i.e. keep the same reference)
+                    umapMasterMap.put(umap.getMuni(), periodList); // and overwrite the previous val (i.e. keep the same reference)
                 } else {
                     // no existing record for that muni, so make a list, inject, and put
                     periodList = new ArrayList<>();
                     periodList.add(umap);
-                    muniPeriodMap.put(umap.getMuni(), periodList);
+                    umapMasterMap.put(umap.getMuni(), periodList);
                 }
                 // User cannot switch to a muni for which they have no authorized periods
-                if(requestedMuni != null && muniPeriodMap.containsKey(requestedMuni)){
-                    credMuni = requestedMuni;
+                if(muniRequested != null && umapMasterMap.containsKey(muniRequested)){
+                    muniToCred = muniRequested;
                 } else if(periodList.get(0).getAssignmentRelativeOrder() > maxRelOrder){
                     maxRelOrder = periodList.get(0).getAssignmentRelativeOrder();
-                    credMuni = mu;
+                    muniToCred = mu;
                 }
-                
+                if( umapRequested != null 
+                        && 
+                    umapMasterMap.get(umapRequested.getMuni()) != null
+                        &&
+                    umapMasterMap.get(umapRequested.getMuni()).contains(umapRequested)    ){
+                    
+                    System.out.println("UserCoordinator.configureUserAuthorized | found requested UMAP: " + umapRequested.getUserMuniAuthPeriodID());
+                    umapToCred = umapRequested;
+                    
+                } else {
+                    umapToCred = umapMasterMap.get(muniToCred).get(0);
+                    System.out.println("UserCoordinator.configureUserAuthorized | umap chose by queue order: " + umapToCred.getUserMuniAuthPeriodID());
+                    
+                }
+                Credential cr = generateCredential(umapToCred);
                 // ************************************************************
                 // ******* GENERATE AND INJECT CREDENTIAL FOR CHOSEN MUNI *****
                 // ************************************************************
-                ua.setMyCredential(generateCredential(muniPeriodMap.get(credMuni).get(0)));
+                ua.setMyCredential(cr);
                 
             } // close for over period candidates
             
             // finally, inject the muniPeriodMap into the UA whose credential is set
-            ua.setMuniAuthPeriodsMap(muniPeriodMap);
+            ua.setMuniAuthPeriodsMap(umapMasterMap);
+            if(umapRequested != null){
+                
+            }
            
-        } else {
+        } else  {
             throw new AuthorizationException("No candidate authorization periods exist for user");
+            
         }
+            
         return ua;
     }
     
@@ -478,12 +501,71 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return u;
     }
     
-  
-    
-    
-    public void updateUser(User u) throws IntegrationException{
+    public void appendNoteToUser(User u, MessageBuilderParams mbp) throws IntegrationException{
+        SystemCoordinator sc = getSystemCoordinator();
         UserIntegrator ui = getUserIntegrator();
+        u.setNotes(sc.appendNoteBlock(mbp));
         ui.updateUser(u);
+        
+    }
+    
+    private StringBuilder assemblePersonLinkUpdateNote(StringBuilder sb, Person currPers, Person updatedPers){
+        
+            sb.append("Updating person link from ");
+            sb.append(currPers.getFirstName());
+            sb.append(" ");
+            sb.append(currPers.getLastName());
+            sb.append("(");
+            sb.append(currPers.getPersonID());
+            sb.append(")");
+            
+            sb.append(" to ");
+            
+            sb.append(updatedPers.getFirstName());
+            sb.append(" ");
+            sb.append(updatedPers.getLastName());
+            sb.append("(");
+            sb.append(updatedPers.getPersonID());
+            sb.append(")");
+            
+            return sb;
+    }
+    
+    private StringBuilder assembleUsernameUpdateNote(StringBuilder sb, Person currPers, String updatedUsername){
+        
+        
+        return sb;
+    }
+    
+    
+    /**
+     * Updates the User's Person and username only. 
+     * Note -- does not update the password which is updated separately
+     * @param u
+     * @param persToUpdate
+     * @param usernameToUpdate
+     * @throws IntegrationException 
+     */
+    public void updateUser(User u, Person persToUpdate, String usernameToUpdate) throws IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        MessageBuilderParams mb = new MessageBuilderParams();
+        StringBuilder sb = new StringBuilder();
+        mb.setExistingContent(u.getNotes());
+        if(persToUpdate != null){
+            
+            u.setPerson(persToUpdate);
+            sb = assemblePersonLinkUpdateNote(sb, u.getPerson(), persToUpdate);
+        }
+
+        if(usernameToUpdate != null){
+            sb = assembleUsernameUpdateNote(sb, u.getPerson(), usernameToUpdate );
+            u.setUsername(usernameToUpdate);
+        }
+        
+        ui.updateUser(u);
+        
+        mb.setNewMessageContent(sb.toString());
+        appendNoteToUser(u, mb);
     }
     
     public void updateUserPassword(User u, String pw) throws IntegrationException, AuthorizationException{
@@ -633,7 +715,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     public UserAuthorized transformUserToUserAuthorizedForConfig(UserAuthorized userRequestor, User uToAuth) throws AuthorizationException, IntegrationException{
-        return authorizeUser(uToAuth, null);
+        return authorizeUser(uToAuth, null, null);
     }
     
 

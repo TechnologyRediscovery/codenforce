@@ -45,27 +45,9 @@ import javax.faces.event.ActionEvent;
  * @author sylvia
  */
 public class UserConfigBB extends BackingBeanUtils{
-
-    /**
-     * @return the userListForConfig
-     */
-    public List<User> getUserListForConfig() {
-        return userListForConfig;
-    }
-
-    /**
-     * @param userListForConfig the userListForConfig to set
-     */
-    public void setUserListForConfig(List<User> userListForConfig) {
-        this.userListForConfig = userListForConfig;
-    }
-
-    /**
-     * Creates a new instance of userConfig
-     */
-    public UserConfigBB() {
-    }
     
+    
+
     private UserAuthorized userAuthorizedInConfig;
     private String freshPasswordCleartext;
     
@@ -117,6 +99,28 @@ public class UserConfigBB extends BackingBeanUtils{
             System.out.println(ex);
         }
     }
+    
+    
+    /**
+     * @return the userListForConfig
+     */
+    public List<User> getUserListForConfig() {
+        return userListForConfig;
+    }
+
+    /**
+     * @param userListForConfig the userListForConfig to set
+     */
+    public void setUserListForConfig(List<User> userListForConfig) {
+        this.userListForConfig = userListForConfig;
+    }
+
+    /**
+     * Creates a new instance of userConfig
+     */
+    public UserConfigBB() {
+    }
+    
     
     public void initiateCreateNewUser(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
@@ -278,7 +282,7 @@ public class UserConfigBB extends BackingBeanUtils{
     public void commitUsernameUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.updateUser(userAuthorizedInConfig);
+            uc.updateUser(userAuthorizedInConfig, null, formUsername);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));
@@ -290,6 +294,9 @@ public class UserConfigBB extends BackingBeanUtils{
             
         }
     }
+    
+    
+    
     public void commitUserInsert(ActionEvent ev) {
         System.out.println("UserBB.commitInsert");
         UserCoordinator uc = getUserCoordinator();
@@ -307,6 +314,7 @@ public class UserConfigBB extends BackingBeanUtils{
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Successfully added username " + usr.getUsername()
                                 + " to the system with an initial password of " + freshUserPswd, ""));
+                
             }
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -329,10 +337,11 @@ public class UserConfigBB extends BackingBeanUtils{
     public void commitUserPersonUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.updateUser(userAuthorizedInConfig);
+            uc.updateUser(userAuthorizedInConfig, selectedUserPerson, null);
+            reloadCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully udpated your person link", ""));
+                            "Successfully udpated your person link: see notes", ""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -343,26 +352,6 @@ public class UserConfigBB extends BackingBeanUtils{
     
     
     
-    /**
-     *
-     */
-    public void commitUpdatesToUser(){
-        UserCoordinator uc = getUserCoordinator();
-       
-        try {
-            uc.updateUser(userAuthorizedInConfig);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "User Update Successful!", ""));
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to update person", "This issue requires administrator attention, sorry"));
-        }
-        
-    }
     
     public void commitUserCreation(){
         UserCoordinator uc = getUserCoordinator();
@@ -397,8 +386,7 @@ public class UserConfigBB extends BackingBeanUtils{
             userAuthorizedInConfig.setNotes(sc.formatAndAppendNote(getSessionBean().getSessionUser(), 
                                     formInvalidateRecordReason, 
                                     userAuthorizedInConfig.getNotes()));
-            uc.updateUser(userAuthorizedInConfig);
-        } catch (IntegrationException | AuthorizationException ex) {
+         } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 

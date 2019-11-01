@@ -111,7 +111,10 @@ public class UserAuthorized extends User{
     }
     
     public List<UserMuniAuthPeriod> getMuniAuthPeriodListForCredMuni(){
-        List<UserMuniAuthPeriod> umapList = muniAuthPeriodsMap.get(myCredential.getGoverningAuthPeriod().getMuni());
+        List<UserMuniAuthPeriod> umapList  = null;
+        if(myCredential != null && myCredential.getGoverningAuthPeriod() != null){
+            umapList = muniAuthPeriodsMap.get(myCredential.getGoverningAuthPeriod().getMuni());
+        }
         return umapList;
         
     }

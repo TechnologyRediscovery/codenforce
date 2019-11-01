@@ -82,6 +82,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private MunicipalityDataHeavy sessionMuni;
     private UserAuthorized sessionUser;
     private User sessionUserForReInitSession;
+    private UserMuniAuthPeriod umapRequestedForReInit;
     
     private CECase sessionCECase;
     private Property sessionProperty;
@@ -898,6 +899,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setSessionUserForReInitSession(User sessionUserForReInitSession) {
         this.sessionUserForReInitSession = sessionUserForReInitSession;
+    }
+
+    /**
+     * @return the umapRequestedForReInit
+     */
+    public UserMuniAuthPeriod getUmapRequestedForReInit() {
+        return umapRequestedForReInit;
+    }
+
+    /**
+     * @param umapRequestedForReInit the umapRequestedForReInit to set
+     */
+    public void setUmapRequestedForReInit(UserMuniAuthPeriod umapRequestedForReInit) {
+        this.umapRequestedForReInit = umapRequestedForReInit;
     }
     
     
