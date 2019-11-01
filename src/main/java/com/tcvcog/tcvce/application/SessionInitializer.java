@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
@@ -71,6 +72,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 
     private User userQueuedForSession;
     private UserAuthorized userAuthorizedQueuedForSession;
+    private UserMuniAuthPeriod umapQueuedForSession;
     private Municipality muniQueuedForSession;
     
     /**
@@ -82,21 +84,25 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     @PostConstruct
     public void initBean(){
         userAuthorizedQueuedForSession = null;
-        muniQueuedForSession = null;
         UserIntegrator ui = getUserIntegrator();
         UserCoordinator uc = getUserCoordinator();
         // check to see if we have an internal session created already
         // to determine which user we authenticate with
         muniQueuedForSession = getSessionBean().getSessionMuni();
+        userQueuedForSession = getSessionBean().getSessionUserForReInitSession();
+        umapQueuedForSession = getSessionBean().getUmapRequestedForReInit();
+        
+        
         try {
-            if(getSessionBean().getSessionUserForReInitSession() == null){
+            if(muniQueuedForSession == null
+                    &&
+                userQueuedForSession == null
+                    &&
+                umapQueuedForSession == null){
+                // we have a first init! Ask the container for its user
                 userQueuedForSession = getContainerAuthenticatedUser();
-            } else {
-                 userQueuedForSession = ui.getUser(getSessionBean().getSessionUserForReInitSession().getUserID());
-            }
-            // This significant call to authorizeUser is happy with a null muni
-            // which is the case for all fresh logins with JBOSS
-            userAuthorizedQueuedForSession = uc.authorizeUser(userQueuedForSession, muniQueuedForSession);
+            } 
+            userAuthorizedQueuedForSession = uc.authorizeUser(userQueuedForSession, muniQueuedForSession, umapQueuedForSession);
         } catch (AuthorizationException | IntegrationException ex) {
             System.out.println(ex);
         }
@@ -119,11 +125,11 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     public String initiateInternalSession() throws IntegrationException, CaseLifecycleException, SQLException{
         UserCoordinator uc = getUserCoordinator();
         if(getSessionBean().getSessionUser() == null){
-            return configureSession(getContainerAuthenticatedUser(), null);
+            return configureSession(getContainerAuthenticatedUser(), null, null);
         } else {
             // if we have an existing session, send in the userAuthorizedQueuedForSession and let the
             // auth logic choose the muni
-            return configureSession(userAuthorizedQueuedForSession, muniQueuedForSession);
+            return configureSession(userAuthorizedQueuedForSession, muniQueuedForSession, umapQueuedForSession);
         }
     }
 
@@ -150,11 +156,12 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @param u
      * @param muni if null, the system will choose the highest ranked role in the
      * muni record added most recently
+     * @param umap
      * @return nav string
      * @throws CaseLifecycleException
      * @throws IntegrationException 
      */
-    public String configureSession(User u, Municipality muni) throws CaseLifecycleException, IntegrationException{
+    public String configureSession(User u, Municipality muni, UserMuniAuthPeriod umap) throws CaseLifecycleException, IntegrationException{
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
@@ -163,7 +170,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         try {
             // The central call which initiates the User's session for a particular municipality
             // Muni will be null when called from initiateInternalSession
-            UserAuthorized authUser = uc.authorizeUser(u, muni);
+            UserAuthorized authUser = uc.authorizeUser(u, muni, umap);
             
             // as long as we have an actual user, proceed with session config
             if(authUser != null){
@@ -355,5 +362,19 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      */
     public void setUserQueuedForSession(User userQueuedForSession) {
         this.userQueuedForSession = userQueuedForSession;
+    }
+
+    /**
+     * @return the umapQueuedForSession
+     */
+    public UserMuniAuthPeriod getUmapQueuedForSession() {
+        return umapQueuedForSession;
+    }
+
+    /**
+     * @param umapQueuedForSession the umapQueuedForSession to set
+     */
+    public void setUmapQueuedForSession(UserMuniAuthPeriod umapQueuedForSession) {
+        this.umapQueuedForSession = umapQueuedForSession;
     }
 }

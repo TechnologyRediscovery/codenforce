@@ -56,7 +56,6 @@ public class UserBB extends BackingBeanUtils implements Serializable {
    
     
     private String formUsername;
-    
     private String formPassword;
     
     private String formNotes;
@@ -64,10 +63,8 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     private String formBadgeNum;
     private String formOriNum;
     
-    private Person formUserPerson;
-    
+    private Person formSelectedUserPerson;
     private List<Person> userPersonList;
-    private Person selectedUserPerson;
     
 
     /**
@@ -81,17 +78,21 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         SearchCoordinator sc = getSearchCoordinator();
         currentUser = getSessionBean().getSessionUser();
         userPersonList = new ArrayList<>();
-        
+        userPersonList.add(currentUser.getPerson());
+        formSelectedUserPerson = null;
+    }
+    
+    public void generateUserPersonList(ActionEvent ev){
+        SearchCoordinator sc = getSearchCoordinator();
         // user our fancy specialized query to get all Persons who are delcared to 
         // be user types
-//        QueryPerson qp = sc.assembleQueryPerson(QueryPersonEnum.USER_PERSONS, currentUser, null, null );
-//        try {
-//            qp = sc.runQuery(qp);
-//            userPersonList = qp.getResults();
-//        } catch (AuthorizationException | IntegrationException ex) {
-//            System.out.println(ex);
-//        }
-        
+        QueryPerson qp = sc.assembleQueryPerson(QueryPersonEnum.USER_PERSONS, currentUser, null, null );
+        try {
+            qp = sc.runQuery(qp);
+            userPersonList = qp.getResults();
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex);
+        }
     }
 
     
@@ -103,16 +104,15 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         currentUser = getSessionBean().getSessionUser();
     }
     
+    /**
+     * Listener to the non-ajax (page redirect) button push to edit a person record
+     * @return 
+     */
     public String editUserPersonRecord(){
         getSessionBean().setSessionPerson(currentUser.getPerson());
         return "persons";
     }
 
-    public void updateUser(UserAuthorized u) {
-        
-        currentUser = u;
-
-    }
     
     public void credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
         // TODO: finish me!
@@ -124,7 +124,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     public void commitUsernameUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.updateUser(currentUser);
+            uc.updateUser(currentUser, null, formUsername);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));
@@ -141,7 +141,8 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     public void commitUserPersonUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.updateUser(currentUser);
+            
+            uc.updateUser(currentUser, formSelectedUserPerson, null);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated your person link", ""));
@@ -158,7 +159,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     public void commitPasswordUpdates(ActionEvent ev){
         
         UserCoordinator uc = getUserCoordinator();
-        try {
+        try { 
             uc.updateUserPassword(currentUser, formPassword);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -272,17 +273,17 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the formUserPerson
+     * @return the formSelectedUserPerson
      */
-    public Person getFormUserPerson() {
-        return formUserPerson;
+    public Person getFormSelectedUserPerson() {
+        return formSelectedUserPerson;
     }
 
     /**
-     * @param formUserPerson the formUserPerson to set
+     * @param formSelectedUserPerson the formSelectedUserPerson to set
      */
-    public void setFormUserPerson(Person formUserPerson) {
-        this.formUserPerson = formUserPerson;
+    public void setFormSelectedUserPerson(Person formSelectedUserPerson) {
+        this.formSelectedUserPerson = formSelectedUserPerson;
     }
 
    
@@ -318,20 +319,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         this.userPersonList = userPersonList;
     }
 
-    /**
-     * @return the selectedUserPerson
-     */
-    public Person getSelectedUserPerson() {
-        return selectedUserPerson;
-    }
-
-    /**
-     * @param selectedUserPerson the selectedUserPerson to set
-     */
-    public void setSelectedUserPerson(Person selectedUserPerson) {
-        this.selectedUserPerson = selectedUserPerson;
-    }
-
+  
     
    
 }

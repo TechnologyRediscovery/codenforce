@@ -197,7 +197,7 @@
                                 <h:outputText value="#{userBB.currentUser.person.lastName}" />
                                 <h:outputText value=" " />
                                 <h:outputText value="("/>
-                                <h:outputText value="#{userBB.currentUser.person.personID})" />
+                                <h:outputText value="#{userBB.currentUser.person.personID}" />
                                 <h:outputText value=")" />
                                 <h:outputText value=" " />
                                 <h:outputText value="+" />
@@ -270,7 +270,9 @@
                                                                             ajax="true"
                                                                             actionListener="#{userBB.commitUsernameUpdates}"
                                                                             icon="fa fa-thumbs-o-up"
-                                                                            update="usersettings-messages-form-username"
+                                                                            update="    @form
+                                                                                        usersettings-messages-form-username
+                                                                                        usersettings-notes-form"
                                                                             value="Update username" 
                                                                             tabindex="3"/>
                                                     </h:form>
@@ -302,7 +304,7 @@
                                                         <p:outputLabel  for="usersettings-som-userpersons" value="Available User-type persons:"/>
                                                         <p:selectOneMenu id="usersettings-som-userpersons" 
                                                                          required="true" 
-                                                                         value="#{userBB.currentUser.person}">
+                                                                         value="#{userBB.formSelectedUserPerson}">
                                                             <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
                                                             <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
                                                                            itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
@@ -311,14 +313,24 @@
                                                         <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
+                                                        
+                                                        <p:commandButton    id="usersettings-button-genuserpersonlist"
+                                                                            ajax="true"
+                                                                            actionListener="#{userBB.generateUserPersonList}"
+                                                                            update="usersettings-som-userpersons"
+                                                                            icon="fa fa-thumbs-0-up"
+                                                                            value="Gemerate person list" 
+                                                                            tabindex="3"/>
+                                                        
                                                         <p:commandButton    id="usersettings-button-updatepersonlink"
                                                                             ajax="true"
                                                                             actionListener="#{userBB.commitUserPersonUpdates}"
                                                                             update="usersettings-messages-form-personlink
-                                                                            usersettings-form-userpersonlink"
+                                                                                    usersettings-form-userpersonlink
+                                                                                    usersettings-notes-form"
                                                                             icon="fa fa-thumbs-0-up"
                                                                             value="Update person link" 
-                                                                            tabindex="3"/>
+                                                                            tabindex="4"/>
                                                     </h:form>
                                                 </p:column>
                                             </p:row>
@@ -352,7 +364,8 @@
                                                                             ajax="true"
                                                                             actionListener="#{userBB.commitPasswordUpdates}"
                                                                             update="usersettings-messages-form-updatepassword
-                                                                            usersettings-form-updatepassword"
+                                                                            usersettings-form-updatepassword
+                                                                            usersettings-notes-form"
                                                                             icon="fa fa-thumbs-0-up"
                                                                             value="Update password" 
                                                                             tabindex="3"/>
@@ -367,10 +380,14 @@
                                 <h:panelGroup>
                                     
                                     
+                                    <h:form id="usersettings-notes-form">
                                         
                                             <h:outputText value="Notes: " styleClass="bold"/>
                                             <p:spacer height="3px" />
-                                            <h:outputText value="#{userBB.currentUser.notes}" escape="false" />
+                                            <h:outputText   id="usersettings-notes-ot"
+                                                            value="#{userBB.currentUser.notes}" 
+                                                            escape="false" />
+                                    </h:form>
 
                                 </h:panelGroup>
                                 
@@ -404,9 +421,16 @@
 
                                           <p:column>
                                               <f:facet name="header">
-                                                  <h:outputText value="Auth Period ID" />
+                                                  <h:outputText value="Period ID" />
                                               </f:facet>
                                               <h:outputText value="#{period.userMuniAuthPeriodID}"/>
+                                          </p:column>
+
+                                          <p:column>
+                                              <f:facet name="header">
+                                                  <h:outputText value="Muni" />
+                                              </f:facet>
+                                              <h:outputText value="#{period.muni.muniName}"/>
                                           </p:column>
 
 
