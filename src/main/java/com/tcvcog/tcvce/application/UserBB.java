@@ -120,11 +120,26 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         
     }
     
+    public void refreshCurrentUser(){
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            currentUser = uc.authorizeUser(currentUser, getSessionBean().getSessionMuni(), null);
+            
+        } catch (IntegrationException ex) {
+            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AuthorizationException ex) {
+            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }
+    
     
     public void commitUsernameUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
             uc.updateUser(currentUser, null, formUsername);
+           refreshCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));
@@ -143,6 +158,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         try {
             
             uc.updateUser(currentUser, formSelectedUserPerson, null);
+            refreshCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated your person link", ""));
@@ -161,6 +177,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         try { 
             uc.updateUserPassword(currentUser, formPassword);
+            refreshCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated your password to --> " + formPassword 
@@ -179,23 +196,9 @@ public class UserBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Authorization error on password update", ""));
         }
-        
-        
-        
-        
-        
     }
     
     
-    
-    public void commitUserUpdates(ActionEvent ev){
-    }
-
-
-    
-   
-
-
     /**
      * @return the formUsername
      */
