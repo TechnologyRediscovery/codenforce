@@ -261,7 +261,7 @@
                                                                      required="true" 
                                                                      validatorMessage="Length must be between 5 and 20 characters"
                                                                      styleClass="inputText">
-                                                            <f:validateLength minimum="5" maximum="20" />
+                                                            <f:validateLength minimum="4" maximum="50" />
                                                         </p:inputText>
                                                         <h:message for="usersettings-it-username" showDetail="false" showSummary="true" 
                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -270,7 +270,7 @@
                                                                             ajax="true"
                                                                             actionListener="#{userBB.commitUsernameUpdates}"
                                                                             icon="fa fa-thumbs-o-up"
-                                                                            update="    @form
+                                                                            update="    usersettings-it-username
                                                                                         usersettings-messages-form-username
                                                                                         usersettings-notes-form"
                                                                             value="Update username" 
