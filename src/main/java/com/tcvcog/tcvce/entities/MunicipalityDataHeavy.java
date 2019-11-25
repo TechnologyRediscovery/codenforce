@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class MunicipalityListified extends Municipality{
+public class MunicipalityDataHeavy extends Municipality{
     
     private String address_street;
     private String address_city;
@@ -57,11 +57,11 @@ public class MunicipalityListified extends Municipality{
     private User lastUpdaetdBy;
     private User primaryStaffContact;
     
-    private List<User> codeOfficers;
+    private List<User> userList;
     private List<CourtEntity> courtEntities;
     private List<Integer> photoDocList;
     
-    public MunicipalityListified(Municipality m){
+    public MunicipalityDataHeavy(Municipality m){
         this.muniName = m.getMuniName();
         this.muniCode = m.getMuniCode();
     }
@@ -242,10 +242,10 @@ public class MunicipalityListified extends Municipality{
     }
 
     /**
-     * @return the codeOfficers
+     * @return the userList
      */
-    public List<User> getCodeOfficers() {
-        return codeOfficers;
+    public List<User> getUserList() {
+        return userList;
     }
 
     /**
@@ -438,10 +438,10 @@ public class MunicipalityListified extends Municipality{
     }
 
     /**
-     * @param codeOfficers the codeOfficers to set
+     * @param userList the userList to set
      */
-    public void setCodeOfficers(List<User> codeOfficers) {
-        this.codeOfficers = codeOfficers;
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
     }
 
     /**
@@ -486,10 +486,106 @@ public class MunicipalityListified extends Municipality{
         hash = 97 * hash + Objects.hashCode(this.lastUpdatedTS);
         hash = 97 * hash + Objects.hashCode(this.lastUpdaetdBy);
         hash = 97 * hash + Objects.hashCode(this.primaryStaffContact);
-        hash = 97 * hash + Objects.hashCode(this.codeOfficers);
+        hash = 97 * hash + Objects.hashCode(this.getUserList());
         hash = 97 * hash + Objects.hashCode(this.courtEntities);
         hash = 97 * hash + Objects.hashCode(this.photoDocList);
         return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MunicipalityDataHeavy other = (MunicipalityDataHeavy) obj;
+        if (this.population != other.population) {
+            return false;
+        }
+        if (this.activeInProgram != other.activeInProgram) {
+            return false;
+        }
+        if (this.defaultNOVStyleID != other.defaultNOVStyleID) {
+            return false;
+        }
+        if (this.enableCodeEnforcement != other.enableCodeEnforcement) {
+            return false;
+        }
+        if (this.enableOccupancy != other.enableOccupancy) {
+            return false;
+        }
+        if (this.enablePublicCEActionRequestSubmissions != other.enablePublicCEActionRequestSubmissions) {
+            return false;
+        }
+        if (this.enablePublicCEActionRequestInfo != other.enablePublicCEActionRequestInfo) {
+            return false;
+        }
+        if (this.enablePublicOccPermitApp != other.enablePublicOccPermitApp) {
+            return false;
+        }
+        if (this.enablePublicOccInspectionTODOs != other.enablePublicOccInspectionTODOs) {
+            return false;
+        }
+        if (this.muniOfficePropertyId != other.muniOfficePropertyId) {
+            return false;
+        }
+        if (!Objects.equals(this.address_street, other.address_street)) {
+            return false;
+        }
+        if (!Objects.equals(this.address_city, other.address_city)) {
+            return false;
+        }
+        if (!Objects.equals(this.address_state, other.address_state)) {
+            return false;
+        }
+        if (!Objects.equals(this.address_zip, other.address_zip)) {
+            return false;
+        }
+        if (!Objects.equals(this.phone, other.phone)) {
+            return false;
+        }
+        if (!Objects.equals(this.fax, other.fax)) {
+            return false;
+        }
+        if (!Objects.equals(this.email, other.email)) {
+            return false;
+        }
+        if (!Objects.equals(this.notes, other.notes)) {
+            return false;
+        }
+        if (!Objects.equals(this.codeSet, other.codeSet)) {
+            return false;
+        }
+        if (!Objects.equals(this.issuingCodeSource, other.issuingCodeSource)) {
+            return false;
+        }
+        if (!Objects.equals(this.profile, other.profile)) {
+            return false;
+        }
+        if (!Objects.equals(this.muniManager, other.muniManager)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastUpdatedTS, other.lastUpdatedTS)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastUpdaetdBy, other.lastUpdaetdBy)) {
+            return false;
+        }
+        if (!Objects.equals(this.primaryStaffContact, other.primaryStaffContact)) {
+            return false;
+        }
+        if (!Objects.equals(this.courtEntities, other.courtEntities)) {
+            return false;
+        }
+        if (!Objects.equals(this.photoDocList, other.photoDocList)) {
+            return false;
+        }
+        return true;
     }
     
 }

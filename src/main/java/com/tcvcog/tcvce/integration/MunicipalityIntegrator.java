@@ -18,10 +18,13 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.MuniCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.MunicipalityComplete;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
@@ -88,9 +91,9 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
     }
     
-    public MunicipalityComplete getMuniComplete(int muniCode) throws IntegrationException{
+    public MunicipalityDataHeavy getMuniListified(int muniCode) throws IntegrationException, AuthorizationException{
         PreparedStatement stmt = null;
-        MunicipalityComplete muniComplete = null;
+        MunicipalityDataHeavy muniComplete = null;
         Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
         String query =  "    SELECT municode, muniname, address_street, address_city, address_state, \n" +
@@ -110,7 +113,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setInt(1, muniCode);
             rs = stmt.executeQuery();
             while(rs.next()){
-                muniComplete = generateMuniComplete(rs);
+                muniComplete = generateMuniDataHeavy(rs);
             }
             
         } catch (SQLException ex) {
@@ -136,14 +139,13 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         return muni;
     }
     
-    private MunicipalityComplete generateMuniComplete(ResultSet rs) throws SQLException, IntegrationException{
-        SystemIntegrator si = getSystemIntegrator();
+    private MunicipalityDataHeavy generateMuniDataHeavy(ResultSet rs) throws SQLException, IntegrationException, AuthorizationException{
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         UserIntegrator ui = getUserIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
-        PropertyIntegrator pi = getPropertyIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         
-        MunicipalityComplete muni = new MunicipalityComplete(generateMuni(rs));
+        MunicipalityDataHeavy muni = new MunicipalityDataHeavy(generateMuni(rs));
         
         muni.setAddress_street(rs.getString("address_street"));
         muni.setAddress_city(rs.getString("address_city"));
@@ -180,7 +182,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setLastUpdaetdBy(ui.getUser(rs.getInt("lastupdated_userid")));
         muni.setPrimaryStaffContact(ui.getUser(rs.getInt("primarystaffcontact_userid")));
         
-        muni.setCodeOfficers(ui.getActiveCodeOfficerList(muni.getMuniCode()));
+        // FIX THIS WHEN WE HAVE STABLE AUTHORIZATION PROCEDURES
+//        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedListForConfig(muni)));
         muni.setCourtEntities(cei.getCourtEntityList(muni.getMuniCode()));
         
         return muni;
@@ -271,7 +274,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
    
     
-    public void updateMuniComplete(MunicipalityComplete muni) throws IntegrationException{
+    public void updateMuniComplete(MunicipalityDataHeavy muni) throws IntegrationException{
         
         Connection con = null;
         String query =  "UPDATE public.municipality\n" +
@@ -407,6 +410,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     /**
      * Users are permitted access to a set of municipalities which are all dumped
      * into a List by this method during the user lookup process.
+     * @deprecated 
      * @param uid
      * @return A list of Municipalities to which the user should be granted data-related
      * access within their user type domain

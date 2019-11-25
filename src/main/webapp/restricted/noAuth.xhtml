@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Error</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../public/navContainer_public.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <f:view id="erroPageView">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                            
+                            <h:form id="errorPageForm">
+                                <h1 style="color:maroon">Hark! No valid authorization periods found</h1>
+                                
+                                <p>You have successfully logged in, but your user account is not authorized at any level--in any 
+                                    municipality. Unfortunately, this error must be corrected by an authorized user.</p>
+                                
+                                <p>If you have never successfully loaded a system dashboard before, your administrator probably
+                                didn't configure your UserAuthorizationPeriod correctly. If you've previously been authorized 
+                                in the system, then it's likely that your authorization periods have all expired. In rare cases, 
+                                all of your previously valid authorization periods have been deliberately invalidated.</p>
+                                
+                            </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

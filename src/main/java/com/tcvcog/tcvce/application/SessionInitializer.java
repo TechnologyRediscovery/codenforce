@@ -27,10 +27,13 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.MunicipalityComplete;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserWithAccessData;
+import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
@@ -43,6 +46,7 @@ import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
@@ -51,7 +55,12 @@ import javax.servlet.http.HttpServletRequest;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -60,6 +69,11 @@ import javax.annotation.PostConstruct;
 public class SessionInitializer extends BackingBeanUtils implements Serializable {
 
    
+
+    private User userQueuedForSession;
+    private UserAuthorized userAuthorizedQueuedForSession;
+    private UserMuniAuthPeriod umapQueuedForSession;
+    private Municipality muniQueuedForSession;
     
     /**
      * Creates a new instance of SessionInitializer
@@ -69,7 +83,29 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     
     @PostConstruct
     public void initBean(){
+        userAuthorizedQueuedForSession = null;
+        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
+        // check to see if we have an internal session created already
+        // to determine which user we authenticate with
+        muniQueuedForSession = getSessionBean().getSessionMuni();
+        userQueuedForSession = getSessionBean().getSessionUserForReInitSession();
+        umapQueuedForSession = getSessionBean().getUmapRequestedForReInit();
         
+        
+        try {
+            if(muniQueuedForSession == null
+                    &&
+                userQueuedForSession == null
+                    &&
+                umapQueuedForSession == null){
+                // we have a first init! Ask the container for its user
+                userQueuedForSession = getContainerAuthenticatedUser();
+            } 
+            userAuthorizedQueuedForSession = uc.authorizeUser(userQueuedForSession, muniQueuedForSession, umapQueuedForSession);
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex);
+        }
     }
     
     /**
@@ -84,39 +120,91 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * or the error page
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.CaseLifecycleException
+     * @throws java.sql.SQLException
      */
     public String initiateInternalSession() throws IntegrationException, CaseLifecycleException, SQLException{
-        CodeIntegrator ci = getCodeIntegrator();
-        System.out.println("SessionInitializer.initiateInternalSession");
+        UserCoordinator uc = getUserCoordinator();
+        if(getSessionBean().getSessionUser() == null){
+            return configureSession(getContainerAuthenticatedUser(), null, null);
+        } else {
+            // if we have an existing session, send in the userAuthorizedQueuedForSession and let the
+            // auth logic choose the muni
+            return configureSession(userAuthorizedQueuedForSession, muniQueuedForSession, umapQueuedForSession);
+        }
+    }
+
+    /**
+     * JBoss is responsible for the first query against the DB. If a username/pass
+     * matches the query, this method will extract the username from any old request
+     * @return the username string of an authenticated user from the container
+     */
+    private User getContainerAuthenticatedUser() throws IntegrationException {
+        UserIntegrator ui  = getUserIntegrator();
+        FacesContext fc = getFacesContext();
+        ExternalContext ec = fc.getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ec.getRequest();
+        return ui.getUser(ui.getUserID(request.getRemoteUser()));
+    }
+    
+    
+    
+    /**
+     * Core configuration method for sessions; called both during an initial login
+     * and subsequent changes to the current municipality. It does the work
+     * of gathering all necessary info for session config
+     * 
+     * @param u
+     * @param muni if null, the system will choose the highest ranked role in the
+     * muni record added most recently
+     * @param umap
+     * @return nav string
+     * @throws CaseLifecycleException
+     * @throws IntegrationException 
+     */
+    public String configureSession(User u, Municipality muni, UserMuniAuthPeriod umap) throws CaseLifecycleException, IntegrationException{
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         PersonIntegrator persInt = getPersonIntegrator();
         CaseIntegrator caseint = getCaseIntegrator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        UserMuniAuthPeriodLogEntry umaple;
         
         try {
-            UserWithAccessData extractedUser = uc.getUserWithAccessData(getContainerAuthenticatedUser());
-            if(extractedUser != null){
+            // The central call which initiates the User's session for a particular municipality
+            // Muni will be null when called from initiateInternalSession
+            UserAuthorized authUser = uc.authorizeUser(u, muni, umap);
+            
+            // as long as we have an actual user, proceed with session config
+            if(authUser != null){
+                // The stadnard Municipality object is simple, but we need the full deal
+                MunicipalityDataHeavy muniHeavy = 
+                        mi.getMuniListified(authUser.getMyCredential().getGoverningAuthPeriod().getMuni().getMuniCode());
+                System.out.println("SessionInitializer.configureSession | loaded MuniHeavy: " + muniHeavy.getMuniName());
                 
-                ExternalContext ec = facesContext.getExternalContext();
-                ec.getSessionMap().put("facesUser", extractedUser);
-                System.out.println("SessionInitializer.initiateInternalSession ");
-
-                Municipality muni = uc.getDefaultyMuni(extractedUser);
-                MunicipalityComplete muniComplete = mi.getMuniComplete(muni.getMuniCode());
+                // load up our SessionBean with its key objects
+                getSessionBean().setSessionMuni(muniHeavy);
+                getSessionBean().setSessionUser(authUser);
                 
-                getSessionBean().setSessionUser(extractedUser);
-                getSessionBean().setSessionMuni(muniComplete);
-                getSessionBean().setUserAuthMuniList(uc.getUserAuthMuniList(extractedUser.getUserID()));
+                populateSessionObjectQueues(authUser, muniHeavy);
                 
-                // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
-                //and then and store in sessionBean
-                getSessionBean().setActiveCodeSet(muniComplete.getCodeSet());
-                populateSessionObjectQueues(extractedUser, muniComplete);
-                getLogIntegrator().makeLogEntry(extractedUser.getUserID(), getSessionID(), 
-                        Integer.parseInt(getResourceBundle(Constants.LOGGING_CATEGORIES).getString("login")), 
-                         "SessionInitializer.initiateInternalSession | Created internal session", false, false);
+                umaple = uc.assembleUserMuniAuthPeriodLogEntrySkeleton(
+                                authUser, 
+                                UserMuniAuthPeriodLogEntryCatEnum.SESSION_INIT);
+        
+                umaple = assembleSessionInfo(umaple);
+                
+                if(umaple != null){
+                    umaple.setAudit_usersession_userid(getSessionBean().getSessionUser().getUserID());
+                    umaple.setAudit_muni_municode(muniHeavy.getMuniCode());
+                    umaple.setAudit_usercredential_userid(authUser.getMyCredential().getGoverningAuthPeriod().getUserID());
+                    System.out.println("SessionInitializer.configureSession | loaded UserMuniAuthPeriod: " + umaple);
+                    uc.logCredentialInvocation(umaple, authUser.getMyCredential().getGoverningAuthPeriod());
+                }
+             
+               return "success";
+            } else {
+                return "noAuth";
             }
         
         } catch (IntegrationException ex) {
@@ -127,14 +215,47 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, 
                     "Integration module error. Unable to connect your server user to the COG system user.", 
                     "Please contact system administrator Eric Darsow at 412.923.9907"));
-            return "failure";
+            return "";
         } catch (AuthorizationException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Auth exception");
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
-            return "failure";
+            return "";
         }
-        return "success";
+    }
+    
+    private UserMuniAuthPeriodLogEntry assembleSessionInfo(UserMuniAuthPeriodLogEntry umaple){
+        FacesContext fc = getFacesContext();
+        HttpServletRequest req = (HttpServletRequest) fc.getExternalContext().getRequest();
+        HttpServletResponse res = (HttpServletResponse) fc.getExternalContext().getResponse();
+        StringBuilder sb = null;
+
+        Map<String, String[]> headMap = req.getParameterMap();
+
+        umaple.setHeader_remoteaddr(req.getRemoteAddr());
+        if(headMap != null && headMap.get(Constants.PARAM_USERAGENT) != null){
+             sb = new StringBuilder();
+            for(String s: headMap.get(Constants.PARAM_USERAGENT)){
+                sb.append(s);
+                sb.append("|");
+            }
+        }
+        if(sb != null){
+            umaple.setHeader_useragent(sb.toString());
+        }
+    
+        umaple.setHeader_dateraw(res.getHeader(Constants.PARAM_DATERAW));
+        
+        Cookie[] cooks = req.getCookies();
+        if(cooks != null){
+            for(Cookie ckie: cooks){
+                if(ckie.getName().equals(Constants.PARAM_JSESS)){
+                    umaple.setCookie_jsessionid(ckie.getValue());
+                    break;
+                } // close inner if
+            } // close for
+        } // close cooks null check
+        return umaple;
     }
 
     /**
@@ -157,7 +278,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @throws IntegrationException
      * @throws CaseLifecycleException 
      */
-    private void populateSessionObjectQueues(UserWithAccessData u, MunicipalityComplete m) throws IntegrationException, CaseLifecycleException{
+    private void populateSessionObjectQueues(UserAuthorized ua, MunicipalityDataHeavy m) throws IntegrationException, CaseLifecycleException{
         SessionBean sessionBean = getSessionBean();
         
         PersonCoordinator persCoord = getPersonCoordinator();
@@ -173,7 +294,6 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 //        
 //        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         
-        sessionBean.setSessionCECase(caseInt.getCECase(u.getAccessRecord().getDefaultCECaseID()));
         sessionBean.setSessionProperty(propI.getProperty(m.getMuniOfficePropertyId()));
         sessionBean.setSessionPerson(u.getPerson());
         
@@ -209,8 +329,66 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         
         sessionBean.setQueryOccPeriod(
                 searchCoord.assembleQueryOccPeriod(
-                QueryOccPeriodEnum.CUSTOM, u, m, null));
-        
+                QueryOccPeriodEnum.CUSTOM, ua, m, null));
+    }
 
+    
+
+    /**
+     * @return the userAuthorizedQueuedForSession
+     */
+    public UserAuthorized getUserAuthorizedQueuedForSession() {
+        return userAuthorizedQueuedForSession;
+    }
+
+    /**
+     * @param userAuthorizedQueuedForSession the userAuthorizedQueuedForSession to set
+     */
+    public void setUserAuthorizedQueuedForSession(UserAuthorized userAuthorizedQueuedForSession) {
+        this.userAuthorizedQueuedForSession = userAuthorizedQueuedForSession;
+    }
+
+    /**
+     * @return the muniQueuedForSession
+     */
+    public Municipality getMuniQueuedForSession() {
+        return muniQueuedForSession;
+    }
+
+    /**
+     * @param muniQueuedForSession the muniQueuedForSession to set
+     */
+    public void setMuniQueuedForSession(Municipality muniQueuedForSession) {
+        this.muniQueuedForSession = muniQueuedForSession;
+    }
+
+   
+
+    /**
+     * @return the userQueuedForSession
+     */
+    public User getUserQueuedForSession() {
+        return userQueuedForSession;
+    }
+
+    /**
+     * @param userQueuedForSession the userQueuedForSession to set
+     */
+    public void setUserQueuedForSession(User userQueuedForSession) {
+        this.userQueuedForSession = userQueuedForSession;
+    }
+
+    /**
+     * @return the umapQueuedForSession
+     */
+    public UserMuniAuthPeriod getUmapQueuedForSession() {
+        return umapQueuedForSession;
+    }
+
+    /**
+     * @param umapQueuedForSession the umapQueuedForSession to set
+     */
+    public void setUmapQueuedForSession(UserMuniAuthPeriod umapQueuedForSession) {
+        this.umapQueuedForSession = umapQueuedForSession;
     }
 }

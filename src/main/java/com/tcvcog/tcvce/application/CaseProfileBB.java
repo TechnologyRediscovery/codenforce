@@ -760,13 +760,17 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         NoticeOfViolation nov;
         CaseCoordinator cc = getCaseCoordinator();
             if (!currentCase.getViolationListUnresolved().isEmpty()) {
-                getSessionBean().getSessionPropertyList().add(0, currentCase.getProperty());
-                getSessionBean().setSessionProperty(currentCase.getProperty());
-                positionCurrentCaseAtHeadOfQueue();
-                nov = cc.novGetNewNOVSkeleton(currentCase, getSessionBean().getSessionMuni());
-                nov.setCreationBy(getSessionBean().getSessionUser());
-                getSessionBean().setSessionNotice(nov);
-                return "noticeOfViolationBuilder";
+                try {
+                    getSessionBean().getSessionPropertyList().add(0, currentCase.getProperty());
+                    getSessionBean().setSessionProperty(currentCase.getProperty());
+                    positionCurrentCaseAtHeadOfQueue();
+                    nov = cc.novGetNewNOVSkeleton(currentCase, getSessionBean().getSessionMuni());
+                    nov.setCreationBy(getSessionBean().getSessionUser());
+                    getSessionBean().setSessionNotice(nov);
+                    return "noticeOfViolationBuilder";
+                } catch (AuthorizationException ex) {
+                    System.out.println(ex);
+                }
             } else {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "No unresolved violations exist for building a letter", ""));

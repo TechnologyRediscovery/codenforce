@@ -12,10 +12,13 @@ import java.io.Serializable;
  * Note the switches are private and final--so they can't be tweaked on the fly
  * by changes in other classes. Watch git changes for those in here!
  *  
+ * @deprecated replaced by com.tcvcog.tcvce.entities.Credential
  * @author Ellen Bascomb
  */
-public class AccessKeyCard implements Serializable{
+public class UserAuthCredential implements Serializable{
 
+    private final UserMuniAuthPeriod governingAuthPeriod;
+    
     private final boolean hasDeveloperPermissions;
     private final boolean hasSysAdminPermissions;
     private final boolean hasCOGStaffPermissions;
@@ -23,12 +26,15 @@ public class AccessKeyCard implements Serializable{
     private final boolean hasMuniStaffPermissions;
     private final boolean hasMuniReaderPermissions;
 
-    public AccessKeyCard(   boolean dev,
-                            boolean admin,
-                            boolean cogstaff,
-                            boolean ceo,
-                            boolean munistaff,
-                            boolean munireader){
+    public UserAuthCredential(  UserMuniAuthPeriod uap,
+                                boolean dev,
+                                boolean admin,
+                                boolean cogstaff,
+                                boolean ceo,
+                                boolean munistaff,
+                                boolean munireader){
+        
+        governingAuthPeriod = uap;
         
         hasDeveloperPermissions = dev;
         hasSysAdminPermissions = admin;
@@ -36,7 +42,7 @@ public class AccessKeyCard implements Serializable{
         hasEnfOfficialPermissions = ceo;
         hasMuniStaffPermissions = munistaff;
         hasMuniReaderPermissions = munireader;
-        
+    
     }
 
 
@@ -81,6 +87,12 @@ public class AccessKeyCard implements Serializable{
     public boolean isHasMuniReaderPermissions() {
         return hasMuniReaderPermissions;
     }
-    
+
+    /**
+     * @return the governingAuthPeriod
+     */
+    public UserMuniAuthPeriod getGoverningAuthPeriod() {
+        return governingAuthPeriod;
+    }
     
 }

@@ -14,9 +14,35 @@
             <ui:define name="content">
                 <f:view id="initiateSessionView">
                     <div class="mainContainer">
+                        
+                        <h:form id="init-session-messages-form">
+                        <h:messages id="init-session-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                    </h:form>
+                        
+                        
                         <h:form id="initiateSessionForm">
-                            <h1>Continue to dashboard</h1>
-                            <p:commandButton ajax="false" value="Go to dashboard" action="#{sessionInitializer.initiateInternalSession}" icon="fa fa-chevron-right"/>
+                            <h1>Authentication successful!</h1>
+                            <f:subview id="initiatesession-subview-header-reloadsession"
+                                       rendered="#{!(empty sessionInitializer.muniQueuedForSession)}">
+                                <p>
+                                    <h:outputText value="Requested session municipality: " />
+                                    <h:outputText value="#{sessionInitializer.muniQueuedForSession.muniName}" />
+                                </p>
+                            </f:subview>
+                            <f:subview id="initiatesession-subview-header-firstauth"
+                                       rendered="#{empty sessionInitializer.muniQueuedForSession}">
+                                <p>
+                                    <h:outputText value="Your session municipality will be determined dynamically by the COGBot" />
+                                </p>
+                            </f:subview>
+                                
+                            <p:commandButton ajax="false" 
+                                             value="Configure session for #{sessionInitializer.userQueuedForSession.username}" 
+                                             action="#{sessionInitializer.initiateInternalSession}" 
+                                             icon="fa fa-chevron-right"
+                                             update="init-session-messages"/>
                         </h:form>
                     </div>
                 </f:view>

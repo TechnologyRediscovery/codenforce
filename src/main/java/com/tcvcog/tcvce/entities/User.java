@@ -41,6 +41,12 @@ public class User implements Serializable{
     protected String badgeNumber;
     protected String oriNumber;
     
+    protected boolean active;
+    protected boolean noLoginVirtualUser;
+    
+    protected int createdByUserId;
+    protected LocalDateTime createdTS;
+    
     
     /**
      * Creates a new instance of User
@@ -61,10 +67,6 @@ public class User implements Serializable{
     public void setUserID(int uid){
         userID = uid;
     }
-    
-    
-    
-    
 
     /**
      * @return the userID
@@ -220,11 +222,91 @@ public class User implements Serializable{
        
         return true;
     }
+
+    /**
+     * @return the pswdLastUpdated
+     */
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @return the noLoginVirtualUser
+     */
+    public boolean isNoLoginVirtualUser() {
+        return noLoginVirtualUser;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+
+    /**
+     * @param noLoginVirtualUser the noLoginVirtualUser to set
+     */
+    public void setNoLoginVirtualUser(boolean noLoginVirtualUser) {
+        this.noLoginVirtualUser = noLoginVirtualUser;
+    }
+
+    /**
+     * @return the createdByUserId
+     */
+    public int getCreatedByUserId() {
+        return createdByUserId;
+    }
+
+    /**
+     * @return the createdTS
+     */
+    public LocalDateTime getCreatedTS() {
+        return createdTS;
+    }
+
+    /**
+     * @return the pswdLastUpdated
+     */
+    /**
+     * @param createdByUserId the createdByUserId to set
+     */
+    public void setCreatedByUserId(int createdByUserId) {
+        this.createdByUserId = createdByUserId;
+    }
+
+    /**
+     * @param createdTS the createdTS to set
+     */
+    public void setCreatedTS(LocalDateTime createdTS) {
+        this.createdTS = createdTS;
+    }
     /**
      * @return the accessRecord
      */
     /**
      * @param accessRecord the accessRecord to set
      */
+    /**
+     * @param pswdLastUpdated the pswdLastUpdated to set
+     */
+    /**
+     * @return the forcePasswordResetTS
+     */
+    /**
+     * @param forcePasswordResetTS the forcePasswordResetTS to set
+     */
+    /**
+     * @return the accessRecord
+     */
+    /**
+     * @param accessRecord the accessRecord to set
+     */
+
 
 }

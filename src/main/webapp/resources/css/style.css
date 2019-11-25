@@ -1111,6 +1111,8 @@ td.gridFooter {
     
 }
 
+
+
 td.userBarTd{
     align-content: center;
     border: none;
@@ -1553,6 +1555,28 @@ div.checkBoxLabel{
 .preview-violations-box{
     display: block;
     width:1000px;
+}
+
+.newpasswd-cont{
+    
+    
+}
+
+.newpsswd-lead{
+    
+    
+}
+
+.newpasswd-text{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+    
+.newpsswd{
+    font-size: 3em;
+    color: darkslateblue;
+    font-weight: bold;
 }
 
 

@@ -771,7 +771,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     public void novResetMailing(NoticeOfViolation nov, UserWithAccessData user) throws IntegrationException, PermissionsException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
-        if(user.getKeyCard().isHasSysAdminPermissions()){
+        if(user.getMyCredential().isHasSysAdminPermissions()){
             cvi.novResetMailingFieldsToNull(nov);
         } else {
             throw new PermissionsException("User does not have sufficient acces righst to clear notice mailing fields");
@@ -779,7 +779,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
         
-    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m) throws SQLException{
+    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m) throws SQLException, AuthorizationException{
         SystemIntegrator si = getSystemIntegrator();
         NoticeOfViolation nov = new NoticeOfViolation();
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
@@ -787,7 +787,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         try {
-            nov.setStyle(si.getPrintStyle(mi.getMuniComplete(m.getMuniCode()).getDefaultNOVStyleID()));
+            nov.setStyle(si.getPrintStyle(mi.getMuniListified(m.getMuniCode()).getDefaultNOVStyleID()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -994,14 +994,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     */
    public boolean determineCEActionRequestRoutingActionEnabledStatus(
                                                         CEActionRequest req,
-                                                        UserWithAccessData u ){
-       if(req != null && u.getKeyCard() != null){
+                                                        UserAuthorized u ){
+       if(req != null && u.getMyCredential() != null){
             if((
                     req.getRequestStatus().getStatusID() == 
                     Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                             .getString("actionRequestInitialStatusCode")))
                     && 
-                    u.getKeyCard().isHasEnfOfficialPermissions()
+                    u.getMyCredential().isHasEnfOfficialPermissions()
                 ){
                 return true;
             }

@@ -105,9 +105,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public QueryCEAR runQuery(QueryCEAR query) throws AuthorizationException, IntegrationException{
         query.clearResultList();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-//        if(query.getUser().getRoleType().getRank() > query.getQueryName().getUserRankMinimum() ){
+//        if(query.getUser().getRole().getRank() > query.getQueryName().getUserRankMinimum() ){
         //TODO: get this to actually work
-        if(query.getUser().getRoleType().getRank() >9999 ){
+        if(query.getUser().getMyCredential().getGoverningAuthPeriod().getRole().getRank() >9999 ){
             throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
         }
         
@@ -708,9 +708,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         QueryOccPeriod qop = null;
         query.clearResultList();
         OccupancyIntegrator oi = getOccupancyIntegrator();
-//        if(query.getUser().getRoleType().getRank() > query.getQueryName().getUserRankMinimum() ){
+//        if(query.getUser().getRole().getRank() > query.getQueryName().getUserRankMinimum() ){
         //TODO: get this to actually work
-        if(query.getUser().getRoleType().getRank() < query.getUserRankAccessMinimum().getRank() ){
+        if(query.getUser().getMyCredential().getGoverningAuthPeriod().getRole().getRank() < query.getUserRankAccessMinimum().getRank() ){
             throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
         }
         
@@ -784,7 +784,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public QueryPerson runQuery(QueryPerson query) throws AuthorizationException, IntegrationException{
         query.clearResultList();
         PersonIntegrator pi = getPersonIntegrator();
-        if(query.getUser().getRoleType().getRank() < query.getUserRankAccessMinimum().getRank() ){
+        if(query.getUser().getMyCredential().getGoverningAuthPeriod().getRole().getRank() < query.getUserRankAccessMinimum().getRank() ){
             throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
         }
         
@@ -863,7 +863,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public QueryProperty runQuery(QueryProperty query) throws AuthorizationException, IntegrationException{
         query.clearResultList();
         PropertyIntegrator pi = getPropertyIntegrator();
-        if(query.getUser().getRoleType().getRank() < query.getUserRankAccessMinimum().getRank() ){
+        if(query.getUser().getMyCredential().getGoverningAuthPeriod().getRole().getRank() < query.getUserRankAccessMinimum().getRank() ){
             throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
         }
         

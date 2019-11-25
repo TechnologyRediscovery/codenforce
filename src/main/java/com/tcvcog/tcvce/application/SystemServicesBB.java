@@ -21,6 +21,10 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -43,6 +47,22 @@ import javax.servlet.http.HttpSession;
  */
 public class SystemServicesBB extends BackingBeanUtils implements Serializable{
 
+    
+    // *************************************************************************
+    // ** Master session level objects on this view-scoped bean               **
+    // *************************************************************************
+    
+    private UserAuthorized bbSessionUser;
+    private MunicipalityDataHeavy bbSessionMuni;
+    
+    private Property bbSessionProperty;
+    private Person bbSessionPerson;
+    
+    
+    
+    // *************************************************************************
+    // **               improvement suggestions, etc.
+    // *************************************************************************
     private String listItemChangeRequestRText;
     
     private String systemImprovementTicketRText;
@@ -61,6 +81,15 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      * Creates a new instance of SystemServicesBB
      */
     public SystemServicesBB() {
+    }
+    
+    @PostConstruct
+    public void initBean(){
+        
+        bbSessionUser = getSessionBean().getSessionUser();
+        bbSessionMuni = getSessionBean().getSessionMuni();
+        System.out.println("SystemServicesBB.initBean");
+        
     }
     
     public String closeRS(){
@@ -321,6 +350,62 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setLogSub(String logSub) {
         this.logSub = logSub;
+    }
+
+    /**
+     * @return the bbSessionUser
+     */
+    public UserAuthorized getBbSessionUser() {
+        return bbSessionUser;
+    }
+
+    /**
+     * @param bbSessionUser the bbSessionUser to set
+     */
+    public void setBbSessionUser(UserAuthorized bbSessionUser) {
+        this.bbSessionUser = bbSessionUser;
+    }
+
+    /**
+     * @return the bbSessionMuni
+     */
+    public MunicipalityDataHeavy getBbSessionMuni() {
+        return bbSessionMuni;
+    }
+
+    /**
+     * @param bbSessionMuni the bbSessionMuni to set
+     */
+    public void setBbSessionMuni(MunicipalityDataHeavy bbSessionMuni) {
+        this.bbSessionMuni = bbSessionMuni;
+    }
+
+    /**
+     * @return the bbSessionProperty
+     */
+    public Property getBbSessionProperty() {
+        return bbSessionProperty;
+    }
+
+    /**
+     * @return the bbSessionPerson
+     */
+    public Person getBbSessionPerson() {
+        return bbSessionPerson;
+    }
+
+    /**
+     * @param bbSessionProperty the bbSessionProperty to set
+     */
+    public void setBbSessionProperty(Property bbSessionProperty) {
+        this.bbSessionProperty = bbSessionProperty;
+    }
+
+    /**
+     * @param bbSessionPerson the bbSessionPerson to set
+     */
+    public void setBbSessionPerson(Person bbSessionPerson) {
+        this.bbSessionPerson = bbSessionPerson;
     }
     
     

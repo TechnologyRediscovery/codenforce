@@ -269,7 +269,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         Municipality m = currentRequest.getMuni();
         Person skel = pc.getNewPersonSkeleton(m);
         try {
-            skel.setCreatorUserID(uc.getRobotUser().getUserID());
+            skel.setCreatorUserID(uc.getUserRobot().getUserID());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -404,7 +404,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO, 
                        "Success! Your request has been submitted and passed to our code enforcement team.", ""));
-            return "success";
+            return "successCEAR";
 
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());

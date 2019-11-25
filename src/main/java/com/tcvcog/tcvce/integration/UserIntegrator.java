@@ -27,8 +27,11 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAccessRecord;
-import com.tcvcog.tcvce.entities.UserWithAccessData;
+import com.tcvcog.tcvce.entities.UserAuthCredential;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
+import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.UserConfigReady;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -68,8 +71,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         User newUser = null;
         // broken query
-        String query =  "   SELECT userid, username, notes, personlink \n" +
-                        "   FROM public.login WHERE userid = ?;";
+        String query =  "   SELECT userid, username, notes, personlink, \n" +
+                        "       active, nologinvirtualonly\n" +
+                        "  FROM public.login WHERE userid = ?;";
         
         PreparedStatement stmt = null;
         
@@ -93,41 +97,56 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return newUser;
     }
     
-    public UserWithAccessData getUserWithAccessData(int userID, Municipality m) throws IntegrationException, AuthorizationException{
-        if(userID == 0){
-            throw new AuthorizationException("UserIntegrator.getUserWithAccessData | incoming userID = 0");
-        }
+    /**
+     *
+     * @param u
+     * @return
+     * @throws IntegrationException 
+     */
+    public UserAuthorized getUserAuthorizedNoAuthPeriods(User u) throws IntegrationException{
+        
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        UserWithAccessData newUser = null;
         // broken query
-        String query =  "   SELECT userid, username, notes, personlink \n" +
-                        "   FROM public.login WHERE userid = ?;";
+        String query =  " SELECT userid, pswdlastupdated, forcepasswordreset, createdby, createdts " +
+                        " FROM public.login WHERE userid = ?;";
         
+        UserAuthorized ua = null;
         PreparedStatement stmt = null;
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, userID);
+            stmt.setInt(1, u.getUserID());
             rs = stmt.executeQuery();
             while(rs.next()){
-                newUser = generateUserWithAccessData(rs, m);
+                ua = new UserAuthorized(u);
+                if(rs.getTimestamp("pswdlastupdated") != null){
+                    ua.setPswdLastUpdated(rs.getTimestamp("pswdlastupdated").toLocalDateTime());
+                }
+                if(rs.getTimestamp("forcepasswordreset") != null){
+                    ua.setForcePasswordResetTS(rs.getTimestamp("forcepasswordreset").toLocalDateTime());
+                }
+                System.out.println("UserIntegrator.getAuthorizedUser | uaid: " + ua.getUserID());
+                ua.setCreatedByUserId(rs.getInt("createdby"));
+                if(rs.getTimestamp("createdts") != null){
+                    ua.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+                }
             }
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Error getting user", ex);
+            throw new IntegrationException("Error generating UserAuthorized", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        return newUser;
-        
-        
+        return ua;
     }
+    
+   
     
      /**
      * Note that the client method is responsible for moving the cursor on the 
@@ -143,7 +162,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setUserID(rs.getInt("userid"));
             user.setUsername(rs.getString("username"));
             user.setNotes(rs.getString("notes"));
+            user.setActive(rs.getBoolean("active"));
             user.setPerson(pi.getPerson(rs.getInt("personlink")));
+            user.setNoLoginVirtualUser(rs.getBoolean("nologinvirtualonly"));
+            
         } catch (SQLException ex) {
             throw new IntegrationException("Cannot create user", ex);
         }
@@ -151,42 +173,106 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return user;
     }
     
-    private UserWithAccessData generateUserWithAccessData(ResultSet rs, Municipality muni) throws IntegrationException{
-            UserWithAccessData user = new UserWithAccessData(generateUser(rs));
-            user.setAccessRecord(getUserAccessRecord(user, muni));
-            return user;
-    }
+  
+ 
     
-    
-    private UserAccessRecord getUserAccessRecord(User u, Municipality muni) throws IntegrationException{
+    /**
+     * Provides a complete list of records by User in the table loginmuniauthperiod.
+     * Client is responsible for validating the UMAP object by the UserCoordinator
+     * @param u
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<UserMuniAuthPeriod> getUserMuniAuthPeriodsRaw(User u) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        UserAccessRecord rec = null;
+        List<UserMuniAuthPeriod> perList = null;
         // broken query
-        String query = "SELECT muni_municode, userid, defaultmuni, accessgranteddatestart, accessgranteddatestop, \n" +
-                        "       codeofficerstartdate, codeofficerstopdate, staffstartdate, staffstopdate, \n" +
-                        "       sysadminstartdate, sysadminstopdate, supportstartdate, supportstopdate, \n" +
-                        "       codeofficerassignmentorder, staffassignmentorder, sysadminassignmentorder, \n" +
-                        "       supportassignmentorder, bypasscodeofficerassignmentorder, bypassstaffassignmentorder, \n" +
-                        "       bypasssysadminassignmentorder, bypasssupportassignmentorder, \n" +
-                        "       recorddeactivatedts, userrole, muniloginrecordid, recordcreatedts,  badgenumber, orinumber, defaultcecase_caseid \n" +
-                        "   FROM public.munilogin "
-                + "         WHERE userid=? "
-                + "             AND muni_municode=? "
-                + "             AND recorddeactivatedts IS NULL "
-                + "             AND accessgranteddatestart < now() "
-                + "             AND accessgranteddatestop > now() "
-                + "             ORDER BY recordcreatedts DESC;";
+        String query = "SELECT muniauthperiodid FROM public.loginmuniauthperiod WHERE authuser_userid=?;";
+        
+        PreparedStatement stmt = null;
+        if(u != null){
+            perList = new ArrayList<>();
+            try {
+                stmt = con.prepareStatement(query);
+                stmt.setInt(1, u.getUserID());
+                rs = stmt.executeQuery();
+                while(rs.next()){
+                    perList.add(getUserMuniAuthPeriod(rs.getInt("muniauthperiodid")));
+                }
+
+            } catch (SQLException ex) {
+                System.out.println(ex);
+                throw new IntegrationException("Error getting user access record", ex);
+            } finally{
+                 if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+                 if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            } // close finally
+        }
+        
+        return perList;
+        
+    }
+    
+    /**
+     * For use by system administrators to manage user data. Raw means that even 
+     * expired or invalidated periods are STILL included
+     * @param m
+     * @return
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
+     */
+    public List<UserMuniAuthPeriod> getUserMuniAuthPeriodsRaw(Municipality m) throws IntegrationException, AuthorizationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        List<UserMuniAuthPeriod> umapList = new ArrayList<>();
+        
+       String query =  "SELECT muniauthperiodid " +
+                        "FROM public.loginmuniauthperiod WHERE muni_municode=?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+                 
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, m.getMuniCode());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                umapList.add(getUserMuniAuthPeriod(rs.getInt("muniauthperiodid")));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error fetching user list", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return umapList;
+        
+    }
+    
+    public UserMuniAuthPeriod getUserMuniAuthPeriod(int periodID) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        UserMuniAuthPeriod per = null;
+        // broken query
+        String query = "SELECT muniauthperiodid, muni_municode, authuser_userid, accessgranteddatestart, \n" +
+                        "       accessgranteddatestop, recorddeactivatedts, authorizedrole, createdts, \n" +
+                        "       createdby_userid, notes, supportassignedby, assignmentrank\n" +
+                        "  FROM public.loginmuniauthperiod WHERE muniauthperiodid=?;";
         
         PreparedStatement stmt = null;
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, u.getUserID());
-            stmt.setInt(2, muni.getMuniCode());
+            stmt.setInt(1, periodID);
             rs = stmt.executeQuery();
             while(rs.next()){
-                rec = generateUserAccessRecord(rs);
+                per = generateUserMuniAuthPeriod(rs);
             }
             
         } catch (SQLException ex) {
@@ -198,105 +284,328 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        return rec;
+        return per;
+        
+        
     }
     
-    private UserAccessRecord generateUserAccessRecord(ResultSet rs) throws SQLException{
-        UserAccessRecord rec = new UserAccessRecord();
+    
+    private UserMuniAuthPeriod generateUserMuniAuthPeriod(ResultSet rs) throws SQLException, IntegrationException{
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        UserMuniAuthPeriod per = new UserMuniAuthPeriod(mi.getMuni(rs.getInt("muni_municode")));
         
-        rec.setMuni_municode(rs.getInt("muni_municode"));
-        rec.setUserid(rs.getInt("userid"));
-        rec.setDefaultmuni(rs.getBoolean("defaultmuni"));
+        per.setUserMuniAuthPeriodID(rs.getInt("muniauthperiodid"));
         
+        per.setPeriodActivityLogBook(getMuniAuthPeriodLogEntryList(per));
+        
+        per.setUserID(rs.getInt("authuser_userid"));
         
         if(rs.getTimestamp("accessgranteddatestart") != null){
-            rec.setAccessgranteddatestart(rs.getTimestamp("accessgranteddatestart").toLocalDateTime());
+            per.setStartDate(rs.getTimestamp("accessgranteddatestart").toLocalDateTime());
         }
         if(rs.getTimestamp("accessgranteddatestop") != null){
-            rec.setAccessgranteddatestop(rs.getTimestamp("accessgranteddatestop").toLocalDateTime());
+            per.setStopDate(rs.getTimestamp("accessgranteddatestop").toLocalDateTime());
         }
-        
-        if(rs.getTimestamp("codeofficerstartdate") != null){
-            rec.setCodeofficerstartdate(rs.getTimestamp("codeofficerstartdate").toLocalDateTime());
-        }
-        if(rs.getTimestamp("codeofficerstopdate") != null){
-            rec.setCodeofficerstopdate(rs.getTimestamp("codeofficerstopdate").toLocalDateTime());
-            
-        }
-        if(rs.getTimestamp("staffstartdate") != null){
-            rec.setStaffstartdate(rs.getTimestamp("staffstartdate").toLocalDateTime());
-        }
-        if(rs.getTimestamp("staffstopdate") != null){
-            rec.setStaffstopdate(rs.getTimestamp("staffstopdate").toLocalDateTime());
-            
-        }
-        
-        if(rs.getTimestamp("sysadminstartdate") != null){
-            rec.setSysadminstartdate(rs.getTimestamp("sysadminstartdate").toLocalDateTime());
-        }
-        if(rs.getTimestamp("sysadminstopdate") != null){
-            rec.setSysadminstopdate(rs.getTimestamp("sysadminstopdate").toLocalDateTime());
-        }
-            
-        if(rs.getTimestamp("supportstartdate") != null){
-            rec.setSupportstartdate(rs.getTimestamp("supportstartdate").toLocalDateTime());
-        }
-        
-        if(rs.getTimestamp("supportstopdate") != null){
-            rec.setSupportstopdate(rs.getTimestamp("supportstopdate").toLocalDateTime());
-        }
-        
-        rec.setCodeofficerassignmentorder(rs.getInt("codeofficerassignmentorder"));
-        rec.setStaffassignmentorder(rs.getInt("staffassignmentorder"));
-        rec.setSysadminassignmentorder(rs.getInt("sysadminassignmentorder"));
-        
-        rec.setSupportassignmentorder(rs.getInt("supportassignmentorder"));
-        rec.setBypasscodeofficerassignmentorder(rs.getInt("bypasscodeofficerassignmentorder"));
-        
-        rec.setBypassstaffassignmentorder(rs.getInt("bypassstaffassignmentorder"));
-        rec.setBypasssysadminassignmentorder(rs.getInt("bypasssysadminassignmentorder"));
-        rec.setBypasssupportassignmentorder(rs.getInt("bypasssupportassignmentorder"));
-        
         if(rs.getTimestamp("recorddeactivatedts") != null){
-            rec.setRecordcreatedts(rs.getTimestamp("recorddeactivatedts").toLocalDateTime());
+            per.setRecorddeactivatedTS(rs.getTimestamp("recorddeactivatedts").toLocalDateTime());
         }
-//        rec.setRole(RoleType.valueOf("role"));
-        rec.setMuniloginrecordid(rs.getInt("muniloginrecordid"));
-        rec.setRecordcreatedts(rs.getTimestamp("recordcreatedts").toLocalDateTime());
-        rec.setOrinumber(rs.getString("orinumber"));
-        rec.setBadgenumber(rs.getString("badgenumber"));
+        per.setRole(RoleType.valueOf(rs.getString("authorizedrole")));
         
-        rec.setDefaultCECaseID(rs.getInt("defaultcecase_caseid"));
+        if(rs.getTimestamp("createdts") != null){
+            per.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+        }
+        per.setCreatedByUserID(rs.getInt("createdby_userid"));
         
-        return rec;
+        per.setNotes(rs.getString("notes"));
+        // do support stuff later
+        per.setAssignmentRelativeOrder(rs.getInt("assignmentrank"));
+        
+        return per;
     }
     
+    
+    public void insertUserMuniAuthPeriodLogEntry(UserMuniAuthPeriodLogEntry entry) throws IntegrationException, AuthorizationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        UserMuniAuthPeriod per = null;
+        // broken query
+        String query =  "INSERT INTO public.loginmuniauthperiodlog(\n" +
+                        "            authperiodlogentryid, authperiod_periodid, category, entryts, \n" +
+                        "            entrydateofrecord, disputedby_userid, disputedts, notes, cookie_jsessionid, \n" +
+                        "            header_remoteaddr, header_useragent, header_dateraw, header_date, \n" +
+                        "            header_cachectl, audit_usersession_userid, audit_usercredential_userid, \n" +
+                        "            audit_muni_municode)\n" +
+                        "    VALUES (DEFAULT, ?, ?, now(), \n" +
+                        "            now(), ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, NULL, \n" +
+                        "            ?, ?, ?, \n" +
+                        "            ?);";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, entry.getUserMuniAuthPeriodID());
+            stmt.setString(2, entry.getCategory());
+            // entry ts and dateofrecord set by PG's now()
+            
+            if(entry.getDisputedByUserID()== 0 && entry.getDisputedts() == null){
+                stmt.setNull(3, java.sql.Types.NULL);
+                stmt.setNull(4, java.sql.Types.NULL);
+            } else {
+                throw new AuthorizationException("Cannot insert a CredentialLogEntry with not null disputed fields!");
+            }
+            stmt.setString(5, entry.getNotes());
+            stmt.setString(6, entry.getCookie_jsessionid());
+            
+            stmt.setString(7, entry.getHeader_remoteaddr());
+            stmt.setString(8, entry.getHeader_useragent());
+            stmt.setString(9,  entry.getHeader_dateraw());
+            
+            //header date java type set to NULL in SQL
+            stmt.setString(10, entry.getHeader_cachectl());
+            stmt.setInt(11, entry.getAudit_usersession_userid());
+            stmt.setInt(12, entry.getAudit_usercredential_userid());
+            
+            stmt.setInt(13, entry.getAudit_muni_municode());
+            
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error getting user access record", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    public List<UserMuniAuthPeriodLogEntry> getMuniAuthPeriodLogEntryList(UserMuniAuthPeriod uap) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        List<UserMuniAuthPeriodLogEntry> uacleList = new ArrayList<>();
+        // broken query
+        String query = "SELECT authperiodlogentryid" +
+                        "  FROM public.loginmuniauthperiodlog WHERE authperiod_periodid=?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, uap.getUserMuniAuthPeriodID());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                uacleList.add(getUserMuniAuthPeriodLogEntry(rs.getInt("authperiodlogentryid")));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error getting user access record", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+        return uacleList;
+    }
+    
+    
+    public UserMuniAuthPeriodLogEntry getUserMuniAuthPeriodLogEntry(int logEntryID) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        UserMuniAuthPeriodLogEntry uacle = null;
+        // broken query
+        String query = "SELECT authperiodlogentryid, authperiod_periodid, category, entryts, \n" +
+                        "       entrydateofrecord, disputedby_userid, disputedts, notes, cookie_jsessionid, \n" +
+                        "       header_remoteaddr, header_useragent, header_dateraw, header_date, \n" +
+                        "       header_cachectl, audit_usersession_userid, audit_usercredential_userid, \n" +
+                        "       audit_muni_municode\n" +
+                        "  FROM public.loginmuniauthperiodlog WHERE authperiodlogentryid=?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, logEntryID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                uacle = generateMuniAuthPeriodLogEntry(rs);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error getting user access record", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+        return uacle;
+        
+    }
+    
+    
+    private UserMuniAuthPeriodLogEntry generateMuniAuthPeriodLogEntry(ResultSet rs) throws SQLException, IntegrationException{
+        UserMuniAuthPeriodLogEntry uacle = new UserMuniAuthPeriodLogEntry();
+        
+        uacle.setLogBookEntryID(rs.getInt("authperiodlogentryid"));
+        uacle.setUserMuniAuthPeriodID(rs.getInt("authperiod_periodid"));
+        uacle.setCategory(rs.getString("category"));
+        
+        if(rs.getTimestamp("entrydateofrecord") != null){
+            uacle.setEntryTS(rs.getTimestamp("entrydateofrecord").toLocalDateTime());
+        }
+        uacle.setDisputedByUserID(rs.getInt("disputedby_userid"));
+        if(rs.getTimestamp("disputedts") != null){
+            uacle.setDisputedts(rs.getTimestamp("disputedts").toLocalDateTime());
+        }
+        uacle.setNotes(rs.getString("notes"));
+        uacle.setCookie_jsessionid(rs.getString("cookie_jsessionid"));
+        
+        uacle.setHeader_remoteaddr(rs.getString("header_remoteaddr"));
+        uacle.setHeader_useragent(rs.getString("header_useragent"));
+        uacle.setHeader_dateraw(rs.getString("header_dateraw"));
+        if(rs.getTimestamp("header_date") != null){
+            uacle.setHeader_date(rs.getTimestamp("header_date").toLocalDateTime());
+        } else {
+            uacle.setHeader_date(null);
+        }
+        
+        uacle.setHeader_cachectl(rs.getString("header_cachectl"));
+        uacle.setAudit_usersession_userid(rs.getInt("audit_usersession_userid"));
+        uacle.setAudit_usercredential_userid(rs.getInt("audit_usercredential_userid"));
+        
+        uacle.setAudit_muni_municode(rs.getInt("audit_muni_municode"));
+        
+        return uacle;
+    }
+    
+    /**
+     * Remember that the notion of a Credential only exists in Java land, since a User 
+     * is never "in" the database, doing stuff.
+     * @param uacle
+     * @throws IntegrationException 
+     */
+    public void updateUserMuniAuthPeriodLogEntry(UserMuniAuthPeriodLogEntry uacle) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        UserMuniAuthPeriod per = null;
+        // broken query
+        String query = "UPDATE public.loginmuniauthperiodlog\n" +
+                        "   SET category=?, entrydateofrecord=?, disputedby_userid=?, disputedts=?, notes=?, \n" +
+                        " WHERE authperiodlogentryid=?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, uacle.getCategory());
+            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(uacle.getEntryDateOfRecord()));
+            stmt.setInt(3, uacle.getDisputedByUserID());
+            if(uacle.getDisputedts() != null){
+                stmt.setTimestamp(4,  java.sql.Timestamp.valueOf(uacle.getDisputedts()));
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            stmt.setString(5, uacle.getNotes());
+            
+            stmt.setInt(6, uacle.getUserMuniAuthPeriodID());
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error getting user access record", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+
+    
+    public void insertNewUserAuthorizationPeriod(UserMuniAuthPeriod uap) throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        
+        String query = "INSERT INTO public.loginmuniauthperiod(\n" +
+                        "            muniauthperiodid, muni_municode, authuser_userid, accessgranteddatestart, \n" +
+                        "            accessgranteddatestop, recorddeactivatedts, authorizedrole, createdts, \n" +
+                        "            createdby_userid, notes, supportassignedby, assignmentrank)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
+                        "            ?, ?, CAST (? AS role), now(), \n" +
+                        "            ?, ?, ?, ?);";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, uap.getMuni().getMuniCode());
+            stmt.setInt(2, uap.getUserID());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(uap.getStartDate()));
+            
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(uap.getStopDate()));
+            if(uap.getRecorddeactivatedTS() != null){
+                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(uap.getRecorddeactivatedTS())); 
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            stmt.setString(6, uap.getRole().toString());
+            // created TS by postgres now()
+            
+            stmt.setInt(7, uap.getCreatedByUserID());
+            stmt.setString(8, uap.getNotes());
+            // set support assigned to null until functionality implemented
+            stmt.setNull(9, java.sql.Types.NULL);
+            stmt.setInt(10, uap.getAssignmentRelativeOrder());
+            
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting new authorization period", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+    }
     
     
     public int insertUser(User userToInsert) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query =  "INSERT INTO    public.login(\n" +
-                        "               userid, username, password, notes, "
-                    +   "               personlink)\n" +
-                        "    VALUES     (DEFAULT, ?, ?, ?, "
-                + "                     ?, ?, ?);";
+        String query =  "INSERT INTO public.login(\n" +
+                        "            userid, username, notes, personlink, \n" +
+                        "            active, createdby, createdts, nologinvirtualonly \n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
+                        "            ?, ?, now(), ?);";
         
         PreparedStatement stmt = null;
         
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, userToInsert.getUsername());
-            StringBuilder sb = new StringBuilder();
-            sb.append(generateControlCodeFromTime());
-            sb.append(generateControlCodeFromTime());
-            stmt.setString(2, sb.toString());
-            stmt.setString(3, userToInsert.getNotes());
+            stmt.setString(2, userToInsert.getNotes());
+            
             if(userToInsert.getPerson() == null){
-                stmt.setInt(10, userToInsert.getPersonID());
+                stmt.setInt(3, userToInsert.getPersonID());
             } else {
-                stmt.setInt(10, userToInsert.getPerson().getPersonID());
+                stmt.setInt(3, userToInsert.getPerson().getPersonID());
             }
+            
+            stmt.setBoolean(4, userToInsert.isActive());
+            
+            stmt.setInt(5, userToInsert.getCreatedByUserId());
+            
+            // created ts from db's now()
+            stmt.setBoolean(6, userToInsert.isNoLoginVirtualUser());
             
             stmt.execute();
             
@@ -318,94 +627,35 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    public Municipality getUserDefaultMunicipality(int userID) throws IntegrationException, AuthorizationException{
-        Connection con = getPostgresCon();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        ResultSet rs = null;
-        String query = "SELECT muni_municode FROM public.munilogin "
-                + "WHERE userid=? AND defaultmuni=? AND recorddeactivatedts IS NULL "
-                + "             AND accessgranteddatestart < now() "
-                + "             AND accessgranteddatestop > now() "
-                + "             ORDER BY recordcreatedts DESC;";
-        Municipality m = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query, 
-                    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setInt(1, userID);
-            stmt.setBoolean(2, true);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                m = mi.getMuni(rs.getInt("muni_municode"));
-            }
-//            if(!rs.first()){
-//                stmt = con.prepareStatement(query);
-//                stmt.setInt(1, userID);
-//                stmt.setBoolean(2, true);
-//                rs = stmt.executeQuery();
-//                while(rs.next()){
-//                    m = mi.getMuni(rs.getInt("muni_municode"));
-//                }
-//                
-//            }
-                
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error getting default muni", ex);
-        } finally{
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        if(m == null){
-            throw new AuthorizationException("Could not load a default muni");
-        }
-        return m;
-    }
-    
     /**
-     * @deprecated 
-     * @param u
-     * @param m
-     * @return
+     * Invalidating an Authorization period is effectively deleting that record. This action
+     * cannot be undone, not even by developers.
+     * 
+     * @param uap
      * @throws IntegrationException 
      */
-    public boolean setDefaultMunicipality(User u, Municipality m) throws IntegrationException, AuthorizationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        boolean defaultSet = false;
-        String queryTurnOffDefaults = "UPDATE munilogin SET defaultmuni = FALSE "
-                + "WHERE USERID = ?;";
-        String query = "UPDATE munilogin SET defaultmuni = TRUE "
-                + "WHERE USERID = ? AND MUNI_MUNICODE = ?;";
+    public void invalidateUserAuthRecord(UserMuniAuthPeriod uap) throws IntegrationException{
+         Connection con = getPostgresCon();
+        
+         String query =     "UPDATE loginmuniauthperiod SET recorddeactivatedts = now(), notes=? "
+                        +   "WHERE muniauthperiodid=?";
+        
         PreparedStatement stmt = null;
         
         try {
-            stmt = con.prepareStatement(queryTurnOffDefaults);
-            stmt.setInt(1, u.getUserID());
-            stmt.executeUpdate();
-            
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, u.getUserID());
-            stmt.setInt(2, m.getMuniCode());
+            stmt.setInt(1, uap.getUserMuniAuthPeriodID());
+            stmt.setString(2, uap.getNotes());
+            
             stmt.executeUpdate();
-            
-            if(getUserDefaultMunicipality(u.getUserID()).equals(m)){
-                defaultSet = true;
-            }
-            
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Error setting default muni for user " + u.getUserID(), ex);
+            throw new IntegrationException("Error updating password", ex);
         } finally{
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-        return defaultSet;
     }
     
     public void setUserPassword(User user, String psswd) throws IntegrationException{
@@ -421,7 +671,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(1, psswd);
             stmt.setInt(2, user.getUserID());
             
-            stmt.execute();
+            stmt.executeUpdate();
             
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -432,12 +682,12 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    public void updateUser(User userToUpdate) throws IntegrationException{
+    public void updateUser(User usr) throws IntegrationException{
         Connection con = getPostgresCon();
         
         String query =  "UPDATE public.login\n" +
-                        "   SET username=?, notes=?, badgenumber=?, orinumber=?, \n" +
-                        "       personlink=?\n" +
+                        "   SET username=?, notes=?, personlink=?, \n" +
+                        "    active=?, nologinvirtualonly=?\n" +
                         " WHERE userid=?;";
         
         PreparedStatement stmt = null;
@@ -445,20 +695,24 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         try {
             
             stmt = con.prepareStatement(query);
-            stmt.setString(1, userToUpdate.getUsername());
-            stmt.setString(2, userToUpdate.getNotes());
-            stmt.setString(3, userToUpdate.getBadgeNumber());
-            stmt.setString(4, userToUpdate.getOriNumber());
+            stmt.setString(1, usr.getUsername());
+            stmt.setString(2, usr.getNotes());
             
-            stmt.setInt(5, userToUpdate.getPerson().getPersonID());
+            if(usr.getPerson() == null){
+                stmt.setInt(3, usr.getPersonID());
+            } else {
+                stmt.setInt(3, usr.getPerson().getPersonID());
+            }
             
-            stmt.setInt(6, userToUpdate.getUserID());
+            stmt.setBoolean(4, usr.isActive());
+            stmt.setBoolean(5, usr.isNoLoginVirtualUser());
+            stmt.setInt(6, usr.getUserID());
             
-            stmt.execute();
+            stmt.executeUpdate();
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Error inserting new person", ex);
+            throw new IntegrationException("UserIntegrator.updateUser:Error updating User", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -466,16 +720,35 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }
     
    
-    // program later--we generally dont want to allow folks to delete
-    // users from the web client since they'll be integrated into tables
-    // etc. They should mark the user as inactive and with an expiry date that
-    // is in the past
-    public void deleteUser(User userToDelete){
+    /**
+     * TODO: Implement functionality for password reset
+     * @param usr
+     * @throws IntegrationException 
+     */
+    public void updateUserAuthorized(UserAuthorized usr) throws IntegrationException{
+        Connection con = getPostgresCon();
+        String query =  "UPDATE public.login\n" +
+                        "   SET forcepasswordreset=? " +
+                        " WHERE userid=?;";
+        PreparedStatement stmt = null;
         
-        // no guts for me!
-        
-    } 
-    
+        try {
+            
+            stmt = con.prepareStatement(query);
+            if(usr.getForcePasswordResetTS() != null){
+                stmt.setTimestamp(1, java.sql.Timestamp.valueOf(usr.getForcePasswordResetTS()));
+            }
+            
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error updating userAuthEntry person", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
     
     /**
      * Primary access point for the entire User system: Called during SessionInitializer actions
@@ -579,134 +852,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         }
     }        
     
-    /**
-     * For use by system administrators to manage user data
-     * @return
-     * @throws IntegrationException 
-     */
-    public List getCompleteActiveUserList() throws IntegrationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        ArrayList<User> userList = new ArrayList();
-        
-       String query =  "SELECT userid "
-                + "FROM munilogin "
-                + "WHERE recorddeactivatedts IS NULL "
-                + "AND accessgranteddatestart < now() "
-                + "AND accessgranteddatestop > now();";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                userList.add(getUser(rs.getInt("userid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error fetching user list", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return userList;
-        
-    }
+  
     
-    /**
-     * For use by system administrators to manage user data
-     * @param muniCode
-     * @return
-     * @throws IntegrationException 
-     */
-    public List getCompleteActiveUserList(int muniCode) throws IntegrationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        ArrayList<User> userList = new ArrayList();
-        
-       String query =  "SELECT userid "
-                + "FROM munilogin "
-                + "WHERE muni_municode=? "
-                + "AND recorddeactivatedts IS NULL "
-                + "AND accessgranteddatestart < now() "
-                + "AND accessgranteddatestop > now();";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, muniCode);
-            
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                userList.add(getUser(rs.getInt("userid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error fetching user list", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return userList;
-        
-    }
-    
-     
-    /**
-     * For attaching event requests to default code officers by muni
-     * @param muniCode
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<User> getActiveCodeOfficerList(int muniCode) throws IntegrationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        List<User> userList = new ArrayList<>();
-        
-        String query =  "SELECT userid "
-                + "FROM munilogin "
-                + "WHERE muni_municode=? "
-                + "AND recorddeactivatedts IS NULL "
-                + "AND accessgranteddatestart < now() "
-                + "AND accessgranteddatestop > now() "
-                + "AND codeofficerstartdate < now() "
-                + "AND codeofficerstopdate > now();";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, muniCode);
-            
-            rs = stmt.executeQuery();
-            
-            while(rs.next()){
-                userList.add(getUser(rs.getInt("userid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error fetching user list", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return userList;
-        
-    }
+   
     
     
     /**

@@ -60,6 +60,7 @@ import com.tcvcog.tcvce.entities.search.QueryProperty;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Stores member vars of pretty much all our custom types
@@ -77,12 +78,13 @@ import java.util.List;
  */
 public class SessionBean extends BackingBeanUtils implements Serializable{
     
-    private List<Municipality> userAuthMuniList;
-
     // BOB individual object session shelves - NOT NULL
-    private MunicipalityComplete sessionMuni;
+    private MunicipalityDataHeavy sessionMuni;
+    private UserAuthorized sessionUser;
+    private User sessionUserForReInitSession;
+    private UserMuniAuthPeriod umapRequestedForReInit;
+    
     private CECase sessionCECase;
-    private UserWithAccessData sessionUser;
     private Property sessionProperty;
     private Person sessionPerson;
     private OccPeriod sessionOccPeriod;
@@ -208,13 +210,22 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     public NoticeOfViolation getSessionNotice() {
         return sessionNotice;
     }
+    
+    public void setActiveCodeSet(CodeSet cs){
+        activeCodeSet = cs;
+    }
 
     
 
     /**
+     * Adaptor method to preserve backward compatability;
+     * The MuniHeavy stores the active copy of these 
      * @return the activeCodeSet
      */
     public CodeSet getActiveCodeSet() {
+//        if(sessionMuni != null){
+//            activeCodeSet = sessionMuni.getCodeSet();
+//        }
         return activeCodeSet;
     }
 
@@ -284,14 +295,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.sessionNotice = sessionNotice;
     }
 
- 
-
-    /**
-     * @param activeCodeSet the activeCodeSet to set
-     */
-    public void setActiveCodeSet(CodeSet activeCodeSet) {
-        this.activeCodeSet = activeCodeSet;
-    }
 
     /**
      * @param sessionCitation the sessionCitation to set
@@ -359,14 +362,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the sessionMuni
      */
-    public MunicipalityComplete getSessionMuni() {
+    public MunicipalityDataHeavy getSessionMuni() {
         return sessionMuni;
     }
 
     /**
      * @param sessionMuni the sessionMuni to set
      */
-    public void setSessionMuni(MunicipalityComplete sessionMuni) {
+    public void setSessionMuni(MunicipalityDataHeavy sessionMuni) {
         this.sessionMuni = sessionMuni;
     }
 
@@ -462,19 +465,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.ceactionRequestForSubmission = ceactionRequestForSubmission;
     }
 
-    /**
-     * @return the userAuthMuniList
-     */
-    public List<Municipality> getUserAuthMuniList() {
-        return userAuthMuniList;
-    }
-
-    /**
-     * @param userAuthMuniList the userAuthMuniList to set
-     */
-    public void setUserAuthMuniList(List<Municipality> userAuthMuniList) {
-        this.userAuthMuniList = userAuthMuniList;
-    }
+  
+   
 
     /**
      * @return the sessionCEAR
@@ -895,36 +887,33 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.reportConfigInspection = reportConfigInspection;
     }
 
-    public Payment getSessionPayment() {
-        return sessionPayment;
+    /**
+     * @return the sessionUserForReInitSession
+     */
+    public User getSessionUserForReInitSession() {
+        return sessionUserForReInitSession;
     }
 
-    public void setSessionPayment(Payment sessionPayment) {
-        this.sessionPayment = sessionPayment;
+    /**
+     * @param sessionUserForReInitSession the sessionUserForReInitSession to set
+     */
+    public void setSessionUserForReInitSession(User sessionUserForReInitSession) {
+        this.sessionUserForReInitSession = sessionUserForReInitSession;
     }
 
-    public String getPaymentRedirTo() {
-        return paymentRedirTo;
+    /**
+     * @return the umapRequestedForReInit
+     */
+    public UserMuniAuthPeriod getUmapRequestedForReInit() {
+        return umapRequestedForReInit;
     }
 
-    public void setPaymentRedirTo(String paymentRedirTo) {
-        this.paymentRedirTo = paymentRedirTo;
+    /**
+     * @param umapRequestedForReInit the umapRequestedForReInit to set
+     */
+    public void setUmapRequestedForReInit(UserMuniAuthPeriod umapRequestedForReInit) {
+        this.umapRequestedForReInit = umapRequestedForReInit;
     }
-
-    public OccPeriod getFeeManagementOccPeriod() {
-        return feeManagementOccPeriod;
-    }
-
-    public void setFeeManagementOccPeriod(OccPeriod feeManagementOccPeriod) {
-        this.feeManagementOccPeriod = feeManagementOccPeriod;
-    }
-
-    public String getFeeRedirTo() {
-        return feeRedirTo;
-    }
-
-    public void setFeeRedirTo(String feeRedirTo) {
-        this.feeRedirTo = feeRedirTo;
-    }
+    
     
 }

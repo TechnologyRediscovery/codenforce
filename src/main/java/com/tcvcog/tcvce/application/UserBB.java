@@ -24,6 +24,10 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
+import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import java.time.ZoneId;
@@ -46,33 +50,19 @@ import javax.faces.event.ActionEvent;
 
 public class UserBB extends BackingBeanUtils implements Serializable {
 
-    private List<User> userList;
-    private User currentUser;
-
-//    @ManagedProperty(value="#{sessionBean}")
-//    private SessionBean subclassSessionBean;
+    private UserAuthorized currentUser;
+   
     
-    private int formUserID;
-    private RoleType formRoleType;
-    private RoleType[] roleTypeArray;
     private String formUsername;
     private String formPassword;
     
-    private Municipality formMuni;
-    
     private String formNotes;
-    private Date formActivityStartDate;
-    private Date formActivityStopDate;
-    private boolean formAccessPermitted;
     
-    private boolean formIsEnfOfficial;
     private String formBadgeNum;
     private String formOriNum;
     
-    
-    
-    private Person formUserPerson;
-
+    private Person formSelectedUserPerson;
+    private List<Person> userPersonList;
     
 
     /**
@@ -84,19 +74,68 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean(){
         currentUser = getSessionBean().getSessionUser();
+        userPersonList = new ArrayList<>();
+        userPersonList.add(currentUser.getPerson());
+        formSelectedUserPerson = null;
     }
     
+    public void generateUserPersonList(ActionEvent ev){
+        SearchCoordinator sc = getSearchCoordinator();
+        // user our fancy specialized query to get all Persons who are delcared to 
+        // be user types
+        QueryPerson qp = sc.assembleQueryPerson(QueryPersonEnum.USER_PERSONS, currentUser, null, null );
+        try {
+            qp = sc.runQuery(qp);
+            userPersonList = qp.getResults();
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
 
-    public void updateUser(User u) {
+    
+    /**
+     * Pass through method called when user settings dialog is displayed
+     * @param ev 
+     */
+    public void initiateUserUpdates(ActionEvent ev){
+        currentUser = getSessionBean().getSessionUser();
+    }
+    
+    /**
+     * Listener to the non-ajax (page redirect) button push to edit a person record
+     * @return 
+     */
+    public String editUserPersonRecord(){
+        getSessionBean().setSessionPerson(currentUser.getPerson());
+        return "persons";
+    }
+
+    
+    public void credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
+        // TODO: finish me!
         
-        currentUser = u;
-
+        
+    }
+    
+    public void refreshCurrentUser(){
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            currentUser = uc.authorizeUser(currentUser, getSessionBean().getSessionMuni(), null);
+            
+        } catch (IntegrationException ex) {
+            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AuthorizationException ex) {
+            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
     }
     
     public void commitUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.updateUser(currentUser);
+            uc.updateUser(currentUser, null, formUsername);
+           refreshCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));
@@ -108,59 +147,54 @@ public class UserBB extends BackingBeanUtils implements Serializable {
             
         }
     }
-
-    public void addUser(ActionEvent ev) {
+    
+    
+    public void commitUserPersonUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
-        System.out.println("UserBB.addUser");
-        currentUser = uc.getUserSkeleton();
-    }
-
-    public void commitInsert(ActionEvent ev) {
-        System.out.println("UserBB.commitInsert");
-        UserCoordinator uc = getUserCoordinator();
-        int newUserID;
-        
         try {
-            newUserID = uc.insertNewUser(currentUser);
+            
+            uc.updateUser(currentUser, formSelectedUserPerson, null);
+            refreshCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully added user with id" + newUserID
-                            + " to the system and this person can now login and get to work!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to add user to system, my apologies",
-                            "This is a system-level error that msut be corrected by an administrator"));
-        }
-
-    }
-
-    /**
-     * @return the userList
-     */
-    public List<User> getUserList() {
-        UserIntegrator ui = getUserIntegrator();
-        try {
-            userList = ui.getCompleteActiveUserList();
+                            "Successfully udpated your person link", ""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Unable to acquire list of users",
-                            "This is a system-level error that msut be corrected by an administrator"));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update person link, sorry!", ""));
+            
         }
-        return userList;
+        
     }
-
     
-
-    /**
-     * @return the formRoleType
-     */
-    public RoleType getFormRoleType() {
-        return formRoleType;
+    public void commitPasswordUpdates(ActionEvent ev){
+        
+        UserCoordinator uc = getUserCoordinator();
+        try { 
+            uc.updateUserPassword(currentUser, formPassword);
+            refreshCurrentUser();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully udpated your password to --> " + formPassword 
+                                    + " <-- Please write this down in a safe place; "
+                                    + "If you lose it, you'll have to make a new one.", ""));
+            formPassword = "";
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update password in DB", ""));
+            
+        } catch (AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Authorization error on password update", ""));
+        }
     }
-
+    
+    
     /**
      * @return the formUsername
      */
@@ -184,43 +218,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         return formNotes;
     }
 
-    /**
-     * @return the formActivityStartDate
-     */
-    public Date getFormActivityStartDate() {
-        return formActivityStartDate;
-    }
-
-    /**
-     * @return the formActivityStopDate
-     */
-    public Date getFormActivityStopDate() {
-        return formActivityStopDate;
-    }
-
-    /**
-     * @return the formAccessPermitted
-     */
-    public boolean isFormAccessPermitted() {
-        formAccessPermitted = true;
-        return formAccessPermitted;
-    }
-
-    /**
-     * @param userList the userList to set
-     */
-    public void setUserList(ArrayList<User> userList) {
-        this.userList = userList;
-    }
-
-   
-    /**
-     * @param formRoleType the formRoleType to set
-     */
-    public void setFormRoleType(RoleType formRoleType) {
-        this.formRoleType = formRoleType;
-    }
-
+    
     /**
      * @param formUsername the formUsername to set
      */
@@ -243,69 +241,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         this.formNotes = formNotes;
     }
 
-    /**
-     * @param formActivityStartDate the formActivityStartDate to set
-     */
-    public void setFormActivityStartDate(Date formActivityStartDate) {
-        this.formActivityStartDate = formActivityStartDate;
-    }
-
-    /**
-     * @param formActivityStopDate the formActivityStopDate to set
-     */
-    public void setFormActivityStopDate(Date formActivityStopDate) {
-        this.formActivityStopDate = formActivityStopDate;
-    }
-
-    /**
-     * @param formAccessPermitted the formAccessPermitted to set
-     */
-    public void setFormAccessPermitted(boolean formAccessPermitted) {
-        this.formAccessPermitted = formAccessPermitted;
-    }
-
-    /**
-     * @return the roleTypeArray
-     */
-    public RoleType[] getRoleTypeArray() {
-        roleTypeArray = RoleType.values();
-        return roleTypeArray;
-    }
-
-    /**
-     * @param roleTypeArray the roleTypeArray to set
-     */
-    public void setRoleTypeArray(RoleType[] roleTypeArray) {
-        this.roleTypeArray = roleTypeArray;
-    }
-
-    /**
-     * @return the formUserID
-     */
-    public int getFormUserID() {
-        return formUserID;
-    }
-
-    /**
-     * @param formUserID the formUserID to set
-     */
-    public void setFormUserID(int formUserID) {
-        this.formUserID = formUserID;
-    }
-
-    /**
-     * @return the formIsEnfOfficial
-     */
-    public boolean isFormIsEnfOfficial() {
-        return formIsEnfOfficial;
-    }
-
-    /**
-     * @param formIsEnfOfficial the formIsEnfOfficial to set
-     */
-    public void setFormIsEnfOfficial(boolean formIsEnfOfficial) {
-        this.formIsEnfOfficial = formIsEnfOfficial;
-    }
+   
 
     /**
      * @return the formBadgeNum
@@ -336,32 +272,20 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the formUserPerson
+     * @return the formSelectedUserPerson
      */
-    public Person getFormUserPerson() {
-        return formUserPerson;
+    public Person getFormSelectedUserPerson() {
+        return formSelectedUserPerson;
     }
 
     /**
-     * @param formUserPerson the formUserPerson to set
+     * @param formSelectedUserPerson the formSelectedUserPerson to set
      */
-    public void setFormUserPerson(Person formUserPerson) {
-        this.formUserPerson = formUserPerson;
+    public void setFormSelectedUserPerson(Person formSelectedUserPerson) {
+        this.formSelectedUserPerson = formSelectedUserPerson;
     }
 
-    /**
-     * @return the formMuni
-     */
-    public Municipality getFormMuni() {
-        return formMuni;
-    }
-
-    /**
-     * @param formMuni the formMuni to set
-     */
-    public void setFormMuni(Municipality formMuni) {
-        this.formMuni = formMuni;
-    }
+   
 
     /**
      * @return the currentUser
@@ -377,6 +301,24 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         this.currentUser = currentUser;
     }
 
+   
+
+  
+    /**
+     * @return the userPersonList
+     */
+    public List<Person> getUserPersonList() {
+        return userPersonList;
+    }
+
+    /**
+     * @param userPersonList the userPersonList to set
+     */
+    public void setUserPersonList(List<Person> userPersonList) {
+        this.userPersonList = userPersonList;
+    }
+
+  
     
    
 }

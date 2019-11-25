@@ -116,11 +116,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public List<EventCECaseCasePropBundle> configureEventBundleList(    List<EventCECaseCasePropBundle> evList, 
-                                                                        User user, 
-                                                                        List<Municipality> userAuthMuniList) throws IntegrationException{
+                                                                        UserAuthorized user) throws IntegrationException{
         Iterator<EventCECaseCasePropBundle> iter = evList.iterator();
         while(iter.hasNext()){
-            configureEvent(iter.next().getEvent(), user, userAuthMuniList);
+            configureEvent(iter.next().getEvent(), user);
         }
         return evList;
     }
@@ -147,7 +146,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return a nicely configured EventCEEcase
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public CECaseEvent configureEvent(CECaseEvent ev, User user, List<Municipality> userAuthMuniList) throws IntegrationException{
+    public CECaseEvent configureEvent(CECaseEvent ev, UserAuthorized user) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
        
@@ -173,12 +172,14 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param userAuthMuniList
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
      */
-    public List<EventCECaseCasePropBundle> queryEvents(SearchParamsEventCECase params, User user, List<Municipality> userAuthMuniList) throws IntegrationException, CaseLifecycleException{
+    public List<EventCECaseCasePropBundle> queryEvents( SearchParamsEventCECase params, 
+                                                        UserAuthorized user) 
+            throws IntegrationException, CaseLifecycleException{
         EventIntegrator ei = getEventIntegrator();
         List<EventCECaseCasePropBundle> evList = configureEventBundleList(  ei.getEventsCECase(params),
-                                                                            user,
-                                                                            userAuthMuniList);
+                                                                            user);
         return evList;
     }
     
@@ -197,17 +198,17 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         // direct event assignment allows view conf to cut across regular permissions
         // checks
-        if(ev.getOwner().equals(u) || u.getKeyCard().isHasDeveloperPermissions()){
+        if(ev.getOwner().equals(u) || u.getMyCredential().isHasDeveloperPermissions()){
             return true;
             // check that the event is associated with the user's auth munis
         } else if(isMunicodeInMuniList(ev.getMuniCode(), muniList)){
             // sys admins for a muni can confirm everything
-            if(u.getKeyCard().isHasSysAdminPermissions()){
+            if(u.getMyCredential().isHasSysAdminPermissions()){
                 return true;
                 // only code officers can enact timeline events
-            } else if(evProp.isDirectPropToDefaultMuniCEO() && u.getKeyCard().isHasEnfOfficialPermissions()){
+            } else if(evProp.isDirectPropToDefaultMuniCEO() && u.getMyCredential().isHasEnfOfficialPermissions()){
                 return true;
-            } else if(evProp.isDirectPropToDefaultMuniStaffer() && u.getKeyCard().isHasMuniStaffPermissions()){
+            } else if(evProp.isDirectPropToDefaultMuniStaffer() && u.getMyCredential().isHasMuniStaffPermissions()){
                 return true;
             } 
         }
@@ -217,7 +218,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public void deleteEvent(CECaseEvent ev, UserWithAccessData u) throws AuthorizationException{
         EventIntegrator ei = getEventIntegrator();
         try {
-            if(u.getKeyCard().isHasSysAdminPermissions()){
+            if(u.getMyCredential().isHasSysAdminPermissions()){
                 ei.deleteEvent(ev);
             } else {
                 throw new AuthorizationException("Must have sys admin permissions "
@@ -233,7 +234,58 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ev.setCategory(ec);
         return ev;
     }
+    /**
+     * Implements business rules for determining which event types are allowed
+     * to be attached to the given CECase based on the case's phase and the
+     * user's permissions in the system.
+     *
+     * Used for displaying the appropriate event types to the user on the
+     * cecases.xhtml page
+     *
+     * @param c the CECase on which the event would be attached
+     * @param u the User doing the attaching
+     * @return allowed EventTypes for attaching to the given case
+     */
     
+    public List<EventType> getPermittedEventTypesForCECase(CECase c, UserAuthorized u) {
+        List<EventType> typeList = new ArrayList<>();
+        RoleType role = u.getRole();
+        if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
+            typeList.add(EventType.Action);
+            typeList.add(EventType.Timeline);
+        }
+        if (role != RoleType.MuniReader) {
+            typeList.add(EventType.Communication);
+            typeList.add(EventType.Meeting);
+            typeList.add(EventType.Custom);
+        }
+        return typeList;
+    }
+    
+    
+    public List<EventType> getPermittedEventTypesForOcc(OccPeriod period, UserAuthorized u) {
+        List<EventType> typeList = new ArrayList<>();
+        RoleType role = u.getRole();
+        if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
+            typeList.add(EventType.Action);
+            typeList.add(EventType.Timeline);
+            typeList.add(EventType.Occupancy);
+        }
+        if (role != RoleType.MuniReader) {
+            typeList.add(EventType.Communication);
+            typeList.add(EventType.Meeting);
+            typeList.add(EventType.Custom);
+        }
+        return typeList;
+    }
+    
+    public List<EventType> getEventTypesAll(){
+        List<EventType> typeList = new ArrayList<>();
+        for(EventType et: EventType.values()){
+            typeList.add(et);
+        }
+        return typeList;
+    }
     
     /**
      * Core coordinator method called by all other classes who want to 
@@ -376,7 +428,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
-        event.setOwner(uc.getRobotUser());
+        event.setOwner(uc.getUserRobot());
         event.setDiscloseToMunicipality(true);
         event.setDiscloseToPublic(true);
         event.setActive(true);

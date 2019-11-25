@@ -16,6 +16,9 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,14 +27,32 @@ import java.util.Map;
  * @author sylvia
  */
 public class UserAuthorized extends User{
-
-    private UserAuthorizationPeriod governingAuthPeriod;
-    private Map<Municipality, UserAuthorizationPeriod> muniAuthPerMap;
-    private final AccessKeyCard keyCard;
     
-    public UserAuthorized(  User u, 
-                            UserAuthorizationPeriod uap, 
-                            AccessKeyCard akc){
+    /**
+     * Remember that the notion of a Credential only exists in Java land, since a User 
+     * is never "in" the database, doing stuff.
+     */
+    
+    private Credential myCredential;
+   
+    /**
+     * Only contains valid auth periods
+     */
+    private Map<Municipality, List<UserMuniAuthPeriod>> muniAuthPeriodsMap;
+    
+    protected LocalDateTime pswdLastUpdated;
+    protected LocalDateTime forcePasswordResetTS;
+
+    
+    /**
+     * This constructor is the only way of setting the internals of this
+     * security-critical BOB, so all must be assembled by the coordinator
+     * and then only read from
+     * @param u
+     * @param uap
+     * @param akc 
+     */
+    public UserAuthorized(User u ){
         this.userID = u.getUserID();
         this.username = u.getUsername();
         this.person = u.getPerson();
@@ -40,69 +61,137 @@ public class UserAuthorized extends User{
         this.badgeNumber = u.getBadgeNumber();
         this.oriNumber = u.getOriNumber();
         
-        this.governingAuthPeriod = uap;
-        this.keyCard = akc;
-        
+        this.active = u.isActive();
+        this.noLoginVirtualUser = u.isNoLoginVirtualUser();
     }
+    
+    
+    /**
+     * INJECTION SITE FOR THE USER'S CREDENTIAL OBJECT
+     * 
+     * @param mc 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException cannot set a credential
+     * to null or one with an id that doesn't match the userid in AuthPeriod
+     */
+    public void setMyCredential(Credential mc) throws AuthorizationException {
+         if(mc != null && mc.getGoverningAuthPeriod().getUserID() == userID){
+            myCredential = mc;
+        }
+        else {
+            throw new AuthorizationException("cannot set a credential to NULL or one without matching userID in AuthPeriod");
+        }
+        this.myCredential = mc;
+    }
+
+    
     
     /**
      * Convenience method for accessing the governingAuthPeriod's
      * authorized role field
      * @return 
      */
-    public RoleType getRoleType(){
-        if(governingAuthPeriod != null){
-            return governingAuthPeriod.getAuthorizedRole();
-        } else {
-            return null;
-        }
+    public RoleType getRole(){
+        if(getMyCredential() != null){
+            if(getMyCredential().getGoverningAuthPeriod() != null){
+                return getMyCredential().getGoverningAuthPeriod().getRole();
+            } 
+        } 
+        return null;
     }
-
-    /**
-     * @return the governingAuthPeriod
-     */
-    public UserAuthorizationPeriod getGoverningAuthPeriod() {
-        return governingAuthPeriod;
-    }
-
-    /**
-     * @param governingAuthPeriod the governingAuthPeriod to set
-     */
-    public void setGoverningAuthPeriod(UserAuthorizationPeriod governingAuthPeriod) {
-        this.governingAuthPeriod = governingAuthPeriod;
-    }
-
-    // no setters for access permissions private variables!!
-    /**
-     * @return the keyCard
-     */
-    public AccessKeyCard getKeyCard() {
-        return keyCard;
-    }
-
     
+    /**
+     * Convenience method for pulling out Muni keys from the authorized Muni:AuthPeriod map
+     * @return 
+     */
+    public List<Municipality> getAuthMuniList(){
+        if(muniAuthPeriodsMap != null){
+            return new ArrayList<>(muniAuthPeriodsMap.keySet());
+        } 
+        return new ArrayList<>();
+    }
+    
+    public List<UserMuniAuthPeriod> getMuniAuthPeriodListForCredMuni(){
+        List<UserMuniAuthPeriod> umapList  = null;
+        if(myCredential != null && myCredential.getGoverningAuthPeriod() != null){
+            umapList = muniAuthPeriodsMap.get(myCredential.getGoverningAuthPeriod().getMuni());
+        }
+        return umapList;
+        
+    }
+    
+    
+    /**
+     * Preserved for legacy compatability. DO NOT DEPRECATE.
+     * @return the UserAuthorized official access credential object for all system level checks
+     */
+    public Credential getKeyCard(){
+        return getMyCredential();
+    }
+
+
+   
+    /**
+     * @return the pswdLastUpdated
+     */
+    public LocalDateTime getPswdLastUpdated() {
+        return pswdLastUpdated;
+    }
+
+    /**
+     * @param pswdLastUpdated the pswdLastUpdated to set
+     */
+    public void setPswdLastUpdated(LocalDateTime pswdLastUpdated) {
+        this.pswdLastUpdated = pswdLastUpdated;
+    }
+
+    /**
+     * @return the forcePasswordResetTS
+     */
+    public LocalDateTime getForcePasswordResetTS() {
+        return forcePasswordResetTS;
+    }
+
+    /**
+     * @param forcePasswordResetTS the forcePasswordResetTS to set
+     */
+    public void setForcePasswordResetTS(LocalDateTime forcePasswordResetTS) {
+        this.forcePasswordResetTS = forcePasswordResetTS;
+    }
+
+    /**
+     * @return the muniAuthPeriodsMap
+     */
+    public Map<Municipality, List<UserMuniAuthPeriod>> getMuniAuthPeriodsMap() {
+        if(muniAuthPeriodsMap != null){
+            System.out.println("UserAuthorized.getMuniAuthPeriodsMap SIZE: " + muniAuthPeriodsMap.keySet().size());
+        }
+        return muniAuthPeriodsMap;
+    }
+
+    /**
+     * @param muniAuthPeriodsMap the muniAuthPeriodsMap to set
+     */
+    public void setMuniAuthPeriodsMap(Map<Municipality, List<UserMuniAuthPeriod>> muniAuthPeriodsMap) {
+        this.muniAuthPeriodsMap = muniAuthPeriodsMap;
+    }
+
+    /**
+     * @return the credential
+     */
+    public Credential getMyCredential() {
+        return myCredential;
+    }
+
+   
 
    
 
     /**
-     * @param validAuthPeriodList the validAuthPeriodList to set
+     * @return the accessRecord
      */
-    public void setValidAuthPeriodList(Map<Municipality, UserAuthorizationPeriod>validAuthPeriodList) {
-        this.setMuniAuthPerMap(validAuthPeriodList);
-    }
-
     /**
-     * @return the muniAuthPerMap
+     * @param accessRecord the accessRecord to set
      */
-    public Map<Municipality, UserAuthorizationPeriod> getMuniAuthPerMap() {
-        return muniAuthPerMap;
-    }
 
-    /**
-     * @param muniAuthPerMap the muniAuthPerMap to set
-     */
-    public void setMuniAuthPerMap(Map<Municipality, UserAuthorizationPeriod> muniAuthPerMap) {
-        this.muniAuthPerMap = muniAuthPerMap;
-    }
     
 }

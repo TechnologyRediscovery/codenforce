@@ -191,8 +191,8 @@
     <managed-bean>
         <managed-bean-name>occupancyCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.OccupancyCoordinator</managed-bean-class>
-    
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>paymentCoordinator</managed-bean-name>
@@ -357,12 +357,6 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>userUpdateBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.UserUpdateBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
         <managed-bean-name>violationAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ViolationAddBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
@@ -452,6 +446,13 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
  
+    
+    <managed-bean>
+        <managed-bean-name>userManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.userManageBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+ 
     <!--request-scoped beans-->
     
     <managed-bean>
@@ -480,7 +481,7 @@
     <!--we need users to pass through this cycle as soon as they try to access anything in /restricted-->
     
     <navigation-rule>
-        <from-view-id>/public/systemHome.xhtml</from-view-id>
+        <from-view-id>*</from-view-id>
         <navigation-case>
             <from-outcome>publicPortal</from-outcome>
             <to-view-id>/public/publicDashboard.xhtml</to-view-id>
@@ -517,8 +518,8 @@
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>failure</from-outcome>
-            <to-view-id>/restricted/error.xhtml</to-view-id>
+            <from-outcome>noAuth</from-outcome>
+            <to-view-id>/restricted/noAuth.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
@@ -656,7 +657,7 @@
     <navigation-rule>
         <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit.xhtml</from-view-id>
         <navigation-case>
-            <from-outcome>success</from-outcome>
+            <from-outcome>successCEAR</from-outcome>
             <to-view-id>/public/services/actionReqSubConf.xhtml</to-view-id>
         </navigation-case>
         <navigation-case>
@@ -748,9 +749,6 @@
             <redirect />
         </navigation-case>
     </navigation-rule>
-    
-    
-   
     
         
     <!--help-->
@@ -1391,10 +1389,10 @@
     <!--System and internal pages-->
     
     <navigation-rule>
-        <from-view-id>/restricted/cogadmin/userManage.xhtml</from-view-id>
+        <from-view-id>*</from-view-id>
         <navigation-case>
-            <from-outcome>userUpdate</from-outcome>
-            <to-view-id>/restricted/cogadmin/userUpdate.xhtml</to-view-id>
+            <from-outcome>userConfig</from-outcome>
+            <to-view-id>/restricted/cogadmin/userConfig.xhtml</to-view-id>
         </navigation-case>
         <navigation-case>
             <from-outcome>userAdd</from-outcome>
@@ -1592,6 +1590,20 @@
     <managed-bean>
         <managed-bean-name>occInspectionBuilderBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBuilderBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>userConfigBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.UserConfigBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>muniCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.MuniCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>loginBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.LoginBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -297,6 +298,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     public String path1CreateNewCaseAtProperty() {
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
 
         if (selectedRequest != null) {
             if (selectedRequest.getRequestProperty() != null) {
@@ -304,13 +306,13 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             }
 
             MessageBuilderParams mbp = new MessageBuilderParams();
-            mbp.user = getSessionBean().getSessionUser();
-            mbp.existingContent = selectedRequest.getPublicExternalNotes();
-            mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseHeader");
-            mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseExplanation");
-            mbp.newMessageContent = "";
+            mbp.setUser(getSessionBean().getSessionUser());
+            mbp.setExistingContent(selectedRequest.getPublicExternalNotes());
+            mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseHeader"));
+            mbp.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseExplanation"));
+            mbp.setNewMessageContent("");
 
-            selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
+            selectedRequest.setPublicExternalNotes(sc.appendNoteBlock(mbp));
 
             // force the bean to go to the integrator and fetch a fresh, updated
             // list of action requests
@@ -359,18 +361,20 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void path3AttachInvalidMessage(ActionEvent ev) {
+        SystemCoordinator sc = getSystemCoordinator();
+        
         if (selectedRequest != null) {
             CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
             updateSelectedRequestStatusWithBundleKey("actionRequestInvalidStatusCode");
 
             // build message to document change
             MessageBuilderParams mcc = new MessageBuilderParams();
-            mcc.user = getSessionBean().getSessionUser();
-            mcc.existingContent = selectedRequest.getPublicExternalNotes();
-            mcc.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestHeader");
-            mcc.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestExplanation");
-            mcc.newMessageContent = invalidMessage;
-            selectedRequest.setPublicExternalNotes(appendNoteBlock(mcc));
+            mcc.setUser(getSessionBean().getSessionUser());
+            mcc.setExistingContent(selectedRequest.getPublicExternalNotes());
+            mcc.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestHeader"));
+            mcc.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestExplanation"));
+            mcc.setNewMessageContent(invalidMessage);
+            selectedRequest.setPublicExternalNotes(sc.appendNoteBlock(mcc));
             try {
                 ceari.updateActionRequestNotes(selectedRequest);
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -391,6 +395,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void path4AttachNoViolationFoundMessage(ActionEvent ev) {
+        SystemCoordinator sc = getSystemCoordinator();
         if (selectedRequest != null) {
 
             CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
@@ -399,13 +404,13 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
             // build message to document change
             MessageBuilderParams mbp = new MessageBuilderParams();
-            mbp.user = getSessionBean().getSessionUser();
-            mbp.existingContent = selectedRequest.getPublicExternalNotes();
-            mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundHeader");
-            mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundExplanation");
-            mbp.newMessageContent = noViolationFoundMessage;
+            mbp.setUser(getSessionBean().getSessionUser());
+            mbp.setExistingContent(selectedRequest.getPublicExternalNotes());
+            mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundHeader"));
+            mbp.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundExplanation"));
+            mbp.setNewMessageContent(noViolationFoundMessage);
 
-            selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
+            selectedRequest.setPublicExternalNotes(sc.appendNoteBlock(mbp));
 
             // force the bean to go to the integrator and fetch a fresh, updated
             // list of action requests
@@ -471,6 +476,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void updateRequestProperty(ActionEvent ev) {
+        SystemCoordinator sc = getSystemCoordinator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
 
         Property formerProp = selectedRequest.getRequestProperty();
@@ -504,13 +510,13 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         }
 
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionBean().getSessionUser();
-        mbp.existingContent = selectedRequest.getPublicExternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedHeader");
-        mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedExplanation");
-        mbp.newMessageContent = sb.toString();
+        mbp.setUser(getSessionBean().getSessionUser());
+        mbp.setExistingContent(selectedRequest.getPublicExternalNotes());
+        mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedHeader"));
+        mbp.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedExplanation"));
+        mbp.setNewMessageContent(sb.toString());
 
-        selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
+        selectedRequest.setPublicExternalNotes(sc.appendNoteBlock(mbp));
         try {
             ceari.updateActionRequestNotes(selectedRequest);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -567,15 +573,15 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void attachInternalMessage(ActionEvent ev) {
-
+        SystemCoordinator sc = getSystemCoordinator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionBean().getSessionUser();
-        mbp.existingContent = selectedRequest.getCogInternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("internalNote");
-        mbp.explanation = "";
-        mbp.newMessageContent = internalMessageText;
-        String newNotes = appendNoteBlock(mbp);
+        mbp.setUser(getSessionBean().getSessionUser());
+        mbp.setExistingContent(selectedRequest.getCogInternalNotes());
+        mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("internalNote"));
+        mbp.setExplanation("");
+        mbp.setNewMessageContent(internalMessageText);
+        String newNotes = sc.appendNoteBlock(mbp);
         System.out.println("CEActionRequestsBB.attachInternalMessage | msg before adding to request: " + newNotes);
         selectedRequest.setCogInternalNotes(newNotes);
         try {
@@ -592,16 +598,17 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void attachMuniMessage(ActionEvent ev) {
+        SystemCoordinator sc = getSystemCoordinator();
 
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionBean().getSessionUser();
-        mbp.existingContent = selectedRequest.getMuniNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("muniNote");
-        mbp.explanation = "";
-        mbp.newMessageContent = muniMessageText;
+        mbp.setUser(getSessionBean().getSessionUser());
+        mbp.setExistingContent(selectedRequest.getMuniNotes());
+        mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("muniNote"));
+        mbp.setExplanation("");
+        mbp.setNewMessageContent(muniMessageText);
 
-        selectedRequest.setMuniNotes(appendNoteBlock(mbp));
+        selectedRequest.setMuniNotes(sc.appendNoteBlock(mbp));
         try {
             ceari.updateActionRequestNotes(selectedRequest);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -617,15 +624,16 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     public void attachPublicMessage(ActionEvent ev) {
 
+        SystemCoordinator sc = getSystemCoordinator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionBean().getSessionUser();
-        mbp.existingContent = selectedRequest.getPublicExternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("externalNote");
-        mbp.explanation = "";
-        mbp.newMessageContent = publicMessageText;
+        mbp.setUser(getSessionBean().getSessionUser());
+        mbp.setExistingContent(selectedRequest.getPublicExternalNotes());
+        mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("externalNote"));
+        mbp.setExplanation("");
+        mbp.setNewMessageContent(publicMessageText);
 
-        selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
+        selectedRequest.setPublicExternalNotes(sc.appendNoteBlock(mbp));
         try {
             ceari.updateActionRequestNotes(selectedRequest);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -978,7 +986,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     /**
-     * @param streetNameSearch the streetNameSearch to set
+     * @param streetNameSearch the streetNameSearch to set()
      */
     public void setStreetNameSearch(String streetNameSearch) {
         this.streetNameSearch = streetNameSearch;
@@ -989,7 +997,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      */
     public boolean isDisablePACCControl() {
         disablePACCControl = false;
-        if (getSessionBean().getSessionUser().getKeyCard().isHasMuniStaffPermissions() == false) {
+        if (getSessionBean().getSessionUser().getMyCredential().isHasMuniStaffPermissions() == false) {
             disablePACCControl = true;
         }
         return disablePACCControl;

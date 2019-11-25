@@ -8,6 +8,8 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -18,6 +20,7 @@ import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
@@ -51,7 +54,8 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     
     private List<EventType> eventTypesList;
     private List<EventCategory> eventCatList;
-    private List<User> userList;
+    
+    private List<UserAuthorized> userList;
     
     private List<QueryEventCECase> queryList;
     private Query selectedBOBQuery;
@@ -71,8 +75,8 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
      
     @PostConstruct
     public void initBean(){
-        EventCoordinator ec = getEventCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
+        UserCoordinator uc = getUserCoordinator();
         
         
         queryList = sc.buildQueryEventCECaseList(getSessionBean().getSessionMuni(),getSessionBean().getSessionUser());
@@ -91,7 +95,18 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         // grab previously loaded event config from the session bean
         // which would have been placed there by the generateReport method in this bean
         reportConfig = getSessionBean().getReportConfigCEEventList();
-        
+//        try {
+//            userList = uc.getUserAuthorizedListForConfig(getSessionBean().getSessionMuni());
+            
+        // **************************************************************
+        // *****FIX ME!!!*********************************************************
+        // **************************************************************
+            userList = new ArrayList<>();
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//        } catch (AuthorizationException ex) {
+//            System.out.println(ex);
+//        }
     }
     
     public void hideEvent(EventCECaseCasePropBundle ev){
@@ -112,8 +127,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
         try {
             eventList = ec.queryEvents( searchParams, 
-                                        getSessionBean().getSessionUser(), 
-                                        getSessionBean().getUserAuthMuniList());
+                                        getSessionBean().getSessionUser());
             if(eventList != null){
                 Collections.sort(eventList);
                 Collections.reverse(eventList);
@@ -280,13 +294,8 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the userList
      */
-    public List<User> getUserList() {
-        UserIntegrator ui = getUserIntegrator();
-        try {
-            userList = ui.getCompleteActiveUserList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+    public List<UserAuthorized> getUserList() {
+        
         return userList;
     }
 
@@ -322,7 +331,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * @param userList the userList to set
      */
-    public void setUserList(List<User> userList) {
+    public void setUserList(List<UserAuthorized> userList) {
         this.userList = userList;
     }
 

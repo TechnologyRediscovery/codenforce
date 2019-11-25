@@ -26,7 +26,12 @@ import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -37,17 +42,76 @@ import java.util.Map;
  *
  * @author Eric C. Darsow
  */
-public class SystemCoordinator extends BackingBeanUtils implements Serializable{
+public class SystemCoordinator extends BackingBeanUtils  implements Serializable{
 
     private Map<Integer, String> muniCodeNameMap;
-    
+   
+            
     /**
      * Creates a new instance of LoggingCoordinator
      */
     public SystemCoordinator() {
     }
     
+        
+    public String appendNoteBlock(MessageBuilderParams mbp){
+        StringBuilder sb = new StringBuilder();
+        if(mbp.getExistingContent() != null){
+            sb.append(mbp.getExistingContent());
+        }
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append(Constants.FMT_NOTE_START);
+        if(mbp.getHeader() != null){
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(mbp.getHeader());
+        }
+        if(mbp.getNewMessageContent() != null){
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(mbp.getNewMessageContent());
+        }
+        sb.append(Constants.FMT_HTML_BREAK);
+        if(mbp.getExplanation() != null){
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(mbp.getExplanation() );
+        }
+        sb.append(Constants.FMT_HTML_BREAK);
+        
+        sb.append(Constants.FMT_NOTE_SEP_INTERNAL);
+        sb.append(mbp.getUser().getPerson().getFirstName());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(mbp.getUser().getPerson().getLastName());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(Constants.FMT_DTYPE_SYMB_USERNAME);
+        sb.append(mbp.getUser().getUsername());
+        sb.append(Constants.FMT_DTYPE_SYMB_USERNAME);
+        sb.append(Constants.FMT_DTYPE_OBJECTID_INLINEOPEN);
+        sb.append(mbp.getUser().getUserID());
+        sb.append(Constants.FMT_DTYPE_OBJECTID_INLINECLOSED);
+        
+        sb.append(Constants.FMT_HTML_BREAK);
+        
+        sb.append(Constants.FMT_DTYPE_KEY_TIMESTAMP_CREATE);
+        sb.append(Constants.FMT_DTYPE_KEYVALDESCSEP);
+        sb.append(stampCurrentTimeForNote());
+        sb.append(Constants.FMT_DTYPE_SYMB_USERNAME);
+        sb.append(mbp.getUser().getUsername());
+        sb.append(Constants.FMT_DTYPE_OBJECTID_INLINEOPEN);
+        sb.append(mbp.getUser().getUserID());
+        sb.append(Constants.FMT_DTYPE_OBJECTID_INLINECLOSED);
+        
+        return sb.toString();
+    }
     
+    public String stampCurrentTimeForNote(){
+        return getPrettyDate(LocalDateTime.now());
+    }
+    
+    
+    
+    public String formatAndAppendNote(User u, String noteToAppend, String existingText){
+        return appendNoteBlock(new MessageBuilderParams(existingText, noteToAppend, null, null, u));
+        
+    }
     
     
 
@@ -69,19 +133,24 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable{
         return muniCodeNameMap;
     }
     
-    public User getPublicAccessUser(){
-        User u = new User();
-        u.setRoleType(RoleType.Public);
-        return u;
-    }
-    
-    
+   
 
     /**
      * @param muniCodeNameMap the muniCodeNameMap to set
      */
     public void setMuniCodeNameMap(Map<Integer, String> muniCodeNameMap) {
         this.muniCodeNameMap = muniCodeNameMap;
+    }
+
+    @Override
+    public String getPrettyDate(LocalDateTime d) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
+        if (d != null) {
+            String formattedDateTime = d.format(formatter);
+            return formattedDateTime;
+        } else {
+            return "";
+        }
     }
     
     

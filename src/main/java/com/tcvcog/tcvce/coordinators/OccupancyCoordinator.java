@@ -31,7 +31,7 @@ import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.MunicipalityComplete;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
@@ -215,9 +215,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     public List<EventType> getPermittedEventTypes(OccPeriod op, User u){
         List<EventType> typeList = new ArrayList<>();
-        int rnk = u.getRoleType().getRank();
-        
-        if(rnk >= MINIMUM_RANK_INSPECTOREVENTS){
+        int rnk = u.getRole().getRank();
+
+        if (rnk >= MINIMUM_RANK_INSPECTOREVENTS) {
             typeList.add(EventType.Action);
             typeList.add(EventType.Timeline);
         }
@@ -239,8 +239,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
     public void authorizeOccPeriod(OccPeriod period, UserWithAccessData u) throws AuthorizationException, CaseLifecycleException, IntegrationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        if(u.getKeyCard().isHasEnfOfficialPermissions()){
-            if(period.isReadyForPeriodAuthorization()){
+        if (u.getMyCredential().isHasEnfOfficialPermissions()) {
+            if (period.isReadyForPeriodAuthorization()) {
                 period.setAuthorizedBy(u);
                 period.setAuthorizedTS(LocalDateTime.now());
                 oi.updateOccPeriod(period);
@@ -374,7 +374,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                                             PropertyUnit pu, 
                                             OccPeriodType perType,
                                             User u, 
-                                            MunicipalityComplete muni) throws IntegrationException{
+                                            MunicipalityDataHeavy muni) throws IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
         OccPeriod period = new OccPeriod();
         
@@ -405,8 +405,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
     public int insertNewOccPeriod(OccPeriod op, User u) throws IntegrationException, InspectionException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        int freshOccPeriodID = oi.insertOccPeriod(op);
-        System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);
+        EventIntegrator ei = getEventIntegrator();
+        
+        if(op.getType().getEventRuleSetID() != 0){
+            EventRuleSet ers = ei.rules_getEventRuleSet(op.getType().getEventRuleSetID());
+        }
+        int freshOccPeriodID = oi.insertOccPeriod(op); 
+        
+       System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);
         try {
             inspectionAction_commenceOccupancyInspection(null, null, oi.getOccPeriod(freshOccPeriodID, u),  u);
         } catch (EventException | AuthorizationException | CaseLifecycleException | ViolationException ex) {

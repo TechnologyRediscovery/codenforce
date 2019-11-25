@@ -85,18 +85,18 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
 
     public List<User> getUserList() {
         UserIntegrator ui = getUserIntegrator();
-        try {
+//        try {
             if (userList == null) {
-                userList = ui.getCompleteActiveUserList();
+//                userList = ui.getCompleteActiveUserList();
             }
-        } catch (IntegrationException ex) {
-            System.out.println("UserAuthMuniManageBB.getUserList | " + ex.toString());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to acquire list of users.",
-                            "This is a system-level error that must be corrected by an "
-                                    + "administrator."));
-        }
+//        } catch (IntegrationException ex) {
+//            System.out.println("UserAuthMuniManageBB.assembleUserListForConfig | " + ex.toString());
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            "Unable to acquire list of users.",
+//                            "This is a system-level error that must be corrected by an "
+//                                    + "administrator."));
+//        }
         return userList;
     }
     

@@ -59,7 +59,32 @@ public class Constants implements Serializable {
     
     public final static String STYLE_CLASS_INACTIVE_CASE_PHASE = "stage-inactive";
     
+//    SESSION REQUEST KEYS
+    public final static String PARAM_JSESS = "JSESSIONID";
+    public final static String PARAM_USERAGENT = "User-Agent";
+    public final static String PARAM_DATERAW = "Date";
      
+    public final static String FMT_NOTE_START =       "----------- note start -------------";
+    public final static String FMT_NOTE_END =    "----------- note end   -------------";
+    public final static String FMT_NOTE_SEP_INTERNAL =       "....................................";
+    public final static String FMT_HTML_BREAK = "<br>";
+    public final static String FMT_SPACE_LITERAL = " ";
+    
+    public final static String FMT_DTYPE_SYMB_USERNAME = "+";
+    
+    public final static String FMT_DTYPE_OBJECTID_INLINEOPEN = "(";
+    public final static String FMT_DTYPE_OBJECTID_INLINECLOSED = ")";
+    
+    public final static String FMT_DTYPE_KEY_TIMESTAMP = "ts";
+    
+    public final static String FMT_DTYPE_KEYVALDESCSEP = ":";
+    public final static String FMT_DTYPE_KEY_SEP_DESC = "-";
+    
+    public final static String FMT_DTYPE_KEY_TIMESTAMP_CREATE = "cr";
+    public final static String FMT_DTYPE_KEY_TIMESTAMP_LOCK = "lock";
+    public final static String FMT_DTYPE_KEY_TIMESTAMP_DEACTIVATE = "deac";
+    
+    
     
     
 }

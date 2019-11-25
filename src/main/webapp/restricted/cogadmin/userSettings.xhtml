@@ -1,0 +1,183 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <f:view id="view-usersettings-dialog">
+        
+
+     <p:dialog header="User settings" 
+                    widgetVar="navcontainer-dialog-usersettings" 
+                    responsive="true" 
+                    width="400"
+                    modal="false"
+                    height="600">
+
+
+               <h2>User settings for <h:outputText value="#{userBB.currentUser.username}" /></h2>
+
+               <p>
+                  <h:outputText value="Role: #{systemServicesBB.bbSessionUser.role.label}" />
+                  <h:outputText value=" | " />
+                  <h:outputText value="Rank: #{systemServicesBB.bbSessionUser.role.rank}" />
+                  <h:outputText value=" | " />
+                  <h:outputText value="ID: #{systemServicesBB.bbSessionUser.userID} " />
+               </p>
+
+               <p>
+                   <h:outputText value="Notes: " styleClass="bold"/>
+                   <h:outputText value="#{userBB.currentUser.notes}" escape="false" />
+               </p>
+
+                  <h:panelGrid columns="2" border="0" 
+                       cellpadding="5" columnClasses="gridTd, gridTd"
+                       footerClass="gridFooter">
+
+
+                  <h:panelGroup>
+
+                      <h:form id="usersettings-messages-form-username">
+                        <h:messages id="usersettings-messages-username"
+                                    globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                    </h:form>
+                      <h:form id="usersettings-form">
+
+                          <p:outputLabel for="usersettings-it-username">
+                              <h:outputText value="User name"/>
+                          </p:outputLabel>
+                          <p:inputText id="usersettings-it-username" value="#{userBB.currentUser.username}" 
+                                       size="12"
+                                       maxlength="20"
+                                       tabindex="3" 
+                                       required="true" 
+                                       validatorMessage="Length must be between 5 and 20 characters"
+                                       styleClass="inputText">
+                              <f:validateLength minimum="5" maximum="20" />
+                          </p:inputText>
+                          <h:message for="usersettings-it-username" showDetail="false" showSummary="true" 
+                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                          <p:commandButton    id="usersettings-button-updateusername"
+                                              ajax="true"
+                                              actionListener="#{userBB.commitUsernameUpdates}"
+                                              icon="fa fa-thumbs-o-up"
+                                              update="usersettings-messages-form-username"
+                                              value="Update username" 
+                                              tabindex="3"/>
+                      </h:form>
+
+                  </h:panelGroup>
+
+                  <h:panelGroup>
+                      <h:form id="usersettings-messages-form-personlink">
+                        <h:messages id="usersettings-messages-personlink"
+                                    globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                    </h:form>
+
+                      <h:form id="usersettings-form-userpersonlink">
+
+                          <h:outputText value="Your user is currently mapped to: " />
+                          <p:spacer height="5px" />
+                          <h:outputText value="#{userBB.currentUser.person.firstName}" />
+                          <h:outputText value=" " />
+                          <h:outputText value="#{userBB.currentUser.person.lastName}" />
+                          <h:outputText value=" (ID: #{userBB.currentUser.person.personID})" />
+                          <h:outputText value=" " />
+
+
+                          <p:spacer height="5px" />
+
+                          <p:outputLabel  for="usersettings-som-userpersons" value="Available User-type persons:"/>
+                          <p:selectOneMenu id="usersettings-som-userpersons" 
+                                           required="true" 
+                                           value="#{userBB.currentUser.person}">
+                              <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                              <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
+                                             itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                              <f:converter converterId="personConverter"/>
+                          </p:selectOneMenu>
+                          <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
+                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                          <p:commandButton    id="usersettings-button-updatepersonlink"
+                                              ajax="true"
+                                              actionListener="#{userBB.commitUserPersonUpdates}"
+                                              update="usersettings-messages-form-personlink
+                                              usersettings-form-userpersonlink"
+                                              icon="fa fa-thumbs-0-up"
+                                              value="Update person link" 
+                                              tabindex="3"/>
+
+                      </h:form>
+                  </h:panelGroup>
+
+
+
+                  <h:panelGroup>
+
+                      <h:form id="usersettings-messages-form-updatepassword">
+                        <h:messages id="usersettings-messages-updategepassword"
+                                    globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                    </h:form>
+
+
+                      <h:form id="usersettings-form-updatepassword">
+                          <p:outputLabel for="usersettings-it-password">
+                              <h:outputText value="New password (use letters and numbers; at least 8 chars please! "/>
+                          </p:outputLabel>
+                          <p:inputText id="usersettings-it-password" value="#{userBB.formPassword}" 
+                                       size="15"
+                                       maxlength="80"
+                                       tabindex="3" 
+                                       required="true" 
+                                       validatorMessage="Length must be between 8 and 50 characters"
+                                       styleClass="inputText">
+                              <f:validateLength minimum="8" maximum="50" />
+                          </p:inputText>
+                          <h:message for="usersettings-it-password" showDetail="false" showSummary="true" 
+                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                          <p:commandButton    id="usersettings-button-updatepassword"
+                                              ajax="true"
+                                              actionListener="#{userBB.commitPasswordUpdates}"
+                                              update="usersettings-messages-form-updatepassword
+                                              usersettings-form-updatepassword"
+                                              icon="fa fa-thumbs-0-up"
+                                              value="Update password" 
+                                              tabindex="3"/>
+                      </h:form>
+                  </h:panelGroup>
+
+
+              </h:panelGrid>
+
+               <h:form id="usersettings-form-close">                             
+
+
+              <p:commandButton ajax="true" 
+                            value="Cancel" icon="fa fa-stop" 
+                            onclick="PF('navcontainer-dialog-usersettings').hide()"
+                            tabindex="4"/>
+
+
+              <p:commandButton ajax="true" 
+                            value="Done!" icon="fa thumbs-up" 
+                            onclick="PF('navcontainer-dialog-usersettings').hide()"
+                            tabindex="4"/>
+           </h:form>
+
+       </p:dialog>
+
+    
+    
+    </f:view>
+          
+</ui:composition>
+    

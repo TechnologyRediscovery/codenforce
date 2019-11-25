@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.MuniCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
@@ -60,9 +61,6 @@ import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import java.time.LocalDateTime;
@@ -128,6 +126,7 @@ public class BackingBeanUtils implements Serializable{
     private SystemIntegrator systemIntegrator;
     private SystemCoordinator systemCoordinator;
     private LogIntegrator logIntegrator;
+    private MuniCoordinator muniCoordinator;
     
     private SearchCoordinator searchCoordinator;
     
@@ -135,6 +134,7 @@ public class BackingBeanUtils implements Serializable{
     
     private DataSource dataSource;
     private Connection connx;
+    
     
     /**
      * Creates a new instance of BackingBeanUtils
@@ -147,7 +147,6 @@ public class BackingBeanUtils implements Serializable{
         // it should be made by the MBCF
         //System.out.println("Constructing BackingBean Utils");
         //userCoordinator = new UserCoordinator();
-        
     }
     
     public static java.sql.Timestamp getCurrentTimeStamp(){
@@ -215,35 +214,7 @@ public class BackingBeanUtils implements Serializable{
       
     }
     
-    public String appendNoteBlock(MessageBuilderParams mcc){
-        StringBuilder sb = new StringBuilder();
-        sb.append(mcc.existingContent);
-        sb.append("<br />******************** NOTE ********************<br />");
-        sb.append(mcc.header);
-        sb.append("<br />");
-        if(mcc.explanation != null){
-            sb.append(mcc.explanation);
-            sb.append("<br />");
-        }
-        sb.append("creatd by: ");
-        sb.append(mcc.user.getPerson().getFirstName());
-        sb.append(" ");
-        sb.append(mcc.user.getPerson().getLastName());
-        sb.append(" (username:  ");
-        sb.append(mcc.user.getUsername());
-        sb.append(", id#: ");
-        sb.append(mcc.user.getUserID());
-        sb.append(")");
-        sb.append("<br />");
-        sb.append(" at ");
-        sb.append(getPrettyDate(LocalDateTime.now()));
-        sb.append("<br />----------------note-text-----------------<br />");
-        sb.append(mcc.newMessageContent);
-        sb.append("<br />**************** END NOTE *****************<br />");
-        return sb.toString();
-    }
-    
-
+   
     /**
      * Chops up the current time to get seven random digits
      * @return 
@@ -504,14 +475,10 @@ public class BackingBeanUtils implements Serializable{
         
     }
     
+    
     public String getPrettyDate(LocalDateTime d){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
-        if(d != null){
-            String formattedDateTime = d.format(formatter); 
-            return formattedDateTime;
-        } else {
-            return "";
-        }
+        SystemCoordinator sc = getSystemCoordinator();
+        return sc.getPrettyDate(d);
     }
     
     
@@ -877,4 +844,62 @@ public class BackingBeanUtils implements Serializable{
         ci = (ChoiceIntegrator) ve.getValue(context.getELContext());
         return ci;
     }
+    /**
+     * @return the blobCoordinator
+     */
+    public BlobCoordinator getBlobCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{blobCoordinator}", BlobCoordinator.class);
+        blobCoordinator = (BlobCoordinator) ve.getValue(context.getELContext());
+        return blobCoordinator;
+    }
+
+    /**
+     * @param blobCoordinator the blobCoordinator to set
+     */
+    public void setBlobCoordinator(BlobCoordinator blobCoordinator) {
+        this.blobCoordinator = blobCoordinator;
+    }
+
+    /**
+     * @return the blobIntegrator
+     */
+    public BlobIntegrator getBlobIntegrator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{blobIntegrator}", BlobIntegrator.class);
+        blobIntegrator = (BlobIntegrator) ve.getValue(context.getELContext());
+        return blobIntegrator;
+    }
+
+    /**
+     * @param blobIntegrator the blobIntegrator to set
+     */
+    public void setBlobIntegrator(BlobIntegrator blobIntegrator) {
+        this.blobIntegrator = blobIntegrator;
+    }
+
+    /**
+     * @return the muniCoordinator
+     */
+    public MuniCoordinator getMuniCoordinator() {
+        
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{muniCoordinator}", MuniCoordinator.class);
+        muniCoordinator = (MuniCoordinator) ve.getValue(context.getELContext());
+        return muniCoordinator;
+    }
+
+    /**
+     * @param muniCoordinator the muniCoordinator to set
+     */
+    public void setMuniCoordinator(MuniCoordinator muniCoordinator) {
+        this.muniCoordinator = muniCoordinator;
+    }
+
+       
+
+
 }
