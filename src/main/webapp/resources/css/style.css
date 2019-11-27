@@ -37,10 +37,11 @@ COG yellow: #e3b73d
 }
 
 body{
+
     margin: 0 auto;
     font-family: sans-serif;
-    
-   
+
+
 }
 
 /*---------------- HEADERS -------------------*/
@@ -55,13 +56,13 @@ h1{
     border-right: none;
     border-left: none;
     border-bottom: 3px solid #5a5754;
-    
+
 }
 
 h2{
     font-size: 1.4em;
     /* color: #00b5ec;  sky blue*/
-    
+
     /*darker sky*/
     color: #00637F; 
     font-weight: bold;
@@ -73,8 +74,8 @@ h3{
     font-weight: bold;
     color: #4F361E;
     font-weight: normal;
-    
-    
+
+
 }
 
 h4{
@@ -89,7 +90,7 @@ h4{
     display: inline-block;
     margin-left: 10px;
     margin-top: 10px;
-       
+
 }
 
 .logoBox h2{
@@ -111,14 +112,14 @@ h4{
     font-size: 1.3em;
     font-weight: bold;
     color: #cde162;
-    
+
 }
 
 .report-title-sub{
     font-size: 1.1em;
     color: #00b5ec;
     font-style: italic;
-    
+
 }
 
 
@@ -128,7 +129,7 @@ h4{
 
 .property-blue{
     color: #03305C;
-    
+
 }
 
 .person-maroon{
@@ -140,7 +141,7 @@ h4{
 }
 
 .occupancy-green{
-    
+
 }
 
 .action-request-header{
@@ -148,20 +149,20 @@ h4{
     font-weight: bold;
     font-size: 1.2em;
     padding-left:5px;
-    
-    
-    
+
+
+
 }
 
 .action-request-subheader{
     display: block;
     clear: both;
     font-size: 1.1em;
-    
+
 }
 
 .logoBox{
-    
+
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -185,8 +186,8 @@ h4{
     font-style: normal;
     background-color: #04284A;
     color: green;
-    
-    
+
+
 }
 
 .tabText{
@@ -195,7 +196,7 @@ h4{
 
 .menuLabel{
     color:white;
-    
+
 }
 
 
@@ -216,7 +217,7 @@ h4{
 
 .ui-menu .ui-menuitem-text{
     font-weight: bold;
-    
+
 }
 
 
@@ -247,7 +248,7 @@ i.material-icons{
 
 .ui-menu .ui-menuitem-link .ui-menuitem-icon, .ui-menu .ui-submenu-icon{
     padding-right: 8px;
-    
+
 }
 
 /*
@@ -263,25 +264,25 @@ i.material-icons{
 
 .userToolBar-icon{
     font-size: 1.5em;
-    
+
 }
 
 /*used from demo on Mozilla site*/
 /*https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content*/
 
 .icon-container {
-  display: grid;
-  box-sizing: border-box;
-  height: 100%;
-  width: 100%;
-  clear: none;
+    display: grid;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    clear: none;
 }
 
 .icon-box-centered {
-  box-sizing: border-box;
-  margin-left: auto;
-  margin-right: auto;
-  
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+
 }
 
 
@@ -330,7 +331,7 @@ a.sblink:hover{
     font-size: 11px;
     float:left;
     clear:none;
-    
+
 }
 
 
@@ -358,7 +359,7 @@ a.headerLinks {
 div.headerLink a:before, a:visited{
     /*color: green;*/
 
-    
+
 }
 
 /************** END LINKS ******************/
@@ -373,7 +374,7 @@ div.headerLink a:before, a:visited{
     flex-direction: row;
     flex-wrap: nowrap;
     padding:5px;
-      
+
 }
 
 .list-column{
@@ -382,8 +383,8 @@ div.headerLink a:before, a:visited{
     min-width: 550px;
     max-width: 550px;
     padding-right:10px;
-    
-    
+
+
 }
 
 .list-column-persons{
@@ -392,8 +393,8 @@ div.headerLink a:before, a:visited{
     min-width: 600px;
     max-width: 600px;
     padding-right:10px;
-    
-    
+
+
 }
 
 .object-column{
@@ -401,7 +402,7 @@ div.headerLink a:before, a:visited{
     flex-grow: 1;
     padding-left: 10px;
 
-    
+
 }
 
 
@@ -410,7 +411,7 @@ div.headerLink a:before, a:visited{
 
 .printing-page-break-before{
     page-break-before: always;
-    
+
 }
 
 .printing-page-break-after{
@@ -420,7 +421,7 @@ div.headerLink a:before, a:visited{
 
 div.printer-friendly-report .ui-widget-content{
     border: none;
-    
+
 }
 
 .event-ds-box-report{
@@ -449,8 +450,8 @@ div.printer-friendly-report .ui-widget-content{
     margin: 15px;
     border: thin solid #4774A0;
     padding: 10px;
-/*    These two attributes are taken from .rowExpansion to see if we can use
-    only .outlinedBox divs for the row expansion*/
+    /*    These two attributes are taken from .rowExpansion to see if we can use
+        only .outlinedBox divs for the row expansion*/
     white-space: normal;
     overflow-wrap: normal;
 }
@@ -473,36 +474,38 @@ div.printer-friendly-report .ui-widget-content{
 
 
 .flex-box-container{
+    position: relative;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     width: 100%;  
-    
+    z-index: 1;
     justify-content: flex-start;
-    
+
     font-family: 'roboto', sans-serif;
     margin-left: 0px;
     margin-right:0px;
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 0px;
-    
+
 }
 
 .flex-box-container-interior{
+
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    
-     justify-content: flex-start;
-    
+
+    justify-content: flex-start;
+
     font-family: 'roboto', sans-serif;
     margin-left: 0px;
     margin-right:0px;
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 0px;
-    
+
 }
 
 .narrow-content-container{
@@ -510,36 +513,36 @@ div.printer-friendly-report .ui-widget-content{
 }
 
 .flexing-box-topbar{
-    
+
     flex-grow: 1;
     flex-basis: 100%;
     flex-shrink: 1;
-    
+
     height: 75px;
     background-color: #5a5754;
-    
+
 }
 
 
 
 .flexing-box-sidebar{
-    
+
     flex-grow: 0;
     flex-basis: 200px;
     flex-shrink: 1;
-    
+
     background-color: #04284A;
     padding: 10px;
-    
+
 }
 
 .flexing-box-sessioninfo{
-    
+
     flex-grow: 1;
     flex-basis: 100%;
     flex-shrink: 1;
     height: 50px;
-    
+
     background-color: #181F36;
     margin-left: 0px;
     margin-right: 0px;
@@ -548,41 +551,41 @@ div.printer-friendly-report .ui-widget-content{
     padding-left: 0px;
     color: white;
     font-weight: normal;
-    
+
 }
 
 .flexing-box-pagecontent{
-    
-    
+
+
     flex-grow: 1;
     flex-basis: max-content;
     flex-shrink: 1;
-    
-    
+
+
     margin-left: 0px;
     padding: 10px;
 }
 
 .flexing-box-footer{
-    
+
     flex-grow: 1;
     flex-basis: 100%;
     flex-shrink: 1;
-    
+
     background-color: #1B1D20;
-    
+
     color: white;
-    
+
 }
 
 .flexing-box-interior{
-    
-    
+
+
     flex-grow: 1;
     flex-basis: 80%;
     flex-shrink: 3;
-    
-    
+
+
 }
 
 .split-page-panelgrid{
@@ -598,7 +601,7 @@ div.printer-friendly-report .ui-widget-content{
 }
 
 
-    
+
 
 #logoHeader{
     margin-top: 3px;
@@ -611,7 +614,7 @@ div.printer-friendly-report .ui-widget-content{
 
 .plainText{
     font-weight: normal;
-    
+
 }
 
 /*this mainContainer class is the containing bins on each user page*/
@@ -625,7 +628,7 @@ div.printer-friendly-report .ui-widget-content{
 
 
 .primaryContentContainer{
-  
+
 }
 
 .footer{
@@ -653,16 +656,16 @@ div.headerLinkCont{
     margin-bottom: 10px;
     margin-top: 10px;
     margin-right: 15px;
-    
-    
-    
+
+
+
 }
 
 .userToolBar{
     display: block;
     float: right;
     clear: none; 
-   height: 90px;
+    height: 90px;
 }
 
 .gridTd-splitPage{
@@ -681,19 +684,19 @@ div.headerLinkCont{
 .mced-status-enforcement{
     font-weight: bold;
     color: blueviolet;
-    
+
 }
 .mced-status-citation{
     font-weight: bold;
     color: red;
-    
+
 }
 .mced-status-closed{
     font-weight: bold;
     color: black;
 }
 .mced-status-holding{
-    
+
 }
 
 .status-list{
@@ -702,7 +705,7 @@ div.headerLinkCont{
     padding-left: 0px;
     margin-left: 10px;
     margin-top: 0px;
-    
+
 }
 
 i.status-display-icon-i{
@@ -710,15 +713,15 @@ i.status-display-icon-i{
 }
 
 .status-display-container{
-	display: flex;
-	flex-direction: row;
-	flex-basis: auto;
+    display: flex;
+    flex-direction: row;
+    flex-basis: auto;
 
 }
 
 .status-display-icon-container{
-	width: auto;
-	margin-right: 5px;
+    width: auto;
+    margin-right: 5px;
 
 
 }
@@ -731,22 +734,22 @@ i.status-display-icon-i{
 
 
 .status-display-icon-container i.material-icons{
-        font-size: 5em;
+    font-size: 5em;
 }
 
 
 .status-display-status-list-container{
-	flex-grow: 1;
-	flex-basis: auto;
+    flex-grow: 1;
+    flex-basis: auto;
 
 
 }
 
 .status-item{
-	font-size: 1em;
-        color: gray;
-        font-weight: normal;
-    
+    font-size: 1em;
+    color: gray;
+    font-weight: normal;
+
 }
 
 .stage-inactive{
@@ -818,8 +821,8 @@ i.status-display-icon-i{
     border: thin solid #4774A0;
     padding: 10px;
     background-color: white;
-/*    These two attributes are taken from .rowExpansion to see if we can use
-    only .outlinedBox divs for the row expansion*/
+    /*    These two attributes are taken from .rowExpansion to see if we can use
+        only .outlinedBox divs for the row expansion*/
     white-space: normal;
     overflow-wrap: normal;
 }
@@ -833,25 +836,25 @@ i.status-display-icon-i{
     padding: 5px;
     font-size:small;
     display: inline-block;
-    
-    
+
+
 }
 .compact-violation-list-container{
     margin-top: 5px;
-    
+
 }
 
 .activeObjectBox h4{
     margin-top: 3px;
     margin-bottom: 8px;
-   
+
 }
 
 .publicInfoBundleContainer{
     margin: 15px;
     border: #04284A solid thick;
     padding: 10px;
-    
+
 }
 
 
@@ -873,7 +876,7 @@ div.headerLinks{
     overflow-wrap: normal;
     padding: 20px;
     line-height: 105%;
-       
+
 }
 
 
@@ -963,17 +966,17 @@ img.headerImg{
 
 .no-border{
     border: none;
-    
+
 }
 
 .ui-expanded-row-content{
     background-color: #04284A;
-    
+
 }
 
 .spacier-rows{
     height: 150%;
-    
+
 }
 
 
@@ -985,7 +988,7 @@ table.primeDataTable td{
 
 
 table.borders{
-    
+
 }
 
 table.borders {
@@ -1003,12 +1006,12 @@ table.borders th{
 
 tr.resolved{
     background-color: lightgreen;
-    
+
 }
 
 tr.pending{
     background-color: lightyellow;
-    
+
 }
 
 tr.pastdeadline{
@@ -1038,9 +1041,9 @@ tr.reinspect{
     border-right: none;
     color: black;
     margin:0;
-    
+
 }
-    
+
 .topbottom-lines-right{
     text-align: left;
     border-left: none;
@@ -1063,13 +1066,13 @@ tr.reinspect{
 
 td.gridFooter {
     border: none;
-    
+
 }
 
 td.userBarTd{
     align-content: center;
     border: none;
-    
+
 }
 
 td.centeredColumnContent{
@@ -1091,7 +1094,7 @@ gridTd-bignum{
 
 .gridTd-mccontainer{
     background-color: #181F36;
-    
+
 }
 
 .action-requests-search{
@@ -1123,7 +1126,7 @@ gridTd-bignum{
 
 .inline-button{
     margin-left:10px;
-    
+
 }
 
 /* formatting command buttons completeCodeSourceList & codeSourceTable on codeSourceManage.xhtml  */
@@ -1142,7 +1145,7 @@ gridTd-bignum{
     display: block;
     margin-top: 10px;
     margin-bottom: 10px;
-        
+
 }
 
 .button-size-small {
@@ -1151,7 +1154,7 @@ gridTd-bignum{
 }
 
 .cear-actions-button {
-    
+
 }
 
 
@@ -1160,8 +1163,8 @@ gridTd-bignum{
     margin-bottom: 10px;
     margin-top: 5px;
     clear: left;
-/*    color: blue;
-    background-color: green;*/
+    /*    color: blue;
+        background-color: green;*/
 }
 
 .noFill{
@@ -1174,7 +1177,7 @@ gridTd-bignum{
 }
 .sessionInfoButton{
     background: none;
-    
+
 }
 
 .sessionInfoButton span{
@@ -1230,7 +1233,7 @@ span.uiLabel{
     clear: left;
     margin-bottom: 10px;
     font-weight: bold;
-    
+
 }
 
 input.selectBooleanCheckbox{
@@ -1252,7 +1255,7 @@ div.checkBoxLabel{
 
 .action-needed{
     color:red;
-    
+
 }
 
 .action-complete{
@@ -1298,7 +1301,7 @@ div.checkBoxLabel{
 table.cases{
     border-collapse: collapse;
     border: 1px solid black;
-    
+
 }
 
 table.cases th{
@@ -1327,13 +1330,13 @@ tr.caseOpen{
 .ui-fieldset-toggleable .ui-fieldset-legend{
     background-color: white;
     font-weight: normal;
-    
+
 }
 
 .ui-fieldset-legend{
     background-color: white;
     font-weight: normal;
-    
+
 }
 
 /* tab views */
@@ -1346,15 +1349,278 @@ tr.caseOpen{
 /* Documentation styling */
 .docContainer{
     max-width: 800px;
-    
+
 }
 
 .pageContentsList{
     list-style-type: none;
 }
-    
-    
+
+
 .pageContentsList li{
     font-size: 1.2em;
     margin-bottom: 10px;
 }
+
+
+/* xiaohong add */
+
+/* horizontal navigation bar*/
+
+.navbar{
+    height: 40px;
+    position: relative;
+    background-color: #181F36;
+}
+
+
+.nav_containner{
+    color:white;
+    float:left;
+    display: inline-block;
+
+}
+
+.nav_containner:hover {
+    color: black;
+    background-color: white;
+    display: inline-block;
+
+}
+
+.nav_content{
+    font-size: 14px;  
+    color: inherit;
+    background-color: inherit;
+    font-family: inherit;
+    height: 40px;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.nav_containner:hover .subnav_containner{
+    color: #2F6381;
+    background-color: white;
+    display: inline-block;
+}
+
+.subnav_containner{
+    display: none;
+    height: 42px;
+    position: absolute;
+    left: 0;
+    font-family: inherit;
+    background-color: #2F6381;
+    color: white;
+    width: 100%;
+    z-index: 3;
+}
+
+.subnav_containner_stable{
+
+    height: 40px;
+    position: absolute;
+    left: 0;
+    font-family: inherit;
+    background-color: white;
+    color: #2F6381;
+    width: 100%;
+    z-index: 3;
+}
+
+.subnav_content{
+    float: left;
+    font-size: 14px;
+    height: 40px;
+    width: 150px;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.nav_font i{
+    padding-right: 5px;
+}
+
+.subnav_content:hover{
+    border-bottom: 2px solid #2F6381;
+}
+
+.nav_display{
+    display:block;
+    z-index: 2;
+}
+.nav_hide{
+    display: none;
+}
+
+.nav_active{
+    background-color: #2F6381;
+}
+.navsub_active{
+    border-bottom: 2px solid #2F6381;
+
+}
+
+.subnav_containner_stable{
+    z-index: 0;
+}
+.currentinfo{
+    float: left;
+    font-size: 14px;
+    height: 40px;
+    width: 300px;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    border-left:1px solid #2F6381;
+    border-right:1px solid #2F6381;
+}
+
+.navItem_logout{
+    float: right;
+    font-size: 14px;
+    height: 40px;
+   
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+
+.sidebar {
+    min-height: 95vh;
+    height: 100%;
+    width: 35px;
+    position: absolute;
+    left: 0;
+    background-color: #181F36;
+    overflow-x: hidden;
+    transition: 0s;
+}
+
+#maincontent{
+
+    margin-left: 40px;
+}
+
+
+
+
+.toolSidebarCollapse{
+    height: 40px;
+    color: #FFFFFF;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    border-bottom: 1px solid #FFFFFF;
+
+}
+
+.toolSidebarExpansion{
+    height: 40px;
+    color: #FFFFFF;
+    font-size: 25px;
+    display:none;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid #FFFFFF;
+    padding-right: 15px;
+    align-items: flex-end;
+}
+
+.toolSidebarTitle{
+    padding-left: 10px;
+    position: absolute;
+    align-self: flex-start;
+    font-size: 15px;
+}
+
+.toolSidebarCollapse i,.toolSidebarExpansion i{
+    cursor: pointer;
+}
+.toolSidebarCollapse i:hover,.toolSidebarExpansion i:hover{
+    color: #2F6381;
+}
+
+
+
+
+
+.sidebar_item{
+    color: white;
+    display: initial;
+}
+
+.sidebar_firstmenu_item{
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid #2F6381;
+}
+
+.sidebar_firstmenu_item i{
+    padding-left: 10px;
+    width: 25px;
+}
+.sidebar_firstmenu_font{
+    padding-left: 20px;
+    font-size: 14px;
+    display: none;
+    cursor: pointer;
+}
+.sidebar_firstmenu_item:hover{
+    border-bottom: 1px solid #FFFFFF;
+}
+
+
+.sidebar_firstmenu_font_active{
+    background-color: #2F6381;
+}
+
+.sidebar_secondmenu{
+    display: none;
+}
+.sidebar_secondmenu_item{
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid #2F6381;
+    background-color: #101423;
+}
+
+.sidebar_secondmenu_item:hover{
+    border-bottom: 1px solid #FFFFFF;
+}
+.sidebar_secondmenu_item i{
+    width: 25px;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.sidebar_secondmenu_font{
+    padding-left: 20px;
+    font-size: 16px;
+    display: none;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
