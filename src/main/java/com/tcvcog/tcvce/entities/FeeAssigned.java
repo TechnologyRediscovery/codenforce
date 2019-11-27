@@ -17,6 +17,8 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
