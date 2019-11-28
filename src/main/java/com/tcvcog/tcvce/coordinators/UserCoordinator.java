@@ -704,6 +704,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             } // we have a list of Users to return!
         }
         return userList;
+
+
     }
     
     public List<UserAuthorized> assembleUserAuthorizedListForConfiguration(List<User> users){
@@ -718,6 +720,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return authorizeUser(uToAuth, null, null);
     }
     
+
 
     /**
      * Convenience method for upcasting UserAuthorized to simple User and putting

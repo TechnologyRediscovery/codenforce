@@ -332,6 +332,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         return userAuthorizedQueuedForSession;
     }
 
+
     /**
      * @param userAuthorizedQueuedForSession the userAuthorizedQueuedForSession to set
      */
@@ -356,6 +357,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
    
 
     /**
+
      * @return the userQueuedForSession
      */
     public User getUserQueuedForSession() {

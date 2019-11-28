@@ -300,7 +300,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         per.setUserID(rs.getInt("authuser_userid"));
         
-        
         if(rs.getTimestamp("accessgranteddatestart") != null){
             per.setStartDate(rs.getTimestamp("accessgranteddatestart").toLocalDateTime());
         }
