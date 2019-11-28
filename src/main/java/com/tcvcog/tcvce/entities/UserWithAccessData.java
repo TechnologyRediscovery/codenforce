@@ -23,7 +23,7 @@ package com.tcvcog.tcvce.entities;
 public class UserWithAccessData extends User{
 
     private UserAccessRecord accessRecord;
-    private AccessKeyCard keyCard;
+    
     
     public UserWithAccessData(User u){
         this.userID = u.getUserID();
@@ -52,19 +52,5 @@ public class UserWithAccessData extends User{
         this.accessRecord = accessRecord;
     }
 
-    // no setters for access permissions private variables!!
-    /**
-     * @return the keyCard
-     */
-    public AccessKeyCard getKeyCard() {
-        return keyCard;
-    }
-
-    /**
-     * @param keyCard the keyCard to set
-     */
-    public void setKeyCard(AccessKeyCard keyCard) {
-        this.keyCard = keyCard;
-    }
-    
+       
 }
