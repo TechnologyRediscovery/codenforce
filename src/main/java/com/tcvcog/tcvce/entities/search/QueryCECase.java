@@ -10,6 +10,7 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,7 +29,7 @@ public class QueryCECase
     public QueryCECase( QueryCECaseEnum qName, 
                         Municipality muni, 
                         List<SearchParamsCECase> params,
-                        User u) {
+                        UserAuthorized u) {
         super(muni, u);
         queryName = qName;
         searchParamsList = new ArrayList<>();

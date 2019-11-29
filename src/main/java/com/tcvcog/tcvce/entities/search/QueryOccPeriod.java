@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class QueryOccPeriod
     public QueryOccPeriod(QueryOccPeriodEnum name,
                         Municipality m, 
                         List<SearchParamsOccPeriod> params,
-                        User u){
+                        UserAuthorized u){
         super(m, u);
         queryName = name;
         searchParamsList = new ArrayList<>();

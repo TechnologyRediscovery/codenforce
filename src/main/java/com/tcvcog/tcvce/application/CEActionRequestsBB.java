@@ -242,38 +242,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         reportConfig = rpt;
     }
     
-     @PostConstruct
-    public void initBean(){
-        CaseCoordinator cc = getCaseCoordinator();
-        SearchCoordinator searchCoord = getSearchCoordinator();
-        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
-                getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
-        rpt.setPrintFullCEARQueue(false);
-        try {
-            QueryCEAR query = searchCoord.assembleQueryCEAR(
-                                                QueryCEAREnum.CUSTOM, 
-                                                getSessionBean().getFacesUser(), 
-                                                getSessionBean().getActiveMuni(), 
-                                                null);
-            List<CEActionRequest> singleReqList = new ArrayList<>();
-            selectedRequest.setInsertPageBreakBefore(false);
-            singleReqList.add(selectedRequest);
-            query.addToResults(singleReqList);
-            query.setExecutionTimestamp(LocalDateTime.now());
-            rpt.setBOBQuery(query);
-            rpt.setGenerationTimestamp(LocalDateTime.now());
-            rpt.setTitle("Code enforcement request");
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Unable to build query, sorry!", ""));
-            
-        }
-        
-        reportConfig = rpt;
-
-    }
+  
 
     public String generateReportSingleCEAR() {
         getSessionBean().setSessionCEAR(selectedRequest);
@@ -286,7 +255,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public String generateReportMultiCEAR(){
         getSessionBean().setSessionCEAR(selectedRequest);
         
-        Collections.sort(reportConfig.getBOBQuery().getBOBResultList());
+        // Not working
+//        Collections.sort(reportConfig.getBOBQuery().getBOBResultList());
         
         // tell the first request in the list to not print a page break before itself
         reportConfig.getBOBQuery().getBOBResultList().get(0).setInsertPageBreakBefore(false);

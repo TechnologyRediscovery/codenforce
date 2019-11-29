@@ -288,12 +288,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
 //    CODE ENFORCEMENT CASE QUERIES
    
-     public QueryCECase getQueryInitialCECASE(Municipality m, User u){
+     public QueryCECase getQueryInitialCECASE(Municipality m, UserAuthorized u){
          return assembleQueryCECase(QueryCECaseEnum.OPENCASES, u, m, null);
          
      }
      
-     public List<QueryCECase> buildQueryCECaseList(Municipality m, User u){
+     public List<QueryCECase> buildQueryCECaseList(Municipality m, UserAuthorized u){
         QueryCECaseEnum[] nameArray = QueryCECaseEnum.values();
         List<QueryCECase> queryList = new ArrayList<>();
 //        for(QueryCECaseEnum queryTitle: nameArray){
@@ -313,7 +313,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return ci.runQueryCECase(query);
      }
      
-     public QueryCECase assembleQueryCECase(QueryCECaseEnum qName, User u, Municipality m, SearchParamsCECase params){
+     public QueryCECase assembleQueryCECase(QueryCECaseEnum qName, UserAuthorized u, Municipality m, SearchParamsCECase params){
          QueryCECase query;
          List<SearchParamsCECase> paramsList = new ArrayList<>();
          
@@ -444,12 +444,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     // CODE ENFORCEMENT EVENTS
     
-     public QueryEventCECase getQueryInitialEventCECASE(Municipality m, User u){
+     public QueryEventCECase getQueryInitialEventCECASE(Municipality m, UserAuthorized u){
          return assembleQueryEventCECase(QueryEventCECaseEnum.REQUESTED_ACTIONS, u, m, null);
          
      }
      
-     public List<QueryEventCECase> buildQueryEventCECaseList(Municipality m, User u){
+     public List<QueryEventCECase> buildQueryEventCECaseList(Municipality m, UserAuthorized u){
         QueryEventCECaseEnum[] nameArray = QueryEventCECaseEnum.values();
         List<QueryEventCECase> queryList = new ArrayList<>();
         for(QueryEventCECaseEnum queryTitle: nameArray){
@@ -471,7 +471,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return ei.runQueryEventCECase(query);
      }
      
-     public QueryEventCECase assembleQueryEventCECase(QueryEventCECaseEnum qName, User u, Municipality m, SearchParamsEventCECase params){
+     public QueryEventCECase assembleQueryEventCECase(QueryEventCECaseEnum qName, UserAuthorized u, Municipality m, SearchParamsEventCECase params){
          QueryEventCECase query;
          List<SearchParamsEventCECase> paramsList = new ArrayList<>();
          
@@ -647,7 +647,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
 
     
-    public QueryOccPeriod assembleQueryOccPeriod(QueryOccPeriodEnum qName, User u, Municipality m, SearchParamsOccPeriod params){
+    public QueryOccPeriod assembleQueryOccPeriod(QueryOccPeriodEnum qName, UserAuthorized u, Municipality m, SearchParamsOccPeriod params){
          QueryOccPeriod  query;
          List<SearchParamsOccPeriod> paramsList = new ArrayList<>();
          
@@ -685,7 +685,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public List<QueryOccPeriod> buildQueryOccPeriodList(User u, Municipality m) throws IntegrationException{
+    public List<QueryOccPeriod> buildQueryOccPeriodList(UserAuthorized u, Municipality m) throws IntegrationException{
         QueryOccPeriodEnum[] nameArray = QueryOccPeriodEnum.values();
         List<QueryOccPeriod> queryList = new ArrayList<>();
         for(QueryOccPeriodEnum queryTitle: nameArray){
@@ -729,7 +729,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public QueryPerson assembleQueryPerson(QueryPersonEnum qName, User u, Municipality m, SearchParamsPerson params){
+    public QueryPerson assembleQueryPerson(QueryPersonEnum qName, UserAuthorized u, Municipality m, SearchParamsPerson params){
          QueryPerson  query;
          List<SearchParamsPerson> paramsList = new ArrayList<>();
          
@@ -763,7 +763,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public List<QueryPerson> buildQueryPersonList(User u, Municipality m) throws IntegrationException{
+    public List<QueryPerson> buildQueryPersonList(UserAuthorized u, Municipality m) throws IntegrationException{
         QueryPersonEnum[] nameArray = QueryPersonEnum.values();
         List<QueryPerson> queryList = new ArrayList<>();
         for(QueryPersonEnum queryTitle: nameArray){
@@ -797,7 +797,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
      
-    public QueryProperty assembleQueryProperty(QueryPropertyEnum qName, User u, Municipality m, SearchParamsProperty params){
+    public QueryProperty assembleQueryProperty(QueryPropertyEnum qName, UserAuthorized u, Municipality m, SearchParamsProperty params){
          QueryProperty  query;
          List<SearchParamsProperty> paramsList = new ArrayList<>();
          
@@ -842,7 +842,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public List<QueryProperty> buildQueryPropertyList(User u, Municipality m) throws IntegrationException{
+    public List<QueryProperty> buildQueryPropertyList(UserAuthorized u, Municipality m) throws IntegrationException{
         QueryPropertyEnum[] nameArray = QueryPropertyEnum.values();
         List<QueryProperty> queryList = new ArrayList<>();
         for(QueryPropertyEnum queryTitle: nameArray){

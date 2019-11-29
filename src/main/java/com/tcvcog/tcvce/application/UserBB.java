@@ -18,7 +18,9 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -87,7 +89,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         try {
             qp = sc.runQuery(qp);
             userPersonList = qp.getResults();
-        } catch (AuthorizationException | IntegrationException ex) {
+        } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
         }
     }
@@ -298,7 +300,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     /**
      * @param currentUser the currentUser to set
      */
-    public void setCurrentUser(User currentUser) {
+    public void setCurrentUser(UserAuthorized currentUser) {
         this.currentUser = currentUser;
     }
 

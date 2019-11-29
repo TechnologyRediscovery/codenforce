@@ -609,4 +609,18 @@ public class CEActionRequest implements Serializable{
         this.caseAttachmentTimeStamp = caseAttachmentTimeStamp;
     }
 
+    /**
+     * @return the insertPageBreakBefore
+     */
+    public boolean isInsertPageBreakBefore() {
+        return insertPageBreakBefore;
+    }
+
+    /**
+     * @param insertPageBreakBefore the insertPageBreakBefore to set
+     */
+    public void setInsertPageBreakBefore(boolean insertPageBreakBefore) {
+        this.insertPageBreakBefore = insertPageBreakBefore;
+    }
+
 }

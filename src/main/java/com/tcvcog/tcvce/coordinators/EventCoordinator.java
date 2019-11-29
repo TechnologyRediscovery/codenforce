@@ -898,7 +898,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public void rules_attachEventRuleAbstractToOccPeriodTypeRuleSet(EventRuleAbstract era, OccPeriod period) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.rules_addEventRuleAbstractToOccPeriodTypeRuleSet(era, period.getType().getEventRuleSetID());
+        ei.rules_addEventRuleAbstractToOccPeriodTypeRuleSet(era, period.getType().getBaseRuleSetID());
     }
     
     /**
@@ -963,7 +963,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         List<EventRuleImplementation> rlst = period.assembleEventRuleList(ViewOptionsEventRulesEnum.VIEW_ALL);
         
         for(EventRuleAbstract era: rlst){
-            if(!rules_evalulateEventRule(period.getActiveEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL), era)){
+            if(!rules_evalulateEventRule(period.assembleEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL), era)){
                 allRulesPassed = false;
                 break;
             }

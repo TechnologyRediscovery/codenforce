@@ -63,6 +63,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private PropertyUnitWithLists currPropUnitWithLists;
     private OccPeriod currOccPeriod;
     
+    private int selectedPhotoID;
     
     private List<Person> filteredPersonList;
     

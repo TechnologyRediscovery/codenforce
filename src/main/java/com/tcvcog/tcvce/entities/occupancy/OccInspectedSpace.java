@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class OccInspectedSpace
     
     private List<OccInspectedSpaceElement> inspectedElementList;
     private List<OccInspectedSpaceElement> inspectedElementListVisible;
-    private OccInspectionViewOptions viewSetting;
+    private ViewOptionsOccChecklistItemsEnum viewSetting;
     
     private OccLocationDescriptor location;
     private OccSpaceType type;
@@ -63,7 +64,7 @@ public class OccInspectedSpace
         this.required = spc.isRequired();
         
         inspectedElementListVisible = new ArrayList<>();
-        viewSetting = OccInspectionViewOptions.ALL_ITEMS;
+        viewSetting = ViewOptionsOccChecklistItemsEnum.ALL_ITEMS;
     }
     
     public void configureVisibleElementList(){
@@ -297,7 +298,7 @@ public class OccInspectedSpace
     /**
      * @return the viewSetting
      */
-    public OccInspectionViewOptions getViewSetting() {
+    public ViewOptionsOccChecklistItemsEnum getViewSetting() {
         
         return viewSetting;
     }
@@ -305,7 +306,7 @@ public class OccInspectedSpace
     /**
      * @param viewSetting the viewSetting to set
      */
-    public void setViewSetting(OccInspectionViewOptions viewSetting) {
+    public void setViewSetting(ViewOptionsOccChecklistItemsEnum viewSetting) {
         this.viewSetting = viewSetting;
     }
 

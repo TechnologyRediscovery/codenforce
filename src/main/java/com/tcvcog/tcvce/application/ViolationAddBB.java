@@ -19,7 +19,9 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -28,6 +30,7 @@ import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.Photograph;
 //import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -52,8 +55,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     
     private CodeViolation currentViolation;
     private CECase currentCase;
-    private List<Photograph> photoList;
-    private Photograph selectedPhoto;
+    private List<Blob> blobList;
     
     /**
      * Creates a new instance of ViolationAdd
@@ -233,19 +235,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         this.blobList = blobList;
     }
 
-    /**
-     * @return the selectedBlob
-     */
-    public Blob getSelectedPhoto() {
-        return selectedBlob;
-    }
-
-    /**
-     * @param selectedBlob
-     */
-    public void setSelectedPhoto(Blob selectedBlob) {
-        this.selectedBlob = selectedBlob;
-    }
+    
 
     /**
      * @return the currentCase

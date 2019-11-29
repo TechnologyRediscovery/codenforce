@@ -477,10 +477,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setApplicationList(getOccPermitApplicationList(op));
         op.setPersonList(pi.getPersonList(op));
 
-        op.setEventList(ei.getOccEvents(op.getPeriodID()));
+        op.setEventList(ei.getEventList(op));
         op.setProposalList(choiceInt.getProposalList(op));
         op.setInspectionList(inspecInt.getOccInspectionList(op));
-        op.setEventRuleOccPeriodList(ei.rules_getEventRuleOccPeriodList(op));
+
+        // TODO: Figure out this inheritance snafoo
+        
+//        op.setEventRuleList(ei.rules_getEventRuleOccPeriodList(op));
         
         // call getPayments(op) here when ready
         

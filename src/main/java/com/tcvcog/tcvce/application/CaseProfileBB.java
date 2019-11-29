@@ -103,7 +103,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private String phaseDiagramImageFilename;
 
     // add currentEvent form fields
-    private ArrayList<EventCategory> eventCategoryList;
+    private List<EventCategory> eventCategoryList;
 
     private EventCategory selectedEventCategory;
     private EventType selectedEventType;
@@ -1355,7 +1355,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the eventCategoryList
      */
-    public ArrayList<EventCategory> getEventCategoryList() {
+    public List<EventCategory> getEventCategoryList() {
         EventIntegrator ei = getEventIntegrator();
 
         if (selectedEventType != null) {

@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,7 +30,7 @@ public class QueryEventCECase extends Query {
     
     public QueryEventCECase(QueryEventCECaseEnum qName, 
                             Municipality muni, 
-                            User u, 
+                            UserAuthorized u, 
                             List<SearchParamsEventCECase> params) {
         super(muni, u);
         eventSearchParamsList = new ArrayList<>();

@@ -43,6 +43,7 @@ import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -114,8 +115,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             cse.setProposalList(new ArrayList<Proposal>());
         }
         
-        if(cse.getEventRuleList() == null){
-            cse.setEventRuleList(new ArrayList<EventRuleAbstract>());
+        if(cse.assembleEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL) == null){
+            // this should not be null
+//            cse.setEventRuleList(new ArrayList<EventRuleAbstract>());
         }
         
         if(cse.getCitationList() == null){

@@ -395,7 +395,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 try {
                     blobi.storeBlob(blob);
                     sb.getCeactionRequestForSubmission().getBlobIDList().add(blob.getBlobID());
-                    blobI.linkBlobToActionRequest(blob.getBlobID(), sb.getActiveRequest().getRequestID());
+                    blobI.linkBlobToActionRequest(blob.getBlobID(), sb.getSessionCEAR().getRequestID());
                 } catch (BlobException ex) {
                     System.out.println(ex);
                 }
