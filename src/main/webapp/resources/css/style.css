@@ -1673,3 +1673,262 @@ tr.caseOpen{
     font-size: 1.2em;
     margin-bottom: 10px;
 }
+
+
+/* xiaohong add */
+
+/* horizontal navigation bar*/
+
+.navbar{
+    height: 40px;
+    position: relative;
+    background-color: #181F36;
+}
+
+
+.nav_containner{
+    color:white;
+    float:left;
+    display: inline-block;
+
+}
+
+.nav_containner:hover {
+    color: black;
+    background-color: white;
+    display: inline-block;
+
+}
+
+.nav_content{
+    font-size: 14px;  
+    color: inherit;
+    background-color: inherit;
+    font-family: inherit;
+    height: 40px;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.nav_containner:hover .subnav_containner{
+    color: #2F6381;
+    background-color: white;
+    display: inline-block;
+}
+
+.subnav_containner{
+    display: none;
+    height: 42px;
+    position: absolute;
+    left: 0;
+    font-family: inherit;
+    background-color: #2F6381;
+    color: white;
+    width: 100%;
+    z-index: 3;
+}
+
+.subnav_containner_stable{
+
+    height: 40px;
+    position: absolute;
+    left: 0;
+    font-family: inherit;
+    background-color: white;
+    color: #2F6381;
+    width: 100%;
+    z-index: 3;
+}
+
+.subnav_content{
+    float: left;
+    font-size: 14px;
+    height: 40px;
+    width: 150px;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.nav_font i{
+    padding-right: 5px;
+}
+
+.subnav_content:hover{
+    border-bottom: 2px solid #2F6381;
+}
+
+.nav_display{
+    display:block;
+    z-index: 2;
+}
+.nav_hide{
+    display: none;
+}
+
+.nav_active{
+    background-color: #2F6381;
+}
+.navsub_active{
+    border-bottom: 2px solid #2F6381;
+
+}
+
+.subnav_containner_stable{
+    z-index: 0;
+}
+.currentinfo{
+    float: left;
+    font-size: 14px;
+    height: 40px;
+    width: 300px;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    border-left:1px solid #2F6381;
+    border-right:1px solid #2F6381;
+}
+
+.navItem_logout{
+    float: right;
+    font-size: 14px;
+    height: 40px;
+   
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+
+.sidebar {
+    min-height: 95vh;
+    height: 100%;
+    width: 35px;
+    position: absolute;
+    left: 0;
+    background-color: #181F36;
+    overflow-x: hidden;
+    transition: 0s;
+}
+
+#maincontent{
+
+    margin-left: 40px;
+}
+
+
+
+
+.toolSidebarCollapse{
+    height: 40px;
+    color: #FFFFFF;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    border-bottom: 1px solid #FFFFFF;
+
+}
+
+.toolSidebarExpansion{
+    height: 40px;
+    color: #FFFFFF;
+    font-size: 25px;
+    display:none;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid #FFFFFF;
+    padding-right: 15px;
+    align-items: flex-end;
+}
+
+.toolSidebarTitle{
+    padding-left: 10px;
+    position: absolute;
+    align-self: flex-start;
+    font-size: 15px;
+}
+
+.toolSidebarCollapse i,.toolSidebarExpansion i{
+    cursor: pointer;
+}
+.toolSidebarCollapse i:hover,.toolSidebarExpansion i:hover{
+    color: #2F6381;
+}
+
+
+
+
+
+.sidebar_item{
+    color: white;
+    display: initial;
+}
+
+.sidebar_firstmenu_item{
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid #2F6381;
+}
+
+.sidebar_firstmenu_item i{
+    padding-left: 10px;
+    width: 25px;
+}
+.sidebar_firstmenu_font{
+    padding-left: 20px;
+    font-size: 14px;
+    display: none;
+    cursor: pointer;
+}
+.sidebar_firstmenu_item:hover{
+    border-bottom: 1px solid #FFFFFF;
+}
+
+
+.sidebar_firstmenu_font_active{
+    background-color: #2F6381;
+}
+
+.sidebar_secondmenu{
+    display: none;
+}
+.sidebar_secondmenu_item{
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid #2F6381;
+    background-color: #101423;
+}
+
+.sidebar_secondmenu_item:hover{
+    border-bottom: 1px solid #FFFFFF;
+}
+.sidebar_secondmenu_item i{
+    width: 25px;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.sidebar_secondmenu_font{
+    padding-left: 20px;
+    font-size: 16px;
+    display: none;
+    cursor: pointer;
+}
+
+
+
