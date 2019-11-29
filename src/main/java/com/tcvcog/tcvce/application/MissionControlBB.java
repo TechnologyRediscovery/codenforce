@@ -67,7 +67,7 @@ import org.primefaces.model.DefaultDashboardModel;
  */
 public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
-    private User user;
+    private User currentUser;
     private Municipality currentMuni;
     private Municipality selectedMuni;
     
@@ -188,19 +188,19 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the user
      */
-    public User getUser() {
-        user = getSessionBean().getSessionUser();
-        if(user != null){
-            System.out.println("MissionControlBB.getUser | facesUser: " + user.getPerson().getFirstName());
+    public User getCurrentUser() {
+        currentUser = getSessionBean().getSessionUser();
+        if(currentUser != null){
+            System.out.println("MissionControlBB.getUser | facesUser: " + currentUser.getPerson().getFirstName());
         }
-        return user;
+        return currentUser;
     }
 
     /**
-     * @param user the user to set
+     * @param currentUser the user to set
      */
-    public void setUser(User user) {
-        this.user = user;
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 
     /**

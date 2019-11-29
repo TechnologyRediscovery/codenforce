@@ -765,8 +765,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         return nextPhaseInSequence;
     }
-    
-    
    
     
     public void novResetMailing(NoticeOfViolation nov, UserWithAccessData user) throws IntegrationException, PermissionsException{

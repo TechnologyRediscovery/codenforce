@@ -34,8 +34,9 @@ import com.tcvcog.tcvce.entities.occupancy.OccEvent;
  */
 public class EventRuleOccPeriod extends EventRuleImplementation{
     
+    private int occPeriodEventRuleID;
     private int OccPeriodID;
-    private OccEvent passedRuleEvent;
+    private Event passedRuleEvent;
     
     /**
      *
@@ -57,12 +58,6 @@ public class EventRuleOccPeriod extends EventRuleImplementation{
         return OccPeriodID;
     }
 
-    /**
-     * @return the passedRuleEvent
-     */
-    public OccEvent getPassedRuleEvent() {
-        return passedRuleEvent;
-    }
 
     /**
      * @param OccPeriodID the OccPeriodID to set
@@ -72,9 +67,30 @@ public class EventRuleOccPeriod extends EventRuleImplementation{
     }
 
     /**
+     * @return the passedRuleEvent
+     */
+    public Event getPassedRuleEvent() {
+        return passedRuleEvent;
+    }
+
+    /**
      * @param passedRuleEvent the passedRuleEvent to set
      */
-    public void setPassedRuleEvent(OccEvent passedRuleEvent) {
+    public void setPassedRuleEvent(Event passedRuleEvent) {
         this.passedRuleEvent = passedRuleEvent;
+    }
+
+    /**
+     * @return the occPeriodEventRuleID
+     */
+    public int getOccPeriodEventRuleID() {
+        return occPeriodEventRuleID;
+    }
+
+    /**
+     * @param occPeriodEventRuleID the occPeriodEventRuleID to set
+     */
+    public void setOccPeriodEventRuleID(int occPeriodEventRuleID) {
+        this.occPeriodEventRuleID = occPeriodEventRuleID;
     }
 }

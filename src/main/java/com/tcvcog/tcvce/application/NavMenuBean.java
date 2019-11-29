@@ -39,43 +39,6 @@ public class NavMenuBean extends BackingBeanUtils implements Serializable{
         return uniSub;
     }
     
-    public MenuModel getModel(){
-        model = new DefaultMenuModel();
-        User user = getSessionBean().getSessionUser();
-        
-        switch(user.getRole()){
-            
-            case Developer:
-            case SysAdmin:
-            case CogStaff:
-            case EnforcementOfficial:
-            case MuniStaff:
-            case MuniReader:
-            case Public:
-            default:
-        } // close switch
-        
-        
-                
-
-        
-        
-        DefaultSubMenu firstSub = new DefaultSubMenu("Java birthed me!");
-
-        DefaultMenuItem item = new DefaultMenuItem("I am an item");
-        item.setOutcome("propertySearch");
-        firstSub.addElement(item);
-        model.addElement(item);
-        
-        DefaultMenuItem item2 = new DefaultMenuItem("Take california");
-        item2.setOutcome("personSearch");
-        
-        firstSub.addElement(item2);
-        model.addElement(item2);
-        
-        model.addElement(getUniversalSubmenu());
-        
-        return model;
-    }
+   
     
 }

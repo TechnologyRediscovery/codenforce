@@ -54,12 +54,12 @@ public class EventRuleImplementation extends EventRuleAbstract implements Serial
 
         this.mandatoryRulePassRequiredToCloseEntity = rule.isMandatoryRulePassRequiredToCloseEntity();
         this.inactivateRuleOnEntityClose = rule.isInactivateRuleOnEntityClose();
-        this.promptingProposal = rule.getPromptingProposal();
+        this.promptingDirective = rule.getPromptingDirective();
 
         this.triggeredECOnRulePass = rule.getTriggeredECOnRulePass();
         this.triggeredECOnRuleFail = rule.getTriggeredECOnRuleFail();
 
-        this.active = rule.isActive();
+        this.activeRuleAbstract = rule.isActiveRuleAbstract();
         this.notes = rule.getNotes();
     }
 

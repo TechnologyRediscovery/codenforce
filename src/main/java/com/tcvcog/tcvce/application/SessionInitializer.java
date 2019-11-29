@@ -286,7 +286,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 //        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         
         sessionBean.setSessionProperty(propI.getProperty(m.getMuniOfficePropertyId()));
-        sessionBean.setSessionPerson(u.getPerson());
+        sessionBean.setSessionPerson(ua.getPerson());
         
 //        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
 //                .getString("arbitraryPlaceholderCaseID")
@@ -300,23 +300,23 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         // "run by integrator" member and run the query if they choose
         sessionBean.setQueryProperty(
                 searchCoord.assembleQueryProperty(
-                QueryPropertyEnum.OPENCECASES_OCCPERIODSINPROCESS, u, m, null));
+                QueryPropertyEnum.OPENCECASES_OCCPERIODSINPROCESS, ua, m, null));
         
         sessionBean.setQueryPerson(
                 searchCoord.assembleQueryPerson(
-                QueryPersonEnum.CUSTOM, u, m, null));
+                QueryPersonEnum.CUSTOM, ua, m, null));
         
         sessionBean.setQueryCEAR(
                 searchCoord.assembleQueryCEAR(
-                QueryCEAREnum.ALL_PAST30, u, m, null));
+                QueryCEAREnum.ALL_PAST30, ua, m, null));
         
         sessionBean.setQueryCECase(
                 searchCoord.assembleQueryCECase(
-                QueryCECaseEnum.OPENCASES, u, m, null));
+                QueryCECaseEnum.OPENCASES, ua, m, null));
         
         sessionBean.setQueryEventCECase(
                 searchCoord.assembleQueryEventCECase(
-                QueryEventCECaseEnum.MUNICODEOFFICER_ACTIVITY_PAST30DAYS, u, m, null));
+                QueryEventCECaseEnum.MUNICODEOFFICER_ACTIVITY_PAST30DAYS, ua, m, null));
         
         sessionBean.setQueryOccPeriod(
                 searchCoord.assembleQueryOccPeriod(

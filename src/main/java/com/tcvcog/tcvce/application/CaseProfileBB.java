@@ -276,14 +276,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public void deletePhoto(int photoID) {
         // TODO: remove entry from linker table for deleted photos
         for(Integer pid : this.selectedViolation.getBlobIDList()){
-            if(pid.compareTo(blobID) == 0){
+            if(pid.compareTo(photoID) == 0){
                 this.selectedViolation.getBlobIDList().remove(pid);
                 break;
             }
         }
         BlobCoordinator blobc = getBlobCoordinator();
         try {
-            blobc.deleteBlob(blobID);
+            blobc.deleteBlob(photoID);
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

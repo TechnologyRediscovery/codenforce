@@ -18,12 +18,14 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseEvent;
-import com.tcvcog.tcvce.entities.CECaseEventRule;
+import com.tcvcog.tcvce.entities.EventRuleCECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -41,6 +43,7 @@ import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -130,22 +133,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-     /**
-     * Getter for rules by ID
-     * 
-     * @param ruleid
-     * @return
-     * @throws IntegrationException 
-     */
-    public EventRuleAbstract getEventRule(int ruleid) throws IntegrationException{
-        if(ruleid == 0){
-            return null;
-        }
-        
-        EventRuleAbstract rule = null;
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+    public CECaseEvent getEventCECase(int eventID) throws IntegrationException {
+        CECaseEvent ev = null;
 
         String query = "SELECT eventid, category_catid, cecase_caseid, dateofrecord, \n" +
                 "       eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n" +
@@ -158,23 +147,28 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
 
         try {
+
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, ruleSetID);
+            stmt.setInt(1, eventID);
             rs = stmt.executeQuery();
+
             while (rs.next()) {
-                list.add(getEventRule(rs.getInt("eventrule_ruleid")));
+                ev = new CECaseEvent(generateEventFromRS(rs));
+                ev.setCaseID(rs.getInt("cecase_caseid"));
             }
+            
+
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot generate list of event rules", ex);
+            throw new IntegrationException("Cannot retrive event", ex);
+
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-
-        return list;
         
+        return ev;    
     }
     
     public OccEvent getOccEvent(int eventID) throws IntegrationException{
@@ -193,113 +187,83 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
 
         try {
+
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, profile.getProfileID());
+            stmt.setInt(1, eventID);
             rs = stmt.executeQuery();
+
             while (rs.next()) {
-                set = getEventRuleSet(rs.getInt("ruleset_setid"));
+                occEv = new OccEvent(generateEventFromRS(rs));
+                occEv.setOccPeriodID(rs.getInt("occperiod_periodid"));
             }
 
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, setID);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                set = generateRuleSet(rs);
-            }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot generate list of event rules", ex);
+            throw new IntegrationException("Cannot retrive event", ex);
+
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return set;
-    }
-    
-    private EventRuleSet generateRuleSet(ResultSet rs) throws SQLException, IntegrationException{
-        EventRuleSet s = new EventRuleSet();
-        s.setRulseSetID(rs.getInt("rulesetid"));
-        s.setTitle(rs.getString("title"));
-        s.setDescription(rs.getString("description"));
-        s.setRuleList(getEventRuleList(rs.getInt("rulesetid")));
-        return s;
-    }
-    
-    public List<CECaseEventRule> getEventRuleCECaseList(CECase cse) throws IntegrationException{
-        EventRuleImplementation ruleImp = null;
-        List<CECaseEventRule> ruleList = new ArrayList<>();
-        String query =  "   SELECT cecase_caseid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
-                        "       lastevaluatedts, passedrulets, passedrule_eventid\n" +
-                        "  FROM public.cecaserule WHERE cecase_caseid=?;";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, cse.getCaseID());
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                ruleImp = generateEventRuleImplementation(rs);
-                ruleList.add(generateCECaseEventRule(rs, ruleImp));
-                
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot generate list of event rules", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return ruleList;
         
         return occEv;    
     }
     
-    private EventRuleOccPeriod generateOccPeriodEventRule(ResultSet rs, EventRuleImplementation imp) throws SQLException{
-        EventRuleOccPeriod evRule = new EventRuleOccPeriod(imp);
-        evRule.setOccPeriodID(rs.getInt("occperiod_periodid"));
-        evRule.setPassedRuleEvent(getOccEvent(rs.getInt("passedrule_eventid")));
-        return evRule;
+    public List<Event> getEventList(IFace_EventRuleGoverned erg) throws IntegrationException{
+        List<Event> evLst = new ArrayList<>();
+        if(erg instanceof OccPeriod){
+            OccPeriod op = (OccPeriod) erg;
+            for(OccEvent oe: getOccEvents(op.getPeriodID())){
+                evLst.add(oe);
+            }
+        } else if(erg instanceof CECase){
+            CECase cec = (CECase) erg;
+            for(CECaseEvent evcec: getEventsByCaseID(cec.getCaseID())){
+                evLst.add(evcec);
+            }
+            
+        }
+        return evLst;
     }
     
-    public List<EventRuleOccPeriod> getEventRuleOccPeriodList(OccPeriod op) throws IntegrationException{
-        EventRuleImplementation ruleImp;
-        List<EventRuleOccPeriod> ruleList = new ArrayList<>();
-        String query = "SELECT occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
-                        "       lastevaluatedts, passedrulets, passedrule_eventid\n" +
-                        "  FROM public.occperiodeventrule WHERE occperiod_periodid=?;";
+    public List<OccEvent> getOccEvents(int occPeriodID) throws IntegrationException{
+        List<OccEvent> evList = new ArrayList<>();
+
+        String query =  "SELECT eventid FROM public.occevent WHERE occperiod_periodid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
 
         try {
+
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, op.getPeriodID());
+            stmt.setInt(1, occPeriodID);
             rs = stmt.executeQuery();
+
             while (rs.next()) {
                 evList.add(getOccEvent(rs.getInt("eventid")));
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot generate list of event rules", ex);
+            throw new IntegrationException("Cannot retrive event", ex);
+
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-
-        return ruleList;
         
+        return evList;
     }
     
-    
-    public ArrayList<EventCategory> getEventCategoryList() throws IntegrationException {
+    /**
+     * Fetches a complete list of eventcategory records, including inactive cats
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<EventCategory> getEventCategoryList() throws IntegrationException {
         String query = "SELECT categoryid FROM public.eventcategory;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -360,13 +324,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     /**
-     * 
+     * List produced here ultimately used for actively picking event categories by the user
      * @param et
      * @return
      * @throws IntegrationException
      */
-    public ArrayList<EventCategory> getEventCategoryList(EventType et) throws IntegrationException {
-        String query = "SELECT categoryid FROM public.eventcategory WHERE categorytype = cast (? as ceeventtype);";
+    public List<EventCategory> getEventCategoryList(EventType et) throws IntegrationException {
+        String query = "SELECT categoryid FROM public.eventcategory WHERE categorytype = CAST (? as eventtype);";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -401,7 +365,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                         "            munideployable, publicdeployable, notifycasemonitors, hidable, \n" +
                         "            icon_iconid, relativeorderwithintype, relativeorderglobal, hosteventdescriptionsuggtext, \n" +
                         "            directive_directiveid)\n" +
-                        "    VALUES (?, ?, ?, ?, ?, \n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
                         "            ?);";
@@ -421,7 +385,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(7, ec.isNotifycasemonitors());
             stmt.setBoolean(8, ec.isHidable());
 
-            stmt.setInt(9, ec.getIcon().getIconid());
+            if(ec.getIcon() != null){
+                stmt.setInt(9, ec.getIcon().getIconid());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
             stmt.setInt(10, ec.getRelativeOrderWithinType());
             stmt.setInt(11, ec.getRelativeOrderGlobal());
             stmt.setString(12, ec.getHostEventDescriptionSuggestedText());
@@ -520,10 +488,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
-    
-    
-    
-    
 
     /**
      * Attaches an Event to a code enforcement case. No checking of logic occurs
@@ -615,10 +579,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         String query = "INSERT INTO public.occevent(\n" +
                         "            eventid, category_catid, occperiod_periodid, dateofrecord, eventtimestamp, \n" +
                         "            eventdescription, owner_userid, disclosetomunicipality, disclosetopublic, \n" +
-                        "            activeevent, hidden, notes)\n" +
+                        "            activeevent, notes)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, now(), \n" +
                         "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?);";
+                        "            ?, ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -641,8 +605,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(7, event.isDiscloseToPublic());
             stmt.setBoolean(8, event.isActive());
             
-            stmt.setBoolean(9, event.isHidden());
-            stmt.setString(10, event.getNotes());
+            stmt.setString(9, event.getNotes());
             
             stmt.execute();
 
@@ -675,7 +638,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public void inactivateEvent(int eventIdToInactivate) throws IntegrationException {
         String query = "UPDATE public.ceevent\n"
-                + "   SET activeevent=false, hidden=true WHERE eventid = ?;";
+                + "   SET activeevent=false WHERE eventid = ?;";
 
         // TO DO: finish clearing view confirmation
         Connection con = getPostgresCon();
@@ -706,7 +669,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         sb.append("   SET category_catid=?, cecase_caseid=?, dateofrecord=?, ");
         sb.append("       eventdescription=?, owner_userid=?, disclosetomunicipality=?, ");
         sb.append("       disclosetopublic=?, activeevent=?, ");
-        sb.append("       hidden=?, notes=? ");
+        sb.append("       notes=? ");
         
         sb.append(" WHERE eventid = ?;");
 
@@ -728,10 +691,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             stmt.setBoolean(7, event.isDiscloseToPublic());
             stmt.setBoolean(8, event.isActive());
-            stmt.setBoolean(9, event.isHidden());
-            stmt.setString(10, event.getNotes());
+            stmt.setString(9, event.getNotes());
             
-            stmt.setInt(11, event.getEventID());
+            stmt.setInt(10, event.getEventID());
             
             stmt.executeUpdate();
 
@@ -747,23 +709,27 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
 
     public void updateEvent(OccEvent event) throws IntegrationException {
-       String sql = "UPDATE public.occevent\n" +
+       String sql = "UPDATE public.occevent \n" +
                     "   SET category_catid=?, dateofrecord=?, \n" +
-                    "       eventtimestamp=?, eventdescription=?, owner_userid=?, disclosetomunicipality=?, \n" +
-                    "       disclosetopublic=?, activeevent=?, hidden=?, notes=?\n" +
+                    "       eventdescription=?, owner_userid=?, disclosetomunicipality=?, \n" +
+                    "       disclosetopublic=?, activeevent=?, notes=? \n" +
                     " WHERE eventid=?;";
 
         // TO DO: finish clearing view confirmation
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
+        UserCoordinator uc = getUserCoordinator();
 
         try {
 
             stmt = con.prepareStatement(sql);
             stmt.setInt(1, event.getCategory().getCategoryID());
-            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(event.getDateOfRecord()));
+            if(event.getDateOfRecord() != null){
+                stmt.setTimestamp(2, java.sql.Timestamp.valueOf(event.getDateOfRecord()));
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
 
-            // timestamp is updated with a call to postgres's now()
             stmt.setString(3, event.getDescription());
             if(event.getOwner() != null){
                 stmt.setInt(4, event.getOwner().getUserID());
@@ -774,10 +740,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             stmt.setBoolean(6, event.isDiscloseToPublic());
             stmt.setBoolean(7, event.isActive());
-            stmt.setBoolean(8, event.isHidden());
-            stmt.setString(9, event.getNotes());
+            stmt.setString(8, event.getNotes());
             
-            stmt.setInt(10, event.getEventID());
+            stmt.setInt(9, event.getEventID());
             
             stmt.executeUpdate();
 
@@ -896,7 +861,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             while (rs.next()) {
                 evCPBundle = new EventCECaseCasePropBundle();
                 evCPBundle.setEvent(getEventCECase(rs.getInt("eventid")));
-                evCPBundle.setEventCaseBare(ci.getCECaseBare(rs.getInt("cecase_caseid")));
+                evCPBundle.setEventCaseBare(ci.getCECaseBase(rs.getInt("cecase_caseid")));
             }
 
         } catch (SQLException ex) {
@@ -1099,179 +1064,513 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         return eventList;
     }
+    
 
-    /**
-     * First gen query for a single purpose: introducing SearchParams objects
-     * with SQL assembly logic in the integration methods
-     * 
-     * Included for reference since the sql is complicated
-     *
-     * @deprecated
-     * @param m
-     * @param start
-     * @param end
-     * @return
-     * @throws IntegrationException
-     */
-    public List<EventCECaseCasePropBundle> getUpcomingTimelineEvents(Municipality m, LocalDateTime start, LocalDateTime end) throws IntegrationException {
+    public List<CECaseEvent> getEventsByCaseID(int caseID) throws IntegrationException {
+        List<CECaseEvent> eventList = new ArrayList();
 
-        ArrayList<EventCECaseCasePropBundle> eventList = new ArrayList<>();
-
-        String query = "SELECT ceevent.eventid, ceevent.category_catid, ceevent.dateofrecord, \n"
-                + "       ceevent.eventtimestamp, ceevent.eventdescription, ceevent.owner_userid, ceevent.disclosetomunicipality, \n"
-                + "       ceevent.disclosetopublic, ceevent.activeevent, ceevent.requestsAction, ceevent.hidden, \n"
-                + "       ceevent.notes, ceevent.viewconfirmedby, ceevent.viewconfirmedat, cecase.caseid, eventcategory.categoryid\n"
-                + " FROM ceevent 	INNER JOIN eventcategory ON (category_catid = categoryid)\n"
-                + "		INNER JOIN cecase ON (cecase_caseid = caseid)\n"
-                + " WHERE categorytype = CAST ('Timeline' AS ceeventtype)\n"
-                + "		AND dateofrecord >= ? AND dateofrecord <= ? \n"
-                + "		AND activeevent = TRUE\n"
-                + "		AND ceevent.requestsAction = TRUE\n"
-                + "		AND hidden = FALSE\n"
-                + "		AND viewconfirmedby IS NULL\n"
-                + "		AND municipality_municode = ?;";
-
+        String query = "SELECT eventid FROM public.ceevent WHERE cecase_caseid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        UserIntegrator ui = getUserIntegrator();
-        PropertyIntegrator pi = getPropertyIntegrator();
-        CaseIntegrator ci = getCaseIntegrator();
 
         try {
-
             stmt = con.prepareStatement(query);
-            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(start));
-            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(end));
-            stmt.setInt(3, m.getMuniCode());
+            stmt.setInt(1, caseID);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                CECaseEvent ev = new CECaseEvent();
-
-                ev.setEventID(rs.getInt("eventid"));
-                ev.setCategory(getEventCategory(rs.getInt("categoryid")));
-                ev.setCaseID(rs.getInt("caseid"));
-                LocalDateTime dt = rs.getTimestamp("dateofrecord").toInstant()
-                        .atZone(ZoneId.systemDefault()).toLocalDateTime();
-                ev.setDateOfRecord(dt);
-
-                ev.setTimestamp(rs.getTimestamp("eventtimestamp").toInstant()
-                        .atZone(ZoneId.systemDefault()).toLocalDateTime());
-                ev.setDescription(rs.getString("eventDescription"));
-                ev.setOwner(ui.getUser(rs.getInt("owner_userid")));
-                ev.setDiscloseToMunicipality(rs.getBoolean("disclosetomunicipality"));
-
-                ev.setDiscloseToPublic(rs.getBoolean("disclosetopublic"));
-                ev.setActive(rs.getBoolean("activeevent"));
-
-                Timestamp ldt = rs.getTimestamp("viewconfirmedat");
-                // removed action requests
-                ev.setHidden(rs.getBoolean("hidden"));
-                ev.setNotes(rs.getString("notes"));
-
-                // now for case and prop info
-//                ev.setCaseID(ci.getCECase(rs.getInt("caseid")));
-//                eventList.add(ev);
-
+                eventList.add(getEventCECase(rs.getInt("eventid")));
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-//            throw new IntegrationException("Cannot retrive event", ex);
+            throw new IntegrationException("Cannot generate case list", ex);
 
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        
+        }
+        return eventList;
+    }
+    
+    
+     /**
+     * Getter for rules by ID
+     * 
+     * @param ruleid
+     * @return
+     * @throws IntegrationException 
+     */
+    public EventRuleAbstract rules_getEventRuleAbstract(int ruleid) throws IntegrationException{
+        if(ruleid == 0){
+            return null;
+        }
+        
+        EventRuleAbstract rule = null;
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String s = "SELECT ruleid, title, description, requiredeventtype, forbiddeneventtype, \n" +
+                        "       requiredeventcat_catid, requiredeventcatthresholdtypeintorder, \n" +
+                        "       requiredeventcatupperboundtypeintorder, requiredeventcatthresholdglobalorder, \n" +
+                        "       requiredeventcatupperboundglobalorder, forbiddeneventcat_catid, \n" +
+                        "       forbiddeneventcatthresholdtypeintorder, forbiddeneventcatupperboundtypeintorder, \n" +
+                        "       forbiddeneventcatthresholdglobalorder, forbiddeneventcatupperboundglobalorder, \n" +
+                        "       mandatorypassreqtocloseentity, autoremoveonentityclose, promptingdirective_directiveid, \n" +
+                        "       triggeredeventcatonpass, triggeredeventcatonfail, active, notes\n" +
+                        "  FROM public.eventrule WHERE ruleid=?;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, ruleid);
+
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                rule = rules_generateEventRule(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to generate case history list", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return rule;
+        
+        
+    }  
+    
+     /**
+     * Instantiation and population of CasePhaseRule changes
+     * 
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    private EventRuleAbstract rules_generateEventRule(ResultSet rs) throws SQLException, IntegrationException{
+        EventRuleAbstract evRule = new EventRuleAbstract();
+        ChoiceIntegrator ci = getChoiceIntegrator();
+        
+        evRule.setRuleid(rs.getInt("ruleid"));
+        evRule.setTitle(rs.getString("title"));
+        evRule.setDescription(rs.getString("description"));
+        
+        if(!(rs.getString("requiredeventtype") == null) && !(rs.getString("requiredeventtype").equals(""))){
+            evRule.setRequiredEventType(EventType.valueOf(rs.getString("requiredeventtype")));
+        }
+        if(!(rs.getString("forbiddeneventtype") == null) && !(rs.getString("forbiddeneventtype").equals(""))){
+            evRule.setForbiddenEventType(EventType.valueOf(rs.getString("forbiddeneventtype")));
+        }
+        
+        evRule.setRequiredEventCategory(getEventCategory(rs.getInt("requiredeventcat_catid")));
+        evRule.setRequiredECThreshold_typeInternalOrder(rs.getInt("requiredeventcatthresholdtypeintorder"));
+        
+        evRule.setRequiredECThreshold_typeInternalOrder_treatAsUpperBound(rs.getBoolean("requiredeventcatupperboundtypeintorder"));
+        evRule.setRequiredECThreshold_globalOrder(rs.getInt("requiredeventcatthresholdglobalorder"));
+        
+        evRule.setRequiredECThreshold_globalOrder_treatAsUpperBound(rs.getBoolean("requiredeventcatupperboundglobalorder"));
+        evRule.setForbiddenEventCategory(getEventCategory(rs.getInt("forbiddeneventcat_catid")));
+        
+        evRule.setForbiddenECThreshold_typeInternalOrder(rs.getInt("forbiddeneventcatthresholdtypeintorder"));
+        evRule.setForbiddenECThreshold_typeInternalOrder_treatAsUpperBound(rs.getBoolean("forbiddeneventcatupperboundtypeintorder"));
+        
+        evRule.setForbiddenECThreshold_globalOrder(rs.getInt("forbiddeneventcatthresholdglobalorder"));
+        evRule.setForbiddenECThreshold_globalOrder_treatAsUpperBound(rs.getBoolean("forbiddeneventcatupperboundglobalorder"));
+        
+        evRule.setMandatoryRulePassRequiredToCloseEntity(rs.getBoolean("mandatorypassreqtocloseentity"));
+        evRule.setInactivateRuleOnEntityClose(rs.getBoolean("autoremoveonentityclose"));
+        if(rs.getInt("promptingdirective_directiveid") != 0){
+            evRule.setPromptingDirective(ci.getDirective(rs.getInt("promptingdirective_directiveid")));
+        }
+        if(rs.getInt("triggeredeventcatonpass") != 0){
+            evRule.setTriggeredECOnRulePass(getEventCategory(rs.getInt("triggeredeventcatonpass")));
+        }
+        if(rs.getInt("triggeredeventcatonfail") != 0){
+            evRule.setTriggeredECOnRuleFail(getEventCategory(rs.getInt("triggeredeventcatonfail")));
+        }
+        evRule.setActiveRuleAbstract(rs.getBoolean("active"));
+        evRule.setNotes(rs.getString("notes"));
+        
+        return evRule;
+    }
+    
+    public List<EventRuleAbstract> rules_getEventRuleList(int ruleSetID) throws IntegrationException{
+        List<EventRuleAbstract> list = new ArrayList<>();
+        String query = "SELECT eventrule_ruleid\n" +
+                        "  FROM public.eventruleruleset WHERE ruleset_rulesetid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, ruleSetID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate list of event rules", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return eventList;
-
+        return list;
+        
     }
-
-   
     
-    /**
-     * @deprecated 
-     * @param ec
-     * @throws IntegrationException 
-     */
-    public void clearResponseToActionRequest(CECaseEvent ec) throws IntegrationException{
-         String query = "UPDATE public.ceevent\n" +
-            "   SET responsetimestamp=NULL, respondernotes=NULL, \n" +
-            "       responseevent_eventid=NULL, rejeecteventrequest=FALSE, "
-                + "responderactual_userid=NULL WHERE eventid = ?;";
+    public List<EventRuleSet> rules_getEventRuleSetList(MuniProfile profile) throws IntegrationException{
+        List<EventRuleSet> setList = new ArrayList<>();
+        String query = "SELECT muniprofile_profileid, ruleset_setid FROM \n" +
+"  FROM public.muniprofileeventruleset WHERE muniprofile_profileid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
 
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, profile.getProfileID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                setList.add(rules_getEventRuleSet(rs.getInt("ruleset_setid")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate list of event rules", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return setList;
+    }
+    
+    public List<EventRuleSet> rules_getEventRuleSetList() throws IntegrationException{
+        List<EventRuleSet> setList = new ArrayList<>();
+        String query = "SELECT rulesetid FROM public.eventruleset; ";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                setList.add(rules_getEventRuleSet(rs.getInt("rulesetid")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate list of event rules", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return setList;
+        
+    }
+    
+    public EventRuleSet rules_getEventRuleSet(int setID) throws IntegrationException{
+        EventRuleSet set = null;
+        String query = "SELECT rulesetid, title, description\n" +
+                        "  FROM public.eventruleset WHERE rulesetid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, setID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                set = rules_generateRuleSet(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate list of event rules", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return set;
+    }
+    
+    private EventRuleSet rules_generateRuleSet(ResultSet rs) throws SQLException, IntegrationException{
+        EventRuleSet s = new EventRuleSet();
+        s.setRulseSetID(rs.getInt("rulesetid"));
+        s.setTitle(rs.getString("title"));
+        s.setDescription(rs.getString("description"));
+        s.setRuleList(rules_getEventRuleList(rs.getInt("rulesetid")));
+        return s;
+    }
+    
+    public List<EventRuleCECase> rules_getEventRuleCECaseList(CECase cse) throws IntegrationException{
+        EventRuleImplementation ruleImp = null;
+        List<EventRuleCECase> ruleList = new ArrayList<>();
+        String query =  "   SELECT cecase_caseid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
+                        "       lastevaluatedts, passedrulets, passedrule_eventid, active \n" +
+                        "  FROM public.cecaseeventrule WHERE cecase_caseid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cse.getCaseID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                ruleImp = rules_generateEventRuleImplementation(rs);
+                ruleList.add(rules_generateCECaseEventRule(rs, ruleImp));
+                
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate list of event rules", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return ruleList;
+        
+    }
+    
+    private EventRuleCECase rules_generateCECaseEventRule(ResultSet rs, EventRuleImplementation imp) 
+            throws SQLException, IntegrationException{
+        EventRuleCECase evRule = new EventRuleCECase(imp);
+        evRule.setCeCaseID(rs.getInt("cecase_caseid"));
+        evRule.setPassedRuleEvent(getEventCECase(rs.getInt("passedrule_eventid")));
+        return evRule;
+        
+    }
+    
+    private EventRuleImplementation rules_generateEventRuleImplementation(ResultSet rs) throws SQLException, IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        
+        EventRuleImplementation ruleImp = new EventRuleImplementation(rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
+        ruleImp.setAttachedTS(rs.getTimestamp("attachedts").toLocalDateTime());
+        ruleImp.setAttachedBy(ui.getUser(rs.getInt("attachedby_userid")));
+        if(rs.getTimestamp("lastevaluatedts") != null){
+            ruleImp.setLastEvaluatedTS(rs.getTimestamp("lastevaluatedts").toLocalDateTime());
+        } 
+       ruleImp.setAttachedBy(ui.getUser(rs.getInt("attachedby_userid")));
+       ruleImp.setActiveRuleImp(rs.getBoolean("active"));
+       
+       return ruleImp;
+    }
+    
+      public int rules_insertEventRule(EventRuleAbstract evrua) throws IntegrationException {
+
+        String query = "INSERT INTO public.eventrule(\n" +
+                        "            ruleid, title, description, requiredeventtype, forbiddeneventtype, \n" + // 1-4
+                        "            requiredeventcat_catid, requiredeventcatupperboundtypeintorder, \n" + //5-6
+                        "            requiredeventcatupperboundglobalorder, forbiddeneventcat_catid, \n" + //7-8
+                        "            forbiddeneventcatupperboundtypeintorder, forbiddeneventcatupperboundglobalorder, \n" + //9-10
+                        "            mandatorypassreqtocloseentity, autoremoveonentityclose, promptingdirective_directiveid, \n" + //11-13
+                        "            triggeredeventcatonpass, triggeredeventcatonfail, active, notes, \n" + //14-17
+                        "            requiredeventcatthresholdtypeintorder, forbiddeneventcatthresholdtypeintorder, \n" + //18-19
+                        "            requiredeventcatthresholdglobalorder, forbiddeneventcatthresholdglobalorder)\n" + // 20-21
+                        "    VALUES (DEFAULT, ?, ?, CAST (? AS eventtype), CAST (? AS eventtype), \n" + 
+                        "            ?, ?, \n" + //5-6
+                        "            ?, ?, \n" + //7-8
+                        "            ?, ?, \n" +
+                        "            ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, ?, \n" +
+                        "            ?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int freshRuleID = 0;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setString(1, evrua.getTitle());
+            stmt.setString(2, evrua.getDescription());
+            if(evrua.getRequiredEventType() != null){
+                stmt.setString(3, evrua.getRequiredEventType().name());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            if(evrua.getForbiddenEventType() != null){
+                stmt.setString(4, evrua.getForbiddenEventType().name());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            if(evrua.getRequiredEventCategory() != null){
+                stmt.setInt(5, evrua.getRequiredEventCategory().getCategoryID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(6, evrua.isRequiredECThreshold_typeInternalOrder_treatAsUpperBound());
+            stmt.setBoolean(7, evrua.isRequiredECThreshold_globalOrder_treatAsUpperBound());
+            
+            
+            if(evrua.getForbiddenEventCategory() != null){
+                stmt.setInt(8, evrua.getForbiddenEventCategory().getCategoryID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(9, evrua.isForbiddenECThreshold_typeInternalOrder_treatAsUpperBound());
+            stmt.setBoolean(10, evrua.isForbiddenECThreshold_globalOrder_treatAsUpperBound());
+            
+            stmt.setBoolean(11, evrua.isMandatoryRulePassRequiredToCloseEntity());
+            stmt.setBoolean(12, evrua.isInactivateRuleOnEntityClose());
+            if(evrua.getPromptingDirective()!= null){
+                stmt.setInt(13, evrua.getPromptingDirective().getDirectiveID());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            
+            if(evrua.getTriggeredECOnRulePass() != null){
+                stmt.setInt(14, evrua.getTriggeredECOnRulePass().getCategoryID());
+            } else {
+                stmt.setNull(14, java.sql.Types.NULL);
+            }
+            
+            if(evrua.getTriggeredECOnRuleFail() != null){
+                stmt.setInt(15, evrua.getTriggeredECOnRuleFail().getCategoryID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(16, evrua.isActiveRuleAbstract());
+            stmt.setString(17, evrua.getNotes());
+
+            stmt.setInt(18, evrua.getRequiredECThreshold_typeInternalOrder());
+            stmt.setInt(19, evrua.getForbiddenECThreshold_typeInternalOrder());
+            
+            stmt.setInt(20, evrua.getRequiredECThreshold_globalOrder());
+            stmt.setInt(21, evrua.getForbiddenECThreshold_globalOrder());
+            
+            stmt.execute();
+            
+            String retrievalQuery = "SELECT currval('cecasephasechangerule_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                freshRuleID = rs.getInt(1);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert EventRuleAbstract into the system", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return freshRuleID;
+       
+    } // close method
+      public void rules_updateEventRule(EventRuleAbstract evrua) throws IntegrationException {
+
+        String query = "UPDATE public.eventrule\n" +
+                    "   SET title=?, description=?, requiredeventtype=CAST (? AS eventtype), forbiddeneventtype= CAST (? AS eventtype), \n" +
+                    "       requiredeventcat_catid=?, requiredeventcatupperboundtypeintorder=?, \n" +
+                    "       requiredeventcatupperboundglobalorder=?, forbiddeneventcat_catid=?, \n" +
+                    "       forbiddeneventcatupperboundtypeintorder=?, forbiddeneventcatupperboundglobalorder=?, \n" +
+                    "       mandatorypassreqtocloseentity=?, autoremoveonentityclose=?, promptingdirective_directiveid=?, \n" +
+                    "       triggeredeventcatonpass=?, triggeredeventcatonfail=?, active=?, \n" +
+                    "       notes=?, requiredeventcatthresholdtypeintorder=?, forbiddeneventcatthresholdtypeintorder=?, \n" +
+                    "       requiredeventcatthresholdglobalorder=?, forbiddeneventcatthresholdglobalorder=?\n" +
+                    " WHERE ruleid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
-
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, ec.getEventID());
+            
+            stmt.setString(1, evrua.getTitle());
+            stmt.setString(2, evrua.getDescription());
+            if(evrua.getRequiredEventType() != null){
+                stmt.setString(3, evrua.getRequiredEventType().name());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            if(evrua.getForbiddenEventType() != null){
+                stmt.setString(4, evrua.getForbiddenEventType().name());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            if(evrua.getRequiredEventCategory() != null){
+                stmt.setInt(5, evrua.getRequiredEventCategory().getCategoryID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(6, evrua.isRequiredECThreshold_typeInternalOrder_treatAsUpperBound());
+            stmt.setBoolean(7, evrua.isRequiredECThreshold_globalOrder_treatAsUpperBound());
+            
+            
+            if(evrua.getForbiddenEventCategory() != null){
+                stmt.setInt(8, evrua.getForbiddenEventCategory().getCategoryID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(9, evrua.isForbiddenECThreshold_typeInternalOrder_treatAsUpperBound());
+            stmt.setBoolean(10, evrua.isForbiddenECThreshold_globalOrder_treatAsUpperBound());
+            
+            stmt.setBoolean(11, evrua.isMandatoryRulePassRequiredToCloseEntity());
+            stmt.setBoolean(12, evrua.isInactivateRuleOnEntityClose());
+            if(evrua.getPromptingDirective()!= null){
+                stmt.setInt(13, evrua.getPromptingDirective().getDirectiveID());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            
+            if(evrua.getTriggeredECOnRulePass() != null){
+                stmt.setInt(14, evrua.getTriggeredECOnRulePass().getCategoryID());
+            } else {
+                stmt.setNull(14, java.sql.Types.NULL);
+            }
+            
+            if(evrua.getTriggeredECOnRuleFail() != null){
+                stmt.setInt(15, evrua.getTriggeredECOnRuleFail().getCategoryID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(16, evrua.isActiveRuleAbstract());
+            stmt.setString(17, evrua.getNotes());
+
+            stmt.setInt(18, evrua.getRequiredECThreshold_typeInternalOrder());
+            stmt.setInt(19, evrua.getForbiddenECThreshold_typeInternalOrder());
+            
+            stmt.setInt(20, evrua.getRequiredECThreshold_globalOrder());
+            stmt.setInt(21, evrua.getForbiddenECThreshold_globalOrder());
+            
+            stmt.setInt(22, evrua.getRuleid());
+            
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive event", ex);
+            throw new IntegrationException("Cannot update EventRuleAbstract into the system", ex);
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-        
-    }
-    
-  
-    
-
-    public CECaseEvent getEventCECase(int eventID) throws IntegrationException {
-        CECaseEvent ev = null;
-
-        String query = "SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n" +
-                "       eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n" +
-                "       disclosetopublic, activeevent, hidden, ceevent.notes, property_propertyid,  municipality_municode " +
-                "       FROM public.ceevent INNER JOIN public.cecase ON (cecase_caseid = caseid)\n" +
-                "                           INNER JOIN public.property on (property_propertyid = propertyid) " +
-                "       WHERE eventid = ?;";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        try {
-
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, eventID);
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                    ev = generateEventFromRS(rs);
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive event", ex);
-
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        
-        return ev;    
-    }
-    
-    public OccEvent getOccEvent(int eventID){
-        // TODO: finish me
-        return new OccEvent();
-        
-        
-        
-    }
-    
-    public List<OccEvent> getOccEvents(int occPeriodID){
-        // TODO: write my guts
+    } // close method
+      
+    public void rules_insertEventRuleOccPeriod(EventRuleOccPeriod erop) throws IntegrationException{
+        UserCoordinator uc = getUserCoordinator();
         
         String query = "INSERT INTO public.occperiodeventrule(\n" +
                         "            occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
@@ -1425,40 +1724,201 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        
     }
     
-    
-    
-
-    public List<CECaseEvent> getEventsByCaseID(int caseID) throws IntegrationException {
-        List<CECaseEvent> eventList = new ArrayList();
-
-        String query = "SELECT eventid FROM public.ceevent WHERE cecase_caseid = ?;";
+    public void rules_UpdatetEventRuleCECase(EventRuleCECase ercec) throws IntegrationException{
+         String query = "UPDATE public.cecaseeventrule\n" +
+                        "   SET cecase_caseid=?, eventrule_ruleid=?, attachedts=?, attachedby_userid=?, \n" +
+                        "       lastevaluatedts=?, passedrulets=?, passedrule_eventid=?, active=?\n" +
+                        " WHERE cecase_caseid=? AND eventrule_ruleid=?;";
         Connection con = getPostgresCon();
-        ResultSet rs = null;
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, caseID);
+            stmt.setInt(1, ercec.getCeCaseID());
+            stmt.setInt(2, ercec.getRuleid());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            if(ercec.getAttachedBy() != null){
+                stmt.setInt(4, ercec.getAttachedBy().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setNull(6, java.sql.Types.NULL);
+            
+            if(ercec.getPassedRuleEvent() != null){
+                stmt.setInt(7, ercec.getPassedRuleEvent().getEventID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(8, ercec.isActiveRuleAbstract());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot update EventRuleCECase", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    private EventRuleOccPeriod rules_generateOccPeriodEventRule(ResultSet rs, EventRuleImplementation imp) throws SQLException, IntegrationException{
+        EventRuleOccPeriod evRule = new EventRuleOccPeriod(imp);
+        evRule.setOccPeriodID(rs.getInt("occperiod_periodid"));
+        evRule.setPassedRuleEvent(getOccEvent(rs.getInt("passedrule_eventid")));
+        return evRule;
+    }
+    
+    
+    public EventRuleOccPeriod rules_getEventRuleOccPeriod(int occperiod_periodid, int eventrule_ruleid) throws IntegrationException{
+        EventRuleOccPeriod ruleOccPer = null;
+        EventRuleImplementation evRuleImp;
+        
+        String query = "SELECT occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
+                        "       lastevaluatedts, passedrulets, passedrule_eventid, active \n" +
+                        "  FROM public.occperiodeventrule WHERE occperiod_periodid=? and eventrule_ruleid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, occperiod_periodid);
+            stmt.setInt(2, eventrule_ruleid);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                evRuleImp = rules_generateEventRuleImplementation(rs);
+                ruleOccPer = (rules_generateOccPeriodEventRule(rs, evRuleImp));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate list of event rules", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return ruleOccPer;
+    }
+    
+    public List<EventRuleImplementation> rules_getEventRuleOccPeriodList(OccPeriod op) throws IntegrationException{
+        EventRuleImplementation ruleImp;
+        List<EventRuleImplementation> ruleList = new ArrayList<>();
+        String query = "SELECT occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
+                        "       lastevaluatedts, passedrulets, passedrule_eventid, active \n" +
+                        "  FROM public.occperiodeventrule WHERE occperiod_periodid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, op.getPeriodID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                ruleImp = rules_generateEventRuleImplementation(rs);
+                ruleList.add(rules_generateOccPeriodEventRule(rs, ruleImp));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate list of event rules", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return ruleList;
+    }
+
+    /**
+     * First gen query for a single purpose: introducing SearchParams objects
+     * with SQL assembly logic in the integration methods
+     * 
+     * Included for reference since the sql is complicated
+     *
+     * @deprecated
+     * @param m
+     * @param start
+     * @param end
+     * @return
+     * @throws IntegrationException
+     */
+    public List<EventCECaseCasePropBundle> getUpcomingTimelineEvents(Municipality m, LocalDateTime start, LocalDateTime end) throws IntegrationException {
+
+        ArrayList<EventCECaseCasePropBundle> eventList = new ArrayList<>();
+
+        String query = "SELECT ceevent.eventid, ceevent.category_catid, ceevent.dateofrecord, \n"
+                + "       ceevent.eventtimestamp, ceevent.eventdescription, ceevent.owner_userid, ceevent.disclosetomunicipality, \n"
+                + "       ceevent.disclosetopublic, ceevent.activeevent, ceevent.requestsAction, ceevent.hidden, \n"
+                + "       ceevent.notes, ceevent.viewconfirmedby, ceevent.viewconfirmedat, cecase.caseid, eventcategory.categoryid\n"
+                + " FROM ceevent 	INNER JOIN eventcategory ON (category_catid = categoryid)\n"
+                + "		INNER JOIN cecase ON (cecase_caseid = caseid)\n"
+                + " WHERE categorytype = CAST ('Timeline' AS ceeventtype)\n"
+                + "		AND dateofrecord >= ? AND dateofrecord <= ? \n"
+                + "		AND activeevent = TRUE\n"
+                + "		AND ceevent.requestsAction = TRUE\n"
+                + "		AND hidden = FALSE\n"
+                + "		AND viewconfirmedby IS NULL\n"
+                + "		AND municipality_municode = ?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        UserIntegrator ui = getUserIntegrator();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        CaseIntegrator ci = getCaseIntegrator();
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(start));
+            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(end));
+            stmt.setInt(3, m.getMuniCode());
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                eventList.add(getEventCECase(rs.getInt("eventid")));
+                CECaseEvent ev = new CECaseEvent(new Event());
+
+                ev.setEventID(rs.getInt("eventid"));
+                ev.setCategory(getEventCategory(rs.getInt("categoryid")));
+                ev.setCaseID(rs.getInt("caseid"));
+                LocalDateTime dt = rs.getTimestamp("dateofrecord").toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDateTime();
+                ev.setDateOfRecord(dt);
+
+                ev.setTimestamp(rs.getTimestamp("eventtimestamp").toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDateTime());
+                ev.setDescription(rs.getString("eventDescription"));
+                ev.setOwner(ui.getUser(rs.getInt("owner_userid")));
+                ev.setDiscloseToMunicipality(rs.getBoolean("disclosetomunicipality"));
+
+                ev.setDiscloseToPublic(rs.getBoolean("disclosetopublic"));
+                ev.setActive(rs.getBoolean("activeevent"));
+
+                Timestamp ldt = rs.getTimestamp("viewconfirmedat");
+                // removed action requests
+                ev.setHidden(rs.getBoolean("hidden"));
+                ev.setNotes(rs.getString("notes"));
+
+                // now for case and prop info
+//                ev.setCaseID(ci.getCECase(rs.getInt("caseid")));
+//                eventList.add(ev);
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot generate case list", ex);
+//            throw new IntegrationException("Cannot retrive event", ex);
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        
-        }
+        } // close finally
+
         return eventList;
     }
-
 } // close class
