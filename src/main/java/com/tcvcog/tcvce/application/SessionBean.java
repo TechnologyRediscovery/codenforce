@@ -914,6 +914,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     public void setUmapRequestedForReInit(UserMuniAuthPeriod umapRequestedForReInit) {
         this.umapRequestedForReInit = umapRequestedForReInit;
     }
+
+    /**
+     * @return the blobList
+     */
+    public List<Blob> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<Blob> blobList) {
+        this.blobList = blobList;
+    }
     
     
 }

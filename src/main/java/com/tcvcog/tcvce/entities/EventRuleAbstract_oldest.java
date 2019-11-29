@@ -35,13 +35,12 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
     protected boolean mandatoryRulePassRequiredToCloseEntity;
     protected boolean inactivateRuleOnEntityClose;
     
-    protected Directive promptingDirective;
-    protected int formPromptingDirectiveID;
-   
+    protected Proposal promptingProposal;
+    
     protected EventCategory triggeredECOnRulePass;
     protected EventCategory triggeredECOnRuleFail;
     
-    protected boolean activeRuleAbstract;
+    protected boolean active;
     protected String notes;
 
     /**
@@ -157,6 +156,12 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
         return inactivateRuleOnEntityClose;
     }
 
+    /**
+     * @return the promptingProposal
+     */
+    public Proposal getPromptingProposal() {
+        return promptingProposal;
+    }
 
     /**
      * @return the triggeredECOnRulePass
@@ -173,10 +178,10 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the activeRuleAbstract
+     * @return the active
      */
-    public boolean isActiveRuleAbstract() {
-        return activeRuleAbstract;
+    public boolean isActive() {
+        return active;
     }
 
     /**
@@ -293,6 +298,13 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
     }
 
     /**
+     * @param promptingProposal the promptingProposal to set
+     */
+    public void setPromptingProposal(Proposal promptingProposal) {
+        this.promptingProposal = promptingProposal;
+    }
+
+    /**
      * @param triggeredECOnRulePass the triggeredECOnRulePass to set
      */
     public void setTriggeredECOnRulePass(EventCategory triggeredECOnRulePass) {
@@ -307,10 +319,10 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
     }
 
     /**
-     * @param activeRuleAbstract the activeRuleAbstract to set
+     * @param active the active to set
      */
-    public void setActiveRuleAbstract(boolean activeRuleAbstract) {
-        this.activeRuleAbstract = activeRuleAbstract;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     /**
@@ -367,35 +379,6 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
      */
     public int getForbiddenECThreshold_globalOrder() {
         return forbiddenECThreshold_globalOrder;
-    }
-
-
-    /**
-     * @return the promptingDirective
-     */
-    public Directive getPromptingDirective() {
-        return promptingDirective;
-    }
-
-    /**
-     * @return the formPromptingDirectiveID
-     */
-    public int getFormPromptingDirectiveID() {
-        return formPromptingDirectiveID;
-    }
-
-    /**
-     * @param promptingDirective the promptingDirective to set
-     */
-    public void setPromptingDirective(Directive promptingDirective) {
-        this.promptingDirective = promptingDirective;
-    }
-
-    /**
-     * @param formPromptingDirectiveID the formPromptingDirectiveID to set
-     */
-    public void setFormPromptingDirectiveID(int formPromptingDirectiveID) {
-        this.formPromptingDirectiveID = formPromptingDirectiveID;
     }
 
     
