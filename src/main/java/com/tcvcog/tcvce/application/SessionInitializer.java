@@ -68,8 +68,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class SessionInitializer extends BackingBeanUtils implements Serializable {
 
-   
-
     private User userQueuedForSession;
     private UserAuthorized userAuthorizedQueuedForSession;
     private UserMuniAuthPeriod umapQueuedForSession;
@@ -83,6 +81,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     
     @PostConstruct
     public void initBean(){
+        System.out.println("SessionInitializer.initBean");
         userAuthorizedQueuedForSession = null;
         UserIntegrator ui = getUserIntegrator();
         UserCoordinator uc = getUserCoordinator();
@@ -139,6 +138,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @return the username string of an authenticated user from the container
      */
     private User getContainerAuthenticatedUser() throws IntegrationException {
+        System.out.println("SessionInitializer.getContainerAuthenticatedUser");
         UserIntegrator ui  = getUserIntegrator();
         FacesContext fc = getFacesContext();
         ExternalContext ec = fc.getExternalContext();
@@ -344,6 +344,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @return the muniQueuedForSession
      */
     public Municipality getMuniQueuedForSession() {
+        System.out.println("SessionInitializer.getMuniQueuedForSession");
         return muniQueuedForSession;
     }
 

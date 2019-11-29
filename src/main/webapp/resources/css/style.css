@@ -107,6 +107,19 @@ h4{
     color: #00b5ec;
 }
 
+.report-title{
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #cde162;
+    
+}
+
+.report-title-sub{
+    font-size: 1.1em;
+    color: #00b5ec;
+    font-style: italic;
+    
+}
 
 
 .darkFont{
@@ -351,7 +364,7 @@ div.headerLink a:before, a:visited{
 /************** END LINKS ******************/
 
 
-/************** START PAGE LAYOUT  ******************/
+/* ------------------- START PAGE LAYOUT  ------------------- */
 
 
 
@@ -391,24 +404,10 @@ div.headerLink a:before, a:visited{
     
 }
 
+/* **************** END PAGE LAYOUT  *********************/
 
 
 /* ----------- Printing and reports-------- */
-
-
-.report-title{
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #cde162;
-    
-}
-
-.report-title-sub{
-    font-size: 1.1em;
-    color: #00b5ec;
-    font-style: italic;
-    
-}
 
 .printing-page-break-before{
     page-break-before: always;
@@ -466,6 +465,12 @@ div.printer-friendly-report .ui-widget-content{
     font-weight: bold;
     font-family: monospace;
 }
+
+.reportconfig-header{
+    text-align: left;
+    
+}
+/* *********** end Printing and reports******** */
 
 
 
@@ -620,6 +625,10 @@ div.printer-friendly-report .ui-widget-content{
 .mainContainer{
 }
 
+.mainContainerDashboard{
+
+    display:block;
+}
 
 
 .primaryContentContainer{
@@ -790,23 +799,6 @@ i.status-display-icon-i{
 }
 
 
-span.ui-label{
-    display: block;
-    clear: left;
-    margin-bottom: 10px;
-    font-weight: bold;
-    
-}
-
-span.ui-label-inline{
-    font-weight: bold;
-}
-
-.font-smaller{
-    font-size: 0.8em;
-}
-
-
 /***************** CLOSE TEXT AND SPANS ***********************/
 
 
@@ -816,15 +808,6 @@ span.ui-label-inline{
     white-space: normal;
     overflow-wrap: normal;
     text-align: left;
-}
-
-
-.datum{
-    display: block;
-    padding: 5px;
-    border: #abb solid thin;
-    margin-top: 5px;
-    margin-bottom: 5px;
 }
 
 .wrapText{
@@ -956,6 +939,22 @@ img.headerImg{
 /*************** END IMAGES ****************************/
 
 
+
+/* ------------------ Primefaces Overrides ----------------------*/
+
+
+.ui-widget, .ui-widget .ui-widget {
+    font-size: 90% !important;
+}
+
+
+.ui-state-hover{
+    
+}
+
+/* ****************** END Primefaces Overrides ***********************/
+
+
 /* ------------------DASHBOARD STYLES ----------------------*/
 
 .bignum{
@@ -974,10 +973,9 @@ img.headerImg{
 
 
 
-.ui-panel, div.ui-state-hover {
+.ui-panel {
                 margin: 10px;
-                
-            }
+}
              
 .ui-dashboard-column {
     width:33%;
@@ -989,16 +987,16 @@ img.headerImg{
 }
 
 
-.ui-widget, .ui-widget .ui-widget {
-    font-size: 90% !important;
-}
-
-
-
 /*************** END DASHBOARD ****************************/
 
 
 /* ------------------TABLE STYLES ----------------------*/
+
+
+.td-dense{
+    padding: 1px;
+    margin: 0px;
+}
 
 .cases-report-citations-2cols{
     width: 50%;
@@ -1074,7 +1072,7 @@ tr.reinspect{
 .gridTd {
     border: none;
     vertical-align: top;
-    padding: 10px;
+    padding: 7px;
 }
 
 .topbottom-lines-left{
@@ -1097,7 +1095,6 @@ tr.reinspect{
     background-color: rgba(12,12,12,0);
     z-index: 100;
     opacity: 1;
-    vertical-align: top''
 }
 
 .panelGridData{
@@ -1165,6 +1162,10 @@ gridTd-bignum{
 .ui-state-hover{
     
     
+}
+
+.full-width{
+    width:100%;
 }
 
 .hover-none:hover{
@@ -1241,12 +1242,6 @@ gridTd-bignum{
 
 .ui-chkbox-box{
     margin:5px;
-}
-
-.right-floater{
-    display: block;
-    float: right;
-    clear: none;
 }
 
 /* ****************** CLOSE BUTTON STYLES ********************/
@@ -1483,6 +1478,9 @@ i.inspection-notinspected{
 
 /* ****************** CLOSE INSPECTION AND OCC PERMIT********************/
 
+
+
+
 /* -------------------- MISC --------------------------------- */
 
 .nov-chosen-recipeint{
@@ -1518,6 +1516,14 @@ a.outputLink{
 
 select.selectOneListbox{   
     margin-bottom: 10px;
+}
+
+span.uiLabel{
+    display: block;
+    clear: left;
+    margin-bottom: 10px;
+    font-weight: bold;
+    
 }
 
 input.selectBooleanCheckbox{

@@ -24,22 +24,23 @@
                         
                         <h:form id="initiateSessionForm">
                             <h1>Authentication successful!</h1>
-                            <f:subview id="initiatesession-subview-header-reloadsession"
-                                       rendered="#{!(empty sessionInitializer.muniQueuedForSession)}">
-                                <p>
-                                    <h:outputText value="Requested session municipality: " />
-                                    <h:outputText value="#{sessionInitializer.muniQueuedForSession.muniName}" />
-                                </p>
-                            </f:subview>
-                            <f:subview id="initiatesession-subview-header-firstauth"
-                                       rendered="#{empty sessionInitializer.muniQueuedForSession}">
-                                <p>
-                                    <h:outputText value="Your session municipality will be determined dynamically by the COGBot" />
-                                </p>
-                            </f:subview>
+
+                                    <f:subview id="initiatesession-subview-header-reloadsession"
+                                               rendered="#{!(empty sessionInitializer.muniQueuedForSession)}">
+                                        <p>
+                                            <h:outputText value="Requested session municipality: " />
+                                            <h:outputText value="#{sessionInitializer.muniQueuedForSession.muniName}" />
+                                        </p>
+                                    </f:subview>
+                                    <f:subview id="initiatesession-subview-header-firstauth"
+                                               rendered="#{empty sessionInitializer.muniQueuedForSession}">
+                                        <p>
+                                            <h:outputText value="Your session municipality will be determined dynamically by the COGBot" />
+                                        </p>
+                                    </f:subview>
                                 
                             <p:commandButton ajax="false" 
-                                             value="Configure session for #{sessionInitializer.userQueuedForSession.username}" 
+                                             value="Configure session" 
                                              action="#{sessionInitializer.initiateInternalSession}" 
                                              icon="fa fa-chevron-right"
                                              update="init-session-messages"/>
