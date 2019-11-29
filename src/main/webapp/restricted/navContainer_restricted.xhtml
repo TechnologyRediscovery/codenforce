@@ -180,23 +180,16 @@
 
                                     </ui:repeat>
 
-                                    <div class="navItem_logout">
-                                        <p:commandButton    id="navcontres-button-logout"
-                                                            action="#{systemServicesBB.logout}" 
-                                                            value="Logout: #{sessionBean.sessionUser.person.firstName}"
-                                                            ajax="false"/>
-                                    </div>
 
-                                    <ui:remove>
 
                                         <div class="navItem_logout">
                                             <p:commandButton    id="navcontres-button-logout"
                                                                 action="#{systemServicesBB.logout}" 
-                                                                value="Logout #{systemServicesBB.sessionAuthUser.person.firstName} 
-                                                                | #{systemServicesBB.sessionAuthUser.roleType.label} 
-                                                                | rnk:#{systemServicesBB.sessionAuthUser.roleType.rank} 
-                                                                | username: #{systemServicesBB.sessionAuthUser.username} 
-                                                                | id:#{systemServicesBB.sessionAuthUser.userID} "
+                                                                value="Logout #{systemServicesBB.bbSessionUser.person.firstName} 
+                                                                | #{systemServicesBB.bbSessionUser.roleType.label} 
+                                                                | rnk:#{systemServicesBB.bbSessionUser.roleType.rank} 
+                                                                | username: #{systemServicesBB.bbSessionUser.username} 
+                                                                | id:#{systemServicesBB.bbSessionUser.userID} "
                                                                 ajax="false"/>
                                         </div>
 
@@ -212,11 +205,9 @@
                                                                     icon="fa fa-gear"/>
                                         </div>
 
-                                    </ui:remove>
                                 </div>
                             </h:form>
 
-                            <ui:remove>
                                 <p:dialog header="User settings" 
                                           widgetVar="navcontainer-dialog-usersettings" 
                                           responsive="true" 
@@ -228,11 +219,11 @@
                                     <h2>User settings for <h:outputText value="#{userBB.currentUser.username}" /></h2>
 
                                     <p>
-                                        <h:outputText value="Role: #{systemServicesBB.sessionAuthUser.roleType.label}" />
+                                        <h:outputText value="Role: #{systemServicesBB.bbSessionUser.roleType.label}" />
                                         <h:outputText value=" | " />
-                                        <h:outputText value="Rank: #{systemServicesBB.sessionAuthUser.roleType.rank}" />
+                                        <h:outputText value="Rank: #{systemServicesBB.bbSessionUser.roleType.rank}" />
                                         <h:outputText value=" | " />
-                                        <h:outputText value="ID: #{systemServicesBB.sessionAuthUser.userID} " />
+                                        <h:outputText value="ID: #{systemServicesBB.bbSessionUser.userID} " />
                                     </p>
 
                                     <p>
@@ -383,7 +374,6 @@
                                     </h:form>
 
                                 </p:dialog>
-                            </ui:remove>
 
                             <p:spacer height="35px;"/>
 
@@ -419,17 +409,16 @@
         <script type="text/javascript">
             var dropdown = document.getElementsByClassName("sidebar_firstmenu_item");
             for (var i = 0; i &lt; dropdown.length; i++) {
-
-            var n = dropdown[i];
-            n.addEventListener("click", function() {
-            this.classList.toggle("sidebar_firstmenu_font_active");
-            var dropdownContent = this.nextElementSibling;
-            if (dropdownContent.style.display === "block") {
-            dropdownContent.style.display = "none";
-            } else {
-            dropdownContent.style.display = "block";
-            }
-            });
+                var n = dropdown[i];
+                n.addEventListener("click", function() {
+                this.classList.toggle("sidebar_firstmenu_font_active");
+                var dropdownContent = this.nextElementSibling;
+                if (dropdownContent.style.display === "block") {
+                    dropdownContent.style.display = "none";
+                } else {
+                    dropdownContent.style.display = "block";
+                }
+                });
             }
 
         </script>
