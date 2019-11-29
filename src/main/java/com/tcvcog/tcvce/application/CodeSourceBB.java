@@ -22,13 +22,17 @@ import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+
 /**
  *
  * @author Eric C. Darsow
  */
-public class CodeSourceBB extends BackingBeanUtils implements Serializable{
-    
+public class CodeSourceBB extends BackingBeanUtils implements Serializable {
+
     private ArrayList<CodeSource> codeSourceList;
     private int sourceID;
     private CodeSource selectedCodeSource;
@@ -37,46 +41,45 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable{
      * Creates a new instance of CodeSourceBB
      */
     public CodeSourceBB() {
-        
+
         // default value settings for form
     }
 
-    public String addNewSource(){
+    public String addNewSource() {
         getSessionBean().setActiveCodeSource(null);
         return "codeSourceAddUpdate";
     }
-    
-    public String updateCodeSource(){
+
+    public String updateCodeSource() {
         System.out.println("CodeSourceBB.updateCodeSource | selected source: " + selectedCodeSource.getSourceName());
-        if(selectedCodeSource != null){
+        if (selectedCodeSource != null) {
             getSessionBean().setActiveCodeSource(selectedCodeSource);
             return "codeSourceAddUpdate";
         } else {
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a code source and try again", ""));
             return "";
         }
     }
-    
-    public String addElementToSource(){
+
+    public String addElementToSource() {
         getSessionBean().setActiveCodeSource(selectedCodeSource);
         // remvoe any active element so when we jump to the
         // add page, there aren't any pre-populated element fields
         getSessionBean().setActiveCodeElement(null);
         return "codeElementAdd";
     }
-    
-    public String viewElementsInSource(){
+
+    public String viewElementsInSource() {
         getSessionBean().setActiveCodeSource(selectedCodeSource);
         return "codeElementList";
     }
-    
-    public String linkElementsToCodeGuide(){
+
+    public String linkElementsToCodeGuide() {
         getSessionBean().setActiveCodeSource(selectedCodeSource);
         return "codeGuideLink";
     }
-    
 
     /**
      * @return the sourceID
@@ -95,13 +98,8 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the codeSourceList
      */
+    //xiaohong edit
     public ArrayList<CodeSource> getCodeSourceList() {
-        CodeIntegrator codeInt = getCodeIntegrator();
-        try {
-            codeSourceList = codeInt.getCompleteCodeSourceList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
         return codeSourceList;
     }
 
@@ -125,4 +123,73 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable{
     public void setSelectedCodeSource(CodeSource selectedCodeSource) {
         this.selectedCodeSource = selectedCodeSource;
     }
+
+    
+    //xiaohong add
+    @PostConstruct
+    public void initBean() {
+        initselectedCodeSourcePanel();
+
+    }
+
+    public void onselectedCodeSourceChange(CodeSource selectedCodeSource) {
+        
+        if (codeSourceSelected == true) {
+            codeSourceList = new ArrayList();
+            codeSourceList.add(selectedCodeSource);
+            
+            setSelectedCodeSource(selectedCodeSource);
+            
+            activeSessionCodeSource(selectedCodeSource);
+            
+            getSessionBean().setActiveCodeSource(selectedCodeSource);
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Code Source Selected", ""));
+            
+        } else if (codeSourceSelected == false) {
+            
+            initselectedCodeSourcePanel();
+            
+        }
+
+    }
+    
+    public void initselectedCodeSourcePanel(){
+        try {
+            CodeIntegrator codeInt = getCodeIntegrator();
+            codeSourceList = codeInt.getCompleteCodeSourceList();
+            
+            setSelectedCodeSource(null);
+            
+            activeSessionCodeSource(null);
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    public void activeSessionCodeSource(CodeSource selectedCodeSource){
+        getSessionBean().setActiveCodeSource(selectedCodeSource);
+    }
+    
+    public boolean activeCodeSourceEdit(){
+        return !codeSourceSelected;
+    }
+    
+    public boolean activeCodeSourceAddSource(){
+        return codeSourceSelected;
+    }
+
+    private boolean codeSourceSelected;
+
+    public boolean isCodeSourceSelected() {
+        return codeSourceSelected;
+    }
+
+    public void setCodeSourceSelected(boolean codeSourceSelected) {
+        this.codeSourceSelected = codeSourceSelected;
+    }
+
 }
