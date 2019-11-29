@@ -10,6 +10,7 @@ import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,7 +30,7 @@ public abstract class Query<E extends BOB>
         implements Serializable{
     
     private Municipality muni;
-    private User user;
+    private UserAuthorized user;
     
     /**
      * Security mechanism for controlling queried data: Coordinators
@@ -55,7 +56,7 @@ public abstract class Query<E extends BOB>
     
     public abstract void clearResultList();
     
-    public Query(Municipality muni, User u) {
+    public Query(Municipality muni, UserAuthorized u) {
         this.muni = muni;
         this.user = u;
         
@@ -99,14 +100,14 @@ public abstract class Query<E extends BOB>
     /**
      * @return the user
      */
-    public User getUser() {
+    public UserAuthorized getUser() {
         return user;
     }
 
     /**
      * @param user the user to set
      */
-    public void setUser(User user) {
+    public void setUser(UserAuthorized user) {
         this.user = user;
     }
 

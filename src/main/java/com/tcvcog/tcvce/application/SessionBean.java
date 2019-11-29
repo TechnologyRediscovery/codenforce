@@ -486,7 +486,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      * @return the sessionUser
      */
     
-    public UserWithAccessData getSessionUser() {
+    public UserAuthorized getSessionUser() {
         return sessionUser;
     }
 
@@ -494,7 +494,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      * @param sessionUser the sessionUser to set
      */
     
-    public void setSessionUser(UserWithAccessData sessionUser) {
+    public void setSessionUser(UserAuthorized sessionUser) {
         this.sessionUser = sessionUser;
     }
 
@@ -927,6 +927,62 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setBlobList(List<Blob> blobList) {
         this.blobList = blobList;
+    }
+
+    /**
+     * @return the sessionPayment
+     */
+    public Payment getSessionPayment() {
+        return sessionPayment;
+    }
+
+    /**
+     * @return the paymentRedirTo
+     */
+    public String getPaymentRedirTo() {
+        return paymentRedirTo;
+    }
+
+    /**
+     * @return the feeManagementOccPeriod
+     */
+    public OccPeriod getFeeManagementOccPeriod() {
+        return feeManagementOccPeriod;
+    }
+
+    /**
+     * @return the feeRedirTo
+     */
+    public String getFeeRedirTo() {
+        return feeRedirTo;
+    }
+
+    /**
+     * @param sessionPayment the sessionPayment to set
+     */
+    public void setSessionPayment(Payment sessionPayment) {
+        this.sessionPayment = sessionPayment;
+    }
+
+    /**
+     * @param paymentRedirTo the paymentRedirTo to set
+     */
+    public void setPaymentRedirTo(String paymentRedirTo) {
+        this.paymentRedirTo = paymentRedirTo;
+    }
+
+    /**
+     * @param feeManagementOccPeriod the feeManagementOccPeriod to set
+     */
+    public void setFeeManagementOccPeriod(OccPeriod feeManagementOccPeriod) {
+        this.feeManagementOccPeriod = feeManagementOccPeriod;
+    }
+
+    /**
+     * @param feeRedirTo the feeRedirTo to set
+     */
+    public void setFeeRedirTo(String feeRedirTo) {
+        this.feeRedirTo = feeRedirTo;
     }
     
     

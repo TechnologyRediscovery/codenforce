@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -28,36 +29,37 @@ import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CECaseEvent;
-import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.ChoiceEventCat;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Directive;
 import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
+import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Proposable;
-import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodStatusEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -89,16 +91,25 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public SearchParamsEventCECase getSearchParamsCEEventsRequiringAction(User user, Municipality m){
-        SearchCoordinator sc = getSearchCoordinator();
-        return sc.getSearchParamsEventsRequiringAction(user,m);
-        
+    /**
+     * Example method as a utility to backing beans
+     * @deprecated 
+     * @return 
+     */
+    public List<ViewOptionsActiveHiddenListsEnum> getViewOptionsActiveHiddenLists(){
+        List<ViewOptionsActiveHiddenListsEnum> lvoahle = new ArrayList<>();
+        lvoahle.addAll(Arrays.asList(ViewOptionsActiveHiddenListsEnum.values()));
+        return lvoahle;
     }
     
-    public SearchParamsEventCECase getSearchParamsOfficerActibityPastWeek(User user, Municipality m){
+    public SearchParamsEventCECase getSearchParamsCEEventsRequiringAction(UserAuthorized user, Municipality m){
+        SearchCoordinator sc = getSearchCoordinator();
+        return sc.getSearchParamsEventsRequiringAction(user,m);
+    }
+    
+    public SearchParamsEventCECase getSearchParamsOfficerActibityPastWeek(UserAuthorized user, Municipality m){
         SearchCoordinator sc = getSearchCoordinator();
         return sc.getSearchParamsOfficerActivity(user, m);
-        
     }
     
     
@@ -314,13 +325,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ){
             throw new CaseLifecycleException("This event cannot be attached to a closed case");
         }
-        
+        Event e = new Event();
         // the moment of event instantiaion!!!!
-        CECaseEvent event = new CECaseEvent();
-        event.setCategory(ec);
-        event.setDateOfRecord(LocalDateTime.now());
-        event.setActive(true);
-        event.setHidden(false);
+        e.setCategory(ec);
+        e.setDateOfRecord(LocalDateTime.now());
+        e.setActive(true);
+        e.setHidden(false);
+        CECaseEvent event = new CECaseEvent(e);
         event.setCaseID(c.getCaseID());
         return event;
     }
@@ -360,12 +371,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param caseID to which the event should be attached
      * @return an instantiated CECaseEvent object ready to be configured
      */
-    public CECaseEvent getInitializedEvent(int caseID){
-        CECaseEvent event = new CECaseEvent();
+    public CECaseEvent getInitializedCECaseEvent(int caseID){
+        CECaseEvent event = new CECaseEvent(new Event());
         event.setCaseID(caseID);
         return event;
-        
     }
+    
     /**
      * Skeleton event factory
      * For use by the public messaging system which attaches events to code enforcement
@@ -377,7 +388,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         OccEvent event = new OccEvent(new Event());
         event.setOccPeriodID(periodID);
         return event;
-        
     }
     
     
@@ -400,7 +410,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Factory method for creating event categories when only the categoryID
      * is available. This is handy since the insertEvent method on the integrator
-     * really only needs the categoryID for storing in the database
+     * only needs the categoryID for storing in the database
      * @param catID the categoryID of the EventCategory you want
      * @return an instantiated EventCategory object
      * @throws com.tcvcog.tcvce.domain.IntegrationException
@@ -426,7 +436,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventCategory ec = getInitiatlizedEventCategory(publicMessageEventCategory);
         
         // setup all the event properties
-        CECaseEvent event = getInitializedEvent(caseID);
+        CECaseEvent event = getInitializedCECaseEvent(caseID);
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
@@ -441,19 +451,17 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ei.insertEvent(event);
     }
     
-    public void editEvent(CECaseEvent evcase, User u) throws IntegrationException{
+    public void editEvent(CECaseEvent evcase, UserAuthorized u) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         System.out.println("EventCoordinator.editEvent");
         ei.updateEvent(evcase);
     }
     
-    public void editEvent(OccEvent oe, User u) throws IntegrationException{
+    public void editEvent(OccEvent oe, UserAuthorized u) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         ei.updateEvent(oe);
         
     }
-    
-    
 
     /**
      * Creates a populated event to log the change of a code violation update. 
@@ -474,7 +482,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         String updateViolationDescr = getResourceBundle(Constants.MESSAGE_TEXT).getString("violationChangeEventDescription");
        
-       
         // hard coded for now
 //        event.setCategory(ei.getEventCategory(117));
         event.setCaseID(ceCase.getCaseID());
@@ -489,7 +496,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         cc.attachNewEventToCECase(ceCase, event, null);
     }
     
-    
     /**
      * Configures an event which represents the moment of compliance with
      * a code violation attached to a code enforcement case
@@ -499,7 +505,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public CECaseEvent generateViolationComplianceEvent(CodeViolation violation) throws IntegrationException{
-        CECaseEvent e = new CECaseEvent();
+        Event e = new Event();
         EventIntegrator ei = getEventIntegrator();
           e.setCategory(ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("complianceEvent"))));
@@ -524,10 +530,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             sb.append(")");
             sb.append("<br /><br />");
         e.setNotes(sb.toString());
-        return e;
+        CECaseEvent cev = new CECaseEvent(e);
+        return cev;
     }
-    
-    
     
     /**
      * At its current impelementation, this amounts to a factory for ArrayLists
@@ -542,6 +547,24 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventIntegrator ei = getEventIntegrator();
         List<CECaseEvent> ll = ei.getEventsByCaseID(currentCase.getCaseID());
         return ll;
+    }
+    
+    public List<EventCategory> getEventCategoryListActive() throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        List<EventCategory> catList = ei.getEventCategoryList();
+        for(EventCategory cat: catList){
+            // TODO: remove inactive EventCategories
+            // TODO: add active flag in DB and int methods
+        }
+        return catList;
+    }
+    
+    
+    public List<EventCategory> loadEventCategoryListUserAllowed(EventType et, UserAuthorized u) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        // TODO: add logic for only allowing certain event cats based on user needs
+        return ei.getEventCategoryList(et);
+        
     }
     
     /**
@@ -592,13 +615,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                     "The case phase has been changed", ""));
 
     } // close method
-
-   
     
-    public void clearActionResponse(CECaseEvent ev) throws IntegrationException{
-        EventIntegrator ei = getEventIntegrator();
-        ei.clearResponseToActionRequest(ev);
-    }
     
     /**
      * A BOB-agnostic event generator given a Proposal object and the Choice that was
@@ -611,7 +628,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public Event generateEventDocumentingProposalEvaluation(Proposal p, Proposable ch, User u) throws CaseLifecycleException, IntegrationException{
+    public Event generateEventDocumentingProposalEvaluation(Proposal p, Proposable ch, UserAuthorized u) throws CaseLifecycleException, IntegrationException{
         Event ev = null;
         if(ch instanceof ChoiceEventCat){
             EventCategory ec = getInitiatlizedEventCategory(((ChoiceEventCat) ch).getEventCategory().getCategoryID());
@@ -633,7 +650,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             descBldr.append(" evaluated the proposal titled: '");
             descBldr.append(p.getDirective().getTitle());
             descBldr.append("' on ");
-            descBldr.append(getPrettyDateNoTime(p.getResponseTimestamp()));
+            descBldr.append(getPrettyDateNoTime(p.getResponseTS()));
             descBldr.append(" and selected choice titled:  '");
             descBldr.append(ch.getTitle());
             descBldr.append("'.");
@@ -647,9 +664,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
         return ev;
     }
-    
-   
-    
     
     public void generateAndInsertManualCasePhaseOverrideEvent(CECase currentCase, CasePhase pastPhase) 
             throws IntegrationException, CaseLifecycleException, ViolationException{
@@ -760,25 +774,205 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     } // close method
     
     
-    public boolean evaluateEventRules(OccPeriod period) throws IntegrationException, CaseLifecycleException, ViolationException{
-        boolean allRulesPassed = true;
-        List<EventRuleOccPeriod> ruleList = period.getEventRuleOccPeriodList();
-        List<Event> evList = new ArrayList<>();
-        // transfer our subclass OccEvents into a List<Event> that our rule checker wants
-        for(Event e: period.getActiveEventList()){
-            evList.add(e);
+    public EventRuleAbstract rules_getEventRuleAbstract(int eraid) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        return ei.rules_getEventRuleAbstract(eraid);
+    }
+    
+    /**
+     * Attaches a single event rule to an EventRuleGoverned entity, the type of which is determined
+     * internally with instanceof checks for OccPeriod and CECase Objects
+     * @param era
+     * @param rg
+     * @param usr
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException if an IFaceEventRuleGoverned instances is neither a CECase or an OccPeriod
+     */
+    public void rules_attachEventRule(EventRuleAbstract era, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, CaseLifecycleException{
+        
+        ChoiceCoordinator cc = getChoiceCoordinator();
+        int freshObjectID = 0;
+        if(rg instanceof OccPeriod){
+                OccPeriod op = (OccPeriod) rg;
+                rules_attachEventRuleAbstractToOccPeriod(era, op, usr);
+                if(freshObjectID != 0 && era.getPromptingDirective() != null){
+                    cc.implementDirective(era.getPromptingDirective(), op, null);
+                    System.out.println("EventCoordinator.rules_attachEventRule | Found not null prompting directive");
+                }
+            } else if (rg instanceof CECase){ 
+                CECase cec = (CECase) rg;
+                rules_attachEventRuleAbstractToCECase(era, cec);
+                if(freshObjectID != 0 && era.getPromptingDirective() != null){
+                    cc.implementDirective(era.getPromptingDirective(), cec, null);
+                }
+            } else {
+                throw new CaseLifecycleException("Cannot attach rule set");
+            }
+    }
+    
+    /**
+     * Returns complete muni dump of the eventrule table
+     * 
+     * @return complete event rule list, including inactive events
+     * @throws IntegrationException 
+     */
+    public List<EventRuleSet> rules_getEventRuleSetList() throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        return ei.rules_getEventRuleSetList();
+    }  
+    
+    public EventRuleAbstract rules_getInitializedEventRuleAbstract(){
+        EventRuleAbstract era = new EventRuleAbstract();
+        era.setActiveRuleAbstract(true);
+        return era;
+    }
+    
+    public void rules_updateEventRuleAbstract(EventRuleAbstract era) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ei.rules_updateEventRule(era);
+        
+    }
+    
+    /**
+     * Primary entrance point for an EventRuleAbstract instance (not its connection to an Object)
+     * @param era required instance
+     * @param period optional--only if you're attaching to an OccPeriod
+     * @param cse Optional--only if you're attachign to a CECase
+     * @param connectToBOBRuleList Switch me on in order to 
+     * @param usr 
+     * @return
+     * @throws IntegrationException 
+     */
+    public int rules_createEventRuleAbstract(EventRuleAbstract era, OccPeriod period, CECase cse, boolean connectToBOBRuleList, UserAuthorized usr) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ChoiceIntegrator ci = getChoiceIntegrator();
+        
+        int freshEventRuleID;
+        if(era.getFormPromptingDirectiveID() != 0){
+            Directive dir = ci.getDirective(era.getFormPromptingDirectiveID());
+            if(dir != null){
+                era.setPromptingDirective(dir);
+                System.out.println("EventCoordinator.rules_createEventRuleAbstract| Found not null directive ID: " + dir.getDirectiveID());
+            }
         }
         
-        for(EventRuleAbstract era: ruleList){
-            if(!evalulateEventRule(evList, era)){
+        freshEventRuleID = ei.rules_insertEventRule(era);
+        if(period != null && cse == null){
+            era = ei.rules_getEventRuleAbstract(freshEventRuleID);
+            rules_attachEventRuleAbstractToOccPeriod(era, period, usr);
+            if(connectToBOBRuleList){
+                rules_attachEventRuleAbstractToOccPeriodTypeRuleSet(era, period);
+            }
+        }
+        if(period == null && cse !=null){
+            era = ei.rules_getEventRuleAbstract(freshEventRuleID);
+            if(connectToBOBRuleList){
+                rules_attachEventRuleAbstractToMuniCERuleSet(era, cse);
+            }
+        }
+        
+        System.out.println("EventCoordinator.rules_createEventRuleAbstract | returned ID: " + freshEventRuleID);
+        return freshEventRuleID;
+    }
+    
+    private void rules_attachEventRuleAbstractToOccPeriod(EventRuleAbstract era, OccPeriod period, UserAuthorized usr) throws IntegrationException{
+        
+        EventIntegrator ei = getEventIntegrator();
+        ChoiceCoordinator cc = getChoiceCoordinator();
+        EventRuleOccPeriod erop = new EventRuleOccPeriod(new EventRuleImplementation(era));
+        // avoid inserting and duplicating keys
+        if(ei.rules_getEventRuleOccPeriod(period.getPeriodID(), era.getRuleid()) == null){
+        erop.setAttachedTS(LocalDateTime.now());
+            erop.setOccPeriodID(period.getPeriodID());
+            
+            erop.setLastEvaluatedTS(null);
+            erop.setPassedRuleTS(null);
+            erop.setPassedRuleEvent(null);
+            ei.rules_insertEventRuleOccPeriod(erop);
+        }
+        if(era.getPromptingDirective() != null){
+            cc.implementDirective(era.getPromptingDirective(), period, null);
+            System.out.println("EventCoordinator.rules_attachEventRulAbstractToOccPeriod | directive implemented with ID " + era.getPromptingDirective().getDirectiveID());
+        }
+    }
+    
+    public void rules_attachEventRuleAbstractToOccPeriodTypeRuleSet(EventRuleAbstract era, OccPeriod period) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ei.rules_addEventRuleAbstractToOccPeriodTypeRuleSet(era, period.getType().getEventRuleSetID());
+    }
+    
+    /**
+     * TODO: Finish my guts!
+     * @param muni to which we want to include the rule. The Municipality's profile will be pulled and its 
+     * @param era 
+     */
+    public void rules_includeEventRuleAbstractInCECaseDefSet(Municipality muni, EventRuleAbstract era){
+        
+    }
+    
+    public void rules_attachRuleSet(EventRuleSet ers, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, CaseLifecycleException{
+        for(EventRuleAbstract era: ers.getRuleList()){
+            if(rg instanceof OccPeriod){
+                OccPeriod op = (OccPeriod) rg;
+                rules_attachEventRuleAbstractToOccPeriod(era, op, usr);
+            } else if (rg instanceof CECase){
+                CECase cec = (CECase) rg;
+                rules_attachEventRuleAbstractToCECase(era, cec);
+            } else {
+                throw new CaseLifecycleException("Cannot attach rule set");
+            }
+        }
+        
+    }
+    
+    
+    /**
+     * TODO: Finish my guts
+     * @param era
+     * @param cse 
+     */
+    private void rules_attachEventRuleAbstractToCECase(EventRuleAbstract era, CECase cse){
+        
+    }
+    
+    /**
+     * TODO: finish my guts
+     * @param era
+     * @param cse 
+     */
+    public void rules_attachEventRuleAbstractToMuniCERuleSet(EventRuleAbstract era, CECase cse){
+        
+    }
+    
+      /**
+     * Adapter method to strip away the OccPeriod type and return plain List<Event>
+     * @param oel
+     * @return 
+     */
+    public List<Event> getEvents(List<OccEvent> oel){
+        List<Event> el = new ArrayList<>();
+        for(OccEvent oe: oel){
+            el.add((Event) oe);
+        }
+        return el;
+    }
+    
+    
+    public boolean rules_evaluateEventRules(OccPeriod period) throws IntegrationException, CaseLifecycleException, ViolationException{
+        boolean allRulesPassed = true;
+        List<EventRuleImplementation> rlst = period.assembleEventRuleList(ViewOptionsEventRulesEnum.VIEW_ALL);
+        
+        for(EventRuleAbstract era: rlst){
+            if(!rules_evalulateEventRule(period.getActiveEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL), era)){
                 allRulesPassed = false;
+                break;
             }
         }
         return allRulesPassed;
     }
 
     
-    public boolean evalulateEventRule(List<Event> eventList, EventRuleAbstract rule) throws IntegrationException, CaseLifecycleException, ViolationException {
+    public boolean rules_evalulateEventRule(List<Event> eventList, EventRuleAbstract rule) throws IntegrationException, CaseLifecycleException, ViolationException {
         CaseCoordinator cc = getCaseCoordinator();
         
         if(eventList == null || rule == null){
@@ -809,7 +1003,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    private boolean evalulateEventRule(CECase cse, CECaseEvent event) throws IntegrationException, CaseLifecycleException, ViolationException {
+    private boolean rules_evalulateEventRule(CECase cse, CECaseEvent event) throws IntegrationException, CaseLifecycleException, ViolationException {
         EventRuleAbstract rule = new EventRuleAbstract();
         boolean rulePasses = false;
         CaseCoordinator cc = getCaseCoordinator();
@@ -880,10 +1074,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
         return subcheckPasses;
     }
-
     
-    private boolean ruleSubcheck_requiredEventCategory(List<Event> eventList, EventRuleAbstract rule) {
-        
+    private boolean ruleSubcheck_requiredEventCategory(List<Event> eventList, EventRuleAbstract rule) {        
         Iterator<Event> iter = eventList.iterator();
         while (iter.hasNext()) {
             Event ev = iter.next();
@@ -982,5 +1174,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
         return true;
     }
+
+    
     
 } // close class

@@ -35,7 +35,7 @@ import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.MunicipalityListified;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
@@ -100,11 +100,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccupancyCoordinator() {
     }
 
-    public OccPeriod configureOccPeriod(OccPeriod period, UserAuthorized u) throws EventException, AuthorizationException, IntegrationException, CaseLifecycleException, ViolationException {
+    public OccPeriod configureOccPeriod(OccPeriod period, User u) throws EventException, AuthorizationException, IntegrationException, CaseLifecycleException, ViolationException {
         ChoiceCoordinator cc = getChoiceCoordinator();
         EventCoordinator ec = getEventCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        UserAuthorized ua = uc.authorizeUser(   u, 
+                                                pi.getPropertyUnitWithProp(period.getPeriodID()).getProperty().getMuni(),
+                                                null);
         period.setGoverningInspection(designateGoverningInspection(period));
-        period = cc.configureProposals(period, u);
+        period = cc.configureProposals(period, ua);
         // Removed during occbeta overhaul
 //        if(period.determineGoverningOccInspection().isReadyForPassedCertification() 
 //                && ec.rules_evaluateEventRules(period)){
@@ -114,13 +120,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     }
     
+    /**
+     * TODO: Finish
+     * @param period 
+     */
     public void configureRuleSet(OccPeriod period){
-        List<EventRuleImplementation> evRuleList = period.assembleEventRuleList(ViewOptionsEventRulesEnum.VIEW_ALL);
-        for(EventRuleAbstract era: evRuleList){
-            if(era.getPromptingDirective()!= null){
-                // TODO: Finish
-            }
-        }
+//        List<EventRuleImplementation> evRuleList = period.getb(ViewOptionsEventRulesEnum.VIEW_ALL);
+//        for(EventRuleAbstract era: evRuleList){
+//            if(era.getPromptingDirective()!= null){
+//                // TODO: Finish
+//            }
+//        }
     }
     
     public OccInspection configureOccInspection(OccInspection inspection){
@@ -387,7 +397,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                                             PropertyUnit pu, 
                                             OccPeriodType perType,
                                             User u, 
-                                            MunicipalityListified muni) throws IntegrationException{
+                                            MunicipalityDataHeavy muni) throws IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
         OccPeriod period = new OccPeriod();
 
@@ -403,7 +413,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         period.setStartDateCertifiedTS(null);
         
         if(period.getStartDate() != null){
-            period.setEndDate(period.getStartDate().plusDays(period.getType().getDefaultPermitValidityPeriodDays()));
+            period.setEndDate(period.getStartDate().plusDays(period.getType().getDefaultValidityPeriodDays()));
         }
         period.setEndDateCertifiedBy(null);
         period.setEndDateCertifiedTS(null);
@@ -419,8 +429,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public int insertNewOccPeriod(OccPeriod op, UserAuthorized u) throws IntegrationException, InspectionException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         EventIntegrator ei = getEventIntegrator();
-        if(op.getType().getEventRuleSetID() != 0){
-            EventRuleSet ers = ei.rules_getEventRuleSet(op.getType().getEventRuleSetID());
+        if(op.getType().getBaseRuleSetID()!= 0){
+            EventRuleSet ers = ei.rules_getEventRuleSet(op.getType().getBaseRuleSetID());
         }
         int freshOccPeriodID = oi.insertOccPeriod(op); 
        System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);

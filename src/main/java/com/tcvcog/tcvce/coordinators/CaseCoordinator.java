@@ -484,7 +484,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      public void evaluateProposal(   Proposal proposal, 
                                     Proposable chosen, 
                                     CECase ceCase, 
-                                    User u) throws EventException, AuthorizationException, CaseLifecycleException, IntegrationException, ViolationException{
+                                    UserAuthorized u) throws EventException, AuthorizationException, CaseLifecycleException, IntegrationException, ViolationException{
         ChoiceCoordinator cc = getChoiceCoordinator();
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
@@ -493,7 +493,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         if(cc.determineProposalEvaluatability(proposal, chosen, u)){
             // since we can evaluate this proposal with the chosen Proposable, configure members
             proposal.setResponderActual(u);
-            proposal.setResponseTimestamp(LocalDateTime.now());
+            proposal.setResponseTS(LocalDateTime.now());
             proposal.setChosenChoice(chosen);
             
             // ask the EventCoord for a nicely formed Event, which we cast to OccEvent
@@ -767,7 +767,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
    
     
-    public void novResetMailing(NoticeOfViolation nov, UserWithAccessData user) throws IntegrationException, PermissionsException{
+    /**
+     * Sets mailing fields to null]
+     * Params changed to take in UserAuthorized during corruption recovery
+     * @param nov
+     * @param user
+     * @throws IntegrationException
+     * @throws PermissionsException 
+     */
+    public void novResetMailing(NoticeOfViolation nov, UserAuthorized user) throws IntegrationException, PermissionsException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         if(user.getMyCredential().isHasSysAdminPermissions()){
             cvi.novResetMailingFieldsToNull(nov);
@@ -1220,7 +1228,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return true;
     }
     
-    public void updateCodeViolation(CECase cse, CodeViolation cv, User u) throws ViolationException, IntegrationException{
+    public void updateCodeViolation(CECase cse, CodeViolation cv, UserAuthorized u) throws ViolationException, IntegrationException{
         EventCoordinator ec = getEventCoordinator();
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         EventIntegrator ei = getEventIntegrator();

@@ -46,6 +46,9 @@ public class OccPeriodType implements Cloneable {
     private boolean enddaterequired;
     private boolean inspectable;
     private boolean passedInspectionRequired;
+    private boolean asynchronousValidityPeriod;
+    
+    private int baseRuleSetID;
     
     private boolean rentalcompatible;
     private boolean active;
@@ -72,7 +75,7 @@ public class OccPeriodType implements Cloneable {
     /**
      * @return the typeid
      */
-    public int getTypeid() {
+    public int getTypeID() {
         return typeid;
     }
 
@@ -198,7 +201,7 @@ public class OccPeriodType implements Cloneable {
     /**
      * @param typeid the typeid to set
      */
-    public void setTypeid(int typeid) {
+    public void setTypeID(int typeid) {
         this.typeid = typeid;
     }
 
@@ -438,6 +441,34 @@ public class OccPeriodType implements Cloneable {
 
     public void setPermittedFees(List<Fee> permittedFees) {
         this.permittedFees = permittedFees;
+    }
+
+    /**
+     * @return the asynchronousValidityPeriod
+     */
+    public boolean isAsynchronousValidityPeriod() {
+        return asynchronousValidityPeriod;
+    }
+
+    /**
+     * @param asynchronousValidityPeriod the asynchronousValidityPeriod to set
+     */
+    public void setAsynchronousValidityPeriod(boolean asynchronousValidityPeriod) {
+        this.asynchronousValidityPeriod = asynchronousValidityPeriod;
+    }
+
+    /**
+     * @return the defaultRuleSetID
+     */
+    public int getBaseRuleSetID() {
+        return baseRuleSetID;
+    }
+
+    /**
+     * @param baseRuleSetID the defaultRuleSetID to set
+     */
+    public void setBaseRuleSetID(int baseRuleSetID) {
+        this.baseRuleSetID = baseRuleSetID;
     }
     
 }

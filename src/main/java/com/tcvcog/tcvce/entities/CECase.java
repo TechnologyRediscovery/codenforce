@@ -9,12 +9,21 @@ import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
+import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 
 /**
  *
- * @author Sylvia Baskem
+ * @author Ellen Baskem
  */
-public class CECase extends CECaseBase implements Cloneable{
+public class CECase 
+        extends CECaseBase 
+        implements Cloneable,
+                   IFace_ProposalDriven, 
+                   IFace_EventRuleGoverned{
     
     private List<CodeViolation> violationList;
     
@@ -22,8 +31,11 @@ public class CECase extends CECaseBase implements Cloneable{
     private boolean showInactiveEvents;
     private List<CECaseEvent> completeEventList;
     
+    // accessed through methods specified in the interfaces
     private List<Proposal> proposalList;
-    private List<EventRuleAbstract> eventRuleList;
+    private List<Event> eventList;
+    private List<EventRuleImplementation> eventRuleList;
+    
     private List<Citation> citationList;
     private List<NoticeOfViolation> noticeList;
     private List<CEActionRequest> ceActionRequestList;
@@ -67,6 +79,138 @@ public class CECase extends CECaseBase implements Cloneable{
     public CECase clone() throws CloneNotSupportedException{
         super.clone();
         return null;
+    }
+    
+     @Override
+    public List<Event> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
+         List<Event> visEventList = new ArrayList<>();
+        if(eventList != null){
+            for (Event ev : eventList) {
+                switch(voahle){
+                    case VIEW_ACTIVE_HIDDEN:
+                        if (ev.isActive()
+                                && ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if (ev.isActive()
+                                && !ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ALL:
+                        visEventList.add(ev);
+                        break;
+                    case VIEW_INACTIVE:
+                        if (!ev.isActive()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    default:
+                        visEventList.add(ev);
+                } // close switch
+            } // close for   
+        } // close null check
+        return visEventList;
+    }
+
+    @Override
+    public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere) {
+         List<EventRuleImplementation> evRuleList = new ArrayList<>();
+        if(eventRuleList != null){
+            for(EventRuleImplementation eri: eventRuleList){
+                switch(voere){
+                    case VIEW_ACTIVE_NOT_PASSED:
+                        if(eri.isActiveRuleAbstract()
+                                && eri.getPassedRuleTS() == null){
+                            evRuleList.add(eri);
+                        }
+                        break;
+                    case VIEW_ACTIVE_PASSED:
+                        if(eri.isActiveRuleAbstract()
+                                && eri.getPassedRuleTS() != null){
+                            evRuleList.add(eri);
+                        }
+                        break;
+                    case VIEW_ALL:
+                        evRuleList.add(eri);
+                        break;
+                    case VIEW_INACTIVE:
+                        if(!eri.isActiveRuleAbstract()){
+                            evRuleList.add(eri);
+                        }
+                        break;
+                    default:
+                        evRuleList.add(eri);
+                } // close switch
+            } // close loop
+        } // close null check
+        return evRuleList;
+    }
+
+    @Override
+    public boolean isAllRulesPassed() {
+        boolean allPassed = true;
+        for(EventRuleImplementation er: eventRuleList){
+            if(er.getPassedRuleTS() == null){
+                allPassed = false;
+                break;
+            }
+        }
+        return allPassed;
+    }
+
+    @Override
+    public List<Proposal> assembleProposalList(ViewOptionsProposalsEnum vope) {
+        List<Proposal> proposalListVisible = new ArrayList<>();
+        if(proposalList != null && !proposalList.isEmpty()){
+            for(Proposal p: proposalList){
+                switch(vope){
+                    case VIEW_ALL:
+                        proposalListVisible.add(p);
+                        break;
+                    case VIEW_ACTIVE_HIDDEN:
+                        if(p.isActive() 
+                                && p.isHidden()){
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if(p.isActive() 
+                                && !p.isHidden()
+                                && !p.getDirective().isRefuseToBeHidden()){
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_EVALUATED:
+                        if(p.getResponseTS() != null){
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_INACTIVE:
+                        if(!p.isActive()){
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_NOT_EVALUATED:
+                        if(p.getResponseTS() == null){
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    default:
+                        proposalListVisible.add(p);
+                } // switch
+            } // for
+        } // if
+        return proposalListVisible;
+    }
+    
+    /**
+     * @param eventRuleList the eventRuleList to set
+     */
+    public void setEventRuleList(List<EventRuleImplementation> eventRuleList) {
+        this.eventRuleList = eventRuleList;
     }
     
     /**
@@ -257,19 +401,21 @@ public class CECase extends CECaseBase implements Cloneable{
     }
 
     /**
-     * @return the eventRuleList
+     * @return the eventList
      */
-    public List<EventRuleAbstract> getEventRuleList() {
-        return eventRuleList;
+    public List<Event> getEventList() {
+        return eventList;
     }
 
     /**
-     * @param eventRuleList the eventRuleList to set
+     * @param eventList the eventList to set
      */
-    public void setEventRuleList(List<EventRuleAbstract> eventRuleList) {
-        this.eventRuleList = eventRuleList;
+    @Override
+    public void setEventList(List<Event> eventList) {
+        this.eventList = eventList;
     }
 
+        
   
     
     

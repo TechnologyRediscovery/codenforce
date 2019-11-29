@@ -826,6 +826,12 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         return getCodeViolations(c.getCaseID());
     }
     
+    /**
+     * TODO: Fix the BlobList References
+     * @param cv
+     * @return
+     * @throws IntegrationException 
+     */
     public CodeViolation loadViolationPhotoList(CodeViolation cv) throws IntegrationException{
         ArrayList<Integer> photoList = new ArrayList<>();
         
@@ -840,10 +846,10 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                blobList.add((Integer)rs.getInt(1));
+//                blobList.add((Integer)rs.getInt(1));
             }
             
-            cv.setBlobIDList(blobList);
+//            cv.setBlobIDList(blobList);
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());

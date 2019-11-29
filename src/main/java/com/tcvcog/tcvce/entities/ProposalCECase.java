@@ -39,7 +39,7 @@ public class ProposalCECase
 
         this.expiresOn = pr.expiresOn;
 
-        this.responseTimestamp = pr.responseTimestamp;
+        this.responseTS = pr.responseTS;
 
         this.active = pr.active;
         this.hidden = pr.hidden;

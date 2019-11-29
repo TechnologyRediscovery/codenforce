@@ -250,7 +250,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, type.getTypeid());
+            stmt.setInt(1, type.getTypeID());
             rs = stmt.executeQuery();
             while (rs.next()) {
                 feeList.add(generateFee(rs));
@@ -845,7 +845,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, fee.getOccupancyInspectionFeeID());
-            stmt.setInt(2, type.getTypeid());
+            stmt.setInt(2, type.getTypeID());
             stmt.setBoolean(3, fee.isAutoAssigned());
             stmt.execute();
         } catch (SQLException ex) {
@@ -881,7 +881,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, fee.getOccupancyInspectionFeeID());
-            stmt.setInt(2, type.getTypeid());
+            stmt.setInt(2, type.getTypeID());
             stmt.execute();
 
         } catch (SQLException ex) {
@@ -918,7 +918,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, fee.getOccupancyInspectionFeeID());
-            stmt.setInt(2, type.getTypeid());
+            stmt.setInt(2, type.getTypeID());
             System.out.println("TRYING TO EXECUTE UPDATE METHOD");
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -956,7 +956,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt = con.prepareStatement(query);
             stmt.setBoolean(1, fee.isAutoAssigned());
             stmt.setInt(2, fee.getOccupancyInspectionFeeID());
-            stmt.setInt(3, type.getTypeid());
+            stmt.setInt(3, type.getTypeID());
             System.out.println("TRYING TO EXECUTE UPDATE METHOD");
             stmt.executeUpdate();
         } catch (SQLException ex) {

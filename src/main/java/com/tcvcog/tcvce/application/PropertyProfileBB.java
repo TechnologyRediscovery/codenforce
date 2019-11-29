@@ -83,6 +83,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private List<OccPeriodType> occPeriodTypeList;
     
     /**
+     * Added to allow compilation after corruption NOV 2019
+     * Unclear if this is needed to plug into Noah's work
+     */
+    private int photoID;
+    
+    /**
      * Creates a new instance of PropertyProfileBB
      */
     public PropertyProfileBB() {
@@ -304,7 +310,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         OccupancyIntegrator oi = getOccupancyIntegrator();
         try {
             if(selectedOccPeriodType != null){
-                System.out.println("PropertyProfileBB.initateNewOccPeriod | selectedType: " + selectedOccPeriodType.getTypeid());
+                System.out.println("PropertyProfileBB.initateNewOccPeriod | selectedType: " + selectedOccPeriodType.getTypeID());
                 currOccPeriod = oc.initializeNewOccPeriod(  currProp, 
                                                             currPropUnit, 
                                                             selectedOccPeriodType,
@@ -667,6 +673,20 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setSelectedOccPeriodType(OccPeriodType selectedOccPeriodType) {
         this.selectedOccPeriodType = selectedOccPeriodType;
+    }
+
+    /**
+     * @return the photoID
+     */
+    public int getPhotoID() {
+        return photoID;
+    }
+
+    /**
+     * @param photoID the photoID to set
+     */
+    public void setPhotoID(int photoID) {
+        this.photoID = photoID;
     }
 
    

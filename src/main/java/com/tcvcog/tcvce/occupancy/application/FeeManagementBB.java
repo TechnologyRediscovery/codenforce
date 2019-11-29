@@ -210,7 +210,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         skeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
         skeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
-        skeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeid());
+        skeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
         skeleton.setPaymentList(occPeriodFormFee.getPaymentList());
         skeleton.setMoneyFeeAssigned(occPeriodFormFee.getMoneyFeeAssigned());
         skeleton.setAssignedBy(getSessionBean().getSessionUser());

@@ -23,10 +23,13 @@ import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -39,8 +42,10 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
+import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriodDateFields;
+import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriodUserFields;
 import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
@@ -50,6 +55,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +77,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     
-    public List<OccPeriod> getOccPeriodList(PropertyUnit pu, User u) throws IntegrationException, AuthorizationException, EventException, CaseLifecycleException, ViolationException {
+    public List<OccPeriod> getOccPeriodList(PropertyUnit pu, UserAuthorized u) 
+            throws  IntegrationException, 
+                    AuthorizationException, 
+                    EventException, 
+                    CaseLifecycleException, 
+                    ViolationException {
         return getOccPeriodList(pu.getUnitID(), u);
     }
     
@@ -101,7 +112,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return opList;
     }
 
-    public QueryOccPeriod runQueryOccPeriod(QueryOccPeriod query, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
+    public QueryOccPeriod runQueryOccPeriod(QueryOccPeriod query, UserAuthorized u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
         List<SearchParamsOccPeriod> pList = query.getParmsList();
         
         for(SearchParamsOccPeriod sp: pList){
@@ -112,7 +123,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return query;
     }
 
-    public List<OccPeriod> searchForOccPeriods(SearchParamsOccPeriod params, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
+    public List<OccPeriod> searchForOccPeriods(SearchParamsOccPeriod params, UserAuthorized u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
         List<OccPeriod> periodList = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -262,7 +273,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 }
 
                 if (params.isOccPeriodType_filterBy()) {
-                    stmt.setInt(++paramCounter, params.getOccPeriodType_type().getTypeid());
+                    stmt.setInt(++paramCounter, params.getOccPeriodType_type().getTypeID());
                 }
 
                 if (params.isUserField_filter()) {
@@ -414,7 +425,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         UserIntegrator ui = getUserIntegrator();
         EventIntegrator ei = getEventIntegrator();
         ChoiceIntegrator choiceInt = getChoiceIntegrator();
-        PaymentIntegrator payInt = getPaymentIntegrator();
 
         OccPeriod op = new OccPeriod();
 
@@ -470,9 +480,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setEventList(ei.getOccEvents(op.getPeriodID()));
         op.setProposalList(choiceInt.getProposalList(op));
         op.setInspectionList(inspecInt.getOccInspectionList(op));
-        op.setEventRuleOccPeriodList(ei.getEventRuleOccPeriodList(op));
+        op.setEventRuleOccPeriodList(ei.rules_getEventRuleOccPeriodList(op));
         
-        op.setPaymentList(payInt.getPaymentList(op));
+        // call getPayments(op) here when ready
         
         op.setPermitList(getOccPermitList(op));
         op.setBlobIDList(getBlobList(op));
@@ -721,17 +731,21 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     public void insertOccPeriodType(OccPeriodType periodType) throws IntegrationException {
-        String query = "INSERT INTO public.occperiodtype(\n"
-                + "            typeid, muni_municode, title, authorizeduses, description, userassignable, \n"
-                + "            permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n"
-                + "            rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n"
-                + "            requiredpersontypes, commercial, requirepersontypeentrycheck, \n"
-                + "            defaultvalidityperioddays, permittitle, permittitlesub)\n"
-                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, \n"
-                + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?, \n"
-                + "            ?, ?, ?);";
+        String query = "INSERT INTO public.occperiodtype(\n" +
+                        "            typeid, muni_municode, title, authorizeduses, description, userassignable, \n" +
+                        "            permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n" +
+                        "            rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n" +
+                        "            requiredpersontypes, commercial, requirepersontypeentrycheck, \n" +
+                        "            defaultpermitvalidityperioddays, occchecklist_checklistlistid, \n" +
+                        "            asynchronousinspectionvalidityperiod, defaultinspectionvalidityperiod, \n" +
+                        "            eventruleset_setid, inspectable, permittitle, permittitlesub)\n" +
+                        "    VALUES (?, ?, ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, \n" +
+                        "            ?, ?, \n" +
+                        "            ?, ?, \n" +
+                        "            ?, ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -797,7 +811,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(1, 10);
             stmt.setInt(2, period.getPropertyUnitID());
             // timestamp set to now()
-            stmt.setInt(3, period.getType().getTypeid());
+            stmt.setInt(3, period.getType().getTypeID());
 
             // PARAMS LINE 2
             if (period.getPeriodTypeCertifiedBy() != null) {
@@ -915,7 +929,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(1, period.getSource().getSourceid());
             stmt.setInt(2, period.getPropertyUnitID());
             // timestamp set to now()
-            stmt.setInt(3, period.getType().getTypeid());
+            stmt.setInt(3, period.getType().getTypeID());
 
             // PARAMS LINE 2
             if (period.getPeriodTypeCertifiedBy() != null) {
@@ -1004,14 +1018,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
 
     }
-
+ 
     private OccPeriodType generateOccPeriodType(ResultSet rs) throws IntegrationException {
         OccPeriodType opt = new OccPeriodType();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        PaymentIntegrator pi = getPaymentIntegrator();
-        
+
         try {
-            opt.setTypeid(rs.getInt("typeid"));
+            opt.setTypeID(rs.getInt("typeid"));
             opt.setMuni(mi.getMuni(rs.getInt("muni_municode")));
             opt.setTitle(rs.getString("title"));
             opt.setAuthorizeduses(rs.getString("authorizeduses"));
@@ -1026,20 +1039,22 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setRentalcompatible(rs.getBoolean("rentalcompatible"));
             opt.setActive(rs.getBoolean("active"));
             opt.setAllowthirdpartyinspection(rs.getBoolean("allowthirdpartyinspection"));
-            opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
-            
-            opt.setInspectable(rs.getBoolean("inspectable"));
+//            opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
 
-            opt.setRequirepersontypeentrycheck(rs.getBoolean("requirepersontypeentrycheck"));
+//            opt.setRequiredPersontypeList(generateRequiredPersonTypes(rs));
             opt.setCommercial(rs.getBoolean("commercial"));
-            opt.setChecklistID(rs.getInt("occchecklist_checklistlistid"));
-            opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
-            opt.setDefaultValidityPeriodDays(rs.getInt("defaultpermitvalidityperioddays"));
+            opt.setRequirepersontypeentrycheck(rs.getBoolean("requirepersontypeentrycheck"));
             
+            opt.setDefaultValidityPeriodDays(rs.getInt("defaultpermitvalidityperioddays"));
+            opt.setChecklistID(rs.getInt("occchecklist_checklistlistid"));
+            
+            opt.setAsynchronousValidityPeriod((rs.getBoolean("asynchronousinspectionvalidityperiod")));
+            opt.setDefaultValidityPeriodDays((rs.getInt("defaultinspectionvalidityperiod")));
+            
+            opt.setBaseRuleSetID(rs.getInt("eventruleset_setid"));
+            opt.setInspectable(rs.getBoolean("inspectable"));
             opt.setPermitTitle(rs.getString("permittitle"));
             opt.setPermitTitleSub(rs.getString("permittitlesub"));
-            
-            opt.setPermittedFees(pi.getFeeList(opt));
 
             // wire up when nathan is done
             // opt.setFeeList(fee);

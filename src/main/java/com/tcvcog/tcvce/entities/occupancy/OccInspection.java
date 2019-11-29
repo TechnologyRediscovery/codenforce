@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     
     private List<OccInspectedSpace> inspectedSpaceList;
     private List<OccInspectedSpace> inspectedSpaceListVisible;
-    private OccInspectionViewOptions viewSetting;
+    private ViewOptionsOccChecklistItemsEnum viewSetting;
     private boolean includeEmtpySpaces;
     
     private int pacc;
@@ -74,7 +75,7 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     public OccInspection(){
         inspectedSpaceList = new ArrayList<>();
         inspectedSpaceListVisible = new ArrayList<>();
-        viewSetting = OccInspectionViewOptions.ALL_ITEMS;
+        viewSetting = ViewOptionsOccChecklistItemsEnum.ALL_ITEMS;
     }
     
     public void addSpaceToInspectedSpaces(OccInspectedSpace spc){
@@ -535,14 +536,14 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     /**
      * @return the viewSetting
      */
-    public OccInspectionViewOptions getViewSetting() {
+    public ViewOptionsOccChecklistItemsEnum getViewSetting() {
         return viewSetting;
     }
 
     /**
      * @param viewSetting the viewSetting to set
      */
-    public void setViewSetting(OccInspectionViewOptions viewSetting) {
+    public void setViewSetting(ViewOptionsOccChecklistItemsEnum viewSetting) {
         
         this.viewSetting = viewSetting;
     }

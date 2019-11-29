@@ -17,6 +17,7 @@ import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
@@ -69,7 +70,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-     public QueryCEAR getQueryInitialCEAR(User u, Municipality m) throws IntegrationException{
+     public QueryCEAR getQueryInitialCEAR(UserAuthorized u, Municipality m) throws IntegrationException{
         return assembleQueryCEAR(QueryCEAREnum.UNPROCESSED, u, m, null);
         
     }
@@ -81,7 +82,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @param m session user's current municipality
      * @return each existing CEAR Query capable of being passed into runQuery()
      */
-    public List<QueryCEAR> buildQueryCEARList(User u, Municipality m) throws IntegrationException{
+    public List<QueryCEAR> buildQueryCEARList(UserAuthorized u, Municipality m) throws IntegrationException{
         QueryCEAREnum[] nameArray = QueryCEAREnum.values();
         List<QueryCEAR> queryList = new ArrayList<>();
 //        qList.add(assembleQueryCEAR(QueryCEAREnum.ALL_PAST30, u, m));
@@ -134,7 +135,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return assembled instance ready for sending to runQuery
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public QueryCEAR assembleQueryCEAR(QueryCEAREnum qName, User u, Municipality m, SearchParamsCEActionRequests params) throws IntegrationException{
+    public QueryCEAR assembleQueryCEAR(QueryCEAREnum qName, UserAuthorized u, Municipality m, SearchParamsCEActionRequests params) throws IntegrationException{
         QueryCEAR query;
         List<SearchParamsCEActionRequests> paramList = new ArrayList<>();
         
@@ -698,13 +699,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * Single point of entry for queries on Occupancy Periods
      * 
      * @param query an assembled QueryOccPeriod
+     * @param u
      * @return a reference to the same QueryOccPeriod instance passed in with the business
      * objects returned from the integrator accessible via getResults()
      * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
      * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
      * @throws IntegrationException fatal error in the integration code
      */
-    public QueryOccPeriod runQuery(QueryOccPeriod query, User u) throws AuthorizationException, IntegrationException, EventException{
+    public QueryOccPeriod runQuery(QueryOccPeriod query, UserAuthorized u) throws AuthorizationException, IntegrationException, EventException{
         QueryOccPeriod qop = null;
         query.clearResultList();
         OccupancyIntegrator oi = getOccupancyIntegrator();

@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities.search;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +31,7 @@ public class QueryCEAR
     public QueryCEAR(   QueryCEAREnum name,
                         Municipality m, 
                         List<SearchParamsCEActionRequests> params,
-                        User u){
+                        UserAuthorized u){
         super(m, u);
         queryName = name;
         searchParamsList = new ArrayList<>();

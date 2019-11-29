@@ -861,7 +861,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             while (rs.next()) {
                 evCPBundle = new EventCECaseCasePropBundle();
                 evCPBundle.setEvent(getEventCECase(rs.getInt("eventid")));
-                evCPBundle.setEventCaseBare(ci.getCECaseBase(rs.getInt("cecase_caseid")));
+                evCPBundle.setEventCaseBare(ci.getCECaseBare(rs.getInt("cecase_caseid")));
             }
 
         } catch (SQLException ex) {
@@ -1367,7 +1367,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             ruleImp.setLastEvaluatedTS(rs.getTimestamp("lastevaluatedts").toLocalDateTime());
         } 
        ruleImp.setAttachedBy(ui.getUser(rs.getInt("attachedby_userid")));
-       ruleImp.setActiveRuleImp(rs.getBoolean("active"));
+       
        
        return ruleImp;
     }
@@ -1766,7 +1766,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private EventRuleOccPeriod rules_generateOccPeriodEventRule(ResultSet rs, EventRuleImplementation imp) throws SQLException, IntegrationException{
+    private EventRuleOccPeriod rules_generateEventRuleOccPeriod(ResultSet rs, EventRuleImplementation imp) throws SQLException, IntegrationException{
         EventRuleOccPeriod evRule = new EventRuleOccPeriod(imp);
         evRule.setOccPeriodID(rs.getInt("occperiod_periodid"));
         evRule.setPassedRuleEvent(getOccEvent(rs.getInt("passedrule_eventid")));
@@ -1791,7 +1791,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             while (rs.next()) {
                 evRuleImp = rules_generateEventRuleImplementation(rs);
-                ruleOccPer = (rules_generateOccPeriodEventRule(rs, evRuleImp));
+                ruleOccPer = (rules_generateEventRuleOccPeriod(rs, evRuleImp));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -1805,9 +1805,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ruleOccPer;
     }
     
-    public List<EventRuleImplementation> rules_getEventRuleOccPeriodList(OccPeriod op) throws IntegrationException{
+    public List<EventRuleOccPeriod> rules_getEventRuleOccPeriodList(OccPeriod op) throws IntegrationException{
         EventRuleImplementation ruleImp;
-        List<EventRuleImplementation> ruleList = new ArrayList<>();
+        List<EventRuleOccPeriod> ruleList = new ArrayList<>();
         String query = "SELECT occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
                         "       lastevaluatedts, passedrulets, passedrule_eventid, active \n" +
                         "  FROM public.occperiodeventrule WHERE occperiod_periodid=?;";
@@ -1820,7 +1820,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             while (rs.next()) {
                 ruleImp = rules_generateEventRuleImplementation(rs);
-                ruleList.add(rules_generateOccPeriodEventRule(rs, ruleImp));
+                ruleList.add(rules_generateEventRuleOccPeriod(rs, ruleImp));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());

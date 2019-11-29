@@ -6,11 +6,16 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.EntityUtils;
+import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.Proposal;
+import com.tcvcog.tcvce.entities.EventRuleAbstract;
+import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
-import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -20,15 +25,23 @@ import java.util.Iterator;
 import java.util.List;
 import com.tcvcog.tcvce.entities.Openable;
 import com.tcvcog.tcvce.entities.Payment;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
+import java.util.Collections;
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
+import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 
 /**
- *
- * @author sylvia
+ * Primary Business Object BOB for holding data about Occupancy Periods
+ * @author Ellen Baskem
  */
 public class OccPeriod 
         extends EntityUtils 
         implements  Serializable,
-                    Openable{
+                    Openable,
+                    IFace_EventRuleGoverned,
+                    IFace_ProposalDriven{
     
     private int periodID;
     private int propertyUnitID;
@@ -40,16 +53,9 @@ public class OccPeriod
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
     
-    private List<OccEvent> eventList;
-    private boolean showHiddenEvents;
-    private boolean showInactiveEvents;
-    
+    private List<Event> eventList;
     private List<Proposal> proposalList;
-    private boolean showHiddenProposals;
-    private boolean showInactiveProposals;
-    private List<Proposal> proposalListVisible;
-    
-    private List<EventRuleOccPeriod> eventRuleOccPeriodList;
+    private List<EventRuleImplementation> eventRuleList;
     
     private OccInspection governingInspection;
     private List<OccInspection> inspectionList;
@@ -84,68 +90,155 @@ public class OccPeriod
     
     private String notes;
     
-    public OccPeriod(){
-        proposalListVisible = new ArrayList<>();
+
+    @Override
+    public void setEventList(List<Event> lst) {
+        eventList = lst;
     }
-    
+
     
      @Override
     public boolean isOpen() {
-        return status.isOpenPeriod();
+        // TEMPORARY until status flow is created
+        if(status != null){
+            return status.isOpenPeriod();
+        } else {
+            return true;
+        }
+                
     }
 
-    public List<OccEvent> getVisibleEventList(){
-        List<OccEvent> visEventList = new ArrayList<>();
-        if(eventList != null){
-            for (OccEvent ev : eventList) {
-                if (!ev.isActive() && !isShowInactiveEvents()) {
-                    continue;
-                }
-                if (ev.isHidden() && !isShowHiddenEvents()) {
-                    continue;
-                }
-                System.out.println("OccPeriod.getVisibleEvent | adding event ID " + ev.getEventID());
-                visEventList.add(ev);
-            } // close for   
-        }
-        return visEventList;
-    }
-    
-     /**
-     * @return the proposalListVisible
-     */
-    public List<Proposal> getProposalListVisible() {
-        proposalListVisible.clear();
-        if(proposalList != null && !proposalList.isEmpty()){
-            for(Proposal p: proposalList){
-                if(p.isActive() && !p.isHidden()){
-                    proposalListVisible.add(p);
-                } else if(p.isActive() 
-                        && p.isHidden() 
-                        && showHiddenProposals 
-                        && !p.getDirective().isRefuseToBeHidden()){
-                    proposalListVisible.add(p);
-                } else if(!p.isActive() && showInactiveProposals){
-                    proposalListVisible.add(p);
-                }
+    @Override
+    public boolean isAllRulesPassed() {
+        boolean allPassed = true;
+        for(EventRuleImplementation er: eventRuleList){
+            if(er.getPassedRuleTS() == null){
+                allPassed = false;
+                break;
             }
         }
-        return proposalListVisible;
+        return allPassed;
+    }
+
+    @Override
+    public void setEventRuleList(List<EventRuleImplementation> lst) {
+        eventRuleList = lst;
+    }
+
+    @Override
+    public List<Event> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
+        List<Event> visEventList = new ArrayList<>();
+        if(eventList != null){
+            for (Event ev : eventList) {
+                switch(voahle){
+                    case VIEW_ACTIVE_HIDDEN:
+                        if (ev.isActive()
+                                && ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if (ev.isActive()
+                                && !ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ALL:
+                        visEventList.add(ev);
+                        break;
+                    case VIEW_INACTIVE:
+                        if (!ev.isActive()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    default:
+                        visEventList.add(ev);
+                } // close switch
+            } // close for   
+        } // close null check
+        return visEventList;
+    }
+
+    @Override
+    public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere) {
+        List<EventRuleImplementation> evRuleList = new ArrayList<>();
+        if(eventRuleList != null){
+            for(EventRuleImplementation eri: eventRuleList){
+                switch(voere){
+                    case VIEW_ACTIVE_NOT_PASSED:
+                        if(eri.isActiveRuleAbstract()
+                                && eri.getPassedRuleTS() == null){
+                            evRuleList.add(eri);
+                        }
+                        break;
+                    case VIEW_ACTIVE_PASSED:
+                        if(eri.isActiveRuleAbstract()
+                                && eri.getPassedRuleTS() != null){
+                            evRuleList.add(eri);
+                        }
+                        break;
+                    case VIEW_ALL:
+                        evRuleList.add(eri);
+                        break;
+                    case VIEW_INACTIVE:
+                        if(!eri.isActiveRuleAbstract()){
+                            evRuleList.add(eri);
+                        }
+                        break;
+                    default:
+                        evRuleList.add(eri);
+                } // close switch
+            } // close loop
+        } // close null check
+        return evRuleList;
     }
     
-      public List<OccEvent> getActiveEventList() {
-        List<OccEvent> actEvList = new ArrayList<>();
-            Iterator<OccEvent> iter = eventList.iterator();
-                while(iter.hasNext()){
-                    OccEvent ev = iter.next();
-                    if(ev.isActive()){
-                        actEvList.add(ev);
-                    }
-                }
-        return actEvList;
+
+    @Override
+    public List<Proposal> assembleProposalList(ViewOptionsProposalsEnum vope) {
+        List<Proposal> proposalListVisible = new ArrayList<>();
+        if(proposalList != null && !proposalList.isEmpty()){
+            for(Proposal p: proposalList){
+                switch(vope){
+                    case VIEW_ALL:
+                        proposalListVisible.add(p);
+                        break;
+                    case VIEW_ACTIVE_HIDDEN:
+                        if(p.isActive() 
+                                && p.isHidden()){
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if(p.isActive() 
+                                && !p.isHidden()
+                                && !p.getDirective().isRefuseToBeHidden()){
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_EVALUATED:
+                        if(p.getResponseTS() != null){
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_INACTIVE:
+                        if(!p.isActive()){
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_NOT_EVALUATED:
+                        if(p.getResponseTS() == null){
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    default:
+                        proposalListVisible.add(p);
+                } // switch
+            } // for
+        } // if
+        return proposalListVisible;
     }
-      
-   
+
     
     /**
      * @return the periodID
@@ -175,12 +268,6 @@ public class OccPeriod
         return personList;
     }
 
-    /**
-     * @return the eventList
-     */
-    public List<OccEvent> getEventList() {
-        return eventList;
-    }
 
     /**
      * @return the proposalList
@@ -357,12 +444,6 @@ public class OccPeriod
         this.personList = personList;
     }
 
-    /**
-     * @param eventList the eventList to set
-     */
-    public void setEventList(List<OccEvent> eventList) {
-        this.eventList = eventList;
-    }
 
     /**
      * @param proposalList the proposalList to set
@@ -513,20 +594,7 @@ public class OccPeriod
 
    
 
-    /**
-     * @return the eventRuleOccPeriodList
-     */
-    public List<EventRuleOccPeriod> getEventRuleOccPeriodList() {
-        return eventRuleOccPeriodList;
-    }
-
-    /**
-     * @param eventRuleOccPeriodList the eventRuleOccPeriodList to set
-     */
-    public void setEventRuleOccPeriodList(List<EventRuleOccPeriod> eventRuleOccPeriodList) {
-        this.eventRuleOccPeriodList = eventRuleOccPeriodList;
-    }
-
+   
     /**
      * @return the startDateUtilDate
      */
@@ -585,34 +653,6 @@ public class OccPeriod
     }
 
     /**
-     * @return the showHiddenEvents
-     */
-    public boolean isShowHiddenEvents() {
-        return showHiddenEvents;
-    }
-
-    /**
-     * @return the showInactiveEvents
-     */
-    public boolean isShowInactiveEvents() {
-        return showInactiveEvents;
-    }
-
-    /**
-     * @param showHiddenEvents the showHiddenEvents to set
-     */
-    public void setShowHiddenEvents(boolean showHiddenEvents) {
-        this.showHiddenEvents = showHiddenEvents;
-    }
-
-    /**
-     * @param showInactiveEvents the showInactiveEvents to set
-     */
-    public void setShowInactiveEvents(boolean showInactiveEvents) {
-        this.showInactiveEvents = showInactiveEvents;
-    }
-
-    /**
      * @return the readyForPeriodAuthorization
      */
     public boolean isReadyForPeriodAuthorization() {
@@ -624,45 +664,6 @@ public class OccPeriod
      */
     public void setReadyForPeriodAuthorization(boolean readyForPeriodAuthorization) {
         this.readyForPeriodAuthorization = readyForPeriodAuthorization;
-    }
-
-   
-
-    /**
-     * @param proposalListVisible the proposalListVisible to set
-     */
-    public void setProposalListVisible(List<Proposal> proposalListVisible) {
-        this.proposalListVisible = proposalListVisible;
-    }
-
-   
-
-    /**
-     * @return the showInactiveProposals
-     */
-    public boolean isShowInactiveProposals() {
-        return showInactiveProposals;
-    }
-
-    /**
-     * @param showInactiveProposals the showInactiveProposals to set
-     */
-    public void setShowInactiveProposals(boolean showInactiveProposals) {
-        this.showInactiveProposals = showInactiveProposals;
-    }
-
-    /**
-     * @return the showHiddenProposals
-     */
-    public boolean isShowHiddenProposals() {
-        return showHiddenProposals;
-    }
-
-    /**
-     * @param showHiddenProposals the showHiddenProposals to set
-     */
-    public void setShowHiddenProposals(boolean showHiddenProposals) {
-        this.showHiddenProposals = showHiddenProposals;
     }
 
     /**
@@ -692,5 +693,4 @@ public class OccPeriod
     public void setGoverningInspection(OccInspection governingInspection) {
         this.governingInspection = governingInspection;
     }
-    
 }

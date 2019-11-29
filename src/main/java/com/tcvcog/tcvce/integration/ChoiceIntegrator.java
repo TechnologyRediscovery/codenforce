@@ -140,7 +140,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             choice = choiceEvCat;
         } else if (rs.getInt("eventrule_ruleid") != 0) {
             ChoiceEventRule choiceEvRule = new ChoiceEventRule();
-            choiceEvRule.setRule(ei.getEventRule(rs.getInt("eventrule_ruleid")));
+            choiceEvRule.setRule(ei.rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
             choiceEvRule.setAddRuleFuncSwitch(rs.getBoolean("addeventrule"));
             choice = choiceEvRule;
         } else if (rs.getString("worflowpagetriggerconstantvar") != null){
@@ -306,7 +306,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         prop.setResponderActual(ui.getUser(rs.getInt("responderactual_userid")));
         prop.setProposalRejected(rs.getBoolean("rejectproposal"));
         if(rs.getTimestamp("responsetimestamp") != null){
-            prop.setResponseTimestamp(rs.getTimestamp("responsetimestamp").toLocalDateTime());
+            prop.setResponseTS(rs.getTimestamp("responsetimestamp").toLocalDateTime());
         }
         
         prop.setActive(rs.getBoolean("active"));
@@ -387,8 +387,8 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             }
             
             stmt.setBoolean(8, prop.isProposalRejected());
-            if(prop.getResponseTimestamp() != null){
-                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(prop.getResponseTimestamp()));
+            if(prop.getResponseTS() != null){
+                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(prop.getResponseTS()));
             } else {
                 stmt.setNull(9, java.sql.Types.NULL);
             }
@@ -699,8 +699,8 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(7, java.sql.Types.NULL);
             }
             stmt.setBoolean(8, prop.isProposalRejected());
-            if(prop.getResponseTimestamp() != null){
-                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(prop.getResponseTimestamp()));
+            if(prop.getResponseTS() != null){
+                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(prop.getResponseTS()));
             } else {
                 stmt.setNull(9, java.sql.Types.NULL);
             }

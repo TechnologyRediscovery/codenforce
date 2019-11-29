@@ -236,7 +236,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mp.setContinuousoccupancybufferdays(rs.getInt("continuousoccupancybufferdays"));
         mp.setMinimumuserranktodeclarerentalintent(rs.getInt("minimumuserranktodeclarerentalintent"));
         
-        mp.setEventRuleSetCE(ei.getEventRuleSet(rs.getInt("profileid")));
+        mp.setEventRuleSetCE(ei.rules_getEventRuleSet(rs.getInt("profileid")));
         mp.setOccPeriodTypeList(oi.getOccPeriodTypeList(rs.getInt("profileid")));
         if(mp.getOccPeriodTypeList() == null){
             mp.setOccPeriodTypeList(new ArrayList<OccPeriodType>());
