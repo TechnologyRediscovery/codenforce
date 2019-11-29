@@ -481,7 +481,7 @@
     <!--we need users to pass through this cycle as soon as they try to access anything in /restricted-->
     
     <navigation-rule>
-        <from-view-id>*</from-view-id>
+        <from-view-id>/public/systemHome.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>publicPortal</from-outcome>
             <to-view-id>/public/publicDashboard.xhtml</to-view-id>
@@ -748,6 +748,9 @@
             <redirect />
         </navigation-case>
     </navigation-rule>
+    
+    
+   
     
         
     <!--help-->
@@ -1225,7 +1228,6 @@
         <navigation-case>
             <from-outcome>occInspections</from-outcome>
             <to-view-id>/restricted/cogview/inspections.xhtml</to-view-id>
-            
         </navigation-case>
         
         <navigation-case>
@@ -1239,8 +1241,8 @@
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>checklist</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/checklsit.xhtml</to-view-id>
+            <from-outcome>checklists</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/checklists.xhtml</to-view-id>
         </navigation-case>
         
        <navigation-case>
@@ -1255,17 +1257,7 @@
 
         <navigation-case>
             <from-outcome>feeManage</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/feeTypeManage.xhtml</to-view-id>
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>editFees</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/feeManage.xhtml</to-view-id>
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>feePermissions</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/feePermissions.xhtml</to-view-id>
         </navigation-case>
         
         <navigation-case>
@@ -1548,6 +1540,39 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
+        <managed-bean-name>cEActionRequestsReportBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsReportBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>eventCECaseReportBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventCECaseReportBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>personSearchPublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonSearchPublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>personEditPublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonEditPublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>dataCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.DataCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>choiceCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.ChoiceCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>choiceIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.ChoiceIntegrator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
         <managed-bean-name>uploadBlobBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.UploadBlobBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>

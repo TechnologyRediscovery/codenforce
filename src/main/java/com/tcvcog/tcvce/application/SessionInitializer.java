@@ -272,11 +272,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     private void populateSessionObjectQueues(UserAuthorized ua, MunicipalityDataHeavy m) throws IntegrationException, CaseLifecycleException{
         SessionBean sessionBean = getSessionBean();
         
-        PersonCoordinator persCoord = getPersonCoordinator();
-        CaseCoordinator caseCoord = getCaseCoordinator();
         PropertyIntegrator propI = getPropertyIntegrator();
-        PersonIntegrator persInt = getPersonIntegrator();
-        CaseIntegrator caseInt = getCaseIntegrator();
         SearchCoordinator searchCoord = getSearchCoordinator();
         
         
