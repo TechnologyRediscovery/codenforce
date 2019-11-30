@@ -25,6 +25,9 @@ public class NavigationSubItem {
     private String value;
     private String pagePath;
     private String icon;
+    /**
+     * A disabled sub item will 
+     */
     private boolean disable;
 
 

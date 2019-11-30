@@ -492,6 +492,11 @@
             <to-view-id>/restricted/initiateInternalSession.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        <navigation-case>
+            <from-outcome>testInit</from-outcome>
+            <to-view-id>/restricted/testInit.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
     </navigation-rule>
     
     <navigation-rule>

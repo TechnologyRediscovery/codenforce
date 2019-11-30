@@ -16,6 +16,8 @@
  */
 package com.tcvcog.tcvce.application;
 
+import javax.faces.context.ExternalContext;
+
 /**
  *
  * @author sylvia
@@ -30,8 +32,16 @@ public class LoginBB extends BackingBeanUtils {
     
      public String loginToMissionControl(){
          System.out.println("LoginBB.loginToMissionControl");
+         System.out.print("External User: ");
+         ExternalContext ec = getFacesContext().getExternalContext();
+         System.out.println(ec.getRemoteUser());
+         System.out.println(ec.getAuthType());
+         System.out.println(ec.getSessionId(false));
+         
         
         return "startInitiationProcess";
+//           return "testInit";
+           
     }
     
 }

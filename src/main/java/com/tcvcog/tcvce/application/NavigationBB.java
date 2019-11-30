@@ -51,6 +51,11 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public NavigationBB() {
     }
     
+    
+    public static void initBean(){
+        System.out.println("NavigationBB.initBean");
+    }
+    
     public String gotoPropertyProfile(){
         if(getSessionBean().getSessionProperty() != null){
             return "propertyProfile";

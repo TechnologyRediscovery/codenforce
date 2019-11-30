@@ -110,6 +110,16 @@
     </security-constraint>
     <security-constraint>
         <web-resource-collection>
+            <web-resource-name>usergen</web-resource-name>
+            <url-pattern>/restricted/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description/>
+            <role-name>User</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <web-resource-collection>
             <web-resource-name>Developer</web-resource-name>
             <url-pattern>/restricted/*</url-pattern>
         </web-resource-collection>

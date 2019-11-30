@@ -57,6 +57,7 @@ import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
 import java.io.Serializable;
 import java.util.List;
+import javax.annotation.PostConstruct;
 
 /**
  * Stores member vars of pretty much all our custom types
@@ -167,6 +168,12 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public SessionBean() {
         System.out.println("SessionBean.SessionBean");
+    }
+    
+    
+    @PostConstruct
+    public void initBean(){
+        System.out.println("SessionBean.initBean");
     }
 
     /**
