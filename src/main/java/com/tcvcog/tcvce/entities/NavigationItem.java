@@ -28,6 +28,10 @@ public class NavigationItem {
     private String icon;
     private String searchpageurl;
     private String currentInfo;
+    /**
+     * This contains all the sub-navigation items that can be accessed from 
+     * the current NavigationItem
+     */
     private List<NavigationSubItem> subNavitem;
 
     public String getValue() {

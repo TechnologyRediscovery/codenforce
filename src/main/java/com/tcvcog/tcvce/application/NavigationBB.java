@@ -191,6 +191,12 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         return navList;
     }
 
+    
+    /*
+     * Note that these sub-items do not contain a page URL yet, 
+     * since the sub-pages had not been created at the time of Xiaohong creating
+     * the nav system.
+     */
     //Nav Bar
     //Sub NavItem: Property
     private final NavigationSubItem propertyUnits = getNavSubItem("Units", "", "fa fa-sign-in", false);
@@ -405,6 +411,9 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
 
         ArrayList<NavigationItem> navList;
         navList = new ArrayList<>();
+        // note: no page URLs are stored for side meaning - meanng side bar items don't 
+        // get selected automatically based on current page
+        // and are not related to a currently loaded object
         try {
             //NavItem: CE
             NavigationItem CEconfigItem = getNavItem("", "", "Code Enforcement", "fa fa-balance-scale", getSidebarCEConfigList());
@@ -442,9 +451,9 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         return mn;
     }
 
-    public NavigationItem getNavItem(String currentInfo, String searchPageUrl, String value, String icon, List navSubList) {
+    public NavigationItem getNavItem(String currentInfo, String searchPageUrl, String navCategory, String icon, List navSubList) {
         NavigationItem ni = new NavigationItem();
-        ni.setValue(value);
+        ni.setValue(navCategory);
         ni.setIcon(icon);
         ni.setSubNavitem(navSubList);
         ni.setSearchpageurl(searchPageUrl);
