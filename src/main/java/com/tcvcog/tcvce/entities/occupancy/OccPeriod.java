@@ -6,31 +6,12 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.EntityUtils;
-import com.tcvcog.tcvce.entities.Event;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.EventRuleAbstract;
-import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccPeriod;
-import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import com.tcvcog.tcvce.entities.Openable;
-import com.tcvcog.tcvce.entities.Payment;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
-import java.util.Collections;
-import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
-import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 
 /**
  * Primary Business Object BOB for holding data about Occupancy Periods
@@ -39,9 +20,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 public class OccPeriod 
         extends EntityUtils 
         implements  Serializable,
-                    Openable,
-                    IFace_EventRuleGoverned,
-                    IFace_ProposalDriven{
+                    Openable{
     
     private int periodID;
     private int propertyUnitID;
@@ -50,19 +29,7 @@ public class OccPeriod
     
     private boolean readyForPeriodAuthorization;
     
-    private List<OccPermitApplication> applicationList;
-    private List<PersonOccPeriod> personList;
-    
-    private List<Event> eventList;
-    private List<Proposal> proposalList;
-    private List<EventRuleImplementation> eventRuleList;
-    
     private OccInspection governingInspection;
-    private List<OccInspection> inspectionList;
-    private List<OccPermit> permitList;
-    private List<Integer> blobIDList;
-    
-    private List<Payment> paymentList;
     
     private User manager;
      
@@ -90,14 +57,7 @@ public class OccPeriod
     
     private String notes;
     
-
     @Override
-    public void setEventList(List<Event> lst) {
-        eventList = lst;
-    }
-
-    
-     @Override
     public boolean isOpen() {
         // TEMPORARY until status flow is created
         if(status != null){
@@ -107,138 +67,6 @@ public class OccPeriod
         }
                 
     }
-
-    @Override
-    public boolean isAllRulesPassed() {
-        boolean allPassed = true;
-        for(EventRuleImplementation er: eventRuleList){
-            if(er.getPassedRuleTS() == null){
-                allPassed = false;
-                break;
-            }
-        }
-        return allPassed;
-    }
-
-    @Override
-    public void setEventRuleList(List<EventRuleImplementation> lst) {
-        eventRuleList = lst;
-    }
-
-    @Override
-    public List<Event> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
-        List<Event> visEventList = new ArrayList<>();
-        if(eventList != null){
-            for (Event ev : eventList) {
-                switch(voahle){
-                    case VIEW_ACTIVE_HIDDEN:
-                        if (ev.isActive()
-                                && ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ACTIVE_NOTHIDDEN:
-                        if (ev.isActive()
-                                && !ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ALL:
-                        visEventList.add(ev);
-                        break;
-                    case VIEW_INACTIVE:
-                        if (!ev.isActive()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    default:
-                        visEventList.add(ev);
-                } // close switch
-            } // close for   
-        } // close null check
-        return visEventList;
-    }
-
-    @Override
-    public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere) {
-        List<EventRuleImplementation> evRuleList = new ArrayList<>();
-        if(eventRuleList != null){
-            for(EventRuleImplementation eri: eventRuleList){
-                switch(voere){
-                    case VIEW_ACTIVE_NOT_PASSED:
-                        if(eri.isActiveRuleAbstract()
-                                && eri.getPassedRuleTS() == null){
-                            evRuleList.add(eri);
-                        }
-                        break;
-                    case VIEW_ACTIVE_PASSED:
-                        if(eri.isActiveRuleAbstract()
-                                && eri.getPassedRuleTS() != null){
-                            evRuleList.add(eri);
-                        }
-                        break;
-                    case VIEW_ALL:
-                        evRuleList.add(eri);
-                        break;
-                    case VIEW_INACTIVE:
-                        if(!eri.isActiveRuleAbstract()){
-                            evRuleList.add(eri);
-                        }
-                        break;
-                    default:
-                        evRuleList.add(eri);
-                } // close switch
-            } // close loop
-        } // close null check
-        return evRuleList;
-    }
-    
-
-    @Override
-    public List<Proposal> assembleProposalList(ViewOptionsProposalsEnum vope) {
-        List<Proposal> proposalListVisible = new ArrayList<>();
-        if(proposalList != null && !proposalList.isEmpty()){
-            for(Proposal p: proposalList){
-                switch(vope){
-                    case VIEW_ALL:
-                        proposalListVisible.add(p);
-                        break;
-                    case VIEW_ACTIVE_HIDDEN:
-                        if(p.isActive() 
-                                && p.isHidden()){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_ACTIVE_NOTHIDDEN:
-                        if(p.isActive() 
-                                && !p.isHidden()
-                                && !p.getDirective().isRefuseToBeHidden()){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_EVALUATED:
-                        if(p.getResponseTS() != null){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_INACTIVE:
-                        if(!p.isActive()){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_NOT_EVALUATED:
-                        if(p.getResponseTS() == null){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    default:
-                        proposalListVisible.add(p);
-                } // switch
-            } // for
-        } // if
-        return proposalListVisible;
-    }
-
     
     /**
      * @return the periodID
@@ -253,50 +81,7 @@ public class OccPeriod
     public int getPropertyUnitID() {
         return propertyUnitID;
     }
-
-    /**
-     * @return the applicationList
-     */
-    public List<OccPermitApplication> getApplicationList() {
-        return applicationList;
-    }
-
-    /**
-     * @return the personList
-     */
-    public List<PersonOccPeriod> getPersonList() {
-        return personList;
-    }
-
-
-    /**
-     * @return the proposalList
-     */
-    public List<Proposal> getProposalList() {
-        return proposalList;
-    }
-
-    /**
-     * @return the inspectionList
-     */
-    public List<OccInspection> getInspectionList() {
-        return inspectionList;
-    }
-
-    /**
-     * @return the permitList
-     */
-    public List<OccPermit> getPermitList() {
-        return permitList;
-    }
-
-    /**
-     * @return the blobIDList
-     */
-    public List<Integer> getBlobIDList() {
-        return blobIDList;
-    }
-
+  
     /**
      * @return the manager
      */
@@ -429,49 +214,7 @@ public class OccPeriod
     public void setPropertyUnitID(int propertyUnitID) {
         this.propertyUnitID = propertyUnitID;
     }
-
-    /**
-     * @param applicationList the applicationList to set
-     */
-    public void setApplicationList(List<OccPermitApplication> applicationList) {
-        this.applicationList = applicationList;
-    }
-
-    /**
-     * @param personList the personList to set
-     */
-    public void setPersonList(List<PersonOccPeriod> personList) {
-        this.personList = personList;
-    }
-
-
-    /**
-     * @param proposalList the proposalList to set
-     */
-    public void setProposalList(List<Proposal> proposalList) {
-        this.proposalList = proposalList;
-    }
-
-    /**
-     * @param inspectionList the inspectionList to set
-     */
-    public void setInspectionList(List<OccInspection> inspectionList) {
-        this.inspectionList = inspectionList;
-    }
-
-    /**
-     * @param permitList the permitList to set
-     */
-    public void setPermitList(List<OccPermit> permitList) {
-        this.permitList = permitList;
-    }
-
-    /**
-     * @param blobIDList the blobIDList to set
-     */
-    public void setBlobIDList(List<Integer> blobIDList) {
-        this.blobIDList = blobIDList;
-    }
+    
 
     /**
      * @param manager the manager to set
@@ -666,19 +409,7 @@ public class OccPeriod
         this.readyForPeriodAuthorization = readyForPeriodAuthorization;
     }
 
-    /**
-     * @return the paymentList
-     */
-    public List<Payment> getPaymentList() {
-        return paymentList;
-    }
-
-    /**
-     * @param paymentList the paymentList to set
-     */
-    public void setPaymentList(List<Payment> paymentList) {
-        this.paymentList = paymentList;
-    }
+  
 
     /**
      * @return the governingInspection

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
@@ -52,7 +53,10 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
     
     
+    @PostConstruct
     public static void initBean(){
+        // Load Navigation lists from SystemCoordinator and place
+        // in member variables here
         System.out.println("NavigationBB.initBean");
     }
     

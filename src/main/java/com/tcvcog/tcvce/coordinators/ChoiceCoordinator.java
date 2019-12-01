@@ -33,6 +33,7 @@ import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -66,7 +67,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
     }
     
-    public OccPeriod configureProposals(OccPeriod oPeriod, UserAuthorized u) throws EventException, AuthorizationException{
+    public OccPeriodDataHeavy configureProposals(OccPeriodDataHeavy oPeriod, UserAuthorized u) throws EventException, AuthorizationException{
         if(oPeriod != null){
             if(oPeriod.getProposalList() != null){
                 Iterator<Proposal> iter = oPeriod.getProposalList().iterator();

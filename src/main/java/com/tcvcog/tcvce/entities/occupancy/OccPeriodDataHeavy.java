@@ -16,6 +16,19 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
+import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
+import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventRuleImplementation;
+import com.tcvcog.tcvce.entities.Payment;
+import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.Proposal;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The Data Intensive subclass of the OccPeriod tree
  * We want to be able to load info about OccPeriods without having to 
@@ -25,6 +38,246 @@ package com.tcvcog.tcvce.entities.occupancy;
  * Object if we're actually editing that particular OccPeriod
  * @author sylvia
  */
-public class OccPeriodDataHeavy {
+public  class       OccPeriodDataHeavy 
+        extends     OccPeriod 
+        implements  IFace_EventRuleGoverned, 
+                    IFace_ProposalDriven{
+
+    private List<OccPermitApplication> applicationList;
+    private List<PersonOccPeriod> personList;
+    private List<Event> eventList;
+    private List<Proposal> proposalList;
+    private List<EventRuleImplementation> eventRuleList;
+    private List<OccInspection> inspectionList;
+    private List<OccPermit> permitList;
+    private List<Integer> blobIDList;
+    private List<Payment> paymentList;
+
+    @Override
+    public void setEventRuleList(List<EventRuleImplementation> lst) {
+        eventRuleList = lst;
+    }
+    
+      @Override
+    public void setEventList(List<Event> lst) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public boolean isAllRulesPassed() {
+        boolean allPassed = true;
+        for(EventRuleImplementation er: eventRuleList){
+            if(er.getPassedRuleTS() == null){
+                allPassed = false;
+                break;
+            }
+        }
+        return allPassed;
+    }
+
+    @Override
+    public List assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
+        List<Event> visEventList = new ArrayList<>();
+        if (eventList != null) {
+            for (Event ev : eventList) {
+                switch (voahle) {
+                    case VIEW_ACTIVE_HIDDEN:
+                        if (ev.isActive() && ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if (ev.isActive() && !ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ALL:
+                        visEventList.add(ev);
+                        break;
+                    case VIEW_INACTIVE:
+                        if (!ev.isActive()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    default:
+                        visEventList.add(ev);
+                } // close switch
+            } // close for
+        } // close null check
+        return visEventList;
+    }
+
+    @Override
+    public List assembleEventRuleList(ViewOptionsEventRulesEnum voere) {
+        List<EventRuleImplementation> evRuleList = new ArrayList<>();
+        if (eventRuleList != null) {
+            for (EventRuleImplementation eri : eventRuleList) {
+                switch (voere) {
+                    case VIEW_ACTIVE_NOT_PASSED:
+                        if (eri.isActiveRuleAbstract() && eri.getPassedRuleTS() == null) {
+                            evRuleList.add(eri);
+                        }
+                        break;
+                    case VIEW_ACTIVE_PASSED:
+                        if (eri.isActiveRuleAbstract() && eri.getPassedRuleTS() != null) {
+                            evRuleList.add(eri);
+                        }
+                        break;
+                    case VIEW_ALL:
+                        evRuleList.add(eri);
+                        break;
+                    case VIEW_INACTIVE:
+                        if (!eri.isActiveRuleAbstract()) {
+                            evRuleList.add(eri);
+                        }
+                        break;
+                    default:
+                        evRuleList.add(eri);
+                } // close switch
+            } // close loop
+        } // close null check
+        return evRuleList;
+    }
+
+    @Override
+    public List assembleProposalList(ViewOptionsProposalsEnum vope) {
+        List<Proposal> proposalListVisible = new ArrayList<>();
+        if (proposalList != null && !proposalList.isEmpty()) {
+            for (Proposal p : proposalList) {
+                switch (vope) {
+                    case VIEW_ALL:
+                        proposalListVisible.add(p);
+                        break;
+                    case VIEW_ACTIVE_HIDDEN:
+                        if (p.isActive() && p.isHidden()) {
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if (p.isActive() && !p.isHidden() && !p.getDirective().isRefuseToBeHidden()) {
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_EVALUATED:
+                        if (p.getResponseTS() != null) {
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_INACTIVE:
+                        if (!p.isActive()) {
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_NOT_EVALUATED:
+                        if (p.getResponseTS() == null) {
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    default:
+                        proposalListVisible.add(p);
+                } // switch
+            } // for
+        } // if
+        return proposalListVisible;
+    }
+    
+      /**
+     * @return the paymentList
+     */
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    /**
+     * @param paymentList the paymentList to set
+     */
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
+    }
+
+    /**
+     * @return the applicationList
+     */
+    public List getApplicationList() {
+        return applicationList;
+    }
+
+    /**
+     * @return the personList
+     */
+    public List getPersonList() {
+        return personList;
+    }
+
+    /**
+     * @return the proposalList
+     */
+    public List getProposalList() {
+        return proposalList;
+    }
+
+    /**
+     * @return the inspectionList
+     */
+    public List getInspectionList() {
+        return inspectionList;
+    }
+
+    /**
+     * @return the permitList
+     */
+    public List getPermitList() {
+        return permitList;
+    }
+
+    /**
+     * @return the blobIDList
+     */
+    public List getBlobIDList() {
+        return blobIDList;
+    }
+
+    /**
+     * @param applicationList the applicationList to set
+     */
+    public void setApplicationList(List<OccPermitApplication> applicationList) {
+        this.applicationList = applicationList;
+    }
+
+    /**
+     * @param personList the personList to set
+     */
+    public void setPersonList(List<PersonOccPeriod> personList) {
+        this.personList = personList;
+    }
+
+    /**
+     * @param proposalList the proposalList to set
+     */
+    @Override
+    public void setProposalList(List<Proposal> proposalList) {
+        this.proposalList = proposalList;
+    }
+
+    /**
+     * @param inspectionList the inspectionList to set
+     */
+    public void setInspectionList(List<OccInspection> inspectionList) {
+        this.inspectionList = inspectionList;
+    }
+
+    /**
+     * @param permitList the permitList to set
+     */
+    public void setPermitList(List<OccPermit> permitList) {
+        this.permitList = permitList;
+    }
+
+    /**
+     * @param blobIDList the blobIDList to set
+     */
+    public void setBlobIDList(List<Integer> blobIDList) {
+        this.blobIDList = blobIDList;
+    }
     
 }

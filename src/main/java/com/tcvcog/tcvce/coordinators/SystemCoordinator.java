@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 
 /**
  *
@@ -51,6 +52,11 @@ public class SystemCoordinator extends BackingBeanUtils  implements Serializable
      * Creates a new instance of LoggingCoordinator
      */
     public SystemCoordinator() {
+    }
+    
+    @PostConstruct
+    public void initBean(){
+        
     }
     
         

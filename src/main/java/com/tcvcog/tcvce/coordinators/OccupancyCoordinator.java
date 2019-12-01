@@ -57,6 +57,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
@@ -101,14 +102,24 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
 
     public OccPeriod configureOccPeriod(OccPeriod period, User u) throws EventException, AuthorizationException, IntegrationException, CaseLifecycleException, ViolationException {
+        return period;
+
+    }
+    
+    public OccPeriodDataHeavy configureOccPeriodDataHeavy(OccPeriodDataHeavy period, User u) throws CaseLifecycleException, IntegrationException, AuthorizationException, EventException{
         ChoiceCoordinator cc = getChoiceCoordinator();
         EventCoordinator ec = getEventCoordinator();
         UserCoordinator uc = getUserCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
-        UserAuthorized ua = uc.authorizeUser(   u, 
-                                                pi.getPropertyUnitWithProp(period.getPeriodID()).getProperty().getMuni(),
-                                                null);
+        
+        UserAuthorized ua =  null;
+        if(!(u instanceof UserAuthorized)){
+        
+            ua = uc.authorizeUser(  u, 
+                                    pi.getPropertyUnitWithProp(period.getPeriodID()).getProperty().getMuni(),
+                                    null);
+        }
         period.setGoverningInspection(designateGoverningInspection(period));
         period = cc.configureProposals(period, ua);
         // Removed during occbeta overhaul
@@ -116,15 +127,16 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 //                && ec.rules_evaluateEventRules(period)){
 //            period.setReadyForPeriodAuthorization(true);
 //        }
+        
         return period;
-
+        
     }
     
     /**
      * TODO: Finish
      * @param period 
      */
-    public void configureRuleSet(OccPeriod period){
+    public void configureRuleSet(OccPeriodDataHeavy period){
 //        List<EventRuleImplementation> evRuleList = period.getb(ViewOptionsEventRulesEnum.VIEW_ALL);
 //        for(EventRuleAbstract era: evRuleList){
 //            if(era.getPromptingDirective()!= null){
@@ -359,11 +371,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * Updates DB to mark the passed in OccInspection the governing one in the 
      * given OccPeriod
      * @param period
-     * @param insp to be made governing
+     
      * @return the governing Inspection
      * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
      */
-    public OccInspection designateGoverningInspection(OccPeriod period) throws CaseLifecycleException{
+    public OccInspection designateGoverningInspection(OccPeriodDataHeavy period) throws CaseLifecycleException{
         List<OccInspection> inspectionList = period.getInspectionList();
         OccInspection selIns = null;
         // logic for determining the currentOccInspection
