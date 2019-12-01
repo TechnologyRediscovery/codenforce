@@ -150,7 +150,9 @@ public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
         CodeIntegrator ci = getCodeIntegrator();
         CodeSet cs = getSessionBean().getActiveCodeSet();
         try {
-            currentCodeSet = ci.getCodeSetBySetID(cs.getCodeSetID());
+            if(cs != null){
+                currentCodeSet = ci.getCodeSetBySetID(cs.getCodeSetID());
+            }
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
