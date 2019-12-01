@@ -1172,7 +1172,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public PropertyUnitWithLists getPropertyUnitWithLists(int unitID, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyUnitWithLists puwl = new PropertyUnitWithLists(getPropertyUnitByPropertyUnitID(unitID));
-        puwl.setPeriodList(oi.getOccPeriodList(unitID, u));
+        puwl.setPeriodList(oi.getOccPeriodList(unitID));
         return puwl;
     }
     

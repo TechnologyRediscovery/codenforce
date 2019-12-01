@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccInspectionStatusEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
@@ -95,8 +96,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public static final String ADD_WITH_COMPLIANCE = "comp";
     public static final String ADD_AS_UNINSPECTED = "insp";
 
+    private OccPeriodDataHeavy currentOccPeriod;
+    
     private OccInspection currentInspection;
-    private OccPeriod currentOccPeriod;
     private PropertyUnitWithProp currentPropertyUnit;
     private Property currentProperty;
     
@@ -191,12 +193,17 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         // set our blank lists used only by elements on this page
         spacesInTypeList = new ArrayList<>();
         visibleInspectedSpaceList = new ArrayList<>();
-        
+        OccPeriod sessionPeriod = getSessionBean().getSessionOccPeriod();
         try {
-            if(getSessionBean().getSessionOccPeriod() != null){
-                currentOccPeriod = oi.getOccPeriod(getSessionBean().getSessionOccPeriod().getPeriodID(), getSessionBean().getSessionUser());
-                currentInspection = currentOccPeriod.getGoverningInspection();
+            if(sessionPeriod != null){
+                if(!(sessionPeriod instanceof OccPeriodDataHeavy)){
+                    currentOccPeriod = oi.generateOccPeriodDataHeavy(sessionPeriod);
+                }
+                if(currentOccPeriod.getConfiguredTS() == null){
+                    currentOccPeriod = oc.configureOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessionUser());
+                }
                 currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+                currentInspection = currentOccPeriod.getGoverningInspection();
                 // all inspected spaces are visible by default
                 if(currentInspection != null){
                     currentInspection.setViewSetting(ViewOptionsOccChecklistItemsEnum.ALL_ITEMS);
@@ -220,7 +227,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 //                } 
 //            }
             propertyUnitCandidateList = pi.getPropertyUnitList(getSessionBean().getSessionProperty());
-        } catch (IntegrationException | EventException| AuthorizationException |CaseLifecycleException | ViolationException ex) {
+        } catch (IntegrationException | EventException| AuthorizationException |CaseLifecycleException ex) {
             System.out.println(ex);
         }
         
@@ -441,7 +448,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             ex.getMessage(), ""));
         }
-        reloadCurrentOccPeriod();
+        reloadCurrentOccPeriodDataHeavy();
     }    
     
     public void proposals_clearProposal(Proposal p){
@@ -455,7 +462,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             ex.getMessage(), ""));
         }
-        reloadCurrentOccPeriod();
+        reloadCurrentOccPeriodDataHeavy();
     }    
     
     private void reloadCurrentInspection(){
@@ -476,10 +483,10 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    private void reloadCurrentOccPeriod(){
-        OccupancyIntegrator oi = getOccupancyIntegrator();
+    private void reloadCurrentOccPeriodDataHeavy(){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            currentOccPeriod = oi.getOccPeriod(currentOccPeriod.getPeriodID(), getSessionBean().getSessionUser());
+            currentOccPeriod = oc.reloadOccPeriod(currentOccPeriod, getSessionBean().getSessionUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Reloaded occ period ID " + currentOccPeriod.getPeriodID(), ""));
@@ -636,7 +643,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Update of event rule successful!", ""));
-            reloadCurrentOccPeriod();
+            reloadCurrentOccPeriodDataHeavy();
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -657,7 +664,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "New event rule added with ID " + freshEventRuleID, ""));
             System.out.println("OccInspectionBB.commiteventRuleCreate");
-            reloadCurrentOccPeriod();
+            reloadCurrentOccPeriodDataHeavy();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -732,7 +739,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             OccupancyCoordinator oc = getOccupancyCoordinator();
             try {
                 oc.activateOccInspection(oc.inspectionAction_commenceOccupancyInspection(null, selectedInspectionTemplate, currentOccPeriod, getSessionBean().getSessionUser()));
-                reloadCurrentOccPeriod();
+                reloadCurrentOccPeriodDataHeavy();
                 reloadCurrentInspection();
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -850,7 +857,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 
 //         nullify the session's case so that the reload of currentCase
 //         no the cecaseProfile.xhtml will trigger a new DB read
-        reloadCurrentOccPeriod();
+        reloadCurrentOccPeriodDataHeavy();
     }
      
     /**
@@ -1013,7 +1020,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Error! Unable to certify inspection as passed, sorry.", ""));
         }
-        reloadCurrentOccPeriod();
+        reloadCurrentOccPeriodDataHeavy();
      }
      
      /**
@@ -1093,7 +1100,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 ex.getMessage(), ""));
         }
-        reloadCurrentOccPeriod();
+        reloadCurrentOccPeriodDataHeavy();
          
      }
      
@@ -1127,7 +1134,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 ex.getMessage(), ""));
         }
-        reloadCurrentOccPeriod();
+        reloadCurrentOccPeriodDataHeavy();
      }
      
      
@@ -1328,7 +1335,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     /**
      * @param currentOccPeriod the currentOccPeriod to set
      */
-    public void setCurrentOccPeriod(OccPeriod currentOccPeriod) {
+    public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
         this.currentOccPeriod = currentOccPeriod;
     }
 

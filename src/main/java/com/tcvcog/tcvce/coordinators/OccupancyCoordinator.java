@@ -101,7 +101,20 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccupancyCoordinator() {
     }
 
-    public OccPeriod configureOccPeriod(OccPeriod period, User u) throws EventException, AuthorizationException, IntegrationException, CaseLifecycleException, ViolationException {
+    
+    /**
+     * Shell container for holding configuration logic applicable to OccPeriods 
+     * minus their many lists
+     * 
+     * @param period
+     * @return
+     * @throws EventException
+     * @throws AuthorizationException
+     * @throws IntegrationException
+     * @throws CaseLifecycleException
+     * @throws ViolationException 
+     */
+    public OccPeriod configureOccPeriod(OccPeriod period) throws EventException, AuthorizationException, IntegrationException, CaseLifecycleException, ViolationException {
         return period;
 
     }
@@ -437,22 +450,57 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         System.out.println("OccupancyCoordinator.intitializeNewOccPeriod | period: " + period);
         return period;
     }
-
-    public int insertNewOccPeriod(OccPeriod op, UserAuthorized u) throws IntegrationException, InspectionException {
+    
+    
+    /**
+     * Primary insertion point for the creation of new OccPeriod objects in the DB
+     * The caller  must already have an initialized OccPeriod object to insert
+     * 
+     * @param op an initialized object which can be retrieved from the method
+     * initializeNewOccPeriod in this class
+     * @param u the UserAuthorized requesting the new Period
+     * @return the unique ID given to the fresh OccPeriod by the database 
+     * @throws IntegrationException
+     * @throws InspectionException 
+     */
+    public int insertNewOccPeriod(OccPeriod op, UserAuthorized u) 
+            throws  IntegrationException, 
+                    InspectionException, 
+                    CaseLifecycleException, 
+                    EventException,
+                    AuthorizationException,
+                    ViolationException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         EventIntegrator ei = getEventIntegrator();
+        EventCoordinator ec = getEventCoordinator();
+        
+        int freshOccPeriodID = oi.insertOccPeriod(op); 
+        
+        OccPeriodDataHeavy opdh = oi.generateOccPeriodDataHeavy(oi.getOccPeriod(freshOccPeriodID));
+        
         if(op.getType().getBaseRuleSetID()!= 0){
             EventRuleSet ers = ei.rules_getEventRuleSet(op.getType().getBaseRuleSetID());
+            ec.rules_attachRuleSet(ers, opdh, u);
         }
-        int freshOccPeriodID = oi.insertOccPeriod(op); 
        System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);
-        try {
-            inspectionAction_commenceOccupancyInspection(null, null, oi.getOccPeriod(freshOccPeriodID, u),  u);
-        } catch (EventException | AuthorizationException | CaseLifecycleException | ViolationException ex) {
-            System.out.println(ex);
-        }
 
         return freshOccPeriodID;
+    }
+    
+     public OccPeriodDataHeavy reloadOccPeriod(OccPeriodDataHeavy opdh, User u) 
+            throws  IntegrationException, 
+                    EventException, 
+                    AuthorizationException,
+                    CaseLifecycleException,
+                    ViolationException{
+         
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+         
+        if(opdh != null){
+            opdh = oi.generateOccPeriodDataHeavy(configureOccPeriod(oi.getOccPeriod(opdh.getPeriodID())));
+            opdh = configureOccPeriodDataHeavy(opdh, u);
+        }
+        return opdh;
     }
 
     /**
@@ -464,10 +512,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @param in A skeleton of an OccInspection without an ID number
      * @param tem
      * @param period the OccPeriod to which the OccInspection should be linked
-     * @param templ The template from which the Inspection will draw its
-     * SpaceTypes
      * @param user The current user who will become the Inspector
-     * @param muni The current Muni
      * @return An OccInspection object with the ID given in the DB and a
      * configured Template inside
      * @throws InspectionException

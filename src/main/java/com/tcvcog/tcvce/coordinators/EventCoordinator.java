@@ -48,6 +48,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodStatusEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.integration.ChoiceIntegrator;
@@ -782,6 +783,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Attaches a single event rule to an EventRuleGoverned entity, the type of which is determined
      * internally with instanceof checks for OccPeriod and CECase Objects
+     * 
      * @param era
      * @param rg
      * @param usr
@@ -792,8 +794,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         ChoiceCoordinator cc = getChoiceCoordinator();
         int freshObjectID = 0;
-        if(rg instanceof OccPeriod){
-                OccPeriod op = (OccPeriod) rg;
+        if(rg instanceof OccPeriodDataHeavy){
+                OccPeriodDataHeavy op = (OccPeriodDataHeavy) rg;
                 rules_attachEventRuleAbstractToOccPeriod(era, op, usr);
                 if(freshObjectID != 0 && era.getPromptingDirective() != null){
                     cc.implementDirective(era.getPromptingDirective(), op, null);
@@ -843,7 +845,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public int rules_createEventRuleAbstract(EventRuleAbstract era, OccPeriod period, CECase cse, boolean connectToBOBRuleList, UserAuthorized usr) throws IntegrationException{
+    public int rules_createEventRuleAbstract(EventRuleAbstract era, OccPeriodDataHeavy period, CECase cse, boolean connectToBOBRuleList, UserAuthorized usr) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         ChoiceIntegrator ci = getChoiceIntegrator();
         
@@ -875,7 +877,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return freshEventRuleID;
     }
     
-    private void rules_attachEventRuleAbstractToOccPeriod(EventRuleAbstract era, OccPeriod period, UserAuthorized usr) throws IntegrationException{
+    private void rules_attachEventRuleAbstractToOccPeriod(EventRuleAbstract era, OccPeriodDataHeavy period, UserAuthorized usr) throws IntegrationException{
         
         EventIntegrator ei = getEventIntegrator();
         ChoiceCoordinator cc = getChoiceCoordinator();
@@ -910,10 +912,20 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * Takes in an EventRuleSet object which contains a list of EventRuleAbstract objects
+     * and either an OccPeriod or CECase and implements those abstract rules 
+     * on that particular business object
+     * @param ers
+     * @param rg
+     * @param usr
+     * @throws IntegrationException
+     * @throws CaseLifecycleException 
+     */
     public void rules_attachRuleSet(EventRuleSet ers, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, CaseLifecycleException{
         for(EventRuleAbstract era: ers.getRuleList()){
-            if(rg instanceof OccPeriod){
-                OccPeriod op = (OccPeriod) rg;
+            if(rg instanceof OccPeriodDataHeavy){
+                OccPeriodDataHeavy op = (OccPeriodDataHeavy) rg;
                 rules_attachEventRuleAbstractToOccPeriod(era, op, usr);
             } else if (rg instanceof CECase){
                 CECase cec = (CECase) rg;
@@ -958,7 +970,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public boolean rules_evaluateEventRules(OccPeriod period) throws IntegrationException, CaseLifecycleException, ViolationException{
+    public boolean rules_evaluateEventRules(OccPeriodDataHeavy period) throws IntegrationException, CaseLifecycleException, ViolationException{
         boolean allRulesPassed = true;
         List<EventRuleImplementation> rlst = period.assembleEventRuleList(ViewOptionsEventRulesEnum.VIEW_ALL);
         

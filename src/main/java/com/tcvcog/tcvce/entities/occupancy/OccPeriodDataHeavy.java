@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,13 +46,54 @@ public  class       OccPeriodDataHeavy
 
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
+    
     private List<Event> eventList;
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
+    
     private List<OccInspection> inspectionList;
     private List<OccPermit> permitList;
+    
     private List<Integer> blobIDList;
     private List<Payment> paymentList;
+
+    private LocalDateTime configuredTS;
+    
+    public OccPeriodDataHeavy() {
+    }
+    
+    public OccPeriodDataHeavy(OccPeriod opLight) {
+        this.periodID = opLight.periodID;
+        this.propertyUnitID = opLight.propertyUnitID;
+        this.type = opLight.type;
+        this.status = opLight.status;
+        
+        this.readyForPeriodAuthorization = opLight.readyForPeriodAuthorization;
+        this.governingInspection = opLight.governingInspection;
+        this.manager = opLight.manager;
+        
+        this.periodTypeCertifiedBy = opLight.periodTypeCertifiedBy;
+        this.periodTypeCertifiedTS = opLight.periodTypeCertifiedTS;
+        
+        this.source = opLight.source;
+        this.createdBy = opLight.createdBy;
+        this.createdTS = opLight.createdTS;
+        
+        this.startDate = opLight.startDate;
+        this.startDateCertifiedTS = opLight.startDateCertifiedTS;
+        this.startDateCertifiedBy = opLight.startDateCertifiedBy;
+        
+        this.endDate = opLight.endDate;
+        this.endDateCertifiedTS = opLight.endDateCertifiedTS;
+        this.endDateCertifiedBy = opLight.endDateCertifiedBy;
+        
+        this.authorizedTS = opLight.authorizedTS;
+        this.authorizedBy = opLight.authorizedBy;
+        
+        this.overrideTypeConfig = opLight.overrideTypeConfig;
+        this.notes = opLight.notes;
+
+    }
 
     @Override
     public void setEventRuleList(List<EventRuleImplementation> lst) {
@@ -278,6 +320,20 @@ public  class       OccPeriodDataHeavy
      */
     public void setBlobIDList(List<Integer> blobIDList) {
         this.blobIDList = blobIDList;
+    }
+
+    /**
+     * @return the configuredTS
+     */
+    public LocalDateTime getConfiguredTS() {
+        return configuredTS;
+    }
+
+    /**
+     * @param configuredTS the configuredTS to set
+     */
+    public void setConfiguredTS(LocalDateTime configuredTS) {
+        this.configuredTS = configuredTS;
     }
     
 }

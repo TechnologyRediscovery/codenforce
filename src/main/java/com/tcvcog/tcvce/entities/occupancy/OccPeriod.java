@@ -22,40 +22,40 @@ public class OccPeriod
         implements  Serializable,
                     Openable{
     
-    private int periodID;
-    private int propertyUnitID;
-    private OccPeriodType type;
-    private OccPeriodStatusEnum status;
+    protected int periodID;
+    protected int propertyUnitID;
+    protected OccPeriodType type;
+    protected OccPeriodStatusEnum status;
     
-    private boolean readyForPeriodAuthorization;
+    protected boolean readyForPeriodAuthorization;
     
-    private OccInspection governingInspection;
+    protected OccInspection governingInspection;
     
-    private User manager;
+    protected User manager;
      
-    private User periodTypeCertifiedBy;
-    private LocalDateTime periodTypeCertifiedTS;
+    protected User periodTypeCertifiedBy;
+    protected LocalDateTime periodTypeCertifiedTS;
     
-    private BOBSource source;
-    private User createdBy;
-    private LocalDateTime createdTS;
+    protected BOBSource source;
+    protected User createdBy;
+    protected LocalDateTime createdTS;
     
-    private LocalDateTime startDate;
-    private java.util.Date startDateUtilDate;
-    private LocalDateTime startDateCertifiedTS;
-    private User startDateCertifiedBy;
+    protected LocalDateTime startDate;
+    protected java.util.Date startDateUtilDate;
+    protected LocalDateTime startDateCertifiedTS;
+    protected User startDateCertifiedBy;
     
-    private LocalDateTime endDate;
-    private java.util.Date endDateUtilDate;
-    private LocalDateTime endDateCertifiedTS;
-    private User endDateCertifiedBy;
+    protected LocalDateTime endDate;
+    protected java.util.Date endDateUtilDate;
+    protected LocalDateTime endDateCertifiedTS;
+    protected User endDateCertifiedBy;
     
-    private LocalDateTime authorizedTS;
-    private User authorizedBy;
+    protected LocalDateTime authorizedTS;
+    protected User authorizedBy;
     
-    private boolean overrideTypeConfig;
+    protected boolean overrideTypeConfig;
     
-    private String notes;
+    protected String notes;
     
     @Override
     public boolean isOpen() {

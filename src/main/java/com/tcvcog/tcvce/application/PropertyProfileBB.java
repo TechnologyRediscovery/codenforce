@@ -321,7 +321,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                 int newID = 0;
                 System.out.println("PropertyProfileBB.initateNewOccPeriod | currOccPeriod: " + currOccPeriod.getPeriodID());
                 newID = oc.insertNewOccPeriod(currOccPeriod, getSessionBean().getSessionUser());
-                getSessionBean().setSessionOccPeriod(oi.getOccPeriod(newID, getSessionBean().getSessionUser()));
+                getSessionBean().setSessionOccPeriod(oi.getOccPeriod(newID));
             } else {
                 getFacesContext().addMessage(null,
                                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
