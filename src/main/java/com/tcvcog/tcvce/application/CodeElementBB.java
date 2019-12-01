@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -32,122 +33,128 @@ import javax.faces.event.ActionEvent;
  */
 public class CodeElementBB extends BackingBeanUtils implements Serializable{
 
-    /**
+     /**
      * Creates a new instance of CodeElementBB
      */
     public CodeElementBB() {
     }
-    
+
     private CodeElement currentElement;
-    
+
     private CodeSource activeCodeSource;
-    
+
     private int formOrdChapterNo;
-    
+
     private String formOrdChapterTitle;
     private String formOrdSecNum;
     private String formOrdSecTitle;
-    
+
     private String formOrdSubSecNum;
     private String formOrdSubSecTitle;
     private String formOrdTechnicalText;
-    
+
     private String formOrdHumanFriendlyText;
     private boolean formIsActive;
-    
+
     private String formResourceURL;
-    
+
     private int formGuideEntryID;
-    
-     public String commitUpdatesToCodeElement() {
+
+    private CodeElement newElement;
+
+    public CodeElement getNewElement() {
+        return newElement;
+    }
+
+    public void setNewElement(CodeElement newElement) {
+        this.newElement = newElement;
+    }
+
+    public String commitUpdatesToCodeElement() {
         CodeIntegrator integrator = getCodeIntegrator();
-        
+
         // elemet ID is already in our currentElementObject
         currentElement.setOrdchapterNo(formOrdChapterNo);
-        
+
         currentElement.setOrdchapterTitle(formOrdChapterTitle);
         currentElement.setOrdSecNum(formOrdSecNum);
         currentElement.setOrdSecTitle(formOrdSecTitle);
-        
+
         currentElement.setOrdSubSecNum(formOrdSubSecNum);
         currentElement.setOrdSubSecTitle(formOrdSubSecTitle);
         currentElement.setOrdTechnicalText(formOrdTechnicalText);
-        
+
         currentElement.setOrdHumanFriendlyText(formOrdHumanFriendlyText);
         currentElement.setIsActive(formIsActive);
-        
+
         currentElement.setResourceURL(formResourceURL);
         currentElement.setGuideEntryID(formGuideEntryID);
-        
-        
+
         try {
             integrator.updateCodeElement(currentElement);
             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                                "Code element updated!", ""));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Code element updated!", ""));
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to update code element; most sincere apologies!", 
-                        "This must be corrected by the System Administrator"));
-            
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to update code element; most sincere apologies!",
+                            "This must be corrected by the System Administrator"));
+
         }
-        
+
         return "codeElementList";
     }
-    
-    public void deleteCodeElement(ActionEvent event){
-        
-        
+
+    public void deleteCodeElement(ActionEvent event) {
+
     }
-    
-    
-    
-    public String insertCodeElement(){
+
+    public String insertCodeElement() {
+
         CodeIntegrator codeIntegrator = getCodeIntegrator();
         CodeElement newCE = new CodeElement();
-        
+
         newCE.setSource(activeCodeSource);
-        
+
         newCE.setOrdchapterNo(formOrdChapterNo);
-        
+
         newCE.setOrdchapterTitle(formOrdChapterTitle);
         newCE.setOrdSecNum(formOrdSecNum);
         newCE.setOrdSecTitle(formOrdSecTitle);
-        
+
         newCE.setOrdSubSecNum(formOrdSecNum);
         newCE.setOrdSubSecTitle(formOrdSubSecTitle);
         newCE.setOrdTechnicalText(formOrdTechnicalText);
-        
+
         newCE.setOrdHumanFriendlyText(formOrdHumanFriendlyText);
         newCE.setIsActive(formIsActive);
-        
+
         newCE.setResourceURL(formResourceURL);
-        
+
         try {
             codeIntegrator.insertCodeElement(newCE);
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to add code elment to code source", 
-                        "This must be corrected by the System Administrator"));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add code elment to code source",
+                            "This must be corrected by the System Administrator"));
         }
-        
+
         getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Successfully added code element to code source", ""));
 
         return "codeSourceManage";
     }
-    
 
     /**
      * @return the formOrdChapterNo
      */
     public int getFormOrdChapterNo() {
-        if(currentElement != null){
-         formOrdChapterNo = currentElement.getOrdchapterNo();
+        if (currentElement != null) {
+            formOrdChapterNo = currentElement.getOrdchapterNo();
         }
         return formOrdChapterNo;
     }
@@ -163,7 +170,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the formOrdChapterTitle
      */
     public String getFormOrdChapterTitle() {
-        if(currentElement != null){
+        if (currentElement != null) {
             formOrdChapterTitle = currentElement.getOrdchapterTitle();
         }
         return formOrdChapterTitle;
@@ -180,7 +187,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the formOrdSecNum
      */
     public String getFormOrdSecNum() {
-        if(currentElement != null){
+        if (currentElement != null) {
             formOrdSecNum = currentElement.getOrdSecNum();
         }
         return formOrdSecNum;
@@ -197,7 +204,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the formOrdSecTitle
      */
     public String getFormOrdSecTitle() {
-        if(currentElement != null){
+        if (currentElement != null) {
             formOrdSecTitle = currentElement.getOrdSecTitle();
         }
         return formOrdSecTitle;
@@ -214,7 +221,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the formOrdSubSecNum
      */
     public String getFormOrdSubSecNum() {
-        if(currentElement != null){
+        if (currentElement != null) {
             formOrdSubSecNum = currentElement.getOrdSubSecNum();
         }
         return formOrdSubSecNum;
@@ -231,8 +238,8 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the formOrdSubSecTitle
      */
     public String getFormOrdSubSecTitle() {
-        if(currentElement != null){
-         formOrdSubSecTitle = currentElement.getOrdSubSecTitle();
+        if (currentElement != null) {
+            formOrdSubSecTitle = currentElement.getOrdSubSecTitle();
         }
         return formOrdSubSecTitle;
     }
@@ -248,7 +255,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the formOrdTechnicalText
      */
     public String getFormOrdTechnicalText() {
-        if(currentElement != null){
+        if (currentElement != null) {
             formOrdTechnicalText = currentElement.getOrdTechnicalText();
         }
         return formOrdTechnicalText;
@@ -265,7 +272,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the formOrdHumanFriendlyText
      */
     public String getFormOrdHumanFriendlyText() {
-        if(currentElement != null){
+        if (currentElement != null) {
             formOrdHumanFriendlyText = currentElement.getOrdHumanFriendlyText();
         }
         return formOrdHumanFriendlyText;
@@ -278,13 +285,11 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
         this.formOrdHumanFriendlyText = formOrdHumanFriendlyText;
     }
 
-    
-
     /**
      * @return the formIsActive
      */
     public boolean isFormIsActive() {
-        if(currentElement != null){
+        if (currentElement != null) {
             formIsActive = currentElement.isIsActive();
         } else {
             formIsActive = true;
@@ -303,7 +308,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the formResourceURL
      */
     public String getFormResourceURL() {
-        if(currentElement != null){
+        if (currentElement != null) {
             formResourceURL = currentElement.getResourceURL();
         }
         return formResourceURL;
@@ -315,7 +320,6 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
     public void setFormResourceURL(String formResourceURL) {
         this.formResourceURL = formResourceURL;
     }
-
 
     /**
      * @return the activeCodeSource
@@ -351,6 +355,10 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the formGuideEntryID
      */
     public int getFormGuideEntryID() {
+        //xiaohong add
+        if (currentElement != null) {
+            formGuideEntryID = currentElement.getGuideEntryID();
+        }
         return formGuideEntryID;
     }
 
@@ -359,6 +367,35 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      */
     public void setFormGuideEntryID(int formGuideEntryID) {
         this.formGuideEntryID = formGuideEntryID;
+    }
+
+    //xiaohong add
+    public void onAddElementToSourceButtonChange() {
+        //xiaohogn add
+        activeCodeSource = getSessionBean().getActiveCodeSource();
+        newElement.setSource(activeCodeSource);
+
+        CodeIntegrator codeIntegrator = getCodeIntegrator();
+        try {
+            codeIntegrator.insertCodeElement(newElement);
+            
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Successfully added code element to code source", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add code elment to code source",
+                            "This must be corrected by the System Administrator"));
+        }
+        
+        newElement = new CodeElement();
+        
+    }
+
+    @PostConstruct
+    public void initBean() {
+        newElement = new CodeElement();
     }
     
 }
