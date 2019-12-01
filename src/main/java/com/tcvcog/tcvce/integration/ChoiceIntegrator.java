@@ -172,7 +172,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                     "       initiator_userid, responderintended_userid, activateson, expireson, \n" +
                     "       responderactual_userid, rejectproposal, responsetimestamp, responseevent_cecaseeventid, \n" +
                     "       active, notes, relativeorder, generatingevent_occeventid, \n" +
-                    "       responseevent_occeventid, occperiod_periodid, cecase_caseid, hidden \n" +
+                    "       responseevent_occeventid, occperiod_periodid, cecase_caseid \n" +
                     "  FROM public.choiceproposal WHERE proposalid=?;");
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -310,7 +310,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         }
         
         prop.setActive(rs.getBoolean("active"));
-        prop.setHidden(rs.getBoolean("hidden"));
         prop.setNotes(rs.getString("notes"));
         prop.setOrder(rs.getInt("relativeorder"));
         
@@ -336,7 +335,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                             "       expireson=?, responderactual_userid=?, rejectproposal=?, responsetimestamp=?, \n" + // 6-9
                             "       responseevent_cecaseeventid=?, active=?, notes=?, relativeorder=?, \n" + // 10-13
                             "       generatingevent_occeventid=?, responseevent_occeventid=?, \n" + // 14-15
-                            "       occperiod_periodid=?, cecase_caseid=?, hidden=?\n" + // 16-18
+                            "       occperiod_periodid=?, cecase_caseid=? \n" + // 16-18
                             " WHERE proposalid=?;"; // 19
 
         Connection con = getPostgresCon();
@@ -420,8 +419,8 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setInt(16, pop.getOccperiodID());
             }
             
-            stmt.setBoolean(18, prop.isHidden());
-            stmt.setInt(19, prop.getProposalID());
+//            stmt.setBoolean(18, prop.isHidden());
+            stmt.setInt(17, prop.getProposalID());
             
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -604,7 +603,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         } else {
             throw new IntegrationException("Cannot record given proposal due to incorrect Proposal object type");
         }
-            sb.append(" hidden=? ");
+//            sb.append(" hidden=? ");
             sb.append(" WHERE proposalid=?;");
 
         Connection con = getPostgresCon();
@@ -624,8 +623,8 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             } 
             
             stmt.setInt(5, p.getResponseEvent().getEventID());
-            stmt.setBoolean(6, p.isHidden());
-            stmt.setInt(7, p.getProposalID());
+//            stmt.setBoolean(6, p.isHidden());
+            stmt.setInt(6, p.getProposalID());
             
             stmt.executeUpdate();
 

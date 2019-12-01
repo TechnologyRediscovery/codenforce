@@ -17,12 +17,14 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 /**
- *
+ * The Data Intensive subclass of the OccPeriod tree
+ * We want to be able to load info about OccPeriods without having to 
+ * initialize and configure each and every event and proposal and rule
+ * associated with each occ period on each unit on each property
+ * that we browse, so we'll only load the DataHeavy version of this
+ * Object if we're actually editing that particular OccPeriod
  * @author sylvia
  */
-public interface Locatable {
-    public OccLocationDescriptor getOccLocationDescriptor();
-    public void setOccLocationDescriptor(OccLocationDescriptor old);
-    
+public class OccPeriodDataHeavy {
     
 }

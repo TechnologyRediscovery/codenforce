@@ -25,20 +25,23 @@ public class PropertyUnitWithProp extends PropertyUnit {
     protected Property property;
 
     public PropertyUnitWithProp(PropertyUnit prop){
-        this.unitID = prop.getUnitID();
-        this.propertyID = prop.getPropertyID();
-        this.unitNumber = prop.getUnitNumber();
+        if(prop != null){
 
-        this.notes = prop.getNotes();
-        this.otherKnownAddress = prop.getOtherKnownAddress();
+            this.unitID = prop.getUnitID();
+            this.propertyID = prop.getPropertyID();
+            this.unitNumber = prop.getUnitNumber();
 
-        this.rentalIntentDateStart = prop.getRentalIntentDateStart();
-        this.rentalIntentDateStop = prop.getRentalIntentDateStop();
-        this.rentalIntentLastUpdatedBy = prop.getRentalIntentLastUpdatedBy();
-        this.rentalNotes = prop.getRentalNotes();
-        this.active = prop.isActive();
-        this.conditionIntensityClassID = prop.getConditionIntensityClassID();
-        this.lastUpdatedTS = prop.getLastUpdatedTS();
+            this.notes = prop.getNotes();
+            this.otherKnownAddress = prop.getOtherKnownAddress();
+
+            this.rentalIntentDateStart = prop.getRentalIntentDateStart();
+            this.rentalIntentDateStop = prop.getRentalIntentDateStop();
+            this.rentalIntentLastUpdatedBy = prop.getRentalIntentLastUpdatedBy();
+            this.rentalNotes = prop.getRentalNotes();
+            this.active = prop.isActive();
+            this.conditionIntensityClassID = prop.getConditionIntensityClassID();
+            this.lastUpdatedTS = prop.getLastUpdatedTS();
+        }
     }
     
     /**

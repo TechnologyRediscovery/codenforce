@@ -60,14 +60,12 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     final int DEFAULT_ASSIGNMENT_RANK = 1;
     final int PERIOD_VALIDITYBUFFERMINUTES = 10;
     
-    
     /**
      * Creates a new instance of UserCoordinator
      */
     public UserCoordinator(){
     
     }    
-    
     
     /**
      * Pass-through method to the converter method on the Integrator which

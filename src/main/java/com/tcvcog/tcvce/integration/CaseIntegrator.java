@@ -376,7 +376,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public CECaseBase getCECaseBare(int ceCaseID) throws IntegrationException, CaseLifecycleException{
+    public CECaseBase getCECaseBase(int ceCaseID) throws IntegrationException, CaseLifecycleException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
             "            login_userid, casename, casephase, originationdate, closingdate, \n" +
             "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
@@ -566,10 +566,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return caseList;
     }
     
-    public CECase getPropertyInfoCase(int propID){
-        // TODO: finish me!
-        return new CECase();
-    }
+  
 
     public CECase insertNewCECase(CECase ceCase) throws IntegrationException, CaseLifecycleException{
         
@@ -718,9 +715,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-        
     }
-    
     
     public List<CECase> getCECaseHistoryList(User u) 
             throws IntegrationException, CaseLifecycleException{

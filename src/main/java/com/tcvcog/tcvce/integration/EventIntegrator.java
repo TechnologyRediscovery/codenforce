@@ -861,7 +861,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             while (rs.next()) {
                 evCPBundle = new EventCECaseCasePropBundle();
                 evCPBundle.setEvent(getEventCECase(rs.getInt("eventid")));
-                evCPBundle.setEventCaseBare(ci.getCECaseBare(rs.getInt("cecase_caseid")));
+                evCPBundle.setEventCaseBare(ci.getCECaseBase(rs.getInt("cecase_caseid")));
             }
 
         } catch (SQLException ex) {
