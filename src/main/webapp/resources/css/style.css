@@ -480,6 +480,7 @@ div.printer-friendly-report .ui-widget-content{
 
 
 .flex-box-container{
+    position:relative;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
