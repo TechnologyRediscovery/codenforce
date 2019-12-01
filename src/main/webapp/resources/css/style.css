@@ -493,6 +493,7 @@ div.printer-friendly-report .ui-widget-content{
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 0px;
+    position: relative;
     
 }
 
