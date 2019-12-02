@@ -9,6 +9,11 @@ import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -70,6 +75,11 @@ public class SearchParamsProperty extends SearchParams implements Serializable {
    private boolean filterByYearBuilt;
    private int yearBuiltMin;
    private int yearBuiltMax;
+   
+   private HashMap allParams;
+   
+   private List<Enum> dateSearchOptions;
+   private String dateToSearchProps;
    
    
     /**
@@ -553,6 +563,77 @@ public class SearchParamsProperty extends SearchParams implements Serializable {
      */
     public void setUserFieldUser(User userFieldUser) {
         this.userFieldUser = userFieldUser;
+    }
+   
+    /**
+     *
+     * @return
+     */
+    public HashMap getParams(){
+        HashMap m = new HashMap();
+        m.put("Fil by Address Part:", this.isFilterByAddressPart());
+        m.put("Fil by Assessed Value:", this.isFilterByAssessedValue());
+        m.put("Fil by Bob Source:", this.isFilterByBOBSource());
+        m.put("Fil by Condition:", this.isFilterByCondition());
+        m.put("Fil by Land Bank Held:", this.isFilterByLandBankHeld());
+        m.put("Fil by Land Bank Proipect:", this.isFilterByLandBankPropspect());
+        m.put("Fil by Lot and block:", this.isFilterByLotAndBlock());
+        m.put("Fil by Muni:", this.isFilterByMuni());
+        m.put("Fil by Nonaddressable:", this.isFilterByNonAddressable());
+        m.put("Fil by Null date field:", this.isFilterByNullDateField());
+        m.put("Fil by Object ID:", this.isFilterByObjectID());
+        m.put("Fil by Parcel ID:", this.isFilterByParcelID());
+        m.put("Fil by Start End Date:", this.isFilterByStartEndDate());
+        m.put("Fil by Use Type:", this.isFilterByUseType());
+        m.put("Fil by User Field:", this.isFilterByUserField());
+        m.put("Fil by Year Built:", this.isFilterByYearBuilt());
+        m.put("Fil by Zip:", this.isFilterByZip());
+        m.put("Fil by Zone Class:", this.isFilterByZoneClass());
+    
+        return m;
+        
+}
+    
+    public HashMap getAllParams(){
+        return this.allParams;
+    }
+           
+
+    /**
+     * @param allParams the allParams to set
+     */
+    public void setAllParams(HashMap allParams) {
+        this.allParams = allParams;
+    }
+
+    /**
+     * @return the dateSearchOptions
+     */
+    public List<Enum> getDateSearchOptions() {
+        List<Enum> dateOptList = SearchParamsPropertyDateFields.ABANDONED_START.getAllTitles();
+        dateSearchOptions = dateOptList;
+        return dateSearchOptions;
+    }
+
+    /**
+     * @param dateSearchOptions the dateSearchOptions to set
+     */
+    public void setDateSearchOptions(List<Enum> dateSearchOptions) {
+        this.dateSearchOptions = dateSearchOptions;
+    }
+
+    /**
+     * @return the dateToSearchProps
+     */
+    public String getDateToSearchProps() {
+        return dateToSearchProps;
+    }
+
+    /**
+     * @param dateToSearchProps the dateToSearchProps to set
+     */
+    public void setDateToSearchProps(String dateToSearchProps) {
+        this.dateToSearchProps = dateToSearchProps;
     }
    
     

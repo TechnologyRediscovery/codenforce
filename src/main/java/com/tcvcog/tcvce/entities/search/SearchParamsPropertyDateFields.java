@@ -16,6 +16,9 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author sylvia
@@ -39,6 +42,28 @@ public enum SearchParamsPropertyDateFields {
     public String getTitle(){
         return title;
     }
+     
+    public Enum getEnumByTitle(String title){
+        for(SearchParamsPropertyDateFields field: SearchParamsPropertyDateFields.values()){
+            if(field.getTitle().equals(title)){
+                return field;
+            }
+        }
+        return null;
+    }
+    
+    public List<Enum> getAllTitles(){
+        List<Enum> output = new ArrayList<Enum>();
+        output.add(SearchParamsPropertyDateFields.ABANDONED_START);
+        output.add(SearchParamsPropertyDateFields.ABANDONED_STOP);
+        output.add(SearchParamsPropertyDateFields.EXTERNAL_DATA_LASTUPDATED);
+        output.add(SearchParamsPropertyDateFields.LAST_UPDATED);
+        output.add(SearchParamsPropertyDateFields.UNFIT_START);
+        output.add(SearchParamsPropertyDateFields.UNFIT_STOP);
+        output.add(SearchParamsPropertyDateFields.VACANT_START);
+        output.add(SearchParamsPropertyDateFields.VACANT_STOP);
+        return output;
+}
      
     
 }

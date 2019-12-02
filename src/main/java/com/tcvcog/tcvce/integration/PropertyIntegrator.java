@@ -616,19 +616,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         sb.append("SELECT DISTINCT propertyid\n");
         sb.append("	FROM property LEFT OUTER JOIN propertyexternaldata ON (property.propertyid = propertyexternaldata.property_propertyid)\n");
         sb.append("	LEFT OUTER JOIN propertyusetype ON (property.usetype_typeid = propertyusetype.propertyusetypeid)\n");
-        sb.append("	LEFT OUTER JOIN propertystatus ON (property.status_statusid = propertystatus.statusid)\n");
+        //sb.append("	LEFT OUTER JOIN propertystatus ON (property.status_statusid = propertystatus.statusid)\n");
         sb.append("	WHERE propertyid IS NOT NULL ");
 
+        System.out.println("PropertyIntegrator.searchForPropWParams");
+        System.out.println(params.getParams());
         if (!params.isFilterByObjectID()) {
             if (params.isFilterByMuni()) {
-                sb.append("municipality_municode = ? "); // param 1
+                sb.append("AND municipality_municode = ? "); // param 1
             }
 
-            if (params.isFilterByStartEndDate()) {
-                sb.append(getDBDateField(params));
-                sb.append(" ");
-                sb.append("BETWEEN ? AND ? "); // parm 2 and 3 without ID
-            }
 
             if (params.isFilterByNullDateField()) {
                 sb.append("AND ");
@@ -715,11 +712,20 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 }
             }
 
+            if (params.isFilterByStartEndDate()) {
+                sb.append(" AND ");
+                sb.append(getDBDateField(params));
+                sb.append(" BETWEEN ? AND ? "); // parm 2 and 3 without ID
+            }
+
         } else {  //object ID filter
             sb.append("AND ");
             sb.append("propertyid=? "); // will be param 1 with ID search
         }
-
+        sb.append(";");
+        
+        System.out.println(sb.toString());
+        
         int paramCounter = 0;
 
         try {
@@ -729,10 +735,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 if (params.isFilterByMuni()) {
                      stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
                 }
-                if (params.isFilterByStartEndDate()) {
-                    stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(params.getStartDate()));
-                    stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(params.getEndDate()));
-                }
+                
                 if (params.isFilterByUserField()) {
                    stmt.setInt(++paramCounter, params.getUserFieldUser().getUserID());
                 }
@@ -771,6 +774,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     stmt.setInt(++paramCounter, params.getYearBuiltMin());
                     stmt.setInt(++paramCounter, params.getYearBuiltMax());
                 }
+                if (params.isFilterByStartEndDate()) {
+                    stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
+                    stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
+                }
             } else {
                 stmt.setInt(++paramCounter, params.getObjectID());
             }
@@ -786,6 +793,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 propList.add(getProperty(rs.getInt("propertyid")));
                 counter++;
             }
+            System.out.println(String.format("number of returned props = %d", counter));
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot search for code enf cases, sorry!", ex);
@@ -794,6 +802,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
+        System.out.println("about to return proplist");
         return propList;
     }
 
