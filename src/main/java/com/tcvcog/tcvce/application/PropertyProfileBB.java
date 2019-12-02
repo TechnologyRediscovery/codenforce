@@ -22,6 +22,8 @@ import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
@@ -66,6 +68,7 @@ Council of Governments, PA
  * @author Eric C. Darsow
  */
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
+
     
     private PropertyWithLists currProp;
     private PropertyUnit currPropUnit;
@@ -91,6 +94,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private OccPeriodType selectedOccPeriodType;
     private List<OccPeriodType> occPeriodTypeList;
     
+    private SearchParamsProperty searchParams;
+    private QueryProperty selectedPropQuery;
+    private List<QueryProperty> queryList;
+    
     /**
      * Creates a new instance of PropertyProfileBB
      */
@@ -103,12 +110,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         OccupancyIntegrator oi = getOccupancyIntegrator();
         
         try {
-            this.currProp = pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser());
+            this.setCurrProp(pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser()));
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
         }
-        propList = getSessionBean().getSessionPropertyList();
-        occPeriodTypeList = getSessionBean().getSessionMuniHeavy().getProfile().getOccPeriodTypeList();
+        setPropList(getSessionBean().getSessionPropertyList());
+        setOccPeriodTypeList(getSessionBean().getSessionMuniHeavy().getProfile().getOccPeriodTypeList());
         
     }
 
@@ -151,13 +158,13 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         unitToAdd.setUnitNumber("");
 //        unitToAdd.setRental(false);
         unitToAdd.setNotes("");
-        currProp.getUnitList().add(unitToAdd);
+        getCurrProp().getUnitList().add(unitToAdd);
         
 //        clearAddUnitFormValues();
     }
     
     public void removePropertyUnitFromEditTable(PropertyUnit pu){
-        currProp.getUnitList().remove(pu);
+        getCurrProp().getUnitList().remove(pu);
         getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Zap!", ""));
@@ -194,7 +201,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         int duplicateNums = 0;
         //The above boolean is a flag to see if there is more than 1 of  Unit Number. The int to the left stores how many of a given number the loop below finds.
 
-        for (PropertyUnit firstUnit : currProp.getUnitList()) {
+        for (PropertyUnit firstUnit : getCurrProp().getUnitList()) {
             duplicateNums = 0;
 
             firstUnit.setUnitNumber(firstUnit.getUnitNumber().replaceAll("(?i)unit", ""));
@@ -204,7 +211,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                 break; //break for performance reasons. Can be removed if breaks are not welcome here.
             }
 
-            for (PropertyUnit secondUnit : currProp.getUnitList()) {
+            for (PropertyUnit secondUnit : getCurrProp().getUnitList()) {
                 if (firstUnit.getUnitNumber().compareTo(secondUnit.getUnitNumber()) == 0) {
                     duplicateNums++;
                 }
@@ -216,7 +223,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             }
         }
 
-        if (currProp.getUnitList().isEmpty()) {
+        if (getCurrProp().getUnitList().isEmpty()) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please add at least one unit.", ""));
@@ -232,12 +239,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                             "Some Units have the same Number", ""));
 
         } else {
-            Iterator<PropertyUnit> iter = currProp.getUnitList().iterator();
+            Iterator<PropertyUnit> iter = getCurrProp().getUnitList().iterator();
             while(iter.hasNext()){
                 PropertyUnit pu = iter.next();
                 if(pu.getUnitID() == 0){
                     try {
-                        pu.setPropertyID(currProp.getPropertyID());
+                        pu.setPropertyID(getCurrProp().getPropertyID());
                         pi.insertPropertyUnit(pu);
                         refreshCurrPropWithLists();
                         
@@ -251,7 +258,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                     }
                 } else {
                     try {
-                        pu.setPropertyID(currProp.getPropertyID());
+                        pu.setPropertyID(getCurrProp().getPropertyID());
                         pi.updatePropertyUnit(pu);
                         refreshCurrPropWithLists();
                         getFacesContext().addMessage(null,
@@ -270,7 +277,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private void refreshCurrPropWithLists(){
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            currProp = pi.getPropertyWithLists(currProp.getPropertyID(), getSessionBean().getSessionUser());
+            setCurrProp(pi.getPropertyWithLists(getCurrProp().getPropertyID(), getSessionBean().getSessionUser()));
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -286,7 +293,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public String openCECase(){
-        getSessionBean().setSessionProperty(currProp);
+        getSessionBean().setSessionProperty(getCurrProp());
         return "addNewCase";
     }
     
@@ -296,15 +303,15 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public String manageOccPeriod(OccPeriod op){
-        currOccPeriod = op;
-        getSessionBean().setSessionOccPeriod(currOccPeriod);
+        setCurrOccPeriod(op);
+        getSessionBean().setSessionOccPeriod(getCurrOccPeriod());
         return "inspection";
         
     }
     
     public void initiateNewOccPeriodCreation(PropertyUnit pu){
-        selectedOccPeriodType = null;
-        currPropUnit = pu;
+        setSelectedOccPeriodType(null);
+        setCurrPropUnit(pu);
     }
     
     public String addNewOccPeriod(){
@@ -312,17 +319,13 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
         try {
-            if(selectedOccPeriodType != null){
-                System.out.println("PropertyProfileBB.initateNewOccPeriod | selectedType: " + selectedOccPeriodType.getTypeID());
-                currOccPeriod = oc.initializeNewOccPeriod(  currProp, 
-                                                            currPropUnit, 
-                                                            selectedOccPeriodType,
-                                                            getSessionBean().getSessionUser(), 
-                                                            getSessionBean().getSessionMuniHeavy());
-                currOccPeriod.setType(selectedOccPeriodType);
+            if(getSelectedOccPeriodType() != null){
+                System.out.println("PropertyProfileBB.initateNewOccPeriod | selectedType: " + getSelectedOccPeriodType().getTypeID());
+                setCurrOccPeriod(oc.initializeNewOccPeriod(getCurrProp(), getCurrPropUnit(), getSelectedOccPeriodType(), getSessionBean().getSessionUser(), getSessionBean().getSessionMuniHeavy()));
+                getCurrOccPeriod().setType(getSelectedOccPeriodType());
                 int newID = 0;
-                System.out.println("PropertyProfileBB.initateNewOccPeriod | currOccPeriod: " + currOccPeriod.getPeriodID());
-                newID = oc.insertNewOccPeriod(currOccPeriod, getSessionBean().getSessionUser());
+                System.out.println("PropertyProfileBB.initateNewOccPeriod | currOccPeriod: " + getCurrOccPeriod().getPeriodID());
+                newID = oc.insertNewOccPeriod(getCurrOccPeriod(), getSessionBean().getSessionUser());
                 getSessionBean().setSessionOccPeriod(oi.getOccPeriod(newID, getSessionBean().getSessionUser()));
             } else {
                 getFacesContext().addMessage(null,
@@ -373,7 +376,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         try {
-            currProp = pi.getPropertyWithLists(prop.getPropertyID(), getSessionBean().getSessionUser());
+            setCurrProp(pi.getPropertyWithLists(prop.getPropertyID(), getSessionBean().getSessionUser()));
             ui.logObjectView(getSessionBean().getSessionUser(), prop);
             getSessionBean().setSessionProperty(prop);
             getFacesContext().addMessage(null,
@@ -438,7 +441,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public String updateProperty(){
-        getSessionBean().getSessionPropertyList().add(0, currProp);
+        getSessionBean().getSessionPropertyList().add(0, getCurrProp());
         return "propertyUpdate";
         
     }
@@ -676,6 +679,48 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setSelectedOccPeriodType(OccPeriodType selectedOccPeriodType) {
         this.selectedOccPeriodType = selectedOccPeriodType;
+    }
+
+    /**
+     * @return the searchParams
+     */
+    public SearchParamsProperty getSearchParams() {
+        return searchParams;
+    }
+
+    /**
+     * @param searchParams the searchParams to set
+     */
+    public void setSearchParams(SearchParamsProperty searchParams) {
+        this.searchParams = searchParams;
+    }
+
+    /**
+     * @return the selectedPropQuery
+     */
+    public QueryProperty getSelectedPropQuery() {
+        return selectedPropQuery;
+    }
+
+    /**
+     * @param selectedPropQuery the selectedPropQuery to set
+     */
+    public void setSelectedPropQuery(QueryProperty selectedPropQuery) {
+        this.selectedPropQuery = selectedPropQuery;
+    }
+
+    /**
+     * @return the queryList
+     */
+    public List<QueryProperty> getQueryList() {
+        return queryList;
+    }
+
+    /**
+     * @param queryList the queryList to set
+     */
+    public void setQueryList(List<QueryProperty> queryList) {
+        this.queryList = queryList;
     }
 
    
