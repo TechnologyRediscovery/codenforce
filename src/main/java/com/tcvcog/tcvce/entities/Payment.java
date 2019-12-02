@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 /**
  *
- * @author Adam Gutonski
+ * @author Adam Gutonski & Nathan Dietz
  */
 public class Payment {
     

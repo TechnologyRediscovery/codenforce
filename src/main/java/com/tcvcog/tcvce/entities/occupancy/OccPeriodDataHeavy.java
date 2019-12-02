@@ -20,6 +20,8 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
+import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.Proposal;
@@ -56,6 +58,7 @@ public  class       OccPeriodDataHeavy
     
     private List<Integer> blobIDList;
     private List<Payment> paymentList;
+    private List<MoneyOccPeriodFeeAssigned> feeList;
 
     private LocalDateTime configuredTS;
     
@@ -334,6 +337,20 @@ public  class       OccPeriodDataHeavy
      */
     public void setConfiguredTS(LocalDateTime configuredTS) {
         this.configuredTS = configuredTS;
+    }
+
+    /**
+     * @return the feeList
+     */
+    public List<MoneyOccPeriodFeeAssigned> getFeeList() {
+        return feeList;
+    }
+
+    /**
+     * @param feeList the feeList to set
+     */
+    public void setFeeList(List<MoneyOccPeriodFeeAssigned> feeList) {
+        this.feeList = feeList;
     }
     
 }

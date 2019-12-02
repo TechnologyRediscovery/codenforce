@@ -127,20 +127,23 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         PropertyCoordinator pc = getPropertyCoordinator();
         
         UserAuthorized ua =  null;
-        if(!(u instanceof UserAuthorized)){
         
-            ua = uc.authorizeUser(  u, 
-                                    pi.getPropertyUnitWithProp(period.getPeriodID()).getProperty().getMuni(),
-                                    null);
+        if(period != null && u != null){
+            if(!(u instanceof UserAuthorized)){
+
+                ua = uc.authorizeUser(  u, 
+                                        pi.getPropertyUnitWithProp(period.getPeriodID()).getProperty().getMuni(),
+                                        null);
+            }
+            period.setGoverningInspection(designateGoverningInspection(period));
+            period = cc.configureProposals(period, ua);
+            // Removed during occbeta overhaul
+    //        if(period.determineGoverningOccInspection().isReadyForPassedCertification() 
+    //                && ec.rules_evaluateEventRules(period)){
+    //            period.setReadyForPeriodAuthorization(true);
+    //        }
+
         }
-        period.setGoverningInspection(designateGoverningInspection(period));
-        period = cc.configureProposals(period, ua);
-        // Removed during occbeta overhaul
-//        if(period.determineGoverningOccInspection().isReadyForPassedCertification() 
-//                && ec.rules_evaluateEventRules(period)){
-//            period.setReadyForPeriodAuthorization(true);
-//        }
-        
         return period;
         
     }

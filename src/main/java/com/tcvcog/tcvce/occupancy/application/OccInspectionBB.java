@@ -176,6 +176,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private List<Person> personCandidateList;
     private Person selectedPerson;
     
+     // payments
+    private List<Payment> filteredPaymentList;
+    private Payment selectedPayment;
+    
+    //fees
+    private List<MoneyOccPeriodFeeAssigned> filteredFeeList;
+    private MoneyOccPeriodFeeAssigned selectedFee;
+    
     /**
      * Creates a new instance of InspectionsBB
      */
@@ -1989,6 +1997,62 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedEventRuleSet(EventRuleSet selectedEventRuleSet) {
         this.selectedEventRuleSet = selectedEventRuleSet;
+    }
+
+    /**
+     * @return the filteredPaymentList
+     */
+    public List<Payment> getFilteredPaymentList() {
+        return filteredPaymentList;
+    }
+
+    /**
+     * @return the selectedPayment
+     */
+    public Payment getSelectedPayment() {
+        return selectedPayment;
+    }
+
+    /**
+     * @return the filteredFeeList
+     */
+    public List<MoneyOccPeriodFeeAssigned> getFilteredFeeList() {
+        return filteredFeeList;
+    }
+
+    /**
+     * @return the selectedFee
+     */
+    public MoneyOccPeriodFeeAssigned getSelectedFee() {
+        return selectedFee;
+    }
+
+    /**
+     * @param filteredPaymentList the filteredPaymentList to set
+     */
+    public void setFilteredPaymentList(List<Payment> filteredPaymentList) {
+        this.filteredPaymentList = filteredPaymentList;
+    }
+
+    /**
+     * @param selectedPayment the selectedPayment to set
+     */
+    public void setSelectedPayment(Payment selectedPayment) {
+        this.selectedPayment = selectedPayment;
+    }
+
+    /**
+     * @param filteredFeeList the filteredFeeList to set
+     */
+    public void setFilteredFeeList(List<MoneyOccPeriodFeeAssigned> filteredFeeList) {
+        this.filteredFeeList = filteredFeeList;
+    }
+
+    /**
+     * @param selectedFee the selectedFee to set
+     */
+    public void setSelectedFee(MoneyOccPeriodFeeAssigned selectedFee) {
+        this.selectedFee = selectedFee;
     }
 
     

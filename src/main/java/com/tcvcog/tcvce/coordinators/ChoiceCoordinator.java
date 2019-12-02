@@ -52,7 +52,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public CECase configureProposals(CECase cse, UserAuthorized u) throws EventException, AuthorizationException{
-        if(cse.getProposalList() != null){
+        if(cse.getProposalList() != null && u != null){
             Iterator<Proposal> iter = cse.getProposalList().iterator();
             while(iter.hasNext()){
                 Proposal p = iter.next();
@@ -67,8 +67,16 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
     }
     
+    /**
+     * Extracts the List&lt;Proposal&gt; from 
+     * @param oPeriod
+     * @param u
+     * @return
+     * @throws EventException
+     * @throws AuthorizationException 
+     */
     public OccPeriodDataHeavy configureProposals(OccPeriodDataHeavy oPeriod, UserAuthorized u) throws EventException, AuthorizationException{
-        if(oPeriod != null){
+        if(oPeriod != null && u != null){
             if(oPeriod.getProposalList() != null){
                 Iterator<Proposal> iter = oPeriod.getProposalList().iterator();
                 while(iter.hasNext()){
@@ -85,62 +93,73 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         return oPeriod;
     }
     
+    /**
+     * Coordinator internal logic container for setting switches on Proposals
+     * @param proposal
+     * @param u
+     * @return 
+     */
     private Proposal configureProposal( Proposal proposal, 
                                         UserAuthorized u){
         
-        // start by  setting the most restrictive rights and then relax them as authorization
-        // status allows
-        proposal.setHidden(true);
-        proposal.setReadOnlyCurrentUser(true);
+        if(proposal != null && u != null){
 
-        // hide inactives and exit
-        if(!proposal.isActive()){
-            return proposal;
-        }
-        
-        if(proposal.getActivatesOn() != null && proposal.getExpiresOn() != null){
-            if(proposal.getActivatesOn().isBefore(LocalDateTime.now()) && proposal.getExpiresOn().isAfter((LocalDateTime.now()))){
+            // start by  setting the most restrictive rights and then relax them as authorization
+            // status allows
+            proposal.setHidden(true);
+            proposal.setReadOnlyCurrentUser(true);
+
+            // hide inactives and exit
+            if(!proposal.isActive()){
+                return proposal;
+            }
+
+            if(proposal.getActivatesOn() != null && proposal.getExpiresOn() != null){
+                if(proposal.getActivatesOn().isBefore(LocalDateTime.now()) && proposal.getExpiresOn().isAfter((LocalDateTime.now()))){
+                    proposal.setHidden(false);
+
+                }
+            }
+            if(u.getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToView()){
                 proposal.setHidden(false);
-                
+                if(u.getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToEvaluate()){
+                    proposal.setReadOnlyCurrentUser(false);
+                }
             }
+            configureChoiceList(proposal, u);
         }
-        if(u.getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToView()){
-            proposal.setHidden(false);
-            if(u.getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToEvaluate()){
-                proposal.setReadOnlyCurrentUser(false);
-            }
-        }
-        configureChoiceList(proposal, u);
         return proposal;
     }
     
     public Proposal configureChoiceList(Proposal proposal, UserAuthorized u){
-        if(proposal.getDirective().getChoiceList() != null){
-            Iterator<Proposable> iter = proposal.getDirective().getChoiceList().iterator();
-            while(iter.hasNext()){
-                Proposable p = iter.next();
-                configureChoice(p, u);
+        if(proposal != null && u != null){
+            if(proposal.getDirective().getChoiceList() != null){
+                Iterator<Proposable> iter = proposal.getDirective().getChoiceList().iterator();
+                while(iter.hasNext()){
+                    Proposable p = iter.next();
+                    configureChoice(p, u);
+                }
             }
         }
         return proposal;
     }
     
     private Proposable configureChoice(Proposable choice, UserAuthorized u){
-        
-        choice.setHidden(true);
-        choice.setCanChoose(false);
-        
-        // hide inactives and exit
-        if(!choice.isActive()){
-            return choice;
-        }
-        
-         if(u.getRole().getRank() >= choice.getMinimumRequiredUserRankToView()){
-                choice.setHidden(false);
-                if(u.getRole().getRank() >= choice.getMinimumRequiredUserRankToChoose()){
-                    choice.setCanChoose(true);
-                }
+        if(choice != null && u != null){
+            choice.setHidden(true);
+            choice.setCanChoose(false);
+
+            // hide inactives and exit
+            if(!choice.isActive()){
+                return choice;
             }
+             if(u.getRole().getRank() >= choice.getMinimumRequiredUserRankToView()){
+                    choice.setHidden(false);
+                    if(u.getRole().getRank() >= choice.getMinimumRequiredUserRankToChoose()){
+                        choice.setCanChoose(true);
+                    }
+            }
+        }
         return choice;
     }
     

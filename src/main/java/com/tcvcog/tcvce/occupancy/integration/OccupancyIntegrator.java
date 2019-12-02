@@ -482,6 +482,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         PersonIntegrator pi = getPersonIntegrator();
         EventIntegrator ei = getEventIntegrator();
         ChoiceIntegrator choiceInt = getChoiceIntegrator();
+        PaymentIntegrator pai = getPaymentIntegrator();
+        
         // now get all the lists from their respective integrators
         // this is the Java version of table joins in SQL; we're doing them interatively
         // in our integrators for each BOB
@@ -491,6 +493,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setEventList(ei.getEventList(op));
         op.setProposalList(choiceInt.getProposalList(op));
         op.setInspectionList(inspecInt.getOccInspectionList(op));
+        op.setPaymentList(pai.getPaymentList(op));
+        op.setFeeList(pai.getFeeAssigned(op));
 
         // TODO: Figure out this inheritance snafoo
         
@@ -500,6 +504,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         
         op.setPermitList(getOccPermitList(op));
         op.setBlobIDList(getBlobList(op));
+        
         
         return op;
         

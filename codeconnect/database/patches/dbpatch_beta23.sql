@@ -195,6 +195,10 @@ ALTER TABLE LOGIN ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE;
 ALTER TABLE LOGIN ADD COLUMN deactivated_userid INTEGER CONSTRAINT login_decatedby_userid_fk REFERENCES login (userid);
 
 
+-- From Nathan
+
+ALTER TABLE moneyoccperiodtypefee ADD COLUMN active boolean;
+ALTER TABLE moneyoccperiodtypefee ADD COLUMN autoassign boolean;
 
 
 
