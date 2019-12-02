@@ -77,7 +77,9 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     public void initBean(){
         currentUser = getSessionBean().getSessionUser();
         userPersonList = new ArrayList<>();
-        userPersonList.add(currentUser.getPerson());
+        if(currentUser != null){
+            userPersonList.add(currentUser.getPerson());
+        }
         formSelectedUserPerson = null;
     }
     

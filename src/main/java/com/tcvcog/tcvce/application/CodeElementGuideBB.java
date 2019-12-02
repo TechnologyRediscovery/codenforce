@@ -80,7 +80,6 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
                 }
             }
         }
-        
         return "";
     }
    

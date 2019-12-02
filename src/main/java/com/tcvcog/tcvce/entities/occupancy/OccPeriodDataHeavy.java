@@ -102,7 +102,7 @@ public  class       OccPeriodDataHeavy
     
       @Override
     public void setEventList(List<Event> lst) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        eventList = lst;
     }
     
     @Override
