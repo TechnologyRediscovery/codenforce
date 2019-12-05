@@ -57,6 +57,7 @@ public  class       OccPeriodDataHeavy
     private List<OccPermit> permitList;
     
     private List<Integer> blobIDList;
+    
     private List<Payment> paymentList;
     private List<MoneyOccPeriodFeeAssigned> feeList;
 

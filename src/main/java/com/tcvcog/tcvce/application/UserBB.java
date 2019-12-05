@@ -122,6 +122,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     }
     
     public void refreshCurrentUser(){
+        System.out.println("UserBB.refreshCurrentUser");
         UserCoordinator uc = getUserCoordinator();
         try {
             currentUser = uc.authorizeUser(currentUser, getSessionBean().getSessionMuni(), null);
@@ -140,7 +141,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         try {
             uc.updateUser(currentUser, null, formUsername);
-           refreshCurrentUser();
+            refreshCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));

@@ -76,7 +76,7 @@
                                                                      disabled="#{!caseProfileBB.searchParams.filterByMuni}">
                                                         <f:converter converterId="muniConverter"/>
                                                         <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                                        <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                        <f:selectItems id="muniNameList" value="#{sessionBean.sessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                                     </p:selectOneMenu>
                                                     <h:message for="cecases-search-muni-som" showDetail="true" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -235,7 +235,7 @@
                                                                      value="#{caseProfileBB.searchParams.caseManagerUser}"
                                                                      disabled="#{!caseProfileBB.searchParams.useCaseManager}">
                                                         <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
-                                                        <f:selectItems value="#{userBB.userList}"  var="u" itemValue="#{u}" 
+                                                        <f:selectItems value="#{caseProfileBB.usersForSearchConfig}"  var="u" itemValue="#{u}" 
                                                                        itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
                                                         <f:converter converterId="userConverter"/>
                                                     </p:selectOneMenu>
@@ -855,14 +855,14 @@
 
                                         
                                         <p:dataScroller id="insp-events-datascroller-chooseeventcategory"
-                                                        value="#{occInspectionBB.eventCategoryList}"
+                                                        value="#{caseProfileBB.eventCategoryList}"
                                                         var="eventCat"
                                                         rowIndexVar="#{eventCat.categoryID}">
                                             
                                             <p:commandButton id="insp-events-button-selecteventcat"
                                                              ajax="true"
                                                              value="new #{eventCat.eventCategoryTitle} event"
-                                                             actionListener="#{occInspectionBB.initializeEvent(eventCat)}"
+                                                             actionListener="#{caseProfileBB.initializeEvent(eventCat)}"
                                                              icon="fa fa-plus" 
                                                              oncomplete=""
                                                              update="insp-form-addeditevent"

@@ -346,7 +346,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public String manageOccPeriod(OccPeriod op){
         setCurrOccPeriod(op);
         getSessionBean().setSessionOccPeriod(getCurrOccPeriod());
-        return "inspection";
+        return "occPeriodStatus";
         
     }
     

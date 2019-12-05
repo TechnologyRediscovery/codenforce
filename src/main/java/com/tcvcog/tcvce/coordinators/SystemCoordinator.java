@@ -213,12 +213,12 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sub NavItem: Occupancy
-    private final NavigationSubItem occPeriodStatus = getNavSubItem("Period Status", "", "fa fa-sign-in", true);
-    private final NavigationSubItem occPermits = getNavSubItem("Permits", "", "fa fa-sign-in", true);
-    private final NavigationSubItem occEvents = getNavSubItem("Events", "", "fa fa-sign-in", false);
-    private final NavigationSubItem occInspections = getNavSubItem("Inspections", "", "fa fa-sign-in", false);
-    private final NavigationSubItem occDocuments = getNavSubItem("Documents", "", "fa fa-sign-in", false);
-    private final NavigationSubItem occPayments = getNavSubItem("Payments", "", "fa fa-sign-in", false);
+    private final NavigationSubItem occPeriodStatus = getNavSubItem("Period Status", "/restricted/cogstaff/occ/occPeriodStatus.xhtml", "fa fa-sign-in", true);
+    private final NavigationSubItem occPermits = getNavSubItem("Permits", "/restricted/cogstaff/occ/occPeriodPermits.xhtml", "fa fa-sign-in", true);
+    private final NavigationSubItem occEvents = getNavSubItem("Events", "/restricted/cogstaff/occ/occPeriodEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem occInspections = getNavSubItem("Inspections", "/restricted/cogstaff/occ/occPeriodInspections.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem occDocuments = getNavSubItem("Payments", "/restricted/cogstaff/occ/occPeriodPayments.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem occPayments = getNavSubItem("Doc+Img", "/restricted/cogstaff/occ/occPeriodBlobs.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Occupancy
     public List<NavigationSubItem> getOccNavList() {

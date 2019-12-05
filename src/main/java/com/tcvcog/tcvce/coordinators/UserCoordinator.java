@@ -148,6 +148,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                             throws  IntegrationException, 
                                                     AuthorizationException{
         
+        System.out.println("UserCoordinator.configureUserAuthorized");
+        
         Map<Municipality, List<UserMuniAuthPeriod>> umapMasterMap = null;
         
         List<UserMuniAuthPeriod> periodList = null;
@@ -159,6 +161,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         if(umapList != null && !umapList.isEmpty() ){
             Collections.sort(umapList);
             umapMasterMap = new HashMap<>();
+            
             for(UserMuniAuthPeriod umap: umapList){
                 mu = umap.getMuni();
                 if(umapMasterMap.containsKey(mu)){
@@ -232,6 +235,19 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             return tempList;
         }
         return tempList;
+    }
+    
+    /**
+     * Creates a list of Users for use by search criterias on various pages
+     * so the user can search by Users who have some past connection to any of the 
+     * given Municipality objects passed into the method.
+     * 
+     * TODO: Finish my guts!
+     * @param muniList The set of Municipalities for which the user may Search
+     * @return An assembled list of users for authorization
+     */
+    public List<User> assembleUserListForSearchCriteria(List<Municipality> muniList){
+        return new ArrayList<>();
     }
     
     /**

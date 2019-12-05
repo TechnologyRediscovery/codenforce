@@ -1,0 +1,1836 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Occ Period Status</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../../restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="occperiod-status-view">
+                    
+                    <div class="mainContainer">
+                        <h:form id="form-messages-global">
+                            <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                        <h1>Occupancy Period Status</h1>
+                        
+                        
+                        
+                            
+                            
+                        
+                                <h:form id="occperiod-form-address">
+
+                                    <div class="occperiod-address-container">
+
+                                        <h:outputText styleClass="occperiod-address"
+                                                      value="#{occInspectionBB.currentPropertyUnit.property.address}
+                                                      (#{occInspectionBB.currentPropertyUnit.property.muni.muniName})" />
+
+                                        <p:spacer height="3px" />
+
+                                        <h:outputText styleClass="ui-label-inline" value="Occupancy period for unit no. "  />
+
+                                        <h:outputText value="(single dwelling unit)"
+                                                      rendered="#{occInspectionBB.currentPropertyUnit.unitNumber == '-1'}"
+                                                      styleClass="data-text italic" />
+
+                                        <h:outputText value="#{occInspectionBB.currentPropertyUnit.unitNumber}"
+                                                      rendered="#{occInspectionBB.currentPropertyUnit.unitNumber != '-1'}"
+                                                      styleClass="data-text"/>
+
+                                        <p:commandButton   id="occperiod-address-button-changepropunit"
+                                                           ajax="true"
+                                                           styleClass="noFill button-size-small"
+                                                           actionListener="#{occInspectionBB.initiatePropUnitUpdate}"
+                                                           oncomplete="PF('occperiod-dialog-periodpropunit-var').show()"
+                                                           icon="fa fa-gears"
+                                                           update="occperiod-dialog-periodpropunit-form"/>
+                                    </div>
+
+                                </h:form>
+
+                                <p:separator />
+
+                                <p:panel id="occperiod-panel-periodmetadata"
+                                         toggleable="true"
+                                         widgetVar="occperiod-panel-periodmetadata-var"
+                                         collapsed="false"
+                                         header="Occupancy period settings">
+
+                                    <h:form id="occperiod-form-periodmetadata">
+                                        <h:panelGrid        id="occperiod-panelgrid-periodmetadata"
+                                                            columns="2"
+                                                            columnClasses="gridTd, gridTdg"
+                                                            rendered="true">
+                                            <h:panelGroup>
+                                                <h:outputText value="Period type:"
+                                                              styleClass="ui-label font-smaller"/>
+                                                <div class="field-lock-status-icon-container">
+                                                    <i class="material-icons">
+                                                        <h:outputText id="occperiod-periodmetadata-icon-type"
+                                                                      value="#{empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS ? 'block' : 'verified_user'}"/>
+                                                    </i>
+                                                </div>
+                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.type.title}"
+                                                              styleClass="data-text"/>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <f:subview id="occperiod-periodmetadata-subview-typelockinfo">
+                                                    <f:subview id="occperiod-periodmetadata-subview-typelock-unlocked"
+                                                               rendered="#{empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS}">
+                                                        <p:commandButton    id="occperiod-periodmetadata-button-pertype-certify"
+                                                                            ajax="true"
+                                                                            styleClass="noFill"
+                                                                            actionListener="#{occInspectionBB.certifyOccPeriodField}"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                            disabled="false"
+                                                                            value="certify period type"
+                                                                            icon="fa fa-shield"
+                                                                            update="occperiod-form-periodmetadata
+                                                                            form-messages-global"
+                                                                            title="secure this occupancy period's type">
+                                                            <f:param name="fieldtocertify" value="occperiodtype" />
+                                                            <f:param name="certifymode" value="certify" />
+                                                        </p:commandButton>
+
+
+                                                    </f:subview>
+                                                    <f:subview id="occperiod-periodmetadata-subview-typelock-locked"
+                                                               rendered="#{!empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS}">
+                                                        <h:outputText styleClass="ui-label-inline font-smaller" value="Period type locked: " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentOccPeriod.periodTypeCertifiedTS)}" />
+                                                        <p:spacer height="0px" />
+                                                        <h:outputText styleClass="ui-label-inline" value="By: " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.currentOccPeriod.periodTypeCertifiedBy.person.firstName}" />
+                                                        <h:outputText styleClass="data-text" value=" " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.currentOccPeriod.periodTypeCertifiedBy.person.lastName}" />
+
+                                                        <p:spacer height="5px" />
+
+                                                        <p:commandButton    id="occperiod-periodmetadata-button-pertype-withdraw"
+                                                                            ajax="true"
+                                                                            styleClass="noFill"
+                                                                            actionListener="#{occInspectionBB.certifyOccPeriodField}"
+                                                                            rendered="true"
+                                                                            disabled="false"
+                                                                            value="remove type lock"
+                                                                            update="occperiod-form-periodmetadata
+                                                                            form-messages-global"
+                                                                            icon="fa fa-unlock"
+                                                                            title="clear a previously existing type authorization">
+                                                            <f:param name="fieldtocertify" value="occperiodtype" />
+                                                            <f:param name="certifymode" value="withdraw" />
+                                                        </p:commandButton>
+                                                    </f:subview>
+                                                </f:subview>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText value="Authorization status: "
+                                                              styleClass="ui-label font-smaller"/>
+                                                <div class="field-lock-status-icon-container">
+                                                    <i class="material-icons">
+                                                        <h:outputText id="occperiod-periodmetadata-icon-authstatus"
+                                                                      value="#{empty occInspectionBB.currentOccPeriod.authorizedTS? 'block' : 'verified_user'}"/>
+                                                    </i>
+                                                </div>
+
+                                                <h:outputText id="occperiod-form-periodmetadata-auth-ot"
+                                                              value="#{empty occInspectionBB.currentOccPeriod.authorizedTS ? 'not authorized' : 'authorized!'}"/>
+
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <f:subview id="occperiod-periodmetadata-subview-auth-container">
+
+                                                    <f:subview id="occperiod-periodmetadata-subview-auth-notauthorized"
+                                                               rendered="#{empty occInspectionBB.currentOccPeriod.authorizedTS}">
+                                                        <p:commandButton    id="occperiod-periodmetadata-subview-auth-button-certify"
+                                                                            ajax="true"
+                                                                            styleClass="noFill"
+                                                                            actionListener="#{occInspectionBB.certifyOccPeriodField}"
+                                                                            rendered="true"
+                                                                            disabled="false"
+                                                                            value="authorize period"
+                                                                            icon="fa fa-shield"
+                                                                            update="occperiod-form-periodmetadata
+                                                                            form-messages-global"
+                                                                            title="finalize all occupancy period settings which then allows permitting">
+                                                            <f:param name="fieldtocertify" value="authorization" />
+                                                            <f:param name="certifymode" value="certify" />
+                                                        </p:commandButton>
+                                                    </f:subview>
+                                                    <f:subview id="occperiod-periodmetadata-subview-auth-authorized"
+                                                               rendered="#{!(empty occInspectionBB.currentOccPeriod.authorizedTS)}">
+
+                                                        <h:outputText styleClass="ui-label-inline" value="Authorized at " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentOccPeriod.authorizedTS)}" />
+                                                        <p:spacer height="0px" />
+                                                        <h:outputText styleClass="ui-label-inline" value=" By user  " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.currentOccPeriod.authorizedBy.person.firstName}" />
+                                                        <h:outputText styleClass="data-text" value=" " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.currentOccPeriod.authorizedBy.person.lastName}" />
+
+                                                        <p:spacer height="5px" />
+
+                                                        <p:commandButton    id="occperiod-periodmetadata-subview-auth-button-withdraw"
+                                                                            ajax="true"
+                                                                            styleClass="noFill"
+                                                                            actionListener="#{occInspectionBB.certifyOccPeriodField}"
+                                                                            rendered="true"
+                                                                            disabled="false"
+                                                                            value="withdraw authorization"
+                                                                            icon="fa fa-warning"
+                                                                            update="occperiod-form-periodmetadata
+                                                                            form-messages-global"
+                                                                            title="finalize all occupancy period settings which then allows permitting">
+                                                            <f:param name="fieldtocertify" value="authorization" />
+                                                            <f:param name="certifymode" value="withdraw" />
+                                                        </p:commandButton>
+                                                    </f:subview>
+                                                </f:subview>
+
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText value="Start date:"
+                                                              styleClass="ui-label font-smaller"/>
+                                                <div class="field-lock-status-icon-container">
+                                                    <i class="material-icons">
+                                                        <h:outputText id="occperiod-periodmetadata-icon-startdate"
+                                                                      value="#{empty occInspectionBB.currentOccPeriod.startDateCertifiedTS ? 'block' : 'verified_user'}"/>
+                                                    </i>
+                                                </div>
+                                                <h:outputText value="#{empty occInspectionBB.currentOccPeriod.endDate ? 'no start date' : occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentOccPeriod.startDate)}" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <f:subview id="occperiod-periodmetadata-subview-startdate-container">
+
+                                                    <f:subview id="occperiod-periodmetadata-subview-startdate-unlocked"
+                                                               rendered="#{empty occInspectionBB.currentOccPeriod.startDateCertifiedTS}">
+
+                                                        <h:outputText value="Edit start date: "
+                                                                      styleClass="ui-label font-smaller"/>
+                                                        <p:calendar     id="occperiod-periodmetadata-cal-startdate"
+                                                                        value="#{occInspectionBB.currentOccPeriod.startDateUtilDate}"
+                                                                        mode="popup"
+                                                                        showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                                        navigator="true" tabindex="16" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                                        showButtonPanel="true" showTodayButton="true"
+                                                                        required="false">
+                                                            <p:ajax />
+                                                        </p:calendar>
+                                                        <p:spacer height="5px" />
+
+                                                        <p:commandButton    id="occperiod-periodmetadata-subview-startdate-button-certify"
+                                                                            ajax="true"
+                                                                            styleClass="noFill"
+                                                                            actionListener="#{occInspectionBB.certifyOccPeriodField}"
+                                                                            rendered="true"
+                                                                            disabled="false"
+                                                                            value="lock start date"
+                                                                            icon="fa fa-shield"
+                                                                            update="occperiod-form-periodmetadata
+                                                                            form-messages-global"
+                                                                            title="finalize start date">
+                                                            <f:param name="fieldtocertify" value="startdate" />
+                                                            <f:param name="certifymode" value="certify" />
+                                                        </p:commandButton>
+                                                    </f:subview>
+                                                    <f:subview id="occperiod-periodmetadata-subview-startdate-locked"
+                                                               rendered="#{!empty occInspectionBB.currentOccPeriod.startDateCertifiedTS}">
+
+                                                        <h:outputText styleClass="ui-label-inline" value="Start date locked at " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentOccPeriod.startDateCertifiedTS)}" />
+                                                        <p:spacer height="0px" />
+                                                        <h:outputText styleClass="ui-label-inline" value=" by " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.currentOccPeriod.startDateCertifiedBy.person.firstName}" />
+                                                        <h:outputText styleClass="data-text" value=" " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.currentOccPeriod.startDateCertifiedBy.person.lastName}" />
+
+                                                        <p:spacer height="5px" />
+
+                                                        <p:commandButton    id="occperiod-periodmetadata-subview-startdate-button-withdraw"
+                                                                            ajax="true"
+                                                                            styleClass="noFill"
+                                                                            actionListener="#{occInspectionBB.certifyOccPeriodField}"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                                            disabled="false"
+                                                                            value="remove date lock"
+                                                                            icon="fa fa-unlock"
+                                                                            update="occperiod-form-periodmetadata
+                                                                            form-messages-global"
+                                                                            title="remove the lock on the period start date">
+                                                            <f:param name="fieldtocertify" value="startdate" />
+                                                            <f:param name="certifymode" value="withdraw" />
+                                                        </p:commandButton>
+                                                    </f:subview>
+                                                </f:subview>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText value="End date:"
+                                                              styleClass="ui-label font-smaller"/>
+                                                <div class="field-lock-status-icon-container">
+                                                    <i class="material-icons">
+                                                        <h:outputText id="occperiod-periodmetadata-icon-enddate"
+                                                                      value="#{empty occInspectionBB.currentOccPeriod.endDateCertifiedTS ? 'block' : 'verified_user'}"/>
+                                                    </i>
+                                                </div>
+
+                                                <h:outputText value="#{empty occInspectionBB.currentOccPeriod.endDate ? 'no end date' : occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentOccPeriod.endDate)}" />
+
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <f:subview id="occperiod-periodmetadata-subview-enddate-container">
+
+                                                    <f:subview id="occperiod-periodmetadata-subview-enddate-unlocked"
+                                                               rendered="#{empty occInspectionBB.currentOccPeriod.endDateCertifiedTS}">
+
+                                                        <h:outputText value="Edit end date: "
+                                                                      styleClass="ui-label font-smaller"/>
+                                                        <p:calendar    id="occperiod-periodmetadata-cal-enddate"
+                                                                       value="#{occInspectionBB.currentOccPeriod.endDateUtilDate}"
+                                                                       mode="popup"
+                                                                       showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                                       navigator="true" tabindex="16" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                                       showButtonPanel="true" showTodayButton="true"
+                                                                       required="false">
+                                                            <p:ajax />
+                                                        </p:calendar>
+
+                                                        <p:spacer height="5px" />
+
+                                                        <p:commandButton    id="occperiod-periodmetadata-subview-enddate-button-certify"
+                                                                            ajax="true"
+
+                                                                            styleClass="noFill"
+                                                                            actionListener="#{occInspectionBB.certifyOccPeriodField}"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                            disabled="false"
+                                                                            value="lock end date"
+                                                                            icon="fa fa-shield"
+                                                                            update="occperiod-form-periodmetadata
+                                                                            form-messages-global"
+                                                                            title="finalize occupancy period end date">
+                                                            <f:param name="fieldtocertify" value="enddate" />
+                                                            <f:param name="certifymode" value="certify" />
+                                                        </p:commandButton>
+                                                    </f:subview>
+
+                                                    <f:subview id="occperiod-periodmetadata-subview-enddate-locked"
+                                                               rendered="#{!empty occInspectionBB.currentOccPeriod.endDateCertifiedTS}">
+
+                                                        <h:outputText styleClass="ui-label-inline" value="End date locked at " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentOccPeriod.endDateCertifiedTS)}" />
+                                                        <p:spacer height="0px" />
+                                                        <h:outputText styleClass="ui-label-inline" value=" by " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.currentOccPeriod.endDateCertifiedBy.person.firstName}" />
+                                                        <h:outputText styleClass="data-text" value=" " />
+                                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.currentOccPeriod.endDateCertifiedBy.person.lastName}" />
+
+                                                        <p:spacer height="5px" />
+
+                                                        <p:commandButton    id="occperiod-periodmetadata-subview-enddate-button-withdraw"
+                                                                            ajax="true"
+                                                                            styleClass="noFill"
+                                                                            actionListener="#{occInspectionBB.certifyOccPeriodField}"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                                            disabled="false"
+                                                                            value="remove date lock"
+                                                                            update="occperiod-form-periodmetadata
+                                                                            form-messages-global"
+                                                                            icon="fa fa-unlock"
+                                                                            title="finalize occupancy period ending date. Note that some period types do not allow empty end dates">
+                                                            <f:param name="fieldtocertify" value="enddate" />
+                                                            <f:param name="certifymode" value="withdraw" />
+                                                        </p:commandButton>
+                                                    </f:subview>
+
+                                                </f:subview>
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                        <p:spacer height="5px" />
+                                        <p:commandButton    id="occperiod-button-advancedperiodsettings"
+                                                            ajax="true"
+                                                            styleClass="noFill button-size-small"
+                                                            actionListener="#{occInspectionBB.updateOccPeriodInitialize}"
+                                                            oncomplete="PF('occperiod-dialog-periodmetadata-var').show()"
+                                                            icon="fa fa-gears"
+                                                            value="period id #{occInspectionBB.currentOccPeriod.periodID} settings"
+                                                            update="occperiod-dialog-periodmetadata-form
+                                                            "/>
+                                    </h:form>
+                                </p:panel>
+
+                                <p:panel id="occperiod-panel-proposals"
+                                         toggleable="true"
+                                         widgetVar="occperiod-panel-proposals-var"
+                                         collapsed="false"
+                                         header="Tasks and notices">
+                                    
+                                    <h:form id="occperiod-panel-proposals-messages-form">
+                                        <h:messages id="occperiod-panel-proposals-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
+                                    
+                                    <p:commandButton    id="proposal-button-propmetadata"
+                                                        ajax="true"
+                                                        value="proposals settings"
+                                                        styleClass="noFill button-size-small"
+                                                        actionListener="#{occInspectionBB.proposals_initiateViewPropMetadata(proposal)}"
+                                                        oncomplete="PF('occperiod-dialog-proposalmetadata-var').show()"
+                                                        icon="fa fa-gears"
+                                                        update="occperiod-dialog-proposalmetadata-form-messages
+                                                        periodmetadata-form-proposalsconfig
+                                                        
+                                                        "/>
+
+                                    <h:form id="occperiod-form-proposals">
+                                        <h:outputLabel styleClass="ui-label" for="occperiod-viewoptionsproposals-solb">
+                                            <h:outputText value="proposal list view options: "/>
+                                        </h:outputLabel>
+
+                                        <p:selectOneMenu style="width: 300px;" 
+                                                            id="occperiod-viewoptionsproposals-solb" 
+                                                            value="#{occInspectionBB.selectedProposalsViewOption}" 
+                                                            tabindex="10">
+
+                                            <p:ajax update="proposals-proposalscroller"                                                           
+                                                    immediate="true"/>
+                                            <f:selectItems  id="occperiod-viewoptionsproposals-selitems" 
+                                                            value="#{occInspectionBB.proposalsViewOptions}" 
+                                                            var="pvo" 
+                                                            itemValue="#{pvo}" 
+                                                            itemLabel="#{pvo.label}"/>
+                                        </p:selectOneMenu>
+
+                                        <h:message for="occperiod-viewoptionsproposals-solb" showDetail="false" showSummary="true"  
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        
+                                        <p:dataScroller id="proposals-proposalscroller"
+                                                        var="proposal"
+                                                        widgetVar="proposals-proposalscroller-var"
+                                                        value="#{occInspectionBB.currentOccPeriod.assembleProposalList(occInspectionBB.selectedProposalsViewOption)}"
+                                                        rowIndexVar="#{proposal.proposalID}">
+                                            <div class="outlinedBox">
+                                                <div class="proposal-metadata-container">
+                                                    <div class="proposal-propbuttoncontainer">
+                                                        <p:commandButton    id="proposal-button-showdescription"
+                                                                            styleClass="noFill button-size-small button-moreinfo"
+                                                                            icon="fa fa-info"/>
+                                                        
+                                                            <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
+                                                                            for="proposal-button-showdescription"
+                                                                            hideEffect="fade" 
+                                                                            dynamic="true" 
+                                                                            showCloseIcon="true"
+                                                                            style="width:300px" 
+                                                                            modal="false">
+                                                                
+                                                            <h:outputText       styleClass="proposal-description"
+                                                                                value="#{proposal.directive.description}" />
+                                                        </p:overlayPanel>
+                                                        
+                                                        
+                                                        <p:commandButton    id="proposal-button-rejectionreason"
+                                                                            styleClass="noFill button-size-small"
+                                                                            oncomplete="PF('occperiod-rejectproposal-dialog-var').show()"
+                                                                            rendered="#{!proposal.directive.requiredEvaluationForBOBClose 
+                                                                                        or systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions }"
+                                                                            icon="fa fa-trash"/>
+                                                    </div>
+                                                    <div class="proposal-prophead">
+                                                        <h:outputText value="#{proposal.directive.title}" />
+                                                    </div>
+                                                    <p:spacer height="5px" />
+                                                        <h:panelGrid   id="occperiod-proposals-panelgrid-propinfo" 
+                                                                       columns="1" 
+                                                                       style="clear:both;"
+                                                                       columnClasses="gridTd" 
+                                                                       rendered="true">
+                                                            <h:panelGroup>
+                                                               <h:outputText styleClass="ui-label-inline" 
+                                                                             value="Intended for: "  />
+                                                               <h:outputText styleClass="data-text" 
+                                                                             value="#{occInspectionBB.currentProposal.responderIntended.person.firstName}" />
+                                                               <h:outputText styleClass="data-text" 
+                                                                             value=" " />
+                                                               <h:outputText styleClass="data-text" 
+                                                                             value="#{occInspectionBB.currentProposal.responderIntended.person.lastName}" />
+                                                            </h:panelGroup>
+                                                        </h:panelGrid>
+                                                </div>
+
+                                                <p:dataScroller id="proposals-choicescroller"
+                                                                var="choice"
+                                                                widgetVar="proposals-choicescroller-var"
+                                                                value="#{proposal.directive.choiceListVisible}"
+                                                                rowIndexVar="#{choice.choiceID}">
+
+                                                    <p:commandButton    id="proposal-choice-button-choose"
+                                                                        ajax="true" 
+                                                                        styleClass="proposal-choice-button"
+                                                                        actionListener="#{occInspectionBB.proposals_makeChoice(choice, proposal)}"
+                                                                        disabled="#{!choice.canChoose or !(empty proposal.responseTS)}"
+                                                                        value="#{choice.title}"
+                                                                        icon="#{choice.icon.fontAwesome}"
+                                                                        title="#{choice.description}"
+                                                                        update="occperiod-form-proposals
+                                                                        occperiod-panel-proposals-messages-form"/>
+                                                    <p:spacer height="5px" />
+                                                </p:dataScroller>
+                                            </div>
+                                        </p:dataScroller>
+                                        
+                                    </h:form>
+                                </p:panel>
+
+
+
+
+                    </div>
+                    
+                    
+                    <p:dialog   id="occperiod-dialog-proposalmetadata"
+                                height="650" width="900"
+                                widgetVar="occperiod-dialog-proposalmetadata-var"
+                                closable="true" 
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                >
+
+                        <h:form id="occperiod-dialog-proposalmetadata-form-messages">
+                            <h:messages id="occperiod-dialog-proposalmetadata-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                        <h:form id="periodmetadata-form-proposalsconfig">
+                              
+                            <h:outputText value="Proposals attached to this OccPeriod"
+                                            styleClass="ui-label" />
+                            <p:dataTable
+                                id="periodmetadata-proposals-table"
+                                var="pr"
+                                rowKey="#{pr.proposalID}"
+                                value="#{occInspectionBB.currentOccPeriod.proposalList}"
+                                tableStyleClass="primeDataTable"
+                                draggableColumns="true"
+                                expandedRow="false"
+                                rowExpandMode="multiple"
+                                resizableColumns="true">
+
+                                <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Exp"/>
+                                        </f:facet>
+                                        <p:rowToggler/>
+                                </p:column>
+                                <p:column width="5%">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{pr.proposalID}"/>
+                                </p:column>
+
+                                <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Directive" />
+                                    </f:facet>
+                                    <h:outputText value="#{pr.directive.title} (ID: #{pr.directive.directiveID})"/>
+                                </p:column>
+                                
+                                <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Choice chosen" />
+                                    </f:facet>
+                                    <h:outputText value="#{!(empty pr.chosenChoice) ? pr.chosenChoice.choiceID : '' }"/>
+                                </p:column>
+
+                                <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Response TS" />
+                                    </f:facet>
+                                    <h:outputText value="#{occInspectionBB.getPrettyDate(pr.responseTS)}"/>
+                                </p:column>
+
+                                <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Responder" />
+                                    </f:facet>
+                                    <h:outputText value="#{!(empty pr.responderActual) ? pr.responderActual.person.lastName : 'no responder'}"/>
+                                </p:column>
+
+                                <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Active?" />
+                                    </f:facet>
+                                    <h:outputText value="#{pr.active}"/>
+                                </p:column>
+                                <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Hidden?" />
+                                    </f:facet>
+                                    <h:outputText value="#{pr.hidden}"/>
+                                </p:column>
+                                <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="RdOnly?" />
+                                    </f:facet>
+                                    <h:outputText value="#{pr.readOnlyCurrentUser}"/>
+                                </p:column>
+                                <p:rowExpansion>
+                                    <div class="outlinedBox">
+                                        <h3>Proposal tools</h3>
+                                        <p:commandButton    id="proposal-choice-button-clearchoice"
+                                                                        ajax="true" 
+                                                                        styleClass="proposal-choice-button"
+                                                                        actionListener="#{occInspectionBB.proposals_clearProposal(pr)}"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions and !(empty pr.responseTS)}"
+                                                                        value="Revoke choice and reset proposal"
+                                                                        update="occperiod-form-proposals
+                                                                        occperiod-panel-proposals-messages-form"/>
+                                        
+                                        <h:panelGrid    id="proposals-grid-rowexp" 
+                                                        columns="2" 
+                                                        columnClasses="td-dense" 
+                                                        rendered="true">
+                                            <h:panelGroup>
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Proposal ID: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.proposalID}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Directive ID:"  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.directiveID}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Generating event ID: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.generatingEventID}" />
+
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Initiator: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.initiator.person.lastName}" />
+                                                <h:outputText value=" (ID: " styleClass="data-text" />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.initiator.userID}" />
+                                                <h:outputText value=")" styleClass="data-text" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Responder intended: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.responderIntended.person.lastName}" />
+                                                <h:outputText value=" (ID: " styleClass="data-text" />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.responderIntended.userID}" />
+                                                <h:outputText value=")" styleClass="data-text" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Responder actual: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.responderActual.person.lastName}" />
+                                                <h:outputText value=" (ID: " styleClass="data-text" />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.responderActual.userID}" />
+                                                <h:outputText value=")" styleClass="data-text" />
+
+
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Activates on: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{occInspectionBB.getPrettyDate(pr.activatesOn)}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Expires on: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{occInspectionBB.getPrettyDate(pr.expiresOn)}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Response timestamp: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{occInspectionBB.getPrettyDate(pr.responseTS)}" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Active : "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.active}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Hidden: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.hidden}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Rejected: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.proposalRejected}" />
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Order: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.order}" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Generating event ID: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{!(empty pr.generatingEvent) ? pr.generatingEvent.eventID : 'no event'}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Response event ID: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{!(empty pr.responseEvent) ? pr.responseEvent.eventID : 'no event'}" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="Notes: "  />
+                                                <h:outputText styleClass="data-text" 
+                                                              escape="false"
+                                                              value="#{pr.notes}" />
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+
+                                                <h:outputText   styleClass="ui-label-inline" 
+                                                                value="directPropToDefaultMuniCEO: " />
+                                                <h:outputText   styleClass="data-text" 
+                                                                value="#{pr.directive.directPropToDefaultMuniCEO}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="directPropToDefaultMuniStaffer: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.directPropToDefaultMuniStaffer}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="directPropToDeveloper: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.directPropToDeveloper}" />
+
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="executeChoiceIfLoneWolf: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.executeChoiceIfLoneWolf}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="inactivateGeneratingEventOnEvaluation: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.inactivateGeneratingEventOnEvaluation}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="maintainRelativeDateWindow: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.maintainRelativeDateWindow}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="instantiateMultipleOnBOB: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.instantiateMultipleOnBOB}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="applyToClosedBOBs: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.applyToClosedBOBs}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="autoInactiveOnBOBClose: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.autoInactiveOnBOBClose}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="autoInactiveOnGenEventInactivation: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.autoInactiveOnGenEventInactivation}" />
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="minimumRequiredUserRankToView: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.minimumRequiredUserRankToView}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="minimumRequiredUserRankToEvaluate: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.minimumRequiredUserRankToEvaluate}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="active: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.active}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="hidden: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.hidden}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="relativeorder: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.relativeorder}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="data-text" 
+                                                              value="directPropToMuniSysAdmin: " />
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="#{pr.directive.directPropToMuniSysAdmin}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="requiredEvaluationForBOBClose: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.requiredEvaluationForBOBClose}" />
+
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="forceHidePrecedingProps: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.forceHidePrecedingProps}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="forceHideTrailingProps: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.forceHideTrailingProps}" />
+
+                                                <p:spacer height="5px" />
+
+                                                <h:outputText styleClass="ui-label-inline" 
+                                                              value="refuseToBeHidden: " />
+                                                <h:outputText styleClass="data-text" 
+                                                              value="#{pr.directive.refuseToBeHidden}" />
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                        
+                                        <p:spacer height="5px" />
+                                        
+                                            <h:outputText value="Choices offered by this directive"
+                                            styleClass="ui-label" />
+                              
+                                        
+                                         <p:dataTable   id="periodmetadata-proposals-choices-table"
+                                                        var="ch"
+                                                        rowKey="#{ch.choiceID}"
+                                                        value="#{pr.directive.choiceList}"
+                                                        tableStyleClass="primeDataTable"
+                                                        draggableColumns="true"
+                                                        expandedRow="false"
+                                                        rowExpandMode="multiple"
+                                                        resizableColumns="true">
+                                             <p:column width="8%">
+                                                 <f:facet name="header">
+                                                     <h:outputText value="ID" />
+                                                 </f:facet>
+                                                 <h:outputText value="#{ch.choiceID}"/>
+                                             </p:column>
+                                             
+                                             <p:column width="8%">
+                                                 <f:facet name="header">
+                                                     <h:outputText value="Title" />
+                                                 </f:facet>
+                                                 <h:outputText value="#{ch.title}"/>
+                                             </p:column>
+                                             
+                                             <p:column width="8%">
+                                                 <f:facet name="header">
+                                                     <h:outputText value="Hidden?" />
+                                                 </f:facet>
+                                                 <h:outputText value="#{ch.hidden}"/>
+                                             </p:column>
+                                             
+                                             <p:column width="8%">
+                                                 <f:facet name="header">
+                                                     <h:outputText value="Active?" />
+                                                 </f:facet>
+                                                 <h:outputText value="#{ch.active}"/>
+                                             </p:column>
+                                             
+                                             <p:column width="8%">
+                                                 <f:facet name="header">
+                                                     <h:outputText value="UsrCanChoose?" />
+                                                 </f:facet>
+                                                 <h:outputText value="#{ch.canChoose}"/>
+                                             </p:column>
+                                             
+                                             <p:column width="8%">
+                                                 <f:facet name="header">
+                                                     <h:outputText value="Choose min rnk" />
+                                                 </f:facet>
+                                                 <h:outputText value="#{ch.minimumRequiredUserRankToChoose}"/>
+                                             </p:column>
+                                             <p:column width="8%">
+                                                 <f:facet name="header">
+                                                     <h:outputText value="View min rnk?" />
+                                                 </f:facet>
+                                                 <h:outputText value="#{ch.minimumRequiredUserRankToView}"/>
+                                             </p:column>
+                                             <p:column width="8%">
+                                                 <f:facet name="header">
+                                                     <h:outputText value="Order" />
+                                                 </f:facet>
+                                                 <h:outputText value="#{ch.relativeOrder}"/>
+                                             </p:column>
+                                            <p:column width="10%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Choose" />
+                                                </f:facet>
+                                            <p:commandButton    id="proposal-choice-button-choose-dialog"
+                                                                ajax="true" 
+                                                                styleClass="proposal-choice-button"
+                                                                actionListener="#{occInspectionBB.proposals_makeChoice(ch, pr)}"
+                                                                disabled="#{!ch.canChoose}"
+                                                                value="Choose"
+                                                                icon="#{ch.icon.fontAwesome}"
+                                                                title="#{ch.description}"
+                                                                update="occperiod-form-proposals
+                                                                occperiod-panel-proposals-messages-form
+                                                                "/>
+                                            </p:column>
+                                             
+                                             <p:rowExpansion>
+                                                 <div class="outlinedBox">
+                                                     <h:outputText styleClass="ui-label-inline" value="Description: "/>
+                                                     <h:outputText styleClass="data-text" value="#{ch.description}"/>
+                                                 </div>
+                                             </p:rowExpansion>
+                                         </p:dataTable>
+                                    </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+                          </h:form>
+                              
+                            <h2>Event rule listing</h2>
+                              
+                            <h:form id="occperiod-propoals-eventrules-form">
+                                
+                                
+                                 <h:outputLabel styleClass="ui-label" for="eventrules-newruleid-it">
+                                        <h:outputText value="Event rule ID: "/>
+                                </h:outputLabel>
+                                <p:inputText id="eventrules-newruleid-it" type="number"
+                                                 value="#{occInspectionBB.formEventRuleIDToAdd}" >
+                                </p:inputText>
+                                <h:message for="eventrules-newruleid-it" showDetail="false" showSummary="true"  
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:commandButton    id="eventrules-addnewrulebyid-cb"
+                                                    ajax="true" 
+                                                    styleClass="proposal-choice-button"
+                                                    actionListener="#{occInspectionBB.rules_initiateEventRuleCreate}"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                    value="Add rule by ID"
+                                                    icon="fa fa-plus"
+                                                    update="occperiod-proposals-eventrules-datatable
+                                                    occperiod-dialog-proposalmetadata-form-messages 
+                                                    periodmetadata-form-proposalsconfig"/>
+                                <p:spacer height="5px" />
+                                
+                                 <h:outputLabel styleClass="ui-label" for="occperiod-eventruleset-solb">
+                                        <h:outputText value="Choose an event rule set: "/>
+                                </h:outputLabel>
+                                
+                                 <p:selectOneMenu style="width: auto;" 
+                                                        id="occperiod-eventruleset-solb" 
+                                                        value="#{occInspectionBB.selectedEventRuleSet}" 
+                                                        tabindex="10">
+                                        <f:converter converterId="eventRuleSetConverter" />
+                                        <p:ajax />
+                                        <f:selectItems  id="occperiod-eventruleset-selitems" 
+                                                        value="#{occInspectionBB.eventRuleSetList}" 
+                                                        var="rsl" 
+                                                        itemValue="#{rsl}" 
+                                                        itemLabel="#{rsl.title} (ID: #{rsl.rulseSetID})"/>
+                                </p:selectOneMenu>
+                                <h:message for="occperiod-eventruleset-solb" showDetail="false" showSummary="true"  
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:commandButton    id="eventrules-button-addruleset"
+                                                    ajax="true" 
+                                                    styleClass="proposal-choice-button"
+                                                    actionListener="#{occInspectionBB.rules_addEventRuleSet(occInspectionBB.selectedEventRuleSet)}"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                    value="Add rule by set"
+                                                    icon="fa fa-plus"
+                                                    update="occperiod-proposals-eventrules-datatable
+                                                    occperiod-dialog-proposalmetadata-form-messages 
+                                                    periodmetadata-form-proposalsconfig"/>
+                                <p:spacer height="5px" />
+                                
+                                <p:commandButton    id="eventrules-addnewrule-cb"
+                                                    ajax="true" 
+                                                    styleClass="proposal-choice-button"
+                                                    actionListener="#{occInspectionBB.rules_initiateEventRuleCreate}"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                    value="Create new event rule"
+                                                    oncomplete="PF('occperiod-dialog-addediteventrule-var').show()"
+                                                    icon="fa fa-plus"
+                                                    update="occperiod-dialog-addediteventrule-form"/>
+                                
+                                <p:spacer height="5px" />
+                                
+                                 <h:outputLabel styleClass="ui-label" for="occperiod-viewoptionsrules-solb">
+                                        <h:outputText value="ruleslist view options: "/>
+                                </h:outputLabel>
+
+                                <p:selectOneMenu style="width: 300px;" 
+                                                        id="occperiod-viewoptionsrules-solb" 
+                                                        value="#{occInspectionBB.selectedRulesViewOption}" 
+                                                        tabindex="10">
+
+                                        <p:ajax update="occperiod-proposals-eventrules-datatable"                                                           
+                                                immediate="true"/>
+                                        <f:selectItems  id="occperiod-viewoptionsrules-selitems" 
+                                                        value="#{occInspectionBB.rulesViewOptions}" 
+                                                        var="rvo" 
+                                                        itemValue="#{rvo}" 
+                                                        itemLabel="#{rvo.label}"/>
+                                    </p:selectOneMenu>
+
+                                    <h:message for="occperiod-viewoptionsrules-solb" showDetail="false" showSummary="true"  
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:dataTable
+                                    id="occperiod-proposals-eventrules-datatable"
+                                    var="rule"
+                                    rowKey="#{rule.ruleid}"
+                                    value="#{occInspectionBB.currentOccPeriod.assembleEventRuleList(occInspectionBB.selectedRulesViewOption)}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableColumns="true"
+                                    expandedRow="false"
+                                    rowExpandMode="multiple"
+                                    resizableColumns="true">
+
+                                      <p:column width="3%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Exp"/>
+                                            </f:facet>
+                                            <p:rowToggler/>
+                                        </p:column>
+
+                                     <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                         <h:outputText value="#{rule.ruleid}"/>
+                                    </p:column>
+
+                                     <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Title" />
+                                        </f:facet>
+                                         <h:outputText value="#{rule.title}"/>
+                                    </p:column>
+
+                                     <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Last evaluated TS" />
+                                        </f:facet>
+                                         <h:outputText value="#{occInspectionBB.getPrettyDate(rule.lastEvaluatedTS)}"/>
+                                    </p:column>
+
+                                     <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Passed TS" />
+                                        </f:facet>
+                                         <h:outputText value="#{occInspectionBB.getPrettyDate(rule.passedRuleTS)}"/>
+                                    </p:column>
+                                    <p:rowExpansion>
+                                        
+                                    <p:commandButton    id="eventrules-editrule-cb"
+                                                        ajax="true" 
+                                                        styleClass="proposal-choice-button"
+                                                        actionListener="#{occInspectionBB.rules_initiateEventRuleEdit(rule)}"
+                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                        value="Edit rule"
+                                                        oncomplete="PF('occperiod-dialog-addediteventrule-var').show()"
+                                                        icon="fa fa-plus"
+                                                        update="occperiod-dialog-addediteventrule-form"/>
+                                    
+                                    <p:spacer height="5px" />
+
+                                          <h:panelGrid    id="eventrules-grid" 
+                                                            columns="2" 
+                                                            columnClasses="td-dense" 
+                                                            rendered="true">
+                                                <h:panelGroup>
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Rule ID: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.ruleid}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Title:  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.title}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Description: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.description}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Attached TS: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{occInspectionBB.getPrettyDate(rule.attachedTS)}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Attached by: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.attachedBy) ? rule.attachedBy.person.lastName : ''}" />
+
+                                                    <p:spacer height="5px" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required event type: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.requiredEventType) ? rule.requiredEventType.label : ''}" />
+
+                                                    <p:spacer height="5px" />
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Forbidden event type: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.forbiddenEventType) ? rule.forbiddenEventType.label : ''}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required event category:  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.requiredEventCategory) 
+                                                                           ? rule.requiredEventCategory.eventCategoryTitle 
+                                                                                + 'ID: ' 
+                                                                                + rule.requiredEventCategory.categoryID  
+                                                                           : '' }" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Forbidden event category:  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.forbiddenEventCategory) 
+                                                                           ? rule.forbiddenEventCategory.eventCategoryTitle 
+                                                                                + 'ID: ' 
+                                                                                + rule.forbiddenEventCategory.categoryID  
+                                                                            : '' }" />
+                                                </h:panelGroup>
+                                              <h:panelGroup>
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Req EC type-internal order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_typeInternalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC Type-internal order thresold upper bound? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC global order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_globalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC global order thresold upper bound?  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_globalOrder_treatAsUpperBound}" />
+
+                                              </h:panelGroup>
+                                              <h:panelGroup>
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Req EC type-internal order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_typeInternalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC Type-internal order thresold upper bound? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC global order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_globalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC global order thresold upper bound?  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_globalOrder_treatAsUpperBound}" />
+
+                                              </h:panelGroup>
+
+                                              <h:panelGroup>
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Mondatory rule pass required for BOB close?"  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.mandatoryRulePassRequiredToCloseEntity}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Inactivate rule on BOB close?"  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.inactivateRuleOnEntityClose}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Prompting proposal: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.promptingProposal) ? rule.promptingProposal.proposalID : ''}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Triggered EC On pass: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.triggeredECOnRulePass) ? rule.triggeredECOnRulePass.categoryID : ''}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Triggered EC On fail: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.triggeredECOnRuleFail) ? rule.triggeredECOnRuleFail.categoryID : ''}" />
+
+                                              </h:panelGroup>
+                                              <h:panelGroup>
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Active? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.activeRuleAbstract}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Notes: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.notes}" escape="false" />
+                                              </h:panelGroup>
+                                          </h:panelGrid>
+                                    </p:rowExpansion>
+                                </p:dataTable>
+                        </h:form>
+                    </p:dialog>
+                    
+                    <p:dialog
+                        id="occperiod-dialog-addediteventrule"
+                        height="600" width="850"
+                        widgetVar="occperiod-dialog-addediteventrule-var"
+                        closable="true" 
+                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                        >
+                        
+                        <h:form id="occperiod-dialog-addediteventrule-form">
+                            
+                            <h2>Add and edit event rules</h2>
+
+                         <h:panelGrid    id="eventrule-create-grid" 
+                                        columns="2" 
+                                        columnClasses="gridTD, gridTD" 
+                                        rendered="true">
+                                            
+                            <h:panelGroup>
+                                  <h:outputLabel for="rule-title-it">
+                                      <h:outputText styleClass="ui-label" value="Rule title:"/>
+                                  </h:outputLabel>
+                                  <p:spacer height="3px"/>
+                                  <p:inputText id="rule-title-it" value="#{occInspectionBB.currentEventRuleAbstract.title}" 
+                                               style="width: 200px;" tabindex="3" required="true" styleClass="inputText"/>
+                                  <h:message    id="rule-title-msg"
+                                                for="rule-title-it" 
+                                                showDetail="false" showSummary="true" 
+                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                  
+                                  <p:spacer height="5px" />
+                                  
+                                  <h:outputLabel for="rule-title-it">
+                                        <h:outputText styleClass="ui-label" 
+                                                      value="Rule description" />
+                                  </h:outputLabel>
+                                  <p:inputText id="rule-desc-it" value="#{occInspectionBB.currentEventRuleAbstract.description}" 
+                                               style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
+                                  <h:message    id="rule-descr-msg"
+                                                for="rule-descr-it" 
+                                                showDetail="false" showSummary="true" 
+                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:panelGroup>
+                             
+                             <h:panelGroup>
+                                 <h:outputText value=" " />
+                             </h:panelGroup>
+                        
+                            <h:panelGroup>
+                                
+                                <h3>Required attributes</h3>
+                                
+                                <h:outputLabel  for="rule-lb-reqet">
+                                    <h:outputText styleClass="ui-label" value="Required event type"/>
+                                </h:outputLabel>
+                                <p:selectOneMenu id="rule-lb-reqet" required="false" 
+                                                    value="#{occInspectionBB.currentEventRuleAbstract.requiredEventType}" 
+                                                    tabindex="3"
+                                                    styleClass="full-width">
+                                    <f:selectItem itemLabel="Select an event type..." itemDisabled="true" noSelectionOption="true"/>
+                                    <f:selectItems value="#{occInspectionBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
+                                </p:selectOneMenu>
+                                <h:message for="rule-lb-reqet" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:spacer height="5px" />
+                                
+                                 <h:outputLabel for="rule-lb-reqcat">
+                                    <h:outputText styleClass="ui-label" value="Required event category"/>
+                                </h:outputLabel>
+                                <p:selectOneMenu id="rule-lb-reqcat" required="false" 
+                                                    value="#{occInspectionBB.currentEventRuleAbstract.requiredEventCategory}" 
+                                                    tabindex="3"
+                                                    styleClass="full-width">
+                                    <f:converter converterId="eventCategoryConverter" />
+                                    <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
+                                    <f:selectItems value="#{occInspectionBB.eventCategoryListAllActive}" 
+                                                   var="ec" 
+                                                   itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
+                                </p:selectOneMenu>
+                                <h:message for="rule-lb-reqcat" showDetail="true" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="Req cat thresold (internal to type)" 
+                                               for="rule-it-reqec-thres-typeint"/>
+                                <p:spacer height="3px"/>
+                                <p:inputText id="rule-it-reqec-thres-typeint" value="#{occInspectionBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder}" 
+                                               style="width: 20px;" 
+                                               tabindex="3" 
+                                               required="false" 
+                                               styleClass="inputText"/>
+                                <h:message     id="rule-reqec-thres-typeint-msg"
+                                               for="rule-it-reqec-thres-typeint" 
+                                               showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:spacer height="3px"/>
+                                
+                                 <h:outputLabel styleClass="ui-label" 
+                                               value="upper bound? (uncheck = lower bound)" 
+                                               for="rule-reqrec-thres-global-upperbound-switch"/>
+                                <p:selectBooleanCheckbox id="rule-req-thres-typeint-upperbound-switch"
+                                                         value="#{occInspectionBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="Req cat thresold (global order)" 
+                                               for="rule-it-reqec-thres-global"/>
+                                
+                                <p:spacer height="3px"/>
+                                
+                                <p:inputText id="rule-it-reqec-thres-global" value="#{occInspectionBB.currentEventRuleAbstract.requiredECThreshold_globalOrder}" 
+                                               style="width: 20px;" 
+                                               tabindex="3" 
+                                               required="false" 
+                                               styleClass="inputText"/>
+                                <h:message     id="rule-reqec-thres-global-msg"
+                                               for="rule-it-reqec-thres-global" 
+                                               showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:spacer height="3px"/>
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="upper bound? (uncheck = lower bound)" 
+                                               for="rule-reqrec-thres-global-upperbound-switch"/>
+                                <p:selectBooleanCheckbox id="rule-reqrec-thres-global-upperbound-switch"
+                                                         value="#{occInspectionBB.currentEventRuleAbstract.requiredECThreshold_globalOrder_treatAsUpperBound}" />
+                            </h:panelGroup>    
+                                
+                        
+                            <h:panelGroup>
+                                <h3>Forbidden attributes</h3>
+                                 <h:outputLabel styleClass="ui-label" for="rule-lb-forbiddenet">
+                                    <h:outputText value="Forbidden event type"/>
+                                </h:outputLabel>
+                                <p:selectOneMenu id="rule-lb-forbiddenet" required="false" 
+                                                    value="#{occInspectionBB.currentEventRuleAbstract.forbiddenEventType}" 
+                                                    tabindex="3"
+                                                    styleClass="full-width">
+                                    <f:selectItem itemLabel="Select an event type..." itemDisabled="true" noSelectionOption="true"/>
+                                    <f:selectItems value="#{occInspectionBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
+                                </p:selectOneMenu>
+                                <h:message for="rule-lb-forbiddenet" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                               
+                                <p:spacer height="3px"/>
+                                
+                                <h:outputLabel styleClass="ui-label" for="rule-lb-forcat">
+                                    <h:outputText value="Forbidden event category"/>
+                                </h:outputLabel>
+                                <p:selectOneMenu id="rule-lb-forcat" required="false" 
+                                                    value="#{occInspectionBB.currentEventRuleAbstract.forbiddenEventCategory}" 
+                                                    tabindex="3"
+                                                    styleClass="full-width">
+                                    <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
+                                    <f:converter converterId="eventCategoryConverter" />
+                                    <f:selectItems value="#{occInspectionBB.eventCategoryListAllActive}" 
+                                                   var="ec" itemLabel="#{ec.eventCategoryTitle}  (ID: #{ec.categoryID})" />
+                                </p:selectOneMenu>
+                                <h:message for="rule-lb-forcat" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:spacer height="3px"/>
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="Forbidden cat thresold (internal to type)" 
+                                               for="rule-it-forec-thres-typeint"/>
+                                
+                                <p:spacer height="3px"/>
+                               
+                                <p:inputText id="rule-it-forec-thres-typeint" value="#{occInspectionBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder}" 
+                                               style="width: 20px;" 
+                                               tabindex="3" 
+                                               required="false" 
+                                               styleClass="inputText"/>
+                                <h:message     id="rule-forec-thres-typeint-msg"
+                                               for="rule-it-forec-thres-typeint" 
+                                               showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:spacer height="3px"/>
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="upper bound? (uncheck = lower bound)" 
+                                               for="rule-forec-thres-typeint-upperbound-switch"/>
+                                <p:selectBooleanCheckbox id="rule-forec-thres-typeint-upperbound-switch"
+                                                         value="#{occInspectionBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="Forbidden cat thresold (global order)" 
+                                               for="rule-it-forec-thres-global"/>
+                                <p:spacer height="3px"/>
+                                <p:inputText id="rule-it-forec-thres-global" value="#{occInspectionBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder}" 
+                                               style="width: 20px;" 
+                                               tabindex="3" 
+                                               required="false" 
+                                               styleClass="inputText"/>
+                                <h:message     id="rule-forec-thres-global-msg"
+                                               for="rule-it-forec-thres-global" 
+                                               showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:spacer height="3px"/>
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="upper bound? (uncheck = lower bound)" 
+                                               for="rule-forec-thres-global-upperbound-switch"/>
+                                <p:selectBooleanCheckbox id="rule-forec-thres-global-upperbound-switch"
+                                                         value="#{occInspectionBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder_treatAsUpperBound}" />
+                                
+                            </h:panelGroup>    
+                                
+                            <h:panelGroup>
+                                <h3>Other rule settings</h3>
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="Required pass for entity close" 
+                                               for="rule-req-switch"/>
+                                <p:selectBooleanCheckbox id="rule-req-switch"
+                                                         value="#{occInspectionBB.currentEventRuleAbstract.mandatoryRulePassRequiredToCloseEntity}" />
+                                
+                                <p:spacer height="5px" />
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="Inactivate on entity close" 
+                                               for="rule-inactivate-switch"/>
+                                <p:selectBooleanCheckbox id="rule-inactivate-switch"
+                                                         value="#{occInspectionBB.currentEventRuleAbstract.inactivateRuleOnEntityClose}" />
+                                
+                                <p:spacer height="5px" />
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="Active?" 
+                                               for="rule-active-switch"/>
+                                <p:selectBooleanCheckbox id="rule-active-switch"
+                                                         value="#{occInspectionBB.currentEventRuleAbstract.activeRuleAbstract}" />
+                                
+                                <p:spacer height="3px"/>
+                                
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="Propmpting directive ID" 
+                                               for="rule-promptprop"/>
+                                <p:inputText id="rule-promptprop" 
+                                             value="#{occInspectionBB.currentEventRuleAbstract.formPromptingDirectiveID}" 
+                                               style="width: 20px;" 
+                                               tabindex="3" 
+                                               required="false" 
+                                               styleClass="inputText"/>
+                                <h:message     id="rule-promptprop-msg"
+                                               for="rule-promptprop" 
+                                               showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                            
+                            </h:panelGroup>    
+                                
+                            <h:panelGroup>
+                                
+                                <h3>Notes</h3>
+                                
+                                <p:spacer height="3px"/>
+                            
+                                <h:outputLabel styleClass="ui-label" 
+                                               value="Notes" 
+                                               for="rule-notes"/>
+                                <p:spacer height="3px"/>
+                                <p:inputTextarea id="rule-notes" 
+                                             value="#{occInspectionBB.currentEventRuleAbstract.notes}" 
+                                               style="width: 100%; height: 50px;" 
+                                               tabindex="3" 
+                                               required="false" 
+                                               styleClass="inputText"/>
+                                <h:message     id="rule-notes-msg"
+                                               for="rule-notes" 
+                                               showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                            
+                            </h:panelGroup>    
+                                
+                            <h:panelGroup>
+                                <h3>Triggers</h3>
+                                <h:outputLabel styleClass="ui-label" for="rule-lb-triggeredcatonpass">
+                                    <h:outputText value="Event category triggered on rule pass"/>
+                                </h:outputLabel>
+                                <p:selectOneMenu id="rule-lb-triggeredcatonpass" required="false" 
+                                                    value="#{occInspectionBB.currentEventRuleAbstract.triggeredECOnRulePass}" 
+                                                    styleClass="full-width"
+                                                    tabindex="3">
+                                    <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
+                                    <f:converter converterId="eventCategoryConverter" />
+                                    <f:selectItems value="#{occInspectionBB.eventCategoryListAllActive}" 
+                                                   var="ec" 
+                                                   itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
+                                </p:selectOneMenu>
+                                <h:message for="rule-lb-triggeredcatonpass" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:spacer height="5px" />
+                                
+                                <h:outputLabel styleClass="ui-label" for="rule-lb-triggeredcatonfail">
+                                    <h:outputText value="Event category triggered on rule fail"/>
+                                </h:outputLabel>
+                                <p:selectOneMenu id="rule-lb-triggeredcatonfail" required="false" 
+                                                    value="#{occInspectionBB.currentEventRuleAbstract.triggeredECOnRuleFail}" 
+                                                    tabindex="3" 
+                                                    styleClass="full-width">
+                                    <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
+                                    <f:converter converterId="eventCategoryConverter" />
+                                    <f:selectItems value="#{occInspectionBB.eventCategoryListAllActive}" 
+                                                   var="ec" itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
+                                </p:selectOneMenu>
+                                <h:message for="rule-lb-triggeredcatonfail" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:panelGroup>    
+                        
+                        
+                        </h:panelGrid>
+                        
+                        <p:spacer height="5px" />
+                        <h:outputLabel for="rule-addtotemplate-switch">
+                            <h:outputText styleClass="ui-label" 
+                                          value="Include new rule in other occ periods of type: #{occInspectionBB.currentOccPeriod.type.title}?" />
+                        </h:outputLabel>
+                            <p:selectBooleanCheckbox id="rule-addtotemplate-switch"
+                                                     value="#{occInspectionBB.includeEventRuleInCurrentOccPeriodTemplate}" />
+                                
+                            <p:spacer height="5px" />
+
+                            <p:commandButton   id="addediteventrule-dialog-close"
+                                               ajax="true" 
+                                               value="Cancel" icon="fa fa-stop" 
+                                               onclick="PF('occperiod-dialog-addediteventrule-var').hide()"/>
+
+                            <p:commandButton    id="addediteventrule-button-addrule"
+                                                ajax="true" 
+                                                actionListener="#{occInspectionBB.rules_commitEventRuleCreate}"
+                                                value="create new rule" icon="fa fa-plus"
+                                                disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                rendered="#{occInspectionBB.currentEventRuleAbstract.ruleid == 0}"
+                                                oncomplete="PF('occperiod-dialog-addediteventrule-var').hide()"
+                                                update="occperiod-dialog-proposalmetadata-form-messages
+                                                periodmetadata-form-proposalsconfig
+                                                occperiod-propoals-eventrules-form"/>
+
+                            <p:commandButton    id="addediteventrule-button-editrule"
+                                                ajax="true" 
+                                                actionListener="#{occInspectionBB.rules_commitEventRuleEdits}"
+                                                value="update rule" icon="fa fa-edit"
+                                                disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                rendered="#{occInspectionBB.currentEventRuleAbstract.ruleid != 0}"
+                                                oncomplete="PF('occperiod-dialog-addediteventrule-var').hide()"
+                                                update="occperiod-dialog-proposalmetadata-form-messages
+                                                periodmetadata-form-proposalsconfig
+                                                occperiod-propoals-eventrules-form"/>
+                            
+                        </h:form>
+
+                    </p:dialog>
+                    
+                    
+                    <p:dialog   id="occperiod-rejectproposal-dialog"
+                                height="650" width="900"
+                                widgetVar="occperiod-rejectproposal-dialog-var"
+                                closable="true" 
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                >
+
+                        <h:form id="occperiod-rejectproposal-form">
+
+                            <h:messages id="occperiod-rejectproposal-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+
+                            <h:outputText styleClass="ui-label" value="reason for rejecting proposal" />
+
+                            <p:inputText    id="proposal-rejectreason-it"
+                                            value="#{occInspectionBB.formProposalRejectionReason}"
+                                            required="true"/>
+
+
+
+                            <p:commandButton    id="proposal-button-reject"
+                                                ajax="true"
+                                                styleClass="noFill button-size-small"
+                                                actionListener="#{occInspectionBB.rejectProposal(proposal)}"
+                                                rendered="#{!proposal.directive.requiredEvaluationForBOBClose}"
+                                                oncomplete="PF('occperiod-rejectproposal-dialog-var').hide()"
+                                                icon="fa fa-hand-stop-o"
+                                                update="occperiod-form-proposals
+                                                
+                                                occperiod-panel-proposals-messages-form"/>
+                        </h:form>
+                    </p:dialog>
+                    
+                    
+
+                    <p:dialog   id="occperiod-dialog-periodpropunit"
+                                height="650" width="900"
+                                widgetVar="occperiod-dialog-periodpropunit-var"
+                                closable="true"
+                                header="occupancy period property unit"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                >
+                        <h:form id="occperiod-dialog-periodpropunit-form">
+                            <h:messages id="occperiod-dialog-periodpropunit-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+                            <h:outputText   value="Property units on current property: #{sessionBean.sessionProperty.address} (#{sessionBean.sessionProperty.muni.muniName})"
+                                            styleClass="ui-label font-smaller"/>
+
+                            <p:selectOneMenu id="occperiod-dialog-periodpropunit-candidatepropunit-som" required="true"
+                                             value="#{occInspectionBB.selectedPropertyUnit}">
+                                <f:selectItem itemLabel="select a property unit..." noSelectionOption="true" />
+                                <f:selectItems value="#{occInspectionBB.propertyUnitCandidateList}"  var="pu" itemValue="#{pu}"
+                                               itemLabel="#{pu.unitNumber} (ID: #{pu.unitID})"/>
+                                <f:converter converterId="propertyUnitConverter"/>
+                            </p:selectOneMenu>
+
+                            <p:spacer height="5px" />
+
+
+                            <p:commandButton    id="occperiod-dialog-periodpropunit-button-cancel"
+                                                ajax="true"  tabindex="27"
+                                                value="Cancel"
+                                                icon="fa fa-stop"
+                                                immediate="true"
+                                                onclick="PF('occperiod-dialog-periodpropunit-var').hide()"
+                                                />
+
+                            <p:commandButton id="occperiod-dialog-periodpropunit-button-submit" ajax="true"
+                                             value="update property unit" action="#{occInspectionBB.checklistAction_editOccupancyInspectionMetadata}"
+                                             icon="fa fa-thumbs-o-up" tabindex="28"
+                                             oncomplete="PF('occperiod-dialog-periodpropunit-var').hide()"
+                                             update="occperiod-form-address
+                                             form-messages-global"
+                                             />
+                        </h:form>
+                    </p:dialog>
+
+                    <p:dialog   id="occperiod-dialog-periodmetadata"
+                                height="400" width="600"
+                                widgetVar="occperiod-dialog-periodmetadata-var"
+                                closable="true"
+                                header="occupancy period settings"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                >
+
+                        <h:form id="occperiod-dialog-periodmetadata-form">
+
+                            <h:messages id="occperiod-dialog-periodmetadata-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+                            <h:panelGrid columns="2"
+                                         columnClasses="gridTd, gridTd">
+
+                                <h:panelGroup>
+                                    <h:outputText value="Period type:"
+                                                  styleClass="ui-label font-smaller"/>
+                                    <p:selectOneMenu
+                                        id="som-occperiodtype" tabindex="1"
+                                        value="#{occInspectionBB.selectedOccPeriodType}">
+
+                                        <f:converter converterId="occPeriodTypeConverter"/>
+                                        <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
+                                        <f:selectItems id="si-typelist"
+                                                       value="#{occInspectionBB.occPeriodTypeList}"
+                                                       var ="opt"
+                                                       itemValue="#{opt}"
+                                                       itemLabel="#{opt.title}" />
+                                    </p:selectOneMenu>
+
+                                    <p:spacer height="5px" />
+
+                                    <p:commandButton    id="occperiod-periodmetadata-subview-typelock-unlocked-button-changetype"
+                                                        ajax="true"
+                                                        styleClass="noFill"
+                                                        actionListener="#{occInspectionBB.up}"
+                                                        disabled="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                        value="change period type"
+                                                        icon="fa fa-edit"
+                                                        title="update period type"/>
+
+                                </h:panelGroup>
+                            </h:panelGrid>
+
+                            <p:commandButton    id="occperiod-updatemetadata-button-cancel"
+                                                ajax="true"  tabindex="27"
+                                                value="Cancel"
+                                                icon="fa fa-stop"
+                                                immediate="true"
+                                                onclick="PF('occperiod-dialog-periodmetadata-var').hide()"
+                                                />
+
+                            <p:commandButton id="button-updatemetadata" ajax="true"
+                                             value="update period settings"
+                                             actionListener="#{occInspectionBB.updateOccPeriodCommit}"
+                                             icon="fa fa-thumbs-o-up" tabindex="28"
+                                             oncomplete="PF('occperiod-dialog-periodmetadata-var').hide()"
+                                             update="
+                                             occperiod-form-periodmetadata
+                                             form-messages-global"
+                                             />
+                        </h:form>
+                    </p:dialog>
+
+
+
+ 
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

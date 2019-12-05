@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -90,6 +91,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private List<CECaseEvent> filteredEventList;
     private CECaseEvent selectedEvent;
 
+    private List<User> usersForSearchConfig;
+    
     private boolean allowedToClearActionResponse;
 
     private List<CodeViolation> selectedViolations;
@@ -145,6 +148,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
+        UserCoordinator uc = getUserCoordinator();
+        
+        usersForSearchConfig = uc.assembleUserListForSearchCriteria(null);
         
         queryList = sc.buildQueryCECaseList(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser());
         selectedCECaseQuery = getSessionBean().getQueryCECase();
@@ -1518,7 +1524,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         
        
         
-        if (currentCase.getCasePhase().getCaseStage() == CaseStage.Investigation) {
+        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStage.Investigation) {
             style = currentCase.getCasePhaseIcon().getStyleClass();
             
         } else {
@@ -1533,7 +1539,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public String getStyleClassEnforcement() {
         String style = null;
-        if (currentCase.getCasePhase().getCaseStage() == CaseStage.Enforcement) {
+        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStage.Enforcement) {
             style = currentCase.getCasePhaseIcon().getStyleClass();
             
         } else {
@@ -1548,7 +1554,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public String getSytleClassCitation() {
         String style = null;
-        if (currentCase.getCasePhase().getCaseStage() == CaseStage.Citation) {
+        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStage.Citation) {
             style = currentCase.getCasePhaseIcon().getStyleClass();
             
         } else {
@@ -1563,7 +1569,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public String getSytleClassClosed() {
         String style = null;
-        if (currentCase.getCasePhase().getCaseStage() == CaseStage.Closed) {
+        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStage.Closed) {
             style = currentCase.getCasePhaseIcon().getStyleClass();
             
         } else {
@@ -1736,6 +1742,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     public void setSelectedInspection(OccInspection selectedInspection) {
         this.selectedInspection = selectedInspection;
+    }
+
+    /**
+     * @return the usersForSearchConfig
+     */
+    public List<User> getUsersForSearchConfig() {
+        return usersForSearchConfig;
+    }
+
+    /**
+     * @param usersForSearchConfig the usersForSearchConfig to set
+     */
+    public void setUsersForSearchConfig(List<User> usersForSearchConfig) {
+        this.usersForSearchConfig = usersForSearchConfig;
     }
     
     

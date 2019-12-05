@@ -25,6 +25,8 @@
                         <h:form id="initiateSessionForm">
                             <h1>Authentication successful!</h1>
 
+                            <ui:remove>
+                                
                                     <f:subview id="initiatesession-subview-header-reloadsession"
                                                rendered="#{!(empty sessionInitializer.muniQueuedForSession)}">
                                         <p>
@@ -38,6 +40,7 @@
                                             <h:outputText value="Your session municipality will be determined dynamically by the COGBot" />
                                         </p>
                                     </f:subview>
+                            </ui:remove>
                                 
                             <p:commandButton ajax="false" 
                                              value="Configure session" 

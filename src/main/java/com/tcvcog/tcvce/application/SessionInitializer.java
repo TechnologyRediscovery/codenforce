@@ -83,7 +83,6 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     public void initBean(){
         System.out.println("SessionInitializer.initBean");
         userAuthorizedQueuedForSession = null;
-        UserIntegrator ui = getUserIntegrator();
         UserCoordinator uc = getUserCoordinator();
         // check to see if we have an internal session created already
         // to determine which user we authenticate with
@@ -122,6 +121,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @throws java.sql.SQLException
      */
     public String initiateInternalSession() throws IntegrationException, CaseLifecycleException, SQLException{
+        System.out.println("SessionInitializer.initiateInternalSession");
         UserCoordinator uc = getUserCoordinator();
         if(getSessionBean().getSessionUser() == null){
             return configureSession(getContainerAuthenticatedUser(), null, null);

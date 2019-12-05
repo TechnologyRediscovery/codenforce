@@ -89,7 +89,7 @@
                                             ajax="true"
                                             icon="fa fa-search"  
                                             actionListener="#{propertyProfileBB.searchForProperties}" 
-                                            update="propSearchTable"/>
+                                            update="propSearchForm:propSearchTable"/>
                                     </h:panelGroup>
 
                                     <ui:remove>
@@ -154,7 +154,7 @@
                                                                      disabled="#{!propertyProfileBB.searchParams.filterByMuni}">
                                                         <f:converter converterId="muniConverter"/>
                                                         <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                                        <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                        <f:selectItems id="muniNameList" value="#{sessionBean.sessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                                     </p:selectOneMenu>
                                                     <h:message for="prop-muni-som" showDetail="true" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />

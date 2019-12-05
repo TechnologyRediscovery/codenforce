@@ -1,0 +1,490 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Occ Period Events</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="occperiod-events-view">
+                    
+                    <div class="mainContainer">
+                       
+                                <h:form id="occperiod-messages-form-rightcolheader">
+                                    <h:messages id="occperiod-messages-messages-rightcolheader" globalOnly="true" showDetail="true" showSummary="true"
+                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                    </h:messages>
+                                </h:form>
+                        
+
+                                <h:form id="form-messages-global">
+                                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                    </h:messages>
+                                </h:form>
+
+                                
+                                
+                                <p:panel    id="occperiod-panel-events"
+                                            widgetVar="occperiod-panel-events-var"
+                                            toggleable="true"  
+                                            collapsed="false"
+                                            header="Events">
+                                    <h:form id="occperiod-form-events">
+                                        
+                                        <h2>Add new event</h2>
+                                        <h:panelGrid columns="3" border="0" 
+                                                     cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
+                                                     footerClass="gridFooter" style="vertical-align: top;">
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="ui-label" for="newEventTypeMenu">
+                                                    <h:outputText value="Step 1: Choose type"/>
+                                                </h:outputLabel>
+                                                <p:selectOneMenu id="newEventTypeMenu" 
+                                                                    required="true" 
+                                                                    value="#{occInspectionBB.selectedEventType}" 
+                                                                    tabindex="10">
+                                                    
+                                                    <p:ajax update="categoryList
+                                                            event-add-dialog-show-cb"
+                                                            listener="#{occInspectionBB.events_loadEventCategories}"
+                                                            immediate="false"/> 
+                                                    <f:selectItem itemLabel="Select event type..." itemDisabled="true" noSelectionOption="true"/>
+                                                    <f:selectItems value="#{occInspectionBB.eventTypeListUserAllowed}" 
+                                                                   var="et" 
+                                                                   itemLabel="#{et.label}" />
+                                                </p:selectOneMenu>
+                                                <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="ui-label" for="categoryList">
+                                                    <h:outputText value="Step 2: Choose category"/>
+                                                </h:outputLabel>
+
+                                              
+                                                <p:selectOneListbox style="width: 300px;" 
+                                                                    id="categoryList" 
+                                                                    value="#{occInspectionBB.selectedEventCategory}" 
+                                                                    tabindex="10">
+                                                    
+                                                    <p:ajax update="
+                                                            event-add-dialog-show-cb"                                                           
+                                                            immediate="true"/>
+                                                    <f:converter converterId="eventCategoryConverter"/>
+                                                    <f:selectItems  id="catItemsList" 
+                                                                    value="#{occInspectionBB.eventCategoryListUserAllowed}" 
+                                                                    var="ec" 
+                                                                    itemValue="#{ec}" 
+                                                                    itemLabel="#{ec.eventCategoryTitle}"/>
+                                                </p:selectOneListbox>
+
+                                                <h:message for="categoryList" showDetail="false" showSummary="true"  
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:commandButton    id="event-add-dialog-show-cb"
+                                                                    ajax="true"
+                                                                    process="@form"
+                                                                    actionListener="#{occInspectionBB.events_initializeEvent}" 
+                                                                    oncomplete="PF('occperiod-events-dialog-addeditevent-var').show()"
+                                                                    disabled="#{empty occInspectionBB.selectedEventCategory}"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                    value="Create new event"  
+                                                                    icon="fa fa-plus"
+                                                                    update="occperiod-events-dialog-form"/>
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                        
+                                        
+                                        <h:outputLabel styleClass="ui-label" for="occperiod-viewoptionsevents-solb">
+                                            <h:outputText value="event list view options: "/>
+                                        </h:outputLabel>
+
+                                        <p:selectOneMenu style="width: 300px;" 
+                                                            id="occperiod-viewoptionsevents-solb" 
+                                                            value="#{occInspectionBB.selectedEventView}" 
+                                                            tabindex="10">
+
+                                            <p:ajax update="occperiod-events-datatable"                                                           
+                                                    immediate="true"/>
+                                            
+                                            <f:selectItems  id="occperiod-viewoptionsevents-selitems" 
+                                                            value="#{occInspectionBB.eventsViewOptions}" 
+                                                            var="evo" 
+                                                            itemValue="#{evo}" 
+                                                            itemLabel="#{evo.label}"/>
+                                        </p:selectOneMenu>
+
+                                        <h:message for="occperiod-viewoptionsevents-solb" showDetail="false" showSummary="true"  
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <h3>Event list</h3>
+                                        
+                                        <p:dataTable
+                                            id="occperiod-events-datatable"
+                                            var="e"
+                                            rowKey="#{e.eventID}"
+                                            value="#{occInspectionBB.currentOccPeriod.assembleEventList(occInspectionBB.selectedEventView)}"
+                                            tableStyleClass="primeDataTable"
+                                            resizableColumns="true"
+                                            rowExpandMode="multiple"
+                                            expandedRow="false"
+                                            filteredValue="#{occInspectionBB.filteredEventList}"
+                                            widgetVar="caseEventTable"
+                                            >
+                                            <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                            <p:column width="3%" exportable="false">
+                                                <p:rowToggler/>
+                                            </p:column>
+
+                                            <p:column width="4%">
+                                                <i class="material-icons"><h:outputText value="#{e.category.icon.materialIcon}"/></i>
+                                            </p:column>
+
+                                            <p:column width="12%" sortBy="#{e.dateOfRecord}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Date" />
+                                                </f:facet>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.dateOfRecordPretty}"/>
+                                                </div>
+                                            </p:column>
+
+                                            <p:column width="4%" sortBy="#{e.eventID}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="ID" />
+                                                </f:facet>
+                                                <h:outputText value="#{e.eventID}"/>
+                                            </p:column>
+                                            <ui:remove>
+                                                <p:column width="20%" sortBy="#{e.category.eventType.label}"
+                                                          filterBy="#{e.category.eventType.label}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Type" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{e.category.eventType.label}"/>
+                                                </p:column>
+                                            </ui:remove>
+
+                                            <p:column width="15%" sortBy="#{e.category.eventCategoryTitle}"
+                                                      filterBy="#{e.category.eventCategoryTitle}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Category" />
+                                                </f:facet>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                                </div>
+                                            </p:column>
+                                            <p:column width="5%" filterBy="#{e.owner.person.lastName}"
+                                                      sortBy="#{e.owner.person.lastName}">
+
+                                                <f:facet name="header">
+                                                    <h:outputText value="Owner" />
+                                                </f:facet>
+                                                <h:outputText value="#{e.owner.person.lastName}"/>
+                                            </p:column>
+                                           
+
+                                            <p:column width="10%" exportable="false">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Hide" />
+                                                </f:facet>
+                                                <p:commandButton    id="occperiod-events-button-hideevent"
+                                                                    icon="fa fa-moon-o"
+                                                                    ajax="true"
+                                                                    disabled="#{e.hidden}"
+                                                                    rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    actionListener="#{occInspectionBB.hideEvent(e)}" 
+                                                                    update="occperiod-events-datatable
+                                                                    occperiod-messages-messages-rightcolheader"
+                                                                    />
+                                                <p:commandButton id="occperiod-events-button-showevent"
+                                                                    icon="fa fa-star"
+                                                                 ajax="true"
+                                                                 disabled="#{!e.hidden}"
+                                                                 actionListener="#{occInspectionBB.unHideEvent(e)}" 
+                                                                 rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                 update="occperiod-events-datatable
+                                                                 occperiod-messages-messages-rightcolheader"
+                                                                 />
+
+                                            </p:column>
+                                            <p:column width="4%" exportable="false">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Edit" />
+                                                </f:facet>
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="true"
+                                                                 actionListener="#{occInspectionBB.events_initiateEventEdit(e)}" 
+                                                                 oncomplete="PF('occperiod-events-dialog-addeditevent-var').show()"
+                                                                 update="occperiod-events-dialog-form"
+                                                                 />
+                                            </p:column>
+                                            <p:rowExpansion>
+                                                <div class="outlinedBox">
+                                                    <h2>
+                                                        <h:outputText value="#{e.category.eventType.label}:#{e.category.eventCategoryTitle}"/>
+                                                        <h:outputText value="; Event ID: "/> 
+                                                        <h:outputText value="#{e.eventID}"/> 
+                                                    </h2>
+                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Description" />
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{e.description}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Disclose to Municipality Staff?" />
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{e.discloseToMunicipality}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Disclose to Public?" />
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{e.discloseToPublic}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Creation time stamp"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{e.timestampPretty}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Active Event?"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{e.active}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <f:facet name="footer" class="leftalign">
+                                                            <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion" style="text-align: left">
+                                                                <h:outputText escape="false" value="#{e.notes}"/>
+                                                            </div>
+                                                        </f:facet>
+
+                                                    </h:panelGrid>
+                                                </div>
+                                            </p:rowExpansion>
+
+                                        </p:dataTable>
+                                     
+                                    </h:form>
+                                </p:panel>
+                                
+
+
+
+
+                    </div>
+                    
+                    
+
+                    <p:dialog    id="occperiod-events-dialog-addeditevent"
+                                 height="650" width="900"
+                                 widgetVar="occperiod-events-dialog-addeditevent-var"
+                                 closable="true" 
+                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
+
+
+                        <h:form id="occperiod-events-dialog-form">
+
+                            <h1>
+                                Add/edit occupancy period event
+                            </h1>
+
+                            <p:outputLabel for="add-event-ec-ot">
+                                <h:outputText styleClass="bold" value="Event:"/>
+                            </p:outputLabel>
+                            <h:outputText id="add-event-ec-ot" value="#{occInspectionBB.currentEvent.category.eventCategoryTitle}"/>
+                            <h:outputText id="add-event-ec-ot2" value=" (cat ID:#{occInspectionBB.currentEvent.eventID})"/>
+
+                            <p:spacer height="5px"/>
+
+                            <p:outputLabel for="add-event-et-ot">
+                                <h:outputText styleClass="bold" value="Event type:"/>
+                            </p:outputLabel>
+                            <h:outputText id="add-event-et-ot" value="#{occInspectionBB.currentEvent.category.eventType.label}"/>
+
+                            <p:spacer height="5px"/>
+
+                            <p:outputLabel for="add-event-cd-ot">
+                                <h:outputText styleClass="bold" value="Cateogry description:"/>
+                            </p:outputLabel>
+                            <h:outputText id="add-event-cd-ot" value="#{occInspectionBB.currentEvent.category.eventCategoryDesc}"/>
+
+
+
+                            <h2>Event details</h2>
+
+                            <h:panelGrid columns="2" border="0"
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+
+                                <f:facet name="header">
+                                    <h:panelGroup>
+                                        <p:outputLabel for="eventDesc">
+                                            <h:outputText value="Short Description:"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="eventDesc" value="#{occInspectionBB.currentEvent.description}"
+                                                     style="width: 600px;" tabindex="3" required="true" styleClass="inputText"/>
+                                        <h:message for="eventDesc" showDetail="false" showSummary="true"
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                </f:facet>
+
+                                <h:panelGroup>
+
+                                    <h:outputLabel for="activeEvent">
+                                        <h:outputText value="Active Event?"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:selectBooleanCheckbox tabindex="18" id="activeEvent" value="#{occInspectionBB.currentEvent.active}" />
+
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="eventDateCal">
+                                        <h:outputText value="Date of Record"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:calendar value="#{occInspectionBB.currentEvent.dateOfRecordUtilDate}"
+                                                mode="popup"  id="eventDateCal"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true" showTodayButton="true"
+                                                required="true"/>
+                                    <h:message for="eventDateCal" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="discloseToMuniIS">
+                                        <h:outputText value="Disclose to Municipalities"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToMuniIS" value="#{occInspectionBB.currentEvent.discloseToMunicipality}" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="discloseToPublic">
+                                        <h:outputText value="Disclose to Public"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToPublic" value="#{occInspectionBB.currentEvent.discloseToPublic}" />
+                                </h:panelGroup>
+
+
+                                <f:facet name="footer">
+
+                                    <h:outputLabel for="eventNotes">
+                                        <h:outputText value="Event Notes:"/>
+                                    </h:outputLabel>
+                                    <h:panelGroup>
+                                        <p:editor id="eventNotes" value="#{occInspectionBB.currentEvent.notes}"
+                                                  controls="bold italic underline strikethrough font size style color
+                                                  bullets numbering center undo redo rule link removeformat outdent
+                                                  indent link unlink copy cut paste rule alignleft center alignright"
+                                                  width="700"
+                                                  height="100"/>
+                                        <h:message for="eventNotes" showDetail="false" showSummary="true"
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                </f:facet>
+
+                            </h:panelGrid>
+
+                            <h2>Connect persons to event</h2>
+
+                            <h:form id="add-person-to-event-form">
+
+                                <h:panelGroup>
+                                    <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Current person list:"/>
+                                    <p:selectOneMenu id="person-list-menu" required="false" value="#{occInspectionBB.selectedPerson}">
+                                        <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                        <f:selectItems value="#{sessionBean.sessionPersonList}"  var="p" itemValue="#{p}"
+                                                       itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                        <f:converter converterId="personConverter"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="person-list-menu" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <p:commandButton    ajax="true" actionListener="#{occInspectionBB.events_queuePerson}"
+                                                    value="Add selected person to event" disabled="true"
+                                                    update="persons-to-add-ds"/>
+                                <p:spacer height="5px"/>
+
+                                <p:dataScroller     id="persons-to-add-ds"
+                                                    value="#{occInspectionBB.currentEvent.personList}"
+                                                    var="pers">
+                                    <h:outputText value="#{pers.firstName} #{pers.lastName} (id:#{pers.personID})"/>
+                                    <p:commandButton    ajax="true"
+                                                        icon="fa fa-trash"
+                                                        immediate="true"
+                                                        actionListener="#{occInspectionBB.events_deQueuePersonFromEvent(pers)}"
+                                                        update="persons-to-add-ds"/>
+                                </p:dataScroller>
+
+                                <p:spacer height="5px"/>
+
+                                <p:commandButton ajax="true"
+                                                 value="Cancel" icon="fa fa-stop"
+                                                 onclick="PF('occperiod-events-dialog-addeditevent-var').hide()"/>
+
+                                <p:commandButton ajax="true" actionListener="#{occInspectionBB.events_attachNewEvent}"
+                                                 value="Create new event" icon="fa fa-plus"
+                                                 oncomplete="PF('occperiod-events-dialog-addeditevent-var').hide()"
+                                                 disabled="#{!(occInspectionBB.currentEvent.eventID == 0)}"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                 update="occperiod-form-events
+                                                 occperiod-messages-form-rightcolheader"/>
+
+                                <p:commandButton ajax="true" actionListener="#{occInspectionBB.events_commitEventEdits}"
+                                                 value="Edit event" icon="fa fa-edit"
+                                                 disabled="#{occInspectionBB.currentEvent.eventID != 0}"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                 oncomplete="PF('occperiod-events-dialog-addeditevent-var').hide()"
+                                                 update="occperiod-form-events
+                                                 occperiod-messages-form-rightcolheader"/>
+
+                                <p:commandButton ajax="true" actionListener="#{occInspectionBB.deleteSelectedEvent}"
+                                                 value="Nuke event" icon="fa fa-bomb"
+                                                 oncomplete="PF('occperiod-events-dialog-addeditevent-var').hide()"
+                                                 rendered="#{sessionBeasessionUserer.keyCard.hasSysAdminPermissions}"
+                                                 update="occperiod-form-events
+                                                 occperiod-messages-form-rightcolheader
+                                                 "/>
+                            </h:form>
+
+
+                        </h:form>
+                    </p:dialog>
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
