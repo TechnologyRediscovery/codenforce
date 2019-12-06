@@ -62,11 +62,15 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return propWL;
     }
     
+    
+    
     public Property configureProperty(Property p){
         if(p.getUnitList() == null){p.setUnitList(new ArrayList<PropertyUnit>());}
         
         return p;
     }
+    
+    
     
     /**
      * Creates a new instance of PropertyUnitCoordinator
