@@ -1145,6 +1145,27 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         reloadCurrentOccPeriodDataHeavy();
      }
      
+     public String editOccPeriodPayments(){
+         getSessionBean().setSessionOccPeriod(currentOccPeriod);
+         getSessionBean().setPaymentRedirTo("inspection");
+         
+         return "payments";
+     }
+     
+     public String editOnePayment(Payment thisPayment){
+         getSessionBean().setSessionPayment(thisPayment);
+         getSessionBean().setPaymentRedirTo("inspection");
+         
+         return "payments";
+     }
+     
+     public String editOccPeriodFees(){
+         getSessionBean().setFeeManagementOccPeriod(currentOccPeriod);
+         getSessionBean().setFeeRedirTo("inspection");
+         
+         return "editFees";
+     }
+     
      
      public void editLocation(OccInspectedSpace inSpace){
          

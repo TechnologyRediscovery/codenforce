@@ -173,11 +173,14 @@
                                                 value="Create new Fee"
                                                 icon="fa fa-plus"
                                                 />
-                            <ui:remove>
-                                                    <!--rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                    ajax="true" actionListener="#{personsBB.initiatePersonCreation}"
-                                -->
-                            </ui:remove>
+                            <p:commandButton rendered="#{feeManagementBB.redirTo != null}" action="#{feeManagementBB.finishAndRedir()}"
+                                             value="Finish editing fee list and return"/>
+                        <p:spacer height="10px"/>
+                        <p:commandButton    id="feePermissionButton"
+                                            action="#{feeManagementBB.goToFeePermissions()}"
+                                                rendered="#{feeManagementBB.redirTo != null}"
+                                                value="Edit Fees that may be used for OccPeriods"
+                                                />
                         </h:form>    
 
                         <p:dialog id="occPeriodFeeAddDialog"
