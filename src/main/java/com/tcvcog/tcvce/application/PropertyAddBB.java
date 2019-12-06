@@ -7,7 +7,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
@@ -19,7 +19,7 @@ import javax.faces.application.FacesMessage;
  */
 public class PropertyAddBB extends BackingBeanUtils implements Serializable{
     
-    private PropertyWithLists prop;
+    private PropertyDataHeavy prop;
 
     /**
      * Creates a new instance of PropertyAddBB
@@ -30,7 +30,7 @@ public class PropertyAddBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         SessionBean sb = getSessionBean();
-        this.prop = new PropertyWithLists();
+        this.prop = new PropertyDataHeavy();
         this.prop.setMuni(sb.getSessionMuni());
         this.prop.setMuniCode(sb.getSessionMuni().getMuniCode());
     }
@@ -59,14 +59,14 @@ public class PropertyAddBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the prop
      */
-    public PropertyWithLists getProp() {
+    public PropertyDataHeavy getProp() {
         return prop;
     }
 
     /**
      * @param prop the prop to set
      */
-    public void setProp(PropertyWithLists prop) {
+    public void setProp(PropertyDataHeavy prop) {
         this.prop = prop;
     }
 

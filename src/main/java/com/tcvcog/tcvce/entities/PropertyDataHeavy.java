@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Eric C. Darsow
  */
-public class PropertyWithLists extends Property implements Serializable{
+public class PropertyDataHeavy extends Property implements Serializable{
     
     // cases store code enforcement data
     private List<CECase> ceCaseList;
@@ -38,11 +38,11 @@ public class PropertyWithLists extends Property implements Serializable{
     private List<PropertyUnitChange> changeList;
     private List<Integer> blobList;
     
-    public PropertyWithLists(){
+    public PropertyDataHeavy(){
         
     }
 
-    public PropertyWithLists(Property prop){
+    public PropertyDataHeavy(Property prop){
         this.propertyID = prop.getPropertyID();
         this.muni = prop.getMuni();
         this.muniCode = prop.getMuniCode();

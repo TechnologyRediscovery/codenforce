@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChange;
 import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
-import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
@@ -203,16 +203,25 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @param rs
      * @return the fully baked Property with all fields set from DB data
      */
-    private PropertyWithLists generatePropertyWithLists(ResultSet rs) throws IntegrationException {
+    private PropertyDataHeavy generatePropertyWithLists(ResultSet rs) throws IntegrationException {
 
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
 
-        PropertyWithLists p = new PropertyWithLists(generateProperty(rs));
+        PropertyDataHeavy p = new PropertyDataHeavy(generateProperty(rs));
 
         // finish me
         return p;
     }
 
+    /**
+     * First gen simple search method for properties
+     * 
+     * @deprecated 
+     * @param houseNum
+     * @param street
+     * @return
+     * @throws IntegrationException 
+     */
     public List<Property> searchForProperties(String houseNum, String street) throws IntegrationException {
 
         String query = "select propertyid FROM property WHERE address ILIKE ?;";
@@ -275,6 +284,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return propList;
     }
 
+    
     public List<Property> searchForChangedProperties(String houseNum, String street, int muniID) throws IntegrationException {
         String query = "SELECT DISTINCT\n"
                 + "	   propertyid, unit_unitid, municipality_municode, parid, lotandblock, address,\n"
@@ -881,6 +891,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     } // close getProperty()
 
+    
+    
     /**
      * 
      * @param propertyID
@@ -891,19 +903,26 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws EventException
      * @throws AuthorizationException 
      */
-    public PropertyWithLists getPropertyWithLists(int propertyID, User u) throws IntegrationException, CaseLifecycleException, EventException, AuthorizationException {
+    public PropertyDataHeavy getPropertyDataHeavy(int propertyID, User u) throws IntegrationException, CaseLifecycleException, EventException, AuthorizationException {
             PropertyCoordinator pc = getPropertyCoordinator();
             CaseIntegrator ci = getCaseIntegrator();
             PersonIntegrator pi = getPersonIntegrator();
             
-            PropertyWithLists p = new PropertyWithLists(getProperty(propertyID));
+            PropertyDataHeavy p = new PropertyDataHeavy(getProperty(propertyID));
    
             p.setCeCaseList(ci.getCECasesByProp(p));
             p.setUnitWithListsList(getPropertyUnitWithListsList(p.getUnitList(), u));
             p.setPersonList(pi.getPersonList(p));
+            
         return pc.configurePropertyWithLists(p);
     }
 
+    /**
+     * Dumps all Property records for a given User and lets the caller sort through them
+     * @param u
+     * @return
+     * @throws IntegrationException 
+     */
     public List<Property> getPropertyHistoryList(User u) throws IntegrationException {
         List<Property> propList = new ArrayList<>();
         Connection con = getPostgresCon();
@@ -1150,7 +1169,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         while(iter.hasNext()){
             try {
                 PropertyUnit pu = iter.next();
-                puwll.add(getPropertyUnitWithLists(pu.getUnitID(), u));
+                puwll.add(getPropertyUnitWithLists(pu.getUnitID()));
             } catch (ViolationException ex) {
                 System.out.println(ex);
             }
@@ -1168,17 +1187,17 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws com.tcvcog.tcvce.domain.EventException 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      */
-    public PropertyUnitWithLists getPropertyUnitWithList(PropertyUnit pu, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException{
+    public PropertyUnitWithLists getPropertyUnitWithList(PropertyUnit pu) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException{
         PropertyUnitWithLists puwl = null;
         try {
-            puwl = getPropertyUnitWithLists(pu.getUnitID(), u);
+            puwl = getPropertyUnitWithLists(pu.getUnitID());
         } catch (ViolationException ex) {
             System.out.println(ex);
         }
         return puwl;
     }
     
-    public PropertyUnitWithLists getPropertyUnitWithLists(int unitID, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException{
+    public PropertyUnitWithLists getPropertyUnitWithLists(int unitID) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyUnitWithLists puwl = new PropertyUnitWithLists(getPropertyUnitByPropertyUnitID(unitID));
         puwl.setPeriodList(oi.getOccPeriodList(unitID));

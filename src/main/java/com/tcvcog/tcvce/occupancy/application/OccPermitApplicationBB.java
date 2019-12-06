@@ -18,7 +18,7 @@ import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChange;
-import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -774,12 +774,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         PropertyIntegrator pri = getPropertyIntegrator();
 
-        PropertyWithLists existingProp = new PropertyWithLists();
+        PropertyDataHeavy existingProp = new PropertyDataHeavy();
         
         Person changedby = getSessionBean().getSessionOccPermitApplication().getApplicantPerson();
         
         try {
-            existingProp = pri.getPropertyWithLists(prop.getPropertyID(), getSessionBean().getSessionUser());
+            existingProp = pri.getPropertyDataHeavy(prop.getPropertyID(), getSessionBean().getSessionUser());
                     
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);

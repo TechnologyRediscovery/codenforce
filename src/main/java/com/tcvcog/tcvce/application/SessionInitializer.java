@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
@@ -274,6 +275,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         
         PropertyIntegrator propI = getPropertyIntegrator();
         SearchCoordinator searchCoord = getSearchCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
         
 //        sessionBean.setSessionPersonList(persCoord.loadPersonHistoryList(u));
@@ -281,7 +283,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 //        
 //        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         
-        sessionBean.setSessionProperty(propI.getProperty(m.getMuniOfficePropertyId()));
+        sessionBean.setSessionProperty(pc.selectDefaultProperty(ua));
         sessionBean.setSessionPerson(ua.getPerson());
         
 //        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)

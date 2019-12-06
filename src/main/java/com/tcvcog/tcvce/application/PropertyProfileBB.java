@@ -18,7 +18,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
-import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
@@ -63,7 +63,7 @@ Council of Governments, PA
  */
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
-    private PropertyWithLists currProp;
+    private PropertyDataHeavy currProp;
     private PropertyUnit currPropUnit;
     private PropertyUnitWithLists currPropUnitWithLists;
     private OccPeriod currOccPeriod;
@@ -105,7 +105,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         SearchCoordinator sc = getSearchCoordinator();
         
         try {
-            this.setCurrProp(pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser()));
+            this.setCurrProp(pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser()));
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
         }
@@ -318,7 +318,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private void refreshCurrPropWithLists(){
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            setCurrProp(pi.getPropertyWithLists(getCurrProp().getPropertyID(), getSessionBean().getSessionUser()));
+            setCurrProp(pi.getPropertyDataHeavy(getCurrProp().getPropertyID(), getSessionBean().getSessionUser()));
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -417,7 +417,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         try {
-            setCurrProp(pi.getPropertyWithLists(prop.getPropertyID(), getSessionBean().getSessionUser()));
+            setCurrProp(pi.getPropertyDataHeavy(prop.getPropertyID(), getSessionBean().getSessionUser()));
             ui.logObjectView(getSessionBean().getSessionUser(), prop);
             getSessionBean().setSessionProperty(prop);
             getFacesContext().addMessage(null,
@@ -434,11 +434,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the currentProperty
      */
-    public PropertyWithLists getCurrProp() {
+    public PropertyDataHeavy getCurrProp() {
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
             if(currProp == null){
-                currProp = pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser());
+                currProp = pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser());
             }
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
@@ -477,7 +477,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @param currentProperty the currentProperty to set
      */
-    public void setCurrProp(PropertyWithLists currentProperty) {
+    public void setCurrProp(PropertyDataHeavy currentProperty) {
         this.currProp = currentProperty;
     }
     

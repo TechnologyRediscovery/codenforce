@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ import javax.faces.application.FacesMessage;
 public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
     
     
-    private PropertyWithLists currProp;
+    private PropertyDataHeavy currProp;
     private HashMap propertyUseTypeMap;
 
     /**
@@ -51,7 +51,7 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            currProp = pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser());
+            currProp = pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser());
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
         }
@@ -83,14 +83,14 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the currProp
      */
-    public PropertyWithLists getCurrProp() {
+    public PropertyDataHeavy getCurrProp() {
         return currProp;
     }
 
     /**
      * @param currProp the currProp to set
      */
-    public void setCurrProp(PropertyWithLists currProp) {
+    public void setCurrProp(PropertyDataHeavy currProp) {
         this.currProp = currProp;
     }
 
