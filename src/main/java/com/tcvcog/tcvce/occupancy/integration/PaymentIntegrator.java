@@ -1399,7 +1399,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
      */
     public void updateOccupancyInspectionFee(Fee oif) throws IntegrationException {
-        String query = "UPDATE public.occinspectionfee\n"
+        String query = "UPDATE public.moneyfee\n"
                 + "   SET muni_municode=?, feename=?, feeamount=(?::numeric::money), effectivedate=?, \n"
                 + "       expirydate=?, notes=? \n"
                 + " WHERE feeid=?;";
@@ -1506,7 +1506,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt = con.prepareStatement(query);
             System.out.println("");
             rs = stmt.executeQuery();
-            System.out.println("OccupancyInspectionFeeIntegrator.getOccupancyInspectionFeeList | SQL: " + stmt.toString());
+            System.out.println("PaymentIntegrator.getOccupancyInspectionFeeList | SQL: " + stmt.toString());
             while (rs.next()) {
                 occupancyInspectionFeeList.add(generateOccupancyInspectionFee(rs));
             }
@@ -1540,7 +1540,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public void insertOccupancyInspectionFee(Fee inspectionFee) throws IntegrationException {
-        String query = "INSERT INTO public.occinspectionfee(\n"
+        String query = "INSERT INTO public.moneyfee(\n"
                 + "            feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n"
                 + "            notes)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?::numeric::money, ?, ?, \n"
@@ -1555,7 +1555,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(inspectionFee.getEffectiveDate()));
             stmt.setTimestamp(5, java.sql.Timestamp.valueOf(inspectionFee.getExpiryDate()));
             stmt.setString(6, inspectionFee.getNotes());
-            System.out.println("OccupancyInspectionFeeIntegrator.occupancyInspectionFeeIntegrator | sql: " + stmt.toString());
+            System.out.println("PaymentIntegrator.occupancyInspectionFeeIntegrator | sql: " + stmt.toString());
             System.out.println("TRYING TO EXECUTE INSERT METHOD");
             stmt.execute();
         } catch (SQLException ex) {

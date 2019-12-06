@@ -28,7 +28,7 @@ import java.util.Objects;
  * @author Adam Gutonski and Sylvia
  */
 public class OccPeriodType implements Cloneable {
-    private int typeid;
+    private int typeID;
     private Municipality muni;
     private String title;
     private String authorizeduses;
@@ -76,7 +76,7 @@ public class OccPeriodType implements Cloneable {
      * @return the typeid
      */
     public int getTypeID() {
-        return typeid;
+        return typeID;
     }
 
     /**
@@ -202,7 +202,7 @@ public class OccPeriodType implements Cloneable {
      * @param typeid the typeid to set
      */
     public void setTypeID(int typeid) {
-        this.typeid = typeid;
+        this.typeID = typeid;
     }
 
     /**
@@ -355,7 +355,7 @@ public class OccPeriodType implements Cloneable {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 23 * hash + this.typeid;
+        hash = 23 * hash + this.typeID;
         hash = 23 * hash + Objects.hashCode(this.muni);
         hash = 23 * hash + Objects.hashCode(this.title);
         hash = 23 * hash + Objects.hashCode(this.authorizeduses);
@@ -390,7 +390,7 @@ public class OccPeriodType implements Cloneable {
             return false;
         }
         final OccPeriodType other = (OccPeriodType) obj;
-        return this.typeid == other.typeid;
+        return this.typeID == other.typeID;
     }
 
     /**

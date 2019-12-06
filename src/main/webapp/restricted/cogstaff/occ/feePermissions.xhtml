@@ -26,7 +26,7 @@
                                 id="occPeriodTypeTable"
                                 var="type"
                                 value="#{feeManagementBB.typeList}"
-                                rowKey="#{type.typeid}"
+                                rowKey="#{type.typeID}"
                                 tableStyleClass="primeDataTable"
                                 rowExpandMode="single"
                                 expandedRow="false"
@@ -46,7 +46,7 @@
                                     <f:facet name="header">
                                         <h:outputText value="ID" />
                                     </f:facet>
-                                    <h:outputText value="#{type.typeid}"/>
+                                    <h:outputText value="#{type.typeID}"/>
                                 </p:column>
 
 
@@ -68,7 +68,7 @@
 
                                 <p:rowExpansion>
                                     <div class="outlinedBox">
-                                        <h2>Full type listing for type <h:outputText value="#{type.typeid}"/> </h2>
+                                        <h2>Full type listing for type <h:outputText value="#{type.typeID}"/> </h2>
                                         <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                      columnClasses="gridTd, gridTd, gridTd, gridTd">
 
@@ -204,7 +204,7 @@
                                   widgetVar="feePermissionsDialogVar"
                                   closable="true">   
                             <h:form id="feePermissionsForm">
-                                <h2>Edit Fee Permissions for fee ID #<p:outputLabel value="#{feeManagementBB.lockedPeriodType.typeid}"/></h2>
+                                <h2>Edit Fee Permissions for fee ID #<p:outputLabel value="#{feeManagementBB.lockedPeriodType.typeID}"/></h2>
                                 <p>Here you can remove or add permitted fees, and even choose which fees are automatically 
                                     applied to an Occupancy Period.</p>
 

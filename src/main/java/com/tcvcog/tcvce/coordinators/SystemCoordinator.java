@@ -218,7 +218,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem occEvents = getNavSubItem("Events", "/restricted/cogstaff/occ/occPeriodEvents.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem occInspections = getNavSubItem("Inspections", "/restricted/cogstaff/occ/occPeriodInspections.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem occDocuments = getNavSubItem("Payments", "/restricted/cogstaff/occ/occPeriodPayments.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem occPayments = getNavSubItem("Doc+Img", "/restricted/cogstaff/occ/occPeriodBlobs.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Occupancy
     public List<NavigationSubItem> getOccNavList() {
@@ -229,7 +228,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList.add(occEvents);
         navList.add(occInspections);
         navList.add(occDocuments);
-        navList.add(occPayments);
         return navList;
     }
 
@@ -323,6 +321,22 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         return navList;
     }
 
+    private final NavigationSubItem feeManage = getNavSubItem("Fees", "/restricted/cogstaff/occ/feeManage.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem feeTypeManage = getNavSubItem("Fee types", "/restricted/cogstaff/occ/feeTypeManage.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem feePermissions = getNavSubItem("Occ Fees", "/restricted/cogstaff/occ/feePermissions", "fa fa-sign-in", false);
+    
+    //Store SubNav Items into List:Payment
+    public List<NavigationSubItem> getSidebarPaymentList(){
+        ArrayList<NavigationSubItem> navList;
+        navList = new ArrayList<>();
+        navList.add(feeManage);
+        navList.add(feeTypeManage);
+        navList.add(feePermissions);
+        return navList;
+    }
+    
+    
+    
     //Sidebar Sub Nav Item: Occ
     private final NavigationSubItem checklist = getNavSubItem("Checklist", "/restricted/cogstaff/occ/checklists.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem payment = getNavSubItem("Payment", "/restricted/cogstaff/occ/checklists.xhtml", "fa fa-sign-in", false);
@@ -395,6 +409,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             NavigationItem codeconfigItem = getNavItem("", "", "Municipal Code", "fa fa-book", getSidebarCodeConfigList());
             //NavItem: System
             NavigationItem reportItem = getNavItem("", "", "Report", "fa fa-bullhorn", getSidebarReportList());
+            //NavItem: Payments
+            NavigationItem paymentsItem = getNavItem("", "", "Payments", "fa fa-cogs", getSidebarPaymentList());
             //NavItem: Reports
             NavigationItem systemItem = getNavItem("", "", "System", "fa fa-cogs", getSidebarSystemList());
             //NavItem: Help
@@ -404,10 +420,12 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             navList.add(OccconfigItem);
             navList.add(codeconfigItem);
             navList.add(reportItem);
+            navList.add(paymentsItem);
             navList.add(systemItem);
             navList.add(helpItem);
 
         } catch (Exception e) {
+            System.out.println(e);
 
         }
         return navList;
