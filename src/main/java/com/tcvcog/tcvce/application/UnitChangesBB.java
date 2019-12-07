@@ -109,7 +109,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         try {
-            selectedProperty = pi.getPropertyDataHeavy(prop.getPropertyID(), getSessionBean().getSessionUser());
+            selectedProperty = pi.getPropertyDataHeavy(prop.getPropertyID());
             existingUnitList = pi.getPropertyUnitList(selectedProperty);
             proposedUnitList = pi.getPropertyUnitChangeList(selectedProperty);
             ui.logObjectView(getSessionBean().getSessionUser(), prop);

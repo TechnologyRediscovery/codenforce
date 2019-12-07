@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.BOB;
+import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
@@ -25,7 +25,7 @@ import java.util.Objects;
  * @param <E> the Business Object of which this Query is used to 
  * retrieve sets
  */
-public abstract class Query<E extends BOB> 
+public abstract class Query<E extends BOb> 
         extends EntityUtils 
         implements Serializable{
     
@@ -146,7 +146,7 @@ public abstract class Query<E extends BOB>
      */
     public String getExecutionTimestampPretty() {
         if(executionTimestamp != null){
-            executionTimestampPretty = getPrettyDate(executionTimestamp);
+            executionTimestampPretty = EntityUtils.getPrettyDate(executionTimestamp);
         }
         return executionTimestampPretty;
     }

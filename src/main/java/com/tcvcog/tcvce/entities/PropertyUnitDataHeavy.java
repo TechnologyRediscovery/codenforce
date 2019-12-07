@@ -17,18 +17,18 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  *
  * @author sylvia
  */
-public class PropertyUnitWithLists extends PropertyUnit{
+public class    PropertyUnitDataHeavy 
+        extends PropertyUnit{
 
     private List<OccPeriod> periodList;
     
-    public PropertyUnitWithLists(PropertyUnit prop){
+    public PropertyUnitDataHeavy(PropertyUnit prop){
         this.unitID = prop.getUnitID();
         this.propertyID = prop.getPropertyID();
         this.unitNumber = prop.getUnitNumber();

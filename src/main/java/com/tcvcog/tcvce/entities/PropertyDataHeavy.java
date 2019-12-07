@@ -31,7 +31,7 @@ public class PropertyDataHeavy extends Property implements Serializable{
     // cases store code enforcement data
     private List<CECase> ceCaseList;
     // property units store occupancy data
-    private List<PropertyUnitWithLists> unitWithListsList;
+    private List<PropertyUnitDataHeavy> unitWithListsList;
     // both are connected to Person objects all over the place
     private List<Person> personList;
     private List<CECase> infoCaseList;
@@ -169,14 +169,14 @@ public class PropertyDataHeavy extends Property implements Serializable{
     /**
      * @return the unitWithListsList
      */
-    public List<PropertyUnitWithLists> getUnitWithListsList() {
+    public List<PropertyUnitDataHeavy> getUnitWithListsList() {
         return unitWithListsList;
     }
 
     /**
      * @param unitWithListsList the unitWithListsList to set
      */
-    public void setUnitWithListsList(List<PropertyUnitWithLists> unitWithListsList) {
+    public void setUnitWithListsList(List<PropertyUnitDataHeavy> unitWithListsList) {
         this.unitWithListsList = unitWithListsList;
     }
     

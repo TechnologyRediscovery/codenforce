@@ -779,7 +779,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         Person changedby = getSessionBean().getSessionOccPermitApplication().getApplicantPerson();
         
         try {
-            existingProp = pri.getPropertyDataHeavy(prop.getPropertyID(), getSessionBean().getSessionUser());
+            existingProp = pri.getPropertyDataHeavy(prop.getPropertyID());
                     
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);

@@ -261,7 +261,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         sb.append("SELECT personid FROM public.person ");   // < -- don't for get
         
-        if(!params.isFilterByObjectID()){
+        if(!params.isObjectID_filterBy()){
             sb.append("WHERE muni_municode = ? ");              // < -- trailing spaces!
             if(params.isFilterByFirstName()){
                 sb.append("AND fname ILIKE ");
@@ -308,7 +308,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(sb.toString());
             
-            if(!params.isFilterByObjectID()){
+            if(!params.isObjectID_filterBy()){
                 stmt.setInt(1, params.getMuni().getMuniCode());
             } else {
                 stmt.setInt(1, params.getObjectID()); // and this is the only param after muni!
@@ -1076,7 +1076,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         boolean notFirstCriteria = false;
         
         
-        if (!params.isFilterByObjectID()){
+        if (!params.isObjectID_filterBy()){
             if (params.isFilterByLastName()){
                 if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
                 query.append("lname ILIKE ? ");
@@ -1115,7 +1115,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             stmt = con.prepareStatement(query.toString());
-            if (!params.isFilterByObjectID()){
+            if (!params.isObjectID_filterBy()){
                 if (params.isFilterByLastName()){
                     stmt.setString(++paramCounter, params.getLastNameSS());
                 }

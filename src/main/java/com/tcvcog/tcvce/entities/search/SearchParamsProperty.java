@@ -61,7 +61,6 @@ public class SearchParamsProperty extends SearchParams implements Serializable {
    private boolean filterByNonAddressable;
    private boolean nonAddressable;
    
-   
    private boolean filterByUseType;
    private int useTypeID;
    
@@ -581,7 +580,7 @@ public class SearchParamsProperty extends SearchParams implements Serializable {
         m.put("Fil by Muni:", this.isFilterByMuni());
         m.put("Fil by Nonaddressable:", this.isFilterByNonAddressable());
         m.put("Fil by Null date field:", this.isFilterByNullDateField());
-        m.put("Fil by Object ID:", this.isFilterByObjectID());
+        m.put("Fil by Object ID:", this.isObjectID_filterBy());
         m.put("Fil by Parcel ID:", this.isFilterByParcelID());
         m.put("Fil by Start End Date:", this.isFilterByStartEndDate());
         m.put("Fil by Use Type:", this.isFilterByUseType());

@@ -17,7 +17,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
+import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
@@ -65,7 +65,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     private PropertyDataHeavy currProp;
     private PropertyUnit currPropUnit;
-    private PropertyUnitWithLists currPropUnitWithLists;
+    private PropertyUnitDataHeavy currPropUnitWithLists;
     private OccPeriod currOccPeriod;
     
     private int selectedPhotoID;
@@ -105,7 +105,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         SearchCoordinator sc = getSearchCoordinator();
         
         try {
-            this.setCurrProp(pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser()));
+            this.setCurrProp(pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID()));
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
         }
@@ -118,12 +118,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         try {
             setQueryList(sc.buildQueryPropertyList(getSessionBean().getSessionUser(), getSessionBean().getSessionMuni()));
         } catch (IntegrationException ex) {
-            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex);
         }
     
         getSearchParams().setFilterByStartEndDate(false);
         getSearchParams().setFilterByMuni(true);
-        getSearchParams().setFilterByObjectID(false);
+        getSearchParams().setObjectID_filterBy(false);
         getSearchParams().setUseRelativeDates(false); 
     }
 
@@ -318,7 +318,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private void refreshCurrPropWithLists(){
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            setCurrProp(pi.getPropertyDataHeavy(getCurrProp().getPropertyID(), getSessionBean().getSessionUser()));
+            setCurrProp(pi.getPropertyDataHeavy(getCurrProp().getPropertyID()));
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -417,7 +417,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         try {
-            setCurrProp(pi.getPropertyDataHeavy(prop.getPropertyID(), getSessionBean().getSessionUser()));
+            setCurrProp(pi.getPropertyDataHeavy(prop.getPropertyID()));
             ui.logObjectView(getSessionBean().getSessionUser(), prop);
             getSessionBean().setSessionProperty(prop);
             getFacesContext().addMessage(null,
@@ -438,7 +438,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
             if(currProp == null){
-                currProp = pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser());
+                currProp = pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID());
             }
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
@@ -669,14 +669,14 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the currPropUnitWithLists
      */
-    public PropertyUnitWithLists getCurrPropUnitWithLists() {
+    public PropertyUnitDataHeavy getCurrPropUnitWithLists() {
         return currPropUnitWithLists;
     }
 
     /**
      * @param currPropUnitWithLists the currPropUnitWithLists to set
      */
-    public void setCurrPropUnitWithLists(PropertyUnitWithLists currPropUnitWithLists) {
+    public void setCurrPropUnitWithLists(PropertyUnitDataHeavy currPropUnitWithLists) {
         this.currPropUnitWithLists = currPropUnitWithLists;
     }
 

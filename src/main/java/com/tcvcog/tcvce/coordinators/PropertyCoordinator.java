@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChange;
-import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
+import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -67,7 +67,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             propWL.setCeCaseList(new ArrayList<CECase>());
         }
         if (propWL.getUnitWithListsList() == null) {
-            propWL.setUnitWithListsList(new ArrayList<PropertyUnitWithLists>());
+            propWL.setUnitWithListsList(new ArrayList<PropertyUnitDataHeavy>());
         }
         if (propWL.getPersonList() == null) {
             propWL.setPersonList(new ArrayList<Person>());
@@ -83,13 +83,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         }
 
         // add a unit number -1 to any PropertyWithoutAnyUnits
-
         
         return propWL;
     }
-    
-    
-    
     
     /**
      * Logic container
@@ -106,6 +102,16 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return p;
     }
     
+    /**
+     * Implements a cascade of logic to determine a best suited startup property
+     * for a given session. When a user has no Property history, it extracts
+     * the office property of the municipality into which a user is switching
+     * 
+     * ecd DEC-19
+     * 
+     * @param ua
+     * @return 
+     */
     public PropertyDataHeavy selectDefaultProperty(UserAuthorized ua){
         
         PropertyIntegrator pi = getPropertyIntegrator();
@@ -118,9 +124,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             try {
                 MunicipalityDataHeavy mdh = mc.getMuniDataHeavy(ua.getMyCredential().getGoverningAuthPeriod().getMuni().getMuniCode());
                     if(mdh.getMuniOfficePropertyId() !=0){
-                        return pi.getPropertyDataHeavy(mdh.getMuniOfficePropertyId(), null);
+                        return pi.getPropertyDataHeavy(mdh.getMuniOfficePropertyId());
                     } else {
-                        return pi.getPropertyDataHeavy(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("arbitraryPlaceholderPropertyID")), ua);
+                        return pi.getPropertyDataHeavy(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("arbitraryPlaceholderPropertyID")));
                     }
             } catch (IntegrationException | AuthorizationException | CaseLifecycleException | EventException ex) {
                 System.out.println(ex);
@@ -131,6 +137,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
     }
     
+    /**
+     * 
+     * @param ua
+     * @return 
+     */
     public List<Property> assemblePropertyHistoryList(UserAuthorized ua){
         PropertyIntegrator pi = getPropertyIntegrator();
         
@@ -153,11 +164,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             }
             
         }
-        
         return propList;
-        
-        
-        
         
     }
     
@@ -198,7 +205,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyDataHeavy propWithLists = null;
         try{
-            propWithLists = pi.getPropertyDataHeavy(prop.getPropertyID(), u);
+            propWithLists = pi.getPropertyDataHeavy(prop.getPropertyID());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }     

@@ -21,7 +21,7 @@ public class EntityUtils {
     
     private final int DAYS_IN_YEAR = 365;
     
-    protected String getPrettyDate(LocalDateTime ldtDate){
+    public static String getPrettyDate(LocalDateTime ldtDate){
         String formattedDateTime = "";
         if(ldtDate != null){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
@@ -38,7 +38,7 @@ public class EntityUtils {
      * @param to
      * @return 
      */
-    public long getTimePeriodAsDays(LocalDateTime from, LocalDateTime to){
+    public static long getTimePeriodAsDays(LocalDateTime from, LocalDateTime to){
         LocalDate dStart = from.toLocalDate();
         LocalDate dEnd = to.toLocalDate();
         long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(dStart, dEnd);
@@ -57,7 +57,7 @@ public class EntityUtils {
      * @param intList
      * @return 
      */
-    public String fomatIDListAsString(List<Integer> intList){
+    public static String fomatIDListAsString(List<Integer> intList){
         
         String listString;
         StringBuilder sb = new StringBuilder();

@@ -81,7 +81,7 @@ public class Event
      * @return the dateOfRecordPretty
      */
     public String getDateOfRecordPretty() {
-        String pretty = getPrettyDate(dateOfRecord);
+        String pretty = EntityUtils.getPrettyDate(dateOfRecord);
         dateOfRecordPretty = pretty;
         return dateOfRecordPretty;
     }
@@ -252,7 +252,7 @@ public class Event
      * @return the timestampPretty
      */
     public String getTimestampPretty() {
-        String s = getPrettyDate(timestamp);
+        String s = EntityUtils.getPrettyDate(timestamp);
         timestampPretty = s;
         return timestampPretty;
     }

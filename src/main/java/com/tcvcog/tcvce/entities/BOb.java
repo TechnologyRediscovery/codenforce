@@ -11,6 +11,6 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
  * Future container for BOB-general members
  * @author sylvia
  */
-public abstract class BOB extends EntityUtils{
+public abstract class BOb{
     
 }

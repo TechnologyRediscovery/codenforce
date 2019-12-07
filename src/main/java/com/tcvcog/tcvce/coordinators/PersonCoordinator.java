@@ -180,7 +180,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
         // superclass parameters
         params.setFilterByMuni(false);
-        params.setFilterByObjectID(false);
+        params.setObjectID_filterBy(false);
         params.setFilterByStartEndDate(false);
         params.setLimitResultCountTo100(true);
         

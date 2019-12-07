@@ -15,12 +15,13 @@ import com.tcvcog.tcvce.entities.Openable;
 
 /**
  * Primary Business Object BOB for holding data about Occupancy Periods
- * @author Ellen Baskem
+ * 
+ * @author Ellen Bascomb
  */
-public class OccPeriod 
-        extends EntityUtils 
+public  class       OccPeriod 
+        extends     EntityUtils 
         implements  Serializable,
-                    Openable{
+                    Openable {
     
     protected int periodID;
     protected int propertyUnitID;

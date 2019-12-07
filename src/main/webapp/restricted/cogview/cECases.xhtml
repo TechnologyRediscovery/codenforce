@@ -199,7 +199,7 @@
 
                                                 <h:panelGroup>
                                                     <p:outputLabel id="cecases-filter-id-ol" for="cecases-filter-id" value="filter by ce case ID? "/>
-                                                    <p:selectBooleanCheckbox id="cecases-filter-id" value="#{caseProfileBB.searchParams.filterByObjectID}" 
+                                                    <p:selectBooleanCheckbox id="cecases-filter-id" value="#{caseProfileBB.searchParams.objectID_filterBy}" 
                                                                              disabled="false" >
                                                         <p:ajax update="cecases-criteria-caseid" />
                                                     </p:selectBooleanCheckbox>
@@ -211,7 +211,7 @@
                                                     <p:spacer height="5px"/>
                                                     <p:inputText id="cecases-criteria-caseid" 
                                                                  value="#{caseProfileBB.searchParams.objectID}" 
-                                                                 disabled="#{!caseProfileBB.searchParams.filterByObjectID}"/>
+                                                                 disabled="#{!caseProfileBB.searchParams.objectID_filterBy}"/>
                                                     <h:message for="cecases-criteria-caseid" showDetail="false" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                 </h:panelGroup>

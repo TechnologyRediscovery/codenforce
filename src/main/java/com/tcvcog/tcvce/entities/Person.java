@@ -30,7 +30,7 @@ import java.util.Objects;
  * 
  * @author Eric Darsow
  */
-public class Person extends EntityUtils implements Serializable{
+public class Person {
     
     protected int personID;
     
@@ -40,6 +40,7 @@ public class Person extends EntityUtils implements Serializable{
      * but now with a super and subclass of muni, we don't need them
      * @deprecated 
      */
+    
     protected int muniCode;
     /**
      * Used this to avoid cycles in Municipality creation
@@ -635,7 +636,7 @@ public class Person extends EntityUtils implements Serializable{
      * @return the expireString
      */
     public String getExpireString() {
-        expireString = getPrettyDate(expiryDate);
+        expireString = EntityUtils.getPrettyDate(expiryDate);
         return expireString;
         
     }
@@ -651,7 +652,7 @@ public class Person extends EntityUtils implements Serializable{
      * @return the lastUpdatedPretty
      */
     public String getLastUpdatedPretty() {
-        lastUpdatedPretty = getPrettyDate(lastUpdated);
+        lastUpdatedPretty = EntityUtils.getPrettyDate(lastUpdated);
         return lastUpdatedPretty;
     }
 

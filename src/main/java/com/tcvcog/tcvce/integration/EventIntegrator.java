@@ -930,7 +930,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         sb.append("INNER JOIN property ON (property_propertyid = propertyid) ");
         sb.append("WHERE ");
         // as long as this isn't an ID only search, do the normal SQL building process
-        if (!params.isFilterByObjectID()) {
+        if (!params.isObjectID_filterBy()) {
             if (params.isFilterByMuni()) {
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 sb.append("municipality_municode = ? "); // param 1
@@ -1002,7 +1002,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(sb.toString());
 
-            if (!params.isFilterByObjectID()) {
+            if (!params.isObjectID_filterBy()) {
                 if (params.isFilterByMuni()) {
                     stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
                 }

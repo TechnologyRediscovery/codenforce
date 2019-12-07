@@ -162,7 +162,7 @@
                                                 
                                                 <h:panelGroup>
                                                     <p:outputLabel id="prop-id-search-ol" for="prop-id-search" value="filter by prop ID:"/>
-                                                    <p:selectBooleanCheckbox id="prop-id-search" value="#{propertyProfileBB.searchParams.filterByObjectID}"
+                                                    <p:selectBooleanCheckbox id="prop-id-search" value="#{propertyProfileBB.searchParams.objectID_filterBy}"
                                                                              disabled="false">
                                                         <p:ajax update="prop-id-input" />
                                                     </p:selectBooleanCheckbox>
@@ -172,7 +172,7 @@
                                 <p:spacer height="5px"/>
                                                     <p:inputText id="prop-id-input"
                                                                  value="#{propertyProfileBB.searchParams.objectID}"
-                                                                 disabled="#{!propertyProfileBB.searchParams.filterByObjectID}"/>
+                                                                 disabled="#{!propertyProfileBB.searchParams.objectID_filterBy}"/>
                                                     <h:message for="prop-id-input" showDetail="false" showSummary="true"
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                 </h:panelGroup>

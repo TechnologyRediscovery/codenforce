@@ -245,7 +245,7 @@ public class CECaseBase
      */
     public String getOriginiationDatePretty() {
         if(originationDate != null){
-            originiationDatePretty = getPrettyDate(originationDate);
+            originiationDatePretty = EntityUtils.getPrettyDate(originationDate);
         }
         return originiationDatePretty;
     }
@@ -255,7 +255,7 @@ public class CECaseBase
      */
     public String getClosingDatePretty() {
         if(closingDate != null){
-            closingDatePretty = getPrettyDate(closingDate);
+            closingDatePretty = EntityUtils.getPrettyDate(closingDate);
         }
         return closingDatePretty;
     }

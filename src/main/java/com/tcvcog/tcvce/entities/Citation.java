@@ -296,7 +296,7 @@ public class Citation extends EntityUtils implements Serializable {
      * @return the dateOfRecordPretty
      */
     public String getDateOfRecordPretty() {
-        dateOfRecordPretty = getPrettyDate(dateOfRecord);
+        dateOfRecordPretty = EntityUtils.getPrettyDate(dateOfRecord);
         return dateOfRecordPretty;
     }
 
@@ -304,7 +304,7 @@ public class Citation extends EntityUtils implements Serializable {
      * @return the timeStampPretty
      */
     public String getTimeStampPretty() {
-        timeStampPretty = getPrettyDate(timeStamp);
+        timeStampPretty = EntityUtils.getPrettyDate(timeStamp);
         return timeStampPretty;
     }
 

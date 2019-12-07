@@ -111,7 +111,7 @@ public abstract class Report
      */
     public String getGenerationTimestampPretty() {
         if(generationTimestamp != null){
-            generationTimestampPretty = getPrettyDate(generationTimestamp);
+            generationTimestampPretty = EntityUtils.getPrettyDate(generationTimestamp);
         }
         return generationTimestampPretty;
     }

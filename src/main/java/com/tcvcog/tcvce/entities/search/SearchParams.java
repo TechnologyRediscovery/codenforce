@@ -18,11 +18,13 @@ import java.time.ZoneId;
  * and the conversions are made automatically based on the
  * LocalDateTime value, allowing objects on the front end and 
  * integration end to just grab the date Type they need and go!
- * @author Sylvia Garland
+ * @author Sylvia, no wait, Lauren
  */
-public class SearchParams extends EntityUtils implements Serializable{
+
+public  class       SearchParams 
+        extends     EntityUtils 
+        implements  Serializable{
     
-     
     private String searchName;
     private String searchDescription;
     
@@ -47,7 +49,7 @@ public class SearchParams extends EntityUtils implements Serializable{
     private boolean applyDateSearchToDateOfRecord;
     private boolean useEntryTimestamp;
     
-    private boolean filterByObjectID;
+    private boolean objectID_filterBy;
     private int objectID;
     
     private boolean limitResultCountTo100;
@@ -230,15 +232,15 @@ public class SearchParams extends EntityUtils implements Serializable{
     /**
      * @return the filterByObjectID
      */
-    public boolean isFilterByObjectID() {
-        return filterByObjectID;
+    public boolean isObjectID_filterBy() {
+        return objectID_filterBy;
     }
 
     /**
-     * @param filterByObjectID the filterByObjectID to set
+     * @param objectID_filterBy the filterByObjectID to set
      */
-    public void setFilterByObjectID(boolean filterByObjectID) {
-        this.filterByObjectID = filterByObjectID;
+    public void setObjectID_filterBy(boolean objectID_filterBy) {
+        this.objectID_filterBy = objectID_filterBy;
     }
 
     /**
@@ -364,7 +366,7 @@ public class SearchParams extends EntityUtils implements Serializable{
     public String getStartDatePretty() {
         if(startDateSQLDate != null){
             LocalDateTime startDateLDT = startDateSQLDate.toLocalDateTime();
-            startDatePretty = getPrettyDate(startDateLDT);
+            startDatePretty = EntityUtils.getPrettyDate(startDateLDT);
         }
         return startDatePretty;
     }
@@ -375,7 +377,7 @@ public class SearchParams extends EntityUtils implements Serializable{
     public String getEndDatePretty() {
         if(endDateSQLDate != null){
             LocalDateTime endDateLDT = endDateSQLDate.toLocalDateTime();
-            endDatePretty = getPrettyDate(endDateLDT);
+            endDatePretty = EntityUtils.getPrettyDate(endDateLDT);
         }
         return endDatePretty;
     }

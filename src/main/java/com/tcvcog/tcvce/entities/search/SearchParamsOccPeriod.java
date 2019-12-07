@@ -15,7 +15,8 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class SearchParamsOccPeriod extends SearchParams implements Serializable {
+public class SearchParamsOccPeriod 
+        extends SearchParams implements Serializable {
     
     private boolean propertyUnit_filterBy;
     private int propertyUnit_unitID;

@@ -137,7 +137,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         sb.append("FROM public.cecase INNER JOIN public.property ON (property_propertyid = propertyid) ");
         sb.append("WHERE ");
         
-         if (!params.isFilterByObjectID()) {
+         if (!params.isObjectID_filterBy()) {
             if (params.isFilterByMuni()) {
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 sb.append("municipality_municode = ? "); // param 1
@@ -225,7 +225,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         try {
             stmt = con.prepareStatement(sb.toString());
 
-            if (!params.isFilterByObjectID()) {
+            if (!params.isObjectID_filterBy()) {
                 if (params.isFilterByMuni()) {
                     stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
                 }

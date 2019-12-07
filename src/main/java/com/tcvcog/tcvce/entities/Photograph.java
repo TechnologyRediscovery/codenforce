@@ -97,7 +97,7 @@ public class Photograph extends EntityUtils {
      */
     public String getTimestampPretty() {
         if(timeStamp != null){
-            timestampPretty = getPrettyDate(timeStamp);
+            timestampPretty = EntityUtils.getPrettyDate(timeStamp);
         }
         return timestampPretty;
     }

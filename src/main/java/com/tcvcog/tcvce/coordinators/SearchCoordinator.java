@@ -16,6 +16,7 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.Query;
@@ -366,7 +367,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         // superclass 
         params.setFilterByMuni(true);
         params.setMuni(m);
-        params.setFilterByObjectID(false);
+        params.setObjectID_filterBy(false);
         params.setLimitResultCountTo100(true);
         
         // subclass specific
@@ -400,7 +401,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         // superclass 
         params.setFilterByMuni(true);
         params.setMuni(m);
-        params.setFilterByObjectID(false);
+        params.setObjectID_filterBy(false);
         params.setLimitResultCountTo100(true);
         
         // subclass specific
@@ -429,7 +430,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         SearchParamsProperty propParams = new SearchParamsProperty();
         // superclass
         propParams.setFilterByStartEndDate(false);
-        propParams.setFilterByObjectID(false);
+        propParams.setObjectID_filterBy(false);
         propParams.setLimitResultCountTo100(true);
         
         // subclass SearchParamsProperty
@@ -541,7 +542,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByMuni(true);
         eventParams.setMuni(muni);
         eventParams.setFilterByStartEndDate(false);
-        eventParams.setFilterByObjectID(false);
+        eventParams.setObjectID_filterBy(false);
         eventParams.setLimitResultCountTo100(true);
         
         eventParams.setFilterByEventCategory(false);
@@ -581,7 +582,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setStartDateRelativeDays(-30);
         eventParams.setEndDateRelativeDays(0);
         
-        eventParams.setFilterByObjectID(false);
+        eventParams.setObjectID_filterBy(false);
         eventParams.setLimitResultCountTo100(true);
         
         eventParams.setFilterByEventCategory(false);
@@ -624,7 +625,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setStartDateRelativeDays(-400);
         eventParams.setEndDateRelativeDays(0);
         
-        eventParams.setFilterByObjectID(false);
+        eventParams.setObjectID_filterBy(false);
         eventParams.setLimitResultCountTo100(true);
         
         eventParams.setFilterByEventCategory(false);
@@ -732,6 +733,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public QueryPerson assembleQueryPerson(QueryPersonEnum qName, UserAuthorized u, Municipality m, SearchParamsPerson params){
          QueryPerson  query;
          List<SearchParamsPerson> paramsList = new ArrayList<>();
+         RoleType rt = null;
          
          if(params != null){
              qName = QueryPersonEnum.CUSTOM;
@@ -740,10 +742,15 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          switch(qName){
             case ACTIVE_PERSONS:
                 paramsList.add(generateParams_persons_active(m));
+                rt = RoleType.MuniReader;
                 break;
+            case USER_PERSONS:
+                paramsList.add(generateParams_persons_users());
+                rt = RoleType.MuniReader;
             
          }
          query = new QueryPerson(qName, m, paramsList, u);
+         query.setUserRankAccessMinimum(rt);
          query.setExecutedByIntegrator(false);
          return query;
      }
@@ -759,8 +766,22 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         pList.add(PersonType.Public);
         params.setPersonTypes(pList);
         
+        
         return params;
         
+    }
+    
+    private SearchParamsPerson generateParams_persons_users(){
+        SearchParamsPerson params = new SearchParamsPerson();
+        params.setSearchName("User Persons");
+        params.setSearchDescription("Persons whose type is a User");
+        
+        params.setFilterByPersonTypes(true);
+        List<PersonType> pList = new ArrayList<>();
+        pList.add(PersonType.User);
+        params.setPersonTypes(pList);
+        
+        return params;
     }
     
     public List<QueryPerson> buildQueryPersonList(UserAuthorized u, Municipality m) throws IntegrationException{
@@ -786,7 +807,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public QueryPerson runQuery(QueryPerson query) throws AuthorizationException, IntegrationException{
         query.clearResultList();
         PersonIntegrator pi = getPersonIntegrator();
-        if(query.getUser().getMyCredential().getGoverningAuthPeriod().getRole().getRank() < query.getUserRankAccessMinimum().getRank() ){
+        if(query.getUser().getMyCredential().getGoverningAuthPeriod().getRole().getRank() < query.getUserRankAccessMinimum().getRank()){
             throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
         }
         

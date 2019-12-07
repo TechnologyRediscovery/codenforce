@@ -133,7 +133,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         sb.append("RIGHT OUTER JOIN occpermit ON (occpermit.occperiod_periodid = periodid) \n ");
         sb.append("WHERE occperiodid iS NOT NULL AND ");
 
-        if (!params.isFilterByObjectID()) {
+        if (!params.isObjectID_filterBy()) {
             if (params.isFilterByMuni()) {
                 sb.append("AND ");
                 sb.append("municipality_municode = ? "); // param 1
@@ -241,7 +241,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         } else {
             sb.append("AND ");
-            sb.append("caseid=? "); // will be param 1 with ID search
+            sb.append("periodid=? "); // will be param 1 with ID search
         }
 
         int paramCounter = 0;
@@ -249,7 +249,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         try {
             stmt = con.prepareStatement(sb.toString());
 
-            if (!params.isFilterByObjectID()) {
+            if (!params.isObjectID_filterBy()) {
                 if (params.isFilterByMuni()) {
                     stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
                 }
@@ -299,7 +299,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot search for code enf cases, sorry!", ex);
+            throw new IntegrationException("Cannot search for occupancy periods, sorry!", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
