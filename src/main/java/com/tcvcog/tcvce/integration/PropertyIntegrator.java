@@ -33,6 +33,7 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -913,12 +914,13 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     /**
      * Dumps all Property records for a given User and lets the caller sort through them
+     * @param cred
      * @param u
      * @return
      * @throws IntegrationException 
      */
-    public List<Property> getPropertyHistoryList(User u) throws IntegrationException {
-        List<Property> propList = new ArrayList<>();
+    public List<Integer> getPropertyHistoryList(Credential cred) throws IntegrationException {
+        List<Integer> propList = new ArrayList<>();
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -929,17 +931,13 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     + "AND property_propertyid IS NOT NULL "
                     + "ORDER BY entrytimestamp DESC;";
             stmt = con.prepareStatement(s);
-            stmt.setInt(1, u.getUserID());
+            stmt.setInt(1, cred.getGoverningAuthPeriod().getUserID());
 
             rs = stmt.executeQuery();
-            int MAX_RES = 20;  //behold a MAGICAL number
-            int iter = 0;
 
             // are we too cool for for-loops?
-            while (rs.next() && iter < MAX_RES) {
-                Property p = getProperty(rs.getInt("property_propertyid"));
-                propList.add(p);
-                iter++;
+            while (rs.next()) {
+                propList.add((rs.getInt("property_propertyid")));
             }
 
         } catch (SQLException ex) {

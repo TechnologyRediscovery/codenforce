@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.MuniCoordinator;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
@@ -194,7 +194,7 @@ public class Initializer implements ServletContextListener{
         ChoiceIntegrator choiceInt = new ChoiceIntegrator();
         servletContext.setAttribute("choiceIntegrator", choiceInt);
         
-        MuniCoordinator mc = new MuniCoordinator();
+        MunicipalityCoordinator mc = new MunicipalityCoordinator();
         servletContext.setAttribute("muniCoordinator", mc);
         
 //        SessionBean sb = new SessionBean();

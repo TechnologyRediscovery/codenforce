@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.EntityUtils;
+import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
@@ -27,7 +28,8 @@ import java.util.Objects;
  */
 public abstract class   Query<E extends BOb> 
         extends         EntityUtils 
-        implements      Serializable{
+        implements      Serializable,
+                        IFace_CredentialSigned{
     
     private Municipality muni;
     private UserAuthorized user;
@@ -47,6 +49,8 @@ public abstract class   Query<E extends BOb>
     private String executionTimestampPretty;
     
     private boolean executedByIntegrator;
+    private String credentialSignature;
+            
     
     public abstract List<E> getBOBResultList();
     public abstract void setBOBResultList(List<E> l);
@@ -55,6 +59,7 @@ public abstract class   Query<E extends BOb>
     public abstract String getQueryTitle();
     
     public abstract void clearResultList();
+    
     
     public Query(Municipality muni, UserAuthorized u) {
         this.muni = muni;
@@ -65,6 +70,17 @@ public abstract class   Query<E extends BOb>
     public Query(){
         //blank
     }
+    
+    
+    /**
+     * @return the credentialSignature
+     */
+    @Override
+    public String getCredentialSignature() {
+        return credentialSignature;
+    }
+
+   
 
     /**
      * @return the muni
@@ -165,7 +181,6 @@ public abstract class   Query<E extends BOb>
         this.executedByIntegrator = executedByIntegrator;
     }
 
-    
    
     
     

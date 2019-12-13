@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
@@ -86,7 +87,9 @@ import javax.sound.midi.SysexMessage;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 
 /**
- *
+ * King of all business logic implementation for the entire Occupancy object tree
+ * the central of which is the Business Object OccPeriod
+ * 
  * @author Eric C. Darsow
  */
 public class OccupancyCoordinator extends BackingBeanUtils implements Serializable {
@@ -119,7 +122,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     }
     
-    public OccPeriodDataHeavy configureOccPeriodDataHeavy(OccPeriodDataHeavy period, User u) throws CaseLifecycleException, IntegrationException, AuthorizationException, EventException{
+    public OccPeriodDataHeavy configureOccPeriodDataHeavy(OccPeriodDataHeavy period, Credential cred) throws CaseLifecycleException, IntegrationException, AuthorizationException, EventException{
         ChoiceCoordinator cc = getChoiceCoordinator();
         EventCoordinator ec = getEventCoordinator();
         UserCoordinator uc = getUserCoordinator();
@@ -128,13 +131,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         UserAuthorized ua =  null;
         
-        if(period != null && u != null){
-            if(!(u instanceof UserAuthorized)){
-
-                ua = uc.authorizeUser(  u, 
-                                        pi.getPropertyUnitWithProp(period.getPeriodID()).getProperty().getMuni(),
-                                        null);
-            }
+        if(period != null && cred != null){
             period.setGoverningInspection(designateGoverningInspection(period));
             period = cc.configureProposals(period, ua);
             // Removed during occbeta overhaul
@@ -421,6 +418,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
     
     
+    
+    
     public OccPeriod initializeNewOccPeriod(Property p, 
                                             PropertyUnit pu, 
                                             OccPeriodType perType,
@@ -490,7 +489,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return freshOccPeriodID;
     }
     
-     public OccPeriodDataHeavy reloadOccPeriod(OccPeriodDataHeavy opdh, User u) 
+     public OccPeriodDataHeavy reloadOccPeriod(OccPeriodDataHeavy opdh, UserAuthorized ua) 
             throws  IntegrationException, 
                     EventException, 
                     AuthorizationException,
@@ -501,7 +500,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
          
         if(opdh != null){
             opdh = oi.generateOccPeriodDataHeavy(configureOccPeriod(oi.getOccPeriod(opdh.getPeriodID())));
-            opdh = configureOccPeriodDataHeavy(opdh, u);
+            opdh = configureOccPeriodDataHeavy(opdh, ua.getMyCredential());
         }
         return opdh;
     }

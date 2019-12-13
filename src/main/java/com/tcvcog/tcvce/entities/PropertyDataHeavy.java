@@ -28,7 +28,7 @@ import java.util.List;
  */
 public  class       PropertyDataHeavy 
         extends     Property 
-        implements  Serializable{
+        implements  IFace_CredentialSigned{
     
     // cases store code enforcement data
     private List<CECase> ceCaseList;
@@ -40,9 +40,66 @@ public  class       PropertyDataHeavy
     private List<PropertyUnitChange> changeList;
     private List<Integer> blobList;
     
+    private String credentialSignature;
+    
     public PropertyDataHeavy(){
         
     }
+    
+       public PropertyDataHeavy(Property prop, Credential cred){
+        
+        this.credentialSignature = cred.getSignature();
+           
+        this.propertyID = prop.getPropertyID();
+        this.muni = prop.getMuni();
+        this.muniCode = prop.getMuniCode();
+        this.parID = prop.getParID();
+        this.lotAndBlock = prop.getLotAndBlock();
+        this.address = prop.getAddress();
+
+        this.useTypeString = prop.getUseTypeString();
+        this.useGroup = prop.getUseGroup();
+        this.constructionType = prop.getConstructionType();
+        this.countyCode = prop.getCountyCode();
+
+        this.notes = prop.getNotes();
+        this.address_city = prop.getAddress_city();
+        this.address_state = prop.getAddress_state();
+        this.address_zip = prop.address_zip;
+
+        this.ownerCode = prop.getOwnerCode();
+        this.propclass = prop.getPropclass();
+
+        this.lastUpdatedTS = prop.getLastUpdatedTS();
+        this.lastUpdatedBy = prop.getLastUpdatedBy();
+        this.locationDescriptor = prop.getLocationDescriptor();
+
+        this.bobSource = prop.getBobSource();
+        this.unfitDateStart = prop.getUnfitDateStart();
+        this.unfitDateStop = prop.getUnfitDateStop();
+        this.unfitBy = prop.getUnfitBy();
+
+        this.abandonedDateStart = prop.getAbandonedDateStart();
+        this.abandonedDateStop = prop.getAbandonedDateStop();
+        this.abandonedBy = prop.getAbandonedBy();
+        this.vacantDateStart = prop.getVacantDateStart();
+
+        this.vacantDateStop = prop.getVacantDateStop();
+        this.vacantBy = prop.getVacantBy();
+        this.conditionIntensityClassID = prop.getConditionIntensityClassID();
+
+        this.landBankProspectIntensityClassID = prop.getLandBankProspectIntensityClassID();
+        this.LandBankHeld = prop.isLandBankHeld();
+        this.active = prop.isActive();
+        this.nonAddressable = prop.isNonAddressable();
+        
+        this.useTypeID = prop.getUseTypeID();
+        this.useTypeString = prop.getUseTypeString();
+        this.unitList = prop.getUnitList();
+        
+        
+    }
+    
 
     public PropertyDataHeavy(Property prop){
         this.propertyID = prop.getPropertyID();
@@ -95,6 +152,14 @@ public  class       PropertyDataHeavy
         
     }
     
+    /**
+     * @return the credentialSignature
+     */
+    @Override
+    public String getCredentialSignature() {
+        return credentialSignature;
+    }
+
     
     /**
      * @return the ceCaseList
@@ -181,5 +246,8 @@ public  class       PropertyDataHeavy
     public void setUnitWithListsList(List<PropertyUnitDataHeavy> unitWithListsList) {
         this.unitWithListsList = unitWithListsList;
     }
+
+
+  
     
 }

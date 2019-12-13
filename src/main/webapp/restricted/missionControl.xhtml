@@ -46,7 +46,11 @@
                                             <div class="dashboard-rightof-bignum">
                                                 <h:outputText styleClass="bignum-header" value="New action requests"/>
                                                 <p:spacer height="5px"/>
-                                                <p:commandButton styleClass="nofill" value="Manage requests" action="cEActionRequests" ajax="false"/>
+                                                <p:commandButton styleClass="nofill" 
+                                                                 value="Manage requests" 
+                                                                 action="cEActionRequests" 
+                                                                 disabled="true"
+                                                                 ajax="false"/>
                                             </div>
                                         </h:panelGroup>
                                     </p:panelGrid>
@@ -113,7 +117,7 @@
                                                           styleClass="noFill" 
                                                           icon="fa fa-home"/>
                                     </div>
-                                    <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                                   
                                 </p:panel>
                                 
                                 <p:panel id="dashpanel-persons"
@@ -127,13 +131,10 @@
                                     <div class="datum">
                                         <h:outputText value="Active Person " />
                                         <h:outputText value=" )" />
-                                        <p:commandButton  value="view property" 
-                                                          action="persons"
-                                                          styleClass="noFill" 
-                                                          icon="fa fa-home"/>
+                                       
                                     </div>
                                     
-                                     <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                                   
                                 </p:panel>
                                 
                                 
@@ -162,11 +163,8 @@
                                          menuTitle="">
                                     
                                     <div class="datum">
-                                        <h:outputText value="Active Inspection " />
-                                        <p:commandButton  value="view property" 
-                                                          action="inspection"
-                                                          styleClass="noFill" 
-                                                          icon="fa fa-home"/>
+                                        <h:outputText value="Active Inspections,,,coming soon! " />
+                                       
                                     </div>
                                     
                                 </p:panel>

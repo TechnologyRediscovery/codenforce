@@ -1630,7 +1630,10 @@
                                     </p:rowExpansion>
                                 </p:dataTable>
 
-                                <p:chart type="donut" model="#{dataCoordinator.generateModelViolationDonut(caseProfileBB.currentCase)}" style="width:600px; height:600px"/>
+                                <ui:remove>
+                                    
+                                    <p:chart type="donut" model="#{dataCoordinator.generateModelViolationDonut(caseProfileBB.currentCase)}" style="width:600px; height:600px"/>
+                                </ui:remove>
 
                             </h:form>
 

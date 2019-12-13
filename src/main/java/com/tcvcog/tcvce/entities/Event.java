@@ -1,4 +1,4 @@
-/*
+/*  
  * Copyright (C) 2018 Turtle Creek Valley
 Council of Governments, PA
  *
@@ -27,9 +27,9 @@ import java.util.Objects;
  *
  * @author Eric C. Darsow
  */
-public class        Event 
-        implements  Serializable, 
-                    Comparable<Event> {
+public  class       Event 
+        extends     BOb
+        implements  Comparable<Event> {
     
     protected int eventID;
     

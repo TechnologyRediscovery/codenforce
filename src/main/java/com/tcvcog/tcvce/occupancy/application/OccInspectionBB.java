@@ -208,7 +208,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                     currentOccPeriod = oi.generateOccPeriodDataHeavy(sessionPeriod);
                 }
                 if(currentOccPeriod.getConfiguredTS() == null){
-                    currentOccPeriod = oc.configureOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessionUser());
+                    currentOccPeriod = oc.configureOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessionUser().getMyCredential());
                 }
                 currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
                 currentInspection = currentOccPeriod.getGoverningInspection();

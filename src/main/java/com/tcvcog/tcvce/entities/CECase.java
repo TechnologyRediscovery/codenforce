@@ -23,7 +23,8 @@ public class        CECase
         extends     CECaseBase 
         implements  Cloneable,
                     IFace_ProposalDriven, 
-                    IFace_EventRuleGoverned{
+                    IFace_EventRuleGoverned,
+                    IFace_CredentialSigned{
     
     private List<CodeViolation> violationList;
     
@@ -39,6 +40,8 @@ public class        CECase
     private List<Citation> citationList;
     private List<NoticeOfViolation> noticeList;
     private List<CEActionRequest> ceActionRequestList;
+    
+    private String credentialSignature;
     
     public CECase(){
     }
@@ -69,6 +72,15 @@ public class        CECase
         this.creationTimestamp = cse.creationTimestamp;
         this.notes = cse.notes;
     }
+    
+    @Override
+    public String getCredentialSignature() {
+        return credentialSignature;
+    }
+
+        
+  
+    
     
     /**
      *
@@ -415,8 +427,6 @@ public class        CECase
         this.eventList = eventList;
     }
 
-        
-  
     
     
     

@@ -23,11 +23,44 @@ import java.util.List;
  *
  * @author sylvia
  */
-public class    PropertyUnitDataHeavy 
-        extends PropertyUnit{
+public class        PropertyUnitDataHeavy 
+        extends     PropertyUnit
+        implements  IFace_CredentialSigned{
 
     private List<OccPeriod> periodList;
     
+    private String credentialSignature;
+    
+    
+    /**
+     * Sets superclass member values and stamps Credential signature
+     * @param prop
+     * @param cred 
+     */
+    public PropertyUnitDataHeavy(PropertyUnit prop, Credential cred){
+        this.unitID = prop.getUnitID();
+        this.propertyID = prop.getPropertyID();
+        this.unitNumber = prop.getUnitNumber();
+
+        this.notes = prop.getNotes();
+        this.otherKnownAddress = prop.getOtherKnownAddress();
+
+        this.rentalIntentDateStart = prop.getRentalIntentDateStart();
+        this.rentalIntentDateStop = prop.getRentalIntentDateStop();
+        this.rentalIntentLastUpdatedBy = prop.getRentalIntentLastUpdatedBy();
+        this.rentalNotes = prop.getRentalNotes();
+        this.active = prop.isActive();
+        this.conditionIntensityClassID = prop.getConditionIntensityClassID();
+        this.lastUpdatedTS = prop.getLastUpdatedTS();
+        
+    }
+    
+    
+    /**
+     * Pre-Credential Requiring constructor
+     * @deprecated 
+     * @param prop 
+     */
     public PropertyUnitDataHeavy(PropertyUnit prop){
         this.unitID = prop.getUnitID();
         this.propertyID = prop.getPropertyID();
@@ -45,6 +78,13 @@ public class    PropertyUnitDataHeavy
         this.lastUpdatedTS = prop.getLastUpdatedTS();
         
     }
+    
+    
+    @Override
+    public String getCredentialSignature() {
+        return credentialSignature;
+    }
+
 
     /**
      * @return the periodList

@@ -23,8 +23,8 @@ import java.time.LocalDateTime;
  *
  * @author Eric C. Darsow
  */
-public class    CodeElement 
-        extends BOb{
+public  class       CodeElement 
+        extends     BOb{
     
     protected int elementID;
     

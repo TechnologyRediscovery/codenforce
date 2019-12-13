@@ -24,10 +24,12 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -61,6 +63,15 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     @PostConstruct
     public void initBean() {
 
+    }
+    
+    /**
+     * Skeleton of a system that may be needed to generate and release carefully
+     * some level of "internal guest" level access Credential
+     * @param ua 
+     */
+    protected void requestBaseInternalAccessCredential(UserAuthorized ua){
+        // TODO: Finish guts
     }
     
     public String appendNoteBlock(MessageBuilderParams mbp) {
@@ -273,7 +284,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             //NavItem: Code Enf
             NavigationItem CEItem = getNavItem(getCurrentCEInfo(), "/restricted/cogview/cECases.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
             //NavItem: Occupancy
-            NavigationItem occItem = getNavItem(getCurrentPeriodInfo(), "/restricted/cogstaff/occ/inspection.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
+            NavigationItem occItem = getNavItem(getCurrentPeriodInfo(), "/restricted/cogstaff/occ/occPeriodStatus.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
             //NavItem: Persons
             NavigationItem personItem = getNavItem(getCurrentPersonInfo(), "/restricted/cogview/persons.xhtml", "Person", "fa fa-female", getPersonNavList());
             //NavItem: Code

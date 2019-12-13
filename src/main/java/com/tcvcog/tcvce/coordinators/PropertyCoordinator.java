@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
@@ -112,17 +113,17 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param ua
      * @return 
      */
-    public PropertyDataHeavy selectDefaultProperty(UserAuthorized ua){
+    public PropertyDataHeavy selectDefaultProperty(Credential cred){
         
         PropertyIntegrator pi = getPropertyIntegrator();
-        MuniCoordinator mc = getMuniCoordinator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
         
         
-        if(ua != null){
+        if(cred != null){
             
              
             try {
-                MunicipalityDataHeavy mdh = mc.getMuniDataHeavy(ua.getMyCredential().getGoverningAuthPeriod().getMuni().getMuniCode());
+                MunicipalityDataHeavy mdh = mc.getMuniDataHeavy(cred.getGoverningAuthPeriod().getMuni().getMuniCode());
                     if(mdh.getMuniOfficePropertyId() !=0){
                         return pi.getPropertyDataHeavy(mdh.getMuniOfficePropertyId());
                     } else {
@@ -137,25 +138,31 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
     }
     
+    
+    
     /**
      * 
      * @param ua
      * @return 
      */
-    public List<Property> assemblePropertyHistoryList(UserAuthorized ua){
+    public List<Property> assemblePropertyHistoryList(Credential cred){
         PropertyIntegrator pi = getPropertyIntegrator();
-        
         List<Property> propList = new ArrayList<>();
-        if(ua != null){
+        List<Integer> propIDList = new ArrayList<>();
+        
+        if(cred != null){
             try {
-                // Only developers get a heterogeneous mix of muni in their history
-                if(ua.getMyCredential().isHasDeveloperPermissions()){
-                    propList.addAll(pi.getPropertyHistoryList(ua));
-                } else {
-                    Municipality m = ua.getMyCredential().getGoverningAuthPeriod().getMuni();
-                    for(Property pr: propList){
-                        if(pr.getMuniCode() == m.getMuniCode()){
-                            propList.add(pr);
+                propIDList.addAll(pi.getPropertyHistoryList(cred));
+                while(!propIDList.isEmpty() && propIDList.size() <= Constants.MAX_BOB_HISTORY_SIZE){
+                    // Only developers get a heterogeneous mix of muni in their history
+                    if(cred.isHasDeveloperPermissions()){
+                        propList.add(pi.getProperty(propIDList.remove(0)));
+                    } else {
+                        Municipality m = cred.getGoverningAuthPeriod().getMuni();
+                        for(Property pr: propList){
+                            if(pr.getMuniCode() == m.getMuniCode()){
+                                propList.add(pr);
+                            }
                         }
                     }
                 }

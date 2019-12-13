@@ -163,9 +163,9 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     }
     
     public void loadPersonHistory(){
-        PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
         try {
-            personList = pi.getPersonHistory(getSessionBean().getSessionUser());
+            personList = pc.assemblePersonHistory(getSessionBean().getSessionUser().getMyCredential());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "History was loaded!", ""));

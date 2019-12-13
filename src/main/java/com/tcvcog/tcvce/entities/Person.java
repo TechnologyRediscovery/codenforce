@@ -50,8 +50,6 @@ public  class   Person
      */
     protected String muniName;
     
-    private Municipality muni;
-    
     protected int sourceID;
     
     protected BOBSource source;
@@ -126,7 +124,6 @@ public  class   Person
     protected ArrayList<Integer> ghostsList;
     protected ArrayList<Integer> cloneList;
     protected ArrayList<Integer> mergedList;
-    //used in applying for occupancy.
     
     
 
@@ -919,13 +916,7 @@ public  class   Person
         this.mergedList = mergedList;
     }
 
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
-    }
-
+    
     /**
      * @return the source
      */

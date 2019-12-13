@@ -280,10 +280,12 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         
         SearchCoordinator searchCoord = getSearchCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
-        CaseCoordinator cc = getCaseCoordinator();
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        OccupancyCoordinator occCord = getOccupancyCoordinator();
+        SystemCoordinator sysCord = getSystemCoordinator();
         PersonCoordinator persc = getPersonCoordinator();
+        
+        sb.setSessionCodeSet(m.getCodeSet());
         
         // Liase with each Coordinator to populate the individual BOb member
         // and its corresponding List<E>
@@ -296,15 +298,30 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
             sb.setSessionPerson(sb.getSessionPersonList().get(0));
         }
         
+        // ********************** Occ Periods**********************   
+//        sb.setSessionOccPeriodList(occCord.assemble(ua.getMyCredential()));
+//        if(sb.getSessionPersonList().isEmpty()){
+//            sb.setSessionPerson(persc.selectDefaultPerson(ua));
+//        } else {
+//            sb.setSessionPerson(sb.getSessionPersonList().get(0));
+//        }
         
-        sessionBean.setSessionCECaseList(caseCoord.getUserCaseHistoryList(u));
+        
+        
+        // ********************** Code Enf Cases **********************   
+        sb.setSessionCECaseList(caseCoord.assembleCaseHistory(ua.getMyCredential()));
+        if(sb.getSessionCECaseList().isEmpty()){
+            caseCoord.selectDefaultCECase(ua.getMyCredential());
+        } else {
+            sb.setSessionCECase(sb.getSessionCECaseList().get(0));
+        }
 //        
 //        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         
         // ********************** PROPERTIES **********************   
-        sb.setSessionPropertyList(pc.assemblePropertyHistoryList(ua));
+        sb.setSessionPropertyList(pc.assemblePropertyHistoryList(ua.getMyCredential()));
         if(sb.getSessionPropertyList().isEmpty()){
-            sb.setSessionProperty(pc.selectDefaultProperty(ua));
+            sb.setSessionProperty(pc.selectDefaultProperty(ua.getMyCredential()));
         } else {
             sb.setSessionProperty(sb.getSessionPropertyList().get(0));
         }

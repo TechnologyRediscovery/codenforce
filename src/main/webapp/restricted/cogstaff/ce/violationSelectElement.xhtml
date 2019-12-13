@@ -21,7 +21,7 @@
                         <h1>Select Violated Code Element</h1>
 
                         <p>Select an enforcable code element to add to this case and then click "Add Selected Violation to current case". Your current code set is: 
-                            <h:outputText value="#{sessionBean.activeCodeSet.codeSetName}"/></p>
+                            <h:outputText value="#{violationSelectElementBB.currentCodeSet.codeSetName}"/></p>
 
                         <h:form id="selectViolatedElementForm">
                             
@@ -34,7 +34,7 @@
                              <p:dataTable
                                 id="enforcableCodeSetElementTable"
                                 var="cse"
-                                value="#{violationSelectElementBB.enfElementList}"
+                                value="#{violationSelectElementBB.currentCodeSet.enfCodeElementList}"
                                 rowKey="#{cse.codeSetElementID}"
                                 tableStyleClass="primeDataTable"
                                 scrollable="true"

@@ -187,13 +187,13 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     public String editEventInCaseManager(EventCECaseCasePropBundle ev){
         CaseIntegrator ci = getCaseIntegrator();
         CECaseBase caseNoLists = ev.getEventCaseBare();
-        try {
-            getSessionBean().getSessionCECaseList().add(0, ci.generateCECase(caseNoLists));
-        } catch (SQLException ex) {
-            System.out.println(ex);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+//        try {
+//            getSessionBean().getSessionCECaseList().add(0, ci.generateCECase(caseNoLists));
+//        } catch (SQLException ex) {
+//            System.out.println(ex);
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//        }
         
         return "ceCases";
     }

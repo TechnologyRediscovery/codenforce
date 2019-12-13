@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.MuniCoordinator;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
@@ -76,7 +76,7 @@ public class UserConfigBB extends BackingBeanUtils{
         UserCoordinator uc = getUserCoordinator();
         setSelectedMuni(getSessionBean().getSessionMuni());
         SearchCoordinator searchCoord = getSearchCoordinator();
-        MuniCoordinator mc = getMuniCoordinator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
         
         try {
             userAuthorizedInConfig = getSessionBean().getSessionUser();
@@ -129,7 +129,7 @@ public class UserConfigBB extends BackingBeanUtils{
     
     public String reInitSession(UserMuniAuthPeriod umap){
         UserCoordinator uc = getUserCoordinator();
-        MuniCoordinator mc = getMuniCoordinator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
         
         if(uc.verifyReInitSessionRequest(getSessionBean().getSessionUser(), umap)){
             try {

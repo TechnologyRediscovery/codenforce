@@ -105,7 +105,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         QueryCEAR sessionQuery = getSessionBean().getQueryCEAR();
 
         selectedRequest = getSessionBean().getSessionCEAR();
-
+        ReportCEARList rpt = null;
         try {
             requestList = sc.runQuery(sessionQuery).getResults();
             if (selectedRequest == null && requestList.size() > 0) {
@@ -115,18 +115,12 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             selectedQueryCEAR = sessionQuery;
             searchParams = sessionQuery.getParmsList().get(0);
             queryList = sc.buildQueryCEARList(getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
-        } catch (IntegrationException | AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-        }
-        
-        CaseCoordinator cc = getCaseCoordinator();
-        SearchCoordinator searchCoord = getSearchCoordinator();
-        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
-                getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
-        rpt.setPrintFullCEARQueue(false);
-        try {
+
+            CaseCoordinator cc = getCaseCoordinator();
+            SearchCoordinator searchCoord = getSearchCoordinator();
+            rpt = cc.getInitializedReportConficCEARs(
+                    getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
+            rpt.setPrintFullCEARQueue(false);
             QueryCEAR query = searchCoord.assembleQueryCEAR(
                                                 QueryCEAREnum.CUSTOM, 
                                                 getSessionBean().getSessionUser(), 
@@ -147,6 +141,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                              "Unable to build query, sorry!", ""));
+        } catch (AuthorizationException ex) {
+            System.out.println(ex);
         }
         reportConfig = rpt;
     }

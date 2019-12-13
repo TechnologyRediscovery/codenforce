@@ -18,9 +18,11 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
@@ -44,7 +46,8 @@ import java.util.List;
 public  class       OccPeriodDataHeavy 
         extends     OccPeriod 
         implements  IFace_EventRuleGoverned, 
-                    IFace_ProposalDriven{
+                    IFace_ProposalDriven,
+                    IFace_CredentialSigned{
 
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
@@ -63,9 +66,59 @@ public  class       OccPeriodDataHeavy
 
     private LocalDateTime configuredTS;
     
+    private String credentialSignature;
+    
     public OccPeriodDataHeavy() {
     }
     
+    /**
+     * Populates superclass members and stamps the 
+     * authorizing Credential's signature
+     * 
+     * @param opLight 
+     * @param cred 
+     */
+    public OccPeriodDataHeavy(OccPeriod opLight, Credential cred) {
+        this.credentialSignature = cred.getSignature();
+        
+        this.periodID = opLight.periodID;
+        this.propertyUnitID = opLight.propertyUnitID;
+        this.type = opLight.type;
+        this.status = opLight.status;
+        
+        this.readyForPeriodAuthorization = opLight.readyForPeriodAuthorization;
+        this.governingInspection = opLight.governingInspection;
+        this.manager = opLight.manager;
+        
+        this.periodTypeCertifiedBy = opLight.periodTypeCertifiedBy;
+        this.periodTypeCertifiedTS = opLight.periodTypeCertifiedTS;
+        
+        this.source = opLight.source;
+        this.createdBy = opLight.createdBy;
+        this.createdTS = opLight.createdTS;
+        
+        this.startDate = opLight.startDate;
+        this.startDateCertifiedTS = opLight.startDateCertifiedTS;
+        this.startDateCertifiedBy = opLight.startDateCertifiedBy;
+        
+        this.endDate = opLight.endDate;
+        this.endDateCertifiedTS = opLight.endDateCertifiedTS;
+        this.endDateCertifiedBy = opLight.endDateCertifiedBy;
+        
+        this.authorizedTS = opLight.authorizedTS;
+        this.authorizedBy = opLight.authorizedBy;
+        
+        this.overrideTypeConfig = opLight.overrideTypeConfig;
+        this.notes = opLight.notes;
+
+    }
+
+    /**
+     * Pre-credential requiring method for creating detailed subclass
+     * 
+     * @deprecated 
+     * @param opLight 
+     */
     public OccPeriodDataHeavy(OccPeriod opLight) {
         this.periodID = opLight.periodID;
         this.propertyUnitID = opLight.propertyUnitID;
@@ -352,6 +405,20 @@ public  class       OccPeriodDataHeavy
      */
     public void setFeeList(List<MoneyOccPeriodFeeAssigned> feeList) {
         this.feeList = feeList;
+    }
+
+    /**
+     * @return the credentialSignature
+     */
+    public String getCredentialSignature() {
+        return credentialSignature;
+    }
+
+    /**
+     * @param credentialSignature the credentialSignature to set
+     */
+    public void setCredentialSignature(String credentialSignature) {
+        this.credentialSignature = credentialSignature;
     }
     
 }

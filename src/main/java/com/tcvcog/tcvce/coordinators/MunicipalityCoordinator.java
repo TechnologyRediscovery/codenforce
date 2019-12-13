@@ -36,12 +36,12 @@ import java.util.Map;
  *
  * @author sylvia
  */
-public class MuniCoordinator extends BackingBeanUtils implements Serializable {
+public class MunicipalityCoordinator extends BackingBeanUtils implements Serializable {
 
     /**
      * Creates a new instance of MuniCoordinator
      */
-    public MuniCoordinator() {
+    public MunicipalityCoordinator() {
     }
     
     public MunicipalityDataHeavy getMuniDataHeavy(int muniCode) throws IntegrationException, AuthorizationException{
@@ -54,6 +54,16 @@ public class MuniCoordinator extends BackingBeanUtils implements Serializable {
     
     
      
+    /**
+     * !!SECURITY CRITICAL!!
+     * Implements logic to generate the authorized list of Municipalities to which
+     * a given Administrator User can assign a new User in the system.
+     * 
+     * 
+     * @param user
+     * @return
+     * @throws IntegrationException 
+     */
       public List<Municipality> getPermittedMunicipalityListForAdminMuniAssignment(UserAuthorized user) throws IntegrationException{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         List<Municipality> muniList = new ArrayList<>();

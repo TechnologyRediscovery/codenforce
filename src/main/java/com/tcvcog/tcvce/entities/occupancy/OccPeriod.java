@@ -19,8 +19,7 @@ import com.tcvcog.tcvce.entities.IFace_Openable;
  * @author Ellen Bascomb
  */
 public  class       OccPeriod 
-        implements  Serializable,
-                    IFace_Openable {
+        extends     OccPeriodPublic  {
     
     protected int periodID;
     protected int propertyUnitID;

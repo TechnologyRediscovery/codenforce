@@ -146,6 +146,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
     }
     
+    public CECaseBase getCECase(int caseID) throws IntegrationException, CaseLifecycleException{
+        CaseIntegrator ci = getCaseIntegrator();
+        return ci.getCECaseBase(caseID);
+        
+    }
+    
     public Icon getIconByCasePhase(CasePhase phase) throws IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
         return si.getIcon(phase);
@@ -283,6 +289,21 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return rpt;
     }
     
+    /**
+     * Old logic but good method sig. This method should get the PropertyInfoCase
+     * associated with the Muni's property
+     * @param cred
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecycleException 
+     */
+    public CECase selectDefaultCECase(Credential cred) throws IntegrationException, CaseLifecycleException{
+        CaseIntegrator ci = getCaseIntegrator();
+        return ci.getCECase( Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("arbitraryPlaceholderCaseID")));
+        
+        
+    }
+    
     public List<CECase> assembleCaseHistory(Credential cred) throws IntegrationException, CaseLifecycleException{
         CaseIntegrator caseInt = getCaseIntegrator();
         List<CECase> cl = new ArrayList<>();
@@ -295,7 +316,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         
-        return null;
+        return cl;
         
     }
     

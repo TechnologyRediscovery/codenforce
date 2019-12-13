@@ -24,7 +24,9 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class MunicipalityDataHeavy extends Municipality{
+public  class       MunicipalityDataHeavy 
+        extends     Municipality
+        implements  IFace_CredentialSigned{
     
     private String address_street;
     private String address_city;
@@ -61,11 +63,42 @@ public class MunicipalityDataHeavy extends Municipality{
     private List<CourtEntity> courtEntities;
     private List<Integer> photoDocList;
     
+    private String credentialSignature;
+    
+    
+    /**
+     * Populates superclass members 
+     * And as an authorization aware entity, asks the applicable Credential
+     * to stamp its signature
+     * @param m
+     * @param cred 
+     */
+     public MunicipalityDataHeavy(Municipality m, Credential cred){
+        this.credentialSignature = cred.getSignature();
+         
+        this.muniName = m.getMuniName();
+        this.muniCode = m.getMuniCode();
+    }
+    
+     /**
+      * Pre-Credential constructor
+      * @deprecated 
+      * @param m 
+      */
     public MunicipalityDataHeavy(Municipality m){
         this.muniName = m.getMuniName();
         this.muniCode = m.getMuniCode();
     }
 
+    
+    /**
+     * @return the credentialSignature
+     */
+    @Override
+    public String getCredentialSignature() {
+        return credentialSignature;
+    }
+    
     /**
      * @return the address_street
      */
@@ -587,5 +620,7 @@ public class MunicipalityDataHeavy extends Municipality{
         }
         return true;
     }
-    
+
+
+  
 }

@@ -1627,9 +1627,9 @@
         <managed-bean-scope>view</managed-bean-scope></managed-bean>
     <managed-bean>
         <managed-bean-name>muniCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.MuniCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.MunicipalityCoordinator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     <managed-bean>
         <managed-bean-name>loginBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.LoginBB</managed-bean-class>

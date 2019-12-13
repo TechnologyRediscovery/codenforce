@@ -133,7 +133,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             newPerson.setPersonID(rs.getInt("personid"));
             newPerson.setPersonType(PersonType.valueOf(rs.getString("persontype")));
             newPerson.setMuniCode(rs.getInt("muni_municode"));
-            newPerson.setMuni(mi.getMuni(rs.getInt("muni_municode")));
             newPerson.setFirstName(rs.getString("fName"));
             newPerson.setLastName(rs.getString("lName"));
             newPerson.setJobTitle(rs.getString("jobtitle"));

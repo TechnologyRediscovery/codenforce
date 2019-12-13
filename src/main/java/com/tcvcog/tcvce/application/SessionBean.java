@@ -97,6 +97,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     // Session Entity Lists
     private List<CEActionRequest> sessionCEARList;
     private List<EventCECaseCasePropBundle> sessionEventWithCasePropList;
+    
+    private CodeViolation sessionCodeViolation;
     private List<CodeViolation> sessionViolationList;
     
     private Blob sessionBlob;
@@ -114,7 +116,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     // CECase-specific objects
     private NoticeOfViolation sessionNotice;
     private Citation sessionCitation;
-    private CodeViolation sessionCodeViolation;
     
     // BOB queries
     private QueryProperty queryProperty;

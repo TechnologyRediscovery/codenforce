@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
  * @author sylvia
  */
 public  class       PropertyUnitPublic 
-        extends     EntityUtils
+        extends     BOb
         implements  Serializable{
     
     protected int unitID;

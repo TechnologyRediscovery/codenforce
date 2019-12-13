@@ -525,23 +525,26 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * Called by pages that aren't ceCases.xhtml to bring up the proper case for
      * viewing
      *
+     * @deprecated 
      * @param ev
      * @return
      */
     public String jumpToCasesToEditCEEvent(EventCECaseCasePropBundle ev) {
-        CaseIntegrator ci = getCaseIntegrator();
+        CaseCoordinator caseCoord = getCaseCoordinator();
         caseList = getSessionBean().getSessionCECaseList();
         List<Property> propList = getSessionBean().getSessionPropertyList();
         if (caseList != null) {
             caseList.add(1, caseList.remove(0));
-            try {
-                caseList.add(0, ci.generateCECase(ev.getEventCaseBare()));
-            } catch (SQLException | IntegrationException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Unable to migrate from events to cases",
-                        "This is a non-user system-level error that must be fixed by your Sys Admin, sorry"));
-            }
+//            try {
+//                caseList.add(0, caseCoord.getCECase((ev.getEventCaseBare().getCaseID())));
+//            } catch (IntegrationException ex) {
+//                System.out.println(ex);
+//                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                        "Unable to migrate from events to cases",
+//                        "This is a non-user system-level error that must be fixed by your Sys Admin, sorry"));
+//            } catch (CaseLifecycleException ex) {
+//                Logger.getLogger(CaseProfileBB.class.getName()).log(Level.SEVERE, null, ex);
+//            }
         }
         if (propList != null) {
             propList.add(1, propList.remove(0));
