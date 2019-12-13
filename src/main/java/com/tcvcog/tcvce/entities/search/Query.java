@@ -25,9 +25,9 @@ import java.util.Objects;
  * @param <E> the Business Object of which this Query is used to 
  * retrieve sets
  */
-public abstract class Query<E extends BOb> 
-        extends EntityUtils 
-        implements Serializable{
+public abstract class   Query<E extends BOb> 
+        extends         EntityUtils 
+        implements      Serializable{
     
     private Municipality muni;
     private UserAuthorized user;

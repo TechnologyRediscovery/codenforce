@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author Nathan Dietz
  */
-public class FeeAssigned  extends EntityUtils implements Serializable {
+public class FeeAssigned   implements Serializable {
 
     private List<Payment> paymentList;
     private int moneyFeeAssigned;

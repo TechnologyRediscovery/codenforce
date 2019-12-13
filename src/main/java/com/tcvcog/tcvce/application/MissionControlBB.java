@@ -164,7 +164,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         try {
             muniComp = mi.getMuniListified(selectedMuni.getMuniCode());
             getSessionBean().setSessionMuni(muniComp);
-            getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
+            getSessionBean().setSessionCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
         } catch (IntegrationException ex) {
             FacesContext facesContext = getFacesContext();
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 

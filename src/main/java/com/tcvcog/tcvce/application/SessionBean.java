@@ -75,16 +75,35 @@ import javax.annotation.PostConstruct;
  */
 public class SessionBean extends BackingBeanUtils implements Serializable{
     
-    // BOB individual object session shelves - NOT NULL
+    // CORE BUSINESS OBJECT SESSION SHELVES
     private MunicipalityDataHeavy sessionMuni;
+
     private UserAuthorized sessionUser;
-    private User sessionUserForReInitSession;
-    private UserMuniAuthPeriod umapRequestedForReInit;
+    
+    private CodeSet sessionCodeSet;
+    
+    private Property sessionProperty;
+    private List<Property> sessionPropertyList;
+    
+    private Person sessionPerson;
+    private List<Person> sessionPersonList;
     
     private CECase sessionCECase;
-    private Property sessionProperty;
-    private Person sessionPerson;
+    private List<CECase> sessionCECaseList;
+    
     private OccPeriod sessionOccPeriod;
+    private List<OccPeriod> sessionOccPeriodList;
+    
+    // Session Entity Lists
+    private List<CEActionRequest> sessionCEARList;
+    private List<EventCECaseCasePropBundle> sessionEventWithCasePropList;
+    private List<CodeViolation> sessionViolationList;
+    
+    private Blob sessionBlob;
+    private List<Blob> blobList;
+    
+    private User sessionUserForReInitSession;
+    private UserMuniAuthPeriod umapRequestedForReInit;
     
     // BOB individual object session shelves - NOT ALWAYS POPULATED
     private CEActionRequest sessionCEAR;
@@ -97,16 +116,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private Citation sessionCitation;
     private CodeViolation sessionCodeViolation;
     
-    // BOB Lists
-    private List<Property> sessionPropertyList;
-    private List<Person> sessionPersonList;
-    private List<CEActionRequest> sessionCEARList;
-    private List<CECase> sessionCECaseList;
-    private List<EventCECaseCasePropBundle> sessionEventWithCasePropList;
-    private List<CodeViolation> sessionViolationList;
-    private List<OccPeriod> sessionOccPeriodList;
-    private List<Blob> blobList;
-    
     // BOB queries
     private QueryProperty queryProperty;
     private QueryPerson queryPerson;
@@ -117,7 +126,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     /* *** Municipal Code Session Shelves ***  */
     private CodeSource activeCodeSource;
-    private CodeSet activeCodeSet;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
     private EnforcableCodeElement selectedEnfCodeElement;
     private CodeElement activeCodeElement;
@@ -159,6 +167,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     private OccPeriod feeManagementOccPeriod;
     private String feeRedirTo;
+    
+    
     /* *** Blob Upload Session Shelves *** */
     //linking
 
@@ -191,14 +201,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void refreshActiveCase() throws IntegrationException, CaseLifecycleException{
-        CaseIntegrator ci = getCaseIntegrator();
-        if(sessionCECase != null){
-            CECase c = ci.getCECase(sessionCECase.getCaseID());
-            sessionCECase = c;
-        }
-    }
-
     /**
      * @return the sessionPerson
      */
@@ -214,8 +216,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         return sessionNotice;
     }
     
-    public void setActiveCodeSet(CodeSet cs){
-        activeCodeSet = cs;
+    public void setSessionCodeSet(CodeSet cs){
+        sessionCodeSet = cs;
     }
 
     
@@ -225,11 +227,11 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      * The MuniHeavy stores the active copy of these 
      * @return the activeCodeSet
      */
-    public CodeSet getActiveCodeSet() {
+    public CodeSet getSessionCodeSet() {
 //        if(sessionMuni != null){
 //            activeCodeSet = sessionMuni.getCodeSet();
 //        }
-        return activeCodeSet;
+        return sessionCodeSet;
     }
 
     /**
@@ -986,6 +988,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setFeeRedirTo(String feeRedirTo) {
         this.feeRedirTo = feeRedirTo;
+    }
+
+    /**
+     * @return the sessionBlob
+     */
+    public Blob getSessionBlob() {
+        return sessionBlob;
+    }
+
+    /**
+     * @param sessionBlob the sessionBlob to set
+     */
+    public void setSessionBlob(Blob sessionBlob) {
+        this.sessionBlob = sessionBlob;
     }
     
     

@@ -17,13 +17,13 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 
 /**
  *
- * @author Ellen Baskem
+ * @author Ellen Bascomb
  */
-public class CECase 
-        extends CECaseBase 
-        implements Cloneable,
-                   IFace_ProposalDriven, 
-                   IFace_EventRuleGoverned{
+public class        CECase 
+        extends     CECaseBase 
+        implements  Cloneable,
+                    IFace_ProposalDriven, 
+                    IFace_EventRuleGoverned{
     
     private List<CodeViolation> violationList;
     

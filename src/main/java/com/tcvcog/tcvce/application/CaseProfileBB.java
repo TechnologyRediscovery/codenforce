@@ -41,6 +41,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
@@ -596,10 +597,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @param c the case to be managed--comes from the data table row button
      */
     public void manageCECase(CECase c) {
-        UserIntegrator ui = getUserIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
+        
         System.out.println("CaseProfileBB.manageCECase | caseid: " + c.getCaseID());
         try {
-            ui.logObjectView(getSessionBean().getSessionUser(), c);
+            si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), c);
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

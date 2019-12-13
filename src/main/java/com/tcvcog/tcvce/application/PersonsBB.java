@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -229,8 +230,9 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     public void selectPerson(Person p){
         UserIntegrator ui = getUserIntegrator();
         PropertyIntegrator pi = getPropertyIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
         try {
-            ui.logObjectView(getSessionBean().getSessionUser(), p);
+            si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), p);
             propertyPersonList = pi.getProperties(p);
         } catch (IntegrationException ex) {
             System.out.println(ex);

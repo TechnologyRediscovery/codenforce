@@ -55,7 +55,6 @@ public class UserConfigBB extends BackingBeanUtils{
     private List<UserMuniAuthPeriod> umapListInConfigFromUserAuth;
     private String formUmapNotes;
     
-    
     private List<User> userListForConfig;
     private User userSelectedForConfig;
     

@@ -11,7 +11,7 @@ import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import com.tcvcog.tcvce.entities.Openable;
+import com.tcvcog.tcvce.entities.IFace_Openable;
 
 /**
  * Primary Business Object BOB for holding data about Occupancy Periods
@@ -19,9 +19,8 @@ import com.tcvcog.tcvce.entities.Openable;
  * @author Ellen Bascomb
  */
 public  class       OccPeriod 
-        extends     EntityUtils 
         implements  Serializable,
-                    Openable {
+                    IFace_Openable {
     
     protected int periodID;
     protected int propertyUnitID;

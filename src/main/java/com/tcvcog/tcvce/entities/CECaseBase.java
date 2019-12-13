@@ -17,10 +17,10 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
  *
  * @author sylvia
  */
-public class CECaseBase 
-        extends EntityUtils 
+public class    CECaseBase 
+        extends BOb 
         implements Serializable, 
-                    Openable,
+                    IFace_Openable,
                     Cloneable{
     
     protected int caseID;
@@ -83,7 +83,7 @@ public class CECaseBase
   
     
     public long getCaseAge() {
-        return getTimePeriodAsDays(originationDate, LocalDateTime.now());
+        return EntityUtils.getTimePeriodAsDays(originationDate, LocalDateTime.now());
     }
 
     /**

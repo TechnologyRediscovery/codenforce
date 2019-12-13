@@ -18,7 +18,7 @@ import java.util.List;
  * @author sylvia
  */
 public abstract class Report
-        extends EntityUtils 
+         
         implements Serializable {
     
     private String title;

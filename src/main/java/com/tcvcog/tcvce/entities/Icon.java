@@ -11,7 +11,7 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class Icon extends EntityUtils {
+public class Icon  {
     private int iconid;
     private String name;
     private String styleClass;

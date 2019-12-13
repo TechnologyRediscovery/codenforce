@@ -23,7 +23,6 @@ import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PersonType;
@@ -32,9 +31,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
-import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -43,9 +40,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -792,6 +786,13 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     } // close updatePerson
 
+    /**
+     * Deprecated first gen person extraction method; replaced by searchForPersons
+     * @deprecated 
+     * @param p
+     * @return
+     * @throws IntegrationException 
+     */
     public List<Person> getPersonList(Property p) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -856,11 +857,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     }
 
 
-    public List<Person> getPersonHistory(User u) throws IntegrationException {
+    public List<Integer> getPersonHistory(int userID) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        ArrayList<Person> al = new ArrayList<>();
+        List<Integer> al = new ArrayList<>();
 
         try {
             String s = "SELECT person_personid, entrytimestamp FROM loginobjecthistory "
@@ -868,16 +869,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     + "AND person_personid IS NOT NULL "
                     + "ORDER BY entrytimestamp DESC;";
             stmt = con.prepareStatement(s);
-            stmt.setInt(1, u.getUserID());
+            stmt.setInt(1, userID);
 
             rs = stmt.executeQuery();
-            int MAX_RES = 20;  //behold a MAGICAL number
-            int iter = 0;
-            
-            while (rs.next() && iter < MAX_RES) {
-                Person pers = getPerson(rs.getInt("person_personid"));
-                al.add(pers);
-                iter++;
+            while (rs.next()) {
+                al.add(rs.getInt("person_personid"));
             }
 
         } catch (SQLException ex) {

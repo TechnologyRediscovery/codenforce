@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) 2019 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +16,12 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
-
 /**
  *
- * @author Eric C. Darsow
+ * @author sylvia
  */
-public class CodifiedMunicipality extends Municipality implements Serializable{
+public interface IFace_Openable {
     
-    private CodeSet cs;
-
-    /**
-     * @return the cs
-     */
-    public CodeSet getCs() {
-        return cs;
-    }
-
-    /**
-     * @param cs the cs to set
-     */
-    public void setCs(CodeSet cs) {
-        this.cs = cs;
-    }
+    public abstract boolean isOpen();
     
 }

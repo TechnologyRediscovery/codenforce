@@ -2,7 +2,7 @@
 -- Patch README:
 -- Patch sealed for the re-braining of the team in December 2019 for beta
 -- testing
--- 
+-- Corresponds with zeronine.sql for re-braining
 
 -- DO THIS FIRST
 -- >>>>>>>>>>>>>>>>>>> UNCOMMENT and RUN THIS LINE ON ITS OWN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

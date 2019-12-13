@@ -41,6 +41,8 @@ public class Constants implements Serializable {
     // blasted unit numbers often have letters in them!
     public final static String DEFAULT_UNIT_NUMBER = "-1";
     
+    // Object management configuration parameters
+    public final static int MAX_BOB_HISTORY_SIZE = 30;
     
     public final static int MAX_CONNECTIONS = 1000;
     

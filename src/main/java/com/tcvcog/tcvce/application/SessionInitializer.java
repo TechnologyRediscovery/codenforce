@@ -18,9 +18,11 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
@@ -29,6 +31,7 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -56,6 +59,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -188,6 +192,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 getSessionBean().setSessionUser(authUser);
                 
                 populateSessionObjectQueues(authUser, muniHeavy);
+                populateSessionQueries(authUser);
                 
                 umaple = uc.assembleUserMuniAuthPeriodLogEntrySkeleton(
                                 authUser, 
@@ -271,21 +276,40 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @throws CaseLifecycleException 
      */
     private void populateSessionObjectQueues(UserAuthorized ua, MunicipalityDataHeavy m) throws IntegrationException, CaseLifecycleException{
-        SessionBean sessionBean = getSessionBean();
+        SessionBean sb = getSessionBean();
         
-        PropertyIntegrator propI = getPropertyIntegrator();
         SearchCoordinator searchCoord = getSearchCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        PersonCoordinator persc = getPersonCoordinator();
+        
+        // Liase with each Coordinator to populate the individual BOb member
+        // and its corresponding List<E>
+        
+        // ********************** PERSONS **********************   
+        sb.setSessionPersonList(persc.assemblePersonHistory(ua.getMyCredential()));
+        if(sb.getSessionPersonList().isEmpty()){
+            sb.setSessionPerson(persc.selectDefaultPerson(ua));
+        } else {
+            sb.setSessionPerson(sb.getSessionPersonList().get(0));
+        }
         
         
-//        sessionBean.setSessionPersonList(persCoord.loadPersonHistoryList(u));
-//        sessionBean.setSessionCECaseList(caseCoord.getUserCaseHistoryList(u));
+        sessionBean.setSessionCECaseList(caseCoord.getUserCaseHistoryList(u));
 //        
 //        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         
-        sessionBean.setSessionProperty(pc.selectDefaultProperty(ua));
-        sessionBean.setSessionPerson(ua.getPerson());
+        // ********************** PROPERTIES **********************   
+        sb.setSessionPropertyList(pc.assemblePropertyHistoryList(ua));
+        if(sb.getSessionPropertyList().isEmpty()){
+            sb.setSessionProperty(pc.selectDefaultProperty(ua));
+        } else {
+            sb.setSessionProperty(sb.getSessionPropertyList().get(0));
+        }
         
+        // ********************** PROPERTIES **********************   
 //        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
 //                .getString("arbitraryPlaceholderCaseID")
 //                
@@ -293,34 +317,43 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 //        sessionBean.setcECaseQueue(new ArrayList<CECase>());
 //        sessionBean.getcECaseQueue().add(c);
         
+
+    }
+
+    private void populateSessionQueries(UserAuthorized ua){
+        SessionBean sb = getSessionBean();
+        SearchCoordinator searchCoord = getSearchCoordinator();
+        Municipality muni = ua.getMyCredential().getGoverningAuthPeriod().getMuni();
+
         // Note that these are Query skeletons and have not yet ben run
         // It's up to the individual beans to check the Query object's
         // "run by integrator" member and run the query if they choose
-        sessionBean.setQueryProperty(
+        sb.setQueryProperty(
                 searchCoord.assembleQueryProperty(
-                QueryPropertyEnum.OPENCECASES_OCCPERIODSINPROCESS, ua, m, null));
+                QueryPropertyEnum.OPENCECASES_OCCPERIODSINPROCESS, ua, muni, null));
         
-        sessionBean.setQueryPerson(
+        sb.setQueryPerson(
                 searchCoord.assembleQueryPerson(
-                QueryPersonEnum.CUSTOM, ua, m, null));
+                QueryPersonEnum.CUSTOM, ua, muni, null));
         
-        sessionBean.setQueryCEAR(
+        sb.setQueryCEAR(
                 searchCoord.assembleQueryCEAR(
-                QueryCEAREnum.ALL_PAST30, ua, m, null));
+                QueryCEAREnum.ALL_PAST30, ua, muni, null));
         
-        sessionBean.setQueryCECase(
+        sb.setQueryCECase(
                 searchCoord.assembleQueryCECase(
-                QueryCECaseEnum.OPENCASES, ua, m, null));
+                QueryCECaseEnum.OPENCASES, ua, muni, null));
         
-        sessionBean.setQueryEventCECase(
+        sb.setQueryEventCECase(
                 searchCoord.assembleQueryEventCECase(
-                QueryEventCECaseEnum.MUNICODEOFFICER_ACTIVITY_PAST30DAYS, ua, m, null));
+                QueryEventCECaseEnum.MUNICODEOFFICER_ACTIVITY_PAST30DAYS, ua, muni, null));
         
-        sessionBean.setQueryOccPeriod(
+        sb.setQueryOccPeriod(
                 searchCoord.assembleQueryOccPeriod(
-                QueryOccPeriodEnum.CUSTOM, ua, m, null));
+                QueryOccPeriodEnum.CUSTOM, ua, muni, null));
+        
+        
     }
-
     
 
     /**

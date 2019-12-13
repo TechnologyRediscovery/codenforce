@@ -6,11 +6,13 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import java.io.Serializable;
 
 /**
  * Future container for BOB-general members
  * @author sylvia
  */
-public abstract class BOb{
+public abstract class BOb
+                implements Serializable{
     
 }

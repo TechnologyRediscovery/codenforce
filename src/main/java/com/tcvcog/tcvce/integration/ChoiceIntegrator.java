@@ -29,7 +29,6 @@ import com.tcvcog.tcvce.entities.ChoiceEventPageNavigation;
 import com.tcvcog.tcvce.entities.ChoiceEventRule;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Event;
-import com.tcvcog.tcvce.entities.Proposable;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
@@ -43,6 +42,7 @@ import java.sql.SQLException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import com.tcvcog.tcvce.entities.IFace_Proposable;
 
 /**
  * A Choice is given to the user in a Directive and can take one of the
@@ -93,8 +93,8 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         return c;
     }
     
-    public List<Proposable> getChoiceList(int directiveID) throws IntegrationException{
-        List<Proposable> choiceList = new ArrayList<>();
+    public List<IFace_Proposable> getChoiceList(int directiveID) throws IntegrationException{
+        List<IFace_Proposable> choiceList = new ArrayList<>();
   
         StringBuilder sb = new StringBuilder();
         sb.append(  "SELECT choice_choiceid, directive_directiveid\n" +

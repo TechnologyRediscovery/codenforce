@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Eric C. Darsow
  */
-public class NoticeOfViolation extends EntityUtils implements Serializable, Comparable<NoticeOfViolation> {
+public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViolation> {
     
     private int noticeID;
     private Person recipient;

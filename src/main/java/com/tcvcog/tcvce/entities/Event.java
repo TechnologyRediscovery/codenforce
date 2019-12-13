@@ -27,9 +27,9 @@ import java.util.Objects;
  *
  * @author Eric C. Darsow
  */
-public class Event 
-        extends EntityUtils 
-        implements Serializable, Comparable<Event> {
+public class        Event 
+        implements  Serializable, 
+                    Comparable<Event> {
     
     protected int eventID;
     
@@ -284,7 +284,7 @@ public class Event
      * @return the daysUntilDue
      */
     public long getDaysUntilDue() {
-        long d = getTimePeriodAsDays(LocalDateTime.now(), dateOfRecord);
+        long d = EntityUtils.getTimePeriodAsDays(LocalDateTime.now(), dateOfRecord);
         daysUntilDue = d;
         return daysUntilDue;
     }

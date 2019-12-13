@@ -23,7 +23,8 @@ import java.time.LocalDateTime;
  *
  * @author sylvia
  */
-public class PropertyPublic implements Serializable {
+public class    PropertyPublic 
+       extends  BOb{
     
     protected int propertyID;
     

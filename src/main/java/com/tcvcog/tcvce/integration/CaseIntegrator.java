@@ -56,6 +56,17 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     public CaseIntegrator() {
     }
     
+    
+    /**
+     * First gen search method before Query and SearchParam object system
+     * came online
+     * 
+     * @deprecated 
+     * @param p
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecycleException 
+     */
     public ArrayList getCECasesByProp(Property p) 
             throws IntegrationException, CaseLifecycleException{
         ArrayList<CECase> caseList = new ArrayList();
@@ -289,6 +300,16 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * First gen attempt at querying BObs manually with method-by-method building.
+     * Replaced by the SearchParams and Query object families
+     * 
+     * @deprecated 
+     * @param muniCode
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecycleException 
+     */
     public ArrayList getOpenCECases(int muniCode) throws IntegrationException, CaseLifecycleException{
         
         ArrayList<CECase> caseList = new ArrayList();
@@ -327,6 +348,17 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         return caseList;
     }
+    
+    /**
+     * First-gen attempt at building history of objects, replaced by loginobjecthistory
+     * queries
+     * 
+     * @deprecated 
+     * @param muniCode
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecycleException 
+     */
     public List getCECaseHistory(int muniCode) throws IntegrationException, CaseLifecycleException{
         
         ArrayList<CECase> caseList = new ArrayList();
@@ -414,7 +446,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     
     
     /**
-     * This method generates a new CECase
+     * Primary retrieval method for CECase objects from the DB
      * @param ceCaseID
      * @return
      * @throws IntegrationException 
@@ -466,7 +498,15 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         else return cse;
     }
     
-    public CECase generateCECase(CECaseBase caseBare) throws SQLException, IntegrationException{
+    /**
+     * Internal populator for CECase objects with lots of data
+     * 
+     * @param caseBare
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private CECase generateCECase(CECaseBase caseBare) throws SQLException, IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         CitationIntegrator ci = getCitationIntegrator();
         ViolationIntegrator cvi = getCodeViolationIntegrator();
@@ -484,7 +524,14 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return cse;
     }
     
-     public CECaseBase generateCECaseNoLists(ResultSet rs) throws SQLException, IntegrationException{
+    /**
+     * Internal populator for CECaseBase objects
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+     private CECaseBase generateCECaseNoLists(ResultSet rs) throws SQLException, IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         SystemIntegrator si = getSystemIntegrator();
@@ -533,6 +580,13 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return c;
     }
     
+     /**
+      * First gen search method to be deprecated in Beta
+      * @param pacc
+      * @return
+      * @throws IntegrationException
+      * @throws CaseLifecycleException 
+      */
     public List<CECase> getCECasesByPACC(int pacc) throws IntegrationException, CaseLifecycleException{
         
         ArrayList<CECase> caseList = new ArrayList();
@@ -567,7 +621,16 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
   
-
+    /**
+     * Insertion point for CECase objects; must be called by Coordinator who checks 
+     * logic before sending to the DB. This method only copies from the passed in CECase
+     * into the SQL INSERT
+     * 
+     * @param ceCase
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecycleException 
+     */
     public CECase insertNewCECase(CECase ceCase) throws IntegrationException, CaseLifecycleException{
         
         String query = "INSERT INTO public.cecase(\n" +
@@ -717,9 +780,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
-    public List<CECase> getCECaseHistoryList(User u) 
+    public List<Integer> getCECaseHistoryList(int userID) 
             throws IntegrationException, CaseLifecycleException{
-        List<CECase> cList = new ArrayList<>();
+        List<Integer> cseidl = new ArrayList<>();
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -730,16 +793,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     + "AND cecase_caseid IS NOT NULL "
                     + "ORDER BY entrytimestamp DESC;";
             stmt = con.prepareStatement(s);
-            stmt.setInt(1, u.getUserID());
+            stmt.setInt(1, userID);
 
             rs = stmt.executeQuery();
-            int MAX_RES = 27;  //behold a MAGICAL number
-            int iter = 0;
             
-            while (rs.next() && iter < MAX_RES) {
-                CECase c = getCECase(rs.getInt("cecase_caseid"));
-                cList.add(c);
-                iter++;
+            while (rs.next()) {
+                cseidl.add(rs.getInt("cecase_caseid"));
             }
 
         } catch (SQLException ex) {
@@ -751,11 +810,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return cList;
+        return cseidl;
     }
-    
-   
-   
-        
-    
+     
 }

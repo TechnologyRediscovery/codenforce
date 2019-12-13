@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  *
  * @author sylvia
  */
-public class Photograph extends EntityUtils {
+public class Photograph  {
     
     private int photoID;
     private String description;

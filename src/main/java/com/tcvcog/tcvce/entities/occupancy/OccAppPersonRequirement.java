@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author Dominic Pimpinella and Eric Darsow
  */
-public class OccAppPersonRequirement extends EntityUtils implements Serializable {
+public class OccAppPersonRequirement  implements Serializable {
    
     private boolean requirementSatisfied;
     private List<PersonType> requiredPersonTypes;

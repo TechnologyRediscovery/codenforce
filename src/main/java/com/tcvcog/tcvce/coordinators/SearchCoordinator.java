@@ -136,52 +136,59 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return assembled instance ready for sending to runQuery
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public QueryCEAR assembleQueryCEAR(QueryCEAREnum qName, UserAuthorized u, Municipality m, SearchParamsCEActionRequests params) throws IntegrationException{
-        QueryCEAR query;
-        List<SearchParamsCEActionRequests> paramList = new ArrayList<>();
-        
-        if(params != null){
-            qName = QueryCEAREnum.CUSTOM;
-        }
-        
-        switch(qName){
-            case UNPROCESSED:
-                paramList.add(generateParams_CEAR_Unprocessed(m));
-                break;
-            case ATTACHED_TO_CECASE:
-                paramList.add(generateParams_CEAR_attachedToCase(m, 30));
-                break;
+    public QueryCEAR assembleQueryCEAR( QueryCEAREnum qName, 
+                                        UserAuthorized u, 
+                                        Municipality m, 
+                                        SearchParamsCEActionRequests params) {
+            QueryCEAR query = null;
+            List<SearchParamsCEActionRequests> paramList = new ArrayList<>();
             
-            case ALL_TODAY:
-                paramList.add(generateParams_CEAR_pastXDays(m, 1));
-                break;
-                
-            case ALL_PAST7DAYS:
-                paramList.add(generateParams_CEAR_pastXDays(m, 7));
-                break;
-                
-            case ALL_PAST30:
-                paramList.add(generateParams_CEAR_pastXDays(m, 30));
-                break;
-
-            case ALL_PASTYEAR:
-                paramList.add(generateParams_CEAR_pastXDays(m, 365));
-                break;
-                
-            case BY_CURRENT_USER:
-                paramList.add(generateParams_CEAR_Unprocessed(m));
-                break;
-                
-            case CUSTOM:
-                paramList.add(params);
-                break;
-                
-            default:
-                paramList.add(generateParams_CEAR_Unprocessed(m));
+            if(params != null){
+                qName = QueryCEAREnum.CUSTOM;
+            }
+            
+        try {
+            switch(qName){
+                case UNPROCESSED:
+                    paramList.add(generateParams_CEAR_Unprocessed(m));
+                    break;
+                case ATTACHED_TO_CECASE:
+                    paramList.add(generateParams_CEAR_attachedToCase(m, 30));
+                    break;
+                    
+                case ALL_TODAY:
+                    paramList.add(generateParams_CEAR_pastXDays(m, 1));
+                    break;
+                    
+                case ALL_PAST7DAYS:
+                    paramList.add(generateParams_CEAR_pastXDays(m, 7));
+                    break;
+                    
+                case ALL_PAST30:
+                    paramList.add(generateParams_CEAR_pastXDays(m, 30));
+                    break;
+                    
+                case ALL_PASTYEAR:
+                    paramList.add(generateParams_CEAR_pastXDays(m, 365));
+                    break;
+                    
+                case BY_CURRENT_USER:
+                    paramList.add(generateParams_CEAR_Unprocessed(m));
+                    break;
+                    
+                case CUSTOM:
+                    paramList.add(params);
+                    break;
+                    
+                default:
+                    paramList.add(generateParams_CEAR_Unprocessed(m));
+            }
+            
+            query = new QueryCEAR(qName, m, paramList, u);
+            query.setExecutedByIntegrator(false);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
         }
-        
-        query = new QueryCEAR(qName, m, paramList, u);
-        query.setExecutedByIntegrator(false);
         return query;
     }
     

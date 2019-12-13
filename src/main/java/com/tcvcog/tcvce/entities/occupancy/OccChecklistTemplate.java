@@ -31,7 +31,7 @@ import java.util.Objects;
  * 
  * @author Eric Darsow
  */
-public class OccChecklistTemplate extends EntityUtils {
+public class OccChecklistTemplate  {
     
     // note we have a lexicon switch here: in the DB, this object is 
     // derived from an inspectionchecklist row. In Javaland, we make

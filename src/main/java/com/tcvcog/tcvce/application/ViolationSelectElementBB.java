@@ -60,7 +60,7 @@ public class ViolationSelectElementBB extends BackingBeanUtils implements Serial
     public ArrayList<EnforcableCodeElement> getEnfElementList() {
         
         CodeIntegrator integrator = getCodeIntegrator();
-        CodeSet codeSet = getSessionBean().getActiveCodeSet();
+        CodeSet codeSet = getSessionBean().getSessionCodeSet();
         System.out.println("ViolationSelectElement.getElementList| retrievedset: " + codeSet);
 
         if (codeSet != null) {

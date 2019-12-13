@@ -62,7 +62,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     public void initBean() {
 
     }
-
+    
     public String appendNoteBlock(MessageBuilderParams mbp) {
         StringBuilder sb = new StringBuilder();
         if (mbp.getExistingContent() != null) {

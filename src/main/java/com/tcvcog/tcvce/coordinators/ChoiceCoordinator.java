@@ -25,8 +25,6 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Directive;
 import com.tcvcog.tcvce.entities.Event;
-import com.tcvcog.tcvce.entities.Openable;
-import com.tcvcog.tcvce.entities.Proposable;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
@@ -38,6 +36,8 @@ import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Iterator;
+import com.tcvcog.tcvce.entities.IFace_Openable;
+import com.tcvcog.tcvce.entities.IFace_Proposable;
 
 /**
  *
@@ -134,9 +134,9 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     public Proposal configureChoiceList(Proposal proposal, UserAuthorized u){
         if(proposal != null && u != null){
             if(proposal.getDirective().getChoiceList() != null){
-                Iterator<Proposable> iter = proposal.getDirective().getChoiceList().iterator();
+                Iterator<IFace_Proposable> iter = proposal.getDirective().getChoiceList().iterator();
                 while(iter.hasNext()){
-                    Proposable p = iter.next();
+                    IFace_Proposable p = iter.next();
                     configureChoice(p, u);
                 }
             }
@@ -144,7 +144,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         return proposal;
     }
     
-    private Proposable configureChoice(Proposable choice, UserAuthorized u){
+    private IFace_Proposable configureChoice(IFace_Proposable choice, UserAuthorized u){
         if(choice != null && u != null){
             choice.setHidden(true);
             choice.setCanChoose(false);
@@ -164,7 +164,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public boolean determineProposalEvaluatability( Proposal proposal,
-                                                    Proposable chosen, 
+                                                    IFace_Proposable chosen, 
                                                     User u){
         if(proposal == null || chosen == null || u== null){
             return false;
@@ -260,7 +260,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
      * This method does not allow evaluation of a required proposal after BOB is closed. 
      * If this occurs, there's a bug somewhere in the entitylifecycle that anybody could have closed this bob
      */
-    public void rejectProposal(Proposal p, Openable bob, UserAuthorized u) throws IntegrationException, AuthorizationException, CaseLifecycleException{
+    public void rejectProposal(Proposal p, IFace_Openable bob, UserAuthorized u) throws IntegrationException, AuthorizationException, CaseLifecycleException{
         ChoiceIntegrator ci = getChoiceIntegrator();
         if(u.getRole().getRank() >= p.getDirective().getMinimumRequiredUserRankToEvaluate()){
             if(!p.getDirective().isRequiredEvaluationForBOBClose() && bob.isOpen()){

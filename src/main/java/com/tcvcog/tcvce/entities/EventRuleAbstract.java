@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * @author sylvia
  */
-public class EventRuleAbstract extends EntityUtils implements Serializable {
+public class EventRuleAbstract  implements Serializable {
     
     protected int ruleid;
     protected String title;

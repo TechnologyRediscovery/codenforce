@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
  *
  * @author sylvia
  */
-public class UserAccessRecord extends EntityUtils implements Serializable {
+public class UserAccessRecord  implements Serializable {
     
   private int muni_municode;
   private int userid;

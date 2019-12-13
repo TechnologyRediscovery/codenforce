@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChange;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -107,12 +108,15 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
     public void manageProperty(Property prop) {
         PropertyIntegrator pi = getPropertyIntegrator();
-        UserIntegrator ui = getUserIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
+        
         try {
             selectedProperty = pi.getPropertyDataHeavy(prop.getPropertyID());
             existingUnitList = pi.getPropertyUnitList(selectedProperty);
             proposedUnitList = pi.getPropertyUnitChangeList(selectedProperty);
-            ui.logObjectView(getSessionBean().getSessionUser(), prop);
+            
+            si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), prop);
+            
             getSessionBean().getSessionPropertyList().add(prop);
 
         } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {

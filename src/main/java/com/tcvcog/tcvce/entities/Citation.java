@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @author Eric C. Darsow
  */
-public class Citation extends EntityUtils implements Serializable {
+public class Citation implements Serializable {
     private int citationID;
     private String citationNo;
     private CitationStatus status;

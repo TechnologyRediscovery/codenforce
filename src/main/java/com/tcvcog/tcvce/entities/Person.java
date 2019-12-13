@@ -30,7 +30,8 @@ import java.util.Objects;
  * 
  * @author Eric Darsow
  */
-public class Person {
+public  class   Person 
+        extends BOb{
     
     protected int personID;
     
@@ -916,13 +917,6 @@ public class Person {
      */
     public void setMergedList(ArrayList<Integer> mergedList) {
         this.mergedList = mergedList;
-    }
-
-    /**
-     * @return the muni
-     */
-    public Municipality getMuni() {
-        return muni;
     }
 
     /**

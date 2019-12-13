@@ -9,7 +9,7 @@ package com.tcvcog.tcvce.entities;
  *
  * @author sylvia
  */
-public interface Proposable {
+public interface IFace_Proposable {
     
     public int getChoiceID();
     public String getTitle();

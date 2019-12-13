@@ -15,7 +15,7 @@ import java.util.Objects;
  * 
  * @author sylvia
  */
-public class Proposal extends EntityUtils implements Serializable, Comparable<Proposal> {
+public class Proposal  implements Serializable, Comparable<Proposal> {
     
     protected int proposalID ;
     protected Directive directive;
@@ -42,7 +42,7 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
     
     protected int order;
     
-    protected Proposable chosenChoice;
+    protected IFace_Proposable chosenChoice;
 
     /**
      * @param responderIntended the responderIntended to set
@@ -363,14 +363,14 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
     /**
      * @return the chosenChoice
      */
-    public Proposable getChosenChoice() {
+    public IFace_Proposable getChosenChoice() {
         return chosenChoice;
     }
 
     /**
      * @param chosenChoice the chosenChoice to set
      */
-    public void setChosenChoice(Proposable chosenChoice) {
+    public void setChosenChoice(IFace_Proposable chosenChoice) {
         this.chosenChoice = chosenChoice;
     }
 

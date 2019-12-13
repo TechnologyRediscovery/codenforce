@@ -40,7 +40,6 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.Proposable;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
@@ -84,6 +83,7 @@ import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.SysexMessage;
+import com.tcvcog.tcvce.entities.IFace_Proposable;
 
 /**
  *
@@ -745,7 +745,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
 
     public void evaluateProposal(Proposal proposal,
-            Proposable chosen,
+            IFace_Proposable chosen,
             OccPeriod occPeriod,
             UserAuthorized u) throws    EventException, 
                                         AuthorizationException, 

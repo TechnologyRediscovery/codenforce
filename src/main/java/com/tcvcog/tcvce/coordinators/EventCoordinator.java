@@ -41,7 +41,6 @@ import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Proposable;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
@@ -66,6 +65,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
+import com.tcvcog.tcvce.entities.IFace_Proposable;
 
 /**
  *
@@ -629,7 +629,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public Event generateEventDocumentingProposalEvaluation(Proposal p, Proposable ch, UserAuthorized u) throws CaseLifecycleException, IntegrationException{
+    public Event generateEventDocumentingProposalEvaluation(Proposal p, IFace_Proposable ch, UserAuthorized u) throws CaseLifecycleException, IntegrationException{
         Event ev = null;
         if(ch instanceof ChoiceEventCat){
             EventCategory ec = getInitiatlizedEventCategory(((ChoiceEventCat) ch).getEventCategory().getCategoryID());

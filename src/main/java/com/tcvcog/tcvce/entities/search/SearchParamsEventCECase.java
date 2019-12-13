@@ -15,7 +15,9 @@ import java.io.Serializable;
  *
  * @author Sylvia Garland
  */
-public class SearchParamsEventCECase extends SearchParams implements Serializable{
+public class        SearchParamsEventCECase 
+        extends     SearchParams 
+        implements  Serializable{
     
     private boolean useRespondedAtDateRange;
     

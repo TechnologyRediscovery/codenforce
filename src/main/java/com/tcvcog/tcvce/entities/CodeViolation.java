@@ -30,7 +30,7 @@ import java.util.Objects;
  *
  * @author Eric C. Darsow
  */
-public class CodeViolation extends EntityUtils implements Serializable{
+public class CodeViolation  implements Serializable{
     protected int violationID;
     protected EnforcableCodeElement violatedEnfElement;
     protected int ceCaseID;
@@ -290,7 +290,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
      */
     public long getDaysUntilStipulatedComplianceDate() {
         daysUntilStipulatedComplianceDate = 
-                getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
+                EntityUtils.getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
         return daysUntilStipulatedComplianceDate;
     }
 

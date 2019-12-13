@@ -26,30 +26,38 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class UserMuniAuthPeriod extends EntityUtils implements Serializable, Comparable<UserMuniAuthPeriod> {
+public class UserMuniAuthPeriod  implements Serializable, Comparable<UserMuniAuthPeriod> {
 
     private int userMuniAuthPeriodID;
 
     private Municipality muni;
     private int userID;
 
+    private RoleType role;
+    
     private List<UserMuniAuthPeriodLogEntry> periodActivityLogBook;
 
     /**
-     * For Javaland only since validity is based on the current date/time
-     */
-    private LocalDateTime validatedTS;
-
-    /**
+     * Timestamped business logic for UMAP validity is implemented.
+     * Works in tandem with the member validatedTS: if this is a valid UMAP,
+     * both this and validatedTS will have the same value. An invalid UAMP
+     * will be timestamped when valuated but denied a validatedTS.
+     * 
      * For Javaland only since validity is based on the current date/time
      */
     private LocalDateTime validityEvaluatedTS;
     
+    /**
+     * Security signaling timestamp upon validation by the UserCoordinator
+     * For Javaland only since validity is based on the current date/time
+     */
+    private LocalDateTime validatedTS;
+
     private LocalDateTime startDate;
     private LocalDateTime stopDate;
 
     private LocalDateTime recorddeactivatedTS;
-    private RoleType role;
+    
 
     private LocalDateTime createdTS;
 

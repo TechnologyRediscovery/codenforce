@@ -236,7 +236,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         while(iter.hasNext()){
             CECaseEvent ev = iter.next();
             if(ev.getCategory().getEventType() == EventType.Citation){
-                
+                // FINISH
             }
         }
          return cse;
@@ -283,9 +283,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return rpt;
     }
     
-    public List<CECase> getUserCaseHistoryList(User u) throws IntegrationException, CaseLifecycleException{
+    public List<CECase> assembleCaseHistory(Credential cred) throws IntegrationException, CaseLifecycleException{
         CaseIntegrator caseInt = getCaseIntegrator();
-        return caseInt.getCECaseHistoryList(u);
+        List<CECase> cl = new ArrayList<>();
+        List<Integer> cseidl = null;
+        if(cred != null){
+            cseidl = caseInt.getCECaseHistoryList(0);
+//             while(!idList.isEmpty() && pl.size() <= Constants.MAX_BOB_HISTORY_SIZE){
+//                pl.add(pi.getPerson(idList.remove(0)));
+//            }
+        }
+        
+        
+        return null;
         
     }
     
@@ -483,8 +493,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return insertedEventID;
     } // close method
     
-     public void evaluateProposal(   Proposal proposal, 
-                                    Proposable chosen, 
+    
+    
+    public void evaluateProposal(   Proposal proposal, 
+                                    IFace_Proposable chosen, 
                                     CECase ceCase, 
                                     UserAuthorized u) throws EventException, AuthorizationException, CaseLifecycleException, IntegrationException, ViolationException{
         ChoiceCoordinator cc = getChoiceCoordinator();

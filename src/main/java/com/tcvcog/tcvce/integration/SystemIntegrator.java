@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
@@ -28,7 +29,9 @@ import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PrintStyle;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -733,6 +736,251 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
         return new IntensitySchema(schemaName);
 
+    }
+    
+    /**
+     * Writes in a history record when a User accesses that object.
+     * The Object's type will be checked against existing history
+     * recording opportunities and create an appropriate entry in the
+     * loginobjecthistory table.
+     *
+     * 
+     *
+     * @param u the User who viewed the object
+     * @param ob any Object that's displayed in a data table or list in the system
+     * @throws IntegrationException
+     */
+    public void logObjectView(User u, Object ob) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        StringBuilder insertSB = new StringBuilder();
+        insertSB.append("INSERT INTO loginobjecthistory ");
+        try {
+            if (ob instanceof Person) {
+                Person p = (Person) ob;
+                
+                insertSB.append("(login_userid, person_personid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
+                stmt = con.prepareStatement(insertSB.toString());
+                
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, p.getPersonID());
+                
+                stmt.execute();
+                
+                System.out.println("SystemIntegrator.logObjectView: Person view logged id = " + p.getPersonID());
+                
+            } else if (ob instanceof Property) {
+                Property p = (Property) ob;
+                
+                insertSB.append("(login_userid, property_propertyid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
+                stmt = con.prepareStatement(insertSB.toString());
+                
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, p.getPropertyID());
+
+                stmt.execute();
+
+                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
+            } else if (ob instanceof CECase) {
+                CECase c = (CECase) ob;
+                
+                insertSB.append("(login_userid, cecase_caseid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
+                stmt = con.prepareStatement(insertSB.toString());
+                
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, c.getCaseID());
+
+                stmt.execute();
+
+                System.out.println("SystemIntegrator.logObjectView: Case view logged id = " + c.getCaseID());
+            } else if (ob instanceof OccPeriod) {
+                OccPeriod op = (OccPeriod) ob;
+
+                insertSB.append("(login_userid, cecase_caseid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
+                stmt = con.prepareStatement(insertSB.toString());
+
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, op.getPeriodID());
+
+                stmt.execute();
+                System.out.println("SystemIntegrator.logObjectView: Occ Period logged id = " + op.getPeriodID() );
+            }
+            
+            
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error writign object history: persons, properties, or cecases", ex);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+    }
+
+    /**
+     * Writes in a history record when a User accesses that object.
+     * The Object's type will be checked against existing history
+     * recording opportunities and create an appropriate entry in the
+     * loginobjecthistory table.
+     *
+     * Checks for duplicates in the table before inserting.
+     * If duplicate object ID exists, update existing entry with the current
+     * time stamp only.
+     *
+     * @deprecated 
+     * @param u the User who viewed the object
+     * @param ob any Object that's displayed in a data table or list in the system
+     * @throws IntegrationException
+     */
+    public void logObjectView_OverwriteDate(User u, Object ob) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        StringBuilder selectSB = new StringBuilder();
+        selectSB.append("SELECT historyentryid FROM loginobjecthistory " + "WHERE login_userid = ? ");
+        StringBuilder insertSB = new StringBuilder();
+        insertSB.append("INSERT INTO loginobjecthistory ");
+        StringBuilder updateSB = new StringBuilder();
+        updateSB.append("UPDATE loginobjecthistory SET entrytimestamp = now() " + "WHERE login_userid = ? ");
+        try {
+            if (ob instanceof Person) {
+                Person p = (Person) ob;
+                // prepare SELECT statement
+                selectSB.append("AND person_personid = ? ");
+                stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, p.getPersonID());
+                rs = stmt.executeQuery();
+                if (rs.first()) {
+                    // history entry with this user and person already exists
+                    updateSB.append("AND person_personid = ? ");
+                    stmt = con.prepareStatement(updateSB.toString());
+                } else {
+                    // pair not in history, do fresh insert
+                    insertSB.append("(login_userid, person_personid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
+                    stmt = con.prepareStatement(insertSB.toString());
+                }
+                // each UPDATE and INSERT SQL structures take the params in this order
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, p.getPersonID());
+                stmt.execute();
+                System.out.println("SystemIntegrator.logObjectView: Person view logged id = " + p.getPersonID());
+            } else if (ob instanceof Property) {
+                Property p = (Property) ob;
+                // prepare SELECT statement
+                selectSB.append("AND property_propertyid = ? ");
+                stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, p.getPropertyID());
+                rs = stmt.executeQuery();
+                if (rs.first()) {
+                    // history entry with this user and person already exists
+                    updateSB.append("AND property_propertyid = ? ");
+                    stmt = con.prepareStatement(updateSB.toString());
+                } else {
+                    // pair not in history, do fresh insert
+                    insertSB.append("(login_userid, property_propertyid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
+                    stmt = con.prepareStatement(insertSB.toString());
+                }
+                // each UPDATE and INSERT SQL structures take the params in this order
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, p.getPropertyID());
+                stmt.execute();
+                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
+            } else if (ob instanceof CECase) {
+                CECase c = (CECase) ob;
+                // prepare SELECT statement
+                selectSB.append("AND cecase_caseid = ? ");
+                stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, c.getCaseID());
+                rs = stmt.executeQuery();
+                if (rs.first()) {
+                    // history entry with this user and person already exists
+                    updateSB.append("AND cecase_caseid = ? ");
+                    stmt = con.prepareStatement(updateSB.toString());
+                } else {
+                    // pair not in history, do fresh insert
+                    insertSB.append("(login_userid, cecase_caseid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
+                    stmt = con.prepareStatement(insertSB.toString());
+                }
+                // each UPDATE and INSERT SQL structures take the params in this order
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, c.getCaseID());
+                stmt.execute();
+                System.out.println("SystemIntegrator.logObjectView: Case view logged id = " + c.getCaseID());
+            } else if (ob instanceof OccPeriod) {
+                OccPeriod op = (OccPeriod) ob;
+                // prepare SELECT statement
+                selectSB.append("AND occperiod_periodid = ? ");
+                stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, op.getPeriodID());
+                rs = stmt.executeQuery();
+                if (rs.first()) {
+                    // history entry with this user and person already exists
+                    updateSB.append("AND cecase_caseid = ? ");
+                    stmt = con.prepareStatement(updateSB.toString());
+                } else {
+                    // pair not in history, do fresh insert
+                    insertSB.append("(login_userid, cecase_caseid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
+                    stmt = con.prepareStatement(insertSB.toString());
+                }
+                // each UPDATE and INSERT SQL structures take the params in this order
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, op.getPeriodID());
+                stmt.execute();
+                System.out.println("SystemIntegrator.logObjectView: Occ Period logged id = " + op.getPeriodID() );
+            }
+            
+            
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error writign object history: persons, properties, or cecases", ex);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
     }
     
 }

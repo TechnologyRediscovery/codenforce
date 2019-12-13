@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * 
  * @author Eric C. Darsow
  */
-public class PropertyDataHeavy extends Property implements Serializable{
+public  class       PropertyDataHeavy 
+        extends     Property 
+        implements  Serializable{
     
     // cases store code enforcement data
     private List<CECase> ceCaseList;

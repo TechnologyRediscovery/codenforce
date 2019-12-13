@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class PrintStyle extends EntityUtils implements Serializable{
+public class PrintStyle  implements Serializable{
     
     private int styleID;
     private String description;

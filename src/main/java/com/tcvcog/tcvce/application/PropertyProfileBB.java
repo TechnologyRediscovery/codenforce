@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -416,9 +417,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void manageProperty(Property prop){
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
+        
         try {
             setCurrProp(pi.getPropertyDataHeavy(prop.getPropertyID()));
-            ui.logObjectView(getSessionBean().getSessionUser(), prop);
+            si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), prop);
             getSessionBean().setSessionProperty(prop);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,

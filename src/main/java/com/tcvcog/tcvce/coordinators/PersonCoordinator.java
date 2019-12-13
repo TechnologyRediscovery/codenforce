@@ -19,15 +19,18 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -151,10 +154,37 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return newCloneID;
     }
     
-    public List<Person> loadPersonHistoryList(User u) throws IntegrationException{
-        PersonIntegrator pi = getPersonIntegrator();
-        return pi.getPersonHistory(u);
+    
+    /**
+     * Logic container for choosing a default person if the SessionInitializer
+     * does not have a session List to work from
+     * @param ua
+     * @return the selected person proposed for becoming the sessionPerson
+     */
+    public Person selectDefaultPerson(UserAuthorized ua){
+        return ua.getPerson();
         
+    }
+
+    
+    /**
+     * Intermediary logic unit for configuring histories of Person object views
+     * given an authorization context
+     * @param cred
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Person> assemblePersonHistory(Credential cred) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        List<Person> pl = new ArrayList<>();
+        List<Integer> idList = null;
+        if(cred != null){
+            idList = pi.getPersonHistory(cred.getGoverningAuthPeriod().getUserID());
+            while(!idList.isEmpty() && pl.size() <= Constants.MAX_BOB_HISTORY_SIZE){
+                pl.add(pi.getPerson(idList.remove(0)));
+            }
+        }
+        return pl;
     }   
 
     /**
