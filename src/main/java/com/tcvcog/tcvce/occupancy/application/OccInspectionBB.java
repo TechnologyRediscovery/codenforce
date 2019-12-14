@@ -18,7 +18,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
-import com.tcvcog.tcvce.entities.occupancy.OccEvent;
+import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
@@ -89,7 +89,7 @@ import javax.faces.event.ActionEvent;
  object of the OccInspection
  * 
  * 
- * @author mced ghost
+ * @author Ellen Bascomb
  */
 public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
@@ -163,7 +163,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private ReportConfigOccPermit reportConfigOccPermit;
     
     // events 
-    private OccEvent currentEvent;
+    private EventOccPeriod currentEvent;
     private List<Event> filteredEventList;
     private List<ViewOptionsActiveHiddenListsEnum> eventsViewOptions;
     private ViewOptionsActiveHiddenListsEnum selectedEventView;
@@ -499,11 +499,11 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private void reloadCurrentOccPeriodDataHeavy(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            currentOccPeriod = oc.reloadOccPeriod(currentOccPeriod, getSessionBean().getSessionUser());
+            currentOccPeriod = oc.getOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessionUser().getMyCredential());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Reloaded occ period ID " + currentOccPeriod.getPeriodID(), ""));
-        } catch (IntegrationException | EventException | AuthorizationException | CaseLifecycleException | ViolationException ex) {
+        } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -567,7 +567,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
     
     
-     public void hideEvent(OccEvent event){
+     public void hideEvent(EventOccPeriod event){
         EventIntegrator ei = getEventIntegrator();
         event.setHidden(true);
         try {
@@ -583,7 +583,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public void unHideEvent(CECaseEvent event){
+    public void unHideEvent(EventCECase event){
         EventIntegrator ei = getEventIntegrator();
         event.setHidden(false);
         try {
@@ -634,7 +634,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public void events_initiateEventEdit(OccEvent ev){
+    public void events_initiateEventEdit(EventOccPeriod ev){
         currentEvent = ev;
         System.out.println("OccInspectionBB.events_initiateEventEdit | current event: " + currentEvent.getEventID());
     }
@@ -1446,14 +1446,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the currentEvent
      */
-    public OccEvent getCurrentEvent() {
+    public EventOccPeriod getCurrentEvent() {
         return currentEvent;
     }
 
     /**
      * @param currentEvent the currentEvent to set
      */
-    public void setCurrentEvent(OccEvent currentEvent) {
+    public void setCurrentEvent(EventOccPeriod currentEvent) {
         this.currentEvent = currentEvent;
     }
 

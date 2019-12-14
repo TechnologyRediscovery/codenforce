@@ -447,6 +447,258 @@
         <managed-bean-class>com.tcvcog.tcvce.application.userManageBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    
+    
+    <managed-bean>
+        <managed-bean-name>textBlockBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>dashboardDataBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBB</managed-bean-class>
+    
+        <managed-bean-scope>request</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>navMenuBean</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.NavMenuBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>actionRequestManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>publicInfoBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PublicInfoBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>publicInfoCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.PublicInfoCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>pIBCECaseBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PIBCECaseBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>searchCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.SearchCoordinator</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>municipalityManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cEComplianceTimeframeClosingsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEComplianceTimeframeClosingsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cENoticeAcknowledgementsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CENoticeAcknowledgementsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cEEventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEEventsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>propertyAddBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyAddBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>iconBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.IconBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>reportingBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ReportingBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cEActionRequestsReportBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsReportBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>eventCECaseReportBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventCECaseReportBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>personSearchPublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonSearchPublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>personEditPublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonEditPublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>dataCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.DataCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>choiceCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.ChoiceCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>choiceIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.ChoiceIntegrator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+        <managed-bean-name>uploadBlobBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.UploadBlobBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <description>Utility application-scoped bean for handling blob upload and download	</description>
+        <managed-bean-name>blobCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.BlobCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <description>Handles storing and retrieving of BLOBs to/from the database	</description>
+        <managed-bean-name>blobIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.BlobIntegrator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>linkBlobBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.linkBlobBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>manageBlobBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.manageBlobBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodSearchBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <description>Handles client-side actions related to choice display and selection</description>
+        <managed-bean-name>choiceBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ChoiceBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>occInspectionBuilderBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBuilderBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>userConfigBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.UserConfigBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>muniCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.MunicipalityCoordinator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>loginBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.LoginBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseWorkflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseWorkflowBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseSearchBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseBlobsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseBlobsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseViolationsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseViolationsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseNoticesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseNoticesBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECasePublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECasePublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECasesActionRequestsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseActionRequestsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <description>		</description>
+        <managed-bean-name>cECasePaymentsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECasePaymentsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseUtilitiesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseUtilitiesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseEventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseEventsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseCitationsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseCitationsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodWorkflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodWorkflowBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodEventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodEventsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodPersonsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPersonsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodPaymentsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPaymentsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodFilesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodFilesBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodPublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
  
     <!--request-scoped beans-->
     
@@ -473,6 +725,7 @@
 
 
     <!--core SYSTEM entry pathway-->
+    
     <!--we need users to pass through this cycle as soon as they try to access anything in /restricted-->
     
     <navigation-rule>
@@ -731,14 +984,7 @@
         
     </navigation-rule>
     
-    <navigation-rule>
-        <from-view-id>/public/publicDashboard.xhtml</from-view-id>  
-        <navigation-case>
-            <from-outcome>scheduleOccIns</from-outcome>
-            <to-view-id>/public/services/scheduleOccupancyInspection.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
+ 
     
    <navigation-rule>
         <from-view-id>/restricted/cogstaff/gen/uploadBlob.xhtml</from-view-id>  
@@ -807,15 +1053,7 @@
         </navigation-case>
     </navigation-rule>
     
-    <navigation-rule>
-        <from-view-id>*</from-view-id>
-        <navigation-case>
-            <from-outcome>addNewCase</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
-        
+  
     
     <navigation-rule>
         <from-view-id>/restricted/cogview/propertySearch.xhtml</from-view-id>
@@ -910,12 +1148,62 @@
     
     <navigation-rule>
         <from-view-id>*</from-view-id>
-
         <navigation-case>
-            <from-outcome>ceCases</from-outcome>
-            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
+            <from-outcome>addNewCase</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+    </navigation-rule>
+        
+    
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+
+        <navigation-case>
+            <from-outcome>ceCaseWorkflow</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseWorkflow.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseViolations</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseViolations.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseNotices</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseNotices.xhtml</to-view-id>    
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseCitations</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseCitations.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseEvents</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseEvents.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCasePayments</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCasePayments.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseRequests</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseRequests.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseFiles</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseFiles.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>ceCasePublic</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCasePublic.xhtml</to-view-id>
+        </navigation-case>
+        
+        
 
         <navigation-case>
             <from-outcome>reportCECase</from-outcome>
@@ -929,56 +1217,13 @@
             <redirect />
         </navigation-case>
 
-        <navigation-case>
-            <from-outcome>ceEvents</from-outcome>
-            <to-view-id>/restricted/cogview/ceEvents.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-
-        <navigation-case>
-            <from-outcome>ceCaseHistory</from-outcome>
-            <to-view-id>/restricted/cogview/ceCaseHistory.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-
-        <navigation-case>
-            <from-outcome>caseProfile</from-outcome>
-            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-
-        <navigation-case>
-            <from-outcome>ceActionRequests</from-outcome>
-            <to-view-id>/restricted/muniview/ceActionRequests.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    
-        <navigation-case>
-            <from-outcome>caseViolations</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/caseViolations.xhtml</to-view-id>
-        </navigation-case>
-    
+       
         <navigation-case>
             <from-outcome>textBlockManage</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/textBlockManage.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>caseCitations</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/caseCitations.xhtml</to-view-id>
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>caseEvents</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/caseEvents.xhtml</to-view-id>
-        </navigation-case>
-
-        <navigation-case>
-            <from-outcome>caseNotices</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/caseNotices.xhtml</to-view-id>
-        </navigation-case>
-
+       
         <navigation-case>
             <from-outcome>noticeOfViolationBuilder</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilder.xhtml</to-view-id>
@@ -1015,22 +1260,7 @@
     
     </navigation-rule>
     
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>violationSelectElement</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        <navigation-case>
-            <from-outcome>printCase</from-outcome>
-            <to-view-id>/restricted/cogView/ceCasePrint.xhtml</to-view-id>
-        </navigation-case>
-        <navigation-case>
-            <from-outcome>citationEdit</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
-        </navigation-case>
-    </navigation-rule>
+  
         
     <navigation-rule>
         <from-view-id>/restricted/cogstaff/ce/requestManagement.xhtml</from-view-id>
@@ -1113,15 +1343,15 @@
     
     <!--  OCCUPANCY  -->
     
-    <navigation-rule>
+     <navigation-rule>
+        <from-view-id>*</from-view-id>
         <navigation-case>
-            <from-view-id>/restricted/*</from-view-id>
-            <from-outcome>inspection</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/inspection.xhtml</to-view-id>
-            <redirect />
+            <from-outcome>occPeriodWorkflow</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ</to-view-id>
         </navigation-case>
+        
     </navigation-rule>
-    
+ 
     
     <navigation-rule>
         <navigation-case>
@@ -1465,253 +1695,4 @@
     </navigation-rule>
     
     
-    <managed-bean>
-        <managed-bean-name>textBlockBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>dashboardDataBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBB</managed-bean-class>
-    
-        <managed-bean-scope>request</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>navMenuBean</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.NavMenuBean</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>actionRequestManageBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>publicInfoBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PublicInfoBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>publicInfoCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.PublicInfoCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>pIBCECaseBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PIBCECaseBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>searchCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.SearchCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>municipalityManageBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cEComplianceTimeframeClosingsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CEComplianceTimeframeClosingsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cENoticeAcknowledgementsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CENoticeAcknowledgementsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cEEventsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CEEventsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>propertyAddBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PropertyAddBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>iconBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.IconBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>reportingBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ReportingBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cEActionRequestsReportBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsReportBB</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>eventCECaseReportBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventCECaseReportBB</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>personSearchPublicBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonSearchPublicBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>personEditPublicBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonEditPublicBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>dataCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.DataCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>choiceCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.ChoiceCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>choiceIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.ChoiceIntegrator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-        <managed-bean-name>uploadBlobBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.UploadBlobBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <description>Utility application-scoped bean for handling blob upload and download	</description>
-        <managed-bean-name>blobCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.BlobCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <description>Handles storing and retrieving of BLOBs to/from the database	</description>
-        <managed-bean-name>blobIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.BlobIntegrator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>linkBlobBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.linkBlobBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>manageBlobBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.manageBlobBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>occPeriodsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodSearchBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <description>Handles client-side actions related to choice display and selection</description>
-        <managed-bean-name>choiceBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ChoiceBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>occInspectionBuilderBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBuilderBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>userConfigBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.UserConfigBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>muniCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.MunicipalityCoordinator</managed-bean-class>
-    
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>loginBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.LoginBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cECaseWorkflowBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseWorkflowBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cECaseSearchBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cECaseBlobsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseBlobsBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>cECaseViolationsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseViolationsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cECaseNoticesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseNoticesBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>cECasePublicBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECasePublicBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cECasesActionRequestsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseActionRequestsBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <description>		</description>
-        <managed-bean-name>cECasePaymentsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECasePaymentsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>cECaseUtilitiesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseUtilitiesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cECaseEventsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseEventsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>cECaseCitationsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseCitationsBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>occPeriodWorkflowBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodWorkflowBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>occPeriodEventsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodEventsBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>occPeriodPersonsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPersonsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>occPeriodPaymentsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPaymentsBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>occPeriodFilesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodFilesBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    <managed-bean>
-        <managed-bean-name>occPeriodPublicBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPublicBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 </faces-config>

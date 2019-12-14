@@ -24,7 +24,7 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseEvent;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventRuleCECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Event;
@@ -40,7 +40,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
-import com.tcvcog.tcvce.entities.occupancy.OccEvent;
+import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
@@ -133,8 +133,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    public CECaseEvent getEventCECase(int eventID) throws IntegrationException {
-        CECaseEvent ev = null;
+    public EventCECase getEventCECase(int eventID) throws IntegrationException {
+        EventCECase ev = null;
 
         String query = "SELECT eventid, category_catid, cecase_caseid, dateofrecord, \n" +
                 "       eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n" +
@@ -153,7 +153,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                ev = new CECaseEvent(generateEventFromRS(rs));
+                ev = new EventCECase(generateEventFromRS(rs));
                 ev.setCaseID(rs.getInt("cecase_caseid"));
             }
             
@@ -171,8 +171,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ev;    
     }
     
-    public OccEvent getOccEvent(int eventID) throws IntegrationException{
-        OccEvent occEv = null;
+    public EventOccPeriod getOccEvent(int eventID) throws IntegrationException{
+        EventOccPeriod occEv = null;
 
         String query =  "SELECT eventid, category_catid, occperiod_periodid, dateofrecord, eventtimestamp,  \n" +
                         "                               eventdescription, owner_userid, disclosetomunicipality, disclosetopublic,  \n" +
@@ -193,7 +193,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                occEv = new OccEvent(generateEventFromRS(rs));
+                occEv = new EventOccPeriod(generateEventFromRS(rs));
                 occEv.setOccPeriodID(rs.getInt("occperiod_periodid"));
             }
 
@@ -214,12 +214,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         List<Event> evLst = new ArrayList<>();
         if(erg instanceof OccPeriod){
             OccPeriod op = (OccPeriod) erg;
-            for(OccEvent oe: getOccEvents(op.getPeriodID())){
+            for(EventOccPeriod oe: getOccEvents(op.getPeriodID())){
                 evLst.add(oe);
             }
         } else if(erg instanceof CECase){
             CECase cec = (CECase) erg;
-            for(CECaseEvent evcec: getEventsByCaseID(cec.getCaseID())){
+            for(EventCECase evcec: getEventsByCaseID(cec.getCaseID())){
                 evLst.add(evcec);
             }
             
@@ -227,8 +227,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return evLst;
     }
     
-    public List<OccEvent> getOccEvents(int occPeriodID) throws IntegrationException{
-        List<OccEvent> evList = new ArrayList<>();
+    public List<EventOccPeriod> getOccEvents(int occPeriodID) throws IntegrationException{
+        List<EventOccPeriod> evList = new ArrayList<>();
 
         String query =  "SELECT eventid FROM public.occevent WHERE occperiod_periodid=?;";
         Connection con = getPostgresCon();
@@ -494,13 +494,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * in this integration method, so the caller should always be a coordiantor
      * who has vetted the event and the associated case.
      *
-     * @param event a fully-baked event ready for insertion. An CECaseEvent
+     * @param event a fully-baked event ready for insertion. An EventCECase
  contains an integer of the caseID to which the event should be attached
      * @return the id of the event just inserted
      * @throws IntegrationException when the system is unable to store event in
      * DB
      */
-    public int insertEvent(CECaseEvent event) throws IntegrationException {
+    public int insertEvent(EventCECase event) throws IntegrationException {
         PersonIntegrator pi = getPersonIntegrator();
         int insertedEventID = 0;
 
@@ -572,7 +572,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     } // close method
     
-    public int insertEvent(OccEvent event) throws IntegrationException {
+    public int insertEvent(EventOccPeriod event) throws IntegrationException {
         PersonIntegrator pi = getPersonIntegrator();
         int insertedEventID = 0;
 
@@ -663,7 +663,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
-    public void updateEvent(CECaseEvent event) throws IntegrationException {
+    public void updateEvent(EventCECase event) throws IntegrationException {
         StringBuilder sb = new StringBuilder();
         sb.append("UPDATE public.ceevent ");
         sb.append("   SET category_catid=?, cecase_caseid=?, dateofrecord=?, ");
@@ -708,7 +708,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
 
-    public void updateEvent(OccEvent event) throws IntegrationException {
+    public void updateEvent(EventOccPeriod event) throws IntegrationException {
        String sql = "UPDATE public.occevent \n" +
                     "   SET category_catid=?, dateofrecord=?, \n" +
                     "       eventdescription=?, owner_userid=?, disclosetomunicipality=?, \n" +
@@ -757,7 +757,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
    
-    public void deleteEvent(CECaseEvent event) throws IntegrationException {
+    public void deleteEvent(EventCECase event) throws IntegrationException {
         String query = "DELETE FROM public.ceevent WHERE eventid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -775,7 +775,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
    
-    public void deleteEvent(OccEvent event) throws IntegrationException {
+    public void deleteEvent(EventOccPeriod event) throws IntegrationException {
         String query = "DELETE FROM public.occeventg WHERE eventid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -893,9 +893,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<CECaseEvent> queryCaseDependentEvents(SearchParamsEventCECase params) throws IntegrationException, CaseLifecycleException{
+    public List<EventCECase> queryCaseDependentEvents(SearchParamsEventCECase params) throws IntegrationException, CaseLifecycleException{
         List<EventCECaseCasePropBundle> wrappedEventList = getEventsCECase(params);
-        List<CECaseEvent> depList = new ArrayList<>();
+        List<EventCECase> depList = new ArrayList<>();
         for(EventCECaseCasePropBundle ec: wrappedEventList){
             depList.add(ec.getEvent());
         }
@@ -966,7 +966,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 sb.append("cecase_caseid = ? ");
             }
 
-            if (params.isFilterByEventOwner() && params.getUser() != null) {
+            if (params.isFilterByEventOwner() && params.getUserID() != 0) {
                     if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                     sb.append("ceevent.owner_userid = ? ");
             }
@@ -1026,8 +1026,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
                 if (params.isFilterByEventOwner() 
                         && 
-                    params.getUser() != null) {
-                        stmt.setInt(++paramCounter, params.getUser().getUserID());
+                    params.getUserID() != 0) {
+                        stmt.setInt(++paramCounter, params.getUserID());
                 }
 
                 if (params.isFilterByPerson()) {
@@ -1066,8 +1066,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
 
-    public List<CECaseEvent> getEventsByCaseID(int caseID) throws IntegrationException {
-        List<CECaseEvent> eventList = new ArrayList();
+    public List<EventCECase> getEventsByCaseID(int caseID) throws IntegrationException {
+        List<EventCECase> eventList = new ArrayList();
 
         String query = "SELECT eventid FROM public.ceevent WHERE cecase_caseid = ?;";
         Connection con = getPostgresCon();
@@ -1881,7 +1881,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                CECaseEvent ev = new CECaseEvent(new Event());
+                EventCECase ev = new EventCECase(new Event());
 
                 ev.setEventID(rs.getInt("eventid"));
                 ev.setCategory(getEventCategory(rs.getInt("categoryid")));

@@ -32,9 +32,6 @@ public abstract class   Query<E extends BOb>
         implements      Serializable,
                         IFace_CredentialSigned{
     
-    private Municipality muni;
-    private UserAuthorized user;
-    private Credential credential;
     
     /**
      * Security mechanism for controlling queried data: Coordinators
@@ -45,14 +42,13 @@ public abstract class   Query<E extends BOb>
      * 
      */
     private RoleType userRankAccessMinimum;
+    private Credential credential;
     
     private String resultsMessage;
     private LocalDateTime executionTimestamp;
     private String executionTimestampPretty;
     
     private boolean executedByIntegrator;
-    private String credentialSignature;
-            
     
     public abstract List<E> getBOBResultList();
     public abstract void setBOBResultList(List<E> l);
@@ -63,8 +59,7 @@ public abstract class   Query<E extends BOb>
     public abstract void clearResultList();
     
     
-    public Query(Municipality muni, Credential c) {
-        this.muni = muni;
+    public Query(Credential c) {
         this.credential = c;
         
     }
@@ -79,25 +74,18 @@ public abstract class   Query<E extends BOb>
      */
     @Override
     public String getCredentialSignature() {
-        return credentialSignature;
+        if(credential != null){
+            return credential.getSignature();
+        }
+        return null;
     }
 
    
-
-    /**
-     * @return the muni
-     */
-    public Municipality getMuni() {
-        return muni;
+    public Credential getCredential(){
+        return credential;
     }
-
-
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
-    }
+  
+    
 
     /**
      * @return the userRankAccessMinimum
@@ -115,20 +103,7 @@ public abstract class   Query<E extends BOb>
 
   
 
-    /**
-     * @return the user
-     */
-    public UserAuthorized getUser() {
-        return user;
-    }
-
-    /**
-     * @param user the user to set
-     */
-    public void setUser(UserAuthorized user) {
-        this.user = user;
-    }
-
+  
     /**
      * @return the resultsMessage
      */

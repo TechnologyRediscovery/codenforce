@@ -3,24 +3,30 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tcvcog.tcvce.entities.occupancy;
+package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.EntityUtils;
-import com.tcvcog.tcvce.entities.Event;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.ArrayList;
+
 
 /**
- *
+ * A subclass of Event designed for Code Enforcement case specific
+ * attributes on Event. 
+ * 
+ * @deprecated 
  * @author sylvia
  */
-public class OccEvent extends Event implements Serializable {
-    private int occPeriodID;
+public class EventCECase 
+        extends Event 
+        implements Serializable{
     
-    public OccEvent(Event ev){
+    
+    private int caseID;
+    
+    public EventCECase(Event ev){
         this.eventID = ev.getEventID();
-        this.muniCode = ev.getMuniCode();
-        this.muniName = ev.getMuniName();
-        this.propertyID = ev.getPropertyID();
         this.category = ev.getCategory();
 
         this.dateOfRecord = ev.getDateOfRecord();
@@ -36,20 +42,28 @@ public class OccEvent extends Event implements Serializable {
         this.notes = ev.getNotes();
         this.personList = ev.getPersonList();
     }
-
+    
+    
+   
     /**
-     * @return the occPeriodID
+     * @return the caseID
      */
-    public int getOccPeriodID() {
-        return occPeriodID;
+    public int getCaseID() {
+        return caseID;
     }
 
     /**
-     * @param occPeriodID the occPeriodID to set
+     * @param caseID the caseID to set
      */
-    public void setOccPeriodID(int occPeriodID) {
-        this.occPeriodID = occPeriodID;
+    public void setCaseID(int caseID) {
+        this.caseID = caseID;
     }
+
+   
+   
+   
+
+    
     
     
 }

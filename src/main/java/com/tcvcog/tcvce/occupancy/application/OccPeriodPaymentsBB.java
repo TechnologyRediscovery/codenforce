@@ -33,7 +33,7 @@ public  class   OccPeriodPaymentsBB
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
-        currentOccPeriod = sb.getSessionOccPeriod();
+       currentOccPeriod = sb.getSessionOccPeriod();
        
     }
     
@@ -42,6 +42,20 @@ public  class   OccPeriodPaymentsBB
      * Creates a new instance of OccPeriodPayments
      */
     public OccPeriodPaymentsBB() {
+    }
+
+    /**
+     * @return the currentOccPeriod
+     */
+    public OccPeriodDataHeavy getCurrentOccPeriod() {
+        return currentOccPeriod;
+    }
+
+    /**
+     * @param currentOccPeriod the currentOccPeriod to set
+     */
+    public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
+        this.currentOccPeriod = currentOccPeriod;
     }
     
 }

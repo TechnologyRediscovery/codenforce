@@ -24,7 +24,7 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseEvent;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
@@ -142,7 +142,7 @@ public class CECaseViolationsBB
         CaseCoordinator cc = getCaseCoordinator();
         setSelectedViolation(cv);
         // build event details package
-        CECaseEvent e = null;
+        EventCECase e = null;
         try {
             getSelectedViolation().setComplianceUser(getSessionBean().getSessionUser());
             e = ec.generateViolationComplianceEvent(getSelectedViolation());

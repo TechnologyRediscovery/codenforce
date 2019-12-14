@@ -3,31 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tcvcog.tcvce.entities;
+package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.EntityUtils;
+import com.tcvcog.tcvce.entities.Event;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.ArrayList;
-
 
 /**
- * A subclass of Event designed for Code Enforcement case specific
- * attributes on Event. 
+ * Subclass used during first pass through with duplicate event infrastructure 
+ * for both CEEvents and OccEvents. Replaced with the EventDomain enum flag on 
+ * Event which signals which ID should be read.
+ * @deprecated 
  * @author sylvia
  */
-public class CECaseEvent 
-        extends Event 
-        implements Serializable{
+public  class       EventOccPeriod 
+        extends     Event 
+        implements  Serializable {
+    private int occPeriodID;
     
-    
-    private int caseID;
-    
-    public CECaseEvent(Event ev){
+    public EventOccPeriod(Event ev){
         this.eventID = ev.getEventID();
-        this.muniCode = ev.getMuniCode();
-        this.muniName = ev.getMuniName();
-        this.propertyID = ev.getPropertyID();
         this.category = ev.getCategory();
 
         this.dateOfRecord = ev.getDateOfRecord();
@@ -43,28 +38,20 @@ public class CECaseEvent
         this.notes = ev.getNotes();
         this.personList = ev.getPersonList();
     }
-    
-    
-   
+
     /**
-     * @return the caseID
+     * @return the occPeriodID
      */
-    public int getCaseID() {
-        return caseID;
+    public int getOccPeriodID() {
+        return occPeriodID;
     }
 
     /**
-     * @param caseID the caseID to set
+     * @param occPeriodID the occPeriodID to set
      */
-    public void setCaseID(int caseID) {
-        this.caseID = caseID;
+    public void setOccPeriodID(int occPeriodID) {
+        this.occPeriodID = occPeriodID;
     }
-
-   
-   
-   
-
-    
     
     
 }

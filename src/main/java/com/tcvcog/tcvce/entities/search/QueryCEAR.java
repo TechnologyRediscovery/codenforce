@@ -16,7 +16,7 @@ import java.util.Objects;
 
 /**
  * Query subclass for retrieving Code Enforcement Action Requests
- * @author Loretta
+ * @author Ellen Bascomb
  */
 public class QueryCEAR 
         extends Query{
@@ -30,10 +30,9 @@ public class QueryCEAR
     private List<CEActionRequest> results;
 
     public QueryCEAR(   QueryCEAREnum name,
-                        Municipality m, 
                         List<SearchParamsCEActionRequests> params,
                         Credential c){
-        super(m, c);
+        super(c);
         queryName = name;
         searchParamsList = new ArrayList<>();
         searchParamsList.addAll(params);

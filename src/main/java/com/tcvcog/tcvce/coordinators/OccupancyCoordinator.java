@@ -54,7 +54,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
-import com.tcvcog.tcvce.entities.occupancy.OccEvent;
+import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
@@ -105,6 +105,49 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
 
     
+    
+    /**
+     * Primary retrieval point for extracted OccPeriod objects. Backing beans should not
+     * be calling Integrators directly since the Coordinator is responsible for implementing
+     * initialization logic usually through a call to configureBObXXXX() method
+     * 
+     * @param periodID
+     * @return
+     * @throws IntegrationException 
+     */
+    public OccPeriod getOccPeriod(int periodID) throws IntegrationException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        OccPeriod op = null;
+        try {
+            op = configureOccPeriod(oi.getOccPeriod(periodID));
+        } catch (EventException | AuthorizationException | CaseLifecycleException | ViolationException ex) {
+            System.out.println(ex);
+        }
+        return op;
+        
+    }
+    
+    /**
+     * Retrieval point for Data-rich occupancy periods
+     * @param per
+     * @param cred
+     * @return
+     * @throws IntegrationException 
+     */
+    public OccPeriodDataHeavy getOccPeriodDataHeavy(OccPeriod per, Credential cred) throws IntegrationException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        OccPeriodDataHeavy opdh = null;
+        try{
+            opdh = configureOccPeriodDataHeavy(oi.generateOccPeriodDataHeavy(per), cred);
+        } catch (CaseLifecycleException | AuthorizationException | EventException ex) {
+            System.out.println(ex);
+        } 
+        
+        return opdh;
+        
+    }
+    
+    
     /**
      * Shell container for holding configuration logic applicable to OccPeriods 
      * minus their many lists
@@ -117,7 +160,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @throws CaseLifecycleException
      * @throws ViolationException 
      */
-    public OccPeriod configureOccPeriod(OccPeriod period) throws EventException, AuthorizationException, IntegrationException, CaseLifecycleException, ViolationException {
+    public OccPeriod configureOccPeriod(OccPeriod period) 
+            throws EventException, AuthorizationException, IntegrationException, CaseLifecycleException, ViolationException {
         return period;
 
     }
@@ -489,22 +533,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return freshOccPeriodID;
     }
     
-     public OccPeriodDataHeavy reloadOccPeriod(OccPeriodDataHeavy opdh, UserAuthorized ua) 
-            throws  IntegrationException, 
-                    EventException, 
-                    AuthorizationException,
-                    CaseLifecycleException,
-                    ViolationException{
-         
-        OccupancyIntegrator oi = getOccupancyIntegrator();
-         
-        if(opdh != null){
-            opdh = oi.generateOccPeriodDataHeavy(configureOccPeriod(oi.getOccPeriod(opdh.getPeriodID())));
-            opdh = configureOccPeriodDataHeavy(opdh, ua.getMyCredential());
-        }
-        return opdh;
-    }
-
+    
+   
     /**
      * Supervises the creation of a new Occupancy Inspection object in the
      * database. The designed flow would be the backing bean calls
@@ -755,7 +785,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
         
-        OccEvent propEvent = null;
+        EventOccPeriod propEvent = null;
         
         int insertedEventID = 0;
         
@@ -765,8 +795,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             proposal.setResponseTS(LocalDateTime.now());
             proposal.setChosenChoice(chosen);
 
-            // ask the EventCoord for a nicely formed Event, which we cast to OccEvent
-            propEvent = new OccEvent(ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u));
+            // ask the EventCoord for a nicely formed Event, which we cast to EventOccPeriod
+            propEvent = new EventOccPeriod(ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u));
             // insert the event and grab the new ID
             insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
             // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
@@ -780,13 +810,13 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public int attachNewEventToOccPeriod(OccPeriod period, Event ev, User u) throws IntegrationException {
         EventIntegrator ei = getEventIntegrator();
         
-        OccEvent oe = new OccEvent(ev);
+        EventOccPeriod oe = new EventOccPeriod(ev);
         oe.setOccPeriodID(period.getPeriodID());
         int insertedEventID = ei.insertEvent(oe);
         return insertedEventID;
     }
 
-    public void editOccEvent(OccEvent ev) throws IntegrationException {
+    public void editOccEvent(EventOccPeriod ev) throws IntegrationException {
         EventIntegrator ei = getEventIntegrator();
         ei.updateEvent(ev);
     }

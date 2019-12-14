@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.CECaseEvent;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -33,7 +33,7 @@ public class QueryEventCECase extends Query {
                             Municipality muni, 
                             Credential c,
                             List<SearchParamsEventCECase> params) {
-        super(muni, c);
+        super(c);
         eventSearchParamsList = new ArrayList<>();
         eventSearchParamsList.addAll(params);
         queryName = qName;

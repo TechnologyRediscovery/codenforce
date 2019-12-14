@@ -34,7 +34,7 @@ public class QueryProperty
                         Municipality m, 
                         List<SearchParamsProperty> params,
                         Credential c){
-        super(m, c);
+        super(c);
         query = name;
         searchParamsList = new ArrayList<>();
         searchParamsList.addAll(params);

@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
@@ -275,7 +276,8 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @throws IntegrationException
      * @throws CaseLifecycleException 
      */
-    private void populateSessionObjectQueues(UserAuthorized ua, MunicipalityDataHeavy m) throws IntegrationException, CaseLifecycleException{
+    private void populateSessionObjectQueues(UserAuthorized ua, MunicipalityDataHeavy m) 
+            throws IntegrationException, CaseLifecycleException{
         SessionBean sb = getSessionBean();
         
         SearchCoordinator searchCoord = getSearchCoordinator();
@@ -340,33 +342,33 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     private void populateSessionQueries(UserAuthorized ua){
         SessionBean sb = getSessionBean();
         SearchCoordinator searchCoord = getSearchCoordinator();
-        Municipality muni = ua.getMyCredential().getGoverningAuthPeriod().getMuni();
+        Credential cred = ua.getMyCredential();
 
         // Note that these are Query skeletons and have not yet ben run
         // It's up to the individual beans to check the Query object's
         // "run by integrator" member and run the query if they choose
         sb.setQueryProperty(
-                searchCoord.assembleQueryProperty(
-                QueryPropertyEnum.OPENCECASES_OCCPERIODSINPROCESS, ua, muni, null));
+                searchCoord.prepareQueryProperty(
+                QueryPropertyEnum.OPENCECASES_OCCPERIODSINPROCESS, cred, null));
         
         sb.setQueryPerson(
-                searchCoord.assembleQueryPerson(
+                searchCoord.prepareQueryPerson(
                 QueryPersonEnum.CUSTOM, ua, muni, null));
         
         sb.setQueryCEAR(
-                searchCoord.assembleQueryCEAR(
+                searchCoord.prepareQueryCEAR(
                 QueryCEAREnum.ALL_PAST30, ua, muni, null));
         
         sb.setQueryCECase(
-                searchCoord.assembleQueryCECase(
+                searchCoord.prepareQueryCECase(
                 QueryCECaseEnum.OPENCASES, ua, muni, null));
         
         sb.setQueryEventCECase(
-                searchCoord.assembleQueryEventCECase(
+                searchCoord.prepareQueryEventCECase(
                 QueryEventCECaseEnum.MUNICODEOFFICER_ACTIVITY_PAST30DAYS, ua, muni, null));
         
         sb.setQueryOccPeriod(
-                searchCoord.assembleQueryOccPeriod(
+                searchCoord.prepareQueryOccPeriod(
                 QueryOccPeriodEnum.CUSTOM, ua, muni, null));
         
         

@@ -11,6 +11,7 @@ package com.tcvcog.tcvce.entities.search;
  */
 public enum QueryOccPeriodEnum {
     
+    ALL_PERIODS_IN_MUNI("All occupancy periods in muni", "All periods", 2, false),
     AUTHWORKINPROGRESS("Occpancy authorization underway, All Phases", "Units with occ periods which do not yet have a certified authorization stamp", 2, false),
     RENTAL_ALL("Current rental units - All statuses", "Units with occ periods whose type is rental compatible regardless of period authorization", 2, false),
     RENTAL_UNREGISTERED("Current rental units - Incomplete registration", "Units with occupancy periods declared as requiring registration but whose registration is currently incomplete", 2, false),

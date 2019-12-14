@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
@@ -26,6 +27,7 @@ import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
@@ -79,25 +81,22 @@ public  class   OccPeriodSearchBB
     }
     
      
-       /**
-     * Primary injection point for setting the case which will be displayed in
-     * the right column (the manage object column) on cECases.xhtml
-     *
+     /**
+     * Loads an OccPeriodDataHeavy and injects it into the session bean 
+     * and sends the user to the Workflow/status page
      * @param op
+     * @return 
      */
-    public void exploreOccPeriod(OccPeriod op) {
+    public String exploreOccPeriod(OccPeriod op) {
         SystemCoordinator sc = getSystemCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        Credential cred = getSessionBean().getSessionUser().getMyCredential();
         
         try {
+            getSessionBean().setSessionOccPeriod(oc.getOccPeriodDataHeavy(op, cred));
+            getSessionBean().setSessionProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), cred));
             sc.logObjectView(getSessionBean().getSessionUser(), op);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        setCurrentOccPeriod(op);
-        getSessionBean().setSessionOccPeriod(currentOccPeriod);
-        try {
-            getSessionBean().setSessionProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), getSessionBean().getSessionUser().getMyCredential()));
         } catch (IntegrationException | CaseLifecycleException | AuthorizationException | EventException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -105,6 +104,8 @@ public  class   OccPeriodSearchBB
                             "Unable to assemble the data-rich occ period", ""));
             
         }
+        return "occPeriodWorkflow";
+        
     }
     
     

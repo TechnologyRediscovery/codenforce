@@ -107,19 +107,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return opList;
     }
 
-    public QueryOccPeriod runQueryOccPeriod(QueryOccPeriod query, UserAuthorized u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
-        List<SearchParamsOccPeriod> pList = query.getParmsList();
-        
-        for(SearchParamsOccPeriod sp: pList){
-            query.addToResults(searchForOccPeriods(sp));
-        }
-        query.setExecutionTimestamp(LocalDateTime.now());
-        query.setExecutedByIntegrator(true);
-        return query;
-    }
+  
 
-    public List<OccPeriod> searchForOccPeriods(SearchParamsOccPeriod params) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
-        List<OccPeriod> periodList = new ArrayList<>();
+    public List<Integer> searchForOccPeriods(SearchParamsOccPeriod params) {
+        List<Integer> periodList = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -293,13 +284,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                periodList.add(getOccPeriod(rs.getInt("periodid")));
+                periodList.add(rs.getInt("periodid"));
                 counter++;
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot search for occupancy periods, sorry!", ex);
+            
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

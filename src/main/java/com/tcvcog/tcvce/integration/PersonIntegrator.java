@@ -21,14 +21,14 @@ import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.Event;
-import com.tcvcog.tcvce.entities.CECaseEvent;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.occupancy.OccEvent;
+import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
@@ -530,14 +530,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     } // close insertPerson()
 
-    public void connectPersonsToEvent(CECaseEvent ev, List<Person> personList) throws IntegrationException {
+    public void connectPersonsToEvent(EventCECase ev, List<Person> personList) throws IntegrationException {
         ListIterator li = personList.listIterator();
         while (li.hasNext()) {
             connectPersonToEvent(ev, (Person) li.next());
         }
     }
 
-    public void connectPersonToEvent(CECaseEvent ev, Person p) throws IntegrationException {
+    public void connectPersonToEvent(EventCECase ev, Person p) throws IntegrationException {
 
         String query = "INSERT INTO public.ceeventperson(\n"
                 + " ceevent_eventid, person_personid)\n"
@@ -564,14 +564,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    public void connectPersonsToEvent(OccEvent ev, List<Person> personList) throws IntegrationException {
+    public void connectPersonsToEvent(EventOccPeriod ev, List<Person> personList) throws IntegrationException {
         ListIterator li = personList.listIterator();
         while (li.hasNext()) {
             connectPersonToEvent(ev, (Person) li.next());
         }
     }
 
-    public void connectPersonToEvent(OccEvent ev, Person p) throws IntegrationException {
+    public void connectPersonToEvent(EventOccPeriod ev, Person p) throws IntegrationException {
 
         String query =  "INSERT INTO public.occeventperson(\n" +
                         "            occevent_eventid, person_personid)\n" +

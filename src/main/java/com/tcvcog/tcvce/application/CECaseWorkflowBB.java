@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseEvent;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.Choice;
@@ -104,7 +104,7 @@ public  class CECaseWorkflowBB
     
     
     public String takeNextAction() {
-//        CECaseEvent e = getEventForTriggeringCasePhaseAdvancement();
+//        EventCECase e = getEventForTriggeringCasePhaseAdvancement();
         return "eventAdd";
     }
     

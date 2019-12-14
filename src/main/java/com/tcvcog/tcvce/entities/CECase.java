@@ -32,7 +32,7 @@ public class        CECase
     
     private boolean showHiddenEvents;
     private boolean showInactiveEvents;
-    private List<CECaseEvent> completeEventList;
+    private List<EventCECase> completeEventList;
     
     // accessed through methods specified in the interfaces
     private List<Proposal> proposalList;
@@ -250,9 +250,9 @@ public class        CECase
      * flags, add the event from the complete list to the visible list
      * @return the visibleEventList
      */
-    public List<CECaseEvent> getVisibleEventList() {
-        List<CECaseEvent> visEventList = new ArrayList<>();
-        for (CECaseEvent ev : completeEventList) {
+    public List<EventCECase> getVisibleEventList() {
+        List<EventCECase> visEventList = new ArrayList<>();
+        for (EventCECase ev : completeEventList) {
             if (!ev.isActive() && !showInactiveEvents) {
                 continue;
             }
@@ -348,14 +348,14 @@ public class        CECase
     /**
      * @return the completeEventList
      */
-    public List<CECaseEvent> getCompleteEventList() {
+    public List<EventCECase> getCompleteEventList() {
         return completeEventList;
     }
 
     /**
      * @param completeEventList the completeEventList to set
      */
-    public void setCompleteEventList(List<CECaseEvent> completeEventList) {
+    public void setCompleteEventList(List<EventCECase> completeEventList) {
         this.completeEventList = completeEventList;
     }
 
@@ -390,11 +390,11 @@ public class        CECase
     /**
      * @return the activeEventList
      */
-    public List<CECaseEvent> getActiveEventList() {
-        List<CECaseEvent> actEvList = new ArrayList<>();
-            Iterator<CECaseEvent> iter = completeEventList.iterator();
+    public List<EventCECase> getActiveEventList() {
+        List<EventCECase> actEvList = new ArrayList<>();
+            Iterator<EventCECase> iter = completeEventList.iterator();
                 while(iter.hasNext()){
-                    CECaseEvent ev = iter.next();
+                    EventCECase ev = iter.next();
                     if(ev.isActive()){
                         actEvList.add(ev);
                     }

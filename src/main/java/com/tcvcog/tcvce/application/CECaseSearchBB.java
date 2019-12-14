@@ -80,7 +80,7 @@ public class CECaseSearchBB
         
         setUsersForSearchConfig(uc.assembleUserListForSearchCriteria(null));
         
-        setQueryList(sc.assembleQueryCECaseList(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser()));
+        setQueryList(sc.prepareQueryCECaseList(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser().getMyCredential()));
         setSelectedCECaseQuery(getSessionBean().getQueryCECase());
         
         setSearchParams(getSelectedCECaseQuery().getSearchParamsList().get(0));

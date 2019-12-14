@@ -31,7 +31,7 @@ public class QueryCECase
                         Municipality muni, 
                         List<SearchParamsCECase> params,
                         Credential c) {
-        super(muni, c);
+        super(c);
         queryName = qName;
         searchParamsList = new ArrayList<>();
         searchParamsList.addAll(params);

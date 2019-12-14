@@ -32,7 +32,7 @@ public class        SearchParamsEventCECase
     private int caseId;
     
     private boolean filterByEventOwner;
-    private User user;
+    private int userID;
   
     private boolean filterByPerson;
     private Person person;
@@ -82,12 +82,7 @@ public class        SearchParamsEventCECase
         return filterByEventOwner;
     }
 
-    /**
-     * @return the ownerUserID
-     */
-    public User getUser() {
-        return user;
-    }
+    
 
     /**
      * @return the filterByActive
@@ -168,13 +163,7 @@ public class        SearchParamsEventCECase
         this.filterByEventOwner = filterByEventOwner;
     }
 
-    /**
-     * @param ownerUserID the ownerUserID to set
-     */
-    public void setOwnerUserID(User ownerUserID) {
-        this.setUser(ownerUserID);
-    }
-
+    
     /**
      * @param filterByActive the filterByActive to set
      */
@@ -265,11 +254,20 @@ public class        SearchParamsEventCECase
         this.person = person;
     }
 
+   
+
     /**
-     * @param user the user to set
+     * @return the userID
      */
-    public void setUser(User user) {
-        this.user = user;
+    public int getUserID() {
+        return userID;
+    }
+
+    /**
+     * @param userID the userID to set
+     */
+    public void setUserID(int userID) {
+        this.userID = userID;
     }
 
    

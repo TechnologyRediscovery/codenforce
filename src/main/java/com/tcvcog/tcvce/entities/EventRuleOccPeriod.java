@@ -17,7 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 
-import com.tcvcog.tcvce.entities.occupancy.OccEvent;
+import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 
 /**
  * Note on naming: This class is formally part of Occupancy and should be in its

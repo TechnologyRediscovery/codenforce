@@ -29,7 +29,7 @@ public  class       SearchParams
     private String searchDescription;
     
     private boolean filterByMuni;
-    private Municipality muni; 
+    private Municipality muni;
     
     private boolean filterByStartEndDate;
     private LocalDateTime startDate;
@@ -425,8 +425,6 @@ public  class       SearchParams
     public void setActive(boolean active) {
         this.active = active;
     }
-
-   
 
    
     

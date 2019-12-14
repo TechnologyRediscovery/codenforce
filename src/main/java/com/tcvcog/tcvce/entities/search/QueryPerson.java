@@ -35,7 +35,7 @@ public class QueryPerson
                         Municipality m, 
                         List<SearchParamsPerson> params,
                         Credential c){
-        super(m, c);
+        super(c);
         query = name;
         searchParamsList = new ArrayList<>();
         searchParamsList.addAll(params);

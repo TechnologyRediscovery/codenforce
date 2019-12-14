@@ -20,8 +20,10 @@ import java.util.Objects;
  * Query subclass for retrieving Code Enforcement Action Requests
  * @author Loretta
  */
-public class QueryOccPeriod 
+public class    QueryOccPeriod 
         extends Query{
+
+  
 
     /**
      * Holds this Query's identity Enum which includes the Query's
@@ -30,16 +32,17 @@ public class QueryOccPeriod
     private QueryOccPeriodEnum queryName;
     private List<SearchParamsOccPeriod> searchParamsList; 
     private List<OccPeriod> results;
+    private List<Integer> resultIDs;
 
     public QueryOccPeriod(QueryOccPeriodEnum name,
-                        Municipality m, 
                         List<SearchParamsOccPeriod> params,
                         Credential c){
-        super(m, c);
+        super(c);
         queryName = name;
         searchParamsList = new ArrayList<>();
         searchParamsList.addAll(params);
         results = new ArrayList<>();
+        resultIDs = new ArrayList<>();
     }
 
     @Override
@@ -146,6 +149,20 @@ public class QueryOccPeriod
      */
     public void setQueryName(QueryOccPeriodEnum queryName) {
         this.queryName = queryName;
+    }
+
+    /**
+     * @return the resultIDs
+     */
+    public List<Integer> getResultIDs() {
+        return resultIDs;
+    }
+
+    /**
+     * @param resultIDs the resultIDs to set
+     */
+    public void setResultIDs(List<Integer> resultIDs) {
+        this.resultIDs = resultIDs;
     }
     
     
