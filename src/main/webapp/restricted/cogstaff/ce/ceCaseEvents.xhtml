@@ -7,69 +7,120 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>_________NAMEME_________</title>
+        <title>CE case events</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="_________NAMEME_________">
+                <f:view id="cecase-events-view">
 
                     <div class="mainContainer">
 
-                        <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
+                        <h:form id="cecase-events-messages-form">
+                            <h:messages id="cecase-events-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
 
-                        <h:form id="_________NAMEME_________">
+                        <h:form id="cecase-events-form">
                             
-                        <h1>_________NAMEME_________</h1>
+                        <h1>Events</h1>
 
 
-                        <p:panel    id="_________NAMEME_________"
+                        <p:panel    id="cecase-events-panel-add"
                                     toggleable="true"
-                                    widgetVar="_________NAMEME_________-var"
+                                    widgetVar="cecase-events-panel-add-var"
                                     collapsed="false"
-                                    header="Occupancy period settings">
+                                    header="Add a new event to CE case">
                                
-                            <h:form id="_________NAMEME_________">
-                                        <h:panelGrid        id="_________NAMEME_________"
-                                                            columns="2"
-                                                            columnClasses="gridTd, gridTdg"
-                                                            rendered="true">
-                                            <h:panelGroup>
-                                                <h:outputText value="_________NAMEME_________"
-                                                              styleClass="ui-label font-smaller"/>
-                                                
-                                                    <h:outputText   id="_________NAMEME_________"
-                                                                    value="#{empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS ? 'block' : 'verified_user'}"/>
-                                                        
-                                                    <p:outputLabel  for="_________NAMEME_________"
-                                                                    value="_________NAMEME_________"
-                                                                    styleClass="ui-label" />
-                                                    <p:inputText    id="_________NAMEME_________" 
-                                                                    type="text"
-                                                                    value="#{occInspectionBB.formEventRuleIDToAdd}" />
-                                                    <h:message  for="_________NAMEME_________" showDetail="false" showSummary="true"  
-                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                
-                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.type.title}"
-                                                              styleClass="data-text"/>
-                                            </h:panelGroup>
+                            
+                            
+                            <h:form id="insp-events-form-addevent">
 
-                                            <h:panelGroup>
-                                                <f:subview id="_________NAMEME_________">
-                                                
-                                                    <!--content-->
-                                                    
-                                                </f:subview>
-                                            </h:panelGroup>
-                                        </h:panelGrid>
-                               </h:form>
-                                                
+                                <h:panelGrid columns="3" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
+                                             footerClass="gridFooter" style="vertical-align: top;">
 
+                                    <h:panelGroup>
+                                        <h:outputLabel styleClass="bold" for="newEventTypeMenu">
+                                            <h:outputText value="Step 1: Choose type"/>
+                                        </h:outputLabel>
+
+                                        <p:selectOneListbox id="newEventTypeMenu" required="true" value="#{caseProfileBB.selectedEventType}" tabindex="10">
+                                            <p:ajax update="categoryList
+                                                    event-add-dialog-show-cb" 
+                                                    immediate="true"/> 
+                                            <f:selectItems value="#{cECaseEventsBB.availableEventTypeList}" var="et" itemLabel="#{et.label}" />
+                                        </p:selectOneListbox>
+
+                                        <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <h:outputLabel styleClass="bold" for="categoryList">
+                                            <h:outputText value="Step 2: Choose category"/>
+                                        </h:outputLabel>
+
+                                        
+                                        <p:dataScroller id="insp-events-datascroller-chooseeventcategory"
+                                                        value="#{caseProfileBB.eventCategoryList}"
+                                                        var="eventCat"
+                                                        rowIndexVar="#{eventCat.categoryID}">
+                                            
+                                            <p:commandButton id="insp-events-button-selecteventcat"
+                                                             ajax="true"
+                                                             value="new #{eventCat.eventCategoryTitle} event"
+                                                             actionListener="#{caseProfileBB.initializeEvent(eventCat)}"
+                                                             icon="fa fa-plus" 
+                                                             oncomplete=""
+                                                             update="insp-form-addeditevent"
+                                                             
+                                                             />
+                                            
+                                        </p:dataScroller>
+                                        <p:selectOneListbox style="width: 300px;" id="categoryList" value="#{caseProfileBB.selectedEventCategory}" tabindex="10">
+                                            <p:ajax update="selectedEventCategoryDescription
+                                                    selectedEventCategoryDescription 
+                                                    selectedEventCateogryNotifiesCaseMonitors
+                                                    event-add-dialog-show-cb
+                                                    " 
+                                                    immediate="true"/>
+                                            <f:converter converterId="eventCategoryConverter"/>
+                                            <f:selectItems  id="catItemsList" value="#{caseProfileBB.eventCategoryList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                        </p:selectOneListbox>
+
+                                        <h:message for="categoryList" showDetail="false" showSummary="true"  
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel styleClass="bold" for="newEventTypeMenu">
+                                            <h:outputText value="Step 3: Create"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:commandButton    id="event-add-dialog-show-cb"
+                                                            ajax="true" 
+                                                            process="@form"
+                                                            actionListener="#{caseProfileBB.initiateUserChosenEventCreation}" 
+                                                            oncomplete="PF('add-event-dialog-var').show()"
+                                                            disabled="#{empty caseProfileBB.selectedEventCategory}"
+                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                            value="Create new event "  
+                                                            icon="fa fa-edit"
+                                                            update="addNewEventForm"/>
+                                        <h3>Event category info:</h3>
+                                        <h:outputText value="Event Cateogry Description: #{caseProfileBB.selectedEventCategory.eventCategoryDesc}" id="selectedEventCategoryDescription"/>
+                                        <p:spacer height="10px"/>
+                                        <h:outputText value="Triggers notification of case monitor subscribers: #{caseProfileBB.selectedEventCategory.notifycasemonitors}" id="selectedEventCateogryNotifiesCaseMonitors"/>
+
+                                    </h:panelGroup>
+                                </h:panelGrid>
+                            </h:form>
+
+                            
 
                         </p:panel>
                         

@@ -301,7 +301,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          
      }
      
-     public List<QueryCECase> buildQueryCECaseList(Municipality m, UserAuthorized u){
+     public List<QueryCECase> assembleQueryCECaseList(Municipality m, UserAuthorized u){
         QueryCECaseEnum[] nameArray = QueryCECaseEnum.values();
         List<QueryCECase> queryList = new ArrayList<>();
 //        for(QueryCECaseEnum queryTitle: nameArray){

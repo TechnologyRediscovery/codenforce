@@ -1635,4 +1635,60 @@
         <managed-bean-class>com.tcvcog.tcvce.application.LoginBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseWorkflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseWorkflowBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseSearchBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseBlobs</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseBlobsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseViolationsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseViolationsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseNotices</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseNoticesBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECasePublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECasePublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECasesActionRequestsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseActionRequestsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <description>		</description>
+        <managed-bean-name>cECasePayments</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECasePaymentsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseUtilitiesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseUtilitiesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseEventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseEventsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseCitations</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseCitationsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
 </faces-config>

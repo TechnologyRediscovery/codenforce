@@ -1,0 +1,291 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>_________NAMEME_________</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="cecase-workflow-view">
+
+                    <div class="mainContainer">
+
+                      
+
+                        <p:panel    id="cecase-workflow-cecasestatus"
+                                    toggleable="true"
+                                    widgetVar="cecase-workflow-cecasestatus-var"
+                                    collapsed="false"
+                                    header="Status">
+                               
+                            <h:form id="case-profile-messages-form">
+                                <h:messages id="case-profile-messages-global"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
+
+                            <h:form id="case-details-form">
+                                <div class="outlinedBox">
+
+                                    <h1>
+                                        <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName} | "/> 
+                                        <h:outputText id="header-id-ot" value="Case ID: #{caseProfileBB.currentCase.caseID}"/><br />
+                                    </h1>
+                                    <h2>
+                                        <h:outputText id="header-addr-ot" value="#{caseProfileBB.currentCase.property.address} "/>  
+                                        <h:outputText id="header-muni-ot" value="(#{caseProfileBB.currentCase.property.muni.muniName})"/>  
+                                        <h:outputText id="header-propid-ot" value=" Prop ID: #{caseProfileBB.currentCase.property.propertyID}"/>  
+                                        <h:outputText id="header-lob-ot" value=" | Lot-block: #{caseProfileBB.currentCase.property.lotAndBlock}"/>  
+                                    </h2>
+
+
+                                    <p:commandButton    id="view-property-cb" 
+                                                        ajax="false" action="properties"
+                                                        icon="fa fa-home" styleClass="noFill button-size-small"
+                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                        value="view property profile" />
+
+                                    <p>
+                                        <a href="#action-requests">proposals <h:outputText value=" (#{caseProfileBB.currentCase.proposalList.size()})" /> </a> | 
+                                        <a href="#add-event">new event</a> | 
+                                        
+                                        <ui:remove>
+                                            
+                                        <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.visibleEventList.size()})" /></a> | 
+                                        </ui:remove>
+                                        
+                                        
+                                        <a href="#violations">violations <h:outputText value=" (#{caseProfileBB.currentCase.violationList.size()})" /></a> | 
+                                        <a href="#notices">notices <h:outputText value=" (#{caseProfileBB.currentCase.noticeList.size()})" /></a> | 
+                                        <a href="#citations">citations <h:outputText value=" (#{caseProfileBB.currentCase.citationList.size()})" /></a> | 
+                                        <a href="#requests">enforcement requests <h:outputText value=" (#{caseProfileBB.currentCase.ceActionRequestList.size()})" /></a>  
+                                    </p>
+
+
+                                    <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                                 columnClasses="gridTd, gridTd">
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.casePhase.caseOpen ? 'Open' : 'Closed'}" />
+                                            <div class="status-display-container">
+                                                <div class="status-display-icon-container #{caseProfileBB.styleClassStatusIcon}">
+                                                    <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{caseProfileBB.currentCase.casePhaseIcon.materialIcon}"/></i>
+                                                </div>
+                                                <div class="status-display-status-list-container">
+                                                    <ul class="status-list">
+
+                                                        <li><h:outputText value="Stage 1: Investigation" styleClass="#{caseProfileBB.styleClassInvestigation}"/></li>
+                                                        <li><h:outputText value="Stage 2: Enforcement" styleClass="#{caseProfileBB.styleClassEnforcement}"/></li>
+                                                        <li><h:outputText value="Stage 3: Citation" styleClass="#{caseProfileBB.sytleClassCitation}"/></li>
+                                                        <li><h:outputText value="Closed" styleClass="#{caseProfileBB.sytleClassClosed}"/></li>
+                                                    </ul>
+                                                </div>
+
+                                            </div>
+                                        </h:panelGroup>      
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Opening Date: "/>
+                                            <h:outputText id="selcase-odate-it" value="#{caseProfileBB.currentCase.originiationDatePretty}"/>
+                                            <h:outputText id="selcase-age-it" 
+                                                          value=" (#{caseProfileBB.currentCase.caseAge} days ago)" 
+                                                          rendered="#{empty caseProfileBB.currentCase.closingDate}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Closing Date: "/>
+                                            <h:outputText id="selcase-cdate-it" value="#{caseProfileBB.currentCase.closingDatePretty}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Case Manager: "/>
+                                            <h:outputText id="selcase-manager-it" 
+                                                          value="#{caseProfileBB.currentCase.caseManager.person.firstName} 
+                                                          #{caseProfileBB.currentCase.caseManager.person.lastName} 
+                                                          (#{caseProfileBB.currentCase.caseManager.username})"/>  
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Case Phase: "/>
+                                            <h:outputText id="casephase-ot" value="#{caseProfileBB.currentCase.casePhase.label}"/>
+                                        </h:panelGroup>      
+
+                                        <f:facet name="footer" class="leftalign">
+                                            <h:outputLabel styleClass="bold" value="Case notes: "/>
+                                            <div class="rowExpansion">
+
+                                                <h:outputText id="selcase-notes-ot" value="#{caseProfileBB.currentCase.notes}"/>
+                                            </div>
+
+                                            <p:spacer height="5px"/>
+
+
+
+                                        </f:facet>
+                                    </h:panelGrid>
+
+                                    <p:commandButton    id="refresh-case-cb" 
+                                                        ajax="true" actionListener="#{caseProfileBB.refreshCurrentCase}"
+                                                        icon="fa fa-refresh" styleClass="noFill"
+                                                        value="reload current case data" 
+                                                        update="
+                                                        case-details-form
+                                                        violation-form
+                                                        notices-form:notices-ds
+                                                        action-requests-form:actionRequestTable
+                                                        event-dt-form:caseEventTable
+                                                        events-datascroller-form
+                                                        cecases-messages-form
+                                                        case-profile-messages-form:case-profile-messages-global
+                                                        "
+                                                        />
+
+                                    <p:commandButton    id="case-settings-cb" 
+                                                        ajax="true" disabled="true"
+                                                        icon="fa fa-gears" styleClass="noFill"
+                                                        value="case settings" />
+
+                                    <p:commandButton    id="overridephase-cb" 
+                                                        ajax="true"
+                                                        immediate="true"
+                                                        value="change stage"
+                                                        onclick="PF('phase-override').show()"
+                                                        icon="fa fa-tachometer" styleClass="noFill"
+                                                        rendered="#{sessionBeasessionUserer.keyCard.hasEnfOfficialPermissions}"
+                                                        update="casePhaseChangeForm"
+                                                        />
+                                    <p:commandButton   id="print-case-cb" 
+                                                       ajax="true" actionListener="#{caseProfileBB.prepareReportCECase}"
+                                                       icon="fa fa-print" styleClass="noFill"
+                                                       oncomplete="PF('report-case-profile-diaglog-var').show()"
+                                                       value="print case profile" 
+                                                       update="report-case-profile-form"/>
+
+
+                                </div>
+
+                            </h:form>
+
+                                                
+
+
+                        </p:panel>
+                        
+                        <p:tabView id="_________NAMEME_________">
+                            <p:tab title="_________NAMEME_________">
+                                
+                            </p:tab>
+                            <p:tab title="_________NAMEME_________">
+                                
+                            </p:tab>
+                        </p:tabView>
+                        
+                          <p:dataScroller
+                                                id="_________NAMEME_________"
+                                                widgetVar="_________NAMEME_________"
+                                                var="inelement"
+                                                value="#{inspace.inspectedElementListVisible}"
+                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
+                          
+                          
+                          
+                          </p:dataScroller>
+                        
+                          <p:dataTable
+                                            id="_________NAMEME_________"
+                                            var="_________NAMEME_________"
+                                            rowKey="#{permit.permitID}"
+                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
+                                            tableStyleClass="primeDataTable"
+                                            draggableColumns="true"
+                                            resizableColumns="true"
+                                            filteredValue="#{occInspectionBB.filteredEventList}"
+                                            widgetVar="caseEventTable">
+
+                                            <p:column width="3%" exportable="false">
+                                                <p:rowToggler/>
+                                            </p:column>
+                                            
+                                            <p:column width="10%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Print" />
+                                                </f:facet>
+                                                <p:commandButton ajax="false" 
+                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
+                                                                 value="print"
+                                                                 icon="fa fa-print"
+                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                                            </p:column>
+                          </p:dataTable>
+
+                        <p:commandButton   id="_________NAMEME_________" 
+                                           value="run selected query" 
+                                           ajax="true" 
+                                           actionListener="_________NAMEME_________"
+                                           icon="fa fa-print" 
+                                           styleClass="button"
+                                           update=""/>
+
+
+
+                        <p:commandButton    id="_________NAMEME_________"
+                                            value="help on this page" 
+                                            onclick="PF('_________NAMEME_________').show()" 
+                                            styleClass="noFill" 
+                                            icon="fa fa-question-circle"/>
+                        <p:spacer height="10px"/>
+
+
+                        </h:form>
+
+
+                    <!--close main container-->
+                    </div>
+                    
+                    
+                    <p:dialog   id="_________NAMEME_________"
+                                header="_________NAMEME_________" 
+                                widgetVar="_________NAMEME_________" 
+                                responsive="true" 
+                                width="400"
+                                modal="false"
+                                height="600">
+                        
+                          <h:form id="_________NAMEME_________">
+                            <h:messages id="_________NAMEME_________"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+                        
+                        <h:form id="_________NAMEME_________">
+                            
+
+                            <h2>_________NAMEME_________</h2>
+
+                            
+                            
+                            <p:commandButton    id="_________NAMEME_________"
+                                                value="_________NAMEME_________" 
+                                                ajax="true" 
+                                                icon="fa fa-edit"
+                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
+                                                disabled="false"
+                                                rendered="true"
+                                                oncomplete="PF('_________NAMEME_________').hide()"
+                                                update=""/>
+
+                            <p:commandLink  value="close" 
+                                            onclick="PF('_________NAMEME_________').hide()" 
+                                            styleClass="noFill"/>
+
+                        </h:form>
+
+                    </p:dialog>
+
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

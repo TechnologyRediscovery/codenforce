@@ -14,7 +14,9 @@ import javax.annotation.PostConstruct;
  *
  * @author sylvia
  */
-public class CEActionRequestsReportBB extends BackingBeanUtils implements Serializable{
+public class        CEActionRequestsReportBB 
+        extends     BackingBeanUtils 
+        implements  Serializable{
 
      private ReportCEARList reportConfig;
     
