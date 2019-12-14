@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.Proposal;
@@ -61,8 +62,8 @@ public  class       OccPeriodDataHeavy
     
     private List<Integer> blobIDList;
     
-    private List<Payment> paymentList;
     private List<MoneyOccPeriodFeeAssigned> feeList;
+    private List<MoneyOccPeriodFeePayment> paymentList;
 
     private LocalDateTime configuredTS;
     
@@ -283,14 +284,14 @@ public  class       OccPeriodDataHeavy
       /**
      * @return the paymentList
      */
-    public List<Payment> getPaymentList() {
+    public List<MoneyOccPeriodFeePayment> getPaymentList() {
         return paymentList;
     }
 
     /**
      * @param paymentList the paymentList to set
      */
-    public void setPaymentList(List<Payment> paymentList) {
+    public void setPaymentList(List<MoneyOccPeriodFeePayment> paymentList) {
         this.paymentList = paymentList;
     }
 

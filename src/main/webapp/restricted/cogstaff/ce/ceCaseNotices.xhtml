@@ -7,185 +7,194 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>CE cases public settings</title>
+        <title>CE cases notices of violation</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="cecases-public-view">
+                <f:view id="cecases-notices-view">
 
                     <div class="mainContainer">
 
-                        <h:form id="cecases-public-messages-form">
-                            <h:messages id="cecases-public-messages"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                        </h:form>
+                            <h:form id="notices-messages-form">
 
-                        <h:form id="cecases-public-form">
+                                <h:messages id="notices-messages-global"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
+
+                        <h:form id="cecases-notices-form">
                             
-                        <h1>Public access control</h1>
+
+                            <h2 id="notices">Notices of violation</h2>
 
 
-                        <p:panel    id="cecases-public-settings-panel"
-                                    toggleable="true"
-                                    widgetVar="_________NAMEME_________-var"
-                                    collapsed="false"
-                                    header="Occupancy period settings">
-                               
-                            <h:form id="_________NAMEME_________">
-                                        <h:panelGrid        id="_________NAMEME_________"
-                                                            columns="2"
-                                                            columnClasses="gridTd, gridTdg"
-                                                            rendered="true">
-                                            <h:panelGroup>
-                                                <h:outputText value="_________NAMEME_________"
-                                                              styleClass="ui-label font-smaller"/>
-                                                
-                                                    <h:outputText   id="_________NAMEME_________"
-                                                                    value="#{empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS ? 'block' : 'verified_user'}"/>
-                                                        
-                                                    <p:outputLabel  for="_________NAMEME_________"
-                                                                    value="_________NAMEME_________"
-                                                                    styleClass="ui-label" />
-                                                    <p:inputText    id="_________NAMEME_________" 
-                                                                    type="text"
-                                                                    value="#{occInspectionBB.formEventRuleIDToAdd}" />
-                                                    <h:message  for="_________NAMEME_________" showDetail="false" showSummary="true"  
-                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            <h:form id="notices-form">
+                                <p:commandButton ajax="false" icon="fa fa-paper-plane"
+                                                 action="#{ceCaseNoticesBB.createNewNotice}"
+                                                 value="Create new notice of violation letter"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                 disabled="false"
+                                                 />
+                                <p:spacer height="5px"/>
+
+                                <ui:remove>
+                                    disabled="#{!(empty ceCaseNoticesBB.currentCase.closingDate)}"
+                                </ui:remove>
                                 
-                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.type.title}"
-                                                              styleClass="data-text"/>
-                                            </h:panelGroup>
+                                <p:dataScroller
+                                    id="notices-ds"
+                                    value="#{ceCaseNoticesBB.currentCase.noticeList}"
+                                    var="notice"
+                                    rendered="true">
 
-                                            <h:panelGroup>
-                                                <f:subview id="_________NAMEME_________">
-                                                
-                                                    <!--content-->
-                                                    
-                                                </f:subview>
-                                            </h:panelGroup>
-                                        </h:panelGrid>
-                               </h:form>
-                                                
+                                    <div class="action-request-header">
+                                        <h:outputText styleClass="bold"   value="Notice dated: " />
+                                        <h:outputText value="#{notice.dateOfRecordPretty}"/>
+                                    </div>
 
+                                    <h:panelGrid columns="2" rendered="true"
+                                                 columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                                 footerClass="no-border">
 
-                        </p:panel>
-                        
-                        <p:tabView id="_________NAMEME_________">
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                        </p:tabView>
-                        
-                          <p:dataScroller
-                                                id="_________NAMEME_________"
-                                                widgetVar="_________NAMEME_________"
-                                                var="inelement"
-                                                value="#{inspace.inspectedElementListVisible}"
-                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
-                          
-                          
-                          
-                          </p:dataScroller>
-                        
-                          <p:dataTable
-                                            id="_________NAMEME_________"
-                                            var="_________NAMEME_________"
-                                            rowKey="#{permit.permitID}"
-                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
-                                            tableStyleClass="primeDataTable"
-                                            draggableColumns="true"
-                                            resizableColumns="true"
-                                            filteredValue="#{occInspectionBB.filteredEventList}"
-                                            widgetVar="caseEventTable">
+                                        <h:panelGroup>
+                                            <h:outputText styleClass="bold" value="Notice ID:" />
+                                            <h:outputText value="#{notice.noticeID}"/>
 
-                                            <p:column width="3%" exportable="false">
-                                                <p:rowToggler/>
-                                            </p:column>
-                                            
-                                            <p:column width="10%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Print" />
-                                                </f:facet>
-                                                <p:commandButton ajax="false" 
-                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
-                                                                 value="print"
-                                                                 icon="fa fa-print"
-                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
-                                            </p:column>
-                          </p:dataTable>
+                                            <p:spacer height="5px"/>
 
-                        <p:commandButton   id="_________NAMEME_________" 
-                                           value="run selected query" 
-                                           ajax="true" 
-                                           actionListener="_________NAMEME_________"
-                                           icon="fa fa-print" 
-                                           styleClass="button"
-                                           update=""/>
+                                            <h:outputText styleClass="bold"   value="Queued for Mailing: " />
+                                            <h:outputText id="nov-queued-ot" value="#{notice.lockedAndQueuedTSPretty}"/>
+                                            <p:spacer height="5px"/>
 
+                                            <h:outputText styleClass="bold"  value="Sent Date: " />
+                                            <h:outputText id="nov-sent-date" value="#{notice.sentTSPretty}"/>
 
+                                            <p:spacer height="5px"/>
+                                            <h:outputText styleClass="bold"  value="Returned? " />
+                                            <h:outputText id="nov-returned-date" value="#{notice.returnedTSPretty}"/>
+                                        </h:panelGroup>
 
-                        <p:commandButton    id="_________NAMEME_________"
-                                            value="help on this page" 
-                                            onclick="PF('_________NAMEME_________').show()" 
-                                            styleClass="noFill" 
-                                            icon="fa fa-question-circle"/>
-                        <p:spacer height="10px"/>
+                                        <h:panelGroup rendered="#{!notice.recipient.useSeparateMailingAddress}">
+                                            <h:outputLabel styleClass="bold" value="Recipient:"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
+                                            <h:outputText value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText escape="false" value="#{notice.recipient.addressStreet}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText value="#{notice.recipient.addressCity}, #{notice.recipient.addressState} #{notice.recipient.addressZip}"/>
+                                        </h:panelGroup>
 
+                                        <h:panelGroup rendered="#{notice.recipient.useSeparateMailingAddress}">
+                                            <h:outputLabel styleClass="bold" value="Recipient (using separate mailing address):"/>
+                                            <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
+                                            <h:outputText value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText escape="false" value="#{notice.recipient.mailingAddressStreet}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText value="#{notice.recipient.mailingAddressCity}, #{notice.recipient.mailingAddressState} #{notice.recipient.mailingAddressZip}"/>
+                                        </h:panelGroup>
 
-                        </h:form>
+                                    </h:panelGrid>
 
+                                    <p:spacer height="5px"/>
 
+                                    <h:panelGrid    id="notice-rowexpand-pg" 
+                                                    columns="4" 
+                                                    columnClasses="gridTd-solid-back, gridTd-solid-back, gridTd-solid-back, gridTd-solid-back" >
+
+                                        <h:panelGroup>
+                                            <p:commandButton    id="nov-print-cb"
+                                                                ajax="false" action="#{ceCaseNoticesBB.printNotice(notice)}"
+                                                                value="Print/View" styleClass="noFill button-size-small"
+                                                                icon="fa fa-print" disabled="#{(empty notice.lockedAndqueuedTS)}" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-edit-cb"
+                                                             ajax="false" action="#{ceCaseNoticesBB.editNoticeOfViolation(notice)}"
+                                                             value="Edit notice" styleClass="noFill"
+                                                             icon="fa fa-edit " 
+                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-delete-cb"
+                                                             ajax="true" actionListener="#{ceCaseNoticesBB.deleteNoticeOfViolation(notice)}"
+                                                             value="Nuke notice" styleClass="noFill"
+                                                             icon="fa fa-bomb" 
+                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}"
+                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             notices-ds"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup></h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-queuenotice-cb"
+                                                             ajax="true" action="#{ceCaseNoticesBB.lockNoticeAndQueueForMailing(notice)}"
+                                                             value="Lock notice: ready to print and mail" styleClass="noFill"
+                                                             icon="fa fa-edit" 
+                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-queuenotice-cb
+                                                             nov-queued-ot
+                                                             nov-edit-cb
+                                                             nov-delete-cb
+                                                             nov-sent-cb
+                                                             nov-print-cb"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-sent-cb"
+                                                             ajax="true" actionListener="#{ceCaseNoticesBB.markNoticeOfViolationAsSent(notice)}"
+                                                             value="Mark notice as mailed!" styleClass="noFill"
+                                                             icon="fa fa-paper-plane" 
+                                                             disabled="#{(empty notice.lockedAndqueuedTS) || (!(empty notice.sentTS) and !(empty notice.lockedAndqueuedTS))}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-sent-date
+                                                             nov-returned-cb
+                                                             nov-sent-cb
+                                                             "/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-returned-cb"
+                                                             ajax="true" actionListener="#{ceCaseNoticesBB.markNoticeOfViolationAsReturned(notice)}"
+                                                             value="Mark notice as returned" styleClass="noFill"
+                                                             icon="fa fa-mail-reply" 
+                                                             disabled="#{(empty notice.sentTS) || !(empty notice.returnedTS)}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-returned-date
+                                                             nov-returned-cb"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-reset-cb"
+                                                             ajax="true" actionListener="#{ceCaseNoticesBB.resetNotice(notice)}"
+                                                             value="Reset mailing status" styleClass="noFill"
+                                                             icon="fa fa-window-close-o" 
+                                                             disabled="false"
+                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-returned-date
+                                                             nov-returned-cb
+                                                             nov-sent-cb
+                                                             nov-queuenotice-cb
+                                                             nov-delete-cb
+                                                             nov-edit-cb
+                                                             nov-queued-ot
+                                                             nov-sent-date
+                                                             nov-returned-date"/>
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                    <hr />
+                                </p:dataScroller>
+                            </h:form>
                     <!--close main container-->
                     </div>
-                    
-                    
-                    <p:dialog   id="_________NAMEME_________"
-                                header="_________NAMEME_________" 
-                                widgetVar="_________NAMEME_________" 
-                                responsive="true" 
-                                width="400"
-                                modal="false"
-                                height="600">
-                        
-                          <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                        </h:form>
-                        
-                        <h:form id="_________NAMEME_________">
-                            
-
-                            <h2>_________NAMEME_________</h2>
-
-                            
-                            
-                            <p:commandButton    id="_________NAMEME_________"
-                                                value="_________NAMEME_________" 
-                                                ajax="true" 
-                                                icon="fa fa-edit"
-                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
-                                                disabled="false"
-                                                rendered="true"
-                                                oncomplete="PF('_________NAMEME_________').hide()"
-                                                update=""/>
-
-                            <p:commandLink  value="close" 
-                                            onclick="PF('_________NAMEME_________').hide()" 
-                                            styleClass="noFill"/>
-
-                        </h:form>
-
-                    </p:dialog>
-
-
                 </f:view>
             </ui:define>
         </ui:composition>

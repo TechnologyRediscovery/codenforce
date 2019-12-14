@@ -17,7 +17,11 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeePayment;
+import com.tcvcog.tcvce.entities.Payment;
 import java.io.Serializable;
+import java.util.List;
 import javax.annotation.PostConstruct;
 
 /**
@@ -29,6 +33,9 @@ public  class       CECasePaymentsBB
         implements  Serializable {
 
     private CECase currentCase;
+    
+    private List<MoneyCECaseFeeAssigned> filteredFeeList;
+    private List<MoneyCECaseFeePayment> filteredPaymentList;
     
     @PostConstruct
     public void initBean() {
@@ -42,6 +49,29 @@ public  class       CECasePaymentsBB
     public CECasePaymentsBB() {
     }
 
+       
+     public String editOccPeriodPayments(){
+         getSessionBean().setSessionCECase(currentCase);
+         getSessionBean().setPaymentRedirTo("inspection");
+         
+         return "payments";
+     }
+     
+     public String editOnePayment(Payment thisPayment){
+         getSessionBean().setSessionPayment(thisPayment);
+         getSessionBean().setPaymentRedirTo("inspection");
+         
+         return "payments";
+     }
+     
+     public String editOccPeriodFees(){
+         getSessionBean().setSessionCECase(currentCase);
+         getSessionBean().setFeeRedirTo("inspection");
+         
+         return "editFees";
+     }
+     
+    
     /**
      * @return the currentCase
      */
@@ -54,6 +84,34 @@ public  class       CECasePaymentsBB
      */
     public void setCurrentCase(CECase currentCase) {
         this.currentCase = currentCase;
+    }
+
+    /**
+     * @return the filteredFeeList
+     */
+    public List<MoneyCECaseFeeAssigned> getFilteredFeeList() {
+        return filteredFeeList;
+    }
+
+    /**
+     * @param filteredFeeList the filteredFeeList to set
+     */
+    public void setFilteredFeeList(List<MoneyCECaseFeeAssigned> filteredFeeList) {
+        this.filteredFeeList = filteredFeeList;
+    }
+
+    /**
+     * @return the filteredPaymentList
+     */
+    public List<MoneyCECaseFeePayment> getFilteredPaymentList() {
+        return filteredPaymentList;
+    }
+
+    /**
+     * @param filteredPaymentList the filteredPaymentList to set
+     */
+    public void setFilteredPaymentList(List<MoneyCECaseFeePayment> filteredPaymentList) {
+        this.filteredPaymentList = filteredPaymentList;
     }
     
 }

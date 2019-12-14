@@ -95,13 +95,13 @@ public class CECaseNoticesBB
 
     public String printNotice(NoticeOfViolation nov) {
         getSessionBean().setSessionNotice(nov);
-        positionCurrentCaseAtHeadOfQueue();
+//        positionCurrentCaseAtHeadOfQueue();
         return "noticeOfViolationPrint";
     }
 
     public String editNoticeOfViolation(NoticeOfViolation nov) {
         getSessionBean().setSessionNotice(nov);
-        positionCurrentCaseAtHeadOfQueue();
+//        positionCurrentCaseAtHeadOfQueue();
         return "noticeOfViolationEditor";
     }
 

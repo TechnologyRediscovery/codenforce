@@ -34,7 +34,7 @@ import javax.faces.application.FacesMessage;
  *
  * @author sylvia
  */
-public class OccPeriodsBB extends BackingBeanUtils implements Serializable{
+public class OccPeriodSearchBB extends BackingBeanUtils implements Serializable{
 
     private OccPeriod currentOccPeriod;
     private List<OccPeriodType> occPeriodTypeList;
@@ -49,7 +49,7 @@ public class OccPeriodsBB extends BackingBeanUtils implements Serializable{
     /**
      * Creates a new instance of OccPeriodsBB
      */
-    public OccPeriodsBB()  {
+    public OccPeriodSearchBB()  {
     }
     
     @PostConstruct

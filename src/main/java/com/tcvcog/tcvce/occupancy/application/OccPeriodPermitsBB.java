@@ -26,12 +26,12 @@ import javax.enterprise.context.Dependent;
  *
  * @author sylvia
  */
-public class OccPermitBB extends BackingBeanUtils implements Serializable{
+public class OccPeriodPermitsBB extends BackingBeanUtils implements Serializable{
 
     /**
      * Creates a new instance of OccPermitBB
      */
-    public OccPermitBB() {
+    public OccPeriodPermitsBB() {
     }
     
     @PostConstruct

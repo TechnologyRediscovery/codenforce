@@ -24,7 +24,8 @@ package com.tcvcog.tcvce.entities;
  *
  * @author Nathan Dietz
  */
-public class MoneyOccPeriodFeePayment {
+public  class   MoneyOccPeriodFeePayment 
+        extends Payment{
 
     private int paymentID;
     private int occPeriodAssignedFeeID;

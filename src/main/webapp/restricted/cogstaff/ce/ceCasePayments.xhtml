@@ -7,185 +7,378 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>_________NAMEME_________</title>
+        <title>Payments</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="_________NAMEME_________">
+                <f:view id="cecase-payments-view">
 
                     <div class="mainContainer">
 
-                        <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
+                        <h:form id="cecase-payments-messages-form">
+                            <h:messages id="cecase-payments-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
 
-                        <h:form id="_________NAMEME_________">
+                        <h:form id="cecase-payments-form">
                             
-                        <h1>_________NAMEME_________</h1>
+                            
+                                <p:panel id="cecase-payments-fees-panel"
+                                         toggleable="true"
+                                         collapsed="false"
+                                         header="Assigned Fees"
+                                         rendered="true">
 
 
-                        <p:panel    id="_________NAMEME_________"
-                                    toggleable="true"
-                                    widgetVar="_________NAMEME_________-var"
-                                    collapsed="false"
-                                    header="Occupancy period settings">
-                               
-                            <h:form id="_________NAMEME_________">
-                                        <h:panelGrid        id="_________NAMEME_________"
-                                                            columns="2"
-                                                            columnClasses="gridTd, gridTdg"
-                                                            rendered="true">
-                                            <h:panelGroup>
-                                                <h:outputText value="_________NAMEME_________"
-                                                              styleClass="ui-label font-smaller"/>
-                                                
-                                                    <h:outputText   id="_________NAMEME_________"
-                                                                    value="#{empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS ? 'block' : 'verified_user'}"/>
-                                                        
-                                                    <p:outputLabel  for="_________NAMEME_________"
-                                                                    value="_________NAMEME_________"
-                                                                    styleClass="ui-label" />
-                                                    <p:inputText    id="_________NAMEME_________" 
-                                                                    type="text"
-                                                                    value="#{occInspectionBB.formEventRuleIDToAdd}" />
-                                                    <h:message  for="_________NAMEME_________" showDetail="false" showSummary="true"  
-                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                
-                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.type.title}"
-                                                              styleClass="data-text"/>
-                                            </h:panelGroup>
+                                    <h:form id="occperiod-fees-form">
 
-                                            <h:panelGroup>
-                                                <f:subview id="_________NAMEME_________">
-                                                
-                                                    <!--content-->
-                                                    
-                                                </f:subview>
-                                            </h:panelGroup>
-                                        </h:panelGrid>
-                               </h:form>
-                                                
-
-
-                        </p:panel>
-                        
-                        <p:tabView id="_________NAMEME_________">
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                        </p:tabView>
-                        
-                          <p:dataScroller
-                                                id="_________NAMEME_________"
-                                                widgetVar="_________NAMEME_________"
-                                                var="inelement"
-                                                value="#{inspace.inspectedElementListVisible}"
-                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
-                          
-                          
-                          
-                          </p:dataScroller>
-                        
-                          <p:dataTable
-                                            id="_________NAMEME_________"
-                                            var="_________NAMEME_________"
-                                            rowKey="#{permit.permitID}"
-                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
+                                        <p:dataTable
+                                            id="feeTable"
+                                            var="fee"
+                                            value="#{cECasePaymentsBB.currentCase.feeList}"
+                                            rowKey="#{fee.ceCaseAssignedFeeID}"
                                             tableStyleClass="primeDataTable"
-                                            draggableColumns="true"
-                                            resizableColumns="true"
-                                            filteredValue="#{occInspectionBB.filteredEventList}"
-                                            widgetVar="caseEventTable">
+                                            rowExpandMode="single"
+                                            expandedRow="false"
+                                            filteredValue="#{cECasePaymentsBB.filteredFeeList}"
+                                            >
 
-                                            <p:column width="3%" exportable="false">
+                                            <p:column width="3%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Exp"/>
+                                                </f:facet>
                                                 <p:rowToggler/>
                                             </p:column>
-                                            
-                                            <p:column width="10%">
+                                            <p:column width="8%">
                                                 <f:facet name="header">
-                                                    <h:outputText value="Print" />
+                                                    <h:outputText value="ID" />
                                                 </f:facet>
-                                                <p:commandButton ajax="false" 
-                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
-                                                                 value="print"
-                                                                 icon="fa fa-print"
-                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                                                <h:outputText value="#{fee.ceCaseAssignedFeeID}"/>
                                             </p:column>
-                          </p:dataTable>
-
-                        <p:commandButton   id="_________NAMEME_________" 
-                                           value="run selected query" 
-                                           ajax="true" 
-                                           actionListener="_________NAMEME_________"
-                                           icon="fa fa-print" 
-                                           styleClass="button"
-                                           update=""/>
 
 
+                                            <p:column width="10%" sortBy="#{fee.fee.name}"
+                                                      filterBy="#{fee.fee.name}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Fee Name" />
+                                                </f:facet>
+                                                <h:outputText value="#{fee.fee.name}"/>
+                                            </p:column>
 
-                        <p:commandButton    id="_________NAMEME_________"
-                                            value="help on this page" 
-                                            onclick="PF('_________NAMEME_________').show()" 
-                                            styleClass="noFill" 
-                                            icon="fa fa-question-circle"/>
-                        <p:spacer height="10px"/>
+                                            <p:column width="10%" sortBy="#{fee.fee.amount}"
+                                                      filterBy="#{fee.fee.amount}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Amount" />
+                                                </f:facet>
+                                                <h:outputText value="#{fee.fee.amount}"/>
+                                            </p:column>
+
+                                            <p:column width="15%" filterBy="#{fee.fee.effectiveDate}"
+                                                      sortBy="#{fee.fee.effectiveDate}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Effective" />
+                                                </f:facet>
+                                                <h:outputText value="#{fee.fee.effectiveDate}"/>
+                                            </p:column>
+
+                                            <p:column width="15%" filterBy="#{fee.fee.expiryDate}"
+                                                      sortBy="#{fee.fee.expiryDate}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Expiry" />
+                                                </f:facet>
+                                                <h:outputText value="#{fee.fee.expiryDate}"/>
+                                            </p:column>
+                                            <p:rowExpansion>
+                                                <div class="outlinedBox">
+                                                    <h2>Full fee listing for fee <h:outputText value="#{fee.fee.occupancyInspectionFeeID}"/> </h2>
+                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.fee.notes}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Assigned By"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Last Modified"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.lastModified}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Other notes"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.notes}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup rendered="#{not empty fee.reducedByUser}">
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Amount Reduced By"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="$ #{fee.reducedBy}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup rendered="#{not empty fee.reducedByUser}">
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Reduced By"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.reducedByUser.person.firstName} #{fee.reducedByUser.person.lastName} (ID: #{fee.reducedByUser.userID}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup rendered="#{not empty fee.waivedBy}">
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Waived By"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{fee.waivedBy.person.firstName} #{fee.waivedBy.person.lastName} (ID: #{fee.waivedBy.userID}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <ui:remove>
+                                                            <h:panelGroup>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <p:commandButton value="Edit this payment" action="#{cECasePaymentsBB.editOnePayment(payment)}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+                                                        </ui:remove>
+                                                    </h:panelGrid>
+                                                </div>
+                                            </p:rowExpansion>
+
+                                        </p:dataTable>
+                                        <p:commandButton value="Edit this Fee list" action="#{cECasePaymentsBB.editOccPeriodFees()}"/>
+                                    </h:form>
+                                </p:panel>
+
+                                <p:panel id="cecase-payments-panel"
+                                         toggleable="true"
+                                         collapsed="false"
+                                         header="Payments"
+                                         rendered="true">
+
+                                    <h:form id="cecase-payments-messages-form">
+                                        <h:messages id="cecase-payments-messages-form" globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
+
+                                    <h:form id="cecase-payments-payments-form">
+
+                                        <p:dataTable
+                                            id="cecase-payments-table"
+                                            var="payment"
+                                            value="#{cECasePaymentsBB.currentCase.paymentList}"
+                                            rowKey="#{payment.moneyPaymentID}"
+                                            tableStyleClass="primeDataTable"
+                                            rowExpandMode="single"
+                                            expandedRow="false"
+                                            filteredValue="#{cECasePaymentsBB.filteredPaymentList}"
+                                            >
+
+                                            <p:column width="3%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Exp"/>
+                                                </f:facet>
+                                                <p:rowToggler/>
+                                            </p:column>
+                                            <p:column width="8%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="ID" />
+                                                </f:facet>
+                                                <h:outputText value="#{payment.moneyPaymentID}"/>
+                                            </p:column>
 
 
-                        </h:form>
+                                            <p:column width="10%" sortBy="#{payment.paymentType.paymentTypeTitle}"
+                                                      filterBy="#{payment.paymentType.paymentTypeTitle}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Payment Type" />
+                                                </f:facet>
+                                                <h:outputText value="#{payment.paymentType.paymentTypeTitle}"/>
+                                            </p:column>
 
+                                            <p:column width="10%" sortBy="#{payment.amount}"
+                                                      filterBy="#{payment.amount}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Amount" />
+                                                </f:facet>
+                                                <h:outputText value="#{payment.amount}"/>
+                                            </p:column>
+
+                                            <p:column width="15%" filterBy="#{payment.dateReceived}"
+                                                      sortBy="#{payment.dateReceived}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Received" />
+                                                </f:facet>
+                                                <h:outputText value="#{payment.dateReceived}"/>
+                                            </p:column>
+
+                                            <p:column width="15%" filterBy="#{payment.dateDeposited}"
+                                                      sortBy="#{payment.dateDeposited}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Deposited" />
+                                                </f:facet>
+                                                <h:outputText value="#{payment.dateDeposited}"/>
+                                            </p:column>
+
+                                            <p:column width="15%" filterBy="#{payment.cleared}"
+                                                      sortBy="#{payment.cleared}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Cleared" />
+                                                </f:facet>
+                                                <h:outputText value="#{payment.cleared}"/>
+                                            </p:column>
+                                            <p:rowExpansion>
+                                                <div class="outlinedBox">
+                                                    <h2>Full payment listing for payment <h:outputText value="#{payment.paymentID}"/> </h2>
+                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Inspection ID"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.occupancyInspectionID}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Assigned Fee ID"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.assignedFeeID} (#{payment.assignedTo})"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Payment Type"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.paymentType.paymentTypeTitle}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Date Received"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.dateReceived}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Date Deposited"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.dateDeposited}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Amount"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="$#{payment.amount}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Payer ID"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.payer.personID} (#{payment.payer.firstName} #{payment.payer.lastName})"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Reference Number"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <p:spacer height="5px"/>
+                                                                <h:outputText value="#{payment.referenceNum}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Check Number"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.checkNum}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Cleared?"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.cleared}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.notes}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Recorded By"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="User ID: #{payment.recordedBy.userID} Name: #{payment.recordedBy.person.firstName} #{payment.recordedBy.person.lastName}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="ui-label-inline" value="Entry Timestamp"/>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{payment.entryTimestamp}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <p:commandButton value="Edit this payment" action="#{cECasePaymentsBB.editOnePayment(payment)}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                    </h:panelGrid>
+                                                </div>
+                                            </p:rowExpansion>
+
+                                        </p:dataTable>
+
+                                        <p:commandButton value="Edit this payment list" action="#{cECasePaymentsBB.editOccPeriodPayments()}"/>
+
+                                    </h:form>
+                                </p:panel>
 
                     <!--close main container-->
                     </div>
-                    
-                    
-                    <p:dialog   id="_________NAMEME_________"
-                                header="_________NAMEME_________" 
-                                widgetVar="_________NAMEME_________" 
-                                responsive="true" 
-                                width="400"
-                                modal="false"
-                                height="600">
-                        
-                          <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                        </h:form>
-                        
-                        <h:form id="_________NAMEME_________">
-                            
-
-                            <h2>_________NAMEME_________</h2>
-
-                            
-                            
-                            <p:commandButton    id="_________NAMEME_________"
-                                                value="_________NAMEME_________" 
-                                                ajax="true" 
-                                                icon="fa fa-edit"
-                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
-                                                disabled="false"
-                                                rendered="true"
-                                                oncomplete="PF('_________NAMEME_________').hide()"
-                                                update=""/>
-
-                            <p:commandLink  value="close" 
-                                            onclick="PF('_________NAMEME_________').hide()" 
-                                            styleClass="noFill"/>
-
-                        </h:form>
-
-                    </p:dialog>
-
-
                 </f:view>
             </ui:define>
         </ui:composition>

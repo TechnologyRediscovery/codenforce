@@ -34,8 +34,6 @@ public class CECaseCitationsBB
         implements  Serializable {
 
     private CECase currentCase;
-    
-    
   
     private List<Citation> citationList;
     private Citation selectedCitation;
@@ -44,7 +42,7 @@ public class CECaseCitationsBB
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
-        setCurrentCase(sb.getSessionCECase());
+        currentCase = sb.getSessionCECase();
        
     }
 
@@ -71,10 +69,10 @@ public class CECaseCitationsBB
     }
 
     public String deleteCitation() {
-        if (selectedCitation != null) {
+        if (getSelectedCitation() != null) {
             CaseCoordinator cc = getCaseCoordinator();
             try {
-                cc.deleteCitation(selectedCitation);
+                cc.deleteCitation(getSelectedCitation());
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -100,6 +98,34 @@ public class CECaseCitationsBB
      */
     public void setCurrentCase(CECase currentCase) {
         this.currentCase = currentCase;
+    }
+
+    /**
+     * @return the citationList
+     */
+    public List<Citation> getCitationList() {
+        return citationList;
+    }
+
+    /**
+     * @return the selectedCitation
+     */
+    public Citation getSelectedCitation() {
+        return selectedCitation;
+    }
+
+    /**
+     * @param citationList the citationList to set
+     */
+    public void setCitationList(List<Citation> citationList) {
+        this.citationList = citationList;
+    }
+
+    /**
+     * @param selectedCitation the selectedCitation to set
+     */
+    public void setSelectedCitation(Citation selectedCitation) {
+        this.selectedCitation = selectedCitation;
     }
     
 }

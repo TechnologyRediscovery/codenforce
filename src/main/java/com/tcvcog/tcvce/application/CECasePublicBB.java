@@ -33,6 +33,8 @@ public class CECasePublicBB
         implements  Serializable {
 
     private CECase currentCase;
+    private int freshPACC;
+    
     
     @PostConstruct
     public void initBean() {
@@ -48,6 +50,26 @@ public class CECasePublicBB
     }
 
     
+    public void generateNewPublicCC(){
+        CaseIntegrator ci = getCaseIntegrator();
+        
+        freshPACC = generateControlCodeFromTime();
+        
+        try {
+            currentCase.setPublicControlCode(freshPACC);
+            ci.updateCECaseMetadata(currentCase);
+            
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Done! Public access control code for case : " + currentCase.getCaseID()
+                    + "is now " + freshPACC, ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to add change public access code ",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+        }
+        
+    }
     
     public void changePACCAccess() {
         System.out.println("CEActionRequestsBB.changePACCAccess");
@@ -79,6 +101,20 @@ public class CECasePublicBB
      */
     public void setCurrentCase(CECase currentCase) {
         this.currentCase = currentCase;
+    }
+
+    /**
+     * @return the freshPACC
+     */
+    public int getFreshPACC() {
+        return freshPACC;
+    }
+
+    /**
+     * @param freshPACC the freshPACC to set
+     */
+    public void setFreshPACC(int freshPACC) {
+        this.freshPACC = freshPACC;
     }
     
 }

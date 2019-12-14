@@ -41,6 +41,9 @@ public class        CECase
     private List<NoticeOfViolation> noticeList;
     private List<CEActionRequest> ceActionRequestList;
     
+    private List<MoneyCECaseFeeAssigned> feeList;
+    private List<MoneyCECaseFeePayment> paymentList;
+    
     private String credentialSignature;
     
     public CECase(){
@@ -425,6 +428,34 @@ public class        CECase
     @Override
     public void setEventList(List<Event> eventList) {
         this.eventList = eventList;
+    }
+
+    /**
+     * @return the feeList
+     */
+    public List<MoneyCECaseFeeAssigned> getFeeList() {
+        return feeList;
+    }
+
+    /**
+     * @return the paymentList
+     */
+    public List<MoneyCECaseFeePayment> getPaymentList() {
+        return paymentList;
+    }
+
+    /**
+     * @param feeList the feeList to set
+     */
+    public void setFeeList(List<MoneyCECaseFeeAssigned> feeList) {
+        this.feeList = feeList;
+    }
+
+    /**
+     * @param paymentList the paymentList to set
+     */
+    public void setPaymentList(List<MoneyCECaseFeePayment> paymentList) {
+        this.paymentList = paymentList;
     }
 
     

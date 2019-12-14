@@ -27,6 +27,11 @@ import com.tcvcog.tcvce.entities.CECaseBase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeePayment;
+import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
@@ -521,6 +526,11 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         cse.setCitationList(ci.getCitations(cse));
         cse.setViolationList(cvi.getCodeViolations(cse.getCaseID()));
         cse.setCeActionRequestList(ceari.getCEActionRequestListByCase(cse.getCaseID()));
+        
+        //TODO NADGIT - integrate Fee functionality
+        cse.setFeeList(new ArrayList<MoneyCECaseFeeAssigned>());
+        cse.setPaymentList(new ArrayList<MoneyCECaseFeePayment>());
+        
         return cse;
     }
     

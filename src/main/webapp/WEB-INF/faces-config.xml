@@ -350,12 +350,7 @@
     </managed-bean>
     
     
-    <managed-bean>
-        <managed-bean-name>caseProfileBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CaseProfileBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-
+   
     <managed-bean>
         <managed-bean-name>violationAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ViolationAddBB</managed-bean-class>
@@ -424,9 +419,9 @@
     </managed-bean>
     <managed-bean>
         <managed-bean-name>occPermitBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPermitBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPermitsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>feeManagementBB</managed-bean-name>
@@ -1101,7 +1096,7 @@
             <to-view-id>/restricted/cogstaff/ce/violationEdit.xhtml</to-view-id>
         </navigation-case>
         <navigation-case>
-            <from-action>#{caseProfileBB.addViolation}</from-action>
+            <from-action>#{ceCaseViolations.addViolation}</from-action>
             <from-outcome>violationSelectElement</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
         </navigation-case>
@@ -1507,7 +1502,6 @@
     <managed-bean>
         <managed-bean-name>searchCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.SearchCoordinator</managed-bean-class>
-    
         <managed-bean-scope>session</managed-bean-scope></managed-bean>
     <managed-bean>
         <managed-bean-name>municipalityManageBB</managed-bean-name>
@@ -1607,9 +1601,9 @@
     </managed-bean>
     <managed-bean>
         <managed-bean-name>occPeriodsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodSearchBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     <managed-bean>
         <description>Handles client-side actions related to choice display and selection</description>
         <managed-bean-name>choiceBB</managed-bean-name>
@@ -1646,7 +1640,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-        <managed-bean-name>cECaseBlobs</managed-bean-name>
+        <managed-bean-name>cECaseBlobsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseBlobsBB</managed-bean-class>
     
         <managed-bean-scope>view</managed-bean-scope></managed-bean>
@@ -1656,7 +1650,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-        <managed-bean-name>cECaseNotices</managed-bean-name>
+        <managed-bean-name>cECaseNoticesBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseNoticesBB</managed-bean-class>
     
         <managed-bean-scope>view</managed-bean-scope></managed-bean>
@@ -1672,7 +1666,7 @@
         <managed-bean-scope>view</managed-bean-scope></managed-bean>
     <managed-bean>
         <description>		</description>
-        <managed-bean-name>cECasePayments</managed-bean-name>
+        <managed-bean-name>cECasePaymentsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECasePaymentsBB</managed-bean-class>
     
         <managed-bean-scope>view</managed-bean-scope></managed-bean>
@@ -1687,7 +1681,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-        <managed-bean-name>cECaseCitations</managed-bean-name>
+        <managed-bean-name>cECaseCitationsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseCitationsBB</managed-bean-class>
     
         <managed-bean-scope>view</managed-bean-scope></managed-bean>

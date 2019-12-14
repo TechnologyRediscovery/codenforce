@@ -203,23 +203,29 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sub NavItem: Code Enf
-    private final NavigationSubItem CEViolations = getNavSubItem("Violations", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CEEvents = getNavSubItem("Events", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CECitations = getNavSubItem("Citations", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CENotices = getNavSubItem("Notices", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CERequests = getNavSubItem("Requests", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CEPayments = getNavSubItem("Payments", "", "fa fa-sign-in", false);
+    private final NavigationSubItem CEWorkflow = getNavSubItem("Workflow", "/restricted/cogstaff/ce/ceCaseWorkflow.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEViolations = getNavSubItem("Violations", "/restricted/cogstaff/ce/ceCaseViolations.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CENotices = getNavSubItem("Notices", "/restricted/cogstaff/ce/ceCaseNotices.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CECitations = getNavSubItem("Citations", "/restricted/cogstaff/ce/ceCaseCitations.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEEvents = getNavSubItem("Events", "/restricted/cogstaff/ce/ceCaseEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEPayments = getNavSubItem("Payments", "/restricted/cogstaff/ce/ceCasePayments.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CERequests = getNavSubItem("Requests", "/restricted/cogstaff/ce/ceCaseRequests.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEFiles = getNavSubItem("Files", "/restricted/cogstaff/ce/ceCaseBlobs.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEPublic = getNavSubItem("Public", "/restricted/cogstaff/ce/ceCasePublic.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Code Enf
     public List<NavigationSubItem> getCENavList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
+        navList.add(CEWorkflow);
         navList.add(CEViolations);
-        navList.add(CEEvents);
-        navList.add(CECitations);
         navList.add(CENotices);
-        navList.add(CERequests);
+        navList.add(CECitations);
+        navList.add(CEEvents);
         navList.add(CEPayments);
+        navList.add(CERequests);
+        navList.add(CEFiles);
+        navList.add(CEPublic);
         return navList;
     }
 
@@ -280,9 +286,9 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             //NavItem: Dashboard
             NavigationItem dashboardItem = getNavItem(getCurrentDashBoardInfo(), "/restricted/missionControl.xhtml", "Dashboard", "fa fa-dashboard", getDashboardNavList());
             //NavItem: Property
-            NavigationItem propertyItem = getNavItem(getCurrentPropertyInfo(), "/restricted/cogview/properties.xhtml", "Property", "fa fa-home", getPropertyNavList());
+            NavigationItem propertyItem = getNavItem(getCurrentPropertyInfo(), "/restricted/cogstaff/prop/properties.xhtml", "Property", "fa fa-home", getPropertyNavList());
             //NavItem: Code Enf
-            NavigationItem CEItem = getNavItem(getCurrentCEInfo(), "/restricted/cogview/cECases.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
+            NavigationItem CEItem = getNavItem(getCurrentCEInfo(), "/restricted/cogstaff/ce/ceCaseSearch.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
             //NavItem: Occupancy
             NavigationItem occItem = getNavItem(getCurrentPeriodInfo(), "/restricted/cogstaff/occ/occPeriodStatus.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
             //NavItem: Persons

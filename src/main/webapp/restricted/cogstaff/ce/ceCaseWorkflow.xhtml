@@ -35,14 +35,14 @@
                                 <div class="outlinedBox">
 
                                     <h1>
-                                        <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName} | "/> 
-                                        <h:outputText id="header-id-ot" value="Case ID: #{caseProfileBB.currentCase.caseID}"/><br />
+                                        <h:outputText id="header-type-ot" value="#{ceCaseWorkflowBB.currentCase.caseName} | "/> 
+                                        <h:outputText id="header-id-ot" value="Case ID: #{ceCaseWorkflowBB.currentCase.caseID}"/><br />
                                     </h1>
                                     <h2>
-                                        <h:outputText id="header-addr-ot" value="#{caseProfileBB.currentCase.property.address} "/>  
-                                        <h:outputText id="header-muni-ot" value="(#{caseProfileBB.currentCase.property.muni.muniName})"/>  
-                                        <h:outputText id="header-propid-ot" value=" Prop ID: #{caseProfileBB.currentCase.property.propertyID}"/>  
-                                        <h:outputText id="header-lob-ot" value=" | Lot-block: #{caseProfileBB.currentCase.property.lotAndBlock}"/>  
+                                        <h:outputText id="header-addr-ot" value="#{ceCaseWorkflowBB.currentCase.property.address} "/>  
+                                        <h:outputText id="header-muni-ot" value="(#{ceCaseWorkflowBB.currentCase.property.muni.muniName})"/>  
+                                        <h:outputText id="header-propid-ot" value=" Prop ID: #{ceCaseWorkflowBB.currentCase.property.propertyID}"/>  
+                                        <h:outputText id="header-lob-ot" value=" | Lot-block: #{ceCaseWorkflowBB.currentCase.property.lotAndBlock}"/>  
                                     </h2>
 
 
@@ -53,37 +53,37 @@
                                                         value="view property profile" />
 
                                     <p>
-                                        <a href="#action-requests">proposals <h:outputText value=" (#{caseProfileBB.currentCase.proposalList.size()})" /> </a> | 
+                                        <a href="#action-requests">proposals <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.proposalList.size()})" /> </a> | 
                                         <a href="#add-event">new event</a> | 
                                         
                                         <ui:remove>
                                             
-                                        <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.visibleEventList.size()})" /></a> | 
+                                        <a href="#event-history">event history <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.visibleEventList.size()})" /></a> | 
                                         </ui:remove>
                                         
                                         
-                                        <a href="#violations">violations <h:outputText value=" (#{caseProfileBB.currentCase.violationList.size()})" /></a> | 
-                                        <a href="#notices">notices <h:outputText value=" (#{caseProfileBB.currentCase.noticeList.size()})" /></a> | 
-                                        <a href="#citations">citations <h:outputText value=" (#{caseProfileBB.currentCase.citationList.size()})" /></a> | 
-                                        <a href="#requests">enforcement requests <h:outputText value=" (#{caseProfileBB.currentCase.ceActionRequestList.size()})" /></a>  
+                                        <a href="#violations">violations <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.violationList.size()})" /></a> | 
+                                        <a href="#notices">notices <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.noticeList.size()})" /></a> | 
+                                        <a href="#citations">citations <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.citationList.size()})" /></a> | 
+                                        <a href="#requests">enforcement requests <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.ceActionRequestList.size()})" /></a>  
                                     </p>
 
 
                                     <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                                  columnClasses="gridTd, gridTd">
                                         <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.casePhase.caseOpen ? 'Open' : 'Closed'}" />
+                                            <h:outputLabel styleClass="bold" value="Case Status: #{ceCaseWorkflowBB.currentCase.casePhase.caseOpen ? 'Open' : 'Closed'}" />
                                             <div class="status-display-container">
-                                                <div class="status-display-icon-container #{caseProfileBB.styleClassStatusIcon}">
-                                                    <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{caseProfileBB.currentCase.casePhaseIcon.materialIcon}"/></i>
+                                                <div class="status-display-icon-container #{ceCaseWorkflowBB.styleClassStatusIcon}">
+                                                    <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{ceCaseWorkflowBB.currentCase.casePhaseIcon.materialIcon}"/></i>
                                                 </div>
                                                 <div class="status-display-status-list-container">
                                                     <ul class="status-list">
 
-                                                        <li><h:outputText value="Stage 1: Investigation" styleClass="#{caseProfileBB.styleClassInvestigation}"/></li>
-                                                        <li><h:outputText value="Stage 2: Enforcement" styleClass="#{caseProfileBB.styleClassEnforcement}"/></li>
-                                                        <li><h:outputText value="Stage 3: Citation" styleClass="#{caseProfileBB.sytleClassCitation}"/></li>
-                                                        <li><h:outputText value="Closed" styleClass="#{caseProfileBB.sytleClassClosed}"/></li>
+                                                        <li><h:outputText value="Stage 1: Investigation" styleClass="#{ceCaseWorkflowBB.styleClassInvestigation}"/></li>
+                                                        <li><h:outputText value="Stage 2: Enforcement" styleClass="#{ceCaseWorkflowBB.styleClassEnforcement}"/></li>
+                                                        <li><h:outputText value="Stage 3: Citation" styleClass="#{ceCaseWorkflowBB.sytleClassCitation}"/></li>
+                                                        <li><h:outputText value="Closed" styleClass="#{ceCaseWorkflowBB.sytleClassClosed}"/></li>
                                                     </ul>
                                                 </div>
 
@@ -91,29 +91,29 @@
                                         </h:panelGroup>      
                                         <h:panelGroup>
                                             <h:outputLabel styleClass="bold" value="Opening Date: "/>
-                                            <h:outputText id="selcase-odate-it" value="#{caseProfileBB.currentCase.originiationDatePretty}"/>
+                                            <h:outputText id="selcase-odate-it" value="#{ceCaseWorkflowBB.currentCase.originiationDatePretty}"/>
                                             <h:outputText id="selcase-age-it" 
-                                                          value=" (#{caseProfileBB.currentCase.caseAge} days ago)" 
-                                                          rendered="#{empty caseProfileBB.currentCase.closingDate}"/>
+                                                          value=" (#{ceCaseWorkflowBB.currentCase.caseAge} days ago)" 
+                                                          rendered="#{empty ceCaseWorkflowBB.currentCase.closingDate}"/>
                                             <p:spacer height="5px"/>
                                             <h:outputLabel styleClass="bold" value="Closing Date: "/>
-                                            <h:outputText id="selcase-cdate-it" value="#{caseProfileBB.currentCase.closingDatePretty}"/>
+                                            <h:outputText id="selcase-cdate-it" value="#{ceCaseWorkflowBB.currentCase.closingDatePretty}"/>
                                             <p:spacer height="5px"/>
                                             <h:outputLabel styleClass="bold" value="Case Manager: "/>
                                             <h:outputText id="selcase-manager-it" 
-                                                          value="#{caseProfileBB.currentCase.caseManager.person.firstName} 
-                                                          #{caseProfileBB.currentCase.caseManager.person.lastName} 
-                                                          (#{caseProfileBB.currentCase.caseManager.username})"/>  
+                                                          value="#{ceCaseWorkflowBB.currentCase.caseManager.person.firstName} 
+                                                          #{ceCaseWorkflowBB.currentCase.caseManager.person.lastName} 
+                                                          (#{ceCaseWorkflowBB.currentCase.caseManager.username})"/>  
                                             <p:spacer height="5px"/>
                                             <h:outputLabel styleClass="bold" value="Case Phase: "/>
-                                            <h:outputText id="casephase-ot" value="#{caseProfileBB.currentCase.casePhase.label}"/>
+                                            <h:outputText id="casephase-ot" value="#{ceCaseWorkflowBB.currentCase.casePhase.label}"/>
                                         </h:panelGroup>      
 
                                         <f:facet name="footer" class="leftalign">
                                             <h:outputLabel styleClass="bold" value="Case notes: "/>
                                             <div class="rowExpansion">
 
-                                                <h:outputText id="selcase-notes-ot" value="#{caseProfileBB.currentCase.notes}"/>
+                                                <h:outputText id="selcase-notes-ot" value="#{ceCaseWorkflowBB.currentCase.notes}"/>
                                             </div>
 
                                             <p:spacer height="5px"/>
@@ -124,18 +124,12 @@
                                     </h:panelGrid>
 
                                     <p:commandButton    id="refresh-case-cb" 
-                                                        ajax="true" actionListener="#{caseProfileBB.refreshCurrentCase}"
+                                                        ajax="true" actionListener="#{ceCaseWorkflowBB.refreshCurrentCase}"
                                                         icon="fa fa-refresh" styleClass="noFill"
                                                         value="reload current case data" 
                                                         update="
                                                         case-details-form
-                                                        violation-form
-                                                        notices-form:notices-ds
-                                                        action-requests-form:actionRequestTable
-                                                        event-dt-form:caseEventTable
-                                                        events-datascroller-form
-                                                        cecases-messages-form
-                                                        case-profile-messages-form:case-profile-messages-global
+                                                       
                                                         "
                                                         />
 
@@ -154,7 +148,7 @@
                                                         update="casePhaseChangeForm"
                                                         />
                                     <p:commandButton   id="print-case-cb" 
-                                                       ajax="true" actionListener="#{caseProfileBB.prepareReportCECase}"
+                                                       ajax="true" actionListener="#{ceCaseWorkflowBB.prepareReportCECase}"
                                                        icon="fa fa-print" styleClass="noFill"
                                                        oncomplete="PF('report-case-profile-diaglog-var').show()"
                                                        value="print case profile" 
@@ -170,117 +164,382 @@
 
                         </p:panel>
                         
-                        <p:tabView id="_________NAMEME_________">
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                        </p:tabView>
+                           <p:panel    id="cecase-workflow-actions-panel"
+                                    toggleable="true"
+                                    widgetVar="cecase-workflow-cecasestatus-var"
+                                    collapsed="false"
+                               header="Status">
+                                        
                         
-                          <p:dataScroller
-                                                id="_________NAMEME_________"
-                                                widgetVar="_________NAMEME_________"
-                                                var="inelement"
-                                                value="#{inspace.inspectedElementListVisible}"
-                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
-                          
-                          
-                          
-                          </p:dataScroller>
                         
-                          <p:dataTable
-                                            id="_________NAMEME_________"
-                                            var="_________NAMEME_________"
-                                            rowKey="#{permit.permitID}"
-                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
-                                            tableStyleClass="primeDataTable"
-                                            draggableColumns="true"
-                                            resizableColumns="true"
-                                            filteredValue="#{occInspectionBB.filteredEventList}"
-                                            widgetVar="caseEventTable">
+                            <h2 id="action-requests">Case workflow</h2>
 
-                                            <p:column width="3%" exportable="false">
-                                                <p:rowToggler/>
-                                            </p:column>
-                                            
-                                            <p:column width="10%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Print" />
+                                
+
+                            <h:form id="events-datascroller-form">
+
+                            <ui:remove>
+                                    <p:dataScroller
+                                        id="events-datascroller"
+                                        var="e"
+                                        value="#{ceCaseWorkflowBB.currentCase.eventProposalList}"
+                                        widgetVar="events-requiredactions-ds">
+
+                                        <div class="outlinedBox event-ds-box">
+
+                                            <div class="status-display-container">
+                                                <div class="action-request-icon">
+                                                    <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.requestedEventCat.icon.materialIcon}"/></i>
+                                                </div>
+                                                <div class="status-display-status-list-container">
+                                                    <div class="action-request-header">
+                                                        <h:outputText value="Requested Action: #{e.requestedEventCat.eventCategoryTitle}"/>
+                                                    </div>
+
+                                                    <div class="action-request-subheader">
+                                                        <h:outputText value="#{e.dateOfRecordPretty} (#{e.daysUntilDue} days from now) "/>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                            <h:panelGrid columns="2" rendered="true"
+                                                         columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                                         footerClass="no-border">
+
+                                                <f:facet name="header" class="leftalign">
+                                                    <div class="wrapText roomy-top-margin">
+                                                        <h:outputText value="Description: " styleClass="bold" />
+                                                        <h:outputText style="font-weight: normal;" value="#{e.description}"/>
+                                                    </div>
                                                 </f:facet>
-                                                <p:commandButton ajax="false" 
-                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
-                                                                 value="print"
-                                                                 icon="fa fa-print"
-                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
-                                            </p:column>
-                          </p:dataTable>
-
-                        <p:commandButton   id="_________NAMEME_________" 
-                                           value="run selected query" 
-                                           ajax="true" 
-                                           actionListener="_________NAMEME_________"
-                                           icon="fa fa-print" 
-                                           styleClass="button"
-                                           update=""/>
 
 
+                                                <h:panelGroup>
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText styleClass="bold" value="Action requested by: "/>
+                                                    <h:outputText value="#{e.actionRequestedBy.person.firstName} #{e.actionRequestedBy.person.lastName}"/>
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText styleClass="bold" value="Addressed to: "/>
+                                                    <h:outputText value="#{(empty e.responderIntended) ? 'default code officer' : e.responderIntended.person.lastName}"/>
+                                                </h:panelGroup>
 
-                        <p:commandButton    id="_________NAMEME_________"
-                                            value="help on this page" 
-                                            onclick="PF('_________NAMEME_________').show()" 
-                                            styleClass="noFill" 
-                                            icon="fa fa-question-circle"/>
-                        <p:spacer height="10px"/>
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Triggering event: "/>
+                                                    <h:outputText value="#{e.category.eventCategoryTitle} (id: #{e.eventID})"/>
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText styleClass="bold" value="Event timestamp: "/>
+                                                    <h:outputText value="#{e.timestampPretty}"/>
 
+                                                </h:panelGroup>
 
-                        </h:form>
+                                                <f:facet name="footer">
+
+                                                    <p:commandButton   id="action-requests-take-requested-action-cb" 
+                                                                       ajax="true"
+                                                                       actionListener="#{ceCaseWorkflowBB.initiateNewRequestedEvent(e)}"
+                                                                       value="take action: #{e.requestedEventCat.eventCategoryTitle}" 
+                                                                       styleClass="noFill"
+                                                                       disabled="#{e.responseComplete}"
+                                                                       icon="fa fa-play-circle-o"
+                                                                       oncomplete="PF('add-event-dialog-var').show()"
+                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                       update="addNewEventForm
+                                                                       events-datascroller-form
+                                                                       "
+                                                                       />
+                                                    <p:commandButton   id="action-requests-reject-requested-action-cb" 
+                                                                       actionListener="#{ceCaseWorkflowBB.rejectRequestedEvent(e)}"
+                                                                       ajax="true"
+                                                                       value="reject requested action" 
+                                                                       oncomplete="PF('reject-requested-action-diaglog-var').show()"
+                                                                       styleClass="noFill"
+                                                                       disabled="#{e.responseComplete}"
+                                                                       icon="fa fa-hand-stop-o"
+                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                       update="events-datascroller-form
+                                                                       case-profile-messages-form:case-profile-messages-global"
+                                                                       />
+                                                    <p:commandButton   id="action-requests-edit-event-cb" 
+                                                                       ajax="true"
+                                                                       actionListener="#{ceCaseWorkflowBB.editEvent(e)}"
+                                                                       value="edit event" 
+                                                                       styleClass="noFill"
+                                                                       icon="fa fa-edit"
+                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                       oncomplete="PF('add-event-dialog-var').show()"
+                                                                       update="addNewEventForm"
+                                                                       />
+                                                </f:facet>
+                                            </h:panelGrid>
+                                        </div>
+
+                                    </p:dataScroller>
+                            </ui:remove>
+
+                            </h:form>
+                        </p:panel>
+
+                            
+                        
 
 
                     <!--close main container-->
                     </div>
                     
                     
-                    <p:dialog   id="_________NAMEME_________"
-                                header="_________NAMEME_________" 
-                                widgetVar="_________NAMEME_________" 
-                                responsive="true" 
-                                width="400"
-                                modal="false"
-                                height="600">
-                        
-                          <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
+                    <p:dialog    id="edit-case-metadata-dialog"
+                                 height="650" width="900"
+                                 widgetVar="edit-case-metadata-var"
+                                 closable="true" 
+                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
+
+                        <h:outputText value="You are editing case no. #{ceCaseWorkflowBB.currentCase.caseID}"/>
+                        <p:spacer height="10px"/>
+
+                        <h:form id="updateCaseForm">
+
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="2" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+                                <h:panelGroup>
+                                    <h:outputText value="Public access control code"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:inputText value="#{ceCaseWorkflowBB.currentCase.publicControlCode}"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:outputText value="Case name"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:inputText value="#{ceCaseWorkflowBB.currentCase.caseName}"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:outputText value="Opening date"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <p:calendar value="#{ceCaseWorkflowBB.currentCase.originationDateUtilDate}" 
+                                                mode="popup" tabindex="3"
+                                                id="formCaseOriginationDateCal"
+                                                showOn="button"
+                                                pattern="EEE, dd MMM, yyyy"
+                                                navigator="true"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                required="true"/>
+
+                                    <h:message for="formCaseOriginationDateCal" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputText value="Notes:"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:inputTextarea value="#{ceCaseWorkflowBB.currentCase.notes}"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:outputLabel class="bold" value="Public access reference num: " for="selcase-pacc" />
+                                    <h:outputText id="selcase-pacc" value="#{ceCaseWorkflowBB.currentCase.publicControlCode}"/>
+                                    <p:spacer height="5px"/>
+                                    <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
+                                    <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{ceCaseWorkflowBB.currentCase.paccEnabled}"
+                                                             disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
+                                        <p:ajax listener="#{ceCaseWorkflowBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                    </p:selectBooleanCheckbox>
+                                    <p:spacer height="5px"/>
+                                    <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
+                                    <h:outputText value=" "/>
+                                    <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{ceCaseWorkflowBB.currentCase.paccEnabled}"
+                                                             disabled="#{!sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}">
+                                        <p:ajax listener="#{ceCaseWorkflowBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                    </p:selectBooleanCheckbox>
+                                    <p:spacer height="5px"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="true" value="Update Case" action="#{ceCaseWorkflowBB.updateCase}"  icon="fa fa-edit"/>
                         </h:form>
-                        
-                        <h:form id="_________NAMEME_________">
-                            
+                    </p:dialog>
 
-                            <h2>_________NAMEME_________</h2>
+                    <p:dialog    id="case-phase-dialog"
+                                 height="650" width="900"
+                                 widgetVar="phase-override"
+                                 closable="true" >
+                        <h2>Override case phase</h2>
+                        <h:form id="casePhaseChangeForm">
+                            <p:outputLabel for="override-currcase-ot">
+                                <h:outputText styleClass="bold" value="Current phase:"/>
+                            </p:outputLabel>
+                            <h:outputText id="override-currcase-ot" value="#{ceCaseWorkflowBB.currentCase.casePhase.label} (case ID:#{ceCaseWorkflowBB.currentCase.caseID}) "/>
 
-                            
-                            
-                            <p:commandButton    id="_________NAMEME_________"
-                                                value="_________NAMEME_________" 
-                                                ajax="true" 
-                                                icon="fa fa-edit"
-                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
-                                                disabled="false"
-                                                rendered="true"
-                                                oncomplete="PF('_________NAMEME_________').hide()"
-                                                update=""/>
+                            <p:spacer height="5px"/>
 
-                            <p:commandLink  value="close" 
-                                            onclick="PF('_________NAMEME_________').hide()" 
-                                            styleClass="noFill"/>
+                            <p:outputLabel for="casePhaseSOM">
+                                <h:outputText styleClass="bold" value="Choose new phase:"/>
+                            </p:outputLabel>
+                            <p:selectOneMenu value="#{ceCaseWorkflowBB.selectedCasePhase}"
+                                             id="casePhaseSOM">
+                                <f:selectItems value="#{ceCaseWorkflowBB.casePhaseList}"
+                                               var="cp"
+                                               itemValue="#{cp}"
+                                               itemLabel="#{cp.label}"/>
+                            </p:selectOneMenu>
+
+                            <p:commandButton value="Abort override" onclick="PF('phase-override').hide()" type="button" icon="fa fa-stop"/>
+
+                            <p:commandButton ajax="true" 
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                             actionListener="#{ceCaseWorkflowBB.overrideCasePhase}" 
+                                             icon="fa fa-bullhorn"
+                                             value="Override phase" 
+                                             oncomplete="PF('phase-override').hide()"
+                                             update="case-details-form
+                                             event-dt-form
+                                             cecase-results-form
+                                             case-profile-messages-form:case-profile-messages-global
+                                             events-datascroller-form
+                                             "/>
 
                         </h:form>
+
+
+
 
                     </p:dialog>
+
+                    <p:confirmDialog message="Reject action request" 
+                                     severity="alert" widgetVar="reject-requested-action-diaglog-var"
+                                     closable="true" responsive="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+
+                        <h:form id="muni-message-form">
+                            <h:outputLabel for="rejection-reason" value="Reason for rejecting request:"/>
+                            <p:spacer height="15px"/>
+                            <p:inputTextarea id="rejection-reason" style="width: 300px; height: 200px;" value="#{ceCaseWorkflowBB.selectedEvent.responderNotes}"/>
+                            <p:spacer height="15px"/>
+                            <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
+                                          and attached to event ID #{ceCaseWorkflowBB.selectedEvent.eventID}"/>
+                            <p:spacer height="15px"/>
+
+                          
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('reject-requested-action-diaglog-var').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+                    
+                    
+
+                    <p:confirmDialog message="Create case profile report" 
+                                     severity="alert" widgetVar="report-case-profile-diaglog-var"
+                                     closable="true" responsive="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                     >
+
+                        <h:form id="report-case-profile-form">
+
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+
+                                <f:facet name="header">
+
+
+                                    <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{ceCaseWorkflowBB.reportCECase.title}"/>
+                                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include case name" for="report-case-profile-casename-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeCaseName}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                                    <p:spacer height="5px"/>
+                                    <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseWorkflowBB.reportCECase.notes}"/>
+                                    <p:spacer height="5px"/>
+                                </f:facet>
+
+                                <h:panelGroup>
+                                    <h3>Case event history report options</h3>
+
+                                    <h:outputLabel class="bold" value="Include hidden events: " for="report-case-profile-hidden-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeHiddenEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include inactive events: " for="report-case-profile-inactive-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeInactiveEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include event notes: " for="report-case-profile-eventnotes-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeEventNotes}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeRequestedActionFields}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include non-public, muni-only events " for="report-case-profile-events-muni-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeMunicipalityDiclosedEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include code officer only events " for="report-case-profile-events-ceo-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeOfficerOnlyEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include event access and metadata" for="report-case-profile-events-meta-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-meta-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeEventMetadata}" />
+
+                                </h:panelGroup>
+                                <h:panelGroup>
+
+                                    <h3>Other options</h3>
+
+                                    <h:outputLabel class="bold" value="Include full letter text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeNoticeFullText}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include returned notices of violation: " for="report-case-profile-allnotices-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeAllNotices}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeFullOrdinanceText}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeViolationPhotos}" />
+
+                                </h:panelGroup>
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('report-case-profile-diaglog-var').hide()"/>
+
+                            <p:commandButton ajax="true" action="#{ceCaseWorkflowBB.generateReportCECase}"
+                                             value="Generate" icon="fa fa-print" 
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                             />
+
+                        </h:form>
+                    </p:confirmDialog>
+
 
 
                 </f:view>

@@ -274,47 +274,58 @@
                     </div>
                     
                     
-                    <p:dialog   id="_________NAMEME_________"
-                                header="_________NAMEME_________" 
-                                widgetVar="_________NAMEME_________" 
-                                responsive="true" 
-                                width="400"
-                                modal="false"
-                                height="600">
-                        
-                          <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
+
+                    <p:confirmDialog message="Photos attached to violation #{caseProfileBB.selectedViolation.violationID}" 
+                                     severity="alert" widgetVar="photo-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}">
+
+                        <h:form id="photo-form">
+                            <p:scrollPanel style="width:1000px; height:400px" mode="native">
+                                <p:dataTable
+                                    id="photoTable"
+                                    var="photoid"
+                                    value="#{caseProfileBB.selectedViolation.blobIDList}"
+                                    rowKey="#{photoid}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6">
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Manage"/>
+                                        </f:facet>
+                                        <p:commandButton ajax="true" 
+                                                         actionListener="#{caseProfileBB.deletePhoto(photoid)}"
+                                                         value="Delete" 
+                                                         icon="fa fa-bomb"
+                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                         update=":photo-form:photoTable"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Photo"/>
+                                        </f:facet>
+                                        <p:graphicImage width="100%" value="#{imageServices.image}">
+                                            <f:param name="photoID" value="#{photoid}"/>
+                                        </p:graphicImage>
+                                    </p:column>
+                                    <p:column width="20%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Description"/>
+                                        </f:facet>
+                                        <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:scrollPanel>
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" 
+                                             value="Continue" 
+                                             update=":violation-form:violation-table"
+                                             onclick="PF('photo-dialog').hide()"/>
                         </h:form>
-                        
-                        <h:form id="_________NAMEME_________">
-                            
+                    </p:confirmDialog>
 
-                            <h2>_________NAMEME_________</h2>
-
-                            
-                            
-                            <p:commandButton    id="_________NAMEME_________"
-                                                value="_________NAMEME_________" 
-                                                ajax="true" 
-                                                icon="fa fa-edit"
-                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
-                                                disabled="false"
-                                                rendered="true"
-                                                oncomplete="PF('_________NAMEME_________').hide()"
-                                                update=""/>
-
-                            <p:commandLink  value="close" 
-                                            onclick="PF('_________NAMEME_________').hide()" 
-                                            styleClass="noFill"/>
-
-                        </h:form>
-
-                    </p:dialog>
-
-
+                    
+                    
                 </f:view>
             </ui:define>
         </ui:composition>
