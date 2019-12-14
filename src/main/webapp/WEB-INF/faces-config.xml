@@ -1668,7 +1668,6 @@
         <description>		</description>
         <managed-bean-name>cECasePaymentsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECasePaymentsBB</managed-bean-class>
-    
         <managed-bean-scope>view</managed-bean-scope></managed-bean>
     <managed-bean>
         <managed-bean-name>cECaseUtilitiesBB</managed-bean-name>
@@ -1685,4 +1684,34 @@
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseCitationsBB</managed-bean-class>
     
         <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodWorkflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodWorkflowBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodEventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodEventsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodPersonsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPersonsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodPaymentsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPaymentsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodFilesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodFilesBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>occPeriodPublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 </faces-config>

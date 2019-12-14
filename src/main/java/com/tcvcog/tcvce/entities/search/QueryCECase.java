@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities.search;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -29,8 +30,8 @@ public class QueryCECase
     public QueryCECase( QueryCECaseEnum qName, 
                         Municipality muni, 
                         List<SearchParamsCECase> params,
-                        UserAuthorized u) {
-        super(muni, u);
+                        Credential c) {
+        super(muni, c);
         queryName = qName;
         searchParamsList = new ArrayList<>();
         searchParamsList.addAll(params);

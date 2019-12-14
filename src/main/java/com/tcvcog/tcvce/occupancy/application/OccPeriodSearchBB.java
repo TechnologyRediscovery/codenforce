@@ -17,29 +17,45 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  *
- * @author sylvia
+ * @author Ellen Bascomb
  */
-public class OccPeriodSearchBB extends BackingBeanUtils implements Serializable{
+public  class   OccPeriodSearchBB 
+        extends BackingBeanUtils {
 
-    private OccPeriod currentOccPeriod;
+    private OccPeriodDataHeavy currentOccPeriod;
     private List<OccPeriodType> occPeriodTypeList;
     
     private List<OccPeriod> occPeriodList;
+    private boolean clearListOnQueryExecute;
     private List<OccPeriod> occPeriodListFiltered;
     
     private List<QueryOccPeriod> occPeriodQueryList;
@@ -54,13 +70,90 @@ public class OccPeriodSearchBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
+        SearchCoordinator sc = getSearchCoordinator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
         occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
+        occPeriodList = new ArrayList<>();
+        
+        
     }
     
-     public void commenceOccInspection(){
-
+     
+       /**
+     * Primary injection point for setting the case which will be displayed in
+     * the right column (the manage object column) on cECases.xhtml
+     *
+     * @param op
+     */
+    public void exploreOccPeriod(OccPeriod op) {
+        SystemCoordinator sc = getSystemCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        try {
+            sc.logObjectView(getSessionBean().getSessionUser(), op);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        setCurrentOccPeriod(op);
+        getSessionBean().setSessionOccPeriod(currentOccPeriod);
+        try {
+            getSessionBean().setSessionProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), getSessionBean().getSessionUser().getMyCredential()));
+        } catch (IntegrationException | CaseLifecycleException | AuthorizationException | EventException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to assemble the data-rich occ period", ""));
+            
+        }
     }
+    
+    
+    /**
+     * Responder to the query button on the UI
+     *
+     * @param ev
+     */
+    public void executeQuery(ActionEvent ev) {
+        System.out.println("OccPeriodSearchBB.executeQuery");
+        executeQuery();
+    }
+    
+    
+    /**
+     * Entry way into the Query world via the SearchCoordinator who is responsible
+     * for calling appropriate Coordinators and configuration methods and such
+     */
+    public void executeQuery(){
+        SearchCoordinator sc = getSearchCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        int listSize = 0;
+        
+        if(clearListOnQueryExecute){
+            occPeriodList.clear();
+        }
+        try {
+            occPeriodList.addAll(sc.runQuery(occPeriodQuerySelected, getSessionBean().getSessionUser().getMyCredential()).getBOBResultList());
+            if (occPeriodList != null) {
+                listSize = occPeriodList.size();
+            }
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Your query completed with " + listSize + " results", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not query the database, sorry.", ""));
+        } catch (AuthorizationException | EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not query for Periods due to authorization errors, sorry.", ""));
+            
+        }
+    }
+    
+    
 
     /**
      * @return the searchParams
@@ -79,7 +172,7 @@ public class OccPeriodSearchBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the currentOccPeriod
      */
-    public OccPeriod getCurrentOccPeriod() {
+    public OccPeriodDataHeavy getCurrentOccPeriod() {
         return currentOccPeriod;
     }
 
@@ -114,7 +207,7 @@ public class OccPeriodSearchBB extends BackingBeanUtils implements Serializable{
     /**
      * @param currentOccPeriod the currentOccPeriod to set
      */
-    public void setCurrentOccPeriod(OccPeriod currentOccPeriod) {
+    public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
         this.currentOccPeriod = currentOccPeriod;
     }
 
@@ -158,6 +251,20 @@ public class OccPeriodSearchBB extends BackingBeanUtils implements Serializable{
      */
     public void setOccPeriodTypeList(List<OccPeriodType> occPeriodTypeList) {
         this.occPeriodTypeList = occPeriodTypeList;
+    }
+
+    /**
+     * @return the clearListOnQueryExecute
+     */
+    public boolean isClearListOnQueryExecute() {
+        return clearListOnQueryExecute;
+    }
+
+    /**
+     * @param clearListOnQueryExecute the clearListOnQueryExecute to set
+     */
+    public void setClearListOnQueryExecute(boolean clearListOnQueryExecute) {
+        this.clearListOnQueryExecute = clearListOnQueryExecute;
     }
     
 }

@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.BOb;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -33,6 +34,7 @@ public abstract class   Query<E extends BOb>
     
     private Municipality muni;
     private UserAuthorized user;
+    private Credential credential;
     
     /**
      * Security mechanism for controlling queried data: Coordinators
@@ -61,9 +63,9 @@ public abstract class   Query<E extends BOb>
     public abstract void clearResultList();
     
     
-    public Query(Municipality muni, UserAuthorized u) {
+    public Query(Municipality muni, Credential c) {
         this.muni = muni;
-        this.user = u;
+        this.credential = c;
         
     }
     

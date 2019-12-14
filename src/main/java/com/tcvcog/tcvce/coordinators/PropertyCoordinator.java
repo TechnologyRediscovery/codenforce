@@ -89,7 +89,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     }
     
     /**
-     * Logic container
+     * Logic container for Property setting configuration
      * @param p
      * @return 
      */
@@ -101,6 +101,74 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         }
         
         return p;
+    }
+    
+     /**
+     * Returns PropertyWithLists with all units, including default unit.
+     * @param prop
+     * @param cred
+     * @return PropertyWithLists object
+     * @throws CaseLifecycleException 
+     * @throws com.tcvcog.tcvce.domain.EventException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
+     */
+    public PropertyDataHeavy getPropertyDataHeavy(Property prop, Credential cred) throws CaseLifecycleException, EventException, AuthorizationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyDataHeavy propWithLists = null;
+        try{
+            propWithLists = pi.getPropertyDataHeavy(prop.getPropertyID());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }     
+        return propWithLists;
+    }   
+    
+    /**
+     * Adapter method for folks who need a PropertyDataHeavy but who only have an
+     * int propertyID; first it gets a simple property from the ID and then
+     * beefs it up to a PropertyDataHeavy
+     * @param propID
+     * @param cred
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecycleException
+     * @throws AuthorizationException
+     * @throws EventException 
+     */
+    public PropertyDataHeavy getPropertyDataHeavy(int propID, Credential cred) throws IntegrationException, CaseLifecycleException, AuthorizationException, EventException{
+        return getPropertyDataHeavy(getProperty(propID), cred);
+    }
+    
+    
+    
+    /**
+     * Adapter method for folks who need a PropertyDataHeavy but who only have an
+     * int propertyID; first it gets a simple property from the ID and then
+     * beefs it up to a PropertyDataHeavy
+     * @param propUnitID
+     * @param cred
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecycleException
+     * @throws AuthorizationException
+     * @throws EventException 
+     */
+    public PropertyDataHeavy getPropertyDataHeavyByUnit(int propUnitID, Credential cred) throws IntegrationException, CaseLifecycleException, AuthorizationException, EventException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return getPropertyDataHeavy(pi.getPropertyUnitWithProp(propUnitID).getProperty(), cred);
+    }
+    
+    
+    /**
+     * Logic intervention method for retrievals of simple properties from the DB
+     * @param propID
+     * @return
+     * @throws IntegrationException 
+     */
+    public Property getProperty(int propID) throws IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getProperty(propID);
+        
     }
     
     /**
@@ -201,21 +269,5 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return propUnit;
     }
     
-    /**
-     * Returns PropertyWithLists with all units, including default unit.
-     * @param prop
-     * @param u
-     * @return PropertyWithLists object
-     * @throws CaseLifecycleException 
-     */
-    public PropertyDataHeavy getPropertyUnits(Property prop, User u) throws CaseLifecycleException, EventException, AuthorizationException{
-        PropertyIntegrator pi = getPropertyIntegrator();
-        PropertyDataHeavy propWithLists = null;
-        try{
-            propWithLists = pi.getPropertyDataHeavy(prop.getPropertyID());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }     
-        return propWithLists;
-    }   
+   
 }

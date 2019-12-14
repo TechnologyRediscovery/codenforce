@@ -48,6 +48,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
@@ -91,7 +92,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CECase sessionCECase;
     private List<CECase> sessionCECaseList;
     
-    private OccPeriod sessionOccPeriod;
+    private OccPeriodDataHeavy sessionOccPeriod;
     private List<OccPeriod> sessionOccPeriodList;
     
     // Session Entity Lists
@@ -173,6 +174,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** Blob Upload Session Shelves *** */
     //linking
 
+    
+    
 
     /**
      * Creates a new instance of getSessionBean()
@@ -697,13 +700,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.occPermitApplicationReason = occPermitApplicationReason;
     }
 
-    /**
-     * @return the sessionOccPeriod
-     */
-    public OccPeriod getSessionOccPeriod() {
-        return sessionOccPeriod;
-    }
-
+  
     /**
      * @return the queryOccPeriod
      */
@@ -732,12 +729,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         return sessionOccPermit;
     }
 
-    /**
-     * @param sessionOccPeriod the sessionOccPeriod to set
-     */
-    public void setSessionOccPeriod(OccPeriod sessionOccPeriod) {
-        this.sessionOccPeriod = sessionOccPeriod;
-    }
+  
 
     /**
      * @param queryOccPeriod the queryOccPeriod to set
@@ -1003,6 +995,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setSessionBlob(Blob sessionBlob) {
         this.sessionBlob = sessionBlob;
+    }
+
+    /**
+     * @return the sessionOccPeriod
+     */
+    public OccPeriodDataHeavy getSessionOccPeriod() {
+        return sessionOccPeriod;
+    }
+
+    /**
+     * @param sessionOccPeriod the sessionOccPeriod to set
+     */
+    public void setSessionOccPeriod(OccPeriodDataHeavy sessionOccPeriod) {
+        this.sessionOccPeriod = sessionOccPeriod;
     }
     
     

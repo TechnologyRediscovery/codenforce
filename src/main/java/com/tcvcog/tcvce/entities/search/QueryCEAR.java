@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -31,8 +32,8 @@ public class QueryCEAR
     public QueryCEAR(   QueryCEAREnum name,
                         Municipality m, 
                         List<SearchParamsCEActionRequests> params,
-                        UserAuthorized u){
-        super(m, u);
+                        Credential c){
+        super(m, c);
         queryName = name;
         searchParamsList = new ArrayList<>();
         searchParamsList.addAll(params);

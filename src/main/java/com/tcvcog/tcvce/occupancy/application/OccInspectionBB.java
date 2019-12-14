@@ -316,6 +316,11 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
     }
     
+    
+     public void commenceOccInspection(){
+
+    }
+    
     /**
      * Placeholder method for the action listener on the client side button
      * @param ev 

@@ -19,17 +19,14 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import java.io.Serializable;
 import javax.annotation.PostConstruct;
-import javax.inject.Named;
-import javax.enterprise.context.Dependent;
 
 /**
  *
  * @author sylvia
  */
-public  class   OccPeriodPermitsBB 
-        extends BackingBeanUtils {
+public  class   OccPeriodWorkflowBB 
+        extends BackingBeanUtils{
     
     private OccPeriodDataHeavy currentOccPeriod;
      
@@ -41,10 +38,9 @@ public  class   OccPeriodPermitsBB
     }
     
     /**
-     * Creates a new instance of OccPermitBB
+     * Creates a new instance of OccPeriodWorkflowBB
      */
-    public OccPeriodPermitsBB() {
+    public OccPeriodWorkflowBB() {
     }
-    
     
 }

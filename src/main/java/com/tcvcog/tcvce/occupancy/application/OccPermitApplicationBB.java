@@ -252,7 +252,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //            }
 //        } else {
 //            try {
-//                propWithLists = pc.getPropertyUnits(selectedProperty);
+//                propWithLists = pc.getPropertyDataHeavy(selectedProperty);
 //            } catch (CaseLifecycleException ex) {
 //                System.out.println(ex);
 //            }
@@ -326,7 +326,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //                }
 //            } else {
 //                try {
-//                    propWithLists = pc.getPropertyUnits(selectedProperty);
+//                    propWithLists = pc.getPropertyDataHeavy(selectedProperty);
 //                } catch (CaseLifecycleException ex) {
 //                    System.out.println(ex);
 //                }

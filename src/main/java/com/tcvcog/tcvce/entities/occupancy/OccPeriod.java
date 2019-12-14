@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.User;
@@ -19,7 +20,8 @@ import com.tcvcog.tcvce.entities.IFace_Openable;
  * @author Ellen Bascomb
  */
 public  class       OccPeriod 
-        extends     OccPeriodPublic  {
+        extends     OccPeriodPublic  
+        implements  IFace_Loggable{
     
     protected int periodID;
     protected int propertyUnitID;

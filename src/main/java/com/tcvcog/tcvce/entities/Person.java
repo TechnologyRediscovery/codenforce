@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,8 +31,9 @@ import java.util.Objects;
  * 
  * @author Eric Darsow
  */
-public  class   Person 
-        extends BOb{
+public  class       Person 
+        extends     BOb
+        implements  IFace_Loggable{
     
     protected int personID;
     
@@ -124,6 +126,7 @@ public  class   Person
     protected ArrayList<Integer> ghostsList;
     protected ArrayList<Integer> cloneList;
     protected ArrayList<Integer> mergedList;
+    
     
     
 
@@ -930,6 +933,7 @@ public  class   Person
     public void setSource(BOBSource source) {
         this.source = source;
     }
-    
+
+   
 
 }

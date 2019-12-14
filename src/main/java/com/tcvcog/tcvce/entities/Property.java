@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
@@ -18,7 +19,8 @@ import java.util.List;
  */
 
 public class    Property 
-        extends PropertyPublic{
+        extends PropertyPublic 
+        implements IFace_Loggable{
     
     protected List<PropertyUnit> unitList;
     

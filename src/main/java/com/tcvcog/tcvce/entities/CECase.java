@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
@@ -24,7 +25,8 @@ public class        CECase
         implements  Cloneable,
                     IFace_ProposalDriven, 
                     IFace_EventRuleGoverned,
-                    IFace_CredentialSigned{
+                    IFace_CredentialSigned,
+                    IFace_Loggable{
     
     private List<CodeViolation> violationList;
     

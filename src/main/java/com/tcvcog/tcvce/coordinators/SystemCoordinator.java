@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.SessionBean;
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -31,6 +32,7 @@ import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
@@ -64,6 +66,13 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     public void initBean() {
 
     }
+    
+     public void logObjectView(User u, IFace_Loggable ob) throws IntegrationException {
+         SystemIntegrator si = getSystemIntegrator();
+         si.logObjectView(u, ob);
+         
+     }
+    
     
     /**
      * Skeleton of a system that may be needed to generate and release carefully
@@ -210,7 +219,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem CEEvents = getNavSubItem("Events", "/restricted/cogstaff/ce/ceCaseEvents.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CEPayments = getNavSubItem("Payments", "/restricted/cogstaff/ce/ceCasePayments.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CERequests = getNavSubItem("Requests", "/restricted/cogstaff/ce/ceCaseRequests.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem CEFiles = getNavSubItem("Files", "/restricted/cogstaff/ce/ceCaseBlobs.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEFiles = getNavSubItem("Files", "/restricted/cogstaff/ce/ceCaseFiles.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CEPublic = getNavSubItem("Public", "/restricted/cogstaff/ce/ceCasePublic.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Code Enf
