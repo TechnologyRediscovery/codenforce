@@ -689,7 +689,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             list.add(getPerson(personId));
         }
         return list;
-    } // close getPersonsByEvent()
+    } // close getPersonList()
 
     /**
      * Updates a given record for a person in the database. Will throw an error
@@ -824,7 +824,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    public List<Person> getPersonsByEvent(Event ev) throws IntegrationException {
+    public List<Person> getPersonList(Event ev) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -1006,7 +1006,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             while (rs.next()){
                 personIDs.add(rs.getInt("person_personid"));
             }
-            persons = getPersonList(personIDs);
+            persons = PersonIntegrator.this.getPersonList(personIDs);
             
             
         } catch (SQLException ex) {

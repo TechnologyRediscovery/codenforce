@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Directive;
 import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
 import com.tcvcog.tcvce.entities.EventRuleSet;
@@ -81,7 +82,7 @@ import com.tcvcog.tcvce.entities.IFace_Proposable;
  * </ol>
  * 
  * 
- * @author Eric C. Darsow
+ * @author Ellen Bascomb
  */
 public class EventCoordinator extends BackingBeanUtils implements Serializable{
 
@@ -90,6 +91,23 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public EventCoordinator() {
         
+    }
+    
+    
+    
+    /**
+     * Primary access point for 
+     * @param eventID
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public Event getEvent(int eventID) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        if(eventID == 0){
+            return null;
+        }
+        Event ev = ei.getEvent(eventID);
+        return ev;
     }
     
     /**
@@ -152,29 +170,38 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Called by the EventIntegrator and other getEventCECase methods to set member variables based on business
- rules before sending the event onto its requesting method. Checks for request processing, 
+     * rules before sending the event onto its requesting method. Checks for request processing, 
      * sets intended responder for action requests, etc.
      * @param ev
      * @param user
-     * @param userAuthMuniList
      * @return a nicely configured EventCEEcase
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public EventCECase configureEvent(EventCECase ev, UserAuthorized user) throws IntegrationException{
-        EventIntegrator ei = getEventIntegrator();
-        PersonIntegrator pi = getPersonIntegrator();
+    public Event configureEvent(Event ev) throws IntegrationException{
+        
+        // Declare this event as either in the CE or Occ domain with 
+        // our hacky little enum thingy
+        
+        if(ev.getCeCaseID() != 0){
+            ev.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
+        } else if(ev.getCeCaseID() != 0){
+            ev.setDomain(EventDomainEnum.OCCUPANCY);
+        } else {
+            ev.setDomain(null);
+        }
+        
        
         // begin configuring the event proposals assocaited with this event
         // remember: event proposals are specified in an EventCategory object
         // but when we build an Event object, the ProposalImplementation lives on the Event itself
         // 
-        if(ev.getCategory().getDirective() != null){
+//        if(ev.getCategory().getDirective() != null){
 //            TODO: OccBeta
 //            Proposal imp = ei.getProposalImplAssociatedWithEvent(ev);
 //            imp.setCurrentUserCanEvaluateProposal(determineCanUserEvaluateProposal(ev, user, userAuthMuniList));
 //            ev.setEventProposalImplementation(imp);
-        }
-        ev.setPersonList(pi.getPersonsByEvent(ev));
+//        }
+//        ev.setPersonList(pi.getPersonList(ev));
         
         return ev;
     }
@@ -243,6 +270,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
     }
     
+    /**
+     * Factory method for empty events of a passed in Category
+     * @param ec
+     * @return 
+     */
     public Event getInitializedEvent(EventCategory ec){
         Event ev = new Event();
         ev.setCategory(ec);
@@ -452,12 +484,27 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ei.insertEvent(event);
     }
     
+    /**
+     * Deprecated with the grand event unification
+     * 
+     * @deprecated 
+     * @param evcase
+     * @param u
+     * @throws IntegrationException 
+     */
     public void editEvent(EventCECase evcase, UserAuthorized u) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         System.out.println("EventCoordinator.editEvent");
         ei.updateEvent(evcase);
     }
     
+    /**
+     * Deprecated with the grand event unification
+     * 
+     * @param oe
+     * @param u
+     * @throws IntegrationException 
+     */
     public void editEvent(EventOccPeriod oe, UserAuthorized u) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         ei.updateEvent(oe);
@@ -572,6 +619,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * The currentCase argument must be a CECase with the desired case phase set
      * The past phase is passed in separately, allowing for phase changes to
      * any phase from any other phase
+     * @deprecated 
      * @param currentCase
      * @param pastPhase
      * @param rule

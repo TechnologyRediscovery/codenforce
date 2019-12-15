@@ -10,8 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author sylvia
+ * Container for logic which can be converted into a 
+ * Proposal of one or more Choices attached to a specific BusinessObject
+ * and instantiated in a particular Authorization context
+ * 
+ * @author Ellen Bascomb
  */
 public class Directive  {
 

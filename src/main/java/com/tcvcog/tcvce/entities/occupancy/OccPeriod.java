@@ -26,9 +26,6 @@ public  class       OccPeriod
     protected int periodID;
     protected int propertyUnitID;
     protected OccPeriodType type;
-    protected OccPeriodStatusEnum status;
-    
-    protected boolean readyForPeriodAuthorization;
     
     protected OccInspection governingInspection;
     
@@ -58,16 +55,7 @@ public  class       OccPeriod
     
     protected String notes;
     
-    @Override
-    public boolean isOpen() {
-        // TEMPORARY until status flow is created
-        if(status != null){
-            return status.isOpenPeriod();
-        } else {
-            return true;
-        }
-                
-    }
+   
     
     /**
      * @return the periodID
@@ -382,35 +370,7 @@ public  class       OccPeriod
         this.endDateUtilDate = endDateUtilDate;
     }
 
-    /**
-     * @return the status
-     */
-    public OccPeriodStatusEnum getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(OccPeriodStatusEnum status) {
-        this.status = status;
-    }
-
-    /**
-     * @return the readyForPeriodAuthorization
-     */
-    public boolean isReadyForPeriodAuthorization() {
-        return readyForPeriodAuthorization;
-    }
-
-    /**
-     * @param readyForPeriodAuthorization the readyForPeriodAuthorization to set
-     */
-    public void setReadyForPeriodAuthorization(boolean readyForPeriodAuthorization) {
-        this.readyForPeriodAuthorization = readyForPeriodAuthorization;
-    }
-
-  
+    
 
     /**
      * @return the governingInspection

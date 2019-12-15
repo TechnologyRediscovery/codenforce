@@ -64,5 +64,33 @@ public  class   EventOccPeriodPropUnitHeavy
     public void setProp(Property prop) {
         this.prop = prop;
     }
+
+    /**
+     * @return the propUnit
+     */
+    public PropertyUnit getPropUnit() {
+        return propUnit;
+    }
+
+    /**
+     * @return the period
+     */
+    public OccPeriod getPeriod() {
+        return period;
+    }
+
+    /**
+     * @param propUnit the propUnit to set
+     */
+    public void setPropUnit(PropertyUnit propUnit) {
+        this.propUnit = propUnit;
+    }
+
+    /**
+     * @param period the period to set
+     */
+    public void setPeriod(OccPeriod period) {
+        this.period = period;
+    }
     
 }

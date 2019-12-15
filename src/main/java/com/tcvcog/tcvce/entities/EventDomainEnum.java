@@ -23,7 +23,7 @@ package com.tcvcog.tcvce.entities;
  * 
  * @author Ellen Bascomb
  */
-public enum EventDomain {
+public enum EventDomainEnum {
     
     CODE_ENFORCEMENT,
     OCCUPANCY;

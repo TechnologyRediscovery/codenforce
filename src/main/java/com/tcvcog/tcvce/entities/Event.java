@@ -34,15 +34,15 @@ public  class       Event
     protected int eventID;
     protected EventCategory category;
     
-    protected EventDomain domain;
+    protected EventDomainEnum domain;
+    
     protected int ceCaseID;
     protected int occPeriodID;
     
     protected LocalDateTime dateOfRecord;
-    protected String dateOfRecordPretty;
     protected java.util.Date dateOfRecordUtilDate;
     protected LocalDateTime timestamp;
-    protected String timestampPretty;
+    
     
     protected String description;
     protected User owner;
@@ -83,8 +83,7 @@ public  class       Event
      */
     public String getDateOfRecordPretty() {
         String pretty = EntityUtils.getPrettyDate(dateOfRecord);
-        dateOfRecordPretty = pretty;
-        return dateOfRecordPretty;
+        return pretty;
     }
 
     /**
@@ -254,17 +253,10 @@ public  class       Event
      */
     public String getTimestampPretty() {
         String s = EntityUtils.getPrettyDate(timestamp);
-        timestampPretty = s;
-        return timestampPretty;
+        return s;
     }
 
-    /**
-     * @param timestampPretty the timestampPretty to set
-     */
-    public void setTimestampPretty(String timestampPretty) {
-        this.timestampPretty = timestampPretty;
-    }
-
+   
 
     /**
      * @return the personList
@@ -296,10 +288,8 @@ public  class       Event
         hash = 97 * hash + this.eventID;
         hash = 97 * hash + Objects.hashCode(this.category);
         hash = 97 * hash + Objects.hashCode(this.dateOfRecord);
-        hash = 97 * hash + Objects.hashCode(this.dateOfRecordPretty);
         hash = 97 * hash + Objects.hashCode(this.dateOfRecordUtilDate);
         hash = 97 * hash + Objects.hashCode(this.timestamp);
-        hash = 97 * hash + Objects.hashCode(this.timestampPretty);
         hash = 97 * hash + Objects.hashCode(this.description);
         hash = 97 * hash + Objects.hashCode(this.owner);
         hash = 97 * hash + (this.discloseToMunicipality ? 1 : 0);
@@ -332,14 +322,14 @@ public  class       Event
     /**
      * @return the domain
      */
-    public EventDomain getDomain() {
+    public EventDomainEnum getDomain() {
         return domain;
     }
 
     /**
      * @param domain the domain to set
      */
-    public void setDomain(EventDomain domain) {
+    public void setDomain(EventDomainEnum domain) {
         this.domain = domain;
     }
 

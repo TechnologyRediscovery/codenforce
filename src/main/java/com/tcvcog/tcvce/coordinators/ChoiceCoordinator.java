@@ -199,7 +199,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Takes in a Directive object and an OccPeriod or CECase and 
      * implements that directive by assigning it via a Proposal given sensible initial values
-     * @param dir
+     * @param dir Extracted from the Event to be implemented
      * @param propDriven which in beta v.0.9 are CECase and OccPeriod objects
      * @param ev 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 

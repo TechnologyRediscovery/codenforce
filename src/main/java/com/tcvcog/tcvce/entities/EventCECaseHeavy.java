@@ -18,12 +18,12 @@ package com.tcvcog.tcvce.entities;
 
 /**
  *
- * @author sylvia
+ * @author Ellen Bascomb
  */
 public  class   EventCECaseHeavy 
         extends Event{
     
-    protected Property prop;
+    protected CECaseBase ceCase;
     
     public EventCECaseHeavy(Event ev){
         this.eventID = ev.getEventID();
@@ -48,17 +48,18 @@ public  class   EventCECaseHeavy
     }
 
     /**
-     * @return the prop
+     * @return the ceCase
      */
-    public Property getProp() {
-        return prop;
+    public CECaseBase getCeCase() {
+        return ceCase;
     }
 
     /**
-     * @param prop the prop to set
+     * @param ceCase the ceCase to set
      */
-    public void setProp(Property prop) {
-        this.prop = prop;
+    public void setCeCase(CECaseBase ceCase) {
+        this.ceCase = ceCase;
     }
-    
+
+   
 }

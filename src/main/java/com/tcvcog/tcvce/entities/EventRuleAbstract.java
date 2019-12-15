@@ -8,7 +8,13 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 
 /**
- * @author sylvia
+ *  Wraps a heap of Event-related constraints or instructions which involve
+ * reviewing an entire list of Events on an EventRuleGoverned object and creating
+ * new events in response to the result of a given Rule's evaluation status.
+ * 
+ * This class's subclass, EventRule
+ * 
+ * @author ellen bascomb
  */
 public class EventRuleAbstract  implements Serializable {
     
