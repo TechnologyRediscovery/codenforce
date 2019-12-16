@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
@@ -15,7 +16,7 @@ import java.io.Serializable;
  *
  * @author Sylvia Garland
  */
-public class        SearchParamsEventCECase 
+public class        SearchParamsEvent 
         extends     SearchParams 
         implements  Serializable{
     
@@ -27,6 +28,8 @@ public class        SearchParamsEventCECase
     private boolean filterByEventType;
     private EventType evtType;
     
+    protected boolean filterByEventDomain;
+    protected EventDomainEnum domain;
     
     private boolean filterByCaseID;
     private int caseId;
@@ -43,7 +46,7 @@ public class        SearchParamsEventCECase
     private boolean filterByHidden;
     private boolean isHidden;
     
-   public SearchParamsEventCECase(){
+   public SearchParamsEvent(){
        
    }
 
@@ -268,6 +271,34 @@ public class        SearchParamsEventCECase
      */
     public void setUserID(int userID) {
         this.userID = userID;
+    }
+
+    /**
+     * @return the filterByEventDomain
+     */
+    public boolean isFilterByEventDomain() {
+        return filterByEventDomain;
+    }
+
+    /**
+     * @param filterByEventDomain the filterByEventDomain to set
+     */
+    public void setFilterByEventDomain(boolean filterByEventDomain) {
+        this.filterByEventDomain = filterByEventDomain;
+    }
+
+    /**
+     * @return the domain
+     */
+    public EventDomainEnum getDomain() {
+        return domain;
+    }
+
+    /**
+     * @param domain the domain to set
+     */
+    public void setDomain(EventDomainEnum domain) {
+        this.domain = domain;
     }
 
    

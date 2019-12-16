@@ -50,7 +50,7 @@ import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodStatusEnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -121,18 +121,18 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return lvoahle;
     }
     
-    public SearchParamsEventCECase getSearchParamsCEEventsRequiringAction(UserAuthorized user, Municipality m){
+    public SearchParamsEvent getSearchParamsCEEventsRequiringAction(UserAuthorized user, Municipality m){
         SearchCoordinator sc = getSearchCoordinator();
         return sc.getSearchParamsEventsRequiringAction(user,m);
     }
     
-    public SearchParamsEventCECase getSearchParamsOfficerActibityPastWeek(UserAuthorized user, Municipality m){
+    public SearchParamsEvent getSearchParamsOfficerActibityPastWeek(UserAuthorized user, Municipality m){
         SearchCoordinator sc = getSearchCoordinator();
         return sc.getSearchParamsOfficerActivity(user, m);
     }
     
     
-    public SearchParamsEventCECase getSearchParamsComplianceEvPastMonth(Municipality m){
+    public SearchParamsEvent getSearchParamsComplianceEvPastMonth(Municipality m){
         SearchCoordinator sc = getSearchCoordinator();
         return sc.getSearchParamsComplianceEvPastMonth(m);
     }
@@ -167,6 +167,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         config.setSortInRevChrono(true);
         return config;
     }
+    
     
     /**
      * Called by the EventIntegrator and other getEventCECase methods to set member variables based on business
@@ -215,13 +216,35 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
      */
-    public List<EventCECaseCasePropBundle> queryEvents( SearchParamsEventCECase params, 
+    public List<EventCECaseCasePropBundle> queryEvents( SearchParamsEvent params, 
                                                         UserAuthorized user) 
             throws IntegrationException, CaseLifecycleException{
         EventIntegrator ei = getEventIntegrator();
-        List<EventCECaseCasePropBundle> evList = configureEventBundleList(  ei.getEventsCECase(params),
+        List<EventCECaseCasePropBundle> evList = configureEventBundleList(  ei.searchForEvents(params),
                                                                             user);
         return evList;
+    }
+    
+    
+    
+    /**
+     * Business rule aware pathway to update fields on Event objects
+     * When updating Person links, this method clears all previous connections
+     * and rebuilds the mapping from scratch on each update.
+     * 
+     * @param ev
+     * @throws IntegrationException 
+     */
+    public void updateEvent(Event ev) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        EventIntegrator ei = getEventIntegrator();
+        
+        ei.updateEvent(ev);
+        
+        pi.eventPersonClear(ev);
+        pi.eventPersonsConnect(ev, ev.getPersonList());
+        
+        
     }
     
     /**

@@ -8,7 +8,7 @@ package com.tcvcog.tcvce.entities.reports;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 
 /**
  *
@@ -110,8 +110,8 @@ public class ReportConfigCEEventList
         queryParams = (QueryEventCECase) q;
     }
     
-    public SearchParamsEventCECase getQueryParams(){
-        return (SearchParamsEventCECase) queryParams.getParamsList().get(0);
+    public SearchParamsEvent getQueryParams(){
+        return (SearchParamsEvent) queryParams.getParamsList().get(0);
     }
     
     

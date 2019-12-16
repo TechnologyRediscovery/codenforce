@@ -37,7 +37,7 @@ import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
@@ -548,9 +548,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return ei.runQueryEventCECase(query);
      }
      
-     public QueryEventCECase prepareQueryEventCECase(QueryEventCECaseEnum qName, Credential cred, Municipality m, SearchParamsEventCECase params){
+     public QueryEventCECase prepareQueryEventCECase(QueryEventCECaseEnum qName, Credential cred, Municipality m, SearchParamsEvent params){
          QueryEventCECase query;
-         List<SearchParamsEventCECase> paramsList = new ArrayList<>();
+         List<SearchParamsEvent> paramsList = new ArrayList<>();
          
          if(params != null){
              qName = QueryEventCECaseEnum.CUSTOM;
@@ -576,6 +576,20 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          query.setExecutedByIntegrator(false);
          return query;
      }
+     
+     
+  
+    public QueryEventCECase runQueryEventCECase(QueryEventCECase q) 
+            throws IntegrationException, CaseLifecycleException{
+        List<SearchParamsEvent> pList = q.getParmsList();
+        
+        for(SearchParamsEvent sp: pList){
+            q.addToResults(getEventsCECase(sp));
+        }
+        q.setExecutionTimestamp(LocalDateTime.now());
+        q.setExecutedByIntegrator(true);
+        return q;
+    }
     
     /**
      * First gen queries. Replaced by the rest of this class
@@ -604,7 +618,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return queryList;
     }
     
-    public SearchParamsEventCECase getSearchParamsEventsRequiringAction(User cred, Municipality muni){
+    public SearchParamsEvent getSearchParamsEventsRequiringAction(User cred, Municipality muni){
         EventCoordinator ec = getEventCoordinator();
         
         // event types are always bundled in an EventCategory
@@ -613,7 +627,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         EventCategory timelineEventTypeCategory = ec.getInitializedEventCateogry();
         timelineEventTypeCategory.setEventType(EventType.Timeline);
         
-        SearchParamsEventCECase eventParams = new SearchParamsEventCECase();
+        SearchParamsEvent eventParams = new SearchParamsEvent();
         
         eventParams.setFilterByMuni(true);
         eventParams.setMuni(muni);
@@ -639,12 +653,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return eventParams;
     }
     
-    public SearchParamsEventCECase getSearchParamsOfficerActivity(User cred, Municipality m){
+    public SearchParamsEvent getSearchParamsOfficerActivity(User cred, Municipality m){
         // event types are always bundled in an EventCategory
         // so in this case of this query, we don't care about the Category title,
         // only the type
         
-        SearchParamsEventCECase eventParams = new SearchParamsEventCECase();
+        SearchParamsEvent eventParams = new SearchParamsEvent();
         
         eventParams.setFilterByMuni(true);
         eventParams.setMuni(m);
@@ -680,7 +694,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public SearchParamsEventCECase getSearchParamsComplianceEvPastMonth(Municipality m){
+    public SearchParamsEvent getSearchParamsComplianceEvPastMonth(Municipality m){
         EventCoordinator ec = getEventCoordinator();
         
         // event types are always bundled in an EventCategory
@@ -689,7 +703,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         EventCategory complianceEventCategory = ec.getInitializedEventCateogry();
         complianceEventCategory.setEventType(EventType.Compliance);
         
-        SearchParamsEventCECase eventParams = new SearchParamsEventCECase();
+        SearchParamsEvent eventParams = new SearchParamsEvent();
         
         eventParams.setFilterByMuni(true);
         eventParams.setMuni(m);

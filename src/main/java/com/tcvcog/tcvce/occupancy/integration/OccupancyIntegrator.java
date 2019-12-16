@@ -122,7 +122,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         sb.append("INNER JOIN property ON (propertyunit.property_propertyid = property.propertyid) \n ");
         sb.append("RIGHT OUTER JOIN occinspection ON (occinspection.occperiod_periodid = periodid) \n");
         sb.append("RIGHT OUTER JOIN occpermit ON (occpermit.occperiod_periodid = periodid) \n ");
-        sb.append("WHERE occperiodid iS NOT NULL AND ");
+        sb.append("WHERE occperiodid IS NOT NULL AND ");
 
         if (!params.isObjectID_filterBy()) {
             if (params.isFilterByMuni()) {

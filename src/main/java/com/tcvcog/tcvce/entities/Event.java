@@ -39,10 +39,12 @@ public  class       Event
     protected int ceCaseID;
     protected int occPeriodID;
     
-    protected LocalDateTime dateOfRecord;
-    protected java.util.Date dateOfRecordUtilDate;
-    protected LocalDateTime timestamp;
+    protected LocalDateTime timeStart;
+    protected java.util.Date timeStartUtilDate;
+    protected LocalDateTime timeEnd;
+    protected java.util.Date timeEndUtilDate;
     
+    protected LocalDateTime timestamp;
     
     protected String description;
     protected User owner;
@@ -71,21 +73,7 @@ public  class       Event
         return category;
     }
 
-    /**
-     * @return the dateOfRecord
-     */
-    public LocalDateTime getDateOfRecord() {
-        return dateOfRecord;
-    }
-
-    /**
-     * @return the dateOfRecordPretty
-     */
-    public String getDateOfRecordPretty() {
-        String pretty = EntityUtils.getPrettyDate(dateOfRecord);
-        return pretty;
-    }
-
+   
     /**
      * @return the timestamp
      */
@@ -156,12 +144,6 @@ public  class       Event
         this.category = category;
     }
 
-    /**
-     * @param dateOfRecord the dateOfRecord to set
-     */
-    public void setDateOfRecord(LocalDateTime dateOfRecord) {
-        this.dateOfRecord = dateOfRecord;
-    }
 
     
     /**
@@ -222,29 +204,6 @@ public  class       Event
 
    
 
-
-
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {
-        if(dateOfRecord != null){
-            dateOfRecordUtilDate = java.util.Date.from(
-                    this.dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return dateOfRecordUtilDate;
-    }
-
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-        if(dateOfRecordUtilDate != null){
-            dateOfRecord = this.dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-    }
-
    
 
 
@@ -277,7 +236,7 @@ public  class       Event
   
     @Override
     public int compareTo(Event e) {
-        int c = this.dateOfRecord.compareTo(e.getDateOfRecord());
+        int c = this.timeStart.compareTo(e.timeStart);
         return c;
         
     }
@@ -287,8 +246,6 @@ public  class       Event
         int hash = 5;
         hash = 97 * hash + this.eventID;
         hash = 97 * hash + Objects.hashCode(this.category);
-        hash = 97 * hash + Objects.hashCode(this.dateOfRecord);
-        hash = 97 * hash + Objects.hashCode(this.dateOfRecordUtilDate);
         hash = 97 * hash + Objects.hashCode(this.timestamp);
         hash = 97 * hash + Objects.hashCode(this.description);
         hash = 97 * hash + Objects.hashCode(this.owner);
@@ -359,6 +316,77 @@ public  class       Event
      */
     public void setOccPeriodID(int occPeriodID) {
         this.occPeriodID = occPeriodID;
+    }
+
+    /**
+     * @return the timeStart
+     */
+    public LocalDateTime getTimeStart() {
+        return timeStart;
+    }
+
+    /**
+     * @return the timeStartUtilDate
+     */
+    public java.util.Date getTimeStartUtilDate() {
+         if(timeStart != null){
+            timeStartUtilDate = java.util.Date.from(
+                    this.timeStart.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return timeStartUtilDate;
+    }
+
+    /**
+     * @return the timeEnd
+     */
+    public LocalDateTime getTimeEnd() {
+        
+        return timeEnd;
+    }
+
+    /**
+     * @return the timeEndUtilDate
+     */
+    public java.util.Date getTimeEndUtilDate() {
+         if(timeEnd != null){
+            timeEndUtilDate = java.util.Date.from(
+                    this.timeEnd.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return timeEndUtilDate;
+    }
+
+    /**
+     * @param timeStart the timeStart to set
+     */
+    public void setTimeStart(LocalDateTime timeStart) {
+        this.timeStart = timeStart;
+    }
+
+    /**
+     * @param tsud
+     */
+    public void setTimeStartUtilDate(java.util.Date tsud) {
+        this.timeStartUtilDate = tsud;
+        if(tsud != null){
+            timeStart = this.timeStartUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
+    /**
+     * @param timeEnd the timeEnd to set
+     */
+    public void setTimeEnd(LocalDateTime timeEnd) {
+        this.timeEnd = timeEnd;
+    }
+
+    /**
+     * @param teud
+     */
+    public void setTimeEndUtilDate(java.util.Date teud) {
+        this.timeEndUtilDate = teud;
+        if(teud != null){
+            timeEnd = this.timeEndUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
 

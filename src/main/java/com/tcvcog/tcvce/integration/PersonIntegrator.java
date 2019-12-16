@@ -530,16 +530,24 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     } // close insertPerson()
 
-    public void connectPersonsToEvent(EventCECase ev, List<Person> personList) throws IntegrationException {
+    /**
+     * Convenience method for iterating over a List<Person> and calling
+     * eventPersonConect for each one
+     * 
+     * @param ev
+     * @param personList
+     * @throws IntegrationException 
+     */
+    public void eventPersonsConnect(Event ev, List<Person> personList) throws IntegrationException {
         ListIterator li = personList.listIterator();
         while (li.hasNext()) {
-            connectPersonToEvent(ev, (Person) li.next());
+            eventPersonConnect(ev, (Person) li.next());
         }
     }
 
-    public void connectPersonToEvent(EventCECase ev, Person p) throws IntegrationException {
+    public void eventPersonConnect(Event ev, Person p) throws IntegrationException {
 
-        String query = "INSERT INTO public.ceeventperson(\n"
+        String query = "INSERT INTO public.eventperson(\n"
                 + " ceevent_eventid, person_personid)\n"
                 + " VALUES (?, ?);";
         Connection con = getPostgresCon();
@@ -564,27 +572,20 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    public void connectPersonsToEvent(EventOccPeriod ev, List<Person> personList) throws IntegrationException {
-        ListIterator li = personList.listIterator();
-        while (li.hasNext()) {
-            connectPersonToEvent(ev, (Person) li.next());
-        }
-    }
-
-    public void connectPersonToEvent(EventOccPeriod ev, Person p) throws IntegrationException {
-
-        String query =  "INSERT INTO public.occeventperson(\n" +
-                        "            occevent_eventid, person_personid)\n" +
-                        "    VALUES (?, ?);";
+   
+    /**
+     * Drops all event-person connections  from eventperson
+     * @param ev 
+     */
+    public void eventPersonClear(Event ev) throws IntegrationException{
+        String query = "DELETE FROM eventperson WHERE ceevent_eventid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, ev.getOccPeriodID());
-            stmt.setInt(2, p.getPersonID());
+            stmt.setInt(1, ev.getEventID());
 
-            System.out.println("PersonIntegrator.connectPersonToEvent | sql: " + stmt.toString());
             stmt.execute();
 
         } catch (SQLException ex) {
@@ -595,8 +596,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-
+        
     }
+    
+    
     
     public void connectPersonToMunicipalities(List<Municipality> munuiList, Person p) throws IntegrationException {
 
