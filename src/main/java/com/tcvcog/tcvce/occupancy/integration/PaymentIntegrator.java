@@ -290,7 +290,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         String query = "SELECT moneyfee.feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes\n"
                 + "FROM moneyfee, moneycodesetelementfee\n"
-                + "WHERE moneyfee.feeid = moneycodesetelementfee.fee_feeid AND moneycodesetelementfee. = ?;";
+                + "WHERE moneyfee.feeid = moneycodesetelementfee.fee_feeid AND moneycodesetelementfee.codesetelement_elementid = ?;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -437,6 +437,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
             fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
+            fee.setAssigned(rs.getTimestamp("assignedbyts").toLocalDateTime());
             fee.setWaivedBy(ui.getUser(rs.getInt("waivedby_userid")));
             fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
             fee.setReducedBy(rs.getDouble("reduceby"));
@@ -467,6 +468,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
             fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
+            fee.setAssigned(rs.getTimestamp("assignedbyts").toLocalDateTime());
             fee.setWaivedBy(ui.getUser(rs.getInt("waivedby_userid")));
             fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
             fee.setReducedBy(rs.getDouble("reducedby"));
@@ -512,6 +514,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+    //TODO: Fix the occinspec_inspectionid field
+    
     public void updatePayment(Payment payment) throws IntegrationException {
         String query = "UPDATE public.moneypayment\n"
                 + "   SET occinspec_inspectionid=?, paymenttype_typeid=?, \n"
@@ -578,6 +582,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+    //TODO: Fix the occinspec_inspectionid field
+    
     /**
      * Extracts the ID of the given OccPerioda and uses this to grab all
      * relevant payments from the db associated with this Occperiod
@@ -634,6 +640,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
+    //TODO: Fix the occinspec_inspectionid field
+    
     public List<Payment> getPaymentList(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
 
         String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
@@ -732,6 +740,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
+    //TODO: Fix the occinspec_inspectionid field
+    
     public Payment getMostRecentPayment() throws IntegrationException {
         String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
@@ -779,6 +789,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return skeleton;
     }
 
+    //TODO: Fix the occinspec_inspectionid field
+    
     public void insertPayment(Payment payment) throws IntegrationException {
         String query = "INSERT INTO public.moneypayment(\n"
                 + " paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
@@ -1052,6 +1064,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
+    //TODO: Fix the occinspec_inspectionid field
+    
     private Payment generatePayment(ResultSet rs) throws IntegrationException {
         Payment newPayment = new Payment();
 
