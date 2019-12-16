@@ -281,16 +281,16 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         
         prop.setDirective(getDirective(rs.getInt("directive_directiveid")));
         if(rs.getInt("generatingevent_cecaseeventid") != 0){
-            prop.setGeneratingEvent(ei.getEventCECase(rs.getInt("generatingevent_cecaseeventid")));
+            prop.setGeneratingEvent(ei.getEvent(rs.getInt("generatingevent_cecaseeventid")));
         }
         if(rs.getInt("generatingevent_occeventid") != 0){
-            prop.setGeneratingEvent(ei.getOccEvent(rs.getInt("generatingevent_occeventid")));
+            prop.setGeneratingEvent(ei.getEvent(rs.getInt("generatingevent_occeventid")));
         }
         if(rs.getInt("responseevent_cecaseeventid") != 0){
-            prop.setResponseEvent(ei.getEventCECase(rs.getInt("responseevent_cecaseeventid")));
+            prop.setResponseEvent(ei.getEvent(rs.getInt("responseevent_cecaseeventid")));
         }
         if(rs.getInt("responseevent_occeventid") != 0){
-            prop.setResponseEvent(ei.getOccEvent(rs.getInt("responseevent_occeventid")));
+            prop.setResponseEvent(ei.getEvent(rs.getInt("responseevent_occeventid")));
         }
                
         prop.setInitiator(ui.getUser(rs.getInt("initiator_userid")));

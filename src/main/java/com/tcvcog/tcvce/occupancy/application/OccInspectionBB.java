@@ -618,7 +618,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             System.out.println("OccInspectionBB.initiateNewEvent | category: " + getSelectedEventCategory().getEventCategoryTitle());
             EventCoordinator ec = getEventCoordinator();
             try {
-                currentEvent = ec.getInitializedEvent(currentOccPeriod, getSelectedEventCategory());
+                currentEvent = ec.initializeEvent(currentOccPeriod, getSelectedEventCategory());
                 currentEvent.setDateOfRecord(LocalDateTime.now());
                 currentEvent.setDiscloseToMunicipality(true);
                 currentEvent.setDiscloseToPublic(false);

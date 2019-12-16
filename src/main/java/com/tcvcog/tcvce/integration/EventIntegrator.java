@@ -565,7 +565,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         String query = " SELECT categoryid, categorytype, title, description, userdeployable, \n" +
                         "       munideployable, publicdeployable, notifycasemonitors, hidable, \n" +
                         "       icon_iconid, relativeorderwithintype, relativeorderglobal, hosteventdescriptionsuggtext, \n" +
-                        "       directive_directiveid\n" +
+                        "       directive_directiveid, defaultdurationmins \n" +
                         "  FROM public.eventcategory WHERE categoryid = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -629,6 +629,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         if(rs.getInt("directive_directiveid") != 0){
             ec.setDirective(choiceInt.getDirective(rs.getInt("directive_directiveid")));
         }
+        
+        ec.setDefaultdurationmins(rs.getInt("defaultdurationmins"));
         return ec;
     }
    
@@ -706,11 +708,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                         "            categoryid, categorytype, title, description, userdeployable, \n" +
                         "            munideployable, publicdeployable, notifycasemonitors, hidable, \n" +
                         "            icon_iconid, relativeorderwithintype, relativeorderglobal, hosteventdescriptionsuggtext, \n" +
-                        "            directive_directiveid)\n" +
+                        "            directive_directiveid, defaultdurationmins)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
-                        "            ?);";
+                        "            ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -741,6 +743,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(13, java.sql.Types.NULL);
             }
+            
+            stmt.setInt(14, ec.getDefaultdurationmins());
 
             stmt.execute();
 
@@ -760,7 +764,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                         "   SET categorytype=?, title=?, description=?, userdeployable=?, \n" +
                         "       munideployable=?, publicdeployable=?, notifycasemonitors=?, hidable=?, \n" +
                         "       icon_iconid=?, relativeorderwithintype=?, relativeorderglobal=?, \n" +
-                        "       hosteventdescriptionsuggtext=?, directive_directiveid=?\n" +
+                        "       hosteventdescriptionsuggtext=?, directive_directiveid=?, defaultdurationmins=?\n" +
                         " WHERE categoryid = ?;";
 
         Connection con = getPostgresCon();
@@ -794,8 +798,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(13, java.sql.Types.NULL);
             }
+            stmt.setInt(14, ec.getDefaultdurationmins());
             
-            stmt.setInt(14, ec.getCategoryID());
+            stmt.setInt(15, ec.getCategoryID());
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
@@ -1093,7 +1098,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             throws SQLException, IntegrationException{
         EventRuleCECase evRule = new EventRuleCECase(imp);
         evRule.setCeCaseID(rs.getInt("cecase_caseid"));
-        evRule.setPassedRuleEvent(getEventCECase(rs.getInt("passedrule_eventid")));
+        evRule.setPassedRuleEvent(getEvent(rs.getInt("passedrule_eventid")));
         return evRule;
         
     }

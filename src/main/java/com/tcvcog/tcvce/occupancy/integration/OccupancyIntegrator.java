@@ -1217,7 +1217,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             occpermitapp.setSubmissionDate(rs.getTimestamp("submissiontimestamp").toLocalDateTime());
             occpermitapp.setSubmissionNotes(rs.getString("submitternotes"));
             occpermitapp.setInternalNotes(rs.getString("internalNotes"));
-            occpermitapp.setApplicationPropertyUnit(propint.getPropertyUnitByPropertyUnitID(rs.getInt("propertyunitid")));
+            occpermitapp.setApplicationPropertyUnit(propint.getPropertyUnit(rs.getInt("propertyunitid")));
 
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyInspectionIntegrator.generateOccPermitApplication | "

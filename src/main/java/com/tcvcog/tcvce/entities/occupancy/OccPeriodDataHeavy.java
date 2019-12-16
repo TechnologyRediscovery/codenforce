@@ -70,7 +70,6 @@ public  class       OccPeriodDataHeavy
     private List<MoneyOccPeriodFeePayment> paymentList;
 
     private LocalDateTime configuredTS;
-    
     private String credentialSignature;
     
     public OccPeriodDataHeavy() {

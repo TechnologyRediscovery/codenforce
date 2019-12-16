@@ -23,7 +23,8 @@ package com.tcvcog.tcvce.entities;
 public class EventRuleCECase extends EventRuleImplementation{
     
     private int ceCaseID;
-    private EventCECase passedRuleEvent;
+    
+    private Event passedRuleEvent;
     
     public EventRuleCECase(EventRuleImplementation imp){
         super(imp);
@@ -44,7 +45,7 @@ public class EventRuleCECase extends EventRuleImplementation{
     /**
      * @return the passedRuleEvent
      */
-    public EventCECase getPassedRuleEvent() {
+    public Event getPassedRuleEvent() {
         return passedRuleEvent;
     }
 

@@ -171,6 +171,18 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
     }
     
+    public PropertyUnit getPropertyUnit(int unitID) throws IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getPropertyUnit(unitID);
+        
+    }
+    
+    public Property getPropertyByPropUnit(int unitID) throws IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getPropertyUnitWithProp(unitID).getProperty();
+    }
+    
+    
     /**
      * Implements a cascade of logic to determine a best suited startup property
      * for a given session. When a user has no Property history, it extracts

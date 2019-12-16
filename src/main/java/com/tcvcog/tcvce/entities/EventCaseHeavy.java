@@ -16,20 +16,19 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-
 /**
- *
+ * A data-rich subclass of Event to hold a CECase
+ * when we want to display the event outside of its CECase context
+ * but still want to know where it came from
+ * 
  * @author Ellen Bascomb
  */
-public  class   EventOccPeriodPropUnitHeavy 
+public  class   EventCaseHeavy 
         extends Event{
     
-    protected Property prop;
-    protected PropertyUnit propUnit;
-    protected OccPeriod period;
+    protected CECaseBase ceCase;
     
-    public EventOccPeriodPropUnitHeavy(Event ev){
+    public EventCaseHeavy(Event ev){
         this.eventID = ev.getEventID();
         this.category = ev.getCategory();
         
@@ -37,7 +36,9 @@ public  class   EventOccPeriodPropUnitHeavy
         this.ceCaseID = ev.getCeCaseID();
         this.occPeriodID = ev.getOccPeriodID();
 
-        this.dateOfRecord = ev.getDateOfRecord();
+        this.timeStart = ev.getTimeStart();
+        this.timeEnd = ev.getTimeEnd();
+        
         this.timestamp = ev.getTimestamp();
         this.description = ev.getDescription();
         
@@ -52,45 +53,18 @@ public  class   EventOccPeriodPropUnitHeavy
     }
 
     /**
-     * @return the prop
+     * @return the ceCase
      */
-    public Property getProp() {
-        return prop;
+    public CECaseBase getCeCase() {
+        return ceCase;
     }
 
     /**
-     * @param prop the prop to set
+     * @param ceCase the ceCase to set
      */
-    public void setProp(Property prop) {
-        this.prop = prop;
+    public void setCeCase(CECaseBase ceCase) {
+        this.ceCase = ceCase;
     }
 
-    /**
-     * @return the propUnit
-     */
-    public PropertyUnit getPropUnit() {
-        return propUnit;
-    }
-
-    /**
-     * @return the period
-     */
-    public OccPeriod getPeriod() {
-        return period;
-    }
-
-    /**
-     * @param propUnit the propUnit to set
-     */
-    public void setPropUnit(PropertyUnit propUnit) {
-        this.propUnit = propUnit;
-    }
-
-    /**
-     * @param period the period to set
-     */
-    public void setPeriod(OccPeriod period) {
-        this.period = period;
-    }
-    
+   
 }

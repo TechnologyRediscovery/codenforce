@@ -952,7 +952,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return propList;
     }
     
-     public PropertyUnit getPropertyUnitByPropertyUnitID(int propUnitID) throws IntegrationException {
+     public PropertyUnit getPropertyUnit(int propUnitID) throws IntegrationException {
         PropertyUnit pu = null;
         String query =  "SELECT unitid, unitnumber, property_propertyid, otherknownaddress, notes, \n" +
                         "       rentalintentdatestart, rentalintentdatestop, rentalintentlastupdatedby_userid, \n" +
@@ -1133,7 +1133,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(1, p.getPropertyID());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                unitList.add(getPropertyUnitByPropertyUnitID(rs.getInt("unitid")));
+                unitList.add(getPropertyUnit(rs.getInt("unitid")));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -1190,7 +1190,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     
     public PropertyUnitDataHeavy getPropertyUnitWithLists(int unitID) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        PropertyUnitDataHeavy puwl = new PropertyUnitDataHeavy(getPropertyUnitByPropertyUnitID(unitID));
+        PropertyUnitDataHeavy puwl = new PropertyUnitDataHeavy(getPropertyUnit(unitID));
         puwl.setPeriodList(oi.getOccPeriodList(unitID));
         return puwl;
     }
@@ -1206,7 +1206,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public PropertyUnitWithProp getPropertyUnitWithProp(int unitID) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         
-        PropertyUnitWithProp puwp = new PropertyUnitWithProp(getPropertyUnitByPropertyUnitID(unitID));
+        PropertyUnitWithProp puwp = new PropertyUnitWithProp(getPropertyUnit(unitID));
         puwp.setProperty(pi.getProperty(puwp.getPropertyID()));
         
         return puwp;
@@ -1228,7 +1228,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         PropertyIntegrator pi = getPropertyIntegrator();
 
-        PropertyUnit skeleton = pi.getPropertyUnitByPropertyUnitID(uc.getUnitID());
+        PropertyUnit skeleton = pi.getPropertyUnit(uc.getUnitID());
 
         if (uc.getUnitNumber() != null) {
             skeleton.setUnitNumber(uc.getUnitNumber());
