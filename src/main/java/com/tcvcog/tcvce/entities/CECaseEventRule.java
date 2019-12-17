@@ -17,7 +17,9 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- *
+ *  Dep during the Grand Event Reunification
+ * 
+ * @deprecated 
  * @author sylvia
  */
 public class CECaseEventRule extends EventRuleImplementation{

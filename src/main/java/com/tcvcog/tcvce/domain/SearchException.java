@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2017 cedba
+ * Copyright (C) 2017 Turtle Creek Valley
+Council of Governments, PA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,30 +17,28 @@
  */
 package com.tcvcog.tcvce.domain;
 
-
 /**
  *
- * @author cedba
+ * @author Eric C. Darsow
  */
-public class PermissionsException extends BaseException{
- 
-  public PermissionsException()
-  {
-    super();
-  }
-
-  public PermissionsException(String message)
-  {
-    super(message);
-  }
-
-  public PermissionsException(Exception e)
-  {
-    super(e);
-  }
-
-  public PermissionsException(String message, Exception e)
-  {
-    super(message, e);
-  }
+public class SearchException extends BaseException {
+    
+    public SearchException(){
+        super();
+        
+    }
+    
+    public SearchException(String message){
+        super(message);
+    }
+    
+    public SearchException(Exception e){
+        super(e);
+    }
+    
+    public SearchException(String message, Exception e){
+        super(message, e);
+        
+    }
+    
 }

@@ -36,7 +36,7 @@ import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.search.QueryEventCECase;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
@@ -1096,9 +1096,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
     private EventRuleCECase rules_generateCECaseEventRule(ResultSet rs, EventRuleImplementation imp) 
             throws SQLException, IntegrationException{
+        EventCoordinator ec = getEventCoordinator();
         EventRuleCECase evRule = new EventRuleCECase(imp);
         evRule.setCeCaseID(rs.getInt("cecase_caseid"));
-        evRule.setPassedRuleEvent(getEvent(rs.getInt("passedrule_eventid")));
+        evRule.setPassedRuleEvent(ec.getEvent(rs.getInt("passedrule_eventid")));
         return evRule;
         
     }

@@ -115,7 +115,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         PersonIntegrator pi = getPersonIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            pc.updatePerson(selectedPerson, getSessionBean().getSessionUser(), updateDescription);
+            pc.editPerson(selectedPerson, getSessionBean().getSessionUser(), updateDescription);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Person updated! This updated person is now your 'active person'", ""));
@@ -154,7 +154,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     public void initiatePersonCreation(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        selectedPerson = pc.getNewPersonSkeleton(getSessionBean().getSessionMuni());
+        selectedPerson = pc.initPerson(getSessionBean().getSessionMuni());
         System.out.println("PersonsBB.initiatePersonCreation : selected person id: " + selectedPerson.getPersonID());
     }
     
@@ -188,7 +188,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         int newPersonID;
         try {
             selectedPerson.setCreatorUserID(getSessionBean().getSessionUser().getUserID());
-            newPersonID = pc.addNewPerson(selectedPerson);
+            newPersonID = pc.createPerson(selectedPerson);
             selectedPerson = pi.getPerson(newPersonID);
             getSessionBean().setSessionPerson(selectedPerson);
             getSessionBean().getSessionPersonList().add(selectedPerson);

@@ -10,7 +10,7 @@ Council of Governments, PA
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU General Public License for mo re details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -25,23 +25,14 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.PermissionsException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
-import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.CitationIntegrator;
-import com.tcvcog.tcvce.integration.ViolationIntegrator;
-import com.tcvcog.tcvce.integration.EventIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.SystemIntegrator;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.integration.*;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.io.Serializable;
@@ -51,12 +42,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -314,8 +301,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     public CECase selectDefaultCECase(Credential cred) throws IntegrationException, CaseLifecycleException{
         CaseIntegrator ci = getCaseIntegrator();
         return ci.getCECase( Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("arbitraryPlaceholderCaseID")));
-        
-        
+    }
+    
+    public QueryCECase selectDefaultQueryCECase(Credential cred){
+        SearchCoordinator sc = getSearchCoordinator();
+        return sc.initQuery(QueryCECaseEnum.OPENCASES);
+    }
+    
+    public QueryCEAR selectDefaultQueryCEAR(Credential cred){
+        SearchCoordinator sc = getSearchCoordinator();
+        return sc.initQuery(QueryCEAREnum.UNPROCESSED);
     }
     
     public List<CECase> assembleCaseHistory(Credential cred) throws IntegrationException, CaseLifecycleException{
@@ -328,13 +323,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 //                pl.add(pi.getPerson(idList.remove(0)));
 //            }
         }
-        
-        
         return cl;
-        
     }
     
-    public CECase getInitializedCECase(Property p, User u){
+    public CECase initCECase(Property p, User u){
         CECase newCase = new CECase();
         
         int casePCC = generateControlCodeFromTime();
@@ -683,14 +675,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param nov
      * @param user
      * @throws IntegrationException
-     * @throws PermissionsException 
      */
-    public void novResetMailing(NoticeOfViolation nov, UserAuthorized user) throws IntegrationException, PermissionsException{
+    public void novResetMailing(NoticeOfViolation nov, UserAuthorized user) throws IntegrationException, PermissionsException, AuthorizationException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         if(user.getMyCredential().isHasSysAdminPermissions()){
             cvi.novResetMailingFieldsToNull(nov);
         } else {
-            throw new PermissionsException("User does not have sufficient acces righst to clear notice mailing fields");
+            throw new AuthorizationException("User does not have sufficient acces righst to clear notice mailing fields");
         }
     }
     

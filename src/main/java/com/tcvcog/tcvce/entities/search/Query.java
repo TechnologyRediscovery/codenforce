@@ -46,14 +46,14 @@ public abstract class   Query<E extends BOb>
     
     private String resultsMessage;
     private LocalDateTime executionTimestamp;
-    private String executionTimestampPretty;
     
     private boolean executedByIntegrator;
+    
     
     public abstract List<E> getBOBResultList();
     public abstract void setBOBResultList(List<E> l);
     
-    public abstract List getParmsList();
+    public abstract List<SearchParams> getParmsList();
     public abstract String getQueryTitle();
     
     public abstract void clearResultList();
@@ -139,9 +139,9 @@ public abstract class   Query<E extends BOb>
      */
     public String getExecutionTimestampPretty() {
         if(executionTimestamp != null){
-            executionTimestampPretty = EntityUtils.getPrettyDate(executionTimestamp);
+            return EntityUtils.getPrettyDate(executionTimestamp);
         }
-        return executionTimestampPretty;
+        return null;
     }
 
     /**

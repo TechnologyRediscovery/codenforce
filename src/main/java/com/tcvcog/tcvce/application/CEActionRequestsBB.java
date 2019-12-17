@@ -121,7 +121,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             rpt = cc.getInitializedReportConficCEARs(
                     getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
             rpt.setPrintFullCEARQueue(false);
-            QueryCEAR query = searchCoord.prepareQueryCEAR(
+            QueryCEAR query = searchCoord.initQuery(
                                                 QueryCEAREnum.CUSTOM, 
                                                 getSessionBean().getSessionUser().getMyCredential(), 
                                                 null);
@@ -190,7 +190,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SearchCoordinator searchCoord = getSearchCoordinator();
         try {
             
-            selectedQueryCEAR = searchCoord.prepareQueryCEAR(
+            selectedQueryCEAR = searchCoord.initQuery(
                                                     QueryCEAREnum.CUSTOM,
                                                     getSessionBean().getSessionUser().getMyCredential(), 
                                                     searchParams);

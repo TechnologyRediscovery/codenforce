@@ -599,20 +599,19 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         } // close finally
     }
 
-    public QueryProperty runQueryProperties(QueryProperty query) throws IntegrationException {
-        List<SearchParamsProperty> pList = query.getParmsList();
+   
 
-        for (SearchParamsProperty sp : pList) {
-            query.addToResults(searchForProperties(sp));
-        }
-        query.setExecutionTimestamp(LocalDateTime.now());
-        query.setExecutedByIntegrator(true);
-        return query;
-    }
+    /**
+     * Single entry point for searches against the property table. It's the job of
+     * the caller to iterate over the result list and make real objects
+     * 
+     * @param params
+     * @return List of property IDs
+     * @throws IntegrationException 
+     */
+    public List<Integer> searchForProperties(SearchParamsProperty params) throws IntegrationException {
 
-    public List<Property> searchForProperties(SearchParamsProperty params) throws IntegrationException {
-
-        List<Property> propList = new ArrayList<>();
+        List<Integer> propIDList = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -795,7 +794,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                propList.add(getProperty(rs.getInt("propertyid")));
+                propIDList.add(rs.getInt("propertyid"));
                 counter++;
             }
             System.out.println(String.format("number of returned props = %d", counter));
@@ -808,7 +807,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         System.out.println("about to return proplist");
-        return propList;
+        return propIDList;
     }
 
     private String getDBDateField(SearchParamsProperty params) {

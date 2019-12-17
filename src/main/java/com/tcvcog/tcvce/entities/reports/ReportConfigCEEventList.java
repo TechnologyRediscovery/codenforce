@@ -7,7 +7,7 @@ package com.tcvcog.tcvce.entities.reports;
 
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
-import com.tcvcog.tcvce.entities.search.QueryEventCECase;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 
 /**
@@ -18,7 +18,7 @@ public class ReportConfigCEEventList
         extends Report
         implements QueryBacked{
     
-    private QueryEventCECase queryParams;
+    private QueryEvent queryParams;
     
     private boolean includeAttachedPersons;
     private boolean includeEventTypeSummaryChart;
@@ -107,7 +107,7 @@ public class ReportConfigCEEventList
 
     @Override
     public void setBOBQuery(Query q) {
-        queryParams = (QueryEventCECase) q;
+        queryParams = (QueryEvent) q;
     }
     
     public SearchParamsEvent getQueryParams(){

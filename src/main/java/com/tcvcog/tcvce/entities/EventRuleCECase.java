@@ -59,7 +59,7 @@ public class EventRuleCECase extends EventRuleImplementation{
     /**
      * @param passedRuleEvent the passedRuleEvent to set
      */
-    public void setPassedRuleEvent(EventCECase passedRuleEvent) {
+    public void setPassedRuleEvent(Event passedRuleEvent) {
         this.passedRuleEvent = passedRuleEvent;
     }
     

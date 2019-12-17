@@ -1062,46 +1062,38 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    public List<Person> searchForPersons(SearchParamsPerson params) throws IntegrationException {
-        ArrayList<Person> personList = new ArrayList();
+    public List<Integer> searchForPersons(SearchParamsPerson params) throws IntegrationException {
+        ArrayList<Integer> persIDList = new ArrayList();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         String defaultQuery = "SELECT personId "
                 + "FROM person "
-                + "WHERE ";
+                + "WHERE personid IS NOT NULL AND ";
         StringBuilder query = new StringBuilder(defaultQuery);
         boolean notFirstCriteria = false;
         
         
         if (!params.isObjectID_filterBy()){
             if (params.isFilterByLastName()){
-                if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
                 query.append("lname ILIKE ? ");
             }
             if (params.isFilterByFirstName()){
-                if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
                 query.append("fname ILIKE ? ");
             }
             if (params.isFilterByAddressStreet()){
-                if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
                 query.append("address_street ILIKE ? ");
             }
             if (params.isFilterByCity()){
-                if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
                 query.append("address_city ILIKE ? ");
             }
             if (params.isFilterByZipCode()){
-                if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
                 query.append("address_zip ILIKE ? ");
             }            
             if (params.isFilterByEmail()){
-                if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
                 query.append("email ILIKE ? ");
             }
-            
             if (params.isFilterByPhoneNumber()){
-                if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
                 query.append("phonecell ILIKE ? OR phonework ILIKE ? OR phonehome ILIKE ? ");
             }
             
@@ -1149,7 +1141,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                personList.add(getPerson(rs.getInt("personid")));
+                persIDList.add(rs.getInt("personid"));
                 counter++;
             }
         } catch (SQLException ex) {
@@ -1162,20 +1154,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         }        
        
-        return personList;
+        return persIDList;
     }
     
-    
-    public QueryPerson runQueryPerson(QueryPerson query) throws IntegrationException {
-        List<SearchParamsPerson> pList = query.getParmsList();
-        
-        for(SearchParamsPerson sp: pList){
-            query.addToResults(searchForPersons(sp));
-        }
-        query.setExecutionTimestamp(LocalDateTime.now());
-        query.setExecutedByIntegrator(true);
-        return query;
-    }
-
 
 } // close class

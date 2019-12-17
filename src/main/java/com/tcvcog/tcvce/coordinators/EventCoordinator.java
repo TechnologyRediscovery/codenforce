@@ -145,7 +145,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                                                                         UserAuthorized user) throws IntegrationException{
         Iterator<EventCECaseCasePropBundle> iter = evList.iterator();
         while(iter.hasNext()){
-            configureEvent(iter.next().getEvent(), user);
+            configureEvent(iter.next().getEvent());
         }
         return evList;
     }
@@ -208,23 +208,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
     }
     
-     /**
-     * Pathway for injecting business logic into the event search process. Now its just a pass through.
-     * @param params
-     * @param user the current user
-     * @param userAuthMuniList
-     * @return
-     * @throws IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
-     */
-    public List<EventCECaseCasePropBundle> queryEvents( SearchParamsEvent params, 
-                                                        UserAuthorized user) 
-            throws IntegrationException, CaseLifecycleException{
-        EventIntegrator ei = getEventIntegrator();
-        List<EventCECaseCasePropBundle> evList = configureEventBundleList(  ei.searchForEvents(params),
-                                                                            user);
-        return evList;
-    }
+    
     
     
     
@@ -324,37 +308,33 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return e;
     }
     
-    /**
-     * Skeleton event factory
-     * For use by the public messaging system which attaches events to code enforcement
-     * cases without having access to the entire CECase object--only the caseid
-     * @param caseID to which the event should be attached
-     * @return an instantiated EventCECase object ready to be configured
-     */
-    public EventCECase getInitializedCECaseEvent(int caseID){
-        EventCECase event = new EventCECase(new Event());
-        event.setCaseID(caseID);
-        return event;
-    }
-    
-    /**
-     * Skeleton event factory
-     * For use by the public messaging system which attaches events to code enforcement
-     * cases without having access to the entire CECase object--only the caseid
-     * @param periodID
-     * @return an instantiated EventCECase object ready to be configured
-     */
-    public EventOccPeriod getInitializedOccPeriodEvent(int periodID){
-        EventOccPeriod event = new EventOccPeriod(new Event());
-        event.setOccPeriodID(periodID);
-        return event;
-    }
     
     
 //    --------------------------------------------------------------------------
 //    ***************************** SEARCH *************************************
 //    --------------------------------------------------------------------------
     
+    
+    
+    
+     /**
+     * Pathway for injecting business logic into the event search process. Now its just a pass through.
+     * @param params
+     * @param user the current user
+     * @return
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
+     */
+    public List<EventCECaseCasePropBundle> queryEvents( SearchParamsEvent params, 
+                                                        Credential cred) throws IntegrationException, CaseLifecycleException{
+        EventIntegrator ei = getEventIntegrator();
+        
+        
+        
+        List<EventCECaseCasePropBundle> evList = configureEventBundleList(  ei.searchForEvents(params),
+                                                                            user);
+        return evList;
+    }
     
     
     public SearchParamsEvent getSearchParamsCEEventsRequiringAction(UserAuthorized user, Municipality m){

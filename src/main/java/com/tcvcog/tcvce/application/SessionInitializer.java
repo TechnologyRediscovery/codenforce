@@ -42,7 +42,7 @@ import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
-import com.tcvcog.tcvce.entities.search.QueryEventCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
@@ -363,9 +363,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 searchCoord.prepareQueryCECase(
                 QueryCECaseEnum.OPENCASES, ua, muni, null));
         
-        sb.setQueryEventCECase(
-                searchCoord.prepareQueryEventCECase(
-                QueryEventCECaseEnum.MUNICODEOFFICER_ACTIVITY_PAST30DAYS, ua, muni, null));
+        sb.setQueryEventCECase(searchCoord.prepareQueryEventCECase(QueryEventEnum.MUNICODEOFFICER_ACTIVITY_PAST30DAYS, ua, muni, null));
         
         sb.setQueryOccPeriod(
                 searchCoord.prepareQueryOccPeriod(

@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
@@ -19,17 +20,18 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class QueryEventCECase extends Query {
+public class QueryEvent 
+        extends Query {
     
-    private QueryEventCECaseEnum queryName;
+    private QueryEventEnum queryName;
     
     
     // should be a list of search params eventually so we can build
     // queries from a set of search params
     private List<SearchParamsEvent> eventSearchParamsList;
-    private List<EventCECaseCasePropBundle> results;
+    private List<Event> results;
     
-    public QueryEventCECase(QueryEventCECaseEnum qName, 
+    public QueryEvent(QueryEventEnum qName, 
                             Municipality muni, 
                             Credential c,
                             List<SearchParamsEvent> params) {
@@ -47,7 +49,7 @@ public class QueryEventCECase extends Query {
     }
 
     @Override
-    public List<EventCECaseCasePropBundle> getBOBResultList() {
+    public List<Event> getBOBResultList() {
         return results;
     }
 
@@ -76,19 +78,19 @@ public class QueryEventCECase extends Query {
     /**
      * @return the queryName
      */
-    public QueryEventCECaseEnum getQueryName() {
+    public QueryEventEnum getQueryName() {
         return queryName;
     }
 
     /**
      * @param queryName the queryName to set
      */
-    public void setQueryName(QueryEventCECaseEnum queryName) {
+    public void setQueryName(QueryEventEnum queryName) {
         this.queryName = queryName;
     }
 
-    public void addToResults(List<EventCECaseCasePropBundle> eventsCECase) {
-        results.addAll(eventsCECase);
+    public void addToResults(List<Event> events) {
+        results.addAll(events);
     }
 
    

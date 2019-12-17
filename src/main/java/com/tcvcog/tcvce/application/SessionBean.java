@@ -43,7 +43,7 @@ import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.QueryEventCECase;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
@@ -123,7 +123,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private QueryPerson queryPerson;
     private QueryCEAR queryCEAR;
     private QueryCECase queryCECase;
-    private QueryEventCECase queryEventCECase;
+    private QueryEvent queryEventCECase;
     private QueryOccPeriod queryOccPeriod;
     
     /* *** Municipal Code Session Shelves ***  */
@@ -776,7 +776,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the queryEventCECase
      */
-    public QueryEventCECase getQueryEventCECase() {
+    public QueryEvent getQueryEventCECase() {
         return queryEventCECase;
     }
 
@@ -797,7 +797,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @param queryEventCECase the queryEventCECase to set
      */
-    public void setQueryEventCECase(QueryEventCECase queryEventCECase) {
+    public void setQueryEventCECase(QueryEvent queryEventCECase) {
         this.queryEventCECase = queryEventCECase;
     }
 

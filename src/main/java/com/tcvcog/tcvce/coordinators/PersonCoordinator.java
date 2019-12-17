@@ -48,7 +48,25 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public PersonCoordinator() {
     }
     
-    public int addNewPerson(Person p) throws IntegrationException{
+    /**
+     * Logic intermediary for receiving requests for a Person 
+     * @param personID
+     * @return
+     * @throws IntegrationException 
+     */
+    public Person getPerson(int personID) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        return pi.getPerson(personID);
+    }
+    
+    
+    /**
+     * Entry point for new Person object requests
+     * @param p
+     * @return
+     * @throws IntegrationException 
+     */
+    public int createPerson(Person p) throws IntegrationException{
         int newid;
         PersonIntegrator pi = getPersonIntegrator();
         newid = pi.insertPerson(p);
@@ -80,8 +98,14 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    
-    public void updatePerson(Person p, User u, String updateNotes) throws IntegrationException{
+    /**
+     * Logic intermediary for Updates to the Person listing
+     * @param p
+     * @param u
+     * @param updateNotes
+     * @throws IntegrationException 
+     */
+    public void editPerson(Person p, User u, String updateNotes) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         StringBuilder sb = new StringBuilder();
         // create the new note header
@@ -94,7 +118,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public Person getNewPersonSkeleton(Municipality m){
+    public Person initPerson(Municipality m){
         Person newP = new Person();
         newP.setPersonType(PersonType.Public);
         newP.setActive(true);
@@ -195,12 +219,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return personTypes;
     }
 
-    /**
-     * @param personTypes the personTypes to set
-     */
-    public void setPersonTypes(PersonType[] personTypes) {
-        this.personTypes = personTypes;
-    }
+   
     /**
      * Returns SearchParamsPerson object with its member variables set to default values.
      * @return params
@@ -226,24 +245,9 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
         return params;
     }
-    /**
-     * Queries the person table and returns a list of Person objects. The results are anonymized if
-     * the anonymizeResults parameter is true.
-     * @param params
-     * @param anonymizeResults
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Person> queryPersons(SearchParamsPerson params, boolean anonymizeResults) throws IntegrationException {
-        PersonIntegrator pi = getPersonIntegrator();
-        List<Person> results = pi.searchForPersons(params);
-        
-        if (anonymizeResults){
-            results = anonymizePersonList(results);          
-        }
-        
-        return results;
-    }
+   
+    
+    
     
     public List<Person> anonymizePersonList(List<Person> personList) {
         for (Person person:personList){
