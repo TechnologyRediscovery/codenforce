@@ -909,7 +909,40 @@
                         </h:form>
                     </p:dialog>
                             
-                            
+                    <p:dialog id="dialog-propinfoedit"
+                              height="650" width="900"
+                              widgetVar="dialog-widvar-propinfoedit"
+                              closable="true">
+                        <h2>Edit Property Info</h2>
+                        <h:form id="form-propinfoedit">
+                            <h:messages id="messages-properties-editpropinfo"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                            <p:dataTable id="table-propinfoedit"
+                                         widgetVar="propdatatable"
+                                         rowIndexVar="rowIndex"
+                                         var="prop"
+                                         value="#{propertyProfileBB.currProp}"
+                                         tabindex="2"
+                                         rowKey="#{unit.propertyID}"
+                                         editable="true">
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Street Address"/>
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{prop.address}" /></f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{prop.address}"
+                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+                    </p:dialog>
                             
                             
                     <p:dialog    id="dialog-unitedit"
