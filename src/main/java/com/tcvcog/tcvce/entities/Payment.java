@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 public class Payment {
     
     private int paymentID;
-    private int occupancyInspectionID;
     private PaymentType paymentType;
     private LocalDateTime dateDeposited;
     private LocalDateTime dateReceived;
@@ -55,20 +54,6 @@ public class Payment {
        paymentType.setPaymentTypeId(2);
        
    }
-
-    /**
-     * @return the occupancyInspectionID
-     */
-    public int getOccupancyInspectionID() {
-        return occupancyInspectionID;
-    }
-
-    /**
-     * @param occupancyInspectionID the occupancyInspectionID to set
-     */
-    public void setOccupancyInspectionID(int occupancyInspectionID) {
-        this.occupancyInspectionID = occupancyInspectionID;
-    }
 
     /**
      * @return the dateDeposited

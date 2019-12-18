@@ -23,12 +23,9 @@ import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -43,10 +40,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
-import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriodDateFields;
-import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriodUserFields;
 import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
@@ -56,7 +51,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -495,6 +489,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setInspectionList(inspecInt.getOccInspectionList(op));
 //        op.setPaymentList(pai.getPaymentList(op));
 //        op.setFeeList(pai.getFeeAssigned(op));
+
+// Above: These two loading methods are causing errors. Fix them so that we can place these object in op
+
+
 
         // TODO: Figure out this inheritance snafoo
         

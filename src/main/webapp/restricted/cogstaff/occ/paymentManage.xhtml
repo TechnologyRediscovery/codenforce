@@ -43,13 +43,6 @@
 
                                 <p:column width="25%">
                                     <f:facet name="header">
-                                        <h:outputText value="Occ Inspection ID" />
-                                    </f:facet>
-                                    <h:outputText value="#{p.occupancyInspectionID}"/>
-                                </p:column>
-
-                                <p:column width="25%">
-                                    <f:facet name="header">
                                         <h:outputText value="Assigned Fee ID" />
                                     </f:facet>
                                     <h:outputText value="#{p.assignedFeeID} (#{p.assignedTo})"/>
@@ -165,17 +158,6 @@
                                 <h:panelGrid columns="4" border="0" 
                                              cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
                                              footerClass="gridFooter">
-
-                                    <h:outputLabel value="Occ Inspection ID:" for="occInsID"/>
-                                    <h:panelGroup>
-                                        <p:inputText id="occInsID" value="#{paymentBB.formPaymentOccupancyInspectionID}" 
-                                                     style="width: 250px;" tabindex="4" required="false" 
-                                                     styleClass="inputText" maxlength="100"/>
-                                        <h:message for="occInsID" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" 
-                                                   fatalClass="msgFatal" errorClass="msgError" 
-                                                   />
-                                    </h:panelGroup>
 
                                     <p:outputLabel for="paymentTypeMenu">
                                         <h:outputText value="Payment Type:"/>

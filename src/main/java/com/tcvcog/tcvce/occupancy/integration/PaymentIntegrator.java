@@ -514,11 +514,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    //TODO: Fix the occinspec_inspectionid field
-    
     public void updatePayment(Payment payment) throws IntegrationException {
         String query = "UPDATE public.moneypayment\n"
-                + "   SET occinspec_inspectionid=?, paymenttype_typeid=?, \n"
+                + "   SET paymenttype_typeid=?, \n"
                 + "       datereceived=?, datedeposited=?, amount=(?::numeric::money), payer_personid=?, referencenum=?, \n"
                 + "       checkno=?, cleared=?, notes=?\n"
                 + " WHERE paymentid=?;";
@@ -528,37 +526,30 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, payment.getOccupancyInspectionID());
-            stmt.setInt(2, payment.getPaymentType().getPaymentTypeId());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateReceived()));
-            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
-            stmt.setDouble(5, payment.getAmount());
-            stmt.setInt(6, payment.getPayer().getPersonID());
-            stmt.setString(7, payment.getReferenceNum());
-            stmt.setInt(8, payment.getCheckNum());
-            stmt.setBoolean(9, payment.isCleared());
-            stmt.setString(10, payment.getNotes());
+            stmt.setInt(1, payment.getPaymentType().getPaymentTypeId());
+
             if (payment.getDateReceived() != null) {
-                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateReceived()));
+                stmt.setTimestamp(2, java.sql.Timestamp.valueOf(payment.getDateReceived()));
+
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            //update date deposited
+            if (payment.getDateDeposited() != null) {
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
 
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
-            //update date deposited
-            if (payment.getDateDeposited() != null) {
-                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
 
-            } else {
-                stmt.setNull(4, java.sql.Types.NULL);
-            }
-            stmt.setBigDecimal(5, BigDecimal.valueOf(payment.getAmount()));
-            stmt.setInt(6, payment.getPayer().getPersonID());
-            stmt.setString(7, payment.getReferenceNum());
-            stmt.setInt(8, payment.getCheckNum());
-            stmt.setBoolean(9, payment.isCleared());
-            stmt.setString(10, payment.getNotes());
-            stmt.setInt(11, payment.getPaymentID());
-            System.out.println("PaymentBB.editPayment | sql: " + stmt.toString());
+            stmt.setBigDecimal(4, BigDecimal.valueOf(payment.getAmount()));
+            stmt.setInt(5, payment.getPayer().getPersonID());
+            stmt.setString(6, payment.getReferenceNum());
+            stmt.setInt(7, payment.getCheckNum());
+            stmt.setBoolean(8, payment.isCleared());
+            stmt.setString(9, payment.getNotes());
+            stmt.setInt(10, payment.getPaymentID());
+            System.out.println("PaymentIntegrator.updatePayment | sql: " + stmt.toString());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -582,8 +573,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    //TODO: Fix the occinspec_inspectionid field
-    
     /**
      * Extracts the ID of the given OccPerioda and uses this to grab all
      * relevant payments from the db associated with this Occperiod
@@ -594,7 +583,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
      */
     public List<Payment> getPaymentList(OccPeriod period) throws IntegrationException {
 
-        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
                 + "FROM moneyoccperiodfeeassigned, moneyoccperiodfeepayment, public.moneypayment\n"
@@ -640,11 +629,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
-    //TODO: Fix the occinspec_inspectionid field
-    
     public List<Payment> getPaymentList(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
 
-        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
                 + "FROM moneyoccperiodfeepayment, public.moneypayment\n"
@@ -740,10 +727,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
-    //TODO: Fix the occinspec_inspectionid field
-    
     public Payment getMostRecentPayment() throws IntegrationException {
-        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
                 + "FROM moneypayment\n"
@@ -789,11 +774,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return skeleton;
     }
 
-    //TODO: Fix the occinspec_inspectionid field
-    
     public void insertPayment(Payment payment) throws IntegrationException {
         String query = "INSERT INTO public.moneypayment(\n"
-                + " paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
+                + " paymentid, paymenttype_typeid, datereceived, \n"
                 + " datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes, \n"
                 + " recordedby_userid, entrytimestamp)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
@@ -803,26 +786,25 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, payment.getOccupancyInspectionID());
-            stmt.setInt(2, payment.getPaymentType().getPaymentTypeId());
+            stmt.setInt(1, payment.getPaymentType().getPaymentTypeId());
             if (payment.getDateReceived() != null) {
-                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateReceived()));
+                stmt.setTimestamp(2, java.sql.Timestamp.valueOf(payment.getDateReceived()));
 
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            if (payment.getDateDeposited() != null) {
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
-            if (payment.getDateDeposited() != null) {
-                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
-            } else {
-                stmt.setNull(4, java.sql.Types.NULL);
-            }
-            stmt.setBigDecimal(5, BigDecimal.valueOf(payment.getAmount()));
-            stmt.setInt(6, payment.getPayer().getPersonID());
-            stmt.setString(7, payment.getReferenceNum());
-            stmt.setInt(8, payment.getCheckNum());
-            stmt.setString(9, payment.getNotes());
-            stmt.setInt(10, payment.getRecordedBy().getUserID());
-            System.out.println("PaymentIntegrator.paymentIntegrator | sql: " + stmt.toString());
+            stmt.setBigDecimal(4, BigDecimal.valueOf(payment.getAmount()));
+            stmt.setInt(5, payment.getPayer().getPersonID());
+            stmt.setString(6, payment.getReferenceNum());
+            stmt.setInt(7, payment.getCheckNum());
+            stmt.setString(8, payment.getNotes());
+            stmt.setInt(9, payment.getRecordedBy().getUserID());
+            System.out.println("PaymentIntegrator.insertPayment | sql: " + stmt.toString());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -954,7 +936,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         }
 
     }
-    
+
     public void updateFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
 
         String query = "UPDATE public.moneyoccperiodtypefee\n"
@@ -1064,8 +1046,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
-    //TODO: Fix the occinspec_inspectionid field
-    
     private Payment generatePayment(ResultSet rs) throws IntegrationException {
         Payment newPayment = new Payment();
 
@@ -1075,7 +1055,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             newPayment.setPaymentID(rs.getInt("paymentid"));
-            newPayment.setOccupancyInspectionID(rs.getInt("occinspec_inspectionid"));
             newPayment.setPaymentType(getPaymentTypeFromPaymentTypeID(rs.getInt("paymenttype_typeid")));
             java.sql.Timestamp dateReceived = rs.getTimestamp("datereceived");
             //for received date

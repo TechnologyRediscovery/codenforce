@@ -20,7 +20,6 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;

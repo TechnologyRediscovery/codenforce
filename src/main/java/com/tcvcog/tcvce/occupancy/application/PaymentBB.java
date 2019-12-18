@@ -33,7 +33,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -140,7 +139,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             Payment payment = selectedPayment;
 
             payment.setPaymentType(formPayment.getPaymentType());
-            payment.setOccupancyInspectionID(formPayment.getOccupancyInspectionID());
             payment.setDateDeposited(formPayment.getDateDeposited());
             payment.setDateReceived(formPayment.getDateReceived());
             payment.setAmount(formPayment.getAmount());
@@ -171,7 +169,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         if (getSelectedPayment() != null) {
             formPayment.setPaymentID(selectedPayment.getPaymentID());
             formPayment.setPaymentType(selectedPayment.getPaymentType());
-            formPayment.setOccupancyInspectionID(selectedPayment.getOccupancyInspectionID());
             formPayment.setAmount(selectedPayment.getAmount());
             formPayment.setPayer(selectedPayment.getPayer());
             formPayment.setReferenceNum(selectedPayment.getReferenceNum());
@@ -236,7 +233,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         Payment payment = new Payment();
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
         payment.setPaymentID(formPayment.getPaymentID());
-        payment.setOccupancyInspectionID(formPayment.getOccupancyInspectionID());
         payment.setPaymentType(formPayment.getPaymentType());
         payment.setDateDeposited(formPayment.getDateDeposited());
         payment.setDateReceived(formPayment.getDateReceived());
@@ -336,15 +332,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     public void setFormPayment(Payment formPayment) {
         this.formPayment = formPayment;
-    }
-
-    // Below are the methods to driectly access the fields of formPayment
-    public int getFormPaymentOccupancyInspectionID() {
-        return formPayment.getOccupancyInspectionID();
-    }
-
-    public void setFormPaymentOccupancyInspectionID(int occupancyInspectionID) {
-        formPayment.setOccupancyInspectionID(occupancyInspectionID);
     }
 
     public Date getFormPaymentDateDeposited() {
