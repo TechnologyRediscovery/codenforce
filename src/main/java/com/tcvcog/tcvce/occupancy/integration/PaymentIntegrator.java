@@ -20,7 +20,9 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.FeeAssignedType;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
@@ -428,11 +430,11 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
+    public FeeAssigned generateFeeAssigned(ResultSet rs) throws IntegrationException {
 
         UserIntegrator ui = getUserIntegrator();
 
-        MoneyOccPeriodFeeAssigned fee = new MoneyOccPeriodFeeAssigned();
+        FeeAssigned fee = new FeeAssigned();
 
         try {
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
@@ -446,7 +448,26 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee.setFee(getFee(rs.getInt("fee_feeid")));
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
 
-            fee.setOccPeriodID(rs.getInt("occperiod_periodid"));
+            fee.setAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
+
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error generating OccPeriodFeeAssigned from ResultSet", ex);
+        }
+
+        return fee;
+
+    }
+
+    public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
+
+        UserIntegrator ui = getUserIntegrator();
+
+        try {
+
+            MoneyOccPeriodFeeAssigned fee = new MoneyOccPeriodFeeAssigned(generateFeeAssigned(rs));
+
+            fee.setDomain(EventDomainEnum.OCCUPANCY);
             fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
             fee.setOccPerAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
             fee.setPaymentList(getPaymentList(fee));
@@ -464,19 +485,12 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         UserIntegrator ui = getUserIntegrator();
 
         MoneyCECaseFeeAssigned fee = new MoneyCECaseFeeAssigned();
-
+        
         try {
-            fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
-            fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
-            fee.setAssigned(rs.getTimestamp("assignedbyts").toLocalDateTime());
-            fee.setWaivedBy(ui.getUser(rs.getInt("waivedby_userid")));
-            fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
-            fee.setReducedBy(rs.getDouble("reducedby"));
-            fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
-            fee.setNotes(rs.getString("notes"));
-            fee.setFee(getFee(rs.getInt("fee_feeid")));
 
-            fee.setCeCaseAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
+            fee = new MoneyCECaseFeeAssigned(generateFeeAssigned(rs));
+
+            fee.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
             fee.setCaseID(rs.getInt("cecase_caseid"));
             fee.setCodeSetElement(rs.getInt("codesetelement_elementid"));
         } catch (SQLException ex) {

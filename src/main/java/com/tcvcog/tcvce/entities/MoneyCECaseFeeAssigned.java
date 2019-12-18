@@ -26,11 +26,27 @@ package com.tcvcog.tcvce.entities;
  */
 public class MoneyCECaseFeeAssigned extends FeeAssigned{
    
-   private int ceCaseAssignedFeeID;
    private int caseID;
    private int codeSetElement;
     
     public MoneyCECaseFeeAssigned() {
+    }
+    
+    public MoneyCECaseFeeAssigned(FeeAssigned fee) {
+        
+        this.assignedFeeID = fee.assignedFeeID;
+        this.domain = fee.domain;
+        this.paymentList = fee.paymentList;
+        this.moneyFeeAssigned = fee.moneyFeeAssigned;
+        this.assignedBy = fee.assignedBy;
+        this.assigned = fee.assigned;
+        this.waivedBy = fee.waivedBy;
+        this.lastModified = fee.lastModified;
+        this.reducedBy = fee.reducedBy;
+        this.reducedByUser = fee.reducedByUser;
+        this.notes = fee.notes;
+        this.fee = fee.fee;
+        
     }
     
     public int getCaseID() {
@@ -48,15 +64,5 @@ public class MoneyCECaseFeeAssigned extends FeeAssigned{
     public void setCodeSetElement(int codeSetElement) {
         this.codeSetElement = codeSetElement;
     }
-
-    public int getCeCaseAssignedFeeID() {
-        return ceCaseAssignedFeeID;
-    }
-
-    public void setCeCaseAssignedFeeID(int ceCaseAssignedFeeID) {
-        this.ceCaseAssignedFeeID = ceCaseAssignedFeeID;
-    }
-    
-    
     
 }

@@ -5,13 +5,10 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Objects;
-import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 
 /**
  *

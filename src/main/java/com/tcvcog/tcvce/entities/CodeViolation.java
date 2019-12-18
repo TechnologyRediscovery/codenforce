@@ -18,11 +18,8 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
  
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 

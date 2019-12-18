@@ -5,7 +5,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
