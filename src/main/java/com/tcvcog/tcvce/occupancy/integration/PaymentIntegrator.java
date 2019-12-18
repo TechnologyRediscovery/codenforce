@@ -682,7 +682,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public ArrayList<Payment> getPaymentList() throws IntegrationException {
-        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived, \n"
                 + "       datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
                 + "  FROM public.moneypayment;";

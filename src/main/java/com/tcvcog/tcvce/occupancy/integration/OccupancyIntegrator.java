@@ -487,14 +487,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setEventList(ei.getEventList(op));
         op.setProposalList(choiceInt.getProposalList(op));
         op.setInspectionList(inspecInt.getOccInspectionList(op));
-//        op.setPaymentList(pai.getPaymentList(op));
-//        op.setFeeList(pai.getFeeAssigned(op));
-
-// Above: These two loading methods are causing errors. Fix them so that we can place these object in op
-
-
-
-        // TODO: Figure out this inheritance snafoo
+        op.setPaymentList(pai.getPaymentList(op));
+        op.setFeeList(pai.getFeeAssigned(op));
+        
+        // TODO: Figure out the inheritance SNAFU below
         
 //        op.setEventRuleList(ei.rules_getEventRuleOccPeriodList(op));
         
