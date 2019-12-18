@@ -447,9 +447,13 @@
                                     </h:panelGroup>
                                 </h:panelGrid>
 
-                                <p:commandButton ajax="false" value="Update Selected Property Info" 
-                                                 action="#{propertyProfileBB.updateProperty}" icon="fa fa-edit"
-                                                 disabled="false"/>
+                                <p:commandButton ajax="true" value="Update Selected Property Info" 
+                                                 action="#{propertyProfileBB.updateProperty}" 
+                                                 oncomplete="PF('dialog-widvar-propinfoedit').show()"
+                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                 icon="fa fa-edit"
+                                                 disabled="false"
+                                                 update="form-propinfoedit"/>
                             </h:form>
 
                             <h:form id="form-propunits-editunits">
@@ -931,14 +935,83 @@
                                     <f:facet name="header">
                                         <h:outputText value="Street Address"/>
                                     </f:facet>
+                                    <f:facet name="output"><h:outputText value="#{prop.address}" /></f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{prop.address}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                    </f:facet>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="City"/>
+                                    </f:facet>
                                     <p:cellEditor>
-                                        <f:facet name="output"><h:outputText value="#{prop.address}" /></f:facet>
+                                        <f:facet name="output"><h:outputText value="#{prop.address_city}" /></f:facet>
                                         <f:facet name="input">
-                                            <p:inputText value="#{prop.address}"
+                                            <p:inputText value="#{prop.address_city}"
                                                          onkeydown="PF('datatable').onKeyDown(event)"
                                                          onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                         </f:facet>
                                     </p:cellEditor>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Zip"/>
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{prop.address_zip}" /></f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{prop.address_zip}"
+                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="State"/>
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{prop.address_state}" /></f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{prop.address_state}"
+                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Lot and Block"/>
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{prop.lotAndBlock}" /></f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{prop.lotAndBlock}"
+                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Parcel ID"/>
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{prop.parID}" /></f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{prop.parID}"
+                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column style="width:40px">
+                                    <f:facet name="header">
+                                        <h:outputText value="Edit?" />
+                                    </f:facet>
+                                    <p:rowEditor/>
                                 </p:column>
                             </p:dataTable>
                         </h:form>
