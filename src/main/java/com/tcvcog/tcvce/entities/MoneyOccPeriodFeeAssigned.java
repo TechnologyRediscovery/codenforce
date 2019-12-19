@@ -27,8 +27,24 @@ public class MoneyOccPeriodFeeAssigned extends FeeAssigned {
    private int occPeriodTypeID;
    
    public MoneyOccPeriodFeeAssigned() {
-    
 }
+   
+   public MoneyOccPeriodFeeAssigned(FeeAssigned fee) {
+        
+        this.assignedFeeID = fee.assignedFeeID;
+        this.domain = EventDomainEnum.OCCUPANCY;
+        this.paymentList = fee.paymentList;
+        this.moneyFeeAssigned = fee.moneyFeeAssigned;
+        this.assignedBy = fee.assignedBy;
+        this.assigned = fee.assigned;
+        this.waivedBy = fee.waivedBy;
+        this.lastModified = fee.lastModified;
+        this.reducedBy = fee.reducedBy;
+        this.reducedByUser = fee.reducedByUser;
+        this.notes = fee.notes;
+        this.fee = fee.fee;
+        
+    }
 
     public int getOccPeriodID() {
         return occPeriodID;

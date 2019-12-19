@@ -20,7 +20,6 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.FeeAssignedType;
@@ -463,11 +462,12 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         UserIntegrator ui = getUserIntegrator();
 
+        MoneyOccPeriodFeeAssigned fee = new MoneyOccPeriodFeeAssigned();
+        
         try {
 
-            MoneyOccPeriodFeeAssigned fee = new MoneyOccPeriodFeeAssigned(generateFeeAssigned(rs));
+            fee = new MoneyOccPeriodFeeAssigned(generateFeeAssigned(rs));
 
-            fee.setDomain(EventDomainEnum.OCCUPANCY);
             fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
             fee.setOccPerAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
             fee.setPaymentList(getPaymentList(fee));
@@ -490,7 +490,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
             fee = new MoneyCECaseFeeAssigned(generateFeeAssigned(rs));
 
-            fee.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
             fee.setCaseID(rs.getInt("cecase_caseid"));
             fee.setCodeSetElement(rs.getInt("codesetelement_elementid"));
         } catch (SQLException ex) {
