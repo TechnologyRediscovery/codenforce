@@ -6,7 +6,6 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
@@ -46,12 +45,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -177,10 +171,12 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private Person selectedPerson;
     
      // payments
+    private List<Payment> paymentList;
     private List<Payment> filteredPaymentList;
     private Payment selectedPayment;
     
     //fees
+    private List<MoneyOccPeriodFeeAssigned> feeList;
     private List<MoneyOccPeriodFeeAssigned> filteredFeeList;
     private MoneyOccPeriodFeeAssigned selectedFee;
     
@@ -204,7 +200,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         OccPeriod sessionPeriod = getSessionBean().getSessionOccPeriod();
         try {
             if(sessionPeriod != null){
-                if(!(sessionPeriod instanceof OccPeriodDataHeavy)){
+                if(!(sessionPeriod instanceof OccPeriodDataHeavy) || currentOccPeriod == null){
                     currentOccPeriod = oi.generateOccPeriodDataHeavy(sessionPeriod);
                 }
                 if(currentOccPeriod.getConfiguredTS() == null){
@@ -295,6 +291,10 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
         periodEndDateNull = false;
         periodStartDateNull = false;
+        
+        feeList = currentOccPeriod.getFeeList();
+        paymentList = currentOccPeriod.getPaymentList();
+        
     }
     
     public void loadSpacesInType(){
@@ -838,7 +838,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      * writing it to the DB
      *
      * @param ev unused
-     * @throws ViolationException
      */
     public void events_attachNewEvent(ActionEvent ev) {
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -1147,21 +1146,21 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      
      public String editOccPeriodPayments(){
          getSessionBean().setSessionOccPeriod(currentOccPeriod);
-         getSessionBean().setPaymentRedirTo("inspection");
+         getSessionBean().setPaymentRedirTo("occPeriodPayments");
          
          return "payments";
      }
      
      public String editOnePayment(Payment thisPayment){
          getSessionBean().setSessionPayment(thisPayment);
-         getSessionBean().setPaymentRedirTo("inspection");
+         getSessionBean().setPaymentRedirTo("occPeriodPayments");
          
          return "payments";
      }
      
      public String editOccPeriodFees(){
          getSessionBean().setFeeManagementOccPeriod(currentOccPeriod);
-         getSessionBean().setFeeRedirTo("inspection");
+         getSessionBean().setFeeRedirTo("occPeriodPayments");
          
          return "editFees";
      }
@@ -2048,6 +2047,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         return selectedFee;
     }
 
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
+    }
+    
     /**
      * @param filteredPaymentList the filteredPaymentList to set
      */
@@ -2062,6 +2069,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         this.selectedPayment = selectedPayment;
     }
 
+    public List<MoneyOccPeriodFeeAssigned> getFeeList() {
+        return feeList;
+    }
+
+    public void setFeeList(List<MoneyOccPeriodFeeAssigned> feeList) {
+        this.feeList = feeList;
+    }
+    
     /**
      * @param filteredFeeList the filteredFeeList to set
      */

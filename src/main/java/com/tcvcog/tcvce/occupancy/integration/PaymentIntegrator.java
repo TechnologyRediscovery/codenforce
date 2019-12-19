@@ -20,9 +20,9 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.FeeAssigned;
-import com.tcvcog.tcvce.entities.FeeAssignedType;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -447,8 +447,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee.setFee(getFee(rs.getInt("fee_feeid")));
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
 
-            fee.setAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
-
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error generating OccPeriodFeeAssigned from ResultSet", ex);
@@ -468,6 +466,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
             fee = new MoneyOccPeriodFeeAssigned(generateFeeAssigned(rs));
 
+            fee.setAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
             fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
             fee.setOccPerAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
             fee.setPaymentList(getPaymentList(fee));
@@ -490,6 +489,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
             fee = new MoneyCECaseFeeAssigned(generateFeeAssigned(rs));
 
+            fee.setAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
             fee.setCaseID(rs.getInt("cecase_caseid"));
             fee.setCodeSetElement(rs.getInt("codesetelement_elementid"));
         } catch (SQLException ex) {
@@ -661,7 +661,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             while (rs.next()) {
                 Payment p = generatePayment(rs);
                 p.setAssignedFeeID(fee.getOccPerAssignedFeeID());
-                p.setAssignedTo(FeeAssignedType.OccPeriod);
+                p.setDomain(EventDomainEnum.OCCUPANCY);
                 paymentList.add(p);
 
             }
@@ -792,7 +792,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 + " paymentid, paymenttype_typeid, datereceived, \n"
                 + " datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes, \n"
                 + " recordedby_userid, entrytimestamp)\n"
-                + "    VALUES (DEFAULT, ?, ?, ?, \n"
+                + "    VALUES (DEFAULT, ?, ?, \n"
                 + "            ?, ?::numeric::money, ?, ?, ?, DEFAULT, ?, ?, NOW());";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;

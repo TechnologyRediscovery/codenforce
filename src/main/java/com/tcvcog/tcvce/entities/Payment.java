@@ -37,7 +37,7 @@ public class Payment {
     private User recordedBy;
     private LocalDateTime entryTimestamp;
     private int assignedFeeID;
-    private FeeAssignedType assignedTo;
+    private EventDomainEnum domain;
     
    public Payment() {
        
@@ -219,11 +219,11 @@ public class Payment {
         this.assignedFeeID = assignedFeeID;
     }
 
-    public FeeAssignedType getAssignedTo() {
-        return assignedTo;
+    public EventDomainEnum getDomain() {
+        return domain;
     }
 
-    public void setAssignedTo(FeeAssignedType assignedTo) {
-        this.assignedTo = assignedTo;
+    public void setDomain(EventDomainEnum domain) {
+        this.domain = domain;
     }
 }
