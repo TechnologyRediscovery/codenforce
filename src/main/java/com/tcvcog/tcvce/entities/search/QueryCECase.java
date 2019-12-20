@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities.search;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseBase;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
@@ -25,7 +26,7 @@ public class QueryCECase
     
     private QueryCECaseEnum queryName;
     private List<SearchParamsCECase> searchParamsList; 
-    private List<CECase> results;
+    private List<CECaseBase> results;
     
     public QueryCECase( QueryCECaseEnum qName, 
                         Municipality muni, 
@@ -38,7 +39,7 @@ public class QueryCECase
         results = new ArrayList<>();
     }
     
-    public void addToResults(List<CECase> list){
+    public void addToResults(List<CECaseBase> list){
         results.addAll(list);
     }
 
@@ -90,14 +91,14 @@ public class QueryCECase
     /**
      * @return the results
      */
-    public List<CECase> getResults() {
+    public List<CECaseBase> getResults() {
         return results;
     }
 
     /**
      * @param results the results to set
      */
-    public void setResults(List<CECase> results) {
+    public void setResults(List<CECaseBase> results) {
         this.results = results;
     }
 

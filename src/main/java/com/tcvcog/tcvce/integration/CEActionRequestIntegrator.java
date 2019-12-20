@@ -613,30 +613,11 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     }
     
     
-    /**
-     * Unpacks a Query object and asks selectWithSearchParams for a set of CEARs
- for each of SearchParams object in the given Query
-     * @param q a fully-baked Query, meaning it has its own Params
-     * @return The set of returned CEARs from each SearchParams inside this Query
-     * @throws IntegrationException 
-     */
-    public QueryCEAR runQueryCEAR(QueryCEAR q) throws IntegrationException{
-        List<SearchParamsCEActionRequests> pList = q.getParmsList();
-        
-        for(SearchParamsCEActionRequests sp: pList){
-            q.addToResults(getCEARs(sp));
-        }
-        q.setExecutionTimestamp(LocalDateTime.now());
-        System.out.println("CEActionRequestIntegrator.QueryCEARs | returning list of size: " + q.getBOBResultList().size());
-        q.setExecutedByIntegrator(true);
-        return q;
-        
-    }
     
     /**
-     * Called by runQueryCECase() only!
+     * Called by the SearchCoordinator's queryCEAR methods
  
- Internal retrieval method for Code Enforcement Action Requests. Implements
+   Implements
      * a multi-stage SQL statement building process based on the settings on the
      * SearchParams object passed into this method.
      *
@@ -649,8 +630,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
      * 
      * @throws IntegrationException
      */
-    private List<CEActionRequest> getCEARs(SearchParamsCEActionRequests params) throws IntegrationException {
-        List<CEActionRequest> list = new ArrayList();
+    public List<Integer> searchForCEActionRequests(SearchParamsCEActionRequests params) throws IntegrationException {
+        List<Integer> cearidlst = new ArrayList();
         StringBuilder sb = new StringBuilder();
 
         sb.append("SELECT requestid FROM public.ceactionrequest ");
@@ -718,8 +699,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println("CEActionRequestIntegrator.getCEActionRequestList | stmt: " + stmt.toString());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                cear = getActionRequestByRequestID(rs.getInt(1));
-                list.add(cear);
+                cearidlst.add(rs.getInt(1));
             } // close while
 
         } catch (SQLException ex) {
@@ -733,7 +713,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         }// close try/catch
 
-        return list;
+        return cearidlst;
     } // close method
 
     public List getCEActionRequestListByCase(int ceCaseID) throws IntegrationException {

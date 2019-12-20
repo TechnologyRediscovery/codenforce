@@ -303,15 +303,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return ci.getCECase( Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("arbitraryPlaceholderCaseID")));
     }
     
-    public QueryCECase selectDefaultQueryCECase(Credential cred){
-        SearchCoordinator sc = getSearchCoordinator();
-        return sc.initQuery(QueryCECaseEnum.OPENCASES);
-    }
-    
-    public QueryCEAR selectDefaultQueryCEAR(Credential cred){
-        SearchCoordinator sc = getSearchCoordinator();
-        return sc.initQuery(QueryCEAREnum.UNPROCESSED);
-    }
+  
     
     public List<CECase> assembleCaseHistory(Credential cred) throws IntegrationException, CaseLifecycleException{
         CaseIntegrator caseInt = getCaseIntegrator();
@@ -354,7 +346,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws CaseLifecycleException
      * @throws ViolationException 
      */
-    public void insertNewCECase(CECase newCase, User u, CEActionRequest cear) throws IntegrationException, CaseLifecycleException, ViolationException{
+    public void insertNewCECase(CECase newCase, User u, CEActionRequest cear) throws IntegrationException, CaseLifecycleException, ViolationException, EventException{
         
         CECase insertedCase;
         
@@ -362,7 +354,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         EventCoordinator ec = getEventCoordinator();
         EventCategory originationCategory;
-        EventCECase originationEvent;
+        Event originationEvent;
         
         // set default status to prelim investigation pending
         newCase.setCasePhase(initialCECasePphase);
@@ -378,7 +370,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationCategory = ec.getInitiatlizedEventCategory(
                     Integer.parseInt(getResourceBundle(
                     Constants.EVENT_CATEGORY_BUNDLE).getString("originiationByActionRequest")));
-            originationEvent = ec.getInitializedEvent(newCase, originationCategory);
+            originationEvent = ec.initializeEvent(newCase, originationCategory);
             StringBuilder sb = new StringBuilder();
             sb.append("Case generated from the submission of a Code Enforcement Action Request");
             sb.append("<br />");
@@ -400,15 +392,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationCategory = ec.getInitiatlizedEventCategory(
                     Integer.parseInt(getResourceBundle(
                     Constants.EVENT_CATEGORY_BUNDLE).getString("originiationByObservation")));
-            originationEvent = ec.getInitializedEvent(newCase, originationCategory);
+            originationEvent = ec.initializeEvent(newCase, originationCategory);
             StringBuilder sb = new StringBuilder();
             sb.append("Case opened directly on property by code officer assigned to this event");
             originationEvent.setNotes(sb.toString());
             
         }
             originationEvent.setOwner(u);
-            originationEvent.setCaseID(insertedCase.getCaseID());
-            originationEvent.setDateOfRecord(LocalDateTime.now());
             attachNewEventToCECase(newCase, originationEvent, null);
     }
     
@@ -876,6 +866,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        
    }
    
+   
+//    --------------------------------------------------------------------------
+//    ********************* CE Action Requests *********************************
+//    --------------------------------------------------------------------------
+    
+   
    /**
     * Factory method for our CEActionRequests - initializes the date as well
     * @return The CEActionRequest ready for populating with user values
@@ -890,6 +886,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        return new CEActionRequest();
        
    }
+   
+   /**
+    * Business logic intermediary method for CEActionRequests. Calls the CEAction
+    * Integrator 
+    * @param cearid
+    * @return
+    * @throws IntegrationException 
+    */
+   public CEActionRequest getCEActionRequest(int cearid) throws IntegrationException{
+       CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+       return ceari.getActionRequestByRequestID(cearid);
+   }
+   
    
    /**
     * Utility method for determining whether or not the panel of Code Enforcement request
@@ -1129,7 +1138,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return true;
     }
     
-    public void updateCodeViolation(CECase cse, CodeViolation cv, UserAuthorized u) throws ViolationException, IntegrationException{
+    public void updateCodeViolation(CECase cse, CodeViolation cv, UserAuthorized u) throws ViolationException, IntegrationException, EventException{
         EventCoordinator ec = getEventCoordinator();
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         EventIntegrator ei = getEventIntegrator();
@@ -1149,7 +1158,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 }
                 Event tfEvent = ei.getEvent(violTimeframeEventID);
                 tfEvent.setTimeStart(cv.getStipulatedComplianceDate());
-                ec.updateEvent(tfEvent, u);
+                ec.editEvent(tfEvent);
                 System.out.println("CaseCoordinator.updateCodeViolation | updated timeframe event ID: " + tfEvent.getEventID());
             }
         }

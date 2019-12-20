@@ -12,6 +12,8 @@ import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CECaseBase;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -213,15 +215,42 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     
     
-     
+     /**
+      * Single point of entry for queries against the CECase table
+      * @param q search params with the credential set
+      * @return a Query subclass with results accessible via q.getResults
+      * @throws IntegrationException
+      * @throws CaseLifecycleException
+      * @throws AuthorizationException
+      * @throws SearchException 
+      */
      public QueryCECase runQuery(QueryCECase q) throws IntegrationException, CaseLifecycleException, AuthorizationException, SearchException{
         CaseIntegrator ci = getCaseIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        
+        if(q == null){
+            return null;
+        }
         
         prepareQueryForRun(q);
+
+        List<SearchParamsCECase> paramsList = q.getParmsList();
+        List<CECaseBase> caseListTemp = new ArrayList<>();
         
-        q = ci.runQueryCECase(q);
+        for(SearchParamsCECase sp: paramsList){
+            caseListTemp.clear();
+            // audit the params and get the result list back
+            for(Integer i: ci.searchForCECases(sp)){
+                caseListTemp.add(cc.getCECase(i));
+            }
+            // add each batch of OccPeriod objects from the SearchParam run to our
+            // ongoing list
+            q.addToResults(caseListTemp);
+        }
         
-         postRunConfigureQuery(q);
+        postRunConfigureQuery(q);
+        
         return q;
      }
      
@@ -229,7 +258,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * Single point of entry for queries on Code Enforcement Requests
      * 
      * @param q must be initialized
-     * @param cred
      * @return a reference to the same QueryCEAR instance passed in with the business
      * objects returned from the integrator accessible via getResults()
      * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
@@ -237,11 +265,33 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException fatal error in the integration code
      */
     public QueryCEAR runQuery(QueryCEAR q) throws AuthorizationException, IntegrationException, SearchException{
-        prepareQueryForRun(q);
+        
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(q == null){
+            return null;
+        }
+        
+        prepareQueryForRun(q);
 
+        List<SearchParamsCEActionRequests> paramsList = q.getParmsList();
+        List<CEActionRequest> ceariListTemp = new ArrayList<>();
+        
+        for(SearchParamsCEActionRequests sp: paramsList){
+            ceariListTemp.clear();
+            // audit the params and get the result list back
+            for(Integer i: ceari.searchForCEActionRequests(sp)){
+                ceariListTemp.add(cc.getCEActionRequest(i));
+            }
+            // add each batch of OccPeriod objects from the SearchParam run to our
+            // ongoing list
+            q.addToResults(ceariListTemp);
+        }
+        
         postRunConfigureQuery(q);
-        return ceari.runQueryCEAR(q);
+        
+        return q;
     }
     
 //    --------------------------------------------------------------------------
