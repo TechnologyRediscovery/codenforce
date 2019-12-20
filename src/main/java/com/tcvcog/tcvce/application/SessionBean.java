@@ -157,6 +157,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private Payment sessionPayment;
     private String paymentRedirTo;
     
+    private EventDomainEnum feeManagementDomain;
+    private CECase feeManagementCeCase;
     private OccPeriod feeManagementOccPeriod;
     private String feeRedirTo;
     /* *** Blob Upload Session Shelves *** */
@@ -987,6 +989,21 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     public void setFeeRedirTo(String feeRedirTo) {
         this.feeRedirTo = feeRedirTo;
     }
-    
+
+    public CECase getFeeManagementCeCase() {
+        return feeManagementCeCase;
+    }
+
+    public void setFeeManagementCeCase(CECase feeManagementCeCase) {
+        this.feeManagementCeCase = feeManagementCeCase;
+    }
+
+    public EventDomainEnum getFeeManagementDomain() {
+        return feeManagementDomain;
+    }
+
+    public void setFeeManagementDomain(EventDomainEnum feeManagementDomain) {
+        this.feeManagementDomain = feeManagementDomain;
+    }
     
 }

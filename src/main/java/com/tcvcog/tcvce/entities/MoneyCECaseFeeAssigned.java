@@ -26,6 +26,7 @@ package com.tcvcog.tcvce.entities;
  */
 public class MoneyCECaseFeeAssigned extends FeeAssigned{
    
+   private int ceCaseAssignedFeeID;
    private int caseID;
    private int codeSetElement;
     
@@ -63,6 +64,14 @@ public class MoneyCECaseFeeAssigned extends FeeAssigned{
 
     public void setCodeSetElement(int codeSetElement) {
         this.codeSetElement = codeSetElement;
+    }
+
+    public int getCeCaseAssignedFeeID() {
+        return ceCaseAssignedFeeID;
+    }
+
+    public void setCeCaseAssignedFeeID(int ceCaseAssignedFeeID) {
+        this.ceCaseAssignedFeeID = ceCaseAssignedFeeID;
     }
     
 }

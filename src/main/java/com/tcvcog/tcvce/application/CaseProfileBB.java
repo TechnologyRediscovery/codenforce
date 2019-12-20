@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
@@ -42,17 +41,15 @@ import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -132,6 +129,15 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private List<OccInspection> inspectionList;
     private OccInspection selectedInspection;
     
+     // payments
+    private List<Payment> paymentList;
+    private List<Payment> filteredPaymentList;
+    private Payment selectedPayment;
+    
+    //fees
+    private List<MoneyCECaseFeeAssigned> feeList;
+    private List<MoneyCECaseFeeAssigned> filteredFeeList;
+    private MoneyCECaseFeeAssigned selectedFee;
     /**
      * Creates a new instance of CaseManageBB
      */
@@ -149,6 +155,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         UserCoordinator uc = getUserCoordinator();
+        PaymentIntegrator pai = getPaymentIntegrator();
         
         usersForSearchConfig = uc.assembleUserListForSearchCriteria(null);
         
@@ -187,6 +194,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         } else {
             reportCECaseList = cc.getDefaultReportConfigCECaseList();
         }
+        
+        try {
+        feeList = pai.getFeeAssigned(currentCase);
+        paymentList = pai.getPaymentList(currentCase);
+        } catch (IntegrationException ex) {
+            System.out.println(ex.toString());
+        }
+        
     }
     
     public String viewCasePropertyProfile(){
@@ -1009,6 +1024,30 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             ex.getMessage(), ""));
         } 
     }    
+
+    public String editCeCasePayments(){
+        getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
+         getSessionBean().setFeeManagementCeCase(currentCase);
+         getSessionBean().setPaymentRedirTo("ceEventPayments");
+         
+         return "payments";
+     }
+     
+    public String editOnePayment(Payment thisPayment){
+        getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
+         getSessionBean().setSessionPayment(thisPayment);
+         getSessionBean().setPaymentRedirTo("ceEventPayments");
+         
+         return "payments";
+     }
+     
+     public String editCeCaseFees(){
+         getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
+         getSessionBean().setFeeManagementCeCase(currentCase);
+         getSessionBean().setFeeRedirTo("ceEventPayments");
+         
+         return "editFees";
+     }
     
     /**
      * @param currentCase the currentCase to set
@@ -1756,6 +1795,54 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void setUsersForSearchConfig(List<User> usersForSearchConfig) {
         this.usersForSearchConfig = usersForSearchConfig;
+    }
+
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
+    }
+
+    public List<Payment> getFilteredPaymentList() {
+        return filteredPaymentList;
+    }
+
+    public void setFilteredPaymentList(List<Payment> filteredPaymentList) {
+        this.filteredPaymentList = filteredPaymentList;
+    }
+
+    public Payment getSelectedPayment() {
+        return selectedPayment;
+    }
+
+    public void setSelectedPayment(Payment selectedPayment) {
+        this.selectedPayment = selectedPayment;
+    }
+
+    public List<MoneyCECaseFeeAssigned> getFeeList() {
+        return feeList;
+    }
+
+    public void setFeeList(List<MoneyCECaseFeeAssigned> feeList) {
+        this.feeList = feeList;
+    }
+
+    public List<MoneyCECaseFeeAssigned> getFilteredFeeList() {
+        return filteredFeeList;
+    }
+
+    public void setFilteredFeeList(List<MoneyCECaseFeeAssigned> filteredFeeList) {
+        this.filteredFeeList = filteredFeeList;
+    }
+
+    public MoneyCECaseFeeAssigned getSelectedFee() {
+        return selectedFee;
+    }
+
+    public void setSelectedFee(MoneyCECaseFeeAssigned selectedFee) {
+        this.selectedFee = selectedFee;
     }
     
     

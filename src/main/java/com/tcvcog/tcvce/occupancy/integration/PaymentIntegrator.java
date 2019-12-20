@@ -489,7 +489,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
             fee = new MoneyCECaseFeeAssigned(generateFeeAssigned(rs));
 
-            fee.setAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
+            fee.setCeCaseAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
             fee.setCaseID(rs.getInt("cecase_caseid"));
             fee.setCodeSetElement(rs.getInt("codesetelement_elementid"));
         } catch (SQLException ex) {
@@ -694,6 +694,62 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
+    /**
+     * Extracts the ID of the given CECase and uses this to grab all
+     * relevant payments from the db associated with this CECase
+     *
+     * @param cse
+     * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<Payment> getPaymentList(CECase cse) throws IntegrationException {
+
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived, datedeposited, \n" +
+                       "amount, payer_personid, referencenum, checkno, cleared,\n" +
+                       "moneypayment.notes, recordedby_userid, entrytimestamp\n" +
+                       "FROM moneycecasefeeassigned, moneycecasefeepayment, public.moneypayment\n" +
+                       "WHERE cecase_caseid = ? AND cecaseassignedfeeid = cecaseassignedfee_id AND payment_paymentid = paymentid;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<Payment> paymentList = new ArrayList();
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cse.getCaseID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                paymentList.add(generatePayment(rs));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Payment List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return paymentList;
+    }
+    
     public ArrayList<Payment> getPaymentList() throws IntegrationException {
         String query = "SELECT paymentid, paymenttype_typeid, datereceived, \n"
                 + "       datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"

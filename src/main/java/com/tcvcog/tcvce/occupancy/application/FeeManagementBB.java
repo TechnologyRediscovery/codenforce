@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
@@ -73,6 +74,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private Fee selectedWorkingFee;
     private List<Fee> allFees;
 
+    private EventDomainEnum currentDomain;
     private boolean editing;
     private String redirTo;
     private boolean waived;
@@ -96,6 +98,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         if (getSessionBean().getFeeRedirTo() != null) {
             redirTo = getSessionBean().getFeeRedirTo();
 
+            currentDomain = getSessionBean().getFeeManagementDomain();
+            
+            if (currentDomain.equals(EventDomainEnum.OCCUPANCY)){
+            
             currentOccPeriod = getSessionBean().getFeeManagementOccPeriod();
 
             if (currentOccPeriod != null) {
@@ -110,7 +116,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 }
 
             }
-
+            
+            } else if(currentDomain.equals(EventDomainEnum.CODE_ENFORCEMENT)){
+                
+                
+                
+            }
+            
         }
 
         if (allFees == null) {
@@ -865,4 +877,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.lockedPeriodType = lockedPeriodType;
     }
 
+    public EventDomainEnum getCurrentDomain() {
+        return currentDomain;
+    }
+
+    public void setCurrentDomain(EventDomainEnum currentDomain) {
+        this.currentDomain = currentDomain;
+    }
+    
 }

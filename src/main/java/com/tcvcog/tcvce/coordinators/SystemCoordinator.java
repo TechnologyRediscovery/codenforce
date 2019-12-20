@@ -189,7 +189,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem CECitations = getNavSubItem("Citations", "", "fa fa-sign-in", false);
     private final NavigationSubItem CENotices = getNavSubItem("Notices", "", "fa fa-sign-in", false);
     private final NavigationSubItem CERequests = getNavSubItem("Requests", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CEPayments = getNavSubItem("Payments", "", "fa fa-sign-in", false);
+    private final NavigationSubItem CEPayments = getNavSubItem("Payments", "/restricted/cogstaff/ce/cEEventPayments.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Code Enf
     public List<NavigationSubItem> getCENavList() {

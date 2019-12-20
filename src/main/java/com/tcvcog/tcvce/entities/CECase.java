@@ -39,6 +39,9 @@ public class CECase
     private List<NoticeOfViolation> noticeList;
     private List<CEActionRequest> ceActionRequestList;
     
+    private List<Payment> paymentList;
+    private List<MoneyCECaseFeeAssigned> feeList;
+    
     public CECase(){
     }
 
@@ -414,10 +417,21 @@ public class CECase
         this.eventList = eventList;
     }
 
-        
-  
-    
-    
-    
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
+    }
+
+    public List<MoneyCECaseFeeAssigned> getFeeList() {
+        return feeList;
+    }
+
+    public void setFeeList(List<MoneyCECaseFeeAssigned> feeList) {
+        this.feeList = feeList;
+    }
+
     
 }

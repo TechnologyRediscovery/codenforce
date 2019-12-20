@@ -105,7 +105,8 @@
         <managed-bean-name>violationIntegrator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.integration.ViolationIntegrator</managed-bean-class>
     
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
 
     <managed-bean>
         <managed-bean-name>userIntegrator</managed-bean-name>
@@ -130,13 +131,15 @@
         <managed-bean-name>inspectionChecklistIntegrator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator</managed-bean-class>
     
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>occupancyIntegrator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator</managed-bean-class>
     
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>courtEntityIntegrator</managed-bean-name>
@@ -148,7 +151,8 @@
     <managed-bean>
         <managed-bean-name>systemCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.SystemCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
     
    
     
@@ -179,7 +183,8 @@
     <managed-bean>
         <managed-bean-name>propertyUnitCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.PropertyCoordinator</managed-bean-class>    
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <description>Interfaces between business objects, the integration layer, and jsf beans </description>
@@ -192,13 +197,15 @@
         <managed-bean-name>occupancyCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.OccupancyCoordinator</managed-bean-class>
     
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>paymentCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.PaymentCoordinator</managed-bean-class>
     
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
     <!--session-scoped beans-->
     
     
@@ -432,7 +439,8 @@
         <managed-bean-name>feeManagementBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.FeeManagementBB</managed-bean-class>
     
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>paymentBB</managed-bean-name>
@@ -745,7 +753,7 @@
         </navigation-case>
     </navigation-rule>
     
-   <navigation-rule>
+    <navigation-rule>
         <from-view-id>/restricted/cogstaff/gen/uploadBlob.xhtml</from-view-id>  
         <navigation-case>
             <from-outcome>linkBlob</from-outcome>
@@ -1250,7 +1258,7 @@
             <to-view-id>/restricted/cogstaff/occ/checklists.xhtml</to-view-id>
         </navigation-case>
         
-       <navigation-case>
+        <navigation-case>
             <from-outcome>payments</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/paymentManage.xhtml</to-view-id>
         </navigation-case>
@@ -1263,6 +1271,11 @@
         <navigation-case>
             <from-outcome>occPeriodPayments</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/occPeriodPayments.xhtml</to-view-id>
+        </navigation-case>
+
+        <navigation-case>
+            <from-outcome>ceEventPayments</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/cEEventPayments.xhtml</to-view-id>
         </navigation-case>
 
         <navigation-case>
@@ -1489,7 +1502,8 @@
         <managed-bean-name>dashboardDataBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBB</managed-bean-class>
     
-        <managed-bean-scope>request</managed-bean-scope></managed-bean>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
     <managed-bean>
         <managed-bean-name>navMenuBean</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.NavMenuBean</managed-bean-class>
@@ -1499,11 +1513,13 @@
         <managed-bean-name>actionRequestManageBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
     
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     <managed-bean>
         <managed-bean-name>publicInfoBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PublicInfoBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     <managed-bean>
         <managed-bean-name>publicInfoCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.PublicInfoCoordinator</managed-bean-class>
@@ -1518,7 +1534,8 @@
         <managed-bean-name>searchCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.SearchCoordinator</managed-bean-class>
     
-        <managed-bean-scope>session</managed-bean-scope></managed-bean>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
     <managed-bean>
         <managed-bean-name>municipalityManageBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
@@ -1634,7 +1651,8 @@
     <managed-bean>
         <managed-bean-name>userConfigBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.UserConfigBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     <managed-bean>
         <managed-bean-name>muniCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.MuniCoordinator</managed-bean-class>
