@@ -923,98 +923,85 @@
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
-                            <p:dataTable id="table-propinfoedit"
-                                         widgetVar="propdatatable"
-                                         rowIndexVar="rowIndex"
-                                         var="prop"
-                                         value="#{propertyProfileBB.currProp}"
-                                         tabindex="2"
-                                         rowKey="#{unit.propertyID}"
-                                         editable="true">
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Street Address"/>
-                                    </f:facet>
-                                    <f:facet name="output"><h:outputText value="#{prop.address}" /></f:facet>
-                                    <f:facet name="input">
-                                        <p:inputText value="#{prop.address}"
+                            <h:panelGrid id="panelgrid-propinfoedit" columns="4" cellpadding="10" cellspacing="30">
+                                <h:panelGroup>
+                                    <p:outputLabel value="Street Address"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                    </f:facet>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="City"/>
-                                    </f:facet>
-                                    <p:cellEditor>
-                                        <f:facet name="output"><h:outputText value="#{prop.address_city}" /></f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{prop.address_city}"
-                                                         onkeydown="PF('datatable').onKeyDown(event)"
-                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Zip"/>
-                                    </f:facet>
-                                    <p:cellEditor>
-                                        <f:facet name="output"><h:outputText value="#{prop.address_zip}" /></f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{prop.address_zip}"
-                                                         onkeydown="PF('datatable').onKeyDown(event)"
-                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="State"/>
-                                    </f:facet>
-                                    <p:cellEditor>
-                                        <f:facet name="output"><h:outputText value="#{prop.address_state}" /></f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{prop.address_state}"
-                                                         onkeydown="PF('datatable').onKeyDown(event)"
-                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Lot and Block"/>
-                                    </f:facet>
-                                    <p:cellEditor>
-                                        <f:facet name="output"><h:outputText value="#{prop.lotAndBlock}" /></f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{prop.lotAndBlock}"
-                                                         onkeydown="PF('datatable').onKeyDown(event)"
-                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Parcel ID"/>
-                                    </f:facet>
-                                    <p:cellEditor>
-                                        <f:facet name="output"><h:outputText value="#{prop.parID}" /></f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{prop.parID}"
-                                                         onkeydown="PF('datatable').onKeyDown(event)"
-                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <p:column style="width:40px">
-                                    <f:facet name="header">
-                                        <h:outputText value="Edit?" />
-                                    </f:facet>
-                                    <p:rowEditor/>
-                                </p:column>
-                            </p:dataTable>
+                                </h:panelGroup>
+                                             
+                                <h:panelGroup>
+                                    <p:outputLabel value="City"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address_city}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+
+                                    <p:outputLabel value="Zip Code"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address_zip}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel value="State"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address_state}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    
+                                </h:panelGroup>
+                            </h:panelGrid>
+                            
+                            
+                            
                         </h:form>
+                        <script type="text/javascript">
+
+                                $(function () {
+                                    $.extend(PF("datatable"), {
+                                        onKeyDown: function (e) {
+                                            var key = e.which,
+                                                    keyCode = $.ui.keyCode;
+
+                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                e.preventDefault();
+                                            }
+                                        },
+
+                                        onKeyUp: function (e, rowIndex) {
+                                            var key = e.which,
+                                                    keyCode = $.ui.keyCode;
+                                            //.ui-row-editor-check .ui-icon-check .ui-c
+                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                this.tbody
+                                                        .find('.ui-row-editor .ui-icon-check')
+                                                        .eq(rowIndex)
+                                                        .click();
+                                            }
+
+                                            if (key === keyCode.ESCAPE) {
+                                                this.tbody
+                                                        .find('.ui-row-editor .ui-icon-close')
+                                                        .eq(rowIndex)
+                                                        .click();
+                                            }
+                                        }
+                                    });
+                                });
+
+                            </script>
                     </p:dialog>
                             
                             

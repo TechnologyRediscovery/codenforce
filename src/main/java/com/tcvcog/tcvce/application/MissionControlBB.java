@@ -33,10 +33,10 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpSession;
 
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
+//import com.itextpdf.kernel.pdf.PdfDocument;
+//import com.itextpdf.kernel.pdf.PdfWriter;
+//import com.itextpdf.layout.Document;
+//import com.itextpdf.layout.element.Paragraph;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
@@ -122,40 +122,40 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         mainDash.addColumn(column3);
         
     }
-    
-    
-    
-    public void testPDF(ActionEvent ev){
-        String DEST = "/home/sylvia/GlassFish_Server/glassfish/domains/domain1/applications/helloPDF.pdf";
-        File file = new File(DEST);
-        System.out.println("MissionControlBB.testPDF | can write to loc: " + file.canWrite());
-        file.getParentFile().mkdirs();
-        //Initialize PDF writer
-        Document document;
-        PdfWriter writer;
-        try {
-            writer = new PdfWriter(file);
-        //Initialize PDF document
-        PdfDocument pdf = new PdfDocument(writer);
- 
-        // Initialize document
-        document = new Document(pdf);
- 
-        //Add paragraph to the document
-        document.add(new Paragraph("Hello World!"));
- 
-        //Close document
-        document.close();
-            System.out.println("wrote pdf!");
-        
-        } catch (FileNotFoundException ex) {
-            System.out.println("MissionControlBB.testPDF");
-            System.out.println(ex);
-        }
-    }
-    
-   
-    
+//    
+//    
+//    
+//    public void testPDF(ActionEvent ev){
+//        String DEST = "/home/sylvia/GlassFish_Server/glassfish/domains/domain1/applications/helloPDF.pdf";
+//        File file = new File(DEST);
+//        System.out.println("MissionControlBB.testPDF | can write to loc: " + file.canWrite());
+//        file.getParentFile().mkdirs();
+//        //Initialize PDF writer
+//        Document document;
+//        PdfWriter writer;
+//        try {
+//            writer = new PdfWriter(file);
+//        //Initialize PDF document
+//        PdfDocument pdf = new PdfDocument(writer);
+// 
+//        // Initialize document
+//        document = new Document(pdf);
+// 
+//        //Add paragraph to the document
+//        document.add(new Paragraph("Hello World!"));
+// 
+//        //Close document
+//        document.close();
+//            System.out.println("wrote pdf!");
+//        
+//        } catch (FileNotFoundException ex) {
+//            System.out.println("MissionControlBB.testPDF");
+//            System.out.println(ex);
+//        }
+//    }
+//    
+//   
+//    
     
     public String switchMuni() throws IntegrationException, SQLException{
         CodeIntegrator ci = getCodeIntegrator();
