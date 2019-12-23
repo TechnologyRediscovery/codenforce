@@ -21,18 +21,21 @@
                     <p>View, create, and manage fees</p>
                     <f:view>
                         <h:form id="occPeriodFeeDisplay">
-                            <h2>Recorded Fees <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/></h2>
+                            <h2>Recorded Fees 
+                                <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/>
+                                <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/>
+                            </h2>
                             <p:dataTable
-                                id="occPeriodFeeTable"
+                                id="feeAssignedTable"
                                 var="fee"
-                                value="#{feeManagementBB.occPeriodFeeList}"
-                                rowKey="#{fee.occPerAssignedFeeID}"
+                                value="#{feeManagementBB.feeAssignedList}"
+                                rowKey="#{fee.assignedFeeID}"
                                 tableStyleClass="primeDataTable"
                                 rowExpandMode="single"
                                 expandedRow="false"
                                 selectionMode="single"
-                                selection="#{feeManagementBB.selectedOccPeriodFee}"
-                                filteredValue="#{feeManagementBB.occPeriodFilteredFeeList}"
+                                selection="#{feeManagementBB.selectedAssignedFee}"
+                                filteredValue="#{feeManagementBB.filteredFeeAssignedList}"
                                 >
 
                                 <p:column width="3%">
@@ -45,7 +48,7 @@
                                     <f:facet name="header">
                                         <h:outputText value="ID" />
                                     </f:facet>
-                                    <h:outputText value="#{fee.occPerAssignedFeeID}"/>
+                                    <h:outputText value="#{fee.assignedFeeID}"/>
                                 </p:column>
 
 
@@ -82,7 +85,7 @@
                                 </p:column>
                                 <p:rowExpansion>
                                     <div class="outlinedBox">
-                                        <h2>Full fee listing for fee <h:outputText value="#{fee.occPerAssignedFeeID}"/> </h2>
+                                        <h2>Full fee listing for fee <h:outputText value="#{fee.assignedFeeID}"/> </h2>
                                         <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                      columnClasses="gridTd, gridTd, gridTd, gridTd">
 
@@ -158,18 +161,18 @@
                             <p:spacer height="10px"/>
                             <p:commandButton 
                                 actionListener="#{feeManagementBB.editOccPeriodFee}"
-                                oncomplete="PF('paymentAddDialogVar').show()"
+                                oncomplete="PF('assignedFeeAddDialogVar').show()"
                                 ajax="true"
-                                update="occPeriodFeeAddForm messages"
+                                update="assignedFeeAddForm messages"
                                 value="Update Selected Fee" tabindex="2"/>
                             <p:commandButton ajax="false" 
                                              actionListener="#{feeManagementBB.deleteSelectedOccPeriodFee}"
                                              value="Nuke Selected Record Forever" tabindex="3"/>
                             <p:commandButton    id="newFeeDialogButton"
                                                 actionListener="#{feeManagementBB.initializeNewFee(e)}"
-                                                oncomplete="PF('paymentAddDialogVar').show()"
+                                                oncomplete="PF('assignedFeeAddDialogVar').show()"
                                                 ajax="true"
-                                                update="occPeriodFeeAddForm"
+                                                update="assignedFeeAddForm"
                                                 value="Create new Fee"
                                                 icon="fa fa-plus"
                                                 />
@@ -185,9 +188,9 @@
 
                         <p:dialog id="occPeriodFeeAddDialog"
                                   height="450" width="1000"
-                                  widgetVar="paymentAddDialogVar"
+                                  widgetVar="assignedFeeAddDialogVar"
                                   closable="true">   
-                            <h:form id="occPeriodFeeAddForm">
+                            <h:form id="assignedFeeAddForm">
                                 <h2>Add New Fee</h2>
                                 <p>The more fields you can populate, the better. (Data integrity hangs in the balance.)</p>
                                 <h:panelGrid columns="4" border="0" 
