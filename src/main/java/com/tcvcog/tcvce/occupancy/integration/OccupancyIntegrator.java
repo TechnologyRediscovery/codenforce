@@ -1039,7 +1039,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     private OccPeriodType generateOccPeriodType(ResultSet rs) throws IntegrationException {
         OccPeriodType opt = new OccPeriodType();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-
+        PaymentIntegrator pi = getPaymentIntegrator();
+        
         try {
             opt.setTypeID(rs.getInt("typeid"));
             opt.setMuni(mi.getMuni(rs.getInt("muni_municode")));
@@ -1073,8 +1074,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setPermitTitle(rs.getString("permittitle"));
             opt.setPermitTitleSub(rs.getString("permittitlesub"));
 
-            // wire up when nathan is done
-            // opt.setFeeList(fee);
+            opt.setFeeList(pi.getFeeList(opt));
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Error generating OccPermitType from ResultSet", ex);

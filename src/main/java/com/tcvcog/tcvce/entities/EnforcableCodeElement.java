@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *  Represents a codesetelement stated with fidelity to the ERD
@@ -40,8 +41,8 @@ public class EnforcableCodeElement extends CodeElement implements Serializable{
     private int normDaysToComply;
     private String daysToComplyNotes;
     private String muniSpecificNotes;
-
-    @Override
+    private List<Fee> feeList;
+    
     public String toString(){
         return codeElement.getHeaderString();
     }
@@ -170,6 +171,14 @@ public class EnforcableCodeElement extends CodeElement implements Serializable{
      */
     public void setMuniSpecificNotes(String muniSpecificNotes) {
         this.muniSpecificNotes = muniSpecificNotes;
+    }
+
+    public List<Fee> getFeeList() {
+        return feeList;
+    }
+
+    public void setFeeList(List<Fee> feeList) {
+        this.feeList = feeList;
     }
     
 }

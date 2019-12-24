@@ -21,9 +21,11 @@
                     <p>View, create, and manage fees</p>
                     <f:view>
                         <h:form id="occPeriodFeeDisplay">
-                            <h2>Recorded Fees 
+                            <h2>Recorded 
+                                <p:outputLabel rendered="#{feeManagementBB.redirTo ne null}" value="At #{feeManagementBB.currentDomain}"/>
+                                Fees 
                                 <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/>
-                                <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/>
+                                <p:outputLabel rendered="#{feeManagementBB.editingCECase()}" value="At #{feeManagementBB.CECaseAddress}"/>
                             </h2>
                             <p:dataTable
                                 id="feeAssignedTable"
@@ -160,7 +162,7 @@
                             </p:dataTable>
                             <p:spacer height="10px"/>
                             <p:commandButton 
-                                actionListener="#{feeManagementBB.editOccPeriodFee}"
+                                actionListener="#{feeManagementBB.editSelectedAssignedFee}"
                                 oncomplete="PF('assignedFeeAddDialogVar').show()"
                                 ajax="true"
                                 update="assignedFeeAddForm messages"
@@ -169,7 +171,7 @@
                                              actionListener="#{feeManagementBB.deleteSelectedOccPeriodFee}"
                                              value="Nuke Selected Record Forever" tabindex="3"/>
                             <p:commandButton    id="newFeeDialogButton"
-                                                actionListener="#{feeManagementBB.initializeNewFee(e)}"
+                                                actionListener="#{feeManagementBB.initializeNewAssignedFee(e)}"
                                                 oncomplete="PF('assignedFeeAddDialogVar').show()"
                                                 ajax="true"
                                                 update="assignedFeeAddForm"
@@ -182,7 +184,7 @@
                         <p:commandButton    id="feePermissionButton"
                                             action="#{feeManagementBB.goToFeePermissions()}"
                                                 rendered="#{feeManagementBB.redirTo != null}"
-                                                value="Edit Fees that may be used for OccPeriods"
+                                                value="Edit Fees that may be used for #{feeManagementBB.whatDomainFees()}"
                                                 />
                         </h:form>    
 
@@ -207,7 +209,7 @@
 
                                     <h:outputLabel value="Reduced By:" for="feeReducedBy"/>
                                     <h:panelGroup>
-                                        <p:inputText id="feeReducedBy" value="#{feeManagementBB.occPeriodFormFee.reducedBy}" 
+                                        <p:inputText id="feeReducedBy" value="#{feeManagementBB.assignedFormFee.reducedBy}" 
                                                      style="width: 250px;" tabindex="9" required="true" styleClass="inputText"/>
                                         <h:message for="feeReducedBy" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -215,7 +217,7 @@
 
                                     <h:outputLabel value="Notes:" for="feeNotes"/>
                                     <h:panelGroup>
-                                        <p:inputText id="feeNotes" value="#{feeManagementBB.occPeriodFormFee.notes}" 
+                                        <p:inputText id="feeNotes" value="#{feeManagementBB.assignedFormFee.notes}" 
                                                      style="width: 250px;" tabindex="10" required="false" styleClass="inputText"/>
                                         <h:message for="feeNotes" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -228,7 +230,7 @@
                                         id="feeFeeTable"
                                         var="o"
                                         selectionMode="single"
-                                        selection="#{feeManagementBB.occPeriodFormFee.fee}"
+                                        selection="#{feeManagementBB.assignedFormFee.fee}"
                                         rowKey="#{o.occupancyInspectionFeeID}"
                                         value="#{feeManagementBB.feeList}"
                                         tableStyleClass="primeDataTable"
@@ -281,10 +283,10 @@
                                     <h:message for="feeFeeTable" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
-
+                                
                                 <p:spacer height="10px"/>
                                 <p:commandButton ajax="false" rendered="#{!feeManagementBB.editing}" 
-                                                 value="Assign Fee" action="#{feeManagementBB.addOccPeriodFee()}" />
+                                                 value="Assign Fee" action="#{feeManagementBB.addAssignedFee()}" />
                                 <p:commandButton ajax="false" rendered="#{feeManagementBB.editing}" 
                                                  actionListener="#{feeManagementBB.commitOccPeriodFeeUpdates(e)}"
                                                  value="Commit Updates" tabindex="14"/>
@@ -293,7 +295,7 @@
                                                     value="Cancel" 
                                                     icon="fa fa-stop" 
                                                     immediate="true"
-                                                    onclick="PF('occPeriodFeeAddDialogVar').hide()"
+                                                    onclick="PF('assignedFeeAddDialogVar').hide()"
                                                     />
 
                             </h:form>

@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -536,8 +537,6 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             while(rs.next()){
                 newEce = generateEnforcableCodeElement(rs);
-                
-                
             }
             
         } catch (SQLException ex) {
@@ -596,6 +595,8 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     
     private EnforcableCodeElement generateEnforcableCodeElement(ResultSet rs) throws SQLException, IntegrationException{
         
+        PaymentIntegrator pi = getPaymentIntegrator();
+        
         EnforcableCodeElement newEce = new EnforcableCodeElement();
         newEce.setCodeSetElementID(rs.getInt("codesetelementid"));
         newEce.setCodeElement(getCodeElement(rs.getInt("codelement_elementid")));
@@ -606,6 +607,8 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         newEce.setNormDaysToComply(rs.getInt("normdaystocomply"));
         newEce.setDaysToComplyNotes(rs.getString("daystocomplynotes"));
         newEce.setMuniSpecificNotes(rs.getString("munispecificnotes"));
+        newEce.setFeeList(pi.getFeeList(newEce));
+        
         return newEce;
     }
     
