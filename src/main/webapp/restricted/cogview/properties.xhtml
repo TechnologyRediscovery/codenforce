@@ -951,13 +951,23 @@
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    
+                                    <p:outputLabel value="Lot and Block"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.lotAndBlock}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event)"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    
+                                    <p:outputLabel value="ParcelID"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.parID}"
+                                                  onkeydown="PF('datatable').onKeyDown(event)"
+                                                  onkeyup="PF('datatable').onKeyUp(event)"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    
+                                    <p:outputLabel value="Municipality"/>
+                                    <h:selectOneMenu id="propinfoedit-muni-som"
+                                                     value="#{propertyProfileBB.currProp.muni}">
+                                        <f:selectItems value="#{getSessionBean()}"
+                                    </h:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     
