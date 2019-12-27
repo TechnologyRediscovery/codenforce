@@ -23,14 +23,13 @@ import java.util.List;
  * @author xiaohong
  */
 public class NavigationItem {
-    
+
     private String value;
     private String icon;
     private String searchpageurl;
-    private String currentInfo;
     /**
-     * This contains all the sub-navigation items that can be accessed from 
-     * the current NavigationItem
+     * This contains all the sub-navigation items that can be accessed from the
+     * current NavigationItem
      */
     private List<NavigationSubItem> subNavitem;
 
@@ -66,15 +65,4 @@ public class NavigationItem {
         this.searchpageurl = searchpageurl;
     }
 
-    public String getCurrentInfo() {
-        return currentInfo;
-    }
-
-    public void setCurrentInfo(String currentInfo) {
-        this.currentInfo = currentInfo;
-    }
-    
-    
-    
-    
 }
