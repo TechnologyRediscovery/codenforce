@@ -64,16 +64,17 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     public void initBean() {
 
     }
-    
+
     /**
      * Skeleton of a system that may be needed to generate and release carefully
      * some level of "internal guest" level access Credential
-     * @param ua 
+     *
+     * @param ua
      */
-    protected void requestBaseInternalAccessCredential(UserAuthorized ua){
+    protected void requestBaseInternalAccessCredential(UserAuthorized ua) {
         // TODO: Finish guts
     }
-    
+
     public String appendNoteBlock(MessageBuilderParams mbp) {
         StringBuilder sb = new StringBuilder();
         if (mbp.getExistingContent() != null) {
@@ -278,24 +279,24 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList = new ArrayList<>();
         try {
             //NavItem: Dashboard
-            NavigationItem dashboardItem = getNavItem(getCurrentDashBoardInfo(), "/restricted/missionControl.xhtml", "Dashboard", "fa fa-dashboard", getDashboardNavList());
+            NavigationItem dashboardItem = getNavItem("/restricted/missionControl.xhtml", "Dashboard", "fa fa-dashboard", getDashboardNavList());
             //NavItem: Property
-            NavigationItem propertyItem = getNavItem(getCurrentPropertyInfo(), "/restricted/cogview/properties.xhtml", "Property", "fa fa-home", getPropertyNavList());
+            NavigationItem propertyItem = getNavItem("/restricted/cogview/properties.xhtml", "Property", "fa fa-home", getPropertyNavList());
             //NavItem: Code Enf
-            NavigationItem CEItem = getNavItem(getCurrentCEInfo(), "/restricted/cogview/cECases.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
+            NavigationItem CEItem = getNavItem("/restricted/cogview/cECases.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
             //NavItem: Occupancy
-            NavigationItem occItem = getNavItem(getCurrentPeriodInfo(), "/restricted/cogstaff/occ/occPeriodStatus.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
+            NavigationItem occItem = getNavItem("/restricted/cogstaff/occ/occPeriodStatus.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
             //NavItem: Persons
-            NavigationItem personItem = getNavItem(getCurrentPersonInfo(), "/restricted/cogview/persons.xhtml", "Person", "fa fa-female", getPersonNavList());
+            NavigationItem personItem = getNavItem("/restricted/cogview/persons.xhtml", "Person", "fa fa-female", getPersonNavList());
             //NavItem: Code
-            NavigationItem codeItem = getNavItem("Current Code: ", "/restricted/cogstaff/code/codeSourceManage.xhtml", "Code", "fa fa-book", getCodeNavList());
+            NavigationItem codeItem = getNavItem("/restricted/cogstaff/code/codeSourceManage.xhtml", "Code", "fa fa-book", getCodeNavList());
 
             navList.add(dashboardItem);
+            navList.add(personItem);
             navList.add(propertyItem);
             navList.add(CEItem);
             navList.add(occItem);
             navList.add(codeItem);
-            navList.add(personItem);
         } catch (Exception e) {
 
         }
@@ -335,9 +336,9 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem feeManage = getNavSubItem("Fees", "/restricted/cogstaff/occ/feeManage.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem feeTypeManage = getNavSubItem("Fee types", "/restricted/cogstaff/occ/feeTypeManage.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem feePermissions = getNavSubItem("Occ Fees", "/restricted/cogstaff/occ/feePermissions", "fa fa-sign-in", false);
-    
+
     //Store SubNav Items into List:Payment
-    public List<NavigationSubItem> getSidebarPaymentList(){
+    public List<NavigationSubItem> getSidebarPaymentList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
         navList.add(feeManage);
@@ -345,9 +346,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList.add(feePermissions);
         return navList;
     }
-    
-    
-    
+
     //Sidebar Sub Nav Item: Occ
     private final NavigationSubItem checklist = getNavSubItem("Checklist", "/restricted/cogstaff/occ/checklists.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem payment = getNavSubItem("Payment", "/restricted/cogstaff/occ/checklists.xhtml", "fa fa-sign-in", false);
@@ -381,7 +380,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     //Sidebar Sub Nav Item: System
     private final NavigationSubItem users = getNavSubItem("Users", "/restricted/cogadmin/userConfig.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem icons = getNavSubItem("Icons", "/restricted/cogadmin/iconManage.xhtml", "fa fa-sign-in", false);
-    
 
     //Store SubNav Items into List: Reports
     public List<NavigationSubItem> getSidebarSystemList() {
@@ -412,19 +410,19 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         // and are not related to a currently loaded object
         try {
             //NavItem: CE
-            NavigationItem CEconfigItem = getNavItem("", "", "Code Enforcement", "fa fa-balance-scale", getSidebarCEConfigList());
+            NavigationItem CEconfigItem = getNavItem("", "Code Enforcement", "fa fa-balance-scale", getSidebarCEConfigList());
             //NavItem: CE
-            NavigationItem OccconfigItem = getNavItem("", "", "Occupancy", "fa fa-list-alt", getSidebarOccConfigList());
+            NavigationItem OccconfigItem = getNavItem("", "Occupancy", "fa fa-list-alt", getSidebarOccConfigList());
             //NavItem: Code
-            NavigationItem codeconfigItem = getNavItem("", "", "Municipal Code", "fa fa-book", getSidebarCodeConfigList());
+            NavigationItem codeconfigItem = getNavItem("", "Municipal Code", "fa fa-book", getSidebarCodeConfigList());
             //NavItem: System
-            NavigationItem reportItem = getNavItem("", "", "Report", "fa fa-bullhorn", getSidebarReportList());
+            NavigationItem reportItem = getNavItem("", "Report", "fa fa-bullhorn", getSidebarReportList());
             //NavItem: Payments
-            NavigationItem paymentsItem = getNavItem("", "", "Payments", "fa fa-cogs", getSidebarPaymentList());
+            NavigationItem paymentsItem = getNavItem("", "Payments", "fa fa-cogs", getSidebarPaymentList());
             //NavItem: Reports
-            NavigationItem systemItem = getNavItem("", "", "System", "fa fa-cogs", getSidebarSystemList());
+            NavigationItem systemItem = getNavItem("", "System", "fa fa-cogs", getSidebarSystemList());
             //NavItem: Help
-            NavigationItem helpItem = getNavItem("", "", "Help", "fa fa-question-circle", getSidebarHelpList());
+            NavigationItem helpItem = getNavItem("", "Help", "fa fa-question-circle", getSidebarHelpList());
 
             navList.add(CEconfigItem);
             navList.add(OccconfigItem);
@@ -451,103 +449,13 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         return mn;
     }
 
-    public NavigationItem getNavItem(String currentInfo, String searchPageUrl, String navCategory, String icon, List navSubList) {
+    public NavigationItem getNavItem(String searchPageUrl, String navCategory, String icon, List navSubList) {
         NavigationItem ni = new NavigationItem();
         ni.setValue(navCategory);
         ni.setIcon(icon);
         ni.setSubNavitem(navSubList);
         ni.setSearchpageurl(searchPageUrl);
-        ni.setCurrentInfo(currentInfo);
         return ni;
-    }
-
-    public Map<String, String> navCategoryMap() {
-
-        HashMap<String, String> categoryMap;
-        categoryMap = new HashMap<>();
-
-        List navList = navList();
-        for (int i = 0; i < navList.size(); i++) {
-            NavigationItem navitem = (NavigationItem) navList.get(i);
-            List subnavList = navitem.getSubNavitem();
-            String categoryName = navitem.getValue();
-            for (int m = 0; m < subnavList.size(); m++) {
-                NavigationSubItem subnavitem = (NavigationSubItem) subnavList.get(m);
-                String pagePath = subnavitem.getPagePath();
-                categoryMap.put(pagePath, categoryName);
-            }
-        }
-        return categoryMap;
-    }
-
-    public String getCurrentPageNavItemValue() {
-        String currentViewPagePath = getviewPagePath();
-        return navCategoryMap().get(currentViewPagePath);
-    }
-
-    public String getviewPagePath() {
-        FacesContext fc = FacesContext.getCurrentInstance();
-        String viewID = fc.getViewRoot().getViewId();
-        return viewID;
-    }
-
-    public String getCurrentDashBoardInfo() {
-        SessionBean s = getSessionBean();
-        try {
-            String info = s.getSessionMuni().getMuniName();
-            return "Current Municipality: " + info;
-        } catch (Exception ex) {
-            return "Current Municipality: ";
-        }
-
-    }
-
-    public String getCurrentPropertyInfo() {
-        SessionBean s = getSessionBean();
-        try {
-            String propertyAddress = s.getSessionProperty().getAddress();
-            String propertyId = String.valueOf(s.getSessionProperty().getPropertyID());
-            return "Current Property: " + propertyAddress + " | ID: " + propertyId;
-        } catch (Exception ex) {
-            return "Current Property: " + " | ID: ";
-        }
-
-    }
-
-    public String getCurrentCEInfo() {
-        SessionBean s = getSessionBean();
-        try {
-            String caseName = s.getSessionCECase().getCaseName();
-            String caseId = String.valueOf(s.getSessionCECase().getCaseID());
-            return "Current Case: " + caseName + " | ID: " + caseId;
-        } catch (Exception ex) {
-            return "Current Case: " + " | ID: ";
-        }
-
-    }
-
-    public String getCurrentPersonInfo() {
-        SessionBean s = getSessionBean();
-        try {
-            String personName = s.getSessionPerson().getFirstName();
-            String personId = String.valueOf(s.getSessionPerson().getPersonID());
-            return "Current Person: " + personName + " | ID: " + personId;
-        } catch (Exception ex) {
-            return "Current Person: " + " | ID: ";
-        }
-
-    }
-
-    public String getCurrentPeriodInfo() {
-        SessionBean s = getSessionBean();
-        try {
-            String periodId = String.valueOf(s.getSessionOccPeriod().getPeriodID());
-            String periodType = s.getSessionOccPeriod().getType().getTitle();
-            return "Current Person: " + periodType + " | ID: " + periodId;
-        } catch (Exception ex) {
-            return "Current Person: " + " | ID: ";
-        }
-
     }
 
 }
