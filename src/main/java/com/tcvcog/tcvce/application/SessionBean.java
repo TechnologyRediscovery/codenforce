@@ -120,11 +120,22 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     // BOB queries
     private QueryProperty queryProperty;
+    private List<QueryProperty> queryPropertyList;
+    
     private QueryPerson queryPerson;
-    private QueryCEAR queryCEAR;
-    private QueryCECase queryCECase;
-    private QueryEvent queryEventCECase;
+    private List<QueryPerson> queryPersonList;
+    
+    private QueryEvent queryEvent;
+    private List<QueryEvent> queryEventList;
+    
     private QueryOccPeriod queryOccPeriod;
+    private List<QueryOccPeriod> queryOccPeriodList;
+    
+    private QueryCECase queryCECase;
+    private List<QueryCECase> queryCECaseList;
+    
+    private QueryCEAR queryCEAR;
+    private List<QueryCEAR> queryCEARList;
     
     /* *** Municipal Code Session Shelves ***  */
     private CodeSource activeCodeSource;
@@ -143,7 +154,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
-    
     
     /* *** Public Data Session Shelves ***  */
     private List<PublicInfoBundle> infoBundleList;
@@ -774,10 +784,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the queryEventCECase
+     * @return the queryEvent
      */
-    public QueryEvent getQueryEventCECase() {
-        return queryEventCECase;
+    public QueryEvent getQueryEvent() {
+        return queryEvent;
     }
 
     /**
@@ -795,10 +805,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param queryEventCECase the queryEventCECase to set
+     * @param queryEvent the queryEvent to set
      */
-    public void setQueryEventCECase(QueryEvent queryEventCECase) {
-        this.queryEventCECase = queryEventCECase;
+    public void setQueryEvent(QueryEvent queryEvent) {
+        this.queryEvent = queryEvent;
     }
 
     /**
@@ -1009,6 +1019,90 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setSessionOccPeriod(OccPeriodDataHeavy sessionOccPeriod) {
         this.sessionOccPeriod = sessionOccPeriod;
+    }
+
+    /**
+     * @return the queryPropertyList
+     */
+    public List<QueryProperty> getQueryPropertyList() {
+        return queryPropertyList;
+    }
+
+    /**
+     * @param queryPropertyList the queryPropertyList to set
+     */
+    public void setQueryPropertyList(List<QueryProperty> queryPropertyList) {
+        this.queryPropertyList = queryPropertyList;
+    }
+
+    /**
+     * @return the queryPersonList
+     */
+    public List<QueryPerson> getQueryPersonList() {
+        return queryPersonList;
+    }
+
+    /**
+     * @param queryPersonList the queryPersonList to set
+     */
+    public void setQueryPersonList(List<QueryPerson> queryPersonList) {
+        this.queryPersonList = queryPersonList;
+    }
+
+    /**
+     * @return the queryOccPeriodList
+     */
+    public List<QueryOccPeriod> getQueryOccPeriodList() {
+        return queryOccPeriodList;
+    }
+
+    /**
+     * @param queryOccPeriodList the queryOccPeriodList to set
+     */
+    public void setQueryOccPeriodList(List<QueryOccPeriod> queryOccPeriodList) {
+        this.queryOccPeriodList = queryOccPeriodList;
+    }
+
+    /**
+     * @return the queryCECaseList
+     */
+    public List<QueryCECase> getQueryCECaseList() {
+        return queryCECaseList;
+    }
+
+    /**
+     * @param queryCECaseList the queryCECaseList to set
+     */
+    public void setQueryCECaseList(List<QueryCECase> queryCECaseList) {
+        this.queryCECaseList = queryCECaseList;
+    }
+
+    /**
+     * @return the queryCEARList
+     */
+    public List<QueryCEAR> getQueryCEARList() {
+        return queryCEARList;
+    }
+
+    /**
+     * @param queryCEARList the queryCEARList to set
+     */
+    public void setQueryCEARList(List<QueryCEAR> queryCEARList) {
+        this.queryCEARList = queryCEARList;
+    }
+
+    /**
+     * @return the queryEventList
+     */
+    public List<QueryEvent> getQueryEventList() {
+        return queryEventList;
+    }
+
+    /**
+     * @param queryEventList the queryEventList to set
+     */
+    public void setQueryEventList(List<QueryEvent> queryEventList) {
+        this.queryEventList = queryEventList;
     }
     
     

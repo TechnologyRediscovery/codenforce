@@ -710,7 +710,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @param m
      * @return 
      */
-    public List<QueryOccPeriod> buildQueryOccPeriodList(Credential cred, Municipality m){
+    public List<QueryOccPeriod> buildQueryOccPeriodList(Credential cred){
         QueryOccPeriodEnum[] nameArray = QueryOccPeriodEnum.values();
         List<QueryOccPeriod> queryList = new ArrayList<>();
         for(QueryOccPeriodEnum queryTitle: nameArray){

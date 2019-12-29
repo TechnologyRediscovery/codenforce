@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -46,7 +47,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Dominic Pimpinella
+ * @author Dominic Pimpinella, MaRoSco, Ellen Bascomb (31Y)
  */
 public class PropertyCoordinator extends BackingBeanUtils implements Serializable {
 
@@ -219,10 +220,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     }
     
     
-    
     /**
      * 
-     * @param ua
+     * @param cred
      * @return 
      */
     public List<Property> assemblePropertyHistoryList(Credential cred){

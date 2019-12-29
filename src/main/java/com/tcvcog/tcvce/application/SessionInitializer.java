@@ -159,7 +159,8 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * and subsequent changes to the current municipality. It does the work
      * of gathering all necessary info for session config
      * 
-     * @param u
+     * @param u The base authenticated User who will be transformed into a UserAuthorized through
+     * the long and multifaceted journey of the UserAuthorization 
      * @param muni if null, the system will choose the highest ranked role in the
      * muni record added most recently
      * @param umap
@@ -231,6 +232,13 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         }
     }
     
+    /**
+     * Designed for recording data about the human user's computer connected to our surver.
+     * TODO: during early design tests, this method wasn't getting the UserAgent from the HTTP
+     * headers like we wanted to
+     * @param umaple
+     * @return 
+     */
     private UserMuniAuthPeriodLogEntry assembleSessionInfo(UserMuniAuthPeriodLogEntry umaple){
         FacesContext fc = getFacesContext();
         HttpServletRequest req = (HttpServletRequest) fc.getExternalContext().getRequest();
@@ -339,36 +347,54 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 
     }
 
+    /**
+     * Based on a User's RoleType, a customized list of Queries available will be
+     * extracted from the SearchCoordinator
+     * @param ua 
+     */
     private void populateSessionQueries(UserAuthorized ua){
         SessionBean sb = getSessionBean();
-        SearchCoordinator searchCoord = getSearchCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
         Credential cred = ua.getMyCredential();
 
-        // Note that these are Query skeletons and have not yet ben run
-        // It's up to the individual beans to check the Query object's
-        // "run by integrator" member and run the query if they choose
-        sb.setQueryProperty(
-                searchCoord.prepareQueryProperty(
-                QueryPropertyEnum.OPENCECASES_OCCPERIODSINPROCESS, cred, null));
+        try {
+            // Note that these are Query skeletons and have not yet been populated with any\
+            // actual business objects
+            // It's up to the individual beans to check the Query object's
+            // "run by integrator" member and run the query if they choose
+            sb.setQueryPropertyList(sc.buildQueryPropertyList(cred));
+            if(!sb.getQueryPropertyList().isEmpty()){
+                sb.setQueryProperty(sb.getQueryPropertyList().get(0));
+            }            
+            
+            sb.setQueryPersonList(sc.buildQueryPersonList(cred));
+            if(!sb.getQueryPersonList().isEmpty()){
+                sb.setQueryPerson(sb.getQueryPersonList().get(0));
+            }
+            
+            sb.setQueryEventList(sc.buildQueryEventList(cred));
+            if(!sb.getQueryEventList().isEmpty()){
+                sb.setQueryEvent(sb.getQueryEventList().get(0));
+            }
+            
+            sb.setQueryOccPeriodList(sc.buildQueryOccPeriodList(cred));
+            if(!sb.getQueryOccPeriodList().isEmpty()){
+                sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
+            }
+
+            sb.setQueryCECaseList(sc.buildQueryCECaseList(cred));
+            if(!sb.getQueryCECaseList().isEmpty()){
+                sb.setQueryCECase(sb.getQueryCECaseList().get(0));
+            }
+
+            sb.setQueryCEARList(sc.buildQueryCEARList(cred));
+            if(!sb.getQueryCEARList().isEmpty()){
+                sb.setQueryCEAR(sb.getQueryCEARList().get(0));
+            }
         
-        sb.setQueryPerson(
-                searchCoord.prepareQueryPerson(
-                QueryPersonEnum.CUSTOM, ua, muni, null));
-        
-        sb.setQueryCEAR(
-                searchCoord.prepareQueryCEAR(
-                QueryCEAREnum.ALL_PAST30, ua, muni, null));
-        
-        sb.setQueryCECase(
-                searchCoord.prepareQueryCECase(
-                QueryCECaseEnum.OPENCASES, ua, muni, null));
-        
-        sb.setQueryEventCECase(searchCoord.prepareQueryEventCECase(QueryEventEnum.MUNICODEOFFICER_ACTIVITY_PAST30DAYS, ua, muni, null));
-        
-        sb.setQueryOccPeriod(
-                searchCoord.prepareQueryOccPeriod(
-                QueryOccPeriodEnum.CUSTOM, ua, muni, null));
-        
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         
     }
     

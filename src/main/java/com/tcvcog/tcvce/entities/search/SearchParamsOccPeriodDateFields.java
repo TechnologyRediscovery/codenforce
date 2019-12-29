@@ -22,7 +22,7 @@ package com.tcvcog.tcvce.entities.search;
  */
 public enum SearchParamsOccPeriodDateFields {
     
-    CREATED_TS, // in occperiod
+    CREATED_TS("Creation timestamp", "createdts"), // in occperiod
     TYPE_CERTIFIED_TS, // in occperiod
     PERIOD_START_DATE, // in occperiod
     PERIOD_END_DATE, // in occperiod
@@ -34,4 +34,13 @@ public enum SearchParamsOccPeriodDateFields {
     THIRDPARTY_INSPECTOR_APPROVAL_TS, // in occinspection
     PERMIT_ISSUANCE_DATE // in occpermit
     ;
+    
+    private final String title;
+    private final String dbField;
+    
+    private SearchParamsOccPeriodDateFields(String t, String db){
+        title = t;
+        dbField = db;
+    }
+    
 }
