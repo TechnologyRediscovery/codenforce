@@ -491,15 +491,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     public String updateProperty(Property prop) throws IntegrationException {
         String query =  "UPDATE public.property\n" +
-                        "   SET propertyid=?, municipality_municode=?, parid=?, lotandblock=?, \n" +
+                        "   SET municipality_municode=?, parid=?, lotandblock=?, \n" +
                         "       address=?, usegroup=?, constructiontype=?, countycode=?, notes=?, \n" +
                         "       addr_city=?, addr_state=?, addr_zip=?, ownercode=?, propclass=?, \n" +
-                        "       lastupdated=?, lastupdatedby=?, locationdescription=?, bobsource_sourceid=?, \n" +
-                        "       unfitdatestart=?, unfitdatestop=?, unfitby_userid=?, abandoneddatestart=?, \n" +
-                        "       abandoneddatestop=?, abandonedby_userid=?, vacantdatestart=?, \n" +
-                        "       vacantdatestop=?, vacantby_userid=?, condition_intensityclassid=?, \n" +
-                        "       landbankprospect_intensityclassid=?, landbankheld=?, active=?, \n" +
-                        "       nonaddressable=?, usetype_typeid=?\n" +
+                        "       lastupdated=?, lastupdatedby=?, \n" +
+//                        "       locationdescription=?, bobsource_sourceid=?, unfitdatestart=?, unfitdatestop=?, unfitby_userid=?, abandoneddatestart=?, \n" +
+//                        "       abandoneddatestop=?, abandonedby_userid=?, vacantdatestart=?, \n" +
+//                        "       vacantdatestop=?, vacantby_userid=?, condition_intensityclassid=?, \n" +
+//                        "       landbankprospect_intensityclassid=?, landbankheld=?, active=?, \n" +
+//                        "       nonaddressable=?, usetype_typeid=?\n" +
                         " WHERE propertyid=?;";
 
         Connection con = getPostgresCon();
@@ -527,39 +527,39 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             stmt.setInt(15, prop.getLastUpdatedBy().getUserID());
             
-            stmt.setInt(16, prop.getLocationDescriptor().getLocationID());
-            stmt.setInt(17, prop.getBobSource().getSourceid());
-            if(prop.getUnfitDateStart() != null){
-                stmt.setTimestamp(18, java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
-            }
-            if(prop.getUnfitDateStop() != null){
-                stmt.setTimestamp(19, java.sql.Timestamp.valueOf(prop.getUnfitDateStop()));
-            }
-            
-            stmt.setInt(20, prop.getUnfitBy().getUserID());
-            if(prop.getAbandonedDateStart()!= null){
-                stmt.setTimestamp(21, java.sql.Timestamp.valueOf(prop.getAbandonedDateStart()));
-            }
-            if(prop.getAbandonedDateStop()!= null){
-                stmt.setTimestamp(22, java.sql.Timestamp.valueOf(prop.getAbandonedDateStop()));
-            }
-            stmt.setInt(23, prop.getAbandonedBy().getUserID());
-            
-            if(prop.getVacantDateStart()!= null){
-                stmt.setTimestamp(24, java.sql.Timestamp.valueOf(prop.getVacantDateStart()));
-            }
-            if(prop.getVacantDateStop()!= null){
-                stmt.setTimestamp(25, java.sql.Timestamp.valueOf(prop.getVacantDateStop()));
-            }
-            stmt.setInt(26, prop.getVacantBy().getUserID());
-            stmt.setInt(27, prop.getConditionIntensityClassID());
-            
-            stmt.setInt(28, prop.getLandBankProspectIntensityClassID());
-            stmt.setBoolean(29, prop.isLandBankHeld());
-            stmt.setBoolean(30, prop.isActive());
-            stmt.setBoolean(31, prop.isNonAddressable());
-            
-            stmt.setInt(32, prop.getUseTypeID());
+//            stmt.setInt(16, prop.getLocationDescriptor().getLocationID());
+//            stmt.setInt(17, prop.getBobSource().getSourceid());
+//            if(prop.getUnfitDateStart() != null){
+//                stmt.setTimestamp(18, java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
+//            }
+//            if(prop.getUnfitDateStop() != null){
+//                stmt.setTimestamp(19, java.sql.Timestamp.valueOf(prop.getUnfitDateStop()));
+//            }
+//            
+//            stmt.setInt(20, prop.getUnfitBy().getUserID());
+//            if(prop.getAbandonedDateStart()!= null){
+//                stmt.setTimestamp(21, java.sql.Timestamp.valueOf(prop.getAbandonedDateStart()));
+//            }
+//            if(prop.getAbandonedDateStop()!= null){
+//                stmt.setTimestamp(22, java.sql.Timestamp.valueOf(prop.getAbandonedDateStop()));
+//            }
+//            stmt.setInt(23, prop.getAbandonedBy().getUserID());
+//            
+//            if(prop.getVacantDateStart()!= null){
+//                stmt.setTimestamp(24, java.sql.Timestamp.valueOf(prop.getVacantDateStart()));
+//            }
+//            if(prop.getVacantDateStop()!= null){
+//                stmt.setTimestamp(25, java.sql.Timestamp.valueOf(prop.getVacantDateStop()));
+//            }
+//            stmt.setInt(26, prop.getVacantBy().getUserID());
+//            stmt.setInt(27, prop.getConditionIntensityClassID());
+//            
+//            stmt.setInt(28, prop.getLandBankProspectIntensityClassID());
+//            stmt.setBoolean(29, prop.isLandBankHeld());
+//            stmt.setBoolean(30, prop.isActive());
+//            stmt.setBoolean(31, prop.isNonAddressable());
+//            
+//            stmt.setInt(32, prop.getUseTypeID());
 
             stmt.executeUpdate();
 

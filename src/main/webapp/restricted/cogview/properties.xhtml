@@ -923,9 +923,10 @@
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
-                            <h:panelGrid id="panelgrid-propinfoedit" columns="4" cellpadding="10" cellspacing="30">
+                            <h:panelGrid id="panelgrid-propinfoedit" columns="2" cellpadding="10" cellspacing="30">
                                 <h:panelGroup>
                                     <p:outputLabel value="Street Address"/>
+                                    <p:spacer width="5px"/>
                                     <p:inputText value="#{propertyProfileBB.currProp.address}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
@@ -933,6 +934,7 @@
                                              
                                 <h:panelGroup>
                                     <p:outputLabel value="City"/>
+                                    <p:spacer width="5px"/>
                                     <p:inputText value="#{propertyProfileBB.currProp.address_city}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
@@ -940,30 +942,35 @@
                                 <h:panelGroup>
 
                                     <p:outputLabel value="Zip Code"/>
+                                    <p:spacer width="5px"/>
                                     <p:inputText value="#{propertyProfileBB.currProp.address_zip}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <p:outputLabel value="State"/>
+                                    <p:spacer width="5px"/>
                                     <p:inputText value="#{propertyProfileBB.currProp.address_state}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <p:outputLabel value="Lot and Block"/>
+                                    <p:spacer width="5px"/>
                                     <p:inputText value="#{propertyProfileBB.currProp.lotAndBlock}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event)"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <p:outputLabel value="ParcelID"/>
+                                    <p:spacer width="5px"/>
                                     <p:inputText value="#{propertyProfileBB.currProp.parID}"
                                                   onkeydown="PF('datatable').onKeyDown(event)"
                                                   onkeyup="PF('datatable').onKeyUp(event)"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <p:outputLabel value="Municipality"/>
+                                    <p:spacer width="5px"/>
                                     <h:selectOneMenu id="propinfoedit-muni-som"
                                                      value="#{propertyProfileBB.currProp.muni}">
                                         <f:converter converterId="muniConverter"/>
@@ -973,15 +980,16 @@
 
                                     </h:selectOneMenu>
                                 </h:panelGroup>
-                                <h:panelGroup>
-                                    <p:commandButton ajax="true"
-                                                     actionListener="#{propertyProfileBB.beginPropertyUnitUpdates}"
-                                                     update="dialog-propinfoedit"
-                                                     icon="fa fa-plus"
-                                                     tabindex="1"
-                                                     value="Save Property Info"/>
-                                </h:panelGroup>
+                                
                             </h:panelGrid>
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="true"
+                                                 actionListener="#{propertyProfileBB.beginPropertyUnitUpdates}"
+                                                 update="dialog-propinfoedit
+                                                 :property-info-form"
+                                                 icon="fa fa-plus"
+                                                 tabindex="1"
+                                                 value="Save Property Info"/>
                             
                             
                             
