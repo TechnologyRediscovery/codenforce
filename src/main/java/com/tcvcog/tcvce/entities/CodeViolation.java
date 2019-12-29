@@ -76,7 +76,7 @@ public class CodeViolation  implements Serializable{
     
     protected LocalDateTime complianceTimeStamp;
     protected User complianceUser;
-    protected CECaseEvent compTimeFrameComplianceEvent;
+    protected EventCECase compTimeFrameComplianceEvent;
     protected int complianceTimeframeEventID;
     
     protected List<Integer> photoList;
@@ -416,7 +416,7 @@ public class CodeViolation  implements Serializable{
     /**
      * @return the compTimeFrameComplianceEvent
      */
-    public CECaseEvent getCompTimeFrameComplianceEvent() {
+    public EventCECase getCompTimeFrameComplianceEvent() {
         return compTimeFrameComplianceEvent;
     }
 
@@ -444,7 +444,7 @@ public class CodeViolation  implements Serializable{
     /**
      * @param compTimeFrameComplianceEvent the compTimeFrameComplianceEvent to set
      */
-    public void setCompTimeFrameComplianceEvent(CECaseEvent compTimeFrameComplianceEvent) {
+    public void setCompTimeFrameComplianceEvent(EventCECase compTimeFrameComplianceEvent) {
         this.compTimeFrameComplianceEvent = compTimeFrameComplianceEvent;
     }
 

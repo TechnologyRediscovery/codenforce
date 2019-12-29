@@ -114,17 +114,16 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             }
             selectedQueryCEAR = sessionQuery;
             searchParams = sessionQuery.getParmsList().get(0);
-            queryList = sc.buildQueryCEARList(getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
+            queryList = sc.buildQueryCEARList(getSessionBean().getSessionUser().getMyCredential());
 
             CaseCoordinator cc = getCaseCoordinator();
             SearchCoordinator searchCoord = getSearchCoordinator();
             rpt = cc.getInitializedReportConficCEARs(
                     getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
             rpt.setPrintFullCEARQueue(false);
-            QueryCEAR query = searchCoord.assembleQueryCEAR(
+            QueryCEAR query = searchCoord.initQuery(
                                                 QueryCEAREnum.CUSTOM, 
-                                                getSessionBean().getSessionUser(), 
-                                                getSessionBean().getSessionMuni(), 
+                                                getSessionBean().getSessionUser().getMyCredential(), 
                                                 null);
             List<CEActionRequest> singleReqList = new ArrayList<>();
             if(selectedRequest != null){
@@ -191,10 +190,9 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SearchCoordinator searchCoord = getSearchCoordinator();
         try {
             
-            selectedQueryCEAR = searchCoord.assembleQueryCEAR(
+            selectedQueryCEAR = searchCoord.initQuery(
                                                     QueryCEAREnum.CUSTOM,
-                                                    getSessionBean().getSessionUser(), 
-                                                    getSessionBean().getSessionMuni(), 
+                                                    getSessionBean().getSessionUser().getMyCredential(), 
                                                     searchParams);
             requestList =searchCoord.runQuery(selectedQueryCEAR).getResults();
             

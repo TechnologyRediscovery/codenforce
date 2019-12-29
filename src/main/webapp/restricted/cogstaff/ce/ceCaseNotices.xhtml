@@ -1,0 +1,203 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>CE cases notices of violation</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="cecases-notices-view">
+
+                    <div class="mainContainer">
+
+                            <h:form id="notices-messages-form">
+
+                                <h:messages id="notices-messages-global"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
+
+                        <h:form id="cecases-notices-form">
+                            
+
+                            <h2 id="notices">Notices of violation</h2>
+
+
+                            <h:form id="notices-form">
+                                <p:commandButton ajax="false" icon="fa fa-paper-plane"
+                                                 action="#{ceCaseNoticesBB.createNewNotice}"
+                                                 value="Create new notice of violation letter"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                 disabled="false"
+                                                 />
+                                <p:spacer height="5px"/>
+
+                                <ui:remove>
+                                    disabled="#{!(empty ceCaseNoticesBB.currentCase.closingDate)}"
+                                </ui:remove>
+                                
+                                <p:dataScroller
+                                    id="notices-ds"
+                                    value="#{ceCaseNoticesBB.currentCase.noticeList}"
+                                    var="notice"
+                                    rendered="true">
+
+                                    <div class="action-request-header">
+                                        <h:outputText styleClass="bold"   value="Notice dated: " />
+                                        <h:outputText value="#{notice.dateOfRecordPretty}"/>
+                                    </div>
+
+                                    <h:panelGrid columns="2" rendered="true"
+                                                 columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                                 footerClass="no-border">
+
+                                        <h:panelGroup>
+                                            <h:outputText styleClass="bold" value="Notice ID:" />
+                                            <h:outputText value="#{notice.noticeID}"/>
+
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputText styleClass="bold"   value="Queued for Mailing: " />
+                                            <h:outputText id="nov-queued-ot" value="#{notice.lockedAndQueuedTSPretty}"/>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputText styleClass="bold"  value="Sent Date: " />
+                                            <h:outputText id="nov-sent-date" value="#{notice.sentTSPretty}"/>
+
+                                            <p:spacer height="5px"/>
+                                            <h:outputText styleClass="bold"  value="Returned? " />
+                                            <h:outputText id="nov-returned-date" value="#{notice.returnedTSPretty}"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup rendered="#{!notice.recipient.useSeparateMailingAddress}">
+                                            <h:outputLabel styleClass="bold" value="Recipient:"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
+                                            <h:outputText value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText escape="false" value="#{notice.recipient.addressStreet}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText value="#{notice.recipient.addressCity}, #{notice.recipient.addressState} #{notice.recipient.addressZip}"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup rendered="#{notice.recipient.useSeparateMailingAddress}">
+                                            <h:outputLabel styleClass="bold" value="Recipient (using separate mailing address):"/>
+                                            <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
+                                            <h:outputText value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText escape="false" value="#{notice.recipient.mailingAddressStreet}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText value="#{notice.recipient.mailingAddressCity}, #{notice.recipient.mailingAddressState} #{notice.recipient.mailingAddressZip}"/>
+                                        </h:panelGroup>
+
+                                    </h:panelGrid>
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:panelGrid    id="notice-rowexpand-pg" 
+                                                    columns="4" 
+                                                    columnClasses="gridTd-solid-back, gridTd-solid-back, gridTd-solid-back, gridTd-solid-back" >
+
+                                        <h:panelGroup>
+                                            <p:commandButton    id="nov-print-cb"
+                                                                ajax="false" action="#{ceCaseNoticesBB.printNotice(notice)}"
+                                                                value="Print/View" styleClass="noFill button-size-small"
+                                                                icon="fa fa-print" disabled="#{(empty notice.lockedAndqueuedTS)}" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-edit-cb"
+                                                             ajax="false" action="#{ceCaseNoticesBB.editNoticeOfViolation(notice)}"
+                                                             value="Edit notice" styleClass="noFill"
+                                                             icon="fa fa-edit " 
+                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-delete-cb"
+                                                             ajax="true" actionListener="#{ceCaseNoticesBB.deleteNoticeOfViolation(notice)}"
+                                                             value="Nuke notice" styleClass="noFill"
+                                                             icon="fa fa-bomb" 
+                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}"
+                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             notices-ds"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup></h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-queuenotice-cb"
+                                                             ajax="true" action="#{ceCaseNoticesBB.lockNoticeAndQueueForMailing(notice)}"
+                                                             value="Lock notice: ready to print and mail" styleClass="noFill"
+                                                             icon="fa fa-edit" 
+                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-queuenotice-cb
+                                                             nov-queued-ot
+                                                             nov-edit-cb
+                                                             nov-delete-cb
+                                                             nov-sent-cb
+                                                             nov-print-cb"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-sent-cb"
+                                                             ajax="true" actionListener="#{ceCaseNoticesBB.markNoticeOfViolationAsSent(notice)}"
+                                                             value="Mark notice as mailed!" styleClass="noFill"
+                                                             icon="fa fa-paper-plane" 
+                                                             disabled="#{(empty notice.lockedAndqueuedTS) || (!(empty notice.sentTS) and !(empty notice.lockedAndqueuedTS))}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-sent-date
+                                                             nov-returned-cb
+                                                             nov-sent-cb
+                                                             "/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-returned-cb"
+                                                             ajax="true" actionListener="#{ceCaseNoticesBB.markNoticeOfViolationAsReturned(notice)}"
+                                                             value="Mark notice as returned" styleClass="noFill"
+                                                             icon="fa fa-mail-reply" 
+                                                             disabled="#{(empty notice.sentTS) || !(empty notice.returnedTS)}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-returned-date
+                                                             nov-returned-cb"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-reset-cb"
+                                                             ajax="true" actionListener="#{ceCaseNoticesBB.resetNotice(notice)}"
+                                                             value="Reset mailing status" styleClass="noFill"
+                                                             icon="fa fa-window-close-o" 
+                                                             disabled="false"
+                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-returned-date
+                                                             nov-returned-cb
+                                                             nov-sent-cb
+                                                             nov-queuenotice-cb
+                                                             nov-delete-cb
+                                                             nov-edit-cb
+                                                             nov-queued-ot
+                                                             nov-sent-date
+                                                             nov-returned-date"/>
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                    <hr />
+                                </p:dataScroller>
+                            </h:form>
+                    <!--close main container-->
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

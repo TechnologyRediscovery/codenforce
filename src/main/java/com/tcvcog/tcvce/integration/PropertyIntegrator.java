@@ -599,20 +599,19 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         } // close finally
     }
 
-    public QueryProperty runQueryProperties(QueryProperty query) throws IntegrationException {
-        List<SearchParamsProperty> pList = query.getParmsList();
+   
 
-        for (SearchParamsProperty sp : pList) {
-            query.addToResults(searchForProperties(sp));
-        }
-        query.setExecutionTimestamp(LocalDateTime.now());
-        query.setExecutedByIntegrator(true);
-        return query;
-    }
+    /**
+     * Single entry point for searches against the property table. It's the job of
+     * the caller to iterate over the result list and make real objects
+     * 
+     * @param params
+     * @return List of property IDs
+     * @throws IntegrationException 
+     */
+    public List<Integer> searchForProperties(SearchParamsProperty params) throws IntegrationException {
 
-    public List<Property> searchForProperties(SearchParamsProperty params) throws IntegrationException {
-
-        List<Property> propList = new ArrayList<>();
+        List<Integer> propIDList = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -626,8 +625,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         System.out.println("PropertyIntegrator.searchForPropWParams");
         System.out.println(params.getParams());
-        if (!params.isObjectID_filterBy()) {
-            if (params.isFilterByMuni()) {
+        if (!params.isBobID_ctl()) {
+            if (params.isMuni_ctl()) {
                 sb.append("AND municipality_municode = ? "); // param 1
             }
 
@@ -674,7 +673,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
             if (params.isFilterByLandBankHeld()) {
                 sb.append("AND landbankheld= ");
-                if (params.isActive()) {
+                if (params.isActive_val()) {
                     sb.append("TRUE ");
                 } else {
                     sb.append("FALSE ");
@@ -683,7 +682,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
             if (params.isFilterByNonAddressable()) {
                 sb.append("AND landbankheld= ");
-                if (params.isActive()) {
+                if (params.isActive_val()) {
                     sb.append("TRUE ");
                 } else {
                     sb.append("FALSE ");
@@ -708,16 +707,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 sb.append("AND propertyexternaldata.yearbuilt<? ");
             }
 
-            if (params.isActive_filterBy()) {
+            if (params.isActive_ctl()) {
                 sb.append("AND ");
-                if (params.isActive()) {
+                if (params.isActive_val()) {
                     sb.append("active=TRUE ");
                 } else {
                     sb.append("active=FALSE ");
                 }
             }
 
-            if (params.isFilterByStartEndDate()) {
+            if (params.isDate_startEnd_ctl()) {
                 sb.append(" AND ");
                 sb.append(getDBDateField(params));
                 sb.append(" BETWEEN ? AND ? "); // parm 2 and 3 without ID
@@ -736,9 +735,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(sb.toString());
 
-            if (!params.isObjectID_filterBy()) {
-                if (params.isFilterByMuni()) {
-                     stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+            if (!params.isBobID_ctl()) {
+                if (params.isMuni_ctl()) {
+                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
                 
                 if (params.isFilterByUserField()) {
@@ -779,23 +778,23 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     stmt.setInt(++paramCounter, params.getYearBuiltMin());
                     stmt.setInt(++paramCounter, params.getYearBuiltMax());
                 }
-                if (params.isFilterByStartEndDate()) {
-                    stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
-                    stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
+                if (params.isDate_startEnd_ctl()) {
+                    stmt.setTimestamp(++paramCounter, params.getStartDate_val_SQLDate());
+                    stmt.setTimestamp(++paramCounter, params.getEndDate_val_SQLDate());
                 }
             } else {
-                stmt.setInt(++paramCounter, params.getObjectID());
+                stmt.setInt(++paramCounter, params.getBobID_val());
             }
             rs = stmt.executeQuery();
             int counter = 0;
             int maxResults;
-            if (params.isLimitResultCountTo100()) {
+            if (params.isLimitResultCount_ctl()) {
                 maxResults = 100;
             } else {
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                propList.add(getProperty(rs.getInt("propertyid")));
+                propIDList.add(rs.getInt("propertyid"));
                 counter++;
             }
             System.out.println(String.format("number of returned props = %d", counter));
@@ -808,7 +807,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         System.out.println("about to return proplist");
-        return propList;
+        return propIDList;
     }
 
     private String getDBDateField(SearchParamsProperty params) {
@@ -952,7 +951,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return propList;
     }
     
-     public PropertyUnit getPropertyUnitByPropertyUnitID(int propUnitID) throws IntegrationException {
+     public PropertyUnit getPropertyUnit(int propUnitID) throws IntegrationException {
         PropertyUnit pu = null;
         String query =  "SELECT unitid, unitnumber, property_propertyid, otherknownaddress, notes, \n" +
                         "       rentalintentdatestart, rentalintentdatestop, rentalintentlastupdatedby_userid, \n" +
@@ -1133,7 +1132,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(1, p.getPropertyID());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                unitList.add(getPropertyUnitByPropertyUnitID(rs.getInt("unitid")));
+                unitList.add(getPropertyUnit(rs.getInt("unitid")));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -1190,7 +1189,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     
     public PropertyUnitDataHeavy getPropertyUnitWithLists(int unitID) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        PropertyUnitDataHeavy puwl = new PropertyUnitDataHeavy(getPropertyUnitByPropertyUnitID(unitID));
+        PropertyUnitDataHeavy puwl = new PropertyUnitDataHeavy(getPropertyUnit(unitID));
         puwl.setPeriodList(oi.getOccPeriodList(unitID));
         return puwl;
     }
@@ -1206,7 +1205,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public PropertyUnitWithProp getPropertyUnitWithProp(int unitID) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         
-        PropertyUnitWithProp puwp = new PropertyUnitWithProp(getPropertyUnitByPropertyUnitID(unitID));
+        PropertyUnitWithProp puwp = new PropertyUnitWithProp(getPropertyUnit(unitID));
         puwp.setProperty(pi.getProperty(puwp.getPropertyID()));
         
         return puwp;
@@ -1228,7 +1227,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         PropertyIntegrator pi = getPropertyIntegrator();
 
-        PropertyUnit skeleton = pi.getPropertyUnitByPropertyUnitID(uc.getUnitID());
+        PropertyUnit skeleton = pi.getPropertyUnit(uc.getUnitID());
 
         if (uc.getUnitNumber() != null) {
             skeleton.setUnitNumber(uc.getUnitNumber());

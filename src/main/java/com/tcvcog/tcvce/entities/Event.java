@@ -32,29 +32,32 @@ public  class       Event
         implements  Comparable<Event> {
     
     protected int eventID;
-    
-    protected int muniCode;
-    protected String muniName;
-    protected int propertyID;
     protected EventCategory category;
     
-    protected LocalDateTime dateOfRecord;
-    protected String dateOfRecordPretty;
-    protected java.util.Date dateOfRecordUtilDate;
+    protected EventDomainEnum domain;
+    
+    protected int ceCaseID;
+    protected int occPeriodID;
+    
+    protected LocalDateTime timeStart;
+    protected java.util.Date timeStartUtilDate;
+    protected LocalDateTime timeEnd;
+    protected java.util.Date timeEndUtilDate;
+    
     protected LocalDateTime timestamp;
-    protected String timestampPretty;
     
     protected String description;
     protected User owner;
+    
     protected boolean discloseToMunicipality; 
     protected boolean discloseToPublic;
     protected boolean active;
     protected boolean hidden;
+    
     protected String notes;
     
     protected List<Person> personList;
     
-    protected long daysUntilDue;
     
     /**
      * @return the eventID
@@ -70,22 +73,7 @@ public  class       Event
         return category;
     }
 
-    /**
-     * @return the dateOfRecord
-     */
-    public LocalDateTime getDateOfRecord() {
-        return dateOfRecord;
-    }
-
-    /**
-     * @return the dateOfRecordPretty
-     */
-    public String getDateOfRecordPretty() {
-        String pretty = EntityUtils.getPrettyDate(dateOfRecord);
-        dateOfRecordPretty = pretty;
-        return dateOfRecordPretty;
-    }
-
+   
     /**
      * @return the timestamp
      */
@@ -156,12 +144,6 @@ public  class       Event
         this.category = category;
     }
 
-    /**
-     * @param dateOfRecord the dateOfRecord to set
-     */
-    public void setDateOfRecord(LocalDateTime dateOfRecord) {
-        this.dateOfRecord = dateOfRecord;
-    }
 
     
     /**
@@ -222,29 +204,6 @@ public  class       Event
 
    
 
-
-
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {
-        if(dateOfRecord != null){
-            dateOfRecordUtilDate = java.util.Date.from(
-                    this.dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return dateOfRecordUtilDate;
-    }
-
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-        if(dateOfRecordUtilDate != null){
-            dateOfRecord = this.dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-    }
-
    
 
 
@@ -253,17 +212,10 @@ public  class       Event
      */
     public String getTimestampPretty() {
         String s = EntityUtils.getPrettyDate(timestamp);
-        timestampPretty = s;
-        return timestampPretty;
+        return s;
     }
 
-    /**
-     * @param timestampPretty the timestampPretty to set
-     */
-    public void setTimestampPretty(String timestampPretty) {
-        this.timestampPretty = timestampPretty;
-    }
-
+   
 
     /**
      * @return the personList
@@ -280,67 +232,11 @@ public  class       Event
     }
 
     
-    /**
-     * @return the daysUntilDue
-     */
-    public long getDaysUntilDue() {
-        long d = EntityUtils.getTimePeriodAsDays(LocalDateTime.now(), dateOfRecord);
-        daysUntilDue = d;
-        return daysUntilDue;
-    }
 
-    /**
-     * @param daysUntilDue the daysUntilDue to set
-     */
-    public void setDaysUntilDue(long daysUntilDue) {
-        this.daysUntilDue = daysUntilDue;
-    }
-
-    /**
-     * @return the muniCode
-     */
-    public int getMuniCode() {
-        return muniCode;
-    }
-
-    /**
-     * @param muniCode the muniCode to set
-     */
-    public void setMuniCode(int muniCode) {
-        this.muniCode = muniCode;
-    }
-
-    /**
-     * @return the propertyID
-     */
-    public int getPropertyID() {
-        return propertyID;
-    }
-
-    /**
-     * @param propertyID the propertyID to set
-     */
-    public void setPropertyID(int propertyID) {
-        this.propertyID = propertyID;
-    }
-
-    /**
-     * @return the muniName
-     */
-    public String getMuniName() {
-        return muniName;
-    }
-
-    /**
-     * @param muniName the muniName to set
-     */
-    public void setMuniName(String muniName) {
-        this.muniName = muniName;
-    }
-
+  
     @Override
     public int compareTo(Event e) {
-        int c = this.dateOfRecord.compareTo(e.getDateOfRecord());
+        int c = this.timeStart.compareTo(e.timeStart);
         return c;
         
     }
@@ -349,15 +245,8 @@ public  class       Event
     public int hashCode() {
         int hash = 5;
         hash = 97 * hash + this.eventID;
-        hash = 97 * hash + this.muniCode;
-        hash = 97 * hash + Objects.hashCode(this.muniName);
-        hash = 97 * hash + this.propertyID;
         hash = 97 * hash + Objects.hashCode(this.category);
-        hash = 97 * hash + Objects.hashCode(this.dateOfRecord);
-        hash = 97 * hash + Objects.hashCode(this.dateOfRecordPretty);
-        hash = 97 * hash + Objects.hashCode(this.dateOfRecordUtilDate);
         hash = 97 * hash + Objects.hashCode(this.timestamp);
-        hash = 97 * hash + Objects.hashCode(this.timestampPretty);
         hash = 97 * hash + Objects.hashCode(this.description);
         hash = 97 * hash + Objects.hashCode(this.owner);
         hash = 97 * hash + (this.discloseToMunicipality ? 1 : 0);
@@ -366,7 +255,6 @@ public  class       Event
         hash = 97 * hash + (this.hidden ? 1 : 0);
         hash = 97 * hash + Objects.hashCode(this.notes);
         hash = 97 * hash + Objects.hashCode(this.personList);
-        hash = 97 * hash + (int) (this.daysUntilDue ^ (this.daysUntilDue >>> 32));
         return hash;
     }
 
@@ -386,6 +274,119 @@ public  class       Event
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the domain
+     */
+    public EventDomainEnum getDomain() {
+        return domain;
+    }
+
+    /**
+     * @param domain the domain to set
+     */
+    public void setDomain(EventDomainEnum domain) {
+        this.domain = domain;
+    }
+
+    /**
+     * @return the ceCaseID
+     */
+    public int getCeCaseID() {
+        return ceCaseID;
+    }
+
+    /**
+     * @return the occPeriodID
+     */
+    public int getOccPeriodID() {
+        return occPeriodID;
+    }
+
+    /**
+     * @param ceCaseID the ceCaseID to set
+     */
+    public void setCeCaseID(int ceCaseID) {
+        this.ceCaseID = ceCaseID;
+    }
+
+    /**
+     * @param occPeriodID the occPeriodID to set
+     */
+    public void setOccPeriodID(int occPeriodID) {
+        this.occPeriodID = occPeriodID;
+    }
+
+    /**
+     * @return the timeStart
+     */
+    public LocalDateTime getTimeStart() {
+        return timeStart;
+    }
+
+    /**
+     * @return the timeStartUtilDate
+     */
+    public java.util.Date getTimeStartUtilDate() {
+         if(timeStart != null){
+            timeStartUtilDate = java.util.Date.from(
+                    this.timeStart.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return timeStartUtilDate;
+    }
+
+    /**
+     * @return the timeEnd
+     */
+    public LocalDateTime getTimeEnd() {
+        
+        return timeEnd;
+    }
+
+    /**
+     * @return the timeEndUtilDate
+     */
+    public java.util.Date getTimeEndUtilDate() {
+         if(timeEnd != null){
+            timeEndUtilDate = java.util.Date.from(
+                    this.timeEnd.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return timeEndUtilDate;
+    }
+
+    /**
+     * @param timeStart the timeStart to set
+     */
+    public void setTimeStart(LocalDateTime timeStart) {
+        this.timeStart = timeStart;
+    }
+
+    /**
+     * @param tsud
+     */
+    public void setTimeStartUtilDate(java.util.Date tsud) {
+        this.timeStartUtilDate = tsud;
+        if(tsud != null){
+            timeStart = this.timeStartUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
+    /**
+     * @param timeEnd the timeEnd to set
+     */
+    public void setTimeEnd(LocalDateTime timeEnd) {
+        this.timeEnd = timeEnd;
+    }
+
+    /**
+     * @param teud
+     */
+    public void setTimeEndUtilDate(java.util.Date teud) {
+        this.timeEndUtilDate = teud;
+        if(teud != null){
+            timeEnd = this.timeEndUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
 

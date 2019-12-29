@@ -7,9 +7,11 @@ package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.RoleType;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 /**
  * Encapsulates municipality restrictions and start/end
@@ -21,226 +23,252 @@ import java.time.ZoneId;
  * @author Sylvia, no wait, Lauren
  */
 
-public  class       SearchParams 
-        extends     EntityUtils 
-        implements  Serializable{
+public  class  SearchParams 
+        implements      Serializable{
+
+    /**
+     * @return the muni_rtMin
+     */
+    public RoleType getMuni_rtMin() {
+        return muni_rtMin;
+    }
+
+    /**
+     * @param muni_rtMin the muni_rtMin to set
+     */
+    public void setMuni_rtMin(RoleType muni_rtMin) {
+        this.muni_rtMin = muni_rtMin;
+    }
     
     private String searchName;
     private String searchDescription;
     
-    private boolean filterByMuni;
-    private Municipality muni; 
+    private RoleType muni_rtMin;
+    private boolean muni_ctl;
+    private Municipality muni_val;
+    protected List<Municipality> muniList_val;
     
-    private boolean filterByStartEndDate;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private RoleType date_rtMin;
+    private boolean date_startEnd_ctl;
+    private LocalDateTime date_start_val;
+    private LocalDateTime date_end_val;
+
+    private boolean date_relativeDates_ctl;
+    private int date_relativeDates_start_val;
+    private int date_realtiveDates_end_val;
     
-    private java.util.Date startDateUtilDate;
-    private java.util.Date endDateUtilDate;
-    private java.sql.Timestamp startDateSQLDate;
-    private java.sql.Timestamp endDateSQLDate;
-    private String startDatePretty;
-    private String endDatePretty;
-    
-    private boolean useRelativeDates;
-    private int startDateRelativeDays;
-    private int endDateRelativeDays;
     
     private boolean applyDateSearchToDateOfRecord;
     private boolean useEntryTimestamp;
     
-    private boolean objectID_filterBy;
-    private int objectID;
+    private RoleType bobID_rtMin;
+    private boolean bobID_ctl;
+    private int bobID_val;
     
-    private boolean limitResultCountTo100;
+    private RoleType limitResultCount_rtMin;
+    private boolean limitResultCount_ctl;
+    private int limitResultCount_val;
     
-    private boolean active_filterBy;
-    private boolean active;
+    private boolean active_ctl;
+    private boolean active_val;
     
    public SearchParams(){
        
    }
    
+   
+   
     /**
-     * @return the muni
+     * Adds a given municipality to the Query's internal list of Municipalities
+     * to query
+     * @param muni a muni_val to search using the Query Object's parameter list
+     * @return the size of the list after the inputed Muni is added
      */
-    public Municipality getMuni() {
-        return muni;
+    public int addMuni(Municipality muni){
+        muniList_val.add(muni);
+        return muniList_val.size();
+        
+    }
+    
+    /**
+     * Utility method for calling clear() on the internal munilist
+     */
+    public void clearMuniList(){
+        muniList_val.clear();
+    }
+    
+    /**
+     * Retrieves the internal list of Municipality objects held by this Query subclass
+     * @return a reference to the internal muniList_val
+     */
+    public List<Municipality> getMuniList_val(){
+        return muniList_val;
+    }
+  
+    
+    
+    /**
+     * @return the muni_val
+     */
+    public Municipality getMuni_val() {
+        return muni_val;
     }
 
     /**
-     * @param muni the muni to set
+     * @param muni_val the muni_val to set
      */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
+    public void setMuni_val(Municipality muni_val) {
+        this.muni_val = muni_val;
     }
 
     /**
-     * @return the startDateUtilDate
+     * @return the startDate_val_utilDate
      */
-    public java.util.Date getStartDateUtilDate() {
-        if(startDate != null){
-            startDateUtilDate = java.util.Date.from(getStartDate().atZone(ZoneId.systemDefault()).toInstant());
+    public java.util.Date getStartDate_val_utilDate() {
+        if(date_start_val != null){
+            return java.util.Date.from(getDate_start_val().atZone(ZoneId.systemDefault()).toInstant());
         }
-        return startDateUtilDate;
+        return null;
     }
 
     /**
-     * @param startDateUtilDate the startDateUtilDate to set
+     * @param startDate_val_utilDate the startDate_val_utilDate to set
      */
-    public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
-        this.startDateUtilDate = startDateUtilDate;
-        if(startDateUtilDate != null){
-            startDate = startDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    public void setStartDate_val_utilDate(java.util.Date startDate_val_utilDate) {
+        if(startDate_val_utilDate != null){
+            date_start_val = startDate_val_utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
     }
 
     /**
-     * @return the endDateUtilDate
+     * @return the endDate_val_utilDate
      */
-    public java.util.Date getEndDateUtilDate() {
-        if(endDate != null){
-            endDateUtilDate = java.util.Date.from(getEndDate().atZone(ZoneId.systemDefault()).toInstant());
+    public java.util.Date getEndDate_val_utilDate() {
+        if(date_end_val != null){
+            return java.util.Date.from(getDate_end_val().atZone(ZoneId.systemDefault()).toInstant());
         }
-        return endDateUtilDate;
+        return null;
     }
 
     /**
-     * @param endDateUtilDate the endDateUtilDate to set
+     * @param endDate_val_utilDate the endDate_val_utilDate to set
      */
-    public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
-        this.endDateUtilDate = endDateUtilDate;
-        if(endDateUtilDate != null){
-            endDate = endDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    public void setEndDate_val_utilDate(java.util.Date endDate_val_utilDate) {
+        if(endDate_val_utilDate != null){
+            date_end_val = endDate_val_utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
     }
 
     /**
-     * @return the startDate
+     * @return the date_start_val
      */
-    public LocalDateTime getStartDate() {
-        return startDate;
+    public LocalDateTime getDate_start_val() {
+        return date_start_val;
     }
 
     /**
-     * @return the endDate
+     * @return the date_end_val
      */
-    public LocalDateTime getEndDate() {
-        return endDate;
+    public LocalDateTime getDate_end_val() {
+        return date_end_val;
     }
 
     /**
-     * @param startDate the startDate to set
+     * @param date_start_val the date_start_val to set
      */
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
+    public void setDate_start_val(LocalDateTime date_start_val) {
+        this.date_start_val = date_start_val;
     }
 
     /**
-     * @param endDate the endDate to set
+     * @param date_end_val the date_end_val to set
      */
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
+    public void setDate_end_val(LocalDateTime date_end_val) {
+        this.date_end_val = date_end_val;
     }
 
     /**
-     * @return the startDateSQLDate
+     * @return the startDate_val_SQLDate
      */
-    public java.sql.Timestamp getStartDateSQLDate() {
-        if(useRelativeDates){
-            startDateSQLDate = java.sql.Timestamp.valueOf(LocalDateTime.now().plusDays(startDateRelativeDays));
-            System.out.println("SearchParams.getStartDateSQLDate | usereldates:true | starddate str: " + startDateSQLDate.toString());
+    public java.sql.Timestamp getStartDate_val_SQLDate() {
+        if(date_relativeDates_ctl){
+            return java.sql.Timestamp.valueOf(LocalDateTime.now().plusDays(date_relativeDates_start_val));
         } else {
-            if(startDate != null){
-                startDateSQLDate = java.sql.Timestamp.valueOf(getStartDate());
+            if(date_start_val != null){
+                return java.sql.Timestamp.valueOf(getDate_start_val());
             }
         }
-        return startDateSQLDate;
+        return null;
     }
 
     /**
-     * @return the endDateSQLDate
+     * @return the endDate_val_SQLDate
      */
-    public java.sql.Timestamp getEndDateSQLDate() {
-        if(useRelativeDates){
-            endDateSQLDate = java.sql.Timestamp.valueOf(LocalDateTime.now().plusDays(endDateRelativeDays));
-            System.out.println("SearchParams.getEndDateSQLDate | usereldates:true | starddate str: " + endDateSQLDate.toString());
+    public java.sql.Timestamp getEndDate_val_SQLDate() {
+        if(date_relativeDates_ctl){
+            return java.sql.Timestamp.valueOf(LocalDateTime.now().plusDays(date_realtiveDates_end_val));
         } else {
-            if(endDate != null){
-                endDateSQLDate = java.sql.Timestamp.valueOf(getEndDate());
+            if(date_end_val != null){
+                return java.sql.Timestamp.valueOf(getDate_end_val());
             }
         }
-        return endDateSQLDate;
+        return null;
     }
 
     /**
-     * @param startDateSQLDate the startDateSQLDate to set
+     * @return the date_startEnd_ctl
      */
-    public void setStartDateSQLDate(java.sql.Timestamp startDateSQLDate) {
-        this.startDateSQLDate = startDateSQLDate;
+    public boolean isDate_startEnd_ctl() {
+        return date_startEnd_ctl;
     }
 
     /**
-     * @param endDateSQLDate the endDateSQLDate to set
+     * @param date_startEnd_ctl the date_startEnd_ctl to set
      */
-    public void setEndDateSQLDate(java.sql.Timestamp endDateSQLDate) {
-        this.endDateSQLDate = endDateSQLDate;
+    public void setDate_startEnd_ctl(boolean date_startEnd_ctl) {
+        this.date_startEnd_ctl = date_startEnd_ctl;
     }
 
     /**
-     * @return the filterByStartEndDate
+     * @return the limitResultCount_ctl
      */
-    public boolean isFilterByStartEndDate() {
-        return filterByStartEndDate;
+    public boolean isLimitResultCount_ctl() {
+        return limitResultCount_ctl;
     }
 
     /**
-     * @param filterByStartEndDate the filterByStartEndDate to set
+     * @param limitResultCount_ctl the limitResultCount_ctl to set
      */
-    public void setFilterByStartEndDate(boolean filterByStartEndDate) {
-        this.filterByStartEndDate = filterByStartEndDate;
+    public void setLimitResultCount_ctl(boolean limitResultCount_ctl) {
+        this.limitResultCount_ctl = limitResultCount_ctl;
     }
 
     /**
-     * @return the limitResultCountTo100
+     * @return the bobID_val
      */
-    public boolean isLimitResultCountTo100() {
-        return limitResultCountTo100;
+    public int getBobID_val() {
+        return bobID_val;
     }
 
     /**
-     * @param limitResultCountTo100 the limitResultCountTo100 to set
+     * @param bobID_val the bobID_val to set
      */
-    public void setLimitResultCountTo100(boolean limitResultCountTo100) {
-        this.limitResultCountTo100 = limitResultCountTo100;
-    }
-
-    /**
-     * @return the objectID
-     */
-    public int getObjectID() {
-        return objectID;
-    }
-
-    /**
-     * @param objectID the objectID to set
-     */
-    public void setObjectID(int objectID) {
-        this.objectID = objectID;
+    public void setBobID_val(int bobID_val) {
+        this.bobID_val = bobID_val;
     }
 
     /**
      * @return the filterByObjectID
      */
-    public boolean isObjectID_filterBy() {
-        return objectID_filterBy;
+    public boolean isBobID_ctl() {
+        return bobID_ctl;
     }
 
     /**
-     * @param objectID_filterBy the filterByObjectID to set
+     * @param bobID_ctl the filterByObjectID to set
      */
-    public void setObjectID_filterBy(boolean objectID_filterBy) {
-        this.objectID_filterBy = objectID_filterBy;
+    public void setBobID_ctl(boolean bobID_ctl) {
+        this.bobID_ctl = bobID_ctl;
     }
 
     /**
@@ -272,59 +300,59 @@ public  class       SearchParams
     }
 
     /**
-     * @return the filterByMuni
+     * @return the muni_ctl
      */
-    public boolean isFilterByMuni() {
-        return filterByMuni;
+    public boolean isMuni_ctl() {
+        return muni_ctl;
     }
 
     /**
-     * @param filterByMuni the filterByMuni to set
+     * @param muni_ctl the muni_ctl to set
      */
-    public void setFilterByMuni(boolean filterByMuni) {
-        this.filterByMuni = filterByMuni;
+    public void setMuni_ctl(boolean muni_ctl) {
+        this.muni_ctl = muni_ctl;
     }
 
     /**
-     * @return the useRelativeDates
+     * @return the date_relativeDates_ctl
      */
-    public boolean isUseRelativeDates() {
-        return useRelativeDates;
+    public boolean isDate_relativeDates_ctl() {
+        return date_relativeDates_ctl;
     }
 
     /**
-     * @return the startDateRelativeDays
+     * @return the date_relativeDates_start_val
      */
-    public int getStartDateRelativeDays() {
-        return startDateRelativeDays;
+    public int getDate_relativeDates_start_val() {
+        return date_relativeDates_start_val;
     }
 
     /**
-     * @return the endDateRelativeDays
+     * @return the date_realtiveDates_end_val
      */
-    public int getEndDateRelativeDays() {
-        return endDateRelativeDays;
+    public int getDate_realtiveDates_end_val() {
+        return date_realtiveDates_end_val;
     }
 
     /**
-     * @param useRelativeDates the useRelativeDates to set
+     * @param date_relativeDates_ctl the date_relativeDates_ctl to set
      */
-    public void setUseRelativeDates(boolean useRelativeDates) {
-        this.useRelativeDates = useRelativeDates;
+    public void setDate_relativeDates_ctl(boolean date_relativeDates_ctl) {
+        this.date_relativeDates_ctl = date_relativeDates_ctl;
     }
 
     /**
-     * @param startDateRelativeDays the startDateRelativeDays to set
+     * @param date_relativeDates_start_val the date_relativeDates_start_val to set
      */
-    public void setStartDateRelativeDays(int startDateRelativeDays) {
-        this.startDateRelativeDays = startDateRelativeDays;
+    public void setDate_relativeDates_start_val(int date_relativeDates_start_val) {
+        this.date_relativeDates_start_val = date_relativeDates_start_val;
     }
 
     /**
-     * @param endDateRelativeDays the endDateRelativeDays to set
+     * @param date_realtiveDates_end_val the date_realtiveDates_end_val to set
      */
-    public void setEndDateRelativeDays(int endDateRelativeDays) {
-        this.endDateRelativeDays = endDateRelativeDays;
+    public void setDate_realtiveDates_end_val(int date_realtiveDates_end_val) {
+        this.date_realtiveDates_end_val = date_realtiveDates_end_val;
     }
 
     /**
@@ -364,69 +392,105 @@ public  class       SearchParams
      * @return the startDatePretty
      */
     public String getStartDatePretty() {
-        if(startDateSQLDate != null){
-            LocalDateTime startDateLDT = startDateSQLDate.toLocalDateTime();
-            startDatePretty = EntityUtils.getPrettyDate(startDateLDT);
+        if(date_start_val != null){
+            return EntityUtils.getPrettyDate(date_start_val);
         }
-        return startDatePretty;
+        return null;
     }
 
     /**
      * @return the endDatePretty
      */
     public String getEndDatePretty() {
-        if(endDateSQLDate != null){
-            LocalDateTime endDateLDT = endDateSQLDate.toLocalDateTime();
-            endDatePretty = EntityUtils.getPrettyDate(endDateLDT);
+        if(date_end_val != null){
+            return EntityUtils.getPrettyDate(date_end_val);
         }
-        return endDatePretty;
+        return null;
     }
 
     /**
-     * 
-     * @param startDatePretty the startDatePretty to set
+     * @return the active_ctl
      */
-    public void setStartDatePretty(String startDatePretty) {
-        
-        this.startDatePretty = startDatePretty;
+    public boolean isActive_ctl() {
+        return active_ctl;
     }
 
     /**
-     * @param endDatePretty the endDatePretty to set
+     * @return the active_val
      */
-    public void setEndDatePretty(String endDatePretty) {
-        this.endDatePretty = endDatePretty;
+    public boolean isActive_val() {
+        return active_val;
     }
 
     /**
-     * @return the active_filterBy
+     * @param active_ctl the active_ctl to set
      */
-    public boolean isActive_filterBy() {
-        return active_filterBy;
+    public void setActive_ctl(boolean active_ctl) {
+        this.active_ctl = active_ctl;
     }
 
     /**
-     * @return the active
+     * @param active_val the active_val to set
      */
-    public boolean isActive() {
-        return active;
+    public void setActive_val(boolean active_val) {
+        this.active_val = active_val;
     }
 
     /**
-     * @param active_filterBy the active_filterBy to set
+     * @return the date_rtMin
      */
-    public void setActive_filterBy(boolean active_filterBy) {
-        this.active_filterBy = active_filterBy;
+    public RoleType getDate_rtMin() {
+        return date_rtMin;
     }
 
     /**
-     * @param active the active to set
+     * @param date_rtMin the date_rtMin to set
      */
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setDate_rtMin(RoleType date_rtMin) {
+        this.date_rtMin = date_rtMin;
     }
 
-   
+    /**
+     * @return the bobID_rtMin
+     */
+    public RoleType getBobID_rtMin() {
+        return bobID_rtMin;
+    }
+
+    /**
+     * @param bobID_rtMin the bobID_rtMin to set
+     */
+    public void setBobID_rtMin(RoleType bobID_rtMin) {
+        this.bobID_rtMin = bobID_rtMin;
+    }
+
+    /**
+     * @return the limitResultCount_val
+     */
+    public int getLimitResultCount_val() {
+        return limitResultCount_val;
+    }
+
+    /**
+     * @param limitResultCount_val the limitResultCount_val to set
+     */
+    public void setLimitResultCount_val(int limitResultCount_val) {
+        this.limitResultCount_val = limitResultCount_val;
+    }
+
+    /**
+     * @return the limitResultCount_rtMin
+     */
+    public RoleType getLimitResultCount_rtMin() {
+        return limitResultCount_rtMin;
+    }
+
+    /**
+     * @param limitResultCount_rtMin the limitResultCount_rtMin to set
+     */
+    public void setLimitResultCount_rtMin(RoleType limitResultCount_rtMin) {
+        this.limitResultCount_rtMin = limitResultCount_rtMin;
+    }
 
    
     

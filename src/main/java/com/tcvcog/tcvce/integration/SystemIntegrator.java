@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.CECase;
@@ -750,7 +751,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * @param ob any Object that's displayed in a data table or list in the system
      * @throws IntegrationException
      */
-    public void logObjectView(User u, Object ob) throws IntegrationException {
+    public void logObjectView(User u, IFace_Loggable ob) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;

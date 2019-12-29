@@ -40,7 +40,7 @@
                                         <p:dataTable
                                             id="feeTable"
                                             var="fee"
-                                            value="#{occInspectionBB.currentOccPeriod.feeList}"
+                                            value="#{occInspectionBB}"
                                             rowKey="#{fee.occPerAssignedFeeID}"
                                             tableStyleClass="primeDataTable"
                                             rowExpandMode="single"
@@ -189,7 +189,7 @@
                                         <p:dataTable
                                             id="paymentTable"
                                             var="payment"
-                                            value="#{occInspectionBB.currentOccPeriod.paymentList}"
+                                            value="#{occPeriodPaymentsBB.currentOccPeriod.paymentList}"
                                             rowKey="#{payment.paymentID}"
                                             tableStyleClass="primeDataTable"
                                             rowExpandMode="single"

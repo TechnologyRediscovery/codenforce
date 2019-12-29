@@ -5,24 +5,38 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.RoleType;
+
 /**
  *
  * @author sylvia
  */
-public enum QueryPropertyEnum {
+public  enum        QueryPropertyEnum 
+        implements  IFace_RankLowerBounded{
     
-    OPENCECASES_OCCPERIODSINPROCESS("Active properties", "Properties with open code enf cases and occupancy period authorization in process", 2, false),
-    CUSTOM("Custom", "Custom", 2, false);
+    OPENCECASES_OCCPERIODSINPROCESS(    "Active properties", 
+                                        "Properties with open code enf cases and occupancy period authorization in process", 
+                                        RoleType.MuniReader, 
+                                        false),
+    
+    CUSTOM(                             "Custom", 
+                                        "Custom", 
+                                        RoleType.MuniReader, 
+                                        false);
     
     private final String title;
     private final String desc;
-    private final int userRankMinimum;
+    private final RoleType requiredRoleMin;
     private final boolean log;
     
-    private QueryPropertyEnum(String t, String l, int rnkMin, boolean lg){
+    private QueryPropertyEnum(String t, String l, RoleType minRoleType, boolean lg){
         this.title = t;
         this.desc = l;
-        this.userRankMinimum = rnkMin;
+        if(minRoleType != null){
+            this.requiredRoleMin = minRoleType;
+        } else {
+            this.requiredRoleMin = RoleType.MuniStaff;
+        }
         this.log = lg;
     }
     
@@ -33,17 +47,14 @@ public enum QueryPropertyEnum {
     public String getTitle(){
         return title;
     }
-
-    /**
-     * @return the userRankMinimum
-     */
-    public int getUserRankMinimum() {
-        return userRankMinimum;
-    }
-    
     
     public boolean logQueryRun(){
         return log;
+    }
+
+    @Override
+    public RoleType getRequiredRoleMin() {
+        return requiredRoleMin;
     }
     
     

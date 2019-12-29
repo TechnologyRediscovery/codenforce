@@ -44,7 +44,9 @@ public class PersonSearchPublicBB extends BackingBeanUtils implements Serializab
     public void queryPersons(SearchParamsPerson params) throws IntegrationException{
        PersonCoordinator pc = getPersonCoordinator();
        boolean anonymizeResults = true;
-       setPersonSearchResults(pc.queryPersons(params, anonymizeResults));
+       
+       // Finish me!
+//       setPersonSearchResults(pc.queryPersons(params, anonymizeResults));
     }
 
     /**

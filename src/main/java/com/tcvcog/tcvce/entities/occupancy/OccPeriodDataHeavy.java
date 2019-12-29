@@ -23,7 +23,9 @@ import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
+import com.tcvcog.tcvce.entities.IFace_Openable;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.Proposal;
@@ -47,7 +49,10 @@ public  class       OccPeriodDataHeavy
         extends     OccPeriod 
         implements  IFace_EventRuleGoverned, 
                     IFace_ProposalDriven,
-                    IFace_CredentialSigned{
+                    IFace_CredentialSigned,
+                    IFace_Openable {
+    
+    protected OccPeriodStatusEnum status;
 
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
@@ -61,14 +66,24 @@ public  class       OccPeriodDataHeavy
     
     private List<Integer> blobIDList;
     
-    private List<Payment> paymentList;
     private List<MoneyOccPeriodFeeAssigned> feeList;
+    private List<MoneyOccPeriodFeePayment> paymentList;
 
     private LocalDateTime configuredTS;
-    
     private String credentialSignature;
     
     public OccPeriodDataHeavy() {
+    }
+    
+     @Override
+    public boolean isOpen() {
+        // TEMPORARY until status flow is created
+        if(getStatus() != null){
+            return getStatus().isOpenPeriod();
+        } else {
+            return true;
+        }
+                
     }
     
     /**
@@ -84,9 +99,7 @@ public  class       OccPeriodDataHeavy
         this.periodID = opLight.periodID;
         this.propertyUnitID = opLight.propertyUnitID;
         this.type = opLight.type;
-        this.status = opLight.status;
         
-        this.readyForPeriodAuthorization = opLight.readyForPeriodAuthorization;
         this.governingInspection = opLight.governingInspection;
         this.manager = opLight.manager;
         
@@ -123,9 +136,7 @@ public  class       OccPeriodDataHeavy
         this.periodID = opLight.periodID;
         this.propertyUnitID = opLight.propertyUnitID;
         this.type = opLight.type;
-        this.status = opLight.status;
         
-        this.readyForPeriodAuthorization = opLight.readyForPeriodAuthorization;
         this.governingInspection = opLight.governingInspection;
         this.manager = opLight.manager;
         
@@ -283,14 +294,14 @@ public  class       OccPeriodDataHeavy
       /**
      * @return the paymentList
      */
-    public List<Payment> getPaymentList() {
+    public List<MoneyOccPeriodFeePayment> getPaymentList() {
         return paymentList;
     }
 
     /**
      * @param paymentList the paymentList to set
      */
-    public void setPaymentList(List<Payment> paymentList) {
+    public void setPaymentList(List<MoneyOccPeriodFeePayment> paymentList) {
         this.paymentList = paymentList;
     }
 
@@ -419,6 +430,20 @@ public  class       OccPeriodDataHeavy
      */
     public void setCredentialSignature(String credentialSignature) {
         this.credentialSignature = credentialSignature;
+    }
+
+    /**
+     * @return the status
+     */
+    public OccPeriodStatusEnum getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(OccPeriodStatusEnum status) {
+        this.status = status;
     }
     
 }

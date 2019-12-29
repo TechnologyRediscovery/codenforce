@@ -53,7 +53,7 @@ public enum SearchParamsPropertyDateFields {
     }
     
     public List<Enum> getAllTitles(){
-        List<Enum> output = new ArrayList<Enum>();
+        List<Enum> output = new ArrayList<>();
         output.add(SearchParamsPropertyDateFields.ABANDONED_START);
         output.add(SearchParamsPropertyDateFields.ABANDONED_STOP);
         output.add(SearchParamsPropertyDateFields.EXTERNAL_DATA_LASTUPDATED);

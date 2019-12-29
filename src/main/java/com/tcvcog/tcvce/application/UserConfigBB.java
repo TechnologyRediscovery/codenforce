@@ -90,7 +90,8 @@ public class UserConfigBB extends BackingBeanUtils{
         
          // user our fancy specialized query to get all Persons who are delcared to 
         // be user types
-        QueryPerson qp = searchCoord.assembleQueryPerson(QueryPersonEnum.USER_PERSONS, getSessionBean().getSessionUser(), null, null );
+        QueryPerson qp = searchCoord.initQuery(QueryPersonEnum.USER_PERSONS, 
+                getSessionBean().getSessionUser().getMyCredential(), null, null );
         try {
             qp = searchCoord.runQuery(qp);
             userPersonList = qp.getResults();

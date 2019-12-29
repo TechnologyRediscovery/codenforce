@@ -1,0 +1,334 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>CE case violations</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="cecase-violations-view">
+
+                    <div class="mainContainer">
+
+                        <h:form id="cecase-violations-messages-form">
+                            <h:messages id="cecase-violations-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                        <h:form id="cecase-violations-form">
+                            
+                        <!--<h1>Code violations</h1>-->
+
+
+                        <p:panel    id="cecase-violations-list-panel"
+                                    toggleable="true"
+                                    widgetVar="cecase-violations-list-panel-var"
+                                    collapsed="false"
+                                    header="Violations">
+                               
+                          
+                            <h:form id="violation-form">
+
+
+                                <h2 id="violations">Code violations  </h2>
+
+                                <p:commandButton ajax="false" action="#{cECaseViolationsBB.addViolation}"
+                                                 value="Log new code violation"
+                                                 icon="fa fa-plus"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                 disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
+                                <p:spacer height="15px"/>
+
+
+
+                                <ui:remove>
+
+                                    <h:outputLabel styleClass="bold" value="Unresolved code violations: 
+                                                   #{caseProfileBB.currentCase.violationListUnresolved.size()} 
+                                                   / #{caseProfileBB.currentCase.violationList.size()}"/> 
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel styleClass="bold" value="Violations with compliance achieved: 
+                                                   #{caseProfileBB.currentCase.violationListResolved.size()} 
+                                                   / #{caseProfileBB.currentCase.violationList.size()}"/> 
+
+                                </ui:remove>
+                                <p:spacer height="5px"/>
+
+
+                                <p:dataTable
+                                    id="violation-table"
+                                    var="v"
+                                    rowKey="#{v.violationID}"
+                                    value="#{cECaseViolationsBB.currentCase.violationList}"
+                                    tableStyleClass="primeDataTable"
+                                    expandedRow="false"
+                                    rowExpandMode="multiple"
+                                    draggableColumns="true"
+                                    reflow="true">
+
+
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="2%">
+                                        <p:rowToggler />
+                                    </p:column>
+
+
+                                    <p:column width="4%">
+                                        <i class="material-icons"><h:outputText value="#{v.icon.materialIcon}" /></i>
+                                    </p:column>
+
+
+                                    <p:column width="6%" sortBy="#{v.status.label}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Status" />
+                                        </f:facet>
+                                        <h:outputText id="violation-status-ot" value="#{v.status.label}"/>
+                                    </p:column>
+
+                                    <p:column width="12%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Ordinance" />
+                                        </f:facet>
+                                        <div class="rowExpansion">
+
+                                            <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
+                                        </div>
+                                    </p:column>
+                                    <p:column width="6%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Photos" />
+                                        </f:facet>
+                                        <p:commandButton value="View #{empty v.blobIDList ? '0' : v.blobIDList.size()} photo docs (s)" icon="fa fa-search"
+                                                         onclick="PF('photo-dialog').show()"
+                                                         actionListener="#{caseProfileBB.setSelectedViolation(v)}"
+                                                         disabled="#{empty v.blobIDList}"
+                                                         update=":photo-form"/>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Stip Comp Date" />
+                                        </f:facet>
+                                        <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                    </p:column>
+                                    <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Days left" />
+                                        </f:facet>
+                                        <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+
+                                    </p:column>
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Compliance!" />
+                                        </f:facet>
+                                        <p:commandButton    id="violation-compliance-cb" 
+                                                            ajax="true" action="#{caseProfileBB.recordCompliance(v)}"
+                                                            icon="fa fa-check"
+                                                            disabled="#{!(empty v.actualComplianceDate)}"
+                                                            oncomplete="PF('add-event-dialog-var').show()"
+                                                            value="Mark compliance"  
+                                                            update="addNewEventForm"/>
+                                    </p:column>
+                                    <p:column width="4%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Edit" />
+                                        </f:facet>
+                                        <p:commandButton    id="violation-edit-cb" 
+                                                            ajax="false" action="#{caseProfileBB.editViolation(v)}"
+                                                            icon="fa fa-edit"
+                                                            disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
+                                    </p:column>
+                                    <p:rowExpansion>
+                                        <div class="outlinedBox">
+                                            <h:outputLabel styleClass="bold" value="Violation ID: "  />
+                                            <h:outputText  value="#{v.violationID}" />
+                                            <p:spacer height="5px" />
+                                            <h:outputLabel styleClass="bold" value="Ordindance: "  />
+                                            <p:spacer height="5px" />
+                                            <h:outputLabel value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                                           (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
+                                            <h:outputText  value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                            <h:outputText  value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                            <p:spacer height="2px" />
+
+                                            <h:outputText  value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
+                                            <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
+                                            <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                            <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+
+                                            <p:spacer height="2px" />
+
+                                            <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTd" 
+                                                            rendered="true">
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
+                                                    <div class="ord-text">
+                                                        <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                            </h:panelGrid>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Description of violation: "/>
+                                            <h:outputText styleClass="weight-normal" value="#{v.description}" escape="false" />
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Internal notes: "/>
+                                            <h:outputText styleClass="weight-normal" value="#{v.notes}" escape="false"/>
+                                        </div>
+                                        <p:commandButton    id="violation-remove-cb" 
+                                                            ajax="true" action="#{caseProfileBB.removeViolation(v)}"
+                                                            icon="fa fa-stop"
+                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                            disabled="#{!(empty v.actualComplianceDate)}"
+                                                            value="Delete violation"  
+                                                            update="violation-table
+                                                            case-profile-messages-form"/>
+                                    </p:rowExpansion>
+                                </p:dataTable>
+
+                            </h:form>
+
+
+                        </p:panel>
+                        
+                        <p:tabView id="_________NAMEME_________">
+                            <p:tab title="_________NAMEME_________">
+                                
+                            </p:tab>
+                            <p:tab title="_________NAMEME_________">
+                                
+                            </p:tab>
+                        </p:tabView>
+                        
+                          <p:dataScroller
+                                                id="_________NAMEME_________"
+                                                widgetVar="_________NAMEME_________"
+                                                var="inelement"
+                                                value="#{inspace.inspectedElementListVisible}"
+                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
+                          
+                          
+                          
+                          </p:dataScroller>
+                        
+                          <p:dataTable
+                                            id="_________NAMEME_________"
+                                            var="_________NAMEME_________"
+                                            rowKey="#{permit.permitID}"
+                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
+                                            tableStyleClass="primeDataTable"
+                                            draggableColumns="true"
+                                            resizableColumns="true"
+                                            filteredValue="#{occInspectionBB.filteredEventList}"
+                                            widgetVar="caseEventTable">
+
+                                            <p:column width="3%" exportable="false">
+                                                <p:rowToggler/>
+                                            </p:column>
+                                            
+                                            <p:column width="10%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Print" />
+                                                </f:facet>
+                                                <p:commandButton ajax="false" 
+                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
+                                                                 value="print"
+                                                                 icon="fa fa-print"
+                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                                            </p:column>
+                          </p:dataTable>
+
+                        <p:commandButton   id="_________NAMEME_________" 
+                                           value="run selected query" 
+                                           ajax="true" 
+                                           actionListener="_________NAMEME_________"
+                                           icon="fa fa-print" 
+                                           styleClass="button"
+                                           update=""/>
+
+
+
+                        <p:commandButton    id="_________NAMEME_________"
+                                            value="help on this page" 
+                                            onclick="PF('_________NAMEME_________').show()" 
+                                            styleClass="noFill" 
+                                            icon="fa fa-question-circle"/>
+                        <p:spacer height="10px"/>
+
+
+                        </h:form>
+
+
+                    <!--close main container-->
+                    </div>
+                    
+                    
+
+                    <p:confirmDialog message="Photos attached to violation #{caseProfileBB.selectedViolation.violationID}" 
+                                     severity="alert" widgetVar="photo-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}">
+
+                        <h:form id="photo-form">
+                            <p:scrollPanel style="width:1000px; height:400px" mode="native">
+                                <p:dataTable
+                                    id="photoTable"
+                                    var="photoid"
+                                    value="#{caseProfileBB.selectedViolation.blobIDList}"
+                                    rowKey="#{photoid}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6">
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Manage"/>
+                                        </f:facet>
+                                        <p:commandButton ajax="true" 
+                                                         actionListener="#{caseProfileBB.deletePhoto(photoid)}"
+                                                         value="Delete" 
+                                                         icon="fa fa-bomb"
+                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                         update=":photo-form:photoTable"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Photo"/>
+                                        </f:facet>
+                                        <p:graphicImage width="100%" value="#{imageServices.image}">
+                                            <f:param name="photoID" value="#{photoid}"/>
+                                        </p:graphicImage>
+                                    </p:column>
+                                    <p:column width="20%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Description"/>
+                                        </f:facet>
+                                        <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:scrollPanel>
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" 
+                                             value="Continue" 
+                                             update=":violation-form:violation-table"
+                                             onclick="PF('photo-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+
+                    
+                    
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
