@@ -83,6 +83,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     private CodeSet sessionCodeSet;
     
+    
     private Property sessionProperty;
     private List<Property> sessionPropertyList;
     
@@ -97,6 +98,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     // Session Entity Lists
     private List<CEActionRequest> sessionCEARList;
+    
     private List<EventCECaseCasePropBundle> sessionEventWithCasePropList;
     
     private CodeViolation sessionCodeViolation;
@@ -118,30 +120,56 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private NoticeOfViolation sessionNotice;
     private Citation sessionCitation;
     
-    // BOB queries
-    private QueryProperty queryProperty;
-    private List<QueryProperty> queryPropertyList;
     
-    private QueryPerson queryPerson;
-    private List<QueryPerson> queryPersonList;
+    /* >>> N CODE<<< */
+    /* CODE CORE  */
     
-    private QueryEvent queryEvent;
-    private List<QueryEvent> queryEventList;
     
-    private QueryOccPeriod queryOccPeriod;
-    private List<QueryOccPeriod> queryOccPeriodList;
     
-    private QueryCECase queryCECase;
-    private List<QueryCECase> queryCECaseList;
-    
-    private QueryCEAR queryCEAR;
-    private List<QueryCEAR> queryCEARList;
-    
-    /* *** Municipal Code Session Shelves ***  */
+    /* *** AUX session shelves ***  */
     private CodeSource activeCodeSource;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
     private EnforcableCodeElement selectedEnfCodeElement;
     private CodeElement activeCodeElement;
+    
+    
+    
+    
+    
+    // >>> I PROPERTY <<<
+    private QueryProperty queryProperty;
+    private List<QueryProperty> queryPropertyList;
+    
+    // >>> II PERSON <<<
+    private QueryPerson queryPerson;
+    private List<QueryPerson> queryPersonList;
+    
+    // >>> III EVENT <<<
+    private QueryEvent queryEvent;
+    private List<QueryEvent> queryEventList;
+    
+    // >>> IV OCCPERIOD <<<
+    private QueryOccPeriod queryOccPeriod;
+    private List<QueryOccPeriod> queryOccPeriodList;
+    
+    // >>> V CECASE <<<
+    private QueryCECase queryCECase;
+    private List<QueryCECase> queryCECaseList;
+    
+    // >>> VI CEAR <<<
+    private QueryCEAR queryCEAR;
+    private List<QueryCEAR> queryCEARList;
+    
+    // >>> VI OCCAPP <<<
+    
+    
+    // >>> VII PAYMENT <<<
+    
+    
+    
+    
+    
+    
     
     /* *** Occupancy Permit Application Session Shelves *** */
     private OccPermitApplication sessionOccPermitApplication;
