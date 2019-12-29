@@ -74,7 +74,7 @@
                                             </p:outputLabel>
                                             <p:spacer height="5px"/>
                                             <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuni}">
-                                                <f:selectItems value="#{sessionBeasessionUserer.authMunis}"/>
+                                                <f:selectItems value="#{sessionBean.sessionUser.authMunis}"/>
                                             </p:selectOneMenu>
                                             <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -926,7 +926,7 @@
                             <h:panelGrid id="panelgrid-propinfoedit" columns="4" cellpadding="10" cellspacing="30">
                                 <h:panelGroup>
                                     <p:outputLabel value="Street Address"/>
-                                    <p:inputText id="" value="#{propertyProfileBB.currProp.address}"
+                                    <p:inputText value="#{propertyProfileBB.currProp.address}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                 </h:panelGroup>
@@ -966,11 +966,20 @@
                                     <p:outputLabel value="Municipality"/>
                                     <h:selectOneMenu id="propinfoedit-muni-som"
                                                      value="#{propertyProfileBB.currProp.muni}">
-                                        <f:selectItems value="#{getSessionBean()}"
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="propinfoedit-muninamelist" 
+                                                       value="#{sessionBean.sessionUser.authMuniList}"
+                                                       var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+
                                     </h:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    
+                                    <p:commandButton ajax="true"
+                                                     actionListener="#{propertyProfileBB.beginPropertyUnitUpdates}"
+                                                     update="dialog-propinfoedit"
+                                                     icon="fa fa-plus"
+                                                     tabindex="1"
+                                                     value="Save Property Info"/>
                                 </h:panelGroup>
                             </h:panelGrid>
                             
