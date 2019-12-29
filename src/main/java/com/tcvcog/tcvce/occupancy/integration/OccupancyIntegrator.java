@@ -124,8 +124,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         sb.append("RIGHT OUTER JOIN occpermit ON (occpermit.occperiod_periodid = periodid) \n ");
         sb.append("WHERE occperiodid IS NOT NULL AND ");
 
-        if (!params.isObjectID_filterBy()) {
-            if (params.isFilterByMuni()) {
+        if (!params.isBobID_ctl()) {
+            if (params.isMuni_ctl()) {
                 sb.append("AND ");
                 sb.append("municipality_municode = ? "); // param 1
             }
@@ -140,7 +140,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 sb.append("propertyunit.propertyunit_unitid=? ");
             }
 
-            if (params.isFilterByStartEndDate()) {
+            if (params.isDate_startEnd_ctl()) {
                 sb.append("AND ");
                 sb.append(getDBDateField(params.getDateField()));
                 sb.append(" ");
@@ -221,9 +221,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 sb.append("occchecklist_checklistlistid=?");
             }
 
-            if (params.isActive_filterBy()) {
+            if (params.isActive_ctl()) {
                 sb.append("AND ");
-                if (params.isActive()) {
+                if (params.isActive_val()) {
                     sb.append("active=TRUE ");
                 } else {
                     sb.append("active=FALSE ");
@@ -240,9 +240,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         try {
             stmt = con.prepareStatement(sb.toString());
 
-            if (!params.isObjectID_filterBy()) {
-                if (params.isFilterByMuni()) {
-                    stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+            if (!params.isBobID_ctl()) {
+                if (params.isMuni_ctl()) {
+                    stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
 
                 if (params.isProperty_filterBy()) {
@@ -253,9 +253,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                     stmt.setInt(++paramCounter, params.getPropertyUnit_unitID());
                 }
 
-                if (params.isFilterByStartEndDate()) {
-                    stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(params.getStartDate()));
-                    stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(params.getEndDate()));
+                if (params.isDate_startEnd_ctl()) {
+                    stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(params.getDate_start_val()));
+                    stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(params.getDate_end_val()));
                 }
 
                 if (params.isOccPeriodType_filterBy()) {
@@ -271,14 +271,14 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 }
 
             } else {
-                stmt.setInt(++paramCounter, params.getObjectID());
+                stmt.setInt(++paramCounter, params.getBobID_val());
             }
 
             rs = stmt.executeQuery();
 
             int counter = 0;
             int maxResults;
-            if (params.isLimitResultCountTo100()) {
+            if (params.isLimitResultCount_ctl()) {
                 maxResults = 100;
             } else {
                 maxResults = Integer.MAX_VALUE;

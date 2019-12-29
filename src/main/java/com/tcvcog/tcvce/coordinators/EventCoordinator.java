@@ -96,7 +96,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return ev;
     }
     
-    public EventCaseHeavy getEventCaseHeavy(Event ev) throws EventException, IntegrationException, CaseLifecycleException{
+    public EventCECaseHeavy getEventCaseHeavy(Event ev) throws EventException, IntegrationException, CaseLifecycleException{
         CaseCoordinator cc = getCaseCoordinator();
         
         if(ev == null) return null;
@@ -105,7 +105,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             throw new EventException("Cannot create an EventCaseHeavy from an event not in CE Domain");
         }
         
-        EventCaseHeavy ech = new EventCaseHeavy(ev);
+        EventCECaseHeavy ech = new EventCECaseHeavy(ev);
         ech.setCeCase(cc.getCECase(ev.getCeCaseID()));
         
         return ech;

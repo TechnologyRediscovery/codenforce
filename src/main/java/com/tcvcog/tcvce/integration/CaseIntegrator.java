@@ -133,12 +133,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         sb.append("FROM public.cecase INNER JOIN public.property ON (property_propertyid = propertyid) ");
         sb.append("WHERE caseid IS NOT NULL AND ");
         
-         if (!params.isObjectID_filterBy()) {
-            if (params.isFilterByMuni()) {
+         if (!params.isBobID_ctl()) {
+            if (params.isMuni_ctl()) {
                 sb.append("municipality_municode = ? "); // param 1
             }
 
-            if (params.isFilterByStartEndDate()){
+            if (params.isDate_startEnd_ctl()){
                 switch (params.getDateToSearchCECases()) {
                     case "Opening date of record":
                         sb.append("originationdate ");
@@ -214,13 +214,13 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         try {
             stmt = con.prepareStatement(sb.toString());
 
-            if (!params.isObjectID_filterBy()) {
-                if (params.isFilterByMuni()) {
-                    stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+            if (!params.isBobID_ctl()) {
+                if (params.isMuni_ctl()) {
+                    stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
-                if (params.isFilterByStartEndDate()) {
-                    stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
-                    stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
+                if (params.isDate_startEnd_ctl()) {
+                    stmt.setTimestamp(++paramCounter, params.getStartDate_val_SQLDate());
+                    stmt.setTimestamp(++paramCounter, params.getEndDate_val_SQLDate());
                 }
                 if (params.isUseCasePhase()) {
                     stmt.setString(++paramCounter, params.getCasePhase().name());
@@ -247,14 +247,14 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     }
                 }
             } else {
-                stmt.setInt(++paramCounter, params.getObjectID());
+                stmt.setInt(++paramCounter, params.getBobID_val());
             }
 
             rs = stmt.executeQuery();
 
             int counter = 0;
             int maxResults;
-            if (params.isLimitResultCountTo100()) {
+            if (params.isLimitResultCount_ctl()) {
                 maxResults = 100;
             } else {
                 maxResults = Integer.MAX_VALUE;

@@ -682,11 +682,11 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         try {
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+            stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
             // as long as we're not searching by ID only
             if (!params.isUseRequestID()) {
-                stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
-                stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
+                stmt.setTimestamp(++paramCounter, params.getStartDate_val_SQLDate());
+                stmt.setTimestamp(++paramCounter, params.getEndDate_val_SQLDate());
                 
                 if(params.isUseRequestStatus()){
                     stmt.setInt(++paramCounter, params.getRequestStatus().getStatusID());

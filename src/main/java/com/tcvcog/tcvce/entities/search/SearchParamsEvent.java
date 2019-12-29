@@ -90,7 +90,7 @@ public class        SearchParamsEvent
     /**
      * @return the filterByActive
      */
-    public boolean isActive_filterBy() {
+    public boolean isActive_ctl() {
         return filterByActive;
     }
 
@@ -170,7 +170,7 @@ public class        SearchParamsEvent
     /**
      * @param filterByActive the filterByActive to set
      */
-    public void setActive_filterBy(boolean filterByActive) {
+    public void setActive_ctl(boolean filterByActive) {
         this.filterByActive = filterByActive;
     }
 

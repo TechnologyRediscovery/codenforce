@@ -54,7 +54,7 @@
                                         <p:outputLabel for="formFirstName-person">
                                             <h:outputText value="First Name"/>
                                         </p:outputLabel>
-                                        <p:inputText id="formFirstName-person" value="#{personsBB.searchParams.firstNameSS}" 
+                                        <p:inputText id="formFirstName-person" value="#{personsBB.searchParams.name_first_val}" 
                                                      style="width: 200px;" tabindex="1" required="false" styleClass="inputText">
                                         </p:inputText>
                                         <h:message for="formFirstName-person" showDetail="true" showSummary="true" 
@@ -65,7 +65,7 @@
                                         <p:outputLabel for="formLastName-person">
                                             <h:outputText value="Last Name"/>
                                         </p:outputLabel>
-                                        <p:inputText id="formLastName-person" value="#{personsBB.searchParams.lastNameSS}" 
+                                        <p:inputText id="formLastName-person" value="#{personsBB.searchParams.name_last_val}" 
                                                      style="width: 200px;" tabindex="2" required="false" styleClass="inputText">
                                         </p:inputText>
                                         <h:message for="formLastName-person" showDetail="true" showSummary="true" 
@@ -97,7 +97,7 @@
 
 
 
-                                <h2>Search Results in <h:outputText value="#{personsBB.searchParams.muni.muniName}" /></h2>
+                                <h2>Search Results in <h:outputText value="#{personsBB.searchParams.muni_val.muniName}" /></h2>
 
                                 <p:commandButton    id="load-history-cb"
                                                     actionListener="#{personsBB.loadPersonHistory}"
@@ -407,7 +407,7 @@
                                 <h:panelGroup>
                                     <p:outputLabel id="filter-by-fname-ol" for="filter-by-fname-cb" value="Filter by first name?"/>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox id="filter-by-fname-cb" value="#{personsBB.searchParams.filterByFirstName}" />
+                                    <p:selectBooleanCheckbox id="filter-by-fname-cb" value="#{personsBB.searchParams.name_first_ctl}" />
                                 </h:panelGroup>
 
 
@@ -415,7 +415,7 @@
                                 <h:panelGroup>
                                     <p:outputLabel id="filter-by-lname-ol" for="filter-by-lname-cb" value="Filter by last name?"/>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox id="filter-by-lname-cb" value="#{personsBB.searchParams.filterByLastName}" />
+                                    <p:selectBooleanCheckbox id="filter-by-lname-cb" value="#{personsBB.searchParams.name_last_ctl}" />
                                 </h:panelGroup>
 
 
@@ -428,7 +428,7 @@
 
                                     <p:selectOneMenu id="muniSelectMenu-person" 
                                                      tabindex="1" 
-                                                     value="#{personsBB.searchParams.muni}">
+                                                     value="#{personsBB.searchParams.muni_val}">
                                         <f:converter converterId="muniConverter"/>
                                         <f:selectItem itemLabel="select muni..." noSelectionOption="true"  itemDisabled="true"/>
                                         <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
@@ -447,7 +447,7 @@
                                     <p:outputLabel for="formPersonID">
                                         <h:outputText value="Person ID number"/>
                                     </p:outputLabel>
-                                    <p:inputText id="formPersonID" value="#{personsBB.searchParams.objectID}" 
+                                    <p:inputText id="formPersonID" value="#{personsBB.searchParams.bobID_val}" 
                                                  style="width: 25%;" tabindex="3" required="false" styleClass="inputText"/>
                                     <h:message for="formPersonID" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />

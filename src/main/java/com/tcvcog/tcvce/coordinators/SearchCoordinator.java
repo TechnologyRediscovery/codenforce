@@ -36,6 +36,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,6 +47,8 @@ import javax.annotation.PostConstruct;
  * @author sylvia
  */
 public class SearchCoordinator extends BackingBeanUtils implements Serializable{
+    
+    private static final RoleType MIN_ROLETYPEFORMULTIMUNI_QUERY = RoleType.CogStaff;
     
     /**
      * Creates a new instance of SearchCoordinator
@@ -70,11 +73,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @param q an assembled QueryOccPeriod
      * @return a reference to the same QueryOccPeriod instance passed in with the business
      * objects returned from the integrator accessible via getResults()
-     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
-     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
-     * @throws IntegrationException fatal error in the integration code
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public QueryProperty runQuery(QueryProperty q) throws AuthorizationException, IntegrationException, SearchException{
+    public QueryProperty runQuery(QueryProperty q) throws SearchException{
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
         
@@ -87,12 +88,16 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         for(SearchParamsProperty sp: paramsList){
             propTempList.clear();
-            // audit the params and get the result list back
-            for(Integer i: pi.searchForProperties(sp)){
-                propTempList.add(pc.getProperty(i));
+            for(Municipality muni: sp.getMuniList_val()){
+                sp.setMuni_val(muni);
+                try {
+                    for(Integer i: pi.searchForProperties(sp)){
+                        propTempList.add(pc.getProperty(i));
+                    }
+                } catch (IntegrationException ex) {
+                    Logger.getLogger(SearchCoordinator.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-            // add each batch of OccPeriod objects from the SearchParam run to our
-            // ongoing list
             q.addToResults(propTempList);
         }
         
@@ -101,17 +106,15 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return q;
     }
     
-      /**
+    /**
      * Single point of entry for queries on Person objects
      * 
      * @param q an assembled QueryOccPeriod
      * @return a reference to the same QueryOccPeriod instance passed in with the business
      * objects returned from the integrator accessible via getResults()
-     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
-     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
-     * @throws IntegrationException fatal error in the integration code
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public QueryPerson runQuery(QueryPerson q) throws AuthorizationException, IntegrationException, SearchException{
+    public QueryPerson runQuery(QueryPerson q) throws SearchException{
         PersonIntegrator pi = getPersonIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
         
@@ -124,21 +127,30 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         for(SearchParamsPerson sp: paramsList){
             persTempList.clear();
-            // audit the params and get the result list back
-            for(Integer i: pi.searchForPersons(sp)){
-                persTempList.add(pc.getPerson(i));
+            for(Municipality muni: sp.getMuniList_val()){
+                sp.setMuni_val(muni);
+                try {
+                    for(Integer i: pi.searchForPersons(sp)){
+                        persTempList.add(pc.getPerson(i));
+                    }
+                } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                    throw new SearchException("Integration error when querying properties");
+                }
             }
-            // add each batch of OccPeriod objects from the SearchParam run to our
-            // ongoing list
             q.addToResults(persTempList);
         }
-        
         postRunConfigureQuery(q);
-        
         return q;
     }
      
-     public QueryEvent runQuery(QueryEvent q) throws IntegrationException, CaseLifecycleException, SearchException{
+    /**
+     * Single point of entry for queries against the Event tables
+     * @param q
+     * @return
+     * @throws SearchException 
+     */
+     public QueryEvent runQuery(QueryEvent q) throws SearchException{
          EventIntegrator ei = getEventIntegrator();
          EventCoordinator ec = getEventCoordinator();
          
@@ -152,8 +164,16 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         for(SearchParamsEvent sp: paramsList){
             evTempList.clear();
             // audit the params and get the result list back
-            for(Integer i: ei.searchForEvents(sp)){
-                evTempList.add(ec.getEvent(i));
+            for(Municipality muni: sp.getMuniList_val()){
+                sp.setMuni_val(muni);
+                try {
+                    for(Integer i: ei.searchForEvents(sp)){
+                        evTempList.add(ec.getEvent(i));
+                    }
+                } catch (IntegrationException | CaseLifecycleException ex) {
+                    System.out.println(ex);
+                    throw new SearchException("Integration or CaseLifecycle exception in query run;");
+                }
             }
             // add each batch of OccPeriod objects from the SearchParam run to our
             // ongoing list
@@ -180,17 +200,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @param q an assembled QueryOccPeriod
      * @return a reference to the same QueryOccPeriod instance passed in with the business
      * objects returned from the integrator accessible via getResults()
-     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
-     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
-     * @throws IntegrationException fatal error in the integration code
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public QueryOccPeriod runQuery(QueryOccPeriod q) throws AuthorizationException, IntegrationException, EventException, SearchException{
+    public QueryOccPeriod runQuery(QueryOccPeriod q) throws SearchException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         
-        if(q == null){
-            return null;
-        }
+        if(q == null){ return null; }
         
         prepareQueryForRun(q);
 
@@ -199,12 +215,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         for(SearchParamsOccPeriod sp: paramsList){
             periodListTemp.clear();
-            // audit the params and get the result list back
-            for(Integer i: oi.searchForOccPeriods(sp)){
-                periodListTemp.add(oc.getOccPeriod(i));
+            for(Municipality muni: sp.getMuniList_val()){
+                sp.setMuni_val(muni);
+                for(Integer i: oi.searchForOccPeriods(sp)){
+                    try {
+                        periodListTemp.add(oc.getOccPeriod(i));
+                    } catch (IntegrationException ex) {
+                        System.out.println(ex);
+                        throw new SearchException("Integration exception when querying OccPeriods");
+                    }
+                }
             }
-            // add each batch of OccPeriod objects from the SearchParam run to our
-            // ongoing list
             q.addToResults(periodListTemp);
         }
         
@@ -219,30 +240,32 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
       * Single point of entry for queries against the CECase table
       * @param q search params with the credential set
       * @return a Query subclass with results accessible via q.getResults
-      * @throws IntegrationException
-      * @throws CaseLifecycleException
-      * @throws AuthorizationException
       * @throws SearchException 
       */
-     public QueryCECase runQuery(QueryCECase q) throws IntegrationException, CaseLifecycleException, AuthorizationException, SearchException{
+     public QueryCECase runQuery(QueryCECase q) throws SearchException{
         CaseIntegrator ci = getCaseIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
         
-        
-        if(q == null){
-            return null;
-        }
+        if(q == null){ return null; }
         
         prepareQueryForRun(q);
 
         List<SearchParamsCECase> paramsList = q.getParmsList();
         List<CECaseBase> caseListTemp = new ArrayList<>();
         
-        for(SearchParamsCECase sp: paramsList){
+        for(SearchParamsCECase params: paramsList){
             caseListTemp.clear();
-            // audit the params and get the result list back
-            for(Integer i: ci.searchForCECases(sp)){
-                caseListTemp.add(cc.getCECase(i));
+            for(Municipality muni: params.getMuniList_val()){
+                try {
+                    // the integrator will only look at the single muni val, 
+                    // so we'll call searchForXXX once for each muni
+                    params.setMuni_val(muni);
+                    for(Integer i: ci.searchForCECases(params)){
+                        caseListTemp.add(cc.getCECase(i));
+                    }
+                } catch (IntegrationException | CaseLifecycleException ex) {
+                    throw new SearchException("Exception during search: " + ex.toString());
+                }
             }
             // add each batch of OccPeriod objects from the SearchParam run to our
             // ongoing list
@@ -260,11 +283,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @param q must be initialized
      * @return a reference to the same QueryCEAR instance passed in with the business
      * objects returned from the integrator accessible via getResults()
-     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
-     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
-     * @throws IntegrationException fatal error in the integration code
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public QueryCEAR runQuery(QueryCEAR q) throws AuthorizationException, IntegrationException, SearchException{
+    public QueryCEAR runQuery(QueryCEAR q) throws SearchException{
         
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -280,17 +301,20 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         for(SearchParamsCEActionRequests sp: paramsList){
             ceariListTemp.clear();
-            // audit the params and get the result list back
-            for(Integer i: ceari.searchForCEActionRequests(sp)){
-                ceariListTemp.add(cc.getCEActionRequest(i));
+            for(Municipality muni: sp.getMuniList_val()){
+                sp.setMuni_val(muni);
+                try {
+                    for(Integer i: ceari.searchForCEActionRequests(sp)){
+                            ceariListTemp.add(cc.getCEActionRequest(i));
+                    }
+                } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                    throw new SearchException("Integration error when querying CEARS");
+                }
             }
-            // add each batch of OccPeriod objects from the SearchParam run to our
-            // ongoing list
             q.addToResults(ceariListTemp);
         }
-        
         postRunConfigureQuery(q);
-        
         return q;
     }
     
@@ -299,6 +323,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //    --------------------------------------------------------------------------
     
     
+    /**
+     * Container for consolidating calls to any methods that need to be run
+     * on a Query before passing it to an Integrator class
+     * @param q
+     * @throws SearchException 
+     */
     private void prepareQueryForRun(Query q) throws SearchException{
         q.clearResultList();
         auditQueryBeforeRun(q);
@@ -339,115 +369,174 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      */
     private void auditSearchParams(Query q) throws SearchException{
         
+        UserCoordinator uc = getUserCoordinator();
+        
+        if(q == null){
+            throw new SearchException("Cannot audit null query");
+        }
+        
+        Credential cred = q.getCredential();
+        List<Municipality> muniSafeList = new ArrayList<>();
         List<SearchParams> splst = new ArrayList<>();
-        for(Object o: q.getParmsList()){
-            splst.add((SearchParams) o);
+        
+        
+        
+        for (Iterator it = q.getParmsList().iterator(); it.hasNext();) {
+            SearchParams sp = (SearchParams) it.next();
+            // logic could be run here on SPs before adding them to the list to run
+            splst.add(sp);
         }
         
         for(SearchParams sp: splst){
-            // unless you're COGStaff or higher, you can only search in your 
-            // authorized Muni
-            if(!q.getCredential().isHasCOGStaffPermissions()){
-                if(     !sp.isFilterByMuni() 
-                            && 
-                        sp.getMuni() != null 
-                            && 
-                        sp.getMuni().getMuniCode() != q.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode()){
-                    throw new SearchException("Params run by credentials below CogStaff must filter by their muni");
-                }                
+            if(sp.getMuniList_val().size() > 1){
+                if(q.getCredential().getGoverningAuthPeriod().getRole().getRank() < MIN_ROLETYPEFORMULTIMUNI_QUERY.getRank()){
+                    throw new SearchException(MIN_ROLETYPEFORMULTIMUNI_QUERY.getLabel() + " is required for muli-muni searching");
+                }
+                try {
+                    muniSafeList = uc.getUnauthorizedMunis(uc.getUser(cred.getGoverningAuthPeriod().getUserID()));
+                } catch (IntegrationException ex) {
+                    throw new SearchException("Could not load user associated with Credential; IntegrationException ");
+                }
+                for(Municipality m: sp.getMuniList_val()){
+                    if(!muniSafeList.contains(m)){
+                        throw new SearchException("Invalid attempt to search for objects in an unauthorized Muni");
+                    }
+                }
+            } else if(sp.getMuniList_val().size() == 1){
+                if(sp.getMuniList_val().get(0).getMuniCode() != q.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode()){
+                    throw new SearchException("Requested muni for search does not match credential's governing auth period");
+                }
+            } else {
+                sp.addMuni(q.getCredential().getGoverningAuthPeriod().getMuni());
             }
         }        
     }
     
-    public void postRunConfigureQuery(Query q){
+    /**
+     * Called after a Query is passed to its respective integrator
+     * @param q 
+     */
+    private void postRunConfigureQuery(Query q){
         q.setExecutionTimestamp(LocalDateTime.now());
-        q.setExecutedByIntegrator(true);
         logQueryRun(q);
         
     }
     
-    public void logQueryRun(Query q){
+    private void logQueryRun(Query q){
         // TODO: write guts for query logging
     }
     
-  
-  
+     
+    /**
+     * 
+     * @param q
+     * @param cred
+     * @return 
+     */
+    private Query initQueryFinalizeInit(Query q){
+        
+        
+        return q;
+    }
     
 //    --------------------------------------------------------------------------
 //    ***************************** INITIALIZERS *******************************
 //    --------------------------------------------------------------------------
     
-     
     
-    public QueryPerson initQuery(QueryPersonEnum qName){
+    public QueryProperty initQuery(QueryPropertyEnum qName, Credential cred){
+         QueryProperty  query;
+         List<SearchParamsProperty> paramsList = new ArrayList<>();
+         
+         switch(qName){
+            case OPENCECASES_OCCPERIODSINPROCESS:
+                paramsList.add(generateParams_property_active());
+                break;
+            case CUSTOM:
+                break;
+         }
+         
+         query = new QueryProperty(qName, paramsList, cred);
+         return (QueryProperty) initQueryFinalizeInit(query);
+     }
+    
+    
+    
+    public QueryPerson initQuery(QueryPersonEnum qName, Credential cred){
          QueryPerson  query;
          List<SearchParamsPerson> paramsList = new ArrayList<>();
-         RoleType rt = null;
-         
-         if(params != null){
-             qName = QueryPersonEnum.CUSTOM;
-         }
          
          switch(qName){
             case ACTIVE_PERSONS:
-                paramsList.add(generateParams_persons_active(m));
-                rt = RoleType.MuniReader;
+                paramsList.add(generateParams_persons_active());
                 break;
             case USER_PERSONS:
                 paramsList.add(generateParams_persons_users());
-                rt = RoleType.MuniReader;
             
          }
-         query = new QueryPerson(qName, m, paramsList, u);
-         query.setUserRankAccessMinimum(rt);
-         query.setExecutedByIntegrator(false);
-         return query;
+         query = new QueryPerson(qName, paramsList, cred);
+         return (QueryPerson) initQueryFinalizeInit(query);
      }
      
     
-     public QueryEvent initQuery(QueryEventEnum qName){
+     public QueryEvent initQuery(QueryEventEnum qName, Credential cred){
          QueryEvent query;
          List<SearchParamsEvent> paramsList = new ArrayList<>();
          
-//         if(params != null){
-//             qName = QueryEventEnum.CUSTOM;
-//         }
-         
          switch(qName){
              case REQUESTED_ACTIONS:
-                paramsList.add(getSearchParamsEventsRequiringAction(cred, m));
+                paramsList.add(getSearchParamsEventsRequiringAction());
                 break;
              case MUNICODEOFFICER_ACTIVITY_PAST30DAYS:
-                 paramsList.add(getSearchParamsOfficerActivity(cred, m));
+                 paramsList.add(getSearchParamsOfficerActivity());
                  break;
              case COMPLIANCE_EVENTS:
-                 paramsList.add(getSearchParamsComplianceEvPastMonth(m));
+                 paramsList.add(getSearchParamsComplianceEvPastMonth());
                  break;
             case CUSTOM:
-                paramsList.add(params);
                 break;
             default:
          }
          
-         query = new QueryEvent(qName, m, cred, paramsList);
-         query.setExecutedByIntegrator(false);
-         return query;
+         query = new QueryEvent(qName, paramsList, cred);
+         return (QueryEvent) initQueryFinalizeInit(query);
      }
      
     
      
      
-     public QueryCECase initQuery(QueryCECaseEnum qName){
+    
+    public QueryOccPeriod initQuery(QueryOccPeriodEnum qName, Credential cred){
+         QueryOccPeriod  query;
+         List<SearchParamsOccPeriod> paramsList = new ArrayList<>();
+         
+         switch(qName){
+            
+            case ALL_PERIODS_IN_MUNI:
+                 
+            case AUTHWORKINPROGRESS:
+                paramsList.add(generateParams_occPeriod_wip());
+                break;
+            case RENTAL_ALL:
+                break;
+            case RENTAL_REGISTERED:
+                break;
+            case RENTAL_UNREGISTERED:
+                break;
+            
+         }
+         query = new QueryOccPeriod(qName, paramsList, null);
+         return (QueryOccPeriod) initQueryFinalizeInit(query);
+     }
+ 
+    
+     public QueryCECase initQuery(QueryCECaseEnum qName, Credential cred){
          QueryCECase query;
          List<SearchParamsCECase> paramsList = new ArrayList<>();
          
-         if(params != null){
-             qName = QueryCECaseEnum.CUSTOM;
-         }
-         
          switch(qName){
             case OPENCASES:
-                paramsList.add(getDefaultSearchParams_CECase_allOpen(cred));
+                paramsList.add(getDefaultSearchParams_CECase_allOpen());
                  break;
             case EXPIRED_TIMEFRAMES:
                 break;
@@ -456,7 +545,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case OPENED_30DAYS:
                 break;
             case CLOSED_30DAYS:
-                paramsList.add(getSearchParams_CECase_closedPast30Days(m));
+                paramsList.add(getSearchParams_CECase_closedPast30Days());
                 break;
             case UNRESOLVED_CITATIONS:
                 break;
@@ -469,9 +558,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             default:
          }
          
-         query = new QueryCECase(qName, m, paramsList, cred);
-         query.setExecutedByIntegrator(false);
-         return query;
+         query = new QueryCECase(qName, paramsList, cred);
+         return (QueryCECase) initQueryFinalizeInit(query);
      }
      
      
@@ -482,67 +570,54 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @param qName an instance of the Enum QueryCEAREnum which is used by a switch
      * to grab the assigned SearchParams subclass
      * @param cred
-     * @param m the requesting Municipality. NOTE: It's up to the CaseCoordinator
-     * to enforce access rules here
-     * @param params optional params. If this object is not null, the query will
-     * automatically become a custom query
      * @return assembled instance ready for sending to runQuery
      */
-    public QueryCEAR initQuery( QueryCEAREnum qName, 
-                                        Credential cred, 
-                                        SearchParamsCEActionRequests params) {
+    public QueryCEAR initQuery(QueryCEAREnum qName, Credential cred) {
             QueryCEAR query = null;
             List<SearchParamsCEActionRequests> paramList = new ArrayList<>();
-            
-            if(params != null){
-                qName = QueryCEAREnum.CUSTOM;
-            }
             
         try {
             switch(qName){
                 case UNPROCESSED:
-                    paramList.add(generateParams_CEAR_Unprocessed(m));
+                    paramList.add(generateParams_CEAR_Unprocessed());
                     break;
                 case ATTACHED_TO_CECASE:
-                    paramList.add(generateParams_CEAR_attachedToCase(m, 30));
+                    paramList.add(generateParams_CEAR_attachedToCase(30));
                     break;
                     
                 case ALL_TODAY:
-                    paramList.add(generateParams_CEAR_pastXDays(m, 1));
+                    paramList.add(generateParams_CEAR_pastXDays(1));
                     break;
                     
                 case ALL_PAST7DAYS:
-                    paramList.add(generateParams_CEAR_pastXDays(m, 7));
+                    paramList.add(generateParams_CEAR_pastXDays(7));
                     break;
                     
                 case ALL_PAST30:
-                    paramList.add(generateParams_CEAR_pastXDays(m, 30));
+                    paramList.add(generateParams_CEAR_pastXDays(30));
                     break;
                     
                 case ALL_PASTYEAR:
-                    paramList.add(generateParams_CEAR_pastXDays(m, 365));
+                    paramList.add(generateParams_CEAR_pastXDays(365));
                     break;
                     
                 case BY_CURRENT_USER:
-                    paramList.add(generateParams_CEAR_Unprocessed(m));
+                    paramList.add(generateParams_CEAR_Unprocessed());
                     break;
                     
                 case CUSTOM:
-                    paramList.add(params);
                     break;
                     
                 default:
-                    paramList.add(generateParams_CEAR_Unprocessed(m));
+                    paramList.add(generateParams_CEAR_Unprocessed());
             }
             
-            query = new QueryCEAR(qName, paramList, u);
-            query.setExecutedByIntegrator(false);
+            query = new QueryCEAR(qName, paramList, null);
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        return query;
+        return (QueryCEAR) initQueryFinalizeInit(query);
     }
-    
     
     
     
@@ -551,120 +626,141 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //    --------------------------------------------------------------------------
     
         
-    public List<QueryProperty> buildQueryPropertyList(Credential cred, Municipality m) throws IntegrationException{
+    /**
+     * Logic container to check if a Query from the main set can be added to a 
+     * particular User's list of possible queries
+     * 
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private boolean checkAuthorizationToAddQueryToList(IFace_RankLowerBounded params, Credential cred){
+        boolean isAuthToAdd = false;
+        
+        if(params.getRequiredRoleMin().getRank() <= cred.getGoverningAuthPeriod().getRole().getRank()){
+            isAuthToAdd = true;
+        }
+        
+        return isAuthToAdd;
+        
+    }
+    
+    
+    /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<QueryProperty> buildQueryPropertyList(Credential cred) throws IntegrationException{
         QueryPropertyEnum[] nameArray = QueryPropertyEnum.values();
         List<QueryProperty> queryList = new ArrayList<>();
+       
         for(QueryPropertyEnum queryTitle: nameArray){
-            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(prepareQueryProperty(queryTitle, cred, m, null));
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        
+        return queryList;
+    }
+    
+    
+    /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @return
+     * @throws IntegrationException 
+     */
+     public List<QueryPerson> buildQueryPersonList(Credential cred) throws IntegrationException{
+        QueryPersonEnum[] nameArray = QueryPersonEnum.values();
+        List<QueryPerson> queryList = new ArrayList<>();
+        for(QueryPersonEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
         }
         return queryList;
     }
     
      /**
-     * First gen queries. Replaced by the rest of this class
-     * 
-     * @deprecated 
-     * @param u
-     * @param m
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
      * @return 
      */
-    public List<Query> getEventQueryList(User cred, Municipality m){
-        List<Query> queryList = new ArrayList<>();
-//        
-//        QueryEvent eq = new QueryEvent("Compliance follow-up events: Today", m);
-//        eq.setEventSearchParams(getSearchParamsEventsRequiringAction(cred, m));
-//        queryList.add(eq);
-//        
-//        eq = new QueryEvent("Officer Activity Report", m);
-//        eq.setEventSearchParams(getSearchParamsOfficerActivity(cred, m));
-//        queryList.add(eq);
-//        
-//        
-//        eq = new QueryEvent("Compliance events: Past Month", m);
-//        eq.setEventSearchParams(getSearchParamsComplianceEvPastMonth(m));
-//        queryList.add(eq);
-        
-        return queryList;
-    }
-     
-     public List<QueryEvent> buildQueryEventCECaseList(Municipality m, Credential cred){
+    public List<QueryEvent> buildQueryEventList(Credential cred){
         QueryEventEnum[] nameArray = QueryEventEnum.values();
         List<QueryEvent> queryList = new ArrayList<>();
         for(QueryEventEnum queryTitle: nameArray){
-            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(initQuery(queryTitle, cred, m, null));
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
         }
-
         return queryList;
-         
-     }
-     
-     
-     public List<QueryCECase> prepareQueryCECaseList(Credential cred){
+    }
+      
+    
+    /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @param m
+     * @return 
+     */
+    public List<QueryOccPeriod> buildQueryOccPeriodList(Credential cred, Municipality m){
+        QueryOccPeriodEnum[] nameArray = QueryOccPeriodEnum.values();
+        List<QueryOccPeriod> queryList = new ArrayList<>();
+        for(QueryOccPeriodEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+               queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        return queryList;
+    }
+    
+
+    /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @return 
+     */
+     public List<QueryCECase> buildQueryCECaseList(Credential cred){
         QueryCECaseEnum[] nameArray = QueryCECaseEnum.values();
         List<QueryCECase> queryList = new ArrayList<>();
-//        for(QueryCECaseEnum queryTitle: nameArray){
-//            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-//            queryList.add(initQuery(queryTitle, cred, m, null));
-//        }
-        queryList.add(SearchCoordinator.this.initQuery(QueryCECaseEnum.OPENCASES, cred, null));
+        for(QueryCECaseEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
+        }
         return queryList;
      }
      
     
     /**
-     * These are just skeleton subQuery objects for Action Requests used for
-     * user selection drop down boxes on faces pages
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
      * @param cred
-     * @param m session user's current municipality
      * @return each existing CEAR Query capable of being passed into runQuery()
      */
-    public List<QueryCEAR> buildQueryCEARList(Credential cred) throws IntegrationException{
+    public List<QueryCEAR> buildQueryCEARList(Credential cred){
         QueryCEAREnum[] nameArray = QueryCEAREnum.values();
         List<QueryCEAR> queryList = new ArrayList<>();
-//        qList.add(initQuery(QueryCEAREnum.ALL_PAST30, cred, m));
         for(QueryCEAREnum queryTitle: nameArray){
-            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(initQuery(queryTitle, cred, null));
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
         }
         return queryList;
     }
     
     
-    
-    
-    
-    
-    public QueryOccPeriod prepareQueryOccPeriod(    QueryOccPeriodEnum qName, 
-                                                    Credential cred, 
-                                                    SearchParamsOccPeriod params){
-         QueryOccPeriod  query;
-         List<SearchParamsOccPeriod> paramsList = new ArrayList<>();
-         
-         if(params != null){
-             qName = QueryOccPeriodEnum.CUSTOM;
-         }
-         
-         switch(qName){
-            
-            case ALL_PERIODS_IN_MUNI:
-                 paramsList.add(generateParams_occPeriod_allMuni(cred));
-            case AUTHWORKINPROGRESS:
-                paramsList.add(generateParams_occPeriod_wip());
-                break;
-            case RENTAL_ALL:
-                break;
-            case RENTAL_REGISTERED:
-                break;
-            case RENTAL_UNREGISTERED:
-                break;
-            
-         }
-         query = new QueryOccPeriod(qName, paramsList, cred);
-         query.setExecutedByIntegrator(false);
-         return query;
-     }
+//    --------------------------------------------------------------------------
+//    ***************************** PARAM GENERATORS ***************************
+//    --------------------------------------------------------------------------
     
     private SearchParamsOccPeriod generateParams_occPeriod_wip(){
         SearchParamsOccPeriod params = new SearchParamsOccPeriod();
@@ -679,7 +775,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    private SearchParamsOccPeriod generateParams_occPeriod_allMuni(Credential cred){
+    private SearchParamsOccPeriod generateParams_occPeriod(){
         MunicipalityCoordinator mc = getMuniCoordinator();
         SearchParamsOccPeriod params = new SearchParamsOccPeriod();
         
@@ -689,36 +785,24 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setInspectionPassed_filterBy(false);
         params.setInspectionPassed_switch_passedInspection(false);
         
-        params.setMuni(cred.getGoverningAuthPeriod().getMuni());
+        return params;
         
-    }
-    
-    
-    public List<QueryOccPeriod> buildQueryOccPeriodList(Credential cred, Municipality m) throws IntegrationException{
-        QueryOccPeriodEnum[] nameArray = QueryOccPeriodEnum.values();
-        List<QueryOccPeriod> queryList = new ArrayList<>();
-        for(QueryOccPeriodEnum queryTitle: nameArray){
-            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(prepareQueryOccPeriod(queryTitle, cred, m, null));
-        }
-        return queryList;
     }
     
    
     
-    private SearchParamsPerson generateParams_persons_active(Municipality m){
+    private SearchParamsPerson generateParams_persons_active(){
         SearchParamsPerson params = new SearchParamsPerson();
         
         params.setSearchName("Public person types");
         params.setSearchDescription("All persons declared to be public");
         
-        params.setFilterByPersonTypes(true);
+        params.setPersonType_ctl(true);
         List<PersonType> pList = new ArrayList<>();
         pList.add(PersonType.Public);
-        params.setPersonTypes(pList);
+        params.setPersonType_val(pList);
         
-        
-        return params;
+         return params;
         
     }
     
@@ -727,79 +811,42 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setSearchName("User Persons");
         params.setSearchDescription("Persons whose type is a User");
         
-        params.setFilterByPersonTypes(true);
+        params.setPersonType_ctl(true);
         List<PersonType> pList = new ArrayList<>();
         pList.add(PersonType.User);
-        params.setPersonTypes(pList);
+        params.setPersonType_val(pList);
         
         return params;
     }
-    
-    public List<QueryPerson> buildQueryPersonList(Credential cred, Municipality m) throws IntegrationException{
-        QueryPersonEnum[] nameArray = QueryPersonEnum.values();
-        List<QueryPerson> queryList = new ArrayList<>();
-        for(QueryPersonEnum queryTitle: nameArray){
-            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(SearchCoordinator.this.initQuery(queryTitle, cred, m, null));
-        }
-        return queryList;
-    }
+   
     
   
      
-    public QueryProperty prepareQueryProperty(QueryPropertyEnum qName, Credential cred, Municipality m, SearchParamsProperty params){
-         QueryProperty  query;
-         List<SearchParamsProperty> paramsList = new ArrayList<>();
-         
-         if(params != null){
-             qName = QueryPropertyEnum.CUSTOM;
-         }
-         
-         switch(qName){
-            case OPENCECASES_OCCPERIODSINPROCESS:
-                paramsList.add(generateParams_property_active(m));
-                break;
-            case CUSTOM:
-                paramsList.add(params);
-                break;
-            
-         }
-         query = new QueryProperty(qName, m, paramsList, u);
-         query.setExecutedByIntegrator(false);
-         return query;
-     }
-    
-    private SearchParamsProperty generateParams_property_active(Municipality m){
+    private SearchParamsProperty generateParams_property_active(){
         SearchParamsProperty params = new SearchParamsProperty();
         
         params.setSearchName("Properties updated in the past month");
         params.setSearchDescription("Applies to properties with any field updated");
         
-        params.setFilterByMuni(true);
-        params.setMuni(m);
+        params.setMuni_ctl(true);
         
-        params.setFilterByStartEndDate(true);
-        params.setUseRelativeDates(true);
+        params.setDate_startEnd_ctl(true);
+        params.setDate_relativeDates_ctl(true);
         params.setDateField(SearchParamsPropertyDateFields.LAST_UPDATED);
-        params.setStartDateRelativeDays(-30);
-        params.setEndDateRelativeDays(0);
+        params.setDate_relativeDates_start_val(-30);
+        params.setDate_realtiveDates_end_val(0);
         
-        params.setActive_filterBy(true);
-        params.setActive(true);
+        params.setActive_ctl(true);
+        params.setActive_val(true);
         
 
         return params;
         
     }
 
- 
-    
-//    --------------------------------------------------------------------------
-//    ***************************** PARAM GENERATORS ***************************
-//    --------------------------------------------------------------------------
 
        
-    public SearchParamsEvent getSearchParamsEventsRequiringAction(User cred, Municipality muni){
+    public SearchParamsEvent getSearchParamsEventsRequiringAction(){
         EventCoordinator ec = getEventCoordinator();
         
         // event types are always bundled in an EventCategory
@@ -810,11 +857,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         SearchParamsEvent eventParams = new SearchParamsEvent();
         
-        eventParams.setFilterByMuni(true);
-        eventParams.setMuni(muni);
-        eventParams.setFilterByStartEndDate(false);
-        eventParams.setObjectID_filterBy(false);
-        eventParams.setLimitResultCountTo100(true);
+        eventParams.setMuni_ctl(true);
+        eventParams.setDate_startEnd_ctl(false);
+        eventParams.setBobID_ctl(false);
+        eventParams.setLimitResultCount_ctl(true);
         
         eventParams.setFilterByEventCategory(false);
         eventParams.setFilterByEventType(false);
@@ -823,7 +869,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         eventParams.setFilterByEventOwner(false);
         
-        eventParams.setActive_filterBy(true);
+        eventParams.setActive_ctl(true);
         eventParams.setIsActive(true);
         
         eventParams.setFilterByPerson(false);
@@ -834,26 +880,25 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return eventParams;
     }
     
-    public SearchParamsEvent getSearchParamsOfficerActivity(User cred, Municipality m){
+    public SearchParamsEvent getSearchParamsOfficerActivity(){
         // event types are always bundled in an EventCategory
         // so in this case of this query, we don't care about the Category title,
         // only the type
         
         SearchParamsEvent eventParams = new SearchParamsEvent();
         
-        eventParams.setFilterByMuni(true);
-        eventParams.setMuni(m);
+        eventParams.setMuni_ctl(true);
         
-        eventParams.setFilterByStartEndDate(true);
-        eventParams.setUseRelativeDates(true);
+        eventParams.setDate_startEnd_ctl(true);
+        eventParams.setDate_relativeDates_ctl(true);
         
         eventParams.setApplyDateSearchToDateOfRecord(true);
         // query from a week ago to now
-        eventParams.setStartDateRelativeDays(-30);
-        eventParams.setEndDateRelativeDays(0);
+        eventParams.setDate_relativeDates_start_val(-30);
+        eventParams.setDate_realtiveDates_end_val(0);
         
-        eventParams.setObjectID_filterBy(false);
-        eventParams.setLimitResultCountTo100(true);
+        eventParams.setBobID_ctl(false);
+        eventParams.setLimitResultCount_ctl(true);
         
         eventParams.setFilterByEventCategory(false);
         eventParams.setFilterByEventType(false);
@@ -861,9 +906,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByCaseID(false);
         
         eventParams.setFilterByEventOwner(true);
-        eventParams.setUserID(cred.getUserID());
         
-        eventParams.setActive_filterBy(true);
+        eventParams.setActive_ctl(true);
         eventParams.setIsActive(true);
         
         eventParams.setFilterByPerson(false);
@@ -875,7 +919,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public SearchParamsEvent getSearchParamsComplianceEvPastMonth(Municipality m){
+    public SearchParamsEvent getSearchParamsComplianceEvPastMonth(){
         EventCoordinator ec = getEventCoordinator();
         
         // event types are always bundled in an EventCategory
@@ -886,17 +930,16 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         SearchParamsEvent eventParams = new SearchParamsEvent();
         
-        eventParams.setFilterByMuni(true);
-        eventParams.setMuni(m);
-        eventParams.setFilterByStartEndDate(true);
-        eventParams.setUseRelativeDates(true);
+        eventParams.setMuni_ctl(true);
+        eventParams.setDate_startEnd_ctl(true);
+        eventParams.setDate_relativeDates_ctl(true);
         eventParams.setApplyDateSearchToDateOfRecord(true);
         // query from a week ago to now
-        eventParams.setStartDateRelativeDays(-400);
-        eventParams.setEndDateRelativeDays(0);
+        eventParams.setDate_relativeDates_start_val(-400);
+        eventParams.setDate_realtiveDates_end_val(0);
         
-        eventParams.setObjectID_filterBy(false);
-        eventParams.setLimitResultCountTo100(true);
+        eventParams.setBobID_ctl(false);
+        eventParams.setLimitResultCount_ctl(true);
         
         eventParams.setFilterByEventCategory(false);
         eventParams.setFilterByEventType(true);
@@ -906,7 +949,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         eventParams.setFilterByEventOwner(false);
         
-        eventParams.setActive_filterBy(true);
+        eventParams.setActive_ctl(true);
         eventParams.setIsActive(true);
         
         eventParams.setFilterByPerson(false);
@@ -926,14 +969,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECase getDefaultSearchParams_CECase_allOpen(Municipality m){
+    public SearchParamsCECase getDefaultSearchParams_CECase_allOpen(){
         SearchParamsCECase params = new SearchParamsCECase();
         
         // superclass 
-        params.setFilterByMuni(true);
-        params.setMuni(m);
-        params.setObjectID_filterBy(false);
-        params.setLimitResultCountTo100(true);
+        params.setMuni_ctl(true);
+        params.setBobID_ctl(false);
+        params.setLimitResultCount_ctl(true);
         
         // subclass specific
         params.setUseIsOpen(true);
@@ -959,15 +1001,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECase getSearchParams_CECase_closedPast30Days (Municipality m){
+    public SearchParamsCECase getSearchParams_CECase_closedPast30Days(){
         SearchParamsCECase params = new SearchParamsCECase();
         params.setSearchName("CECases");
         
         // superclass 
-        params.setFilterByMuni(true);
-        params.setMuni(m);
-        params.setObjectID_filterBy(false);
-        params.setLimitResultCountTo100(true);
+        params.setMuni_ctl(true);
+        params.setBobID_ctl(false);
+        params.setLimitResultCount_ctl(true);
         
         // subclass specific
         params.setUseIsOpen(false);
@@ -977,8 +1018,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         LocalDateTime pastXDays = LocalDateTime.now().minusDays(30);
         
-        params.setStartDate(pastXDays);
-        params.setEndDate(LocalDateTime.now());
+        params.setDate_start_val(pastXDays);
+        params.setDate_end_val(LocalDateTime.now());
         
         params.setUseCasePhase(false);
         params.setUseCaseStage(false);
@@ -994,9 +1035,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     protected SearchParamsProperty getSearchParamsSkeletonProperties(){
         SearchParamsProperty propParams = new SearchParamsProperty();
         // superclass
-        propParams.setFilterByStartEndDate(false);
-        propParams.setObjectID_filterBy(false);
-        propParams.setLimitResultCountTo100(true);
+        propParams.setDate_startEnd_ctl(false);
+        propParams.setBobID_ctl(false);
+        propParams.setLimitResultCount_ctl(true);
         
         // subclass SearchParamsProperty
         propParams.setFilterByLotAndBlock(false);
@@ -1014,18 +1055,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
       * @return
       * @throws IntegrationException 
       */
-     public SearchParamsCEActionRequests generateParams_CEAR_RequestorCurrentU(Municipality m, User u) throws IntegrationException{
+     public SearchParamsCEActionRequests generateParams_CEAR_RequestorCurrentU(User u) throws IntegrationException{
             
         CEActionRequestIntegrator cari = getcEActionRequestIntegrator();
 
         SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
 
-        sps.setMuni(m);
         LocalDateTime pastTenYears = LocalDateTime.now().minusDays(30);
         // action requests cannot have a time stamp past the current datetime
-        sps.setEndDate(LocalDateTime.now());
+        sps.setDate_end_val(LocalDateTime.now());
         
-        sps.setLimitResultCountTo100(true);
+        sps.setLimitResultCount_ctl(true);
         sps.setUseAttachedToCase(false);
         sps.setAttachedToCase(false);
         sps.setUseMarkedUrgent(false);
@@ -1036,19 +1076,18 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-     public SearchParamsCEActionRequests generateParams_CEAR_Unprocessed(Municipality m) throws IntegrationException{
+     public SearchParamsCEActionRequests generateParams_CEAR_Unprocessed() throws IntegrationException{
             
         CEActionRequestIntegrator cari = getcEActionRequestIntegrator();
 
         SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
 
-        sps.setMuni(m);
         LocalDateTime pastTenYears = LocalDateTime.now().minusYears(10);
-        sps.setStartDate(pastTenYears);
+        sps.setDate_start_val(pastTenYears);
         // action requests cannot have a time stamp past the current datetime
-        sps.setEndDate(LocalDateTime.now());
+        sps.setDate_end_val(LocalDateTime.now());
         
-        sps.setLimitResultCountTo100(true);
+        sps.setLimitResultCount_ctl(true);
         sps.setUseAttachedToCase(false);
         sps.setAttachedToCase(false);
         sps.setUseMarkedUrgent(false);
@@ -1060,18 +1099,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return sps;
     }
     
-     public SearchParamsCEActionRequests generateParams_CEAR_pastXDays(Municipality m, int days){
+     public SearchParamsCEActionRequests generateParams_CEAR_pastXDays(int days){
             
         SearchCoordinator sc = getSearchCoordinator();
 
         SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
 
-        sps.setMuni(m);
         LocalDateTime pastxDays = LocalDateTime.now().minusDays(days);
-        sps.setStartDate(pastxDays);
+        sps.setDate_start_val(pastxDays);
 
         // action requests cannot have a time stamp past the current datetime
-        sps.setEndDate(LocalDateTime.now());
+        sps.setDate_end_val(LocalDateTime.now());
 
         sps.setUseAttachedToCase(false);
         sps.setUseMarkedUrgent(false);
@@ -1082,18 +1120,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-     public SearchParamsCEActionRequests generateParams_CEAR_attachedToCase(Municipality m, int days){
+     public SearchParamsCEActionRequests generateParams_CEAR_attachedToCase(int days){
             
         SearchCoordinator sc = getSearchCoordinator();
 
         SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
 
-        sps.setMuni(m);
         LocalDateTime pastxDays = LocalDateTime.now().minusDays(days);
-        sps.setStartDate(pastxDays);
+        sps.setDate_start_val(pastxDays);
 
         // action requests cannot have a time stamp past the current datetime
-        sps.setEndDate(LocalDateTime.now());
+        sps.setDate_end_val(LocalDateTime.now());
 
         sps.setUseAttachedToCase(true);
         sps.setAttachedToCase(true);

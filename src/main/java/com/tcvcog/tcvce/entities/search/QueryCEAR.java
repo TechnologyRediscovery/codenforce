@@ -7,9 +7,6 @@ package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +32,9 @@ public class QueryCEAR
         super(c);
         queryName = name;
         searchParamsList = new ArrayList<>();
-        searchParamsList.addAll(params);
+        if(params != null){
+            searchParamsList.addAll(params);
+        }
         results = new ArrayList<>();
     }
 
@@ -73,7 +72,7 @@ public class QueryCEAR
     }
 
     @Override
-    public void setBOBResultList(List l) {
+    public void addBObListToResults(List l) {
         results = l;
     }
 
@@ -125,6 +124,19 @@ public class QueryCEAR
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int addParams(SearchParams params) {
+        if(params != null && params instanceof SearchParamsCEActionRequests){
+            searchParamsList.add((SearchParamsCEActionRequests) params);
+        }
+        return searchParamsList.size();
+    }
+
+    @Override
+    public int getParamsListSize() {
+        return searchParamsList.size();
     }
     
     

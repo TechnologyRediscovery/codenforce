@@ -117,15 +117,15 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         setSelectedPropQuery(getSessionBean().getQueryProperty());
         setSearchParams(getSelectedPropQuery().getParmsList().get(0));
         try {
-            setQueryList(sc.buildQueryPropertyList(getSessionBean().getSessionUser(), getSessionBean().getSessionMuni()));
+            setQueryList(sc.buildQueryPropertyList(s().getSessionUser(), getSessionBean().getSessionMuni()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
     
-        getSearchParams().setFilterByStartEndDate(false);
-        getSearchParams().setFilterByMuni(true);
-        getSearchParams().setObjectID_filterBy(false);
-        getSearchParams().setUseRelativeDates(false); 
+        getSearchParams().setDate_startEnd_ctl(false);
+        getSearchParams().setMuni_ctl(true);
+        getSearchParams().setBobID_ctl(false);
+        getSearchParams().setDate_relativeDates_ctl(false); 
     }
 
     public void searchForProperties(ActionEvent event){

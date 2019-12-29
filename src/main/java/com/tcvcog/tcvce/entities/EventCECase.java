@@ -29,7 +29,6 @@ public class EventCECase
         this.eventID = ev.getEventID();
         this.category = ev.getCategory();
 
-        this.dateOfRecord = ev.getDateOfRecord();
         this.timestamp = ev.getTimestamp();
         this.description = ev.getDescription();
         

@@ -32,7 +32,6 @@ public class    QueryOccPeriod
     private QueryOccPeriodEnum queryName;
     private List<SearchParamsOccPeriod> searchParamsList; 
     private List<OccPeriod> results;
-    private List<Integer> resultIDs;
 
     public QueryOccPeriod(QueryOccPeriodEnum name,
                         List<SearchParamsOccPeriod> params,
@@ -40,10 +39,26 @@ public class    QueryOccPeriod
         super(c);
         queryName = name;
         searchParamsList = new ArrayList<>();
-        searchParamsList.addAll(params);
+        if(params != null){
+            searchParamsList.addAll(params);
+        }
         results = new ArrayList<>();
-        resultIDs = new ArrayList<>();
     }
+    
+    
+    @Override
+    public int addParams(SearchParams params) {
+         if(params instanceof SearchParamsOccPeriod){
+            searchParamsList.add((SearchParamsOccPeriod) params);
+        }
+        return searchParamsList.size();
+    }
+
+    @Override
+    public int getParamsListSize() {
+        return searchParamsList.size();
+    }
+
 
     @Override
     public String getQueryTitle(){
@@ -79,7 +94,7 @@ public class    QueryOccPeriod
     }
 
     @Override
-    public void setBOBResultList(List l) {
+    public void addBObListToResults(List l) {
         results = l;
     }
 
@@ -151,19 +166,5 @@ public class    QueryOccPeriod
         this.queryName = queryName;
     }
 
-    /**
-     * @return the resultIDs
-     */
-    public List<Integer> getResultIDs() {
-        return resultIDs;
-    }
-
-    /**
-     * @param resultIDs the resultIDs to set
-     */
-    public void setResultIDs(List<Integer> resultIDs) {
-        this.resultIDs = resultIDs;
-    }
-    
     
 }

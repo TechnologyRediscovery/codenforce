@@ -29,19 +29,30 @@ public class QueryCECase
     private List<CECaseBase> results;
     
     public QueryCECase( QueryCECaseEnum qName, 
-                        Municipality muni, 
                         List<SearchParamsCECase> params,
                         Credential c) {
         super(c);
         queryName = qName;
         searchParamsList = new ArrayList<>();
-        searchParamsList.addAll(params);
+        if(params != null){
+            searchParamsList.addAll(params);
+        }
         results = new ArrayList<>();
     }
     
     public void addToResults(List<CECaseBase> list){
         results.addAll(list);
     }
+    
+    
+    @Override
+    public int addParams(SearchParams params) {
+        if(params != null && params instanceof SearchParamsCECase){
+            searchParamsList.add((SearchParamsCECase) params);
+        }
+        return searchParamsList.size();
+    }
+    
 
     @Override
     public List getBOBResultList() {
@@ -49,7 +60,7 @@ public class QueryCECase
     }
 
     @Override
-    public void setBOBResultList(List l) {
+    public void addBObListToResults(List l) {
         results = l;
     }
 
@@ -146,7 +157,12 @@ public class QueryCECase
     public QueryCECaseEnum getQueryName() {
         return queryName;
     }
-    
+
+    @Override
+    public int getParamsListSize() {
+        return searchParamsList.size();
+    }
+
     
     
     

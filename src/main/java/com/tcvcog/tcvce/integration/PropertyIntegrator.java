@@ -625,8 +625,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         System.out.println("PropertyIntegrator.searchForPropWParams");
         System.out.println(params.getParams());
-        if (!params.isObjectID_filterBy()) {
-            if (params.isFilterByMuni()) {
+        if (!params.isBobID_ctl()) {
+            if (params.isMuni_ctl()) {
                 sb.append("AND municipality_municode = ? "); // param 1
             }
 
@@ -673,7 +673,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
             if (params.isFilterByLandBankHeld()) {
                 sb.append("AND landbankheld= ");
-                if (params.isActive()) {
+                if (params.isActive_val()) {
                     sb.append("TRUE ");
                 } else {
                     sb.append("FALSE ");
@@ -682,7 +682,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
             if (params.isFilterByNonAddressable()) {
                 sb.append("AND landbankheld= ");
-                if (params.isActive()) {
+                if (params.isActive_val()) {
                     sb.append("TRUE ");
                 } else {
                     sb.append("FALSE ");
@@ -707,16 +707,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 sb.append("AND propertyexternaldata.yearbuilt<? ");
             }
 
-            if (params.isActive_filterBy()) {
+            if (params.isActive_ctl()) {
                 sb.append("AND ");
-                if (params.isActive()) {
+                if (params.isActive_val()) {
                     sb.append("active=TRUE ");
                 } else {
                     sb.append("active=FALSE ");
                 }
             }
 
-            if (params.isFilterByStartEndDate()) {
+            if (params.isDate_startEnd_ctl()) {
                 sb.append(" AND ");
                 sb.append(getDBDateField(params));
                 sb.append(" BETWEEN ? AND ? "); // parm 2 and 3 without ID
@@ -735,9 +735,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(sb.toString());
 
-            if (!params.isObjectID_filterBy()) {
-                if (params.isFilterByMuni()) {
-                     stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+            if (!params.isBobID_ctl()) {
+                if (params.isMuni_ctl()) {
+                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
                 
                 if (params.isFilterByUserField()) {
@@ -778,17 +778,17 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     stmt.setInt(++paramCounter, params.getYearBuiltMin());
                     stmt.setInt(++paramCounter, params.getYearBuiltMax());
                 }
-                if (params.isFilterByStartEndDate()) {
-                    stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
-                    stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
+                if (params.isDate_startEnd_ctl()) {
+                    stmt.setTimestamp(++paramCounter, params.getStartDate_val_SQLDate());
+                    stmt.setTimestamp(++paramCounter, params.getEndDate_val_SQLDate());
                 }
             } else {
-                stmt.setInt(++paramCounter, params.getObjectID());
+                stmt.setInt(++paramCounter, params.getBobID_val());
             }
             rs = stmt.executeQuery();
             int counter = 0;
             int maxResults;
-            if (params.isLimitResultCountTo100()) {
+            if (params.isLimitResultCount_ctl()) {
                 maxResults = 100;
             } else {
                 maxResults = Integer.MAX_VALUE;

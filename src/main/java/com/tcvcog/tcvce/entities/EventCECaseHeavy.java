@@ -23,12 +23,12 @@ package com.tcvcog.tcvce.entities;
  * 
  * @author Ellen Bascomb
  */
-public  class   EventCaseHeavy 
+public  class   EventCECaseHeavy 
         extends Event{
     
     protected CECaseBase ceCase;
     
-    public EventCaseHeavy(Event ev){
+    public EventCECaseHeavy(Event ev){
         this.eventID = ev.getEventID();
         this.category = ev.getCategory();
         

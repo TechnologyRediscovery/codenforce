@@ -254,30 +254,30 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         sb.append("SELECT personid FROM public.person ");   // < -- don't for get
         
-        if(!params.isObjectID_filterBy()){
+        if(!params.isBobID_ctl()){
             sb.append("WHERE muni_municode = ? ");              // < -- trailing spaces!
-            if(params.isFilterByFirstName()){
+            if(params.isName_first_ctl()){
                 sb.append("AND fname ILIKE ");
                 sb.append("'%");
-                sb.append(params.getFirstNameSS());
+                sb.append(params.getName_first_val());
                 sb.append("%'");
             }
-            if(params.isFilterByLastName()){
+            if(params.isName_last_ctl()){
                 sb.append("AND lname ILIKE ");
                 sb.append("'%");
-                sb.append(params.getLastNameSS());
+                sb.append(params.getName_last_val());
                 sb.append("%'");
             }
-            if(params.isFilterByEmail()){
+            if(params.isEmail_ctl()){
                 sb.append("AND email ILIKE ");
                 sb.append("'%");
-                sb.append(params.getEmailSS());
+                sb.append(params.getEmail_val());
                 sb.append("%'");
             }
-            if(params.isFilterByAddressStreet()){
+            if(params.isAddress_streetNum_ctl()){
                 sb.append("AND address_street ILIKE ");
                 sb.append("'%");
-                sb.append(params.getAddrStreetSS());
+                sb.append(params.getAddress_streetNum_val());
                 sb.append("%'");
             }
             if(params.isFilterByActiveSwitch()){
@@ -287,8 +287,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     sb.append("AND isactive = FALSE ");
                 }
             }
-            if(params.isFilterByVerifiedSwitch()){
-                if(params.isVerifiedSwitch()){
+            if(params.isVerified_val()){
+                if(params.isVerified_ctl()){
                     sb.append("AND humanverifiedby IS NOT NULL");
                 } else {
                     sb.append("AND humanverifiedby IS NULL");
@@ -301,17 +301,17 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(sb.toString());
             
-            if(!params.isObjectID_filterBy()){
-                stmt.setInt(1, params.getMuni().getMuniCode());
+            if(!params.isBobID_ctl()){
+                stmt.setInt(1, params.getMuni_val().getMuniCode());
             } else {
-                stmt.setInt(1, params.getObjectID()); // and this is the only param after muni!
+                stmt.setInt(1, params.getBobID_val()); // and this is the only param after muni!
             }
             
             rs = stmt.executeQuery();
             
             int counter = 0;
             int maxResults;
-            if(params.isLimitResultCountTo100()){
+            if(params.isLimitResultCount_ctl()){
                  maxResults = Integer.parseInt(getResourceBundle(
                         Constants.DB_FIXED_VALUE_BUNDLE).getString("defaultMaxQueryResults"));
             } else {
@@ -1074,26 +1074,26 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         boolean notFirstCriteria = false;
         
         
-        if (!params.isObjectID_filterBy()){
-            if (params.isFilterByLastName()){
+        if (!params.isBobID_ctl()){
+            if (params.isName_last_ctl()){
                 query.append("lname ILIKE ? ");
             }
-            if (params.isFilterByFirstName()){
+            if (params.isName_first_ctl()){
                 query.append("fname ILIKE ? ");
             }
-            if (params.isFilterByAddressStreet()){
+            if (params.isAddress_streetNum_ctl()){
                 query.append("address_street ILIKE ? ");
             }
-            if (params.isFilterByCity()){
+            if (params.isCity_ctl()){
                 query.append("address_city ILIKE ? ");
             }
-            if (params.isFilterByZipCode()){
+            if (params.isZip_ctl()){
                 query.append("address_zip ILIKE ? ");
             }            
-            if (params.isFilterByEmail()){
+            if (params.isEmail_ctl()){
                 query.append("email ILIKE ? ");
             }
-            if (params.isFilterByPhoneNumber()){
+            if (params.isPhoneNumber_ctl()){
                 query.append("phonecell ILIKE ? OR phonework ILIKE ? OR phonehome ILIKE ? ");
             }
             
@@ -1105,37 +1105,37 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             stmt = con.prepareStatement(query.toString());
-            if (!params.isObjectID_filterBy()){
-                if (params.isFilterByLastName()){
-                    stmt.setString(++paramCounter, params.getLastNameSS());
+            if (!params.isBobID_ctl()){
+                if (params.isName_last_ctl()){
+                    stmt.setString(++paramCounter, params.getName_last_val());
                 }
-                if (params.isFilterByFirstName()){
-                    stmt.setString(++paramCounter, params.getFirstNameSS());
+                if (params.isName_first_ctl()){
+                    stmt.setString(++paramCounter, params.getName_first_val());
                 }
-                if (params.isFilterByAddressStreet()){
-                    stmt.setString(++paramCounter, params.getAddrStreetSS());
+                if (params.isAddress_streetNum_ctl()){
+                    stmt.setString(++paramCounter, params.getAddress_streetNum_val());
                 }
-                if (params.isFilterByCity()){
-                    stmt.setString(++paramCounter, params.getCity());
+                if (params.isCity_ctl()){
+                    stmt.setString(++paramCounter, params.getCity_val());
                 }
-                if (params.isFilterByZipCode()){
-                    stmt.setString(++paramCounter, params.getZipCode());
+                if (params.isZip_ctl()){
+                    stmt.setString(++paramCounter, params.getZip_val());
                 }            
-                if (params.isFilterByEmail()){
-                    stmt.setString(++paramCounter, params.getEmailSS());
+                if (params.isEmail_ctl()){
+                    stmt.setString(++paramCounter, params.getEmail_val());
                 }
-                if (params.isFilterByPhoneNumber()){
-                    stmt.setString(++paramCounter, params.getPhoneNumber());
+                if (params.isPhoneNumber_ctl()){
+                    stmt.setString(++paramCounter, params.getPhoneNumber_val());
                 }
             } else {
-                stmt.setInt(++paramCounter, params.getObjectID());
+                stmt.setInt(++paramCounter, params.getBobID_val());
             }
             
             rs = stmt.executeQuery();
             
             int counter = 0;
             int maxResults;
-            if (params.isLimitResultCountTo100()) {
+            if (params.isLimitResultCount_ctl()) {
                 maxResults = 100;
             } else {
                 maxResults = Integer.MAX_VALUE;

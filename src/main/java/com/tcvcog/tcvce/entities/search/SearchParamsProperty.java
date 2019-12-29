@@ -577,12 +577,12 @@ public class SearchParamsProperty extends SearchParams implements Serializable {
         m.put("Fil by Land Bank Held:", this.isFilterByLandBankHeld());
         m.put("Fil by Land Bank Proipect:", this.isFilterByLandBankPropspect());
         m.put("Fil by Lot and block:", this.isFilterByLotAndBlock());
-        m.put("Fil by Muni:", this.isFilterByMuni());
+        m.put("Fil by Muni:", this.isMuni_ctl());
         m.put("Fil by Nonaddressable:", this.isFilterByNonAddressable());
         m.put("Fil by Null date field:", this.isFilterByNullDateField());
-        m.put("Fil by Object ID:", this.isObjectID_filterBy());
+        m.put("Fil by Object ID:", this.isBobID_ctl());
         m.put("Fil by Parcel ID:", this.isFilterByParcelID());
-        m.put("Fil by Start End Date:", this.isFilterByStartEndDate());
+        m.put("Fil by Start End Date:", this.isDate_startEnd_ctl());
         m.put("Fil by Use Type:", this.isFilterByUseType());
         m.put("Fil by User Field:", this.isFilterByUserField());
         m.put("Fil by Year Built:", this.isFilterByYearBuilt());

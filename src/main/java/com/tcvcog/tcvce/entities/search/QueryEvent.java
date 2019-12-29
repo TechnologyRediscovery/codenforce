@@ -25,19 +25,17 @@ public class QueryEvent
     
     private QueryEventEnum queryName;
     
-    
-    // should be a list of search params eventually so we can build
-    // queries from a set of search params
-    private List<SearchParamsEvent> eventSearchParamsList;
+    private List<SearchParamsEvent> searchParamList;
     private List<Event> results;
     
     public QueryEvent(QueryEventEnum qName, 
-                            Municipality muni, 
-                            Credential c,
-                            List<SearchParamsEvent> params) {
+                            List<SearchParamsEvent> params,
+                            Credential c) {
         super(c);
-        eventSearchParamsList = new ArrayList<>();
-        eventSearchParamsList.addAll(params);
+        searchParamList = new ArrayList<>();
+        if(params != null){
+            searchParamList.addAll(params);
+        }
         queryName = qName;
         results = new ArrayList<>();
         
@@ -45,7 +43,7 @@ public class QueryEvent
 
     
     public List getParamsList() {
-        return eventSearchParamsList;
+        return searchParamList;
     }
 
     @Override
@@ -53,14 +51,18 @@ public class QueryEvent
         return results;
     }
 
+    /**
+     * Does not work yet
+     * @param l 
+     */
     @Override
-    public void setBOBResultList(List l) {
-        results = l;
+    public void addBObListToResults(List l) {
+        throw new UnsupportedOperationException("must still deal with Inheritance snafoo");
     }
 
     @Override
     public List getParmsList() {
-        return eventSearchParamsList;
+        return searchParamList;
     }
 
     @Override
@@ -93,8 +95,18 @@ public class QueryEvent
         results.addAll(events);
     }
 
-   
-    
+    @Override
+    public int addParams(SearchParams params) {
+         if(params instanceof SearchParamsEvent){
+            searchParamList.add((SearchParamsEvent) params);
+        }
+        return searchParamList.size();
+    }
+
+    @Override
+    public int getParamsListSize() {
+        return searchParamList.size();
+    }
     
     
 }

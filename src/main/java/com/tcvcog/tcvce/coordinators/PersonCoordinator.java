@@ -77,21 +77,21 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsPerson getDefaultSearchParamsPersons(Municipality m){
         SearchParamsPerson spp = new SearchParamsPerson();
         // on the parent class SearchParams
-        spp.setFilterByStartEndDate(false);
-        spp.setLimitResultCountTo100(true);
-        spp.setMuni(m);
+        spp.setDate_startEnd_ctl(false);
+        spp.setLimitResultCount_ctl(true);
+        spp.setMuni_val(m);
         
         // on the subclass SearchParamsPerson
-        spp.setFilterByFirstName(true);
-        spp.setFilterByLastName(true);
-        spp.setOnlySearchCompositeLastNames(false);
+        spp.setName_first_ctl(true);
+        spp.setName_last_ctl(true);
+        spp.setName_compositeLNameOnly_ctl(false);
         
-        spp.setFilterByPersonTypes(false);
-        spp.setFilterByEmail(false);
-        spp.setFilterByAddressStreet(false);
+        spp.setPersonType_ctl(false);
+        spp.setEmail_ctl(false);
+        spp.setAddress_streetNum_ctl(false);
         
         spp.setFilterByActiveSwitch(false);
-        spp.setFilterByVerifiedSwitch(false);
+        spp.setVerified_val(false);
         
         
         return spp;
@@ -228,20 +228,20 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         SearchParamsPerson params = new SearchParamsPerson();
         
         // superclass parameters
-        params.setFilterByMuni(false);
-        params.setObjectID_filterBy(false);
-        params.setFilterByStartEndDate(false);
-        params.setLimitResultCountTo100(true);
+        params.setMuni_ctl(false);
+        params.setBobID_ctl(false);
+        params.setDate_startEnd_ctl(false);
+        params.setLimitResultCount_ctl(true);
         
         // subclass specific parameters
-        params.setFilterByLastName(true);
-        params.setFilterByAddressStreet(false);
+        params.setName_last_ctl(true);
+        params.setAddress_streetNum_ctl(false);
         
-        params.setFilterByFirstName(false);
-        params.setFilterByPhoneNumber(false);
-        params.setFilterByEmail(false);        
-        params.setFilterByCity(false);
-        params.setFilterByZipCode(false);
+        params.setName_first_ctl(false);
+        params.setPhoneNumber_ctl(false);
+        params.setEmail_ctl(false);        
+        params.setCity_ctl(false);
+        params.setZip_ctl(false);
         
         return params;
     }
