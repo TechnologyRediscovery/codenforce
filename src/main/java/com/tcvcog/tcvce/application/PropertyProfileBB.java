@@ -185,7 +185,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
       
-    public void beginPropertyUnitChanges(ActionEvent ev){
+    public void beginPropertyUnitUpdates(ActionEvent ev){
         
     }
     
@@ -354,6 +354,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void initiateNewOccPeriodCreation(PropertyUnit pu){
         setSelectedOccPeriodType(null);
         setCurrPropUnit(pu);
+    }
+    
+    public void saveNewPropInfo(){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
     }
     
     public String addNewOccPeriod(){
