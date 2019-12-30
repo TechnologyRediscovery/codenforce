@@ -34,7 +34,7 @@ import javax.faces.application.FacesMessage;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
     

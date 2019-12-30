@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.domain;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class SearchException extends BaseException {
     

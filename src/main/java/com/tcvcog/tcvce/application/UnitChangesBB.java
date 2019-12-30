@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitChange;
+import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -58,7 +58,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
     private PropertyDataHeavy propWithLists;
 
     private List<PropertyUnit> existingUnitList;
-    private List<PropertyUnitChange> proposedUnitList;
+    private List<PropertyUnitChangeOrder> proposedUnitList;
     private Person existingOwner;
     private Person proposedOwner;
     private List<ChangeOrderAction> actionList;
@@ -131,7 +131,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            for (PropertyUnitChange change : proposedUnitList) {
+            for (PropertyUnitChangeOrder change : proposedUnitList) {
 
                 if (change.getAction() == ChangeOrderAction.Accept) {
 
@@ -242,11 +242,11 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         this.existingUnitList = existingUnitList;
     }
 
-    public List<PropertyUnitChange> getProposedUnitList() {
+    public List<PropertyUnitChangeOrder> getProposedUnitList() {
         return proposedUnitList;
     }
 
-    public void setProposedUnitList(List<PropertyUnitChange> proposedUnitList) {
+    public void setProposedUnitList(List<PropertyUnitChangeOrder> proposedUnitList) {
         this.proposedUnitList = proposedUnitList;
     }
 

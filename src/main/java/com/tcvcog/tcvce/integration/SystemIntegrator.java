@@ -47,7 +47,7 @@ import java.util.Map;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 

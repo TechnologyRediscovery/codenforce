@@ -72,7 +72,7 @@ import javax.annotation.PostConstruct;
  * object on one of these session shelves for others to work with and to maintain
  * user state across page changes.
  * 
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class SessionBean extends BackingBeanUtils implements Serializable{
     

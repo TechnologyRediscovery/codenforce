@@ -51,7 +51,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 

@@ -17,7 +17,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitChange;
+import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -770,7 +770,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public void submitUnitChangeList() {
 
-        List<PropertyUnitChange> changeList = new ArrayList<>();
+        List<PropertyUnitChangeOrder> changeList = new ArrayList<>();
 
         PropertyIntegrator pri = getPropertyIntegrator();
 
@@ -787,7 +787,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         
         for (PropertyUnit workingUnit : workingPropUnits) {
 
-            PropertyUnitChange skeleton = new PropertyUnitChange();
+            PropertyUnitChangeOrder skeleton = new PropertyUnitChangeOrder();
 
             boolean added = true;
 
@@ -877,7 +877,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         for (PropertyUnit activeUnit : existingProp.getUnitList()) {
 
-            PropertyUnitChange skeleton = new PropertyUnitChange();
+            PropertyUnitChangeOrder skeleton = new PropertyUnitChangeOrder();
 
             skeleton.setPropertyID(getSessionBean().getSessionOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
             
@@ -937,7 +937,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
-        for (PropertyUnitChange order : changeList) {
+        for (PropertyUnitChangeOrder order : changeList) {
 
             try {
                 pri.insertPropertyUnitChange(order);

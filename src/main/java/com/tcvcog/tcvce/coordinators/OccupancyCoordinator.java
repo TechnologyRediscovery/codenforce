@@ -90,7 +90,7 @@ import com.tcvcog.tcvce.entities.IFace_Proposable;
  * King of all business logic implementation for the entire Occupancy object tree
  * the central of which is the Business Object OccPeriod
  * 
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class OccupancyCoordinator extends BackingBeanUtils implements Serializable {
 

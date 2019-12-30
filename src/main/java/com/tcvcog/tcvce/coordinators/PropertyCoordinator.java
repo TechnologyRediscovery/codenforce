@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitChange;
+import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.User;
@@ -61,7 +61,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    public PropertyDataHeavy configurePropertyWithLists(PropertyDataHeavy propWL) throws IntegrationException, BObStatusException{
+    public PropertyDataHeavy configurePropertyDataHeavy(PropertyDataHeavy propWL) throws IntegrationException, BObStatusException{
         
         PropertyIntegrator pi = getPropertyIntegrator();
         
@@ -70,15 +70,17 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         }
         if (propWL.getUnitWithListsList() == null) {
             propWL.setUnitWithListsList(new ArrayList<PropertyUnitDataHeavy>());
+            // since it was empty
         }
+        
         if (propWL.getPersonList() == null) {
             propWL.setPersonList(new ArrayList<Person>());
         }
         if (propWL.getInfoCaseList() == null) {
-            propWL.setInfoCaseList(new ArrayList<CECase>());
+            propWL.setPropInfoCaseList(new ArrayList<CECase>());
         }
         if (propWL.getChangeList() == null) {
-            propWL.setChangeList(new ArrayList<PropertyUnitChange>());
+            propWL.setChangeList(new ArrayList<PropertyUnitChangeOrder>());
         }
         if (propWL.getBlobList() == null) {
             propWL.setBlobList(new ArrayList<Integer>());
@@ -115,13 +117,16 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public PropertyDataHeavy getPropertyDataHeavy(Property prop, Credential cred) throws BObStatusException, EventException, AuthorizationException{
         PropertyIntegrator pi = getPropertyIntegrator();
-        PropertyDataHeavy propWithLists = null;
+        
+        PropertyDataHeavy pdh = null;
+        
         try{
-            propWithLists = pi.getPropertyDataHeavy(prop.getPropertyID());
+            pdh = pi.getPropertyDataHeavy(prop.getPropertyID());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }     
-        return propWithLists;
+        
+        return pdh;
     }   
     
     /**

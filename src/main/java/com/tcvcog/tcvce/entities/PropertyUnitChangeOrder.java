@@ -28,7 +28,7 @@ import java.sql.Timestamp;
  *
  * @author Nathan Dietz
  */
-public class PropertyUnitChange {
+public class PropertyUnitChangeOrder {
 
     private int unitChangeID;
     private ChangeOrderAction action; //not in the database, used by interface

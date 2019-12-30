@@ -74,7 +74,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public  class       SessionInitializer 
         extends     BackingBeanUtils 

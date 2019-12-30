@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class LogEntry implements Serializable{
     

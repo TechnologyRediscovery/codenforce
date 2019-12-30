@@ -44,7 +44,7 @@ import javax.servlet.http.HttpSession;
 /**
  * A hodgepodge class of backing bean code for improvement suggestion stuff
  * and related data
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class SystemServicesBB extends BackingBeanUtils implements Serializable{
 

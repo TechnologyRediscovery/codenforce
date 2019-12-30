@@ -42,7 +42,7 @@ import java.util.Map;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class MunicipalityIntegrator extends BackingBeanUtils implements Serializable {
 
@@ -141,12 +141,9 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     private MunicipalityDataHeavy generateMuniDataHeavy(ResultSet rs) throws SQLException, IntegrationException, AuthorizationException{
-        MunicipalityCoordinator mc = getMuniCoordinator();
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         UserIntegrator ui = getUserIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
-        UserCoordinator uc = getUserCoordinator();
-        PropertyCoordinator pc = getPropertyCoordinator();
         
         MunicipalityDataHeavy mdh = new MunicipalityDataHeavy(generateMuni(rs));
         
@@ -191,7 +188,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
 //        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedListForConfig(muni)));
         mdh.setCourtEntities(cei.getCourtEntityList(mdh.getMuniCode()));
         
-        return mc.configureMuniDataHeavy(mdh);
+        return mdh;
     }
     
     private MuniProfile getMuniProfile(int profileID) throws IntegrationException{
@@ -279,7 +276,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
    
     
-    public void updateMuniComplete(MunicipalityDataHeavy muni) throws IntegrationException{
+    public void updateMuniDataHeavy(MunicipalityDataHeavy muni) throws IntegrationException{
         
         Connection con = null;
         String query =  "UPDATE public.municipality\n" +

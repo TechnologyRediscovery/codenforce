@@ -25,7 +25,7 @@ import javax.faces.convert.FacesConverter;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 @FacesConverter(value="citationStatusConverter")
 public class CitationStatusConverter extends EntityConverter implements Converter{

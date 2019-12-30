@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * in the Space are wrapped in an inspection blanket and added to the 
  * inspectedElementList which captures the compliance status, comp date, and notes.
  * 
- * @author Eric C. Darsow, Technology Rediscovery LLC 
+ * @author ellen bascomb of apt 31y, Technology Rediscovery LLC 
  */
 public class OccInspectedSpace 
         extends OccSpace 

@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.util.SubSysEnum;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public  class   SessionException 
         extends BaseException {

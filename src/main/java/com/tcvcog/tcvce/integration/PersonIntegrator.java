@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Eric C. Darsow
+ * Copyright (C) 2017 ellen bascomb of apt 31y
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ import java.util.ListIterator;
 /**
  * Connects Person objects to the data store
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 

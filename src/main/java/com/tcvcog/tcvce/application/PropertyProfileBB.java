@@ -60,7 +60,7 @@ Council of Governments, PA
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     

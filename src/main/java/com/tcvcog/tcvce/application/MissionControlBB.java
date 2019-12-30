@@ -63,7 +63,7 @@ import org.primefaces.model.DefaultDashboardModel;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
@@ -157,6 +157,12 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
 //   
 //    
     
+    /**
+     * TODO: Push this logic into the coordinators and session folks!!
+     * @return
+     * @throws IntegrationException
+     * @throws SQLException 
+     */
     public String switchMuni() throws IntegrationException, SQLException{
         CodeIntegrator ci = getCodeIntegrator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();

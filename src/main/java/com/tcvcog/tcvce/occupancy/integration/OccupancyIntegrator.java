@@ -61,7 +61,7 @@ import java.util.List;
  * High-level object families produced here include: OccPeriod OccPeriodType
  * OccPermit OccPermitApplication
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class OccupancyIntegrator extends BackingBeanUtils implements Serializable {
 

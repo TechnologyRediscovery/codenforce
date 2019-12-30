@@ -51,7 +51,7 @@ import java.util.ListIterator;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class OccInspectionIntegrator extends BackingBeanUtils implements Serializable {
 

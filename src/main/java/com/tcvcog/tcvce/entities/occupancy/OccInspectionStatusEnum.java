@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.entities.*;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public enum OccInspectionStatusEnum {
 

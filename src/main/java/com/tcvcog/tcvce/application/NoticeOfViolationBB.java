@@ -39,7 +39,7 @@ import javax.faces.event.ActionEvent;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class NoticeOfViolationBB extends BackingBeanUtils implements Serializable {
     

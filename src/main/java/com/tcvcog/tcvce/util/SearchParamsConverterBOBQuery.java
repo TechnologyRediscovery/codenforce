@@ -26,7 +26,7 @@ import javax.faces.convert.FacesConverter;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 @FacesConverter(value="bOBQueryConverter")
 public class SearchParamsConverterBOBQuery extends EntityConverter implements Converter{

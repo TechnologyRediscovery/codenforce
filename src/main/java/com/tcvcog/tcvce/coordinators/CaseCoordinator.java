@@ -49,7 +49,7 @@ import javax.faces.application.FacesMessage;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 
@@ -665,8 +665,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param nov
      * @param user
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException
      */
-    public void novResetMailing(NoticeOfViolation nov, UserAuthorized user) throws IntegrationException, PermissionsException, AuthorizationException{
+    public void novResetMailing(NoticeOfViolation nov, UserAuthorized user) throws IntegrationException, AuthorizationException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         if(user.getMyCredential().isHasSysAdminPermissions()){
             cvi.novResetMailingFieldsToNull(nov);
@@ -676,7 +677,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
         
-    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m) throws SQLException, AuthorizationException{
+    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, MunicipalityDataHeavy mdh) throws SQLException, AuthorizationException{
         SystemIntegrator si = getSystemIntegrator();
         NoticeOfViolation nov = new NoticeOfViolation();
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
@@ -684,7 +685,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         try {
-            nov.setStyle(si.getPrintStyle(mi.getMunDataHeavy(m.getMuniCode()).getDefaultNOVStyleID()));
+            nov.setStyle(si.getPrintStyle(mdh.getDefaultNOVStyleID()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

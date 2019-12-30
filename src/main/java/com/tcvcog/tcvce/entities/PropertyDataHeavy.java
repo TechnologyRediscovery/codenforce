@@ -24,29 +24,39 @@ import java.util.List;
 
 /**
  * 
- * @author Eric C. Darsow
+ * @author ellen bascomb
  */
 public  class       PropertyDataHeavy 
         extends     Property 
         implements  IFace_CredentialSigned{
     
-    // cases store code enforcement data
+    
     private List<CECase> ceCaseList;
-    // property units store occupancy data
+    
     private List<PropertyUnitDataHeavy> unitWithListsList;
-    // both are connected to Person objects all over the place
+    
     private List<Person> personList;
-    private List<CECase> infoCaseList;
-    private List<PropertyUnitChange> changeList;
+    
+    private List<CECase> propInfoCaseList;
+    
+    private List<PropertyUnitChangeOrder> changeList;
+    
     private List<Integer> blobList;
     
     private String credentialSignature;
+    
     
     public PropertyDataHeavy(){
         
     }
     
-       public PropertyDataHeavy(Property prop, Credential cred){
+    /**
+     * Theoretically we store the credential signature of the user who
+     * retrieves any data heavy bob, but for now, this is in holding
+     * @param prop
+     * @param cred 
+     */
+    public PropertyDataHeavy(Property prop, Credential cred){
         
         this.credentialSignature = cred.getSignature();
            
@@ -192,17 +202,17 @@ public  class       PropertyDataHeavy
     }
 
     /**
-     * @return the infoCaseList
+     * @return the propInfoCaseList
      */
     public List getInfoCaseList() {
-        return infoCaseList;
+        return propInfoCaseList;
     }
 
     /**
-     * @param infoCaseList the infoCaseList to set
+     * @param propInfoCaseList the propInfoCaseList to set
      */
-    public void setInfoCaseList(List<CECase> infoCaseList) {
-        this.infoCaseList = infoCaseList;
+    public void setPropInfoCaseList(List<CECase> propInfoCaseList) {
+        this.propInfoCaseList = propInfoCaseList;
     }
 
     /**
@@ -215,7 +225,7 @@ public  class       PropertyDataHeavy
     /**
      * @param changeList the changeList to set
      */
-    public void setChangeList(List<PropertyUnitChange> changeList) {
+    public void setChangeList(List<PropertyUnitChangeOrder> changeList) {
         this.changeList = changeList;
     }
 
