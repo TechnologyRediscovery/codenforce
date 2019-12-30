@@ -18,7 +18,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -180,7 +180,7 @@ public class CECaseEventsBB
                 getSelectedEvent().setDateOfRecord(LocalDateTime.now());
                 getSelectedEvent().setDiscloseToMunicipality(true);
                 getSelectedEvent().setDiscloseToPublic(false);
-            } catch (CaseLifecycleException ex) {
+            } catch (BObStatusException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -246,7 +246,7 @@ public class CECaseEventsBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(),
                             "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        } catch (CaseLifecycleException ex) {
+        } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

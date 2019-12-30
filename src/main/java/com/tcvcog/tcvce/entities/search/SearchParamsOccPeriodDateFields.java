@@ -17,23 +17,43 @@
 package com.tcvcog.tcvce.entities.search;
 
 /**
- *
- * @author sylvia
+ * Utility enum for allowing users to choose a date field for building query
+ * search param objects. Contains direct mapping of DB field names to 
+ * human friendly descriptions of dates available
+ * 
+ * @author ellen bascomb
  */
 public enum SearchParamsOccPeriodDateFields {
     
-    CREATED_TS("Creation timestamp", "createdts"), // in occperiod
-    TYPE_CERTIFIED_TS, // in occperiod
-    PERIOD_START_DATE, // in occperiod
-    PERIOD_END_DATE, // in occperiod
-    START_DATE_CERTIFIED_TS, // in occperiod
-    END_DATE_CERTIFIED_TS, // in occperiod
-    AUTHORIZATION_TS, // in occperiod
-    INSPECTION_EFFECTIVEDATE, // in occinspection
-    PASSEDINSPECTION_TS, // in occinspection
-    THIRDPARTY_INSPECTOR_APPROVAL_TS, // in occinspection
-    PERMIT_ISSUANCE_DATE // in occpermit
-    ;
+    CREATED_TS              ("Creation timestamp", 
+                            "createdts"), 
+    
+    TYPE_CERTIFIED_TS       ("Period type certification timestamp",
+                            "typecertifiedts"), 
+    
+    PERIOD_START_DATE       ("Period start date", 
+                            "startdate"), 
+    
+    PERIOD_END_DATE         ("Period end date", 
+                            "enddate"), 
+    
+    START_DATE_CERTIFIED_TS ("Period start date certification timestamp", 
+                            "startdatecertifiedts"), 
+    
+    END_DATE_CERTIFIED_TS  ("Period end date certification timestamp",
+                            "enddatecertifiedts"),
+    
+    AUTHORIZATION_TS        ("Period authorization timestamp",
+                            "authorizationts"),
+            
+    INSPECTION_EFFECTIVEDATE    ("Inspection effective date",
+                                "effectivedate"), // in occinspection
+    
+    PASSEDINSPECTION_TS         ("Inspection passed",
+                                "passedinspectionts"), // in occinspection
+    
+    PERMIT_ISSUANCE_DATE        ("Permit date issued",
+                                "dateissued");
     
     private final String title;
     private final String dbField;
@@ -41,6 +61,20 @@ public enum SearchParamsOccPeriodDateFields {
     private SearchParamsOccPeriodDateFields(String t, String db){
         title = t;
         dbField = db;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @return the dbField
+     */
+    public String getDbField() {
+        return dbField;
     }
     
 }

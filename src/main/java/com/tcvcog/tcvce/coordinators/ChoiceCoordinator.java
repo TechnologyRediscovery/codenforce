@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -256,11 +256,11 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
      * @param u the current session user
      * @throws IntegrationException
      * @throws AuthorizationException
-     * @throws CaseLifecycleException if the directive is required for bob close and if it is open.
+     * @throws BObStatusException if the directive is required for bob close and if it is open.
      * This method does not allow evaluation of a required proposal after BOB is closed. 
      * If this occurs, there's a bug somewhere in the entitylifecycle that anybody could have closed this bob
      */
-    public void rejectProposal(Proposal p, IFace_Openable bob, UserAuthorized u) throws IntegrationException, AuthorizationException, CaseLifecycleException{
+    public void rejectProposal(Proposal p, IFace_Openable bob, UserAuthorized u) throws IntegrationException, AuthorizationException, BObStatusException{
         ChoiceIntegrator ci = getChoiceIntegrator();
         if(u.getRole().getRank() >= p.getDirective().getMinimumRequiredUserRankToEvaluate()){
             if(!p.getDirective().isRequiredEvaluationForBOBClose() && bob.isOpen()){
@@ -272,17 +272,17 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
                 // send the updates to the integrator
                 ci.updateProposal(p);
             } else {
-                throw new CaseLifecycleException("Evaluating this proposal is required. This setting can be overriden by an administrator.");
+                throw new BObStatusException("Evaluating this proposal is required. This setting can be overriden by an administrator.");
             }
         } else {
             throw new AuthorizationException("You do not have sufficient privileges to reject this propsoal");
         }
     }
     
-    public void clearProposalEvaluation(Proposal p, UserAuthorized u) throws IntegrationException, CaseLifecycleException{
+    public void clearProposalEvaluation(Proposal p, UserAuthorized u) throws IntegrationException, BObStatusException{
         ChoiceIntegrator ci = getChoiceIntegrator();
         if(p.isReadOnlyCurrentUser()){
-            throw new CaseLifecycleException("User cannot clear a proposal they cannot evaluate");
+            throw new BObStatusException("User cannot clear a proposal they cannot evaluate");
         }
         p.setResponseTS(null);
         p.setResponderActual(null);

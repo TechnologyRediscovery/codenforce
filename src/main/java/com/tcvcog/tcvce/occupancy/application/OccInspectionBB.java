@@ -11,7 +11,7 @@ import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -235,7 +235,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 //                } 
 //            }
             propertyUnitCandidateList = pi.getPropertyUnitList(getSessionBean().getSessionProperty());
-        } catch (IntegrationException | EventException| AuthorizationException |CaseLifecycleException ex) {
+        } catch (IntegrationException | EventException| AuthorizationException | BObStatusExceptionex) {
             System.out.println(ex);
         }
         
@@ -437,7 +437,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             choiceCoord.rejectProposal(p, currentOccPeriod, getSessionBean().getSessionUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             "Proposal id " + p.getProposalID() + " has been rejected!", ""));
-        } catch (IntegrationException | AuthorizationException | CaseLifecycleException ex) {
+        } catch (IntegrationException | AuthorizationException | BObStatusExceptionex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             ex.getMessage(), ""));
         }
@@ -456,7 +456,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
             }
             
-        } catch (EventException | AuthorizationException | CaseLifecycleException | IntegrationException ex) {
+        } catch (EventException | AuthorizationException | BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             ex.getMessage(), ""));
@@ -470,7 +470,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         try {
             cc.clearProposalEvaluation(p, getSessionBean().getSessionUser());
             
-        } catch (CaseLifecycleException | IntegrationException ex) {
+        } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             ex.getMessage(), ""));
@@ -622,7 +622,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 currentEvent.setDateOfRecord(LocalDateTime.now());
                 currentEvent.setDiscloseToMunicipality(true);
                 currentEvent.setDiscloseToPublic(false);
-            } catch (CaseLifecycleException ex) {
+            } catch (BObStatusException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -695,7 +695,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Success! added rule to occ period", ""));
-        } catch (IntegrationException | CaseLifecycleException ex) {
+        } catch (IntegrationException | BObStatusExceptionex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -711,7 +711,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Success! added rule set to occ period", ""));
-        } catch (IntegrationException | CaseLifecycleException ex) {
+        } catch (IntegrationException | BObStatusExceptionex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1126,7 +1126,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                new FacesMessage(FacesMessage.SEVERITY_INFO,
                "Success! Occupancy period ID " + currentOccPeriod.getPeriodID() 
                        + " is now authorized and permits can be generated.", ""));
-        } catch (AuthorizationException | CaseLifecycleException | IntegrationException ex) {
+        } catch (AuthorizationException | BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_ERROR,

@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -126,7 +126,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             ex.getMessage(), "Stipulated compliance date must "
                                 + "be in the future; please revise the stipulated compliance date."));
-        } catch (CaseLifecycleException ex) {
+        } catch (BObStatusException ex) {
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             ex.getMessage(), "To preserve data integrity, this "
@@ -157,7 +157,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN, 
                             ex.getMessage(), "Stipulated compliance date must be in the future; please revise the stipulated compliance date."));
-        } catch (CaseLifecycleException ex) {
+        } catch (BObStatusException ex) {
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             ex.getMessage(), "To preserve data integrity, this "

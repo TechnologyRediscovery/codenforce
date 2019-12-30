@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Property;
@@ -52,7 +52,7 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
             currProp = pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID());
-        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
+        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
             System.out.println(ex);
         }
     }

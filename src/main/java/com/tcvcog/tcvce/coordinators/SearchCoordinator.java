@@ -8,7 +8,7 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -170,7 +170,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     for(Integer i: ei.searchForEvents(sp)){
                         evTempList.add(ec.getEvent(i));
                     }
-                } catch (IntegrationException | CaseLifecycleException ex) {
+                } catch (IntegrationException | BObStatusExceptionex) {
                     System.out.println(ex);
                     throw new SearchException("Integration or CaseLifecycle exception in query run;");
                 }
@@ -263,7 +263,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     for(Integer i: ci.searchForCECases(params)){
                         caseListTemp.add(cc.getCECase(i));
                     }
-                } catch (IntegrationException | CaseLifecycleException ex) {
+                } catch (IntegrationException | BObStatusExceptionex) {
                     throw new SearchException("Exception during search: " + ex.toString());
                 }
             }

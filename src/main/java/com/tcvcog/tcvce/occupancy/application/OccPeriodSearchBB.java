@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -97,7 +97,7 @@ public  class   OccPeriodSearchBB
             getSessionBean().setSessionOccPeriod(oc.getOccPeriodDataHeavy(op, cred));
             getSessionBean().setSessionProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), cred));
             sc.logObjectView(getSessionBean().getSessionUser(), op);
-        } catch (IntegrationException | CaseLifecycleException | AuthorizationException | EventException ex) {
+        } catch (IntegrationException | BObStatusException | AuthorizationException | EventException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

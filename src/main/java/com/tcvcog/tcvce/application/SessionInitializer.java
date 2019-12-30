@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
@@ -25,7 +26,9 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
+import com.tcvcog.tcvce.domain.SessionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
@@ -58,6 +61,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.SubSysEnum;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,12 +76,15 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Eric C. Darsow
  */
-public class SessionInitializer extends BackingBeanUtils implements Serializable {
+public  class       SessionInitializer 
+        extends     BackingBeanUtils 
+        implements  Serializable {
 
     private User userQueuedForSession;
     private UserAuthorized userAuthorizedQueuedForSession;
     private UserMuniAuthPeriod umapQueuedForSession;
     private Municipality muniQueuedForSession;
+    private SessionBean sb;
     
     /**
      * Creates a new instance of SessionInitializer
@@ -87,14 +94,15 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     
     @PostConstruct
     public void initBean(){
+        sb = getSessionBean();
         System.out.println("SessionInitializer.initBean");
         userAuthorizedQueuedForSession = null;
         UserCoordinator uc = getUserCoordinator();
         // check to see if we have an internal session created already
         // to determine which user we authenticate with
-        muniQueuedForSession = getSessionBean().getSessionMuni();
-        userQueuedForSession = getSessionBean().getSessionUserForReInitSession();
-        umapQueuedForSession = getSessionBean().getUmapRequestedForReInit();
+        muniQueuedForSession = sb.getSessionMuni();
+        userQueuedForSession = sb.getSessionUserForReInitSession();
+        umapQueuedForSession = sb.getUmapRequestedForReInit();
         
         
         try {
@@ -123,13 +131,13 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @return success or failure String used by faces to navigate to the internal page
      * or the error page
      * @throws com.tcvcog.tcvce.domain.IntegrationException
-     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws java.sql.SQLException
      */
-    public String initiateInternalSession() throws IntegrationException, CaseLifecycleException, SQLException{
+    public String initiateInternalSession() throws IntegrationException, BObStatusException, SQLException{
         System.out.println("SessionInitializer.initiateInternalSession");
         UserCoordinator uc = getUserCoordinator();
-        if(getSessionBean().getSessionUser() == null){
+        if(sb.getSessionUser() == null){
             return configureSession(getContainerAuthenticatedUser(), null, null);
         } else {
             // if we have an existing session, send in the userAuthorizedQueuedForSession and let the
@@ -165,10 +173,10 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * muni record added most recently
      * @param umap
      * @return nav string
-     * @throws CaseLifecycleException
+     * @throws BObStatusException
      * @throws IntegrationException 
      */
-    public String configureSession(User u, Municipality muni, UserMuniAuthPeriod umap) throws CaseLifecycleException, IntegrationException{
+    public String configureSession(User u, Municipality muni, UserMuniAuthPeriod umap) throws BObStatusException, IntegrationException{
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
@@ -185,16 +193,13 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
             // as long as we have an actual user, proceed with session config
             if(authUser != null){
                 // The stadnard Municipality object is simple, but we need the full deal
-                MunicipalityDataHeavy muniHeavy = 
-                        mi.getMuniListified(authUser.getMyCredential().getGoverningAuthPeriod().getMuni().getMuniCode());
-                System.out.println("SessionInitializer.configureSession | loaded MuniHeavy: " + muniHeavy.getMuniName());
                 
+                initializeSubsystems(authUser.getKeyCard());
+
                 // load up our SessionBean with its key objects
-                getSessionBean().setSessionMuni(muniHeavy);
-                getSessionBean().setSessionUser(authUser);
+                sb.setSessionMuni(muniHeavy);
+                sb.setSessionUser(authUser);
                 
-                populateSessionObjectQueues(authUser, muniHeavy);
-                populateSessionQueries(authUser);
                 
                 umaple = uc.assembleUserMuniAuthPeriodLogEntrySkeleton(
                                 authUser, 
@@ -203,7 +208,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 umaple = assembleSessionInfo(umaple);
                 
                 if(umaple != null){
-                    umaple.setAudit_usersession_userid(getSessionBean().getSessionUser().getUserID());
+                    umaple.setAudit_usersession_userid(sb.getSessionUser().getUserID());
                     umaple.setAudit_muni_municode(muniHeavy.getMuniCode());
                     umaple.setAudit_usercredential_userid(authUser.getMyCredential().getGoverningAuthPeriod().getUserID());
                     System.out.println("SessionInitializer.configureSession | loaded UserMuniAuthPeriod: " + umaple);
@@ -229,7 +234,64 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
             return "";
+        } catch (SessionException ex) {
+            System.out.println(ex.getMessage());
         }
+    }
+    
+    
+    private void initializeSubsystems(Credential cred) throws SessionException{
+        
+        for(SubSysEnum ss: SubSysEnum.values()){
+            if(ss.isInitialize()){
+                printSubsystemInit(ss);
+                switch(ss){
+                    case N_USER:
+                        initSubsystem_N_User(cred, ss);
+                        break;
+                    case I_MUNICIPALITY:
+                        initSubsystem_I_Municipality(cred, ss);
+                        break;
+                    case II_CODEBOOK:
+                        initSubsystem_II_CodeBook(cred, ss, sb.getSessionMuni());
+                        break;
+                    case III_PROPERTY:
+                        initSubsystem_III_Property(cred, ss);
+                        break;
+                    case IV_PERSON:
+                        initSubsystem_IV_Person(cred, ss);
+                        break;
+                    case V_EVENT:
+                        initSubsystem_V_Event(cred, ss);
+                        break;
+                    case VI_OCCPERIOD:
+                        initSubsystem_VI_OccPeriod(cred, ss, sb.getSessionMuni());
+                        break;
+                    case VII_CECASE:
+                        initSubsystem_VII_CECase(cred, ss);
+                        break;
+                    case VIII_CEACTIONREQ:
+                        initSubsystem_VIII_CEActionRequest(cred, ss);
+                        break;
+                    case VIV_OCCAPP:
+                        initSubsystem_VIV_OccApp(cred, ss);
+                        break;
+                    case X_PAYMENT:
+                        initSubsystem_X_Payment(cred, ss);
+                        break;
+                    case XI_REPORT:
+                        initSubsystem_XI_Report(cred, ss);
+                        break;
+                    case XII_BLOB:
+                        initSubsystem_XII_Blob(cred, ss);
+                        break;
+                    case XIII_PUBLICINFO:
+                        initSubsystem_XIII_PublicInfoBundle(cred, ss);
+                        break;
+                } // close switch
+            }
+        }
+        
     }
     
     /**
@@ -282,11 +344,10 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @param u
      * @param m
      * @throws IntegrationException
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      */
     private void populateSessionObjectQueues(UserAuthorized ua, MunicipalityDataHeavy m) 
-            throws IntegrationException, CaseLifecycleException{
-        SessionBean sb = getSessionBean();
+            throws IntegrationException, BObStatusException{
         
         SearchCoordinator searchCoord = getSearchCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
@@ -295,46 +356,8 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         SystemCoordinator sysCord = getSystemCoordinator();
         PersonCoordinator persc = getPersonCoordinator();
         
-        sb.setSessionCodeSet(m.getCodeSet());
-        
-        // Liase with each Coordinator to populate the individual BOb member
-        // and its corresponding List<E>
-        
-        // ********************** PERSONS **********************   
-        sb.setSessionPersonList(persc.assemblePersonHistory(ua.getMyCredential()));
-        if(sb.getSessionPersonList().isEmpty()){
-            sb.setSessionPerson(persc.selectDefaultPerson(ua));
-        } else {
-            sb.setSessionPerson(sb.getSessionPersonList().get(0));
-        }
-        
-        // ********************** Occ Periods**********************   
-//        sb.setSessionOccPeriodList(occCord.assemble(ua.getMyCredential()));
-//        if(sb.getSessionPersonList().isEmpty()){
-//            sb.setSessionPerson(persc.selectDefaultPerson(ua));
-//        } else {
-//            sb.setSessionPerson(sb.getSessionPersonList().get(0));
-//        }
-        
-        
-        
-        // ********************** Code Enf Cases **********************   
-        sb.setSessionCECaseList(caseCoord.assembleCaseHistory(ua.getMyCredential()));
-        if(sb.getSessionCECaseList().isEmpty()){
-            caseCoord.selectDefaultCECase(ua.getMyCredential());
-        } else {
-            sb.setSessionCECase(sb.getSessionCECaseList().get(0));
-        }
-//        
-//        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         
         // ********************** PROPERTIES **********************   
-        sb.setSessionPropertyList(pc.assemblePropertyHistoryList(ua.getMyCredential()));
-        if(sb.getSessionPropertyList().isEmpty()){
-            sb.setSessionProperty(pc.selectDefaultProperty(ua.getMyCredential()));
-        } else {
-            sb.setSessionProperty(sb.getSessionPropertyList().get(0));
-        }
         
         // ********************** PROPERTIES **********************   
 //        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
@@ -344,60 +367,203 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 //        sessionBean.setcECaseQueue(new ArrayList<CECase>());
 //        sessionBean.getcECaseQueue().add(c);
         
+        
+        // Liase with each Coordinator to populate the individual BOb member
+        // and its corresponding List<E>
+        
+        // ********************** PERSONS **********************   
+
+
+        // ********************** Events **********************   
+
+
+        
+        // ********************** Occ Periods**********************   
+
+
+
+        
+        
+        // ********************** Code Enf Cases **********************   
+        
+        
+        // ********************** CEARs **********************   
+//        
+//        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
+        
 
     }
-
-    /**
-     * Based on a User's RoleType, a customized list of Queries available will be
-     * extracted from the SearchCoordinator
-     * @param ua 
-     */
-    private void populateSessionQueries(UserAuthorized ua){
-        SessionBean sb = getSessionBean();
+    
+    private void printSubsystemInit(SubSysEnum ss){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Initializing subsystem ");
+        sb.append(ss.getSubSysID_Roman());
+        sb.append(" ");
+        sb.append(ss.getTitle());
+        System.out.println(sb.toString());
+        
+    }
+    
+    private void initSubsystem_N_User(Credential cred, SubSysEnum ss) throws SessionException{
+        
+        
+    }
+    
+    private void initSubsystem_I_Municipality(Credential cred, SubSysEnum ss) throws SessionException{
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        
+        MunicipalityDataHeavy muniHeavy =  mc.getMunDataHeavy(cred.getGoverningAuthPeriod().getMuni().getMuniCode(), cred);
+        
+    }
+    
+    private void initSubsystem_II_CodeBook(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
+        sb.setSessionCodeSet(mdh.getCodeSet());
+        
+    }
+    
+    private void initSubsystem_III_Property(Credential cred, SubSysEnum ss) throws SessionException{
+        PropertyCoordinator pc = getPropertyCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
-        Credential cred = ua.getMyCredential();
-
+        
+        sb.setSessionPropertyList(pc.assemblePropertyHistoryList(cred));
+        if(sb.getSessionPropertyList().isEmpty()){
+            sb.setSessionProperty(pc.selectDefaultProperty(cred));
+        } else {
+            sb.setSessionProperty(sb.getSessionPropertyList().get(0));
+        }
+        
         try {
-            // Note that these are Query skeletons and have not yet been populated with any\
-            // actual business objects
-            // It's up to the individual beans to check the Query object's
-            // "run by integrator" member and run the query if they choose
             sb.setQueryPropertyList(sc.buildQueryPropertyList(cred));
+
             if(!sb.getQueryPropertyList().isEmpty()){
                 sb.setQueryProperty(sb.getQueryPropertyList().get(0));
             }            
-            
-            sb.setQueryPersonList(sc.buildQueryPersonList(cred));
-            if(!sb.getQueryPersonList().isEmpty()){
-                sb.setQueryPerson(sb.getQueryPersonList().get(0));
-            }
-            
-            sb.setQueryEventList(sc.buildQueryEventList(cred));
-            if(!sb.getQueryEventList().isEmpty()){
-                sb.setQueryEvent(sb.getQueryEventList().get(0));
-            }
-            
-            sb.setQueryOccPeriodList(sc.buildQueryOccPeriodList(cred));
-            if(!sb.getQueryOccPeriodList().isEmpty()){
-                sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
-            }
-
-            sb.setQueryCECaseList(sc.buildQueryCECaseList(cred));
-            if(!sb.getQueryCECaseList().isEmpty()){
-                sb.setQueryCECase(sb.getQueryCECaseList().get(0));
-            }
-
-            sb.setQueryCEARList(sc.buildQueryCEARList(cred));
-            if(!sb.getQueryCEARList().isEmpty()){
-                sb.setQueryCEAR(sb.getQueryCEARList().get(0));
-            }
-        
         } catch (IntegrationException ex) {
-            System.out.println(ex);
+            throw new SessionException("Error setting proerty query list", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
         }
         
     }
     
+    private void initSubsystem_IV_Person(Credential cred, SubSysEnum ss) throws SessionException{
+        SearchCoordinator sc = getSearchCoordinator();
+        PersonCoordinator persc = getPersonCoordinator();
+        
+        try {
+            sb.setSessionPersonList(persc.assemblePersonHistory(cred));
+            if(sb.getSessionPersonList().isEmpty()){
+                sb.setSessionPerson(persc.selectDefaultPerson(cred));
+            } else {
+                sb.setSessionPerson(sb.getSessionPersonList().get(0));
+            }
+            sb.setQueryPersonList(sc.buildQueryPersonList(cred));
+            if(!sb.getQueryPersonList().isEmpty()){
+                sb.setQueryPerson(sb.getQueryPersonList().get(0));
+            }
+        } catch (IntegrationException ex) {
+            
+            
+        }
+
+    }
+    
+    private void initSubsystem_V_Event(Credential cred, SubSysEnum ss) throws SessionException{
+        SearchCoordinator sc = getSearchCoordinator();
+        sb.setQueryEventList(sc.buildQueryEventList(cred));
+        if(!sb.getQueryEventList().isEmpty()){
+            sb.setQueryEvent(sb.getQueryEventList().get(0));
+        }
+        
+    }
+    
+    private void initSubsystem_VI_OccPeriod(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
+        SearchCoordinator sc = getSearchCoordinator();
+        OccupancyCoordinator occCord = getOccupancyCoordinator();
+        
+            try {
+            // Session object init
+            sb.setSessionOccPeriodList(occCord.assembleOccPeriodHistoryList(cred));
+            if(sb.getSessionOccPeriodList().isEmpty()){
+                sb.setSessionOccPeriod(occCord.getOccPeriodDataHeavy(occCord.selectDefaultOccPeriod(mdh, cred), cred));
+            } else {
+                sb.setSessionOccPeriod(occCord.getOccPeriodDataHeavy(sb.getSessionOccPeriodList().get(0), cred));
+            }
+
+            // Query set init
+            sb.setQueryOccPeriodList(sc.buildQueryOccPeriodList(cred));
+            if(!sb.getQueryOccPeriodList().isEmpty()){
+                sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
+            }
+        } catch (IntegrationException ex) {
+            throw new SessionException( "Occ period list or query assembly failure", 
+                                        ex, 
+                                        ss, 
+                                        ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
+        }
+        
+    }
+    
+    
+    private void initSubsystem_VII_CECase(Credential cred, SubSysEnum ss) throws SessionException{
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
+        
+        try {
+        
+            sb.setSessionCECaseList(caseCoord.assembleCaseHistory(cred));
+            if(sb.getSessionCECaseList().isEmpty()){
+                caseCoord.selectDefaultCECase(cred);
+            } else {
+                sb.setSessionCECase(sb.getSessionCECaseList().get(0));
+            }
+        
+            sb.setSessionCECaseList(caseCoord.assembleCaseHistory(cred));
+            if(sb.getSessionCECaseList().isEmpty()){
+                caseCoord.selectDefaultCECase(cred);
+            } else {
+                sb.setSessionCECase(sb.getSessionCECaseList().get(0));
+            }
+        } catch (IntegrationException | BObStatusExceptionex) {
+            throw new SessionException("Error assembling session CECase list from history", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
+        }
+
+        sb.setQueryCECaseList(sc.buildQueryCECaseList(cred));
+        if(!sb.getQueryCECaseList().isEmpty()){
+            sb.setQueryCECase(sb.getQueryCECaseList().get(0));
+        }
+        
+    }
+    
+    private void initSubsystem_VIII_CEActionRequest(Credential cred, SubSysEnum ss) throws SessionException{
+        SearchCoordinator sc = getSearchCoordinator();
+        sb.setQueryCEARList(sc.buildQueryCEARList(cred));
+        if(!sb.getQueryCEARList().isEmpty()){
+            sb.setQueryCEAR(sb.getQueryCEARList().get(0));
+        }
+        
+    }
+    
+    private void initSubsystem_VIV_OccApp(Credential cred, SubSysEnum ss) throws SessionException{
+        
+    }
+    
+    
+    private void initSubsystem_X_Payment(Credential cred, SubSysEnum ss) throws SessionException{
+        
+    }
+    
+    private void initSubsystem_XI_Report(Credential cred, SubSysEnum ss) throws SessionException{ 
+        
+        
+    }
+    private void initSubsystem_XII_Blob(Credential cred, SubSysEnum ss) throws SessionException{
+        
+    }
+
+    private void initSubsystem_XIII_PublicInfoBundle(Credential cred, SubSysEnum ss) throws SessionException{
+        
+        
+    }
+
 
     /**
      * @return the userAuthorizedQueuedForSession

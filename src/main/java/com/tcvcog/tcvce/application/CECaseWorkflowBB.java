@@ -18,7 +18,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -95,7 +95,7 @@ public  class CECaseWorkflowBB
                 "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
             }
             
-        } catch (EventException | AuthorizationException | CaseLifecycleException | IntegrationException | ViolationException ex) {
+        } catch (EventException | AuthorizationException | BObStatusException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             ex.getMessage(), ""));
@@ -125,7 +125,7 @@ public  class CECaseWorkflowBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to write case phase changes to DB",
                             "This error must be corrected by a system administrator, sorry"));
-        } catch (CaseLifecycleException | ViolationException ex) {
+        } catch (BObStatusException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -165,7 +165,7 @@ public  class CECaseWorkflowBB
             reportCECase = cc.transformCECaseForReport(reportCECase);
         } catch (IntegrationException ex) {
             System.out.println(ex);
-        } catch (CaseLifecycleException ex) {
+        } catch (BObStatusException ex) {
             System.out.println(ex);
         }
 

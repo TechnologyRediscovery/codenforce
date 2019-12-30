@@ -18,13 +18,17 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -34,7 +38,7 @@ import java.util.Map;
 
 /**
  *
- * @author sylvia
+ * @author ellen bascomb
  */
 public class MunicipalityCoordinator extends BackingBeanUtils implements Serializable {
 
@@ -44,13 +48,46 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
     public MunicipalityCoordinator() {
     }
     
-    public MunicipalityDataHeavy getMuniDataHeavy(int muniCode) throws IntegrationException, AuthorizationException{
+    public MunicipalityDataHeavy getMuniDataHeavy(int muniCode, Credential cred) throws IntegrationException, AuthorizationException, BObStatusException, EventException{
         MunicipalityDataHeavy mdh = null;
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        mdh = mi.getMuniListified(muniCode);
+        mdh = mi.getMunDataHeavy(muniCode);
+        return configureMuniDataHeavy(mdh, cred);
+    }
+
+
+    public MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        pc.getPropertyDataHeavy(mdh.getMuniOfficePropertyId(), cred);
+        
         return mdh;
-    }    
+        
+        
+    }
    
+    
+    public OccPeriod selectMuniOccPeriod(Municipality muni) throws IntegrationException, AuthorizationException{
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        MunicipalityDataHeavy mdh;
+        if(muni != null){
+             mdh = getMuniDataHeavy(muni.getMuniCode());
+            if(mdh != null 
+                            && 
+                        mdh.getMuniPropertyDH().getUnitWithListsList() != null
+                            &&
+                        mdh.getMuniPropertyDH().getUnitWithListsList().get(0) != null){
+                
+                // TODO: this sequence needs to be tightened up
+                
+                return mdh.getMuniPropertyDH().getUnitWithListsList().get(0).getPeriodList().get(0);
+                
+            }
+        } 
+        
+        return null;
+    }
+    
     
     
      

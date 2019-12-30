@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -76,12 +76,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             throws  IntegrationException, 
                     AuthorizationException, 
                     EventException, 
-                    CaseLifecycleException, 
+                    BObStatusException, 
                     ViolationException {
         return getOccPeriodList(pu.getUnitID());
     }
     
-    public List<OccPeriod> getOccPeriodList(int unitID) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
+    public List<OccPeriod> getOccPeriodList(int unitID) throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException {
         List<OccPeriod> opList = new ArrayList<>();
         String query = "SELECT periodid FROM public.occperiod WHERE propertyunit_unitid=?;";
 
@@ -371,7 +371,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     public OccPeriod getOccPeriod(int periodid) throws IntegrationException, 
                                                                 EventException, 
                                                                 AuthorizationException, 
-                                                                CaseLifecycleException, 
+                                                                BObStatusException, 
                                                                 ViolationException {
         OccPeriod op = null;
         OccupancyCoordinator oc = getOccupancyCoordinator();

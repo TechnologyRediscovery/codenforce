@@ -8,7 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
@@ -139,7 +139,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         Map<CaseStage, Integer> stageMap = null;
         try {
              stageMap = dc.getCaseCountsByStage(caseList);
-        } catch (IntegrationException | CaseLifecycleException ex) {
+        } catch (IntegrationException | BObStatusExceptionex) {
             System.out.println(ex);
         }
         Integer max = 0;

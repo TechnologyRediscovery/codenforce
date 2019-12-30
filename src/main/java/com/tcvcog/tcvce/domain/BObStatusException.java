@@ -19,24 +19,24 @@ package com.tcvcog.tcvce.domain;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb
  */
-public class CaseLifecycleException extends BaseException {
+public class BObStatusException extends BaseException {
     
-    public CaseLifecycleException(){
+    public BObStatusException(){
         super();
         
     }
     
-    public CaseLifecycleException(String message){
+    public BObStatusException(String message){
         super(message);
     }
     
-    public CaseLifecycleException(Exception e){
+    public BObStatusException(Exception e){
         super(e);
     }
     
-    public CaseLifecycleException(String message, Exception e){
+    public BObStatusException(String message, Exception e){
         super(message, e);
         
     }

@@ -17,7 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.Report;
@@ -76,57 +76,29 @@ import javax.annotation.PostConstruct;
  */
 public class SessionBean extends BackingBeanUtils implements Serializable{
     
-    // CORE BUSINESS OBJECT SESSION SHELVES
-    private MunicipalityDataHeavy sessionMuni;
-
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                      N User                                    <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
     private UserAuthorized sessionUser;
+    private User sessionUserForReInitSession;
+    
+    private UserMuniAuthPeriod umapRequestedForReInit;
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                    I Municipality                              <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private MunicipalityDataHeavy sessionMuni;
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                   III CodeBook                                 <<< */
+    /* >>> -------------------------------------------------------------- <<< */
     
     private CodeSet sessionCodeSet;
     
     
-    private Property sessionProperty;
-    private List<Property> sessionPropertyList;
-    
-    private Person sessionPerson;
-    private List<Person> sessionPersonList;
-    
-    private CECase sessionCECase;
-    private List<CECase> sessionCECaseList;
-    
-    private OccPeriodDataHeavy sessionOccPeriod;
-    private List<OccPeriod> sessionOccPeriodList;
-    
-    // Session Entity Lists
-    private List<CEActionRequest> sessionCEARList;
-    
-    private List<EventCECaseCasePropBundle> sessionEventWithCasePropList;
-    
-    private CodeViolation sessionCodeViolation;
-    private List<CodeViolation> sessionViolationList;
-    
-    private Blob sessionBlob;
-    private List<Blob> blobList;
-    
-    private User sessionUserForReInitSession;
-    private UserMuniAuthPeriod umapRequestedForReInit;
-    
-    // BOB individual object session shelves - NOT ALWAYS POPULATED
-    private CEActionRequest sessionCEAR;
-    private PropertyUnit sessionPropertyUnit;
-    private OccInspection sessionOccInspection;
-    private OccPermit sessionOccPermit;
-    
-    // CECase-specific objects
-    private NoticeOfViolation sessionNotice;
-    private Citation sessionCitation;
-    
-    
-    /* >>> N CODE<<< */
-    /* CODE CORE  */
-    
-    
-    
-    /* *** AUX session shelves ***  */
     private CodeSource activeCodeSource;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
     private EnforcableCodeElement selectedEnfCodeElement;
@@ -134,60 +106,129 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     
     
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                   III Property                                 <<< */
+    /* >>> -------------------------------------------------------------- <<< */
     
     
-    // >>> I PROPERTY <<<
+    private Property sessionProperty;
+    private List<Property> sessionPropertyList;
+    
+    private PropertyUnit sessionPropertyUnit;
+    
+    /* >>> QUERY PROPERTY <<< */
     private QueryProperty queryProperty;
     private List<QueryProperty> queryPropertyList;
     
-    // >>> II PERSON <<<
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                     IV Person                                  <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    
+    private Person sessionPerson;
+    private List<Person> sessionPersonList;
+    
+    
+    /* >>> QUERY PERSON <<< */
     private QueryPerson queryPerson;
     private List<QueryPerson> queryPersonList;
     
-    // >>> III EVENT <<<
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                   V Event                                      <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    
+    private List<EventCECaseCasePropBundle> sessionEventWithCasePropList;
+    
+    /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
     private List<QueryEvent> queryEventList;
     
-    // >>> IV OCCPERIOD <<<
+    
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                  VI OccPeriod                                  <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private OccPeriodDataHeavy sessionOccPeriod;
+    private List<OccPeriod> sessionOccPeriodList;
+    
+    private OccPermit sessionOccPermit;
+    private OccInspection sessionOccInspection;
+    
+    /* >>> QUERY OCCPERIOD <<< */
     private QueryOccPeriod queryOccPeriod;
     private List<QueryOccPeriod> queryOccPeriodList;
     
-    // >>> V CECASE <<<
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                  VII CECase                                    <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private CECase sessionCECase;
+    private List<CECase> sessionCECaseList;
+    
+    private CodeViolation sessionCodeViolation;
+    private List<CodeViolation> sessionViolationList;
+    
+    private NoticeOfViolation sessionNotice;
+    private Citation sessionCitation;
+    
+    
+    /* >>> QUERY CECASE <<< */
     private QueryCECase queryCECase;
     private List<QueryCECase> queryCECaseList;
     
-    // >>> VI CEAR <<<
-    private QueryCEAR queryCEAR;
-    private List<QueryCEAR> queryCEARList;
     
-    // >>> VI OCCAPP <<<
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>              VIII CEActionRequest                              <<< */
+    /* >>> -------------------------------------------------------------- <<< */
     
+    private List<CEActionRequest> sessionCEARList;
     
-    // >>> VII PAYMENT <<<
-    
-    
-    
-    
-    
-    
-    
-    /* *** Occupancy Permit Application Session Shelves *** */
-    private OccPermitApplication sessionOccPermitApplication;
-    private Property occPermitAppActiveProp;
-    private Property occPermitAppWorkingProp;
-    private PropertyUnit occPermitAppActivePropUnit;
-    private PersonType occPermitAppActivePersonType;
-    
+    private CEActionRequest sessionCEAR;
     /* *** Code Enf Action Request Session Shelves ***  */
     private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
     
-    /* *** Public Data Session Shelves ***  */
-    private List<PublicInfoBundle> infoBundleList;
-    private PublicInfoBundleCECase pibCECase;
+    
+    // --- QUERY CEAR ---
+    private QueryCEAR queryCEAR;
+    private List<QueryCEAR> queryCEARList;
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                     VIV OccApp                                 <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private OccPermitApplication sessionOccPermitApplication;
+    
+    private Property occPermitAppActiveProp;
+    private Property occPermitAppWorkingProp;
+    private PropertyUnit occPermitAppActivePropUnit;
+    private PersonType occPermitAppActivePersonType;
+    
+    private OccPermitApplicationReason occPermitApplicationReason;
 
-    /* *** Reporting *** */
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                        X Payment                               <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+
+    private Payment sessionPayment;
+    private String paymentRedirTo;
+    
+    private OccPeriod feeManagementOccPeriod;
+    private String feeRedirTo;
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                         XI Report                              <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+
     private Report sessionReport;
     
     private ReportConfigCECase reportConfigCECase;
@@ -197,24 +238,27 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private ReportConfigOccInspection reportConfigInspection;
     private ReportConfigOccPermit reportConfigOccPermit;
     
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                         XII Blob                                <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private Blob sessionBlob;
+    private List<Blob> blobList;
+    
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                  XIII PublicInfoBundle                          <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private List<PublicInfoBundle> infoBundleList;
+    private PublicInfoBundleCECase pibCECase;
+    
     /* *** Public Person Search/Edit Session Shelves *** */
     private Person activeAnonPerson;
-    private OccPermitApplicationReason occPermitApplicationReason;
-
-    /* *** Payment and Fee Management Shelves *** */
-    private Payment sessionPayment;
-    private String paymentRedirTo;
-    
-    private OccPeriod feeManagementOccPeriod;
-    private String feeRedirTo;
     
     
-    /* *** Blob Upload Session Shelves *** */
-    //linking
-
-    
-    
-
     /**
      * Creates a new instance of getSessionBean()
      */

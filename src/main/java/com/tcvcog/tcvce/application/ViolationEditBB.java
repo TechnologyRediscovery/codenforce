@@ -21,7 +21,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -68,7 +68,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
          formDiscloseToPublic = true;
     }
     
-    public String editViolation() throws IntegrationException, CaseLifecycleException{
+    public String editViolation() throws IntegrationException, BObStatusException{
        CaseCoordinator cc = getCaseCoordinator();
        EventCoordinator eventCoordinator = getEventCoordinator();     
        SystemCoordinator sc = getSystemCoordinator();

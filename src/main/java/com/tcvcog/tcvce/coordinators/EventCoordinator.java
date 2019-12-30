@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -96,7 +96,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return ev;
     }
     
-    public EventCECaseHeavy getEventCaseHeavy(Event ev) throws EventException, IntegrationException, CaseLifecycleException{
+    public EventCECaseHeavy getEventCaseHeavy(Event ev) throws EventException, IntegrationException, BObStatusException{
         CaseCoordinator cc = getCaseCoordinator();
         
         if(ev == null) return null;
@@ -259,9 +259,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param erg
      * @param ec the type of event to attach to the case
      * @return an initialized event with basic properties set
-     * @throws CaseLifecycleException thrown if the case is in an improper state for proposed event
+     * @throws BObStatusException thrown if the case is in an improper state for proposed event
      */
-    public Event initializeEvent(IFace_EventRuleGoverned erg, EventCategory ec) throws CaseLifecycleException, EventException{
+    public Event initializeEvent(IFace_EventRuleGoverned erg, EventCategory ec) throws BObStatusException, EventException{
         
         if(ec == null) return null;
         
@@ -283,7 +283,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                         ec.getEventType() == EventType.Compliance
                     )
                 ){
-                    throw new CaseLifecycleException("This event cannot be attached to a closed case");
+                    throw new BObStatusException("This event cannot be attached to a closed case");
                 }
                 e.setCeCaseID(cse.getCaseID());
                 e.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
@@ -323,10 +323,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param user the current user
      * @return
      * @throws IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public List<EventCECaseCasePropBundle> queryEvents( SearchParamsEvent params, 
-                                                        Credential cred) throws IntegrationException, CaseLifecycleException{
+                                                        Credential cred) throws IntegrationException, BObStatusException{
         EventIntegrator ei = getEventIntegrator();
         
         
@@ -492,11 +492,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param event An initialized event
      * @throws IntegrationException bubbled up from the integrator
      * @throws EventException 
-     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
     public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCECase event) 
-            throws IntegrationException, EventException, CaseLifecycleException, ViolationException{
+            throws IntegrationException, EventException, BObStatusException, ViolationException{
         EventIntegrator ei = getEventIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
         String updateViolationDescr = getResourceBundle(Constants.MESSAGE_TEXT).getString("violationChangeEventDescription");
@@ -521,10 +521,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param caseID id of the case to which the event should be attached
      * @param message the text of the event description message
      * @throws IntegrationException in the case of broken integration process
-     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.EventException
      */
-    public void attachPublicMessagToCECase(int caseID, String message) throws IntegrationException, CaseLifecycleException, EventException{
+    public void attachPublicMessagToCECase(int caseID, String message) throws IntegrationException, BObStatusException, EventException{
         EventIntegrator ei = getEventIntegrator();
         UserCoordinator uc = getUserCoordinator();
         
@@ -598,11 +598,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param pastPhase
      * @param rule
      * @throws IntegrationException
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
     public void generateAndInsertPhaseChangeEvent(CECase currentCase, CasePhase pastPhase, EventRuleAbstract rule) 
-            throws IntegrationException, CaseLifecycleException, ViolationException, EventException{
+            throws IntegrationException, BObStatusException, ViolationException, EventException{
         
         EventIntegrator ei = getEventIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -646,10 +646,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param u
      * @return a configured but not integrated Event superclass. The caller will need to cast it to
      * the appropriate subclass and insert it
-     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public Event generateEventDocumentingProposalEvaluation(Proposal p, IFace_Proposable ch, UserAuthorized u) throws CaseLifecycleException, IntegrationException{
+    public Event generateEventDocumentingProposalEvaluation(Proposal p, IFace_Proposable ch, UserAuthorized u) throws BObStatusException, IntegrationException{
         Event ev = null;
         if(ch instanceof ChoiceEventCat){
             EventCategory ec = getInitiatlizedEventCategory(((ChoiceEventCat) ch).getEventCategory().getCategoryID());
@@ -679,7 +679,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             ev.setDescription(descBldr.toString());
             
         } else {
-            throw new CaseLifecycleException("Generating events for Choice "
+            throw new BObStatusException("Generating events for Choice "
                     + "objects that are not Event triggers is not yet supported. "
                     + "Thank you in advance for your patience.");
         }
@@ -687,7 +687,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public void generateAndInsertManualCasePhaseOverrideEvent(CECase currentCase, CasePhase pastPhase) 
-            throws IntegrationException, CaseLifecycleException, ViolationException{
+            throws IntegrationException, BObStatusException, ViolationException{
         
           EventIntegrator ei = getEventIntegrator();
           CaseCoordinator cc = getCaseCoordinator();
@@ -769,9 +769,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param rg
      * @param usr
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException if an IFaceEventRuleGoverned instances is neither a CECase or an OccPeriod
+     * @throws com.tcvcog.tcvce.domain.BObStatusException if an IFaceEventRuleGoverned instances is neither a CECase or an OccPeriod
      */
-    public void rules_attachEventRule(EventRuleAbstract era, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, CaseLifecycleException{
+    public void rules_attachEventRule(EventRuleAbstract era, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, BObStatusException{
         
         ChoiceCoordinator cc = getChoiceCoordinator();
         int freshObjectID = 0;
@@ -789,7 +789,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                     cc.implementDirective(era.getPromptingDirective(), cec, null);
                 }
             } else {
-                throw new CaseLifecycleException("Cannot attach rule set");
+                throw new BObStatusException("Cannot attach rule set");
             }
     }
     
@@ -901,9 +901,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param rg
      * @param usr
      * @throws IntegrationException
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      */
-    public void rules_attachRuleSet(EventRuleSet ers, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, CaseLifecycleException{
+    public void rules_attachRuleSet(EventRuleSet ers, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, BObStatusException{
         for(EventRuleAbstract era: ers.getRuleList()){
             if(rg instanceof OccPeriodDataHeavy){
                 OccPeriodDataHeavy op = (OccPeriodDataHeavy) rg;
@@ -912,7 +912,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 CECase cec = (CECase) rg;
                 rules_attachEventRuleAbstractToCECase(era, cec);
             } else {
-                throw new CaseLifecycleException("Cannot attach rule set");
+                throw new BObStatusException("Cannot attach rule set");
             }
         }
         
@@ -937,7 +937,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public boolean rules_evaluateEventRules(OccPeriodDataHeavy period) throws IntegrationException, CaseLifecycleException, ViolationException{
+    public boolean rules_evaluateEventRules(OccPeriodDataHeavy period) throws IntegrationException, BObStatusException, ViolationException{
         boolean allRulesPassed = true;
         List<EventRuleImplementation> rlst = period.assembleEventRuleList(ViewOptionsEventRulesEnum.VIEW_ALL);
         
@@ -951,11 +951,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
 
     
-    public boolean rules_evalulateEventRule(List<Event> eventList, EventRuleAbstract rule) throws IntegrationException, CaseLifecycleException, ViolationException {
+    public boolean rules_evalulateEventRule(List<Event> eventList, EventRuleAbstract rule) throws IntegrationException, BObStatusException, ViolationException {
         CaseCoordinator cc = getCaseCoordinator();
         
         if(eventList == null || rule == null){
-            throw new CaseLifecycleException("EventCoordinator.evaluateEventRule | Null event list or rule");
+            throw new BObStatusException("EventCoordinator.evaluateEventRule | Null event list or rule");
         }
         
         if (rule.getRequiredEventType() != null){
@@ -982,7 +982,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    private boolean rules_evalulateEventRule(CECase cse, EventCECase event) throws IntegrationException, CaseLifecycleException, ViolationException {
+    private boolean rules_evalulateEventRule(CECase cse, EventCECase event) throws IntegrationException, BObStatusException, ViolationException {
         EventRuleAbstract rule = new EventRuleAbstract();
         boolean rulePasses = false;
         CaseCoordinator cc = getCaseCoordinator();

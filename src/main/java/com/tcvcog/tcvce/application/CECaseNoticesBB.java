@@ -18,7 +18,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -109,7 +109,7 @@ public class CECaseNoticesBB
         
         try {
             caseCoord.novLockAndQueue(currentCase, nov, getSessionBean().getSessionUser());
-        } catch (CaseLifecycleException | IntegrationException ex) {
+        } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         } catch (EventException ex) {
@@ -140,7 +140,7 @@ public class CECaseNoticesBB
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID() + " has been nuked forever", ""));
-        } catch (CaseLifecycleException ex) {
+        } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -161,7 +161,7 @@ public class CECaseNoticesBB
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Marked notice as sent and added event to case",
                             ""));
-        } catch (CaseLifecycleException | IntegrationException ex) {
+        } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,ex.getMessage(),""));
         }catch (EventException ex) {
@@ -183,7 +183,7 @@ public class CECaseNoticesBB
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID()
                             + " has been marked as returned on today's date", ""));
-        } catch (IntegrationException | CaseLifecycleException ex) {
+        } catch (IntegrationException | BObStatusExceptionex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }

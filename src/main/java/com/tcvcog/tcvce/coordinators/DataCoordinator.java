@@ -6,7 +6,7 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
@@ -65,7 +65,7 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
     }
 
     
-    public Map<CaseStage, Integer> getCaseCountsByStage(List<CECase> caseList) throws IntegrationException, CaseLifecycleException {
+    public Map<CaseStage, Integer> getCaseCountsByStage(List<CECase> caseList) throws IntegrationException, BObStatusException {
         Map<CaseStage, Integer> stageCountMap = null;
         if(caseList != null && !caseList.isEmpty()){
 

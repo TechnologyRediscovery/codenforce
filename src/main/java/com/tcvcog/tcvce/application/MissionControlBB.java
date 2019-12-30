@@ -162,7 +162,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         MunicipalityDataHeavy muniComp;
         try {
-            muniComp = mi.getMuniListified(selectedMuni.getMuniCode());
+            muniComp = mi.getMunDataHeavy(selectedMuni.getMuniCode());
             getSessionBean().setSessionMuni(muniComp);
             getSessionBean().setSessionCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
         } catch (IntegrationException ex) {

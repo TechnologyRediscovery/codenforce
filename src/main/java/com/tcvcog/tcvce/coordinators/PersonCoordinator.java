@@ -90,7 +90,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         spp.setEmail_ctl(false);
         spp.setAddress_streetNum_ctl(false);
         
-        spp.setFilterByActiveSwitch(false);
+        spp.setVerified_ctl(false);
         spp.setVerified_val(false);
         
         
@@ -182,11 +182,13 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Logic container for choosing a default person if the SessionInitializer
      * does not have a session List to work from
-     * @param ua
+     * @param cred
      * @return the selected person proposed for becoming the sessionPerson
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public Person selectDefaultPerson(UserAuthorized ua){
-        return ua.getPerson();
+    public Person selectDefaultPerson(Credential cred) throws IntegrationException{
+        UserCoordinator uc = getUserCoordinator();
+        return uc.getUser(cred.getGoverningAuthPeriod().getUserID()).getPerson();
         
     }
 

@@ -22,13 +22,36 @@ package com.tcvcog.tcvce.entities.search;
  */
 public enum SearchParamsOccPeriodUserFields {
     
-    CREATED_USER,
-    MANAGER_USER,
-    TYPE_CERTIFYING_USER,
-    START_DATE_CERTIFYING_USER,
-    END_DATE_CERTIFYING_USER,
-    AUTHORIZIING_USER,
-    INSPECTOR_USER,
-    PASSEDINSPETION_AUTH_USER,
-    PERMIT_ISSUEDBY_USER;
+    CREATED_USER                ("Period creator", "createdby_userid"),
+    MANAGER_USER                ("Period manager", "manager_userid"),
+    TYPE_CERTIFYING_USER        ("Period certifier", "typecertifiedby_userid"),
+    START_DATE_CERTIFYING_USER  ("Period start date certifier", "startdatecertifiedby_userid"),
+    END_DATE_CERTIFYING_USER    ("Period end date certifier", "enddatecertifiedby_userid"),
+    AUTHORIZIING_USER           ("Period authorizer", "authorizedby_userid"),
+    INSPECTOR_USER              ("Inspector", "inspector_userid"),
+    PASSEDINSPETION_AUTH_USER   ("Inspection pass certifier", "passedinspection_userid"),
+    PERMIT_ISSUEDBY_USER        ("Permit issuer", "issuedby_userid");
+    
+    private final String title;
+    private final String dbField;
+    
+    private SearchParamsOccPeriodUserFields(String t, String db){
+        title = t;
+        dbField = db;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @return the dbField
+     */
+    public String getDbField() {
+        return dbField;
+    }
+    
 }

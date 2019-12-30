@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EventCECase;
@@ -405,10 +405,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @param params
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      */
     public List<Integer> searchForEvents(SearchParamsEvent params) 
-            throws IntegrationException, CaseLifecycleException {
+            throws IntegrationException, BObStatusException {
         List<Integer> evidlst = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1850,9 +1850,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @param eventid
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      */
-    public EventCECaseCasePropBundle getEventCasePropBundle(int eventid) throws IntegrationException, CaseLifecycleException{
+    public EventCECaseCasePropBundle getEventCasePropBundle(int eventid) throws IntegrationException, BObStatusException{
         EventCECaseCasePropBundle evCPBundle = null;
         CaseIntegrator ci = getCaseIntegrator();
 

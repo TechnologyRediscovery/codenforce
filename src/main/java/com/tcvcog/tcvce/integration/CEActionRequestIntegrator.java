@@ -17,7 +17,7 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
@@ -287,17 +287,17 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     }
 
     public void connectActionRequestToCECase(int actionRequestID, int cecaseID, int userid)
-            throws CaseLifecycleException, IntegrationException {
+            throws BObStatusException, IntegrationException {
         CECase cecase = null;
 
         CaseIntegrator ci = getCaseIntegrator();
         try {
             cecase = ci.getCECase(cecaseID);
         } catch (IntegrationException ex) {
-            throw new CaseLifecycleException("Cannot find a CECase to which the action request can be connected");
+            throw new BObStatusException("Cannot find a CECase to which the action request can be connected");
         }
         if (cecase == null) {
-            throw new CaseLifecycleException("Case returned has ID of zero");
+            throw new BObStatusException("Case returned has ID of zero");
         }
 
         String q = "UPDATE ceactionrequest SET cecase_caseid =?, "

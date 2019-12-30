@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -59,9 +59,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param propWL
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      */
-    public PropertyDataHeavy configurePropertyWithLists(PropertyDataHeavy propWL) throws IntegrationException, CaseLifecycleException{
+    public PropertyDataHeavy configurePropertyWithLists(PropertyDataHeavy propWL) throws IntegrationException, BObStatusException{
         
         PropertyIntegrator pi = getPropertyIntegrator();
         
@@ -109,11 +109,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param prop
      * @param cred
      * @return PropertyWithLists object
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      * @throws com.tcvcog.tcvce.domain.EventException 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      */
-    public PropertyDataHeavy getPropertyDataHeavy(Property prop, Credential cred) throws CaseLifecycleException, EventException, AuthorizationException{
+    public PropertyDataHeavy getPropertyDataHeavy(Property prop, Credential cred) throws BObStatusException, EventException, AuthorizationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyDataHeavy propWithLists = null;
         try{
@@ -132,11 +132,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param cred
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecycleException
+     * @throws BObStatusException
      * @throws AuthorizationException
      * @throws EventException 
      */
-    public PropertyDataHeavy getPropertyDataHeavy(int propID, Credential cred) throws IntegrationException, CaseLifecycleException, AuthorizationException, EventException{
+    public PropertyDataHeavy getPropertyDataHeavy(int propID, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException{
         return getPropertyDataHeavy(getProperty(propID), cred);
     }
     
@@ -150,11 +150,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param cred
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecycleException
+     * @throws BObStatusException
      * @throws AuthorizationException
      * @throws EventException 
      */
-    public PropertyDataHeavy getPropertyDataHeavyByUnit(int propUnitID, Credential cred) throws IntegrationException, CaseLifecycleException, AuthorizationException, EventException{
+    public PropertyDataHeavy getPropertyDataHeavyByUnit(int propUnitID, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException{
         PropertyIntegrator pi = getPropertyIntegrator();
         return getPropertyDataHeavy(pi.getPropertyUnitWithProp(propUnitID).getProperty(), cred);
     }
@@ -191,7 +191,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * 
      * ecd DEC-19
      * 
-     * @param ua
+     * @param cred
      * @return 
      */
     public PropertyDataHeavy selectDefaultProperty(Credential cred){
@@ -210,7 +210,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                     } else {
                         return pi.getPropertyDataHeavy(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("arbitraryPlaceholderPropertyID")));
                     }
-            } catch (IntegrationException | AuthorizationException | CaseLifecycleException | EventException ex) {
+            } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
                 System.out.println(ex);
             }
         }
@@ -262,19 +262,21 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     public PropertyCoordinator() {
     }
     
-    public Property getNewProperty(){
+    public Property initProperty(Municipality muni){
         Property prop = new Property();
+        prop.setMuni(muni);
         return prop;
     }
     
     /**
      * This method generates a skeleton PropertyUnit with logical, preset defaults, including
      * empty lists.
+     * @param p
      * @return 
      */
-    public PropertyUnit getNewPropertyUnit(){
+    public PropertyUnit initPropertyUnit(Property p){
         PropertyUnit propUnit = new PropertyUnit();
-        
+        propUnit.setPropertyID(p.getPropertyID());
         propUnit.setUnitNumber(Constants.DEFAULT_UNIT_NUMBER);
 //        propUnit.setRental(DEFAULTRENTAL);
 //        propUnit.setPropertyUnitPersonList(new ArrayList<Person>());

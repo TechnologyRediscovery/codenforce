@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EventCECase;
@@ -110,7 +110,7 @@ public class CECaseViolationsBB
     }
     
     
-    public void updateViolationsCodeBookLink(ActionEvent ae) throws CaseLifecycleException {
+    public void updateViolationsCodeBookLink(ActionEvent ae) throws BObStatusException {
         CaseIntegrator casei = getCaseIntegrator();
         try {
             ViolationIntegrator cvi = getCodeViolationIntegrator();

@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -91,7 +92,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
     }
     
-    public MunicipalityDataHeavy getMuniListified(int muniCode) throws IntegrationException, AuthorizationException{
+    public MunicipalityDataHeavy getMunDataHeavy(int muniCode) throws IntegrationException, AuthorizationException{
         PreparedStatement stmt = null;
         MunicipalityDataHeavy muniComplete = null;
         Connection con = null;
@@ -140,53 +141,57 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     private MunicipalityDataHeavy generateMuniDataHeavy(ResultSet rs) throws SQLException, IntegrationException, AuthorizationException{
+        MunicipalityCoordinator mc = getMuniCoordinator();
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         UserIntegrator ui = getUserIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
         UserCoordinator uc = getUserCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
-        MunicipalityDataHeavy muni = new MunicipalityDataHeavy(generateMuni(rs));
+        MunicipalityDataHeavy mdh = new MunicipalityDataHeavy(generateMuni(rs));
         
-        muni.setAddress_street(rs.getString("address_street"));
-        muni.setAddress_city(rs.getString("address_city"));
-        muni.setAddress_state(rs.getString("address_state"));
+        mdh.setAddress_street(rs.getString("address_street"));
+        mdh.setAddress_city(rs.getString("address_city"));
+        mdh.setAddress_state(rs.getString("address_state"));
         
-        muni.setAddress_zip(rs.getString("address_zip"));
-        muni.setPhone(rs.getString("phone"));
-        muni.setFax(rs.getString("fax"));
-        muni.setEmail(rs.getString("email"));
-        muni.setPopulation(rs.getInt("population"));
-        muni.setActiveInProgram(rs.getBoolean("activeinprogram"));             
+        mdh.setAddress_zip(rs.getString("address_zip"));
+        mdh.setPhone(rs.getString("phone"));
+        mdh.setFax(rs.getString("fax"));
+        mdh.setEmail(rs.getString("email"));
+        mdh.setPopulation(rs.getInt("population"));
+        mdh.setActiveInProgram(rs.getBoolean("activeinprogram"));             
         
-        muni.setCodeSet(ci.getCodeSetBySetID(rs.getInt("defaultcodeset")));
-        muni.setIssuingCodeSource(ci.getCodeSource(rs.getInt("occpermitissuingsource_sourceid")));
-        muni.setDefaultNOVStyleID(rs.getInt("novprintstyle_styleid"));
+        mdh.setCodeSet(ci.getCodeSetBySetID(rs.getInt("defaultcodeset")));
+        mdh.setIssuingCodeSource(ci.getCodeSource(rs.getInt("occpermitissuingsource_sourceid")));
+        mdh.setDefaultNOVStyleID(rs.getInt("novprintstyle_styleid"));
         
-        muni.setProfile(getMuniProfile(rs.getInt("profile_profileid")));
-        muni.setEnableCodeEnforcement(rs.getBoolean("enablecodeenforcement"));
-        muni.setEnableOccupancy(rs.getBoolean("enableoccupancy"));
-        muni.setEnablePublicCEActionRequestSubmissions(rs.getBoolean("enablepublicceactionreqsub"));
+        mdh.setProfile(getMuniProfile(rs.getInt("profile_profileid")));
+        mdh.setEnableCodeEnforcement(rs.getBoolean("enablecodeenforcement"));
+        mdh.setEnableOccupancy(rs.getBoolean("enableoccupancy"));
+        mdh.setEnablePublicCEActionRequestSubmissions(rs.getBoolean("enablepublicceactionreqsub"));
         
-        muni.setEnablePublicCEActionRequestInfo(rs.getBoolean("enablepublicceactionreqinfo"));
-        muni.setEnablePublicOccPermitApp(rs.getBoolean("enablepublicoccpermitapp"));
-        muni.setEnablePublicOccInspectionTODOs(rs.getBoolean("enablepublicoccinspectodo"));
+        mdh.setEnablePublicCEActionRequestInfo(rs.getBoolean("enablepublicceactionreqinfo"));
+        mdh.setEnablePublicOccPermitApp(rs.getBoolean("enablepublicoccpermitapp"));
+        mdh.setEnablePublicOccInspectionTODOs(rs.getBoolean("enablepublicoccinspectodo"));
 
-        muni.setMuniManager(ui.getUser(rs.getInt("munimanager_userid")));
-        muni.setMuniOfficePropertyId(rs.getInt("office_propertyid"));
-        muni.setNotes(rs.getString("notes"));
+        mdh.setMuniManager(ui.getUser(rs.getInt("munimanager_userid")));
+        mdh.setMuniOfficePropertyId(rs.getInt("office_propertyid"));
+        
+        
+        mdh.setNotes(rs.getString("notes"));
         
         if(rs.getTimestamp("lastupdatedts") != null){
-            muni.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+            mdh.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
         }
         
-        muni.setLastUpdaetdBy(ui.getUser(rs.getInt("lastupdated_userid")));
-        muni.setPrimaryStaffContact(ui.getUser(rs.getInt("primarystaffcontact_userid")));
+        mdh.setLastUpdaetdBy(ui.getUser(rs.getInt("lastupdated_userid")));
+        mdh.setPrimaryStaffContact(ui.getUser(rs.getInt("primarystaffcontact_userid")));
         
         // FIX THIS WHEN WE HAVE STABLE AUTHORIZATION PROCEDURES
 //        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedListForConfig(muni)));
-        muni.setCourtEntities(cei.getCourtEntityList(muni.getMuniCode()));
+        mdh.setCourtEntities(cei.getCourtEntityList(mdh.getMuniCode()));
         
-        return muni;
+        return mc.configureMuniDataHeavy(mdh);
     }
     
     private MuniProfile getMuniProfile(int profileID) throws IntegrationException{

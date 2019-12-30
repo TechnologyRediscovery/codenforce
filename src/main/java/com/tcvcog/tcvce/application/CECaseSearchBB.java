@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.User;
@@ -88,7 +88,7 @@ public class CECaseSearchBB
         if(!selectedCECaseQuery.isExecutedByIntegrator()){
             try {
                 sc.runQuery(getSelectedCECaseQuery());
-            } catch (IntegrationException | CaseLifecycleException ex) {
+            } catch (IntegrationException | BObStatusExceptionex) {
                 System.out.println(ex);
             }
         }
@@ -154,7 +154,7 @@ public class CECaseSearchBB
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
-        } catch (CaseLifecycleException ex) {
+        } catch (BObStatusException ex) {
             System.out.println(ex);
         }
     }

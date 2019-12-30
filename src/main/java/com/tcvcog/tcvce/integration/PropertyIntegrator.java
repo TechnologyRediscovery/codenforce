@@ -18,7 +18,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -148,7 +148,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             if(p.getUnitList() != null && p.getUnitList().isEmpty()){
                 System.out.println("PropertyIntegrator.generateProperty | inserting new unit");
-                PropertyUnit pu = pc.getNewPropertyUnit();
+                PropertyUnit pu = pc.initPropertyUnit();
                 pu.setPropertyID(p.getPropertyID());
                 insertPropertyUnit(pu);
             }
@@ -893,11 +893,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @param u
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecycleException
+     * @throws BObStatusException
      * @throws EventException
      * @throws AuthorizationException 
      */
-    public PropertyDataHeavy getPropertyDataHeavy(int propertyID) throws IntegrationException, CaseLifecycleException, EventException, AuthorizationException {
+    public PropertyDataHeavy getPropertyDataHeavy(int propertyID) throws IntegrationException, BObStatusException, EventException, AuthorizationException {
             PropertyCoordinator pc = getPropertyCoordinator();
             CaseIntegrator ci = getCaseIntegrator();
             PersonIntegrator pi = getPersonIntegrator();
@@ -1153,7 +1153,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws IntegrationException
      * @throws EventException
      */
-    public List<PropertyUnitDataHeavy> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList) throws IntegrationException, EventException, EventException, AuthorizationException, CaseLifecycleException{
+    public List<PropertyUnitDataHeavy> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList) throws IntegrationException, EventException, EventException, AuthorizationException, BObStatusException{
         List<PropertyUnitDataHeavy> puwll = new ArrayList<>();
         Iterator<PropertyUnit> iter = propUnitList.iterator();
         while(iter.hasNext()){
@@ -1177,7 +1177,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws com.tcvcog.tcvce.domain.EventException 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      */
-    public PropertyUnitDataHeavy getPropertyUnitWithList(PropertyUnit pu) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException{
+    public PropertyUnitDataHeavy getPropertyUnitWithList(PropertyUnit pu) throws IntegrationException, EventException, AuthorizationException, BObStatusException{
         PropertyUnitDataHeavy puwl = null;
         try {
             puwl = getPropertyUnitWithLists(pu.getUnitID());
@@ -1187,7 +1187,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return puwl;
     }
     
-    public PropertyUnitDataHeavy getPropertyUnitWithLists(int unitID) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException{
+    public PropertyUnitDataHeavy getPropertyUnitWithLists(int unitID) throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyUnitDataHeavy puwl = new PropertyUnitDataHeavy(getPropertyUnit(unitID));
         puwl.setPeriodList(oi.getOccPeriodList(unitID));

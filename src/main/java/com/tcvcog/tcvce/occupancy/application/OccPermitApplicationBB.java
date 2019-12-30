@@ -9,7 +9,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -167,7 +167,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     } // end postConstruct
     
     
-    public String beginInternalOccApp(PropertyUnit pu) throws IntegrationException, CaseLifecycleException{
+    public String beginInternalOccApp(PropertyUnit pu) throws IntegrationException, BObStatusException{
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         
@@ -247,13 +247,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //        if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
 //            try {
 //                propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
-//            } catch (CaseLifecycleException ex) {
+//            } catch (BObStatusException ex) {
 //                System.out.println(ex);
 //            }
 //        } else {
 //            try {
 //                propWithLists = pc.getPropertyDataHeavy(selectedProperty);
-//            } catch (CaseLifecycleException ex) {
+//            } catch (BObStatusException ex) {
 //                System.out.println(ex);
 //            }
 //        }
@@ -273,7 +273,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void addUnitToNewPropUnits() {
         PropertyCoordinator pc = getPropertyCoordinator();
-        unitToAdd = pc.getNewPropertyUnit();
+        unitToAdd = pc.initPropertyUnit();
         unitToAdd.setUnitNumber("");
 //        unitToAdd.setRental(false);
         unitToAdd.setNotes("");
@@ -321,13 +321,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //            if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
 //                try {
 //                    propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
-//                } catch (CaseLifecycleException ex) {
+//                } catch (BObStatusException ex) {
 //                    System.out.println(ex);
 //                }
 //            } else {
 //                try {
 //                    propWithLists = pc.getPropertyDataHeavy(selectedProperty);
-//                } catch (CaseLifecycleException ex) {
+//                } catch (BObStatusException ex) {
 //                    System.out.println(ex);
 //                }
 //            }
@@ -781,7 +781,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         try {
             existingProp = pri.getPropertyDataHeavy(prop.getPropertyID());
                     
-        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
+        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
             System.out.println(ex);
         }
         

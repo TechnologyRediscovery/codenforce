@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseBase;
@@ -70,10 +70,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param p
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      */
     public ArrayList getCECasesByProp(Property p) 
-            throws IntegrationException, CaseLifecycleException{
+            throws IntegrationException, BObStatusException{
         ArrayList<CECase> caseList = new ArrayList();
         String query = "SELECT \n" +
             "  caseid\n" +
@@ -119,9 +119,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param params
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      */
-    public List<Integer> searchForCECases(SearchParamsCECase params) throws IntegrationException, CaseLifecycleException{
+    public List<Integer> searchForCECases(SearchParamsCECase params) throws IntegrationException, BObStatusException{
         List<Integer> cseidlst = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -286,7 +286,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public CECaseBase getCECaseBase(int ceCaseID) throws IntegrationException, CaseLifecycleException{
+    public CECaseBase getCECaseBase(int ceCaseID) throws IntegrationException, BObStatusException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
             "            login_userid, casename, casephase, originationdate, closingdate, \n" +
             "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
@@ -328,9 +328,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param ceCaseID
      * @return
      * @throws IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public CECase getCECase(int ceCaseID) throws IntegrationException, CaseLifecycleException{
+    public CECase getCECase(int ceCaseID) throws IntegrationException, BObStatusException{
         if(ceCaseID == 0){
             throw new IntegrationException("Cannot get a case with ID 0");
         } else {
@@ -468,9 +468,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
       * @param pacc
       * @return
       * @throws IntegrationException
-      * @throws CaseLifecycleException 
+      * @throws BObStatusException 
       */
-    public List<CECase> getCECasesByPACC(int pacc) throws IntegrationException, CaseLifecycleException{
+    public List<CECase> getCECasesByPACC(int pacc) throws IntegrationException, BObStatusException{
         
         ArrayList<CECase> caseList = new ArrayList();
         String query = "SELECT caseid FROM public.cecase WHERE cecasepubliccc = ?;";
@@ -512,9 +512,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param ceCase
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      */
-    public CECase insertNewCECase(CECase ceCase) throws IntegrationException, CaseLifecycleException{
+    public CECase insertNewCECase(CECase ceCase) throws IntegrationException, BObStatusException{
         
         String query = "INSERT INTO public.cecase(\n" +
                         "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
@@ -664,7 +664,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     public List<Integer> getCECaseHistoryList(int userID) 
-            throws IntegrationException, CaseLifecycleException{
+            throws IntegrationException, BObStatusException{
         List<Integer> cseidl = new ArrayList<>();
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
