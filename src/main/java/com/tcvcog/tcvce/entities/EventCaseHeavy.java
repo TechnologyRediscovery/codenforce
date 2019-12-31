@@ -17,18 +17,18 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- * A data-rich subclass of Event to hold a CECase
- * when we want to display the event outside of its CECase context
- * but still want to know where it came from
+ * A data-rich subclass of EventCnF to hold a CECase
+ when we want to display the event outside of its CECase context
+ but still want to know where it came from
  * 
  * @author Ellen Bascomb
  */
-public  class   EventCECaseHeavy 
-        extends Event{
+public  class   EventCaseHeavy 
+        extends EventCnF{
     
     protected CECaseBase ceCase;
     
-    public EventCECaseHeavy(Event ev){
+    public EventCaseHeavy(EventCnF ev){
         this.eventID = ev.getEventID();
         this.category = ev.getCategory();
         

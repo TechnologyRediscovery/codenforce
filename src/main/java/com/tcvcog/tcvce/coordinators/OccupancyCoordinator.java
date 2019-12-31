@@ -28,7 +28,7 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
@@ -54,7 +54,6 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
-import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
@@ -804,7 +803,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
         
-        EventOccPeriod propEvent = null;
+        EventCnF propEvent = null;
         
         int insertedEventID = 0;
         
@@ -814,8 +813,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             proposal.setResponseTS(LocalDateTime.now());
             proposal.setChosenChoice(chosen);
 
-            // ask the EventCoord for a nicely formed Event, which we cast to EventOccPeriod
-            propEvent = new EventOccPeriod(ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u));
+            // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
+            propEvent = ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u);
             // insert the event and grab the new ID
             insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
             // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
@@ -826,16 +825,16 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
     }
 
-    public int attachNewEventToOccPeriod(OccPeriod period, Event ev, User u) throws IntegrationException {
+    public int attachNewEventToOccPeriod(OccPeriod period, EventCnF ev, User u) throws IntegrationException {
         EventIntegrator ei = getEventIntegrator();
         
-        EventOccPeriod oe = new EventOccPeriod(ev);
+        EventCnF oe = new EventCnF();
         oe.setOccPeriodID(period.getPeriodID());
         int insertedEventID = ei.insertEvent(oe);
         return insertedEventID;
     }
 
-    public void editOccEvent(EventOccPeriod ev) throws IntegrationException {
+    public void editOccEvent(EventCnF ev) throws IntegrationException {
         EventIntegrator ei = getEventIntegrator();
         ei.updateEvent(ev);
     }

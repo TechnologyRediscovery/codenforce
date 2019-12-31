@@ -27,7 +27,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EventCECase;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -73,10 +73,10 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
        EventCoordinator eventCoordinator = getEventCoordinator();     
        SystemCoordinator sc = getSystemCoordinator();
        
-       EventCategory ec = eventCoordinator.getInitiatlizedEventCategory(
+       EventCategory ec = eventCoordinator.initEventCategory(
                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
        
-       EventCECase event = eventCoordinator.getInitializedEvent(getCurrentCase(), ec);
+       EventCnF event = eventCoordinator.getInitializedEvent(getCurrentCase(), ec);
         
         // load up edit event data
         event.setNotes(formEventNotes);

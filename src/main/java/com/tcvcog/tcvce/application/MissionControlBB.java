@@ -19,7 +19,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
+import com.tcvcog.tcvce.entities.EventCnFCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -76,8 +76,8 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     private DashboardModel mainDash;
     
-    private List<EventCECaseCasePropBundle> timelineEventList;
-    private List<EventCECaseCasePropBundle> filteredEventWithCasePropList;
+    private List<EventCnFCasePropBundle> timelineEventList;
+    private List<EventCnFCasePropBundle> filteredEventWithCasePropList;
     private int timelineEventViewDateRange;
     
     private List<ProposalCECase> ceProposalList;
@@ -245,11 +245,11 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the timelineEventList
      */
-    public List<EventCECaseCasePropBundle> getTimelineEventList() {
+    public List<EventCnFCasePropBundle> getTimelineEventList() {
         EventIntegrator ei = getEventIntegrator();
         try {
             timelineEventList = 
-                    (ArrayList<EventCECaseCasePropBundle>) ei.getUpcomingTimelineEvents(getSessionBean().getSessionMuni(), 
+                    (ArrayList<EventCnFCasePropBundle>) ei.getUpcomingTimelineEvents(getSessionBean().getSessionMuni(), 
                             LocalDateTime.now(), LocalDateTime.now().plusDays(365));
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -260,21 +260,21 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     /**
      * @param timelineEventList the timelineEventList to set
      */
-    public void setTimelineEventList(ArrayList<EventCECaseCasePropBundle> timelineEventList) {
+    public void setTimelineEventList(ArrayList<EventCnFCasePropBundle> timelineEventList) {
         this.timelineEventList = timelineEventList;
     }
 
     /**
      * @return the filteredEventWithCasePropList
      */
-    public List<EventCECaseCasePropBundle> getFilteredEventWithCasePropList() {
+    public List<EventCnFCasePropBundle> getFilteredEventWithCasePropList() {
         return filteredEventWithCasePropList;
     }
 
     /**
      * @param filteredEventWithCasePropList the filteredEventWithCasePropList to set
      */
-    public void setFilteredEventWithCasePropList(ArrayList<EventCECaseCasePropBundle> filteredEventWithCasePropList) {
+    public void setFilteredEventWithCasePropList(ArrayList<EventCnFCasePropBundle> filteredEventWithCasePropList) {
         this.filteredEventWithCasePropList = filteredEventWithCasePropList;
     }
 

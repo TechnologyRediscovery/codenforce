@@ -14,10 +14,10 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseBase;
-import com.tcvcog.tcvce.entities.EventCECase;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
+import com.tcvcog.tcvce.entities.EventCnFCasePropBundle;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -60,9 +60,9 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     private List<QueryEvent> queryList;
     private Query selectedBOBQuery;
     
-    private List<EventCECaseCasePropBundle> eventList;
+    private List<EventCnFCasePropBundle> eventList;
    
-    private List<EventCECaseCasePropBundle> filteredEventList;
+    private List<EventCnFCasePropBundle> filteredEventList;
     
     private ReportConfigCEEventList reportConfig;
     
@@ -79,8 +79,8 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         
         
-        queryList = sc.buildQueryEventCECaseList(getSessionBean().getSessionMuni(),getSessionBean().getSessionUser());
-        selectedBOBQuery = sc.getQueryInitialEventCECASE(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser());
+        queryList = sc.buildQueryEventCnFList(getSessionBean().getSessionMuni(),getSessionBean().getSessionUser());
+        selectedBOBQuery = sc.getQueryInitialEventCnF(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser());
         if(!selectedBOBQuery.isExecutedByIntegrator()){
             try {
                 sc.runQuery((QueryEvent) selectedBOBQuery);
@@ -109,7 +109,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
 //        }
     }
     
-    public void hideEvent(EventCECaseCasePropBundle ev){
+    public void hideEvent(EventCnFCasePropBundle ev){
         EventIntegrator ei = getEventIntegrator();
         try {
             ei.updateEvent(ev.getEvent());
@@ -184,7 +184,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         
     }
     
-    public String editEventInCaseManager(EventCECaseCasePropBundle ev){
+    public String editEventInCaseManager(EventCnFCasePropBundle ev){
         CaseIntegrator ci = getCaseIntegrator();
         CECaseBase caseNoLists = ev.getEventCaseBare();
 //        try {
@@ -302,7 +302,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the eventList
      */
-    public List<EventCECaseCasePropBundle> getEventList() {
+    public List<EventCnFCasePropBundle> getEventList() {
         
         return eventList;
     }
@@ -310,7 +310,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredEventList
      */
-    public List<EventCECaseCasePropBundle> getFilteredEventList() {
+    public List<EventCnFCasePropBundle> getFilteredEventList() {
         return filteredEventList;
     }
 
@@ -338,14 +338,14 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<EventCECaseCasePropBundle> eventList) {
+    public void setEventList(List<EventCnFCasePropBundle> eventList) {
         this.eventList = eventList;
     }
 
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(List<EventCECaseCasePropBundle> filteredEventList) {
+    public void setFilteredEventList(List<EventCnFCasePropBundle> filteredEventList) {
         this.filteredEventList = filteredEventList;
     }
 

@@ -18,7 +18,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
  * @author sylvia
  */
 public class    CECaseBase 
-        extends BOb 
+        extends CECasePublic
         implements Serializable, 
                     IFace_Openable,
                     Cloneable{

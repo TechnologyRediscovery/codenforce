@@ -6,22 +6,22 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.EntityUtils;
-import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventCnF;
 import java.io.Serializable;
 
 /**
  * Subclass used during first pass through with duplicate event infrastructure 
  * for both CEEvents and OccEvents. Replaced with the EventDomain enum flag on 
- * Event which signals which ID should be read.
+ EventCnF which signals which ID should be read.
  * @deprecated 
  * @author sylvia
  */
 public  class       EventOccPeriod 
-        extends     Event 
+        extends     EventCnF 
         implements  Serializable {
     private int occPeriodID;
     
-    public EventOccPeriod(Event ev){
+    public EventOccPeriod(EventCnF ev){
         this.eventID = ev.getEventID();
         this.category = ev.getCategory();
 

@@ -34,8 +34,8 @@ public class Proposal  implements Serializable, Comparable<Proposal> {
     protected boolean hidden;
     
     protected int generatingEventID;
-    protected Event generatingEvent;
-    protected Event responseEvent;
+    protected EventCnF generatingEvent;
+    protected EventCnF responseEvent;
 
     protected String notes;
     protected boolean proposalRejected;
@@ -255,14 +255,14 @@ public class Proposal  implements Serializable, Comparable<Proposal> {
     /**
      * @return the generatingEvent
      */
-    public Event getGeneratingEvent() {
+    public EventCnF getGeneratingEvent() {
         return generatingEvent;
     }
 
     /**
      * @return the responseEvent
      */
-    public Event getResponseEvent() {
+    public EventCnF getResponseEvent() {
         return responseEvent;
     }
 
@@ -276,14 +276,14 @@ public class Proposal  implements Serializable, Comparable<Proposal> {
     /**
      * @param generatingEvent the generatingEvent to set
      */
-    public void setGeneratingEvent(Event generatingEvent) {
+    public void setGeneratingEvent(EventCnF generatingEvent) {
         this.generatingEvent = generatingEvent;
     }
 
     /**
      * @param responseEvent the responseEvent to set
      */
-    public void setResponseEvent(Event responseEvent) {
+    public void setResponseEvent(EventCnF responseEvent) {
         this.responseEvent = responseEvent;
     }
 

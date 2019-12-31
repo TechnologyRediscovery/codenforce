@@ -24,7 +24,7 @@ public class EventRuleCECase extends EventRuleImplementation{
     
     private int ceCaseID;
     
-    private Event passedRuleEvent;
+    private EventCnF passedRuleEvent;
     
     public EventRuleCECase(EventRuleImplementation imp){
         super(imp);
@@ -45,7 +45,7 @@ public class EventRuleCECase extends EventRuleImplementation{
     /**
      * @return the passedRuleEvent
      */
-    public Event getPassedRuleEvent() {
+    public EventCnF getPassedRuleEvent() {
         return passedRuleEvent;
     }
 
@@ -59,7 +59,7 @@ public class EventRuleCECase extends EventRuleImplementation{
     /**
      * @param passedRuleEvent the passedRuleEvent to set
      */
-    public void setPassedRuleEvent(Event passedRuleEvent) {
+    public void setPassedRuleEvent(EventCnF passedRuleEvent) {
         this.passedRuleEvent = passedRuleEvent;
     }
     

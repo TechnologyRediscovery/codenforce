@@ -24,7 +24,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Directive;
-import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
@@ -199,12 +199,12 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Takes in a Directive object and an OccPeriod or CECase and 
      * implements that directive by assigning it via a Proposal given sensible initial values
-     * @param dir Extracted from the Event to be implemented
+     * @param dir Extracted from the EventCnF to be implemented
      * @param propDriven which in beta v.0.9 are CECase and OccPeriod objects
      * @param ev 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public void implementDirective(Directive dir, IFace_ProposalDriven propDriven, Event ev) throws IntegrationException{
+    public void implementDirective(Directive dir, IFace_ProposalDriven propDriven, EventCnF ev) throws IntegrationException{
         ChoiceIntegrator ci = getChoiceIntegrator();
         Proposal pr = new Proposal();
         pr.setDirective(dir);

@@ -26,15 +26,15 @@ public enum SubSysEnum {
                         "N", 
                         "User", 
                         "User authorization and credentialization", 
-                        false, 
-                        false,
-                        true),
+                        false, // is BOb?
+                        false, // is searchable?
+                        true), // should be initialized? (i.e. in active service)
     
     I_MUNICIPALITY(     1, 
                         "I", 
                         "Municipality", 
                         "Municipalities and their default configurations", 
-                        false, 
+                        true, 
                         false,
                         true),
     
@@ -42,7 +42,7 @@ public enum SubSysEnum {
                         "II", 
                         "CodeBook", 
                         "Municipal code book from any source", 
-                        false, 
+                        true, 
                         false,
                         true),
     
@@ -50,7 +50,7 @@ public enum SubSysEnum {
                         "III", 
                         "Property", 
                         "Properties and their property units", 
-                        false, 
+                        true, 
                         false,
                         true),
     
@@ -58,40 +58,40 @@ public enum SubSysEnum {
                         "IV", 
                         "Person", 
                         "Persons", 
-                        false, 
-                        false,
+                        true, 
+                        true,
                         true),
     
     V_EVENT(            5, 
                         "V", 
                         "Event", 
                         "Events pertaining to code enforcment cases and occupancy periods", 
-                        false, 
-                        false,
+                        true, 
+                        true,
                         true),
     
     VI_OCCPERIOD(       6, 
                         "Occ Period", 
                         "Occupancy Period, inspections, and permits", 
                         "User authorization and credentialization", 
-                        false, 
-                        false,
+                        true, 
+                        true,
                         true),
     
     VII_CECASE(         7, 
                         "VII", 
                         "Code Enf Case", 
                         "Code enforcement cases, their violations, notices, and citations", 
-                        false, 
-                        false,
+                        true, 
+                        true,
                         true),
     
     VIII_CEACTIONREQ(   8, 
                         "VIII", 
                         "Code Enf Action Request", 
                         "Requests for code enforcement investigation", 
-                        false, 
-                        false,
+                        true, 
+                        true,
                         true),
     
     VIV_OCCAPP(         9, 
@@ -139,7 +139,7 @@ public enum SubSysEnum {
     private final String subSysID_Roman;
     private final String title;
     private final String description;
-    private final boolean bobHolder;
+    private final boolean bob;
     private final boolean bobSearchable;
     private final boolean initialize;
     
@@ -155,7 +155,7 @@ public enum SubSysEnum {
         subSysID_Roman = rn;
         title = t;
         description = des;
-        bobHolder = bh;
+        bob = bh;
         bobSearchable = bs;
         initialize = in;
 
@@ -184,10 +184,10 @@ public enum SubSysEnum {
     }
 
     /**
-     * @return the bobHolder
+     * @return the bob
      */
-    public boolean isBobHolder() {
-        return bobHolder;
+    public boolean isBob() {
+        return bob;
     }
 
     /**

@@ -15,7 +15,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECaseBase;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -145,7 +145,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
      
     /**
-     * Single point of entry for queries against the Event tables
+     * Single point of entry for queries against the EventCnF tables
      * @param q
      * @return
      * @throws SearchException 
@@ -159,7 +159,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         prepareQueryForRun(q);
 
         List<SearchParamsEvent> paramsList = q.getParmsList();
-        List<Event> evTempList = new ArrayList<>();
+        List<EventCnF> evTempList = new ArrayList<>();
         
         for(SearchParamsEvent sp: paramsList){
             evTempList.clear();
@@ -450,7 +450,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          
          switch(qName){
             case OPENCECASES_OCCPERIODSINPROCESS:
-                paramsList.add(generateParams_property_active());
+                paramsList.add(genParam_property_active());
                 break;
             case CUSTOM:
                 break;
@@ -765,34 +765,58 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //    --------------------------------------------------------------------------
     
     
+    /* --------------------------------------------
+                     III. Property
+       -------------------------------------------- */
     
-    private SearchParamsOccPeriod generateParams_occPeriod_wip(){
-        SearchParamsOccPeriod params = new SearchParamsOccPeriod();
+     
+    private SearchParamsProperty genParam_property_active(){
+        SearchParamsProperty params = new SearchParamsProperty();
         
-        params.setSearchName("Periods with outstanding inspections");
-        params.setSearchDescription("Inspections have been started by not certified as passed");
+        params.setSearchName("Properties updated in the past month");
+        params.setSearchDescription("Applies to properties with any field updated");
         
-        params.setInspectionPassed_filterBy(true);
-        params.setInspectionPassed_switch_passedInspection(false);
+        params.setMuni_ctl(true);
         
+        params.setDate_startEnd_ctl(true);
+        params.setDate_relativeDates_ctl(true);
+        params.setDateField(SearchParamsPropertyDateFields.LAST_UPDATED);
+        params.setDate_relativeDates_start_val(-30);
+        params.setDate_realtiveDates_end_val(0);
+        
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+
         return params;
         
     }
+
+
+
     
-    private SearchParamsOccPeriod generateParams_occPeriod(){
-        MunicipalityCoordinator mc = getMuniCoordinator();
-        SearchParamsOccPeriod params = new SearchParamsOccPeriod();
+    protected SearchParamsProperty getSearchParamsSkeletonProperties(){
+        SearchParamsProperty propParams = new SearchParamsProperty();
+        // superclass
+        propParams.setDate_startEnd_ctl(false);
+        propParams.setBobID_ctl(false);
+        propParams.setLimitResultCount_ctl(true);
         
-        params.setSearchName("All periods in credentialed muni");
-        params.setSearchDescription("All periods regardless of status");
+        // subclass SearchParamsProperty
+        propParams.setFilterByLotAndBlock(false);
+        propParams.setFilterByParcelID(false);
+        propParams.setFilterByAddressPart(true);
+
         
-        params.setInspectionPassed_filterBy(false);
-        params.setInspectionPassed_switch_passedInspection(false);
-        
-        return params;
-        
+        return propParams;
     }
     
+    // END V PROPERTY
+    
+    
+    /* --------------------------------------------
+                    IV. Person
+       -------------------------------------------- */
    
     
     private SearchParamsPerson generateParams_persons_active(){
@@ -823,32 +847,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return params;
     }
    
+    // END IV PERSON
     
-  
-     
-    private SearchParamsProperty generateParams_property_active(){
-        SearchParamsProperty params = new SearchParamsProperty();
-        
-        params.setSearchName("Properties updated in the past month");
-        params.setSearchDescription("Applies to properties with any field updated");
-        
-        params.setMuni_ctl(true);
-        
-        params.setDate_startEnd_ctl(true);
-        params.setDate_relativeDates_ctl(true);
-        params.setDateField(SearchParamsPropertyDateFields.LAST_UPDATED);
-        params.setDate_relativeDates_start_val(-30);
-        params.setDate_realtiveDates_end_val(0);
-        
-        params.setActive_ctl(true);
-        params.setActive_val(true);
-        
-
-        return params;
-        
-    }
-
-
+    /* --------------------------------------------
+                    V. Event
+       -------------------------------------------- */
+    
+    
        
     public SearchParamsEvent getSearchParamsEventsRequiringAction(){
         EventCoordinator ec = getEventCoordinator();
@@ -856,7 +861,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         // event types are always bundled in an EventCategory
         // so in this case of this query, we don't care about the Category title,
         // only the type
-        EventCategory timelineEventTypeCategory = ec.getInitializedEventCateogry();
+        EventCategory timelineEventTypeCategory = ec.initEventCategory();
         timelineEventTypeCategory.setEventType(EventType.Timeline);
         
         SearchParamsEvent eventParams = new SearchParamsEvent();
@@ -929,7 +934,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         // event types are always bundled in an EventCategory
         // so in this case of this query, we don't care about the Category title,
         // only the type
-        EventCategory complianceEventCategory = ec.getInitializedEventCateogry();
+        EventCategory complianceEventCategory = ec.initEventCategory();
         complianceEventCategory.setEventType(EventType.Compliance);
         
         SearchParamsEvent eventParams = new SearchParamsEvent();
@@ -963,7 +968,47 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         return eventParams;
     }
-
+    
+    // END V EVENT
+    
+    /* --------------------------------------------
+                   VI. OccPeriod
+       -------------------------------------------- */
+    private SearchParamsOccPeriod generateParams_occPeriod_wip(){
+        SearchParamsOccPeriod params = new SearchParamsOccPeriod();
+        
+        params.setSearchName("Periods with outstanding inspections");
+        params.setSearchDescription("Inspections have been started by not certified as passed");
+        
+        params.setInspectionPassed_filterBy(true);
+        params.setInspectionPassed_switch_passedInspection(false);
+        
+        return params;
+        
+    }
+    
+    
+    private SearchParamsOccPeriod generateParams_occPeriod(){
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        SearchParamsOccPeriod params = new SearchParamsOccPeriod();
+        
+        params.setSearchName("All periods in credentialed muni");
+        params.setSearchDescription("All periods regardless of status");
+        
+        params.setInspectionPassed_filterBy(false);
+        params.setInspectionPassed_switch_passedInspection(false);
+        
+        return params;
+        
+    }
+   
+    // END VI OccPeriod
+    
+    
+    /* --------------------------------------------
+                     VII. CECase
+       -------------------------------------------- */
+    
     
     /**
      * Returns a SearchParams subclass for retrieving all open
@@ -1035,22 +1080,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
    
+    // END VII CECase
     
-    protected SearchParamsProperty getSearchParamsSkeletonProperties(){
-        SearchParamsProperty propParams = new SearchParamsProperty();
-        // superclass
-        propParams.setDate_startEnd_ctl(false);
-        propParams.setBobID_ctl(false);
-        propParams.setLimitResultCount_ctl(true);
-        
-        // subclass SearchParamsProperty
-        propParams.setFilterByLotAndBlock(false);
-        propParams.setFilterByParcelID(false);
-        propParams.setFilterByAddressPart(true);
-
-        
-        return propParams;
-    }
+    /* --------------------------------------------
+                  VIII. CEActionRequest
+       -------------------------------------------- */
+    
     
      /**
       * TODO : Finish!
@@ -1145,4 +1180,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         return sps;
     }
+    
+    // END VIII. CEActionRequest
+    
+    
+  
 }

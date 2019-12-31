@@ -5,10 +5,10 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.EventCECase;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Event;
-import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
+import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventCnFCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -26,7 +26,7 @@ public class QueryEvent
     private QueryEventEnum queryName;
     
     private List<SearchParamsEvent> searchParamList;
-    private List<Event> results;
+    private List<EventCnF> results;
     
     public QueryEvent(QueryEventEnum qName, 
                             List<SearchParamsEvent> params,
@@ -47,7 +47,7 @@ public class QueryEvent
     }
 
     @Override
-    public List<Event> getBOBResultList() {
+    public List<EventCnF> getBOBResultList() {
         return results;
     }
 
@@ -91,7 +91,7 @@ public class QueryEvent
         this.queryName = queryName;
     }
 
-    public void addToResults(List<Event> events) {
+    public void addToResults(List<EventCnF> events) {
         results.addAll(events);
     }
 

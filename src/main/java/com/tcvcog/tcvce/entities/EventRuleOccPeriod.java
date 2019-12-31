@@ -17,26 +17,26 @@
 package com.tcvcog.tcvce.entities;
 
 
-import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 
 /**
  * Note on naming: This class is formally part of Occupancy and should be in its
  * Entities package, but since it extends EventRuleImplementation whose members have
  * protected access, they needed to share packages. Its sister Object on the CE side
- * is CECaseEventRule. The naming pattern for subclasses specific to one of our two
- * main branches of
- * 
- *  [BranchName][ObjectFamilyName] 
- * 
- * was inverted when naming this class since there are no
- *  Occ* classes in here. SO the next best group was the Event* family.
+ is CECaseEventRule. The naming pattern for subclasses specific to one of our two
+ main branches of
+ 
+  [BranchName][ObjectFamilyName] 
+ 
+ was inverted when naming this class since there are no
+  Occ* classes in here. SO the next best group was the EventCnF* family.
  * @author sylvia
  */
-public class EventRuleOccPeriod extends EventRuleImplementation{
+public class    EventRuleOccPeriod 
+        extends EventRuleImplementation{
     
     private int occPeriodEventRuleID;
     private int OccPeriodID;
-    private Event passedRuleEvent;
+    private EventCnF passedRuleEvent;
     
     /**
      *
@@ -69,14 +69,14 @@ public class EventRuleOccPeriod extends EventRuleImplementation{
     /**
      * @return the passedRuleEvent
      */
-    public Event getPassedRuleEvent() {
+    public EventCnF getPassedRuleEvent() {
         return passedRuleEvent;
     }
 
     /**
      * @param passedRuleEvent the passedRuleEvent to set
      */
-    public void setPassedRuleEvent(Event passedRuleEvent) {
+    public void setPassedRuleEvent(EventCnF passedRuleEvent) {
         this.passedRuleEvent = passedRuleEvent;
     }
 

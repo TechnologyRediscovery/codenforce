@@ -27,9 +27,9 @@ import java.util.Objects;
  *
  * @author ellen bascomb of apt 31y
  */
-public  class       Event 
+public  class       EventCnF 
         extends     BOb
-        implements  Comparable<Event> {
+        implements  Comparable<EventCnF> {
     
     protected int eventID;
     protected EventCategory category;
@@ -40,10 +40,7 @@ public  class       Event
     protected int occPeriodID;
     
     protected LocalDateTime timeStart;
-    protected java.util.Date timeStartUtilDate;
     protected LocalDateTime timeEnd;
-    protected java.util.Date timeEndUtilDate;
-    
     protected LocalDateTime timestamp;
     
     protected String description;
@@ -57,6 +54,32 @@ public  class       Event
     protected String notes;
     
     protected List<Person> personList;
+    
+    public EventCnF(){
+        
+        
+    }
+    
+    public EventCnF(EventCnF ev){
+        
+        eventID = ev.eventID;
+        category = ev.category;
+        domain = ev.domain;
+        ceCaseID = ev.ceCaseID;
+        occPeriodID = ev.occPeriodID;
+        timeStart = ev.timeStart;
+        timeEnd = ev.timeEnd;
+        timestamp = ev.timestamp;
+        description = ev.description;
+        owner = ev.owner;
+        discloseToMunicipality = ev.discloseToMunicipality;
+        discloseToPublic = ev.discloseToPublic;
+        active = ev.active;
+        hidden = ev.hidden;
+        notes = ev.notes;
+        personList = ev.personList;
+        
+    }
     
     
     /**
@@ -235,7 +258,7 @@ public  class       Event
 
   
     @Override
-    public int compareTo(Event e) {
+    public int compareTo(EventCnF e) {
         int c = this.timeStart.compareTo(e.timeStart);
         return c;
         
@@ -269,7 +292,7 @@ public  class       Event
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Event other = (Event) obj;
+        final EventCnF other = (EventCnF) obj;
         if (this.eventID != other.eventID) {
             return false;
         }
@@ -330,10 +353,9 @@ public  class       Event
      */
     public java.util.Date getTimeStartUtilDate() {
          if(timeStart != null){
-            timeStartUtilDate = java.util.Date.from(
-                    this.timeStart.atZone(ZoneId.systemDefault()).toInstant());
+            return java.util.Date.from(this.timeStart.atZone(ZoneId.systemDefault()).toInstant());
         }
-        return timeStartUtilDate;
+        return null;
     }
 
     /**
@@ -349,10 +371,9 @@ public  class       Event
      */
     public java.util.Date getTimeEndUtilDate() {
          if(timeEnd != null){
-            timeEndUtilDate = java.util.Date.from(
-                    this.timeEnd.atZone(ZoneId.systemDefault()).toInstant());
+            return java.util.Date.from(this.timeEnd.atZone(ZoneId.systemDefault()).toInstant());
         }
-        return timeEndUtilDate;
+        return null;
     }
 
     /**
@@ -366,9 +387,8 @@ public  class       Event
      * @param tsud
      */
     public void setTimeStartUtilDate(java.util.Date tsud) {
-        this.timeStartUtilDate = tsud;
         if(tsud != null){
-            timeStart = this.timeStartUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            timeStart = tsud.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
     }
 
@@ -383,9 +403,8 @@ public  class       Event
      * @param teud
      */
     public void setTimeEndUtilDate(java.util.Date teud) {
-        this.timeEndUtilDate = teud;
         if(teud != null){
-            timeEnd = this.timeEndUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            teud.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
     }
 

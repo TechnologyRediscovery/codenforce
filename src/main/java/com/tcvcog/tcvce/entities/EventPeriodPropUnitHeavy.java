@@ -19,9 +19,9 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 
 /**
- * A data-rich subclass of Event for use in contexts
- * where the event needs to carry info about its parent objects
- * in a non-parental way (i.e. the subclass having member vars to 
+ * A data-rich subclass of EventCnF for use in contexts
+ where the event needs to carry info about its parent objects
+ in a non-parental way (i.e. the subclass having member vars to 
  * hold these BObs.
  * 
  * The companion to this class is EventCaseHeavy which contains a CECase object
@@ -32,13 +32,13 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
  * @author Ellen Bascomb
  */
 public  class   EventPeriodPropUnitHeavy 
-        extends Event{
+        extends EventCnF{
     
     protected Property prop;
     protected PropertyUnit propUnit;
     protected OccPeriod period;
     
-    public EventPeriodPropUnitHeavy(Event ev){
+    public EventPeriodPropUnitHeavy(EventCnF ev){
         this.eventID = ev.getEventID();
         this.category = ev.getCategory();
         

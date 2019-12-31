@@ -17,45 +17,10 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.*;
-import com.tcvcog.tcvce.entities.reports.Report;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
-import com.tcvcog.tcvce.entities.CodeSet;
-import com.tcvcog.tcvce.entities.CodeSource;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PublicInfoBundle;
-import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.QueryCEAR;
-import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.QueryEvent;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.entities.occupancy.OccPermit;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
-import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
-import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
-import com.tcvcog.tcvce.entities.search.QueryPerson;
-import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.reports.*;
+import com.tcvcog.tcvce.entities.search.*;
+import com.tcvcog.tcvce.entities.occupancy.*;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -74,7 +39,8 @@ import javax.annotation.PostConstruct;
  * 
  * @author ellen bascomb of apt 31y
  */
-public class SessionBean extends BackingBeanUtils implements Serializable{
+public class    SessionBean 
+        extends BackingBeanUtils {
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                      N User                                    <<< */
@@ -97,13 +63,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* >>> -------------------------------------------------------------- <<< */
     
     private CodeSet sessionCodeSet;
-    
-    
     private CodeSource activeCodeSource;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
     private EnforcableCodeElement selectedEnfCodeElement;
     private CodeElement activeCodeElement;
-    
     
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -141,7 +104,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    private List<EventCECaseCasePropBundle> sessionEventWithCasePropList;
+    private List<EventCaseHeavy> sessionEventWithCasePropList;
     
     /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
@@ -640,14 +603,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /*
      * @return the sessionEventWithCasePropList
      */
-    public List<EventCECaseCasePropBundle> getSessionEventWithCasePropList() {
+    public List<EventCaseHeavy> getSessionEventWithCasePropList() {
         return sessionEventWithCasePropList;
     }
 
     /**
      * @param sessionEventWithCasePropList the sessionEventWithCasePropList to set
      */
-    public void setSessionEventWithCasePropList(List<EventCECaseCasePropBundle> sessionEventWithCasePropList) {
+    public void setSessionEventWithCasePropList(List<EventCaseHeavy> sessionEventWithCasePropList) {
         this.sessionEventWithCasePropList = sessionEventWithCasePropList;
     }
 

@@ -391,6 +391,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_I_Municipality(Credential cred, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
         MunicipalityCoordinator mc = getMuniCoordinator();
         
         MunicipalityDataHeavy muniHeavy;
@@ -418,6 +419,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_II_CodeBook(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
+        printSubsystemInit(ss);
         sb.setSessionCodeSet(mdh.getCodeSet());
         
     }
@@ -440,6 +442,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */  
     private void initSubsystem_III_Property(Credential cred, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
         PropertyCoordinator pc = getPropertyCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         
@@ -480,6 +483,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_IV_Person(Credential cred, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
         SearchCoordinator sc = getSearchCoordinator();
         PersonCoordinator persc = getPersonCoordinator();
         
@@ -513,6 +517,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_V_Event(Credential cred, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
         SearchCoordinator sc = getSearchCoordinator();
         sb.setQueryEventList(sc.buildQueryEventList(cred));
         if(!sb.getQueryEventList().isEmpty()){
@@ -536,6 +541,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_VI_OccPeriod(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
+        printSubsystemInit(ss);
         SearchCoordinator sc = getSearchCoordinator();
         OccupancyCoordinator occCord = getOccupancyCoordinator();
         
@@ -576,6 +582,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_VII_CECase(Credential cred, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
         CaseCoordinator caseCoord = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         
@@ -621,6 +628,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_VIII_CEActionRequest(Credential cred, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
         SearchCoordinator sc = getSearchCoordinator();
         sb.setQueryCEARList(sc.buildQueryCEARList(cred));
         if(!sb.getQueryCEARList().isEmpty()){
@@ -645,6 +653,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_VIV_OccApp(Credential cred, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
         
     }
     
@@ -666,6 +675,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_X_Payment(Credential cred, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
         
     }
 
@@ -685,6 +695,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_XI_Report(Credential cred, SubSysEnum ss) throws SessionException{ 
+        printSubsystemInit(ss);
         
         
     }
@@ -706,6 +717,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_XII_Blob(Credential cred, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
         
     }
 
@@ -726,6 +738,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_XIII_PublicInfoBundle(Credential cred, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
         
         
     }
@@ -748,6 +761,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_logSession(UserAuthorized authUser, SubSysEnum ss) throws SessionException{
+        printSubsystemInit(ss);
          UserMuniAuthPeriodLogEntry umaple;
          UserCoordinator uc = getUserCoordinator();
          

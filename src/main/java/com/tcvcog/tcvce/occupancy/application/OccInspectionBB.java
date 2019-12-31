@@ -18,7 +18,6 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
-import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
@@ -163,8 +162,8 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private ReportConfigOccPermit reportConfigOccPermit;
     
     // events 
-    private EventOccPeriod currentEvent;
-    private List<Event> filteredEventList;
+    private EventCnF currentEvent;
+    private List<EventCnF> filteredEventList;
     private List<ViewOptionsActiveHiddenListsEnum> eventsViewOptions;
     private ViewOptionsActiveHiddenListsEnum selectedEventView;
     private List<EventType> eventTypeListUserAllowed; 
@@ -567,7 +566,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
     
     
-     public void hideEvent(EventOccPeriod event){
+     public void hideEvent(EventCnF event){
         EventIntegrator ei = getEventIntegrator();
         event.setHidden(true);
         try {
@@ -583,7 +582,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public void unHideEvent(EventCECase event){
+    public void unHideEvent(EventCnF event){
         EventIntegrator ei = getEventIntegrator();
         event.setHidden(false);
         try {
@@ -601,7 +600,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
   /**
      * Called when the user selects their own EventCategory to add to the case
-     * and is a pass-through method to the initializeEvent method
+ and is a pass-through method to the initEvent method
      *
      * @param ev
      */
@@ -618,7 +617,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             System.out.println("OccInspectionBB.initiateNewEvent | category: " + getSelectedEventCategory().getEventCategoryTitle());
             EventCoordinator ec = getEventCoordinator();
             try {
-                currentEvent = ec.initializeEvent(currentOccPeriod, getSelectedEventCategory());
+                currentEvent = ec.initEvent(currentOccPeriod, getSelectedEventCategory());
                 currentEvent.setDateOfRecord(LocalDateTime.now());
                 currentEvent.setDiscloseToMunicipality(true);
                 currentEvent.setDiscloseToPublic(false);
@@ -634,7 +633,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public void events_initiateEventEdit(EventOccPeriod ev){
+    public void events_initiateEventEdit(EventCnF ev){
         currentEvent = ev;
         System.out.println("OccInspectionBB.events_initiateEventEdit | current event: " + currentEvent.getEventID());
     }
@@ -1390,14 +1389,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredEventList
      */
-    public List<Event> getFilteredEventList() {
+    public List<EventCnF> getFilteredEventList() {
         return filteredEventList;
     }
 
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(List<Event> filteredEventList) {
+    public void setFilteredEventList(List<EventCnF> filteredEventList) {
         this.filteredEventList = filteredEventList;
     }
 
@@ -1446,14 +1445,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the currentEvent
      */
-    public EventOccPeriod getCurrentEvent() {
+    public EventCnF getCurrentEvent() {
         return currentEvent;
     }
 
     /**
      * @param currentEvent the currentEvent to set
      */
-    public void setCurrentEvent(EventOccPeriod currentEvent) {
+    public void setCurrentEvent(EventCnF currentEvent) {
         this.currentEvent = currentEvent;
     }
 

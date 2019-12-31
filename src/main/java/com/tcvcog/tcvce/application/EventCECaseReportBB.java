@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
+import com.tcvcog.tcvce.entities.EventCnFCasePropBundle;
 import com.tcvcog.tcvce.entities.reports.Report;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import java.util.List;
@@ -15,14 +15,14 @@ import javax.annotation.PostConstruct;
  *
  * @author sylvia
  */
-public class EventCECaseReportBB extends BackingBeanUtils{
+public class EventCnFReportBB extends BackingBeanUtils{
 
     private ReportConfigCEEventList reportConfig; 
     
     /**
-     * Creates a new instance of EventCECaseReportBB
+     * Creates a new instance of EventCnFReportBB
      */
-    public EventCECaseReportBB() {
+    public EventCnFReportBB() {
     }
     
     @PostConstruct

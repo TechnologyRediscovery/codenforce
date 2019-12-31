@@ -33,7 +33,7 @@ public class Citation implements Serializable {
     private CitationStatus status;
     private CourtEntity origin_courtentity;
     
-    private List<EventCECase> eventList;
+    private List<EventCnF> eventList;
     
     private CECaseBase ceCaseNoLists;
     private User userOwner;
@@ -311,14 +311,14 @@ public class Citation implements Serializable {
     /**
      * @return the eventList
      */
-    public List<EventCECase> getEventList() {
+    public List<EventCnF> getEventList() {
         return eventList;
     }
 
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<EventCECase> eventList) {
+    public void setEventList(List<EventCnF> eventList) {
         this.eventList = eventList;
     }
     

@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
@@ -57,7 +57,7 @@ public  class       OccPeriodDataHeavy
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
     
-    private List<Event> eventList;
+    private List<EventCnF> eventList;
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
     
@@ -169,7 +169,7 @@ public  class       OccPeriodDataHeavy
     }
     
       @Override
-    public void setEventList(List<Event> lst) {
+    public void setEventList(List<EventCnF> lst) {
         eventList = lst;
     }
     
@@ -187,9 +187,9 @@ public  class       OccPeriodDataHeavy
 
     @Override
     public List assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
-        List<Event> visEventList = new ArrayList<>();
+        List<EventCnF> visEventList = new ArrayList<>();
         if (eventList != null) {
-            for (Event ev : eventList) {
+            for (EventCnF ev : eventList) {
                 switch (voahle) {
                     case VIEW_ACTIVE_HIDDEN:
                         if (ev.isActive() && ev.isHidden()) {

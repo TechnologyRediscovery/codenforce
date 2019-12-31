@@ -887,7 +887,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return pc.configureProperty(p);
 
     } // close getProperty()
-
+  
     
     
     /**
@@ -908,16 +908,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             
             PropertyDataHeavy pdh = new PropertyDataHeavy(getProperty(propertyID));
-            QueryPerson qp = sc.initQuery(QueryPersonEnum.PROPERTY_PERSONS, null);
-            
-            
-            pdh.setCeCaseList();
             
             pdh.setUnitWithListsList(getPropertyUnitWithListsList(pdh.getUnitList()));
             
-            pdh.setPersonList();
             
-        return pc.configurePropertyDataHeavy(pdh);
+        return 
     }
 
     /**

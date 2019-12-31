@@ -22,8 +22,8 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.EventCECase;
-import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
+import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventCnFCasePropBundle;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
@@ -46,15 +46,15 @@ public class CECaseEventsBB
         implements  Serializable {
 
     private CECase currentCase;
-    private ArrayList<EventCECase> recentEventList;
+    private ArrayList<EventCnF> recentEventList;
     
     
-    private EventCECase eventForTriggeringCasePhaseAdvancement;
+    private EventCnF eventForTriggeringCasePhaseAdvancement;
     
-    private EventCECase triggeringEventForProposal;
+    private EventCnF triggeringEventForProposal;
 
-    private List<EventCECase> filteredEventList;
-    private EventCECase selectedEvent;
+    private List<EventCnF> filteredEventList;
+    private EventCnF selectedEvent;
     private Person selectedPerson;
 
     
@@ -84,13 +84,13 @@ public class CECaseEventsBB
     }
     
     
-    public void rejectRequestedEvent(EventCECase ev) {
+    public void rejectRequestedEvent(EventCnF ev) {
         setSelectedEvent(ev);
 //        rejectedEventListIndex = currentCase.getEventProposalList().indexOf(ev);
     }
     
     
-    public void hideEvent(EventCECase event){
+    public void hideEvent(EventCnF event){
         EventIntegrator ei = getEventIntegrator();
         event.setHidden(true);
         try {
@@ -106,7 +106,7 @@ public class CECaseEventsBB
         }
     }
     
-    public void unHideEvent(EventCECase event){
+    public void unHideEvent(EventCnF event){
         EventIntegrator ei = getEventIntegrator();
         event.setHidden(false);
         try {
@@ -141,7 +141,7 @@ public class CECaseEventsBB
         }
     }
 
-    public void editEvent(EventCECase ev) {
+    public void editEvent(EventCnF ev) {
         selectedEvent = ev;
     }
     
@@ -152,7 +152,7 @@ public class CECaseEventsBB
      *
      * @param ev
      */
-    public void initiateNewRequestedEvent(EventCECase ev) {
+    public void initiateNewRequestedEvent(EventCnF ev) {
         //selectedEventCategory = ev.getRequestedEventCat();
         
         setTriggeringEventForProposal(ev);
@@ -294,35 +294,35 @@ public class CECaseEventsBB
     /**
      * @return the recentEventList
      */
-    public ArrayList<EventCECase> getRecentEventList() {
+    public ArrayList<EventCnF> getRecentEventList() {
         return recentEventList;
     }
 
     /**
      * @return the eventForTriggeringCasePhaseAdvancement
      */
-    public EventCECase getEventForTriggeringCasePhaseAdvancement() {
+    public EventCnF getEventForTriggeringCasePhaseAdvancement() {
         return eventForTriggeringCasePhaseAdvancement;
     }
 
     /**
      * @return the triggeringEventForProposal
      */
-    public EventCECase getTriggeringEventForProposal() {
+    public EventCnF getTriggeringEventForProposal() {
         return triggeringEventForProposal;
     }
 
     /**
      * @return the filteredEventList
      */
-    public List<EventCECase> getFilteredEventList() {
+    public List<EventCnF> getFilteredEventList() {
         return filteredEventList;
     }
 
     /**
      * @return the selectedEvent
      */
-    public EventCECase getSelectedEvent() {
+    public EventCnF getSelectedEvent() {
         return selectedEvent;
     }
 
@@ -366,35 +366,35 @@ public class CECaseEventsBB
     /**
      * @param recentEventList the recentEventList to set
      */
-    public void setRecentEventList(ArrayList<EventCECase> recentEventList) {
+    public void setRecentEventList(ArrayList<EventCnF> recentEventList) {
         this.recentEventList = recentEventList;
     }
 
     /**
      * @param eventForTriggeringCasePhaseAdvancement the eventForTriggeringCasePhaseAdvancement to set
      */
-    public void setEventForTriggeringCasePhaseAdvancement(EventCECase eventForTriggeringCasePhaseAdvancement) {
+    public void setEventForTriggeringCasePhaseAdvancement(EventCnF eventForTriggeringCasePhaseAdvancement) {
         this.eventForTriggeringCasePhaseAdvancement = eventForTriggeringCasePhaseAdvancement;
     }
 
     /**
      * @param triggeringEventForProposal the triggeringEventForProposal to set
      */
-    public void setTriggeringEventForProposal(EventCECase triggeringEventForProposal) {
+    public void setTriggeringEventForProposal(EventCnF triggeringEventForProposal) {
         this.triggeringEventForProposal = triggeringEventForProposal;
     }
 
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(List<EventCECase> filteredEventList) {
+    public void setFilteredEventList(List<EventCnF> filteredEventList) {
         this.filteredEventList = filteredEventList;
     }
 
     /**
      * @param selectedEvent the selectedEvent to set
      */
-    public void setSelectedEvent(EventCECase selectedEvent) {
+    public void setSelectedEvent(EventCnF selectedEvent) {
         this.selectedEvent = selectedEvent;
     }
 

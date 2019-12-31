@@ -32,11 +32,11 @@ public class        CECase
     
     private boolean showHiddenEvents;
     private boolean showInactiveEvents;
-    private List<EventCECase> completeEventList;
+    private List<EventCnF> completeEventList;
     
     // accessed through methods specified in the interfaces
     private List<Proposal> proposalList;
-    private List<Event> eventList;
+    private List<EventCnF> eventList;
     private List<EventRuleImplementation> eventRuleList;
     
     private List<Citation> citationList;
@@ -99,10 +99,10 @@ public class        CECase
     }
     
      @Override
-    public List<Event> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
-         List<Event> visEventList = new ArrayList<>();
+    public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
+         List<EventCnF> visEventList = new ArrayList<>();
         if(eventList != null){
-            for (Event ev : eventList) {
+            for (EventCnF ev : eventList) {
                 switch(voahle){
                     case VIEW_ACTIVE_HIDDEN:
                         if (ev.isActive()
@@ -250,9 +250,9 @@ public class        CECase
      * flags, add the event from the complete list to the visible list
      * @return the visibleEventList
      */
-    public List<EventCECase> getVisibleEventList() {
-        List<EventCECase> visEventList = new ArrayList<>();
-        for (EventCECase ev : completeEventList) {
+    public List<EventCnF> getVisibleEventList() {
+        List<EventCnF> visEventList = new ArrayList<>();
+        for (EventCnF ev : completeEventList) {
             if (!ev.isActive() && !showInactiveEvents) {
                 continue;
             }
@@ -348,14 +348,14 @@ public class        CECase
     /**
      * @return the completeEventList
      */
-    public List<EventCECase> getCompleteEventList() {
+    public List<EventCnF> getCompleteEventList() {
         return completeEventList;
     }
 
     /**
      * @param completeEventList the completeEventList to set
      */
-    public void setCompleteEventList(List<EventCECase> completeEventList) {
+    public void setCompleteEventList(List<EventCnF> completeEventList) {
         this.completeEventList = completeEventList;
     }
 
@@ -390,11 +390,11 @@ public class        CECase
     /**
      * @return the activeEventList
      */
-    public List<EventCECase> getActiveEventList() {
-        List<EventCECase> actEvList = new ArrayList<>();
-            Iterator<EventCECase> iter = completeEventList.iterator();
+    public List<EventCnF> getActiveEventList() {
+        List<EventCnF> actEvList = new ArrayList<>();
+            Iterator<EventCnF> iter = completeEventList.iterator();
                 while(iter.hasNext()){
-                    EventCECase ev = iter.next();
+                    EventCnF ev = iter.next();
                     if(ev.isActive()){
                         actEvList.add(ev);
                     }
@@ -420,7 +420,7 @@ public class        CECase
     /**
      * @return the eventList
      */
-    public List<Event> getEventList() {
+    public List<EventCnF> getEventList() {
         return eventList;
     }
 
@@ -428,7 +428,7 @@ public class        CECase
      * @param eventList the eventList to set
      */
     @Override
-    public void setEventList(List<Event> eventList) {
+    public void setEventList(List<EventCnF> eventList) {
         this.eventList = eventList;
     }
 

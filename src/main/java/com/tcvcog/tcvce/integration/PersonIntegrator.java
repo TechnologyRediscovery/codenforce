@@ -20,15 +20,14 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.Event;
-import com.tcvcog.tcvce.entities.EventCECase;
+import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.occupancy.EventOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
@@ -280,8 +279,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 sb.append(params.getAddress_streetNum_val());
                 sb.append("%'");
             }
-            if(params.isFilterByActiveSwitch()){
-                if(params.isActiveSwitch()){
+            if(params.isActive_ctl()){
+                if(params.isActive_val()){
                     sb.append("AND isactive = TRUE ");
                 } else {
                     sb.append("AND isactive = FALSE ");
@@ -538,14 +537,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @param personList
      * @throws IntegrationException 
      */
-    public void eventPersonsConnect(Event ev, List<Person> personList) throws IntegrationException {
+    public void eventPersonsConnect(EventCnF ev, List<Person> personList) throws IntegrationException {
         ListIterator li = personList.listIterator();
         while (li.hasNext()) {
             eventPersonConnect(ev, (Person) li.next());
         }
     }
 
-    public void eventPersonConnect(Event ev, Person p) throws IntegrationException {
+    public void eventPersonConnect(EventCnF ev, Person p) throws IntegrationException {
 
         String query = "INSERT INTO public.eventperson(\n"
                 + " ceevent_eventid, person_personid)\n"
@@ -577,7 +576,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * Drops all event-person connections  from eventperson
      * @param ev 
      */
-    public void eventPersonClear(Event ev) throws IntegrationException{
+    public void eventPersonClear(EventCnF ev) throws IntegrationException{
         String query = "DELETE FROM eventperson WHERE ceevent_eventid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -827,7 +826,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    public List<Person> getPersonList(Event ev) throws IntegrationException {
+    public List<Person> getPersonList(EventCnF ev) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
