@@ -15,8 +15,10 @@ Council of Governments, PA
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.entities;
+package com.tcvcog.tcvce.util;
 
+import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
+import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -27,11 +29,20 @@ import java.time.LocalDateTime;
 public class LogEntry implements Serializable{
     
     private int logEntryID;
+    
+    private int entryID;
     private LocalDateTime timeOfEntry;
+    
     private User user;
-    private int sessionID;
-    private String entryCategory;
     private String notes;
+    private boolean err;
+    
+    private LogEntryCategory entryCategory;
+    
+    private String credSignature;
+    private SubSysEnum subSys;
+    private ExceptionSeverityEnum severity;
+    
 
     /**
      * @return the logEntryID
@@ -75,33 +86,7 @@ public class LogEntry implements Serializable{
         this.user = user;
     }
 
-    /**
-     * @return the sessionID
-     */
-    public int getSessionID() {
-        return sessionID;
-    }
-
-    /**
-     * @param sessionID the sessionID to set
-     */
-    public void setSessionID(int sessionID) {
-        this.sessionID = sessionID;
-    }
-
-    /**
-     * @return the entryCategory
-     */
-    public String getEntryCategory() {
-        return entryCategory;
-    }
-
-    /**
-     * @param entryCategory the entryCategory to set
-     */
-    public void setEntryCategory(String entryCategory) {
-        this.entryCategory = entryCategory;
-    }
+  
 
     /**
      * @return the notes
@@ -115,6 +100,90 @@ public class LogEntry implements Serializable{
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the credSignature
+     */
+    public String getCredSignature() {
+        return credSignature;
+    }
+
+    /**
+     * @param credSignature the credSignature to set
+     */
+    public void setCredSignature(String credSignature) {
+        this.credSignature = credSignature;
+    }
+
+    /**
+     * @return the entryCategory
+     */
+    public LogEntryCategory getEntryCategory() {
+        return entryCategory;
+    }
+
+    /**
+     * @param entryCategory the entryCategory to set
+     */
+    public void setEntryCategory(LogEntryCategory entryCategory) {
+        this.entryCategory = entryCategory;
+    }
+
+    /**
+     * @return the severity
+     */
+    public ExceptionSeverityEnum getSeverity() {
+        return severity;
+    }
+
+    /**
+     * @return the subSys
+     */
+    public SubSysEnum getSubSys() {
+        return subSys;
+    }
+
+    /**
+     * @param severity the severity to set
+     */
+    public void setSeverity(ExceptionSeverityEnum severity) {
+        this.severity = severity;
+    }
+
+    /**
+     * @param subSys the subSys to set
+     */
+    public void setSubSys(SubSysEnum subSys) {
+        this.subSys = subSys;
+    }
+
+    /**
+     * @return the err
+     */
+    public boolean isErr() {
+        return err;
+    }
+
+    /**
+     * @param err the err to set
+     */
+    public void setErr(boolean err) {
+        this.err = err;
+    }
+
+    /**
+     * @return the entryID
+     */
+    public int getEntryID() {
+        return entryID;
+    }
+
+    /**
+     * @param entryID the entryID to set
+     */
+    public void setEntryID(int entryID) {
+        this.entryID = entryID;
     }
     
 }

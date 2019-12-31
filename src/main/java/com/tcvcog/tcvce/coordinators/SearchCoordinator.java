@@ -472,6 +472,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 break;
             case USER_PERSONS:
                 paramsList.add(generateParams_persons_users());
+            case PROPERTY_PERSONS:
+                paramsList.add(generateParams_person_prop());
             
          }
          query = new QueryPerson(qName, paramsList, cred);
@@ -761,6 +763,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //    --------------------------------------------------------------------------
 //    ***************************** PARAM GENERATORS ***************************
 //    --------------------------------------------------------------------------
+    
+    
     
     private SearchParamsOccPeriod generateParams_occPeriod_wip(){
         SearchParamsOccPeriod params = new SearchParamsOccPeriod();

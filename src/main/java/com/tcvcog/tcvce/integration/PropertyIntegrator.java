@@ -30,10 +30,13 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -148,7 +151,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             if(p.getUnitList() != null && p.getUnitList().isEmpty()){
                 System.out.println("PropertyIntegrator.generateProperty | inserting new unit");
-                PropertyUnit pu = pc.initPropertyUnit();
+                PropertyUnit pu = pc.initPropertyUnit(p);
                 pu.setPropertyID(p.getPropertyID());
                 insertPropertyUnit(pu);
             }
@@ -901,14 +904,20 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             PropertyCoordinator pc = getPropertyCoordinator();
             CaseIntegrator ci = getCaseIntegrator();
             PersonIntegrator pi = getPersonIntegrator();
+            SearchCoordinator sc = getSearchCoordinator();
             
-            PropertyDataHeavy p = new PropertyDataHeavy(getProperty(propertyID));
-   
-            p.setCeCaseList(ci.getCECasesByProp(p));
-            p.setUnitWithListsList(getPropertyUnitWithListsList(p.getUnitList()));
-            p.setPersonList(pi.getPersonList(p));
             
-        return pc.configurePropertyDataHeavy(p);
+            PropertyDataHeavy pdh = new PropertyDataHeavy(getProperty(propertyID));
+            QueryPerson qp = sc.initQuery(QueryPersonEnum.PROPERTY_PERSONS, null);
+            
+            
+            pdh.setCeCaseList();
+            
+            pdh.setUnitWithListsList(getPropertyUnitWithListsList(pdh.getUnitList()));
+            
+            pdh.setPersonList();
+            
+        return pc.configurePropertyDataHeavy(pdh);
     }
 
     /**

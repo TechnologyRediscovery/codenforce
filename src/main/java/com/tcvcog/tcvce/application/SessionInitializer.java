@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
 import com.tcvcog.tcvce.domain.SessionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -179,11 +180,6 @@ public  class       SessionInitializer
     public String configureSession(User u, Municipality muni, UserMuniAuthPeriod umap) throws BObStatusException, IntegrationException{
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
-        PropertyIntegrator pi = getPropertyIntegrator();
-        PersonIntegrator persInt = getPersonIntegrator();
-        CaseIntegrator caseint = getCaseIntegrator();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        UserMuniAuthPeriodLogEntry umaple;
         
         try {
             // The central call which initiates the User's session for a particular municipality
@@ -194,26 +190,8 @@ public  class       SessionInitializer
             if(authUser != null){
                 // The stadnard Municipality object is simple, but we need the full deal
                 
-                initializeSubsystems(authUser.getKeyCard());
-
-                // load up our SessionBean with its key objects
-                sb.setSessionMuni(muniHeavy);
-                sb.setSessionUser(authUser);
-                
-                
-                umaple = uc.assembleUserMuniAuthPeriodLogEntrySkeleton(
-                                authUser, 
-                                UserMuniAuthPeriodLogEntryCatEnum.SESSION_INIT);
-        
-                umaple = assembleSessionInfo(umaple);
-                
-                if(umaple != null){
-                    umaple.setAudit_usersession_userid(sb.getSessionUser().getUserID());
-                    umaple.setAudit_muni_municode(muniHeavy.getMuniCode());
-                    umaple.setAudit_usercredential_userid(authUser.getMyCredential().getGoverningAuthPeriod().getUserID());
-                    System.out.println("SessionInitializer.configureSession | loaded UserMuniAuthPeriod: " + umaple);
-                    uc.logCredentialInvocation(umaple, authUser.getMyCredential().getGoverningAuthPeriod());
-                }
+                initializeSubsystems(authUser);
+              
              
                return "success";
             } else {
@@ -228,69 +206,94 @@ public  class       SessionInitializer
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, 
                     "Integration module error. Unable to connect your server user to the COG system user.", 
                     "Please contact system administrator Eric Darsow at 412.923.9907"));
-            return "";
+            return "sessionLoadError";
         } catch (AuthorizationException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Auth exception");
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
             return "";
         } catch (SessionException ex) {
+            System.out.println("SessionInitializer.intitiateInternalSession | Session exception");
             System.out.println(ex.getMessage());
         }
+        return "";
     }
     
     
-    private void initializeSubsystems(Credential cred) throws SessionException{
+    /**
+     * Distributor method for all subsystem initialization routines.
+     * Individual subsystems are initialized in an order which allows 
+     * each to use objects generated during its predecessors sequences, such as
+     * a UserAuthorized, a Credential, a MuniDataHeavy
+     * @param ua
+     * @throws SessionException 
+     */
+    private void initializeSubsystems(UserAuthorized ua) throws SessionException{
+        if(ua == null){
+            throw new SessionException( "No authorized user found for subsystem initialization", 
+                                        SubSysEnum.N_USER, 
+                                        ExceptionSeverityEnum.SESSION_FATAL);
+        }
+        
+        Credential cred = ua.getMyCredential();
+        List<SessionException> exlist = new ArrayList<>();
         
         for(SubSysEnum ss: SubSysEnum.values()){
-            if(ss.isInitialize()){
-                printSubsystemInit(ss);
-                switch(ss){
-                    case N_USER:
-                        initSubsystem_N_User(cred, ss);
-                        break;
-                    case I_MUNICIPALITY:
-                        initSubsystem_I_Municipality(cred, ss);
-                        break;
-                    case II_CODEBOOK:
-                        initSubsystem_II_CodeBook(cred, ss, sb.getSessionMuni());
-                        break;
-                    case III_PROPERTY:
-                        initSubsystem_III_Property(cred, ss);
-                        break;
-                    case IV_PERSON:
-                        initSubsystem_IV_Person(cred, ss);
-                        break;
-                    case V_EVENT:
-                        initSubsystem_V_Event(cred, ss);
-                        break;
-                    case VI_OCCPERIOD:
-                        initSubsystem_VI_OccPeriod(cred, ss, sb.getSessionMuni());
-                        break;
-                    case VII_CECASE:
-                        initSubsystem_VII_CECase(cred, ss);
-                        break;
-                    case VIII_CEACTIONREQ:
-                        initSubsystem_VIII_CEActionRequest(cred, ss);
-                        break;
-                    case VIV_OCCAPP:
-                        initSubsystem_VIV_OccApp(cred, ss);
-                        break;
-                    case X_PAYMENT:
-                        initSubsystem_X_Payment(cred, ss);
-                        break;
-                    case XI_REPORT:
-                        initSubsystem_XI_Report(cred, ss);
-                        break;
-                    case XII_BLOB:
-                        initSubsystem_XII_Blob(cred, ss);
-                        break;
-                    case XIII_PUBLICINFO:
-                        initSubsystem_XIII_PublicInfoBundle(cred, ss);
-                        break;
-                } // close switch
+            try{
+                if(ss.isInitialize()){
+                    printSubsystemInit(ss);
+                    switch(ss){
+                        case N_USER:
+                            initSubsystem_N_User(ua, ss);
+                            break;
+                        case I_MUNICIPALITY:
+                            initSubsystem_I_Municipality(cred, ss);
+                            break;
+                        case II_CODEBOOK:
+                            initSubsystem_II_CodeBook(cred, ss, sb.getSessionMuni());
+                            break;
+                        case III_PROPERTY:
+                            initSubsystem_III_Property(cred, ss);
+                            break;
+                        case IV_PERSON:
+                            initSubsystem_IV_Person(cred, ss);
+                            break;
+                        case V_EVENT:
+                            initSubsystem_V_Event(cred, ss);
+                            break;
+                        case VI_OCCPERIOD:
+                            initSubsystem_VI_OccPeriod(cred, ss, sb.getSessionMuni());
+                            break;
+                        case VII_CECASE:
+                            initSubsystem_VII_CECase(cred, ss);
+                            break;
+                        case VIII_CEACTIONREQ:
+                            initSubsystem_VIII_CEActionRequest(cred, ss);
+                            break;
+                        case VIV_OCCAPP:
+                            initSubsystem_VIV_OccApp(cred, ss);
+                            break;
+                        case X_PAYMENT:
+                            initSubsystem_X_Payment(cred, ss);
+                            break;
+                        case XI_REPORT:
+                            initSubsystem_XI_Report(cred, ss);
+                            break;
+                        case XII_BLOB:
+                            initSubsystem_XII_Blob(cred, ss);
+                            break;
+                        case XIII_PUBLICINFO:
+                            initSubsystem_XIII_PublicInfoBundle(cred, ss);
+                            break;
+                    } // close switch
+                } // close if
+            } catch (SessionException ex){
+                throw new SessionException("Subsystem init catch all", ex);
             }
-        }
+        } // close for over subsystem enum
+        
+        // record session data to DB
+        initSubsystem_logSession(ua, SubSysEnum.N_USER);
         
     }
     
@@ -336,64 +339,11 @@ public  class       SessionInitializer
     }
     
         
+        
     /**
-     * With an active User and Municipality, we're ready to load up our
-     * Session-persistent shelves with our core business objects,
-     * Queries and some utility lists
-     * 
-     * @param u
-     * @param m
-     * @throws IntegrationException
-     * @throws BObStatusException 
+     * Utility method for printing to the console notes about session init
+     * @param ss 
      */
-    private void populateSessionObjectQueues(UserAuthorized ua, MunicipalityDataHeavy m) 
-            throws IntegrationException, BObStatusException{
-        
-        SearchCoordinator searchCoord = getSearchCoordinator();
-        PropertyCoordinator pc = getPropertyCoordinator();
-        CaseCoordinator caseCoord = getCaseCoordinator();
-        OccupancyCoordinator occCord = getOccupancyCoordinator();
-        SystemCoordinator sysCord = getSystemCoordinator();
-        PersonCoordinator persc = getPersonCoordinator();
-        
-        
-        // ********************** PROPERTIES **********************   
-        
-        // ********************** PROPERTIES **********************   
-//        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-//                .getString("arbitraryPlaceholderCaseID")
-//                
-
-//        sessionBean.setcECaseQueue(new ArrayList<CECase>());
-//        sessionBean.getcECaseQueue().add(c);
-        
-        
-        // Liase with each Coordinator to populate the individual BOb member
-        // and its corresponding List<E>
-        
-        // ********************** PERSONS **********************   
-
-
-        // ********************** Events **********************   
-
-
-        
-        // ********************** Occ Periods**********************   
-
-
-
-        
-        
-        // ********************** Code Enf Cases **********************   
-        
-        
-        // ********************** CEARs **********************   
-//        
-//        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
-        
-
-    }
-    
     private void printSubsystemInit(SubSysEnum ss){
         StringBuilder sb = new StringBuilder();
         sb.append("Initializing subsystem ");
@@ -403,24 +353,92 @@ public  class       SessionInitializer
         System.out.println(sb.toString());
         
     }
-    
-    private void initSubsystem_N_User(Credential cred, SubSysEnum ss) throws SessionException{
+
+    /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   N User                                       <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+    private void initSubsystem_N_User(UserAuthorized authUser, SubSysEnum ss) throws SessionException{
+        UserCoordinator uc = getUserCoordinator();
         
-        
+        sb.setSessionUser(authUser);
+       
     }
     
+    
+    /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   I Municipality                               <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_I_Municipality(Credential cred, SubSysEnum ss) throws SessionException{
         MunicipalityCoordinator mc = getMuniCoordinator();
         
-        MunicipalityDataHeavy muniHeavy =  mc.getMunDataHeavy(cred.getGoverningAuthPeriod().getMuni().getMuniCode(), cred);
-        
+        MunicipalityDataHeavy muniHeavy;
+        try {
+            muniHeavy = mc.getMuniDataHeavy(cred.getGoverningAuthPeriod().getMuni().getMuniCode(), cred);
+        } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
+            throw new SessionException("Error creating muni data heavy", ex, ss, ExceptionSeverityEnum.SESSION_FATAL);
+        }
+        sb.setSessionMuni(muniHeavy);
     }
-    
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   II Codebook                                  <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_II_CodeBook(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
         sb.setSessionCodeSet(mdh.getCodeSet());
         
     }
-    
+
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   III Property                                 <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */  
     private void initSubsystem_III_Property(Credential cred, SubSysEnum ss) throws SessionException{
         PropertyCoordinator pc = getPropertyCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
@@ -439,11 +457,28 @@ public  class       SessionInitializer
                 sb.setQueryProperty(sb.getQueryPropertyList().get(0));
             }            
         } catch (IntegrationException ex) {
-            throw new SessionException("Error setting proerty query list", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
+            throw new SessionException( "Error setting proerty query list", 
+                                        ex, ss, 
+                                        ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
         }
         
     }
-    
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   IV Person                                    <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_IV_Person(Credential cred, SubSysEnum ss) throws SessionException{
         SearchCoordinator sc = getSearchCoordinator();
         PersonCoordinator persc = getPersonCoordinator();
@@ -460,21 +495,46 @@ public  class       SessionInitializer
                 sb.setQueryPerson(sb.getQueryPersonList().get(0));
             }
         } catch (IntegrationException ex) {
-            
-            
         }
-
     }
-    
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   V Event                                     <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_V_Event(Credential cred, SubSysEnum ss) throws SessionException{
         SearchCoordinator sc = getSearchCoordinator();
         sb.setQueryEventList(sc.buildQueryEventList(cred));
         if(!sb.getQueryEventList().isEmpty()){
             sb.setQueryEvent(sb.getQueryEventList().get(0));
         }
-        
     }
-    
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   VI OccPeriod                                 <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_VI_OccPeriod(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
         SearchCoordinator sc = getSearchCoordinator();
         OccupancyCoordinator occCord = getOccupancyCoordinator();
@@ -499,10 +559,22 @@ public  class       SessionInitializer
                                         ss, 
                                         ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
         }
-        
     }
     
-    
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   VII Cecase                                   <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_VII_CECase(Credential cred, SubSysEnum ss) throws SessionException{
         CaseCoordinator caseCoord = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
@@ -522,7 +594,7 @@ public  class       SessionInitializer
             } else {
                 sb.setSessionCECase(sb.getSessionCECaseList().get(0));
             }
-        } catch (IntegrationException | BObStatusExceptionex) {
+        } catch (IntegrationException | BObStatusException ex) {
             throw new SessionException("Error assembling session CECase list from history", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
         }
 
@@ -533,6 +605,21 @@ public  class       SessionInitializer
         
     }
     
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   VIII CEActionrequest                         <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_VIII_CEActionRequest(Credential cred, SubSysEnum ss) throws SessionException{
         SearchCoordinator sc = getSearchCoordinator();
         sb.setQueryCEARList(sc.buildQueryCEARList(cred));
@@ -541,29 +628,154 @@ public  class       SessionInitializer
         }
         
     }
-    
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   VIV Occapp                                   <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_VIV_OccApp(Credential cred, SubSysEnum ss) throws SessionException{
         
     }
     
-    
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   X Payment                                    <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_X_Payment(Credential cred, SubSysEnum ss) throws SessionException{
         
     }
+
     
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   XI Report                                    <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_XI_Report(Credential cred, SubSysEnum ss) throws SessionException{ 
         
         
     }
+    
+    
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   XII Blob                                     <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_XII_Blob(Credential cred, SubSysEnum ss) throws SessionException{
         
     }
 
+    
+    
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   XIII PublicInfo                              <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
     private void initSubsystem_XIII_PublicInfoBundle(Credential cred, SubSysEnum ss) throws SessionException{
         
         
     }
 
+    
+    
+    
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   XIII PublicInfo                              <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+    private void initSubsystem_logSession(UserAuthorized authUser, SubSysEnum ss) throws SessionException{
+         UserMuniAuthPeriodLogEntry umaple;
+         UserCoordinator uc = getUserCoordinator();
+         
+        umaple = uc.assembleUserMuniAuthPeriodLogEntrySkeleton(
+                              authUser, 
+                              UserMuniAuthPeriodLogEntryCatEnum.SESSION_INIT);
+
+        umaple = assembleSessionInfo(umaple);
+
+        if(umaple != null){
+            umaple.setAudit_usersession_userid(sb.getSessionUser().getUserID());
+            umaple.setAudit_muni_municode(sb.getSessionMuni().getMuniCode());
+            umaple.setAudit_usercredential_userid(authUser.getMyCredential().getGoverningAuthPeriod().getUserID());
+            try {
+                uc.logCredentialInvocation(umaple, authUser.getMyCredential().getGoverningAuthPeriod());
+            } catch (IntegrationException | AuthorizationException ex) {
+                throw new SessionException( "Failure creating user muni auth period log entry", 
+                                            ex, ss,
+                                            ExceptionSeverityEnum.NONCRITICAL_FAILURE);
+            }
+        }
+        
+    }
+
+    
+    
+    
+    
 
     /**
      * @return the userAuthorizedQueuedForSession

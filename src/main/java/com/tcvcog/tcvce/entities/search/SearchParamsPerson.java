@@ -27,7 +27,6 @@ public  class   SearchParamsPerson
         private boolean name_last_ctl;
         private boolean name_compositeLNameOnly_ctl;
         
-        
         protected RoleType phoneNumber_rtMin;
         private boolean phoneNumber_ctl;
         private String phoneNumber_val;

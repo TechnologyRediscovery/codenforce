@@ -25,7 +25,7 @@ public class SearchParamsProperty extends SearchParams implements Serializable {
     // The filter by date switch is on the superclass SearchParams
     // if that's swich is on, the integrator will look at this Enum value
     // to decide which field to use in the query against the db
-    private SearchParamsPropertyDateFields dateField;
+   private SearchParamsPropertyDateFields dateField;
     
    private boolean filterByNullDateField;
    private SearchParamsPropertyDateFields nullDateField;

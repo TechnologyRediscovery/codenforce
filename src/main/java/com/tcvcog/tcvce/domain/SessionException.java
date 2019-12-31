@@ -48,6 +48,13 @@ public  class   SessionException
         super(message, e);
     }
     
+    public SessionException(String message, SubSysEnum ss, ExceptionSeverityEnum sev){
+        super(message);
+        subSys = ss;
+        severity = sev;
+        
+    }
+    
     public SessionException(String message, Exception e, SubSysEnum ss, ExceptionSeverityEnum sev){
         super(message, e);
         subSys = ss;

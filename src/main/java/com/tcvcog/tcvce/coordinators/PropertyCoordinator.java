@@ -57,11 +57,12 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     /**
      * Logic container for initializing members on the Property subclass PropertyWithLists
      * @param propWL
+     * @param cred
      * @return
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    public PropertyDataHeavy configurePropertyDataHeavy(PropertyDataHeavy propWL) throws IntegrationException, BObStatusException{
+    public PropertyDataHeavy configurePropertyDataHeavy(PropertyDataHeavy propWL, Credential cred) throws IntegrationException, BObStatusException{
         
         PropertyIntegrator pi = getPropertyIntegrator();
         
@@ -121,7 +122,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyDataHeavy pdh = null;
         
         try{
-            pdh = pi.getPropertyDataHeavy(prop.getPropertyID());
+            pdh = configurePropertyDataHeavy(pi.getPropertyDataHeavy(prop.getPropertyID()), cred);
+            
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }     

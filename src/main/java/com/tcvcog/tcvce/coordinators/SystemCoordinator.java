@@ -31,9 +31,11 @@ import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.LogEntry;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -72,6 +74,17 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
          si.logObjectView(u, ob);
          
      }
+
+     /**
+      * Central access point for writing all LogEntry objects to the DB
+      * @param entry
+      * @return 
+      */
+     public int makeLogEntry(LogEntry entry){
+         LogIntegrator li = getLogIntegrator();
+         return li.writeLogEntry(entry);
+     }
+     
     
     
     /**
