@@ -64,6 +64,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private ArrayList<Fee> feeList;
     private ArrayList<Fee> filteredFeeList;
     private ArrayList<CodeViolation> violationList;
+    private ArrayList<CodeViolation> filteredViolationList;
     private CodeViolation selectedViolation;
 
     private FeeAssigned assignedFormFee;
@@ -106,6 +107,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         if (getSessionBean().getFeeRedirTo() != null) {
 
             refreshFeeAssignedList();
+
+            if (currentCase != null) {
+                violationList = (ArrayList<CodeViolation>) currentCase.getViolationList();
+            }
 
             if (allFees == null) {
                 try {
@@ -201,7 +206,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public void intializeNewAssignedFee(ActionEvent e) {
+    public void initializeNewAssignedFee(ActionEvent e) {
 
         editing = false;
         assignedFormFee = new FeeAssigned();
@@ -266,7 +271,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             }
 
         } else {
-            
+
             MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(firstSkeleton);
             MoneyCECaseFeeAssigned caseFormFee = (MoneyCECaseFeeAssigned) assignedFormFee;
 
@@ -283,7 +288,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Unable to add fee to database, sorry!", "Check server print out..."));
             }
-            
+
         }
 
         return "";
@@ -337,7 +342,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             }
 
         } else {
-            
+
             MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(firstSkeleton);
             MoneyCECaseFeeAssigned caseFormFee = (MoneyCECaseFeeAssigned) assignedFormFee;
 
@@ -354,7 +359,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Unable to update fee in database, sorry!", "Check server print out..."));
             }
-            
+
         }
 
         return "";
@@ -654,7 +659,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
                 try {
                     feeAssignedList.addAll(pi.getFeeAssigned(currentCase));
-//                    feeList = (ArrayList<Fee>) currentCase.getType().getPermittedFees(); pop this back in when we find out how to get permitted fees
+                    feeList = new ArrayList<>();
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -664,6 +669,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             }
 
         }
+
+    }
+
+    public void violationSelected(ActionEvent e) {
+
+        feeList.clear();
+
+        feeList.addAll(selectedViolation.getViolatedEnfElement().getFeeList());
 
     }
 
@@ -1012,6 +1025,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public void setAssignedFormFee(FeeAssigned assignedFormFee) {
         this.assignedFormFee = assignedFormFee;
+    }
+
+    public ArrayList<CodeViolation> getFilteredViolationList() {
+        return filteredViolationList;
+    }
+
+    public void setFilteredViolationList(ArrayList<CodeViolation> filteredViolationList) {
+        this.filteredViolationList = filteredViolationList;
     }
 
     public CodeViolation getSelectedViolation() {

@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -712,7 +713,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         CodeIntegrator ci = getCodeIntegrator();
         CitationIntegrator citInt = getCitationIntegrator();
         UserIntegrator ui = getUserIntegrator();
-
+        PaymentIntegrator pai = getPaymentIntegrator();
         
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));

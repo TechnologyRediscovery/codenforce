@@ -78,8 +78,6 @@ public class CodeViolation extends EntityUtils implements Serializable{
     
     protected List<Integer> photoList;
     
-    protected List<Fee> feeList;
-    
     private int severityIntensityClassID;
     
     
