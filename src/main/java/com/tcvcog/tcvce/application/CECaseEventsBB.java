@@ -19,11 +19,11 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventCnFCasePropBundle;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
@@ -33,6 +33,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -170,20 +172,23 @@ public class CECaseEventsBB
     }
 
     public void initiateNewEvent() {
-
+        EventCoordinator ec = getEventCoordinator();
+        
+        EventCnF ev = null;
         if (getSelectedEventCategory() != null) {
 
             System.out.println("EventAddBB.startNewEvent | category: " + getSelectedEventCategory().getEventCategoryTitle());
-            EventCoordinator ec = getEventCoordinator();
             try {
-                setSelectedEvent(ec.getInitializedEvent(getCurrentCase(), getSelectedEventCategory()));
-                getSelectedEvent().setDateOfRecord(LocalDateTime.now());
-                getSelectedEvent().setDiscloseToMunicipality(true);
-                getSelectedEvent().setDiscloseToPublic(false);
+                
+                ev = ec.initEvent(currentCase, selectedEventCategory);
+                ev.setDiscloseToMunicipality(true);
+                ev.setDiscloseToPublic(false);
             } catch (BObStatusException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            } catch (EventException ex) {
+                Logger.getLogger(CECaseEventsBB.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             getFacesContext().addMessage(null,
@@ -207,7 +212,7 @@ public class CECaseEventsBB
         CaseCoordinator cc = getCaseCoordinator();
 
         // category is already set from initialization sequence
-        getSelectedEvent().setCaseID(getCurrentCase().getCaseID());
+        getSelectedEvent().setCeCaseID(getCurrentCase().getCaseID());
         getSelectedEvent().setOwner(getSessionBean().getSessionUser());
         try {
         
@@ -240,19 +245,13 @@ public class CECaseEventsBB
                 setTriggeringEventForProposal(null);
             }
 
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException | EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(),
                             "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(),
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        }
+        } 
 
         // nullify the session's case so that the reload of currentCase
         // no the cecaseProfile.xhtml will trigger a new DB read
@@ -263,7 +262,7 @@ public class CECaseEventsBB
         EventCoordinator ec = getEventCoordinator();
 //        currentCase.getEventList().remove(selectedEvent);
         try {
-            ec.editEvent(getSelectedEvent(), getSessionBean().getSessionUser());
+            ec.editEvent(getSelectedEvent());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Event udpated!", ""));
         } catch (IntegrationException ex) {
@@ -271,6 +270,8 @@ public class CECaseEventsBB
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Please select one or more people to attach to this event",
                     "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        } catch (EventException ex) {
+            Logger.getLogger(CECaseEventsBB.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

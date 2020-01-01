@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -109,9 +110,10 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
     public void manageProperty(Property prop) {
         PropertyIntegrator pi = getPropertyIntegrator();
         SystemIntegrator si = getSystemIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
         try {
-            selectedProperty = pi.getPropertyDataHeavy(prop.getPropertyID());
+            selectedProperty = pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessionUser().getMyCredential());
             existingUnitList = pi.getPropertyUnitList(selectedProperty);
             proposedUnitList = pi.getPropertyUnitChangeList(selectedProperty);
             
@@ -119,7 +121,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
             
             getSessionBean().getSessionPropertyList().add(prop);
 
-        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -180,7 +182,12 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
     public String goToChangeDetail() {
 
-        getSessionBean().setSessionProperty(selectedProperty);
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(selectedProperty, getSessionBean().getSessionUser().getMyCredential()));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        }
 
         return "unitchangedetail";
 

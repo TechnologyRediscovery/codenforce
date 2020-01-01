@@ -243,20 +243,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void onPropertySelection() {
         PropertyCoordinator pc = getPropertyCoordinator();
-// todo: occbeta
-//        if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
-//            try {
-//                propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
-//            } catch (BObStatusException ex) {
-//                System.out.println(ex);
-//            }
-//        } else {
-//            try {
-//                propWithLists = pc.getPropertyDataHeavy(selectedProperty);
-//            } catch (BObStatusException ex) {
-//                System.out.println(ex);
-//            }
-//        }
 
         getSessionBean().setOccPermitAppActiveProp(prop);
 
@@ -273,7 +259,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void addUnitToNewPropUnits() {
         PropertyCoordinator pc = getPropertyCoordinator();
-        unitToAdd = pc.initPropertyUnit();
+        unitToAdd = pc.initPropertyUnit(selectedProperty);
         unitToAdd.setUnitNumber("");
 //        unitToAdd.setRental(false);
         unitToAdd.setNotes("");
@@ -777,13 +763,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         PropertyDataHeavy existingProp = new PropertyDataHeavy();
         
         Person changedby = getSessionBean().getSessionOccPermitApplication().getApplicantPerson();
-        
-        try {
-            existingProp = pri.getPropertyDataHeavy(prop.getPropertyID());
-                    
-        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
-            System.out.println(ex);
-        }
+
+        // TODO: Occbeta
+
+//        try {
+//            existingProp = pri.getPropertyDataHeavy(prop.getPropertyID());
+//                    
+//        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
+//            System.out.println(ex);
+//        }
         
         for (PropertyUnit workingUnit : workingPropUnits) {
 

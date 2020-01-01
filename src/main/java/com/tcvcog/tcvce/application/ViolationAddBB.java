@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -131,6 +132,11 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             ex.getMessage(), "To preserve data integrity, this "
                                 + "case's phase restrictions forbid attaching new code violations."));
+        } catch (EventException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            ex.getMessage(), "Violation event exception"));
         }
         return "";
         
@@ -162,6 +168,11 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             ex.getMessage(), "To preserve data integrity, this "
                                 + "case's phase restrictions forbid attaching new code violations."));
+        } catch (EventException ex) {
+             System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            ex.getMessage(), "Violation event exception"));
         }
         return "";
         

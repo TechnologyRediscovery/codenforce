@@ -17,10 +17,12 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
@@ -288,11 +290,12 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
     public void connectActionRequestToCECase(int actionRequestID, int cecaseID, int userid)
             throws BObStatusException, IntegrationException {
-        CECaseDataHeavy cecase = null;
-
-        CaseIntegrator ci = getCaseIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
+        CECase cecase = null;
+        
+        
         try {
-            cecase = ci.getCECase(cecaseID);
+            cecase = cc.getCECase(cecaseID);
         } catch (IntegrationException ex) {
             throw new BObStatusException("Cannot find a CECase to which the action request can be connected");
         }

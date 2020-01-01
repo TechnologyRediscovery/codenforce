@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -26,6 +27,8 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -55,18 +58,21 @@ public class CECaseNoticesBB
     
     public String createNewNotice() throws SQLException {
         NoticeOfViolation nov;
+        PropertyCoordinator pc = getPropertyCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
             if (!currentCase.getViolationListUnresolved().isEmpty()) {
                 try {
                     getSessionBean().getSessionPropertyList().add(0, currentCase.getProperty());
-                    getSessionBean().setSessionProperty(currentCase.getProperty());
+                    getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(currentCase.getProperty(), getSessionBean().getSessionUser().getMyCredential()));
 //                    positionCurrentCaseAtHeadOfQueue();
                     nov = cc.novGetNewNOVSkeleton(currentCase, getSessionBean().getSessionMuni());
                     nov.setCreationBy(getSessionBean().getSessionUser());
                     getSessionBean().setSessionNotice(nov);
                     return "noticeOfViolationBuilder";
-                } catch (AuthorizationException ex) {
+                } catch (AuthorizationException | IntegrationException | BObStatusException ex) {
                     System.out.println(ex);
+                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot build new notice", ""));
                 }
             } else {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -136,7 +142,7 @@ public class CECaseNoticesBB
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
             caseCoord.novDelete(nov);
-            caseCoord.refreshCase(currentCase);
+            currentCase = caseCoord.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessionUser().getMyCredential());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID() + " has been nuked forever", ""));
@@ -178,7 +184,7 @@ public class CECaseNoticesBB
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
             caseCoord.novMarkAsReturned(currentCase, nov, getSessionBean().getSessionUser());
-            caseCoord.refreshCase(currentCase);
+            currentCase = caseCoord.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessionUser().getMyCredential());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID()

@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -91,6 +92,8 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
                             "Best try again or note the error and complain to Eric."));
             System.out.println(ex);
         } catch (ViolationException ex) {
+            System.out.println(ex);
+        } catch (EventException ex) {
             System.out.println(ex);
         }
         

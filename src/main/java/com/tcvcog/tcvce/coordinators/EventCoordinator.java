@@ -228,6 +228,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    public void deactivateEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException{
+        SystemCoordinator sc = getSystemCoordinator();
+        EventIntegrator ei = getEventIntegrator();
+        ev.setActive(false);
+        ev.setNotes(sc.formatAndAppendNote(ua, "Event deactivated by User with credential sig " + ua.getMyCredential().getSignature(), ev.getNotes()));
+        ei.updateEvent(ev);
+        
+    }
+    
     public void deleteEvent(EventCnF ev, UserAuthorized u) throws AuthorizationException{
         EventIntegrator ei = getEventIntegrator();
         try {
@@ -248,7 +257,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * case phase (closed cases cannot have action, origination, or compliance events.
      * Includes the instantiation of EventCnF objects
      * 
-     * @param erg which for Beta v0.9 includes CECaseDataHeavy and OccPeriod object
+     * @param erg which for Beta v0.9 includes CECaseDataHeavy and OccPeriod object; null means 
+     * caller will need to insert the BOb ID later
      * @param ec the type of event to attach to the case
      * @return an initialized event with basic properties set
      * @throws BObStatusException thrown if the case is in an improper state for proposed event
@@ -554,11 +564,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public EventCnF generateEventDocumentingProposalEvaluation(Proposal p, IFace_Proposable ch, UserAuthorized u) throws BObStatusException, IntegrationException{
+    public EventCnF generateEventDocumentingProposalEvaluation(Proposal p, IFace_Proposable ch, UserAuthorized u) throws BObStatusException, IntegrationException, EventException{
         EventCnF ev = null;
         if(ch instanceof ChoiceEventCat){
             EventCategory ec = initEventCategory(((ChoiceEventCat) ch).getEventCategory().getCategoryID());
-            ev = initEvent(ec);
+            ev = initEvent(null, ec);
             
             ev.setActive(true);
             ev.setHidden(false);
@@ -592,8 +602,20 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return ev;
     }
     
+    
+    /**
+     * 
+     * 
+     * @deprecated since phases aren't DB stored fields, no need to do any overriding
+     * @param currentCase
+     * @param pastPhase
+     * @throws IntegrationException
+     * @throws BObStatusException
+     * @throws ViolationException
+     * @throws EventException 
+     */
     public void generateAndInsertManualCasePhaseOverrideEvent(CECaseDataHeavy currentCase, CasePhase pastPhase) 
-            throws IntegrationException, BObStatusException, ViolationException{
+            throws IntegrationException, BObStatusException, ViolationException, EventException{
         
           EventIntegrator ei = getEventIntegrator();
           CaseCoordinator cc = getCaseCoordinator();
@@ -609,8 +631,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("\' by a a case officer.");
         event.setDescription(sb.toString());
         
-        event.setCaseID(currentCase.getCaseID());
-        event.setDateOfRecord(LocalDateTime.now());
+        event.setCeCaseID(currentCase.getCaseID());
+//        event.set(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
         event.setOwner(getSessionBean().getSessionUser());
@@ -647,7 +669,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(ev.getOwner().equals(u) || u.getMyCredential().isHasDeveloperPermissions()){
             return true;
             // check that the event is associated with the user's auth munis
-        } else if(isMunicodeInMuniList(ev.getMuniCode(), muniList)){
+// TODO: Finish me occ beta
+//        } else if(isMunicodeInMuniList(ev.getMuniCode(), muniList)){
+        } else if(true){
             // sys admins for a muni can confirm everything
             if(u.getMyCredential().isHasSysAdminPermissions()){
                 return true;

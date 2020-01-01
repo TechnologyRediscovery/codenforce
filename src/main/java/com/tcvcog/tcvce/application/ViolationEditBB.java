@@ -76,20 +76,20 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
        EventCategory ec = eventCoordinator.initEventCategory(
                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
        
-       EventCnF event = eventCoordinator.getInitializedEvent(getCurrentCase(), ec);
-        
-        // load up edit event data
-        event.setNotes(formEventNotes);
-        event.setDiscloseToMunicipality(formDiscloseToMuni);
-        event.setDiscloseToPublic(formDiscloseToPublic);
-        
-        MessageBuilderParams mcc = new MessageBuilderParams();
-        mcc.setExistingContent(currentViolation.getNotes());
-        mcc.setNewMessageContent(formEventNotes);
-        mcc.setUser(getSessionBean().getSessionUser());
-        currentViolation.setNotes(sc.appendNoteBlock(mcc));
-        
         try {
+            EventCnF event = eventCoordinator.initEvent(getCurrentCase(), ec);
+
+            // load up edit event data
+            event.setNotes(formEventNotes);
+            event.setDiscloseToMunicipality(formDiscloseToMuni);
+            event.setDiscloseToPublic(formDiscloseToPublic);
+
+            MessageBuilderParams mcc = new MessageBuilderParams();
+            mcc.setExistingContent(currentViolation.getNotes());
+            mcc.setNewMessageContent(formEventNotes);
+            mcc.setUser(getSessionBean().getSessionUser());
+            currentViolation.setNotes(sc.appendNoteBlock(mcc));
+
             
              cc.updateCodeViolation(currentCase, currentViolation, getSessionBean().getSessionUser());
              

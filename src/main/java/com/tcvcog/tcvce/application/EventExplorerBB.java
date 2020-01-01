@@ -12,12 +12,12 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.EventCnFCasePropBundle;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -45,7 +45,7 @@ import javax.faces.event.ActionEvent;
  *
  * @author sylvia
  */
-public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
+public class EventExplorerBB extends BackingBeanUtils implements Serializable {
 
     
     private SearchParamsEvent searchParams;
@@ -58,11 +58,11 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     private List<UserAuthorized> userList;
     
     private List<QueryEvent> queryList;
-    private Query selectedBOBQuery;
+    private QueryEvent selectedBOBQuery;
     
-    private List<EventCnFCasePropBundle> eventList;
+    private List<EventCnF> eventList;
    
-    private List<EventCnFCasePropBundle> filteredEventList;
+    private List<EventCnF> filteredEventList;
     
     private ReportConfigCEEventList reportConfig;
     
@@ -70,7 +70,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * Creates a new instance of CEEventsBB
      */
-    public EventsCECaseBB() {
+    public EventExplorerBB() {
     }
      
     @PostConstruct
@@ -79,19 +79,14 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         
         
-        queryList = sc.buildQueryEventCnFList(getSessionBean().getSessionMuni(),getSessionBean().getSessionUser());
-        selectedBOBQuery = sc.getQueryInitialEventCnF(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser());
-        if(!selectedBOBQuery.isExecutedByIntegrator()){
-            try {
-                sc.runQuery((QueryEvent) selectedBOBQuery);
-            } catch (IntegrationException| BObStatusException ex) {
-                System.out.println(ex);
-            }
-            
+        queryList = sc.buildQueryEventList(getSessionBean().getSessionUser().getMyCredential());
+        if(queryList != null && !queryList.isEmpty()){
+            selectedBOBQuery = queryList.get(0);
         }
-        eventList = selectedBOBQuery.getBOBResultList();
         
-        searchParams = (SearchParamsEvent) selectedBOBQuery.getParmsList().get(0);
+//        eventList = getSessionBean().getSessopmEvemtCaseHeavyList();
+        eventList = getSessionBean().getSessionEventList();
+        
         // grab previously loaded event config from the session bean
         // which would have been placed there by the generateReport method in this bean
         reportConfig = getSessionBean().getReportConfigCEEventList();
@@ -99,7 +94,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
 //            userList = uc.getUserAuthorizedListForConfig(getSessionBean().getSessionMuni());
             
         // **************************************************************
-        // *****FIX ME!!!*********************************************************
+        // *****FIX ME!!!************************************************
         // **************************************************************
             userList = new ArrayList<>();
 //        } catch (IntegrationException ex) {
@@ -109,46 +104,31 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
 //        }
     }
     
-    public void hideEvent(EventCnFCasePropBundle ev){
-        EventIntegrator ei = getEventIntegrator();
-        try {
-            ei.updateEvent(ev.getEvent());
-            eventList.remove(ev);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not hide event ID " + ev.getEvent().getEventID(), ""));
-            
-        }
+    public void hideEvent(EventCnF ev){
+        eventList.remove(ev);
     }
     
     public void executeManualQuery(){
-        EventCoordinator ec = getEventCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
+        
         try {
-            eventList = ec.queryEvents( searchParams, 
-                                        getSessionBean().getSessionUser());
+            eventList = sc.runQuery(selectedBOBQuery).getBOBResultList();
             if(eventList != null){
                 Collections.sort(eventList);
                 Collections.reverse(eventList);
             }
             
             generateQueryResultMessage();
-        } catch (IntegrationException ex) {
+        } catch (SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
-        } catch (BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Case lifecycle exception.", ""));
         }
     }
     
     public void executeQuery(){
         System.out.println("CEEventsBB.executeQuery");
-        EventCoordinator ec = getEventCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         QueryEvent eventQuery = (QueryEvent) selectedBOBQuery;
         searchParams = (SearchParamsEvent) eventQuery.getParamsList().get(0);
@@ -160,15 +140,11 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
             }
             
             generateQueryResultMessage();
-        } catch (IntegrationException ex) {
+        } catch (SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
-        } catch (BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Case lifecycle exception.", ""));
         }
     }
     
@@ -184,9 +160,9 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         
     }
     
-    public String editEventInCaseManager(EventCnFCasePropBundle ev){
+    public String editEventInCaseManager(EventCnF ev){
         CaseIntegrator ci = getCaseIntegrator();
-        CECase caseNoLists = ev.getEventCaseBare();
+//        CECase caseNoLists = ev.getEventCaseBare();
 //        try {
 //            getSessionBean().getSessionCECaseList().add(0, ci.generateCECase(caseNoLists));
 //        } catch (SQLException ex) {
@@ -245,16 +221,17 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
            
        }
        
-       if(!selectedBOBQuery.isExecutedByIntegrator()){
+       if(selectedBOBQuery.getExecutionTimestamp() == null){
             try {
-                selectedBOBQuery = sc.runQuery((QueryEvent) selectedBOBQuery);
-            } catch (IntegrationException| BObStatusException ex) {
+                selectedBOBQuery = sc.runQuery(selectedBOBQuery);
+            } catch (SearchException ex) {
                 System.out.println(ex);
-            }
+           }
             
         }
        reportConfig.setBOBQuery(selectedBOBQuery);
-       getSessionBean().setSessionEventWithCasePropList(eventList);
+//       getSessionBean().setSessionEventWithCasePropList(eventList);
+
        getSessionBean().setReportConfigCEEventList(reportConfig);
        getSessionBean().setSessionReport(reportConfig);
        return "reportCEEventList";
@@ -281,7 +258,6 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
          EventIntegrator ei = getEventIntegrator();
         
         if(searchParams.getEvtType() != null){
-            
             try {
                 eventCatList = ei.getEventCategoryList(searchParams.getEvtType() );
             } catch (IntegrationException ex) {
@@ -302,7 +278,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the eventList
      */
-    public List<EventCnFCasePropBundle> getEventList() {
+    public List<EventCnF> getEventList() {
         
         return eventList;
     }
@@ -310,7 +286,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredEventList
      */
-    public List<EventCnFCasePropBundle> getFilteredEventList() {
+    public List<EventCnF> getFilteredEventList() {
         return filteredEventList;
     }
 
@@ -338,14 +314,14 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<EventCnFCasePropBundle> eventList) {
+    public void setEventList(List<EventCnF> eventList) {
         this.eventList = eventList;
     }
 
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(List<EventCnFCasePropBundle> filteredEventList) {
+    public void setFilteredEventList(List<EventCnF> filteredEventList) {
         this.filteredEventList = filteredEventList;
     }
 
@@ -366,16 +342,16 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the selectedBOBQuery
      */
-    public Query getSelectedBOBQuery() {
+    public QueryEvent getSelectedBOBQuery() {
         return selectedBOBQuery;
     }
 
     /**
      * @param selectedBOBQuery the selectedBOBQuery to set
      */
-    public void setSelectedBOBQuery(Query selectedBOBQuery) {
-        QueryEvent eq = (QueryEvent) selectedBOBQuery;
-        searchParams = (SearchParamsEvent) eq.getParamsList().get(0);
+    public void setSelectedBOBQuery(QueryEvent selectedBOBQuery) {
+//        QueryEvent eq = (QueryEvent) selectedBOBQuery;
+//        searchParams = (SearchParamsEvent) eq.getParamsList().get(0);
         this.selectedBOBQuery = selectedBOBQuery;
     }
 

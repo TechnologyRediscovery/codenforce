@@ -74,7 +74,7 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    private Property sessionProperty;
+    private PropertyDataHeavy sessionProperty;
     private List<Property> sessionPropertyList;
     
     private PropertyUnit sessionPropertyUnit;
@@ -105,6 +105,7 @@ public class    SessionBean
     
     
     private List<EventCaseHeavy> sessionEventWithCasePropList;
+    private List<EventCnF> sessionEventList;
     
     /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
@@ -238,7 +239,7 @@ public class    SessionBean
     /**
      * @return the sessionProperty
      */
-    public Property getSessionProperty() {
+    public PropertyDataHeavy getSessionProperty() {
         return sessionProperty;
     }
 
@@ -321,7 +322,7 @@ public class    SessionBean
     /**
      * @param sessionProperty the sessionProperty to set
      */
-    public void setSessionProperty(Property sessionProperty) {
+    public void setSessionProperty(PropertyDataHeavy sessionProperty) {
         this.sessionProperty = sessionProperty;
     }
 
@@ -603,7 +604,7 @@ public class    SessionBean
     /*
      * @return the sessionEventWithCasePropList
      */
-    public List<EventCaseHeavy> getSessionEventWithCasePropList() {
+    public List<EventCaseHeavy> getSessopmEvemtCaseHeavyList() {
         return sessionEventWithCasePropList;
     }
 
@@ -1138,6 +1139,20 @@ public class    SessionBean
      */
     public void setQueryEventList(List<QueryEvent> queryEventList) {
         this.queryEventList = queryEventList;
+    }
+
+    /**
+     * @return the sessionEventList
+     */
+    public List<EventCnF> getSessionEventList() {
+        return sessionEventList;
+    }
+
+    /**
+     * @param sessionEventList the sessionEventList to set
+     */
+    public void setSessionEventList(List<EventCnF> sessionEventList) {
+        this.sessionEventList = sessionEventList;
     }
     
     

@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
@@ -87,11 +88,11 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         SearchCoordinator sc = getSearchCoordinator();
         // user our fancy specialized query to get all Persons who are delcared to 
         // be user types
-        QueryPerson qp = sc.initQuery(QueryPersonEnum.USER_PERSONS, currentUser.getMyCredential(), null, null );
+        QueryPerson qp = sc.initQuery(QueryPersonEnum.USER_PERSONS, currentUser.getMyCredential());
         try {
             qp = sc.runQuery(qp);
             userPersonList = qp.getResults();
-        } catch (IntegrationException | AuthorizationException ex) {
+        } catch (SearchException ex) {
             System.out.println(ex);
         }
     }

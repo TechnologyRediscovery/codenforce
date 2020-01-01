@@ -128,11 +128,13 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             req != null 
                 && 
             currentRequest.getRequestProperty() != null){
-            try {
-                personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonList();
-            } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
-                System.out.println(ex);
-            }
+//            TODO: occbeta
+            
+//            try {
+//                personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonList();
+//            } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
+//                System.out.println(ex);
+//            }
         } else if (usr != null && req != null ) {
             personCandidateList = getSessionBean().getSessionPersonList();
         }

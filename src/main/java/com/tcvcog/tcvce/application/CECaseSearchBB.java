@@ -17,10 +17,13 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
@@ -33,6 +36,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -45,10 +50,10 @@ public class CECaseSearchBB
         extends BackingBeanUtils
         implements Serializable {
     
-    private CECaseDataHeavy currentCase;
+    private CECase currentCase;
     
-    private List<CECaseDataHeavy> caseList;
-    private ArrayList<CECaseDataHeavy> filteredCaseList;
+    private List<CECase> caseList;
+    private List<CECase> filteredCaseList;
     private SearchParamsCECase searchParams;
     
     private List<QueryCECase> queryList;
@@ -80,15 +85,15 @@ public class CECaseSearchBB
         
         setUsersForSearchConfig(uc.assembleUserListForSearchCriteria(null));
         
-        setQueryList(sc.prepareQueryCECaseList(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser().getMyCredential()));
+        setQueryList(sc.buildQueryCECaseList(getSessionBean().getSessionUser().getMyCredential()));
         setSelectedCECaseQuery(getSessionBean().getQueryCECase());
         
         setSearchParams(getSelectedCECaseQuery().getSearchParamsList().get(0));
         
-        if(!selectedCECaseQuery.isExecutedByIntegrator()){
+        if(selectedCECaseQuery.getExecutionTimestamp() == null){
             try {
-                sc.runQuery(getSelectedCECaseQuery());
-            } catch (IntegrationException | BObStatusException ex) {
+                caseList.addAll(sc.runQuery(getSelectedCECaseQuery()).getBOBResultList());
+            } catch (SearchException ex) {
                 System.out.println(ex);
             }
         }
@@ -111,6 +116,8 @@ public class CECaseSearchBB
      */
     public void manageCECase(CECaseDataHeavy c) {
         SystemIntegrator si = getSystemIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
         System.out.println("CaseProfileBB.manageCECase | caseid: " + c.getCaseID());
         try {
@@ -119,8 +126,16 @@ public class CECaseSearchBB
             System.out.println(ex);
         }
         setCurrentCase(c);
-        getSessionBean().setSessionCECase(getCurrentCase());
-        getSessionBean().setSessionProperty(c.getProperty());
+        try {
+            getSessionBean().setSessionCECase(cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessionUser().getMyCredential()));
+            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(c.getProperty(), getSessionBean().getSessionUser().getMyCredential()));
+        } catch (BObStatusException | IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot load full case with data.", ""));
+            
+        }
+        
     }
     
     
@@ -149,14 +164,12 @@ public class CECaseSearchBB
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Your query completed with " + listSize + " results", ""));
-        } catch (IntegrationException ex) {
+        } catch (SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
-        }
+        } 
     }
     
     
@@ -194,21 +207,21 @@ public class CECaseSearchBB
     /**
      * @return the currentCase
      */
-    public CECaseDataHeavy getCurrentCase() {
+    public CECase getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @return the caseList
      */
-    public List<CECaseDataHeavy> getCaseList() {
+    public List<CECase> getCaseList() {
         return caseList;
     }
 
     /**
      * @return the filteredCaseList
      */
-    public ArrayList<CECaseDataHeavy> getFilteredCaseList() {
+    public List<CECase> getFilteredCaseList() {
         return filteredCaseList;
     }
 
@@ -274,14 +287,14 @@ public class CECaseSearchBB
     /**
      * @param caseList the caseList to set
      */
-    public void setCaseList(List<CECaseDataHeavy> caseList) {
+    public void setCaseList(List<CECase> caseList) {
         this.caseList = caseList;
     }
 
     /**
      * @param filteredCaseList the filteredCaseList to set
      */
-    public void setFilteredCaseList(ArrayList<CECaseDataHeavy> filteredCaseList) {
+    public void setFilteredCaseList(List<CECase> filteredCaseList) {
         this.filteredCaseList = filteredCaseList;
     }
 

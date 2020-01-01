@@ -381,7 +381,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     
-    public void novUpdate(NoticeOfViolation notice) throws IntegrationException {
+    public void novUpdateNotice(NoticeOfViolation notice) throws IntegrationException {
         String query = "UPDATE public.noticeofviolation\n"
                 + "   SET lettertextbeforeviolations=?, \n" +
                 "       dateofrecord=?, personid_recipient=?, \n" +

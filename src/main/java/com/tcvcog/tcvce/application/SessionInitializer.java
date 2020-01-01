@@ -23,7 +23,6 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -31,30 +30,14 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
 import com.tcvcog.tcvce.domain.SessionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
-import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
-import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
-import com.tcvcog.tcvce.entities.search.QueryEventEnum;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
-import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
-import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
@@ -67,8 +50,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -396,7 +377,7 @@ public  class       SessionInitializer
         
         MunicipalityDataHeavy muniHeavy;
         try {
-            muniHeavy = mc.getMuniDataHeavy(cred.getGoverningAuthPeriod().getMuni().getMuniCode(), cred);
+            muniHeavy = mc.assembleMuniDataHeavy(cred.getGoverningAuthPeriod().getMuni(), cred);
         } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
             throw new SessionException("Error creating muni data heavy", ex, ss, ExceptionSeverityEnum.SESSION_FATAL);
         }
@@ -445,21 +426,21 @@ public  class       SessionInitializer
         printSubsystemInit(ss);
         PropertyCoordinator pc = getPropertyCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
-        
-        sb.setSessionPropertyList(pc.assemblePropertyHistoryList(cred));
-        if(sb.getSessionPropertyList().isEmpty()){
-            sb.setSessionProperty(pc.selectDefaultProperty(cred));
-        } else {
-            sb.setSessionProperty(sb.getSessionPropertyList().get(0));
-        }
-        
         try {
+
+            sb.setSessionPropertyList(pc.assemblePropertyHistoryList(cred));
+            if(sb.getSessionPropertyList().isEmpty()){
+                sb.setSessionProperty(pc.selectDefaultProperty(cred));
+            } else {
+                sb.setSessionProperty(pc.assemblePropertyDataHeavy(sb.getSessionPropertyList().get(0), cred));
+            }
+        
             sb.setQueryPropertyList(sc.buildQueryPropertyList(cred));
 
             if(!sb.getQueryPropertyList().isEmpty()){
                 sb.setQueryProperty(sb.getQueryPropertyList().get(0));
             }            
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             throw new SessionException( "Error setting proerty query list", 
                                         ex, ss, 
                                         ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
@@ -549,9 +530,9 @@ public  class       SessionInitializer
             // Session object init
             sb.setSessionOccPeriodList(occCord.assembleOccPeriodHistoryList(cred));
             if(sb.getSessionOccPeriodList().isEmpty()){
-                sb.setSessionOccPeriod(occCord.getOccPeriodDataHeavy(occCord.selectDefaultOccPeriod(mdh, cred), cred));
+                sb.setSessionOccPeriod(occCord.assembleOccPeriodDataHeavy(occCord.selectDefaultOccPeriod(mdh, cred), cred));
             } else {
-                sb.setSessionOccPeriod(occCord.getOccPeriodDataHeavy(sb.getSessionOccPeriodList().get(0), cred));
+                sb.setSessionOccPeriod(occCord.assembleOccPeriodDataHeavy(sb.getSessionOccPeriodList().get(0), cred));
             }
 
             // Query set init

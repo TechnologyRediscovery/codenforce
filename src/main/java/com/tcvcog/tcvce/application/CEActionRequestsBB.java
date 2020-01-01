@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -250,29 +251,34 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public String path1CreateNewCaseAtProperty() {
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
 
         if (selectedRequest != null) {
-            if (selectedRequest.getRequestProperty() != null) {
-                getSessionBean().setSessionProperty(selectedRequest.getRequestProperty());
-            }
-
-            MessageBuilderParams mbp = new MessageBuilderParams();
-            mbp.setUser(getSessionBean().getSessionUser());
-            mbp.setExistingContent(selectedRequest.getPublicExternalNotes());
-            mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseHeader"));
-            mbp.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseExplanation"));
-            mbp.setNewMessageContent("");
-
-            selectedRequest.setPublicExternalNotes(sc.appendNoteBlock(mbp));
-
-            // force the bean to go to the integrator and fetch a fresh, updated
-            // list of action requests
             try {
+                if (selectedRequest.getRequestProperty() != null) {
+                        getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(selectedRequest.getRequestProperty(), getSessionBean().getSessionUser().getMyCredential()));
+                }
+
+                MessageBuilderParams mbp = new MessageBuilderParams();
+                mbp.setUser(getSessionBean().getSessionUser());
+                mbp.setExistingContent(selectedRequest.getPublicExternalNotes());
+                mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseHeader"));
+                mbp.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseExplanation"));
+                mbp.setNewMessageContent("");
+
+                selectedRequest.setPublicExternalNotes(sc.appendNoteBlock(mbp));
+
+                // force the bean to go to the integrator and fetch a fresh, updated
+                // list of action requests
                 ceari.updateActionRequestNotes(selectedRequest);
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                  "Unable to update action request with case attachment notes", ""));
+            } catch (BObStatusException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                 "Unable to create a new case at property due to a BobStatusException", ""));
             }
         } else {
             getFacesContext().addMessage(null,
@@ -762,14 +768,15 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public ArrayList<CECaseDataHeavy> getCaseListForSelectedProperty() {
         CaseIntegrator ci = getCaseIntegrator();
         if (selectedRequest != null) {
-            try {
-                caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty());
-                System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            } catch (BObStatusException ex) {
-                System.out.println(ex);
-            }
+
+//            try {
+//                caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty());
+//                System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
+//            } catch (IntegrationException ex) {
+//                System.out.println(ex);
+//            } catch (BObStatusException ex) {
+//                System.out.println(ex);
+//            }
         }
         return caseListForSelectedProperty;
     }

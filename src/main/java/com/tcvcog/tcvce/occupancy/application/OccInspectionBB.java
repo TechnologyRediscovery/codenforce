@@ -498,7 +498,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private void reloadCurrentOccPeriodDataHeavy(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            currentOccPeriod = oc.getOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessionUser().getMyCredential());
+            currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessionUser().getMyCredential());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Reloaded occ period ID " + currentOccPeriod.getPeriodID(), ""));

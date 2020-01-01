@@ -37,7 +37,7 @@ import javax.faces.event.ActionEvent;
  *
  * @author ellen bascomb of apt 31y
  */
-public class EventCnFConfigurationBB extends BackingBeanUtils implements Serializable{
+public class EventCECaseConfigurationBB extends BackingBeanUtils implements Serializable{
 
     private EventCategory selectedEventCategory;
     private List<EventCategory> eventCategoryList;
@@ -70,7 +70,7 @@ public class EventCnFConfigurationBB extends BackingBeanUtils implements Seriali
     private boolean newFormHidable;
     
     
-    public EventCnFConfigurationBB() {
+    public EventCECaseConfigurationBB() {
     }
     
     @PostConstruct

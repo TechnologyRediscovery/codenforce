@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
@@ -61,7 +62,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             // go grab that case and check for allowed forward access
             // if forwardLinking is allowed, scrape public data from case and add
             if(cear.getCaseID() != 0){
-                CECaseDataHeavy caseFromActionRequest = caseInt.getCECase(cear.getCaseID());
+                CECase caseFromActionRequest = caseInt.getCECase(cear.getCaseID());
                 if(caseFromActionRequest.isAllowForwardLinkedPublicAccess()){
                     infoBundleList.add(extractPublicInfo(caseFromActionRequest));
                 }
@@ -72,10 +73,10 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         // now go and get CECaseDataHeavy bundles and add them to the list
         
-        List<CECaseDataHeavy> caseList = caseInt.getCECasesByPACC(pacc);
+        List<CECase> caseList = caseInt.getCECasesByPACC(pacc);
         System.out.println("PublicInfoCoordinator.getPublicInfoBundles | num CE cases found: " + caseList.size());
         
-        for(CECaseDataHeavy c: caseList){
+        for(CECase c: caseList){
             // let the extraction method deal with all the assembly logic
             // and access control issues
             infoBundleList.add(extractPublicInfo(c));
@@ -85,7 +86,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return infoBundleList;
     }
     
-    private PublicInfoBundleCECase extractPublicInfo(CECaseDataHeavy c){
+    private PublicInfoBundleCECase extractPublicInfo(CECase c){
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
         pib.setCaseID(c.getCaseID());
         pib.setPacc(c.getPublicControlCode());
@@ -112,15 +113,15 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             
             
             pib.setPublicEventList(new ArrayList<EventCnF>());
-            for(EventCnF ev: c.getVisibleEventList()){
-                if(ev.isDiscloseToPublic()){
-                    pib.getPublicEventList().add(ev);
-                }
-            }
-            
-            pib.setCountViolations(c.getViolationList().size());
-            pib.setCountNoticeLetters(c.getNoticeList().size());
-            pib.setCountCitations(c.getCitationList().size());
+//            for(EventCnF ev: c.getVisibleEventList()){
+//                if(ev.isDiscloseToPublic()){
+//                    pib.getPublicEventList().add(ev);
+//                }
+//            }
+//            
+//            pib.setCountViolations(c.getViolationList().size());
+//            pib.setCountNoticeLetters(c.getNoticeList().size());
+//            pib.setCountCitations(c.getCitationList().size());
             pib.setShowDetailsPageButton(true);
             pib.setShowAddMessageButton(false);
             

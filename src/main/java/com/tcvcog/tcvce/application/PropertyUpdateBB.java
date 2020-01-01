@@ -50,11 +50,7 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
-        try {
-            currProp = pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID());
-        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
-            System.out.println(ex);
-        }
+            currProp = getSessionBean().getSessionProperty();
     }
     
     public String updateProperty(){

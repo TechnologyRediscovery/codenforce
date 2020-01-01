@@ -111,7 +111,7 @@ public class CECaseViolationsBB
     
     
     public void updateViolationsCodeBookLink(ActionEvent ae) throws BObStatusException {
-        CaseIntegrator casei = getCaseIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
         try {
             ViolationIntegrator cvi = getCodeViolationIntegrator();
             CodeIntegrator ci = getCodeIntegrator();
@@ -122,7 +122,7 @@ public class CECaseViolationsBB
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Success: Updated Violation with new CodeBook linking", ""));
-                currentCase = casei.getCECase(currentCase.getCaseID());
+                currentCase = cc.assembleCECaseDataHeavy(cc.getCECase(currentCase.getCaseID()), getSessionBean().getSessionUser().getMyCredential());
             } else {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -147,7 +147,7 @@ public class CECaseViolationsBB
             getSelectedViolation().setComplianceUser(getSessionBean().getSessionUser());
             e = ec.generateViolationComplianceEvent(getSelectedViolation());
             e.setOwner(getSessionBean().getSessionUser());
-            e.setDateOfRecord(LocalDateTime.now());
+            e.setTimeStart(LocalDateTime.now());
             cv.setActualComplianceDate(LocalDateTime.now());
             cc.recordCompliance(cv, getSessionBean().getSessionUser());
         } catch (IntegrationException ex) {

@@ -137,7 +137,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @return
      * @throws IntegrationException 
      */
-    public OccPeriodDataHeavy getOccPeriodDataHeavy(OccPeriod per, Credential cred) throws IntegrationException{
+    public OccPeriodDataHeavy assembleOccPeriodDataHeavy(OccPeriod per, Credential cred) throws IntegrationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccPeriodDataHeavy opdh = null;
         try{

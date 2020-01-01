@@ -110,30 +110,6 @@ public  class CECaseWorkflowBB
     
     
     
-    public void overrideCasePhase(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        CaseIntegrator ci = getCaseIntegrator();
-        try {
-            cc.manuallyChangeCasePhase(currentCase, getSelectedCasePhase());
-            currentCase = ci.getCECase(currentCase.getCaseID());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Updated case phase; please refresh case", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to write case phase changes to DB",
-                            "This error must be corrected by a system administrator, sorry"));
-        } catch (BObStatusException | ViolationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to change case phase due to a case lifecycle exception",
-                            "Please check with your system administrator"));
-
-        }
-    }
 
     
     /**

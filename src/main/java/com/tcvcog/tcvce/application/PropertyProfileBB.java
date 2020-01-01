@@ -4,11 +4,13 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
@@ -101,15 +103,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
         SearchCoordinator sc = getSearchCoordinator();
         
-        try {
-            this.setCurrProp(pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID()));
-        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
-            System.out.println(ex);
-        }
+            this.setCurrProp(getSessionBean().getSessionProperty());
         setPropList(getSessionBean().getSessionPropertyList());
         setOccPeriodTypeList(getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList());
         setSelectedMuni(getSessionBean().getSessionMuni());
@@ -117,7 +115,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         setSelectedPropQuery(getSessionBean().getQueryProperty());
         setSearchParams(getSelectedPropQuery().getParmsList().get(0));
         try {
-            setQueryList(sc.buildQueryPropertyList(s().getSessionUser(), getSessionBean().getSessionMuni()));
+            setQueryList(sc.buildQueryPropertyList(getSessionBean().getSessionUser().getMyCredential()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -142,40 +140,43 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to complete search! ", ""));
-        }
+        } 
     }
     
     public void searchForPropParams(ActionEvent event){
         System.out.println("PropSearchBean.searchwithparams");
         PropertyIntegrator pi = getPropertyIntegrator();
         SearchParamsProperty params = getSearchParams();
+        SearchCoordinator sc = getSearchCoordinator();
 //        params.setAddressPart("%" + getHouseNum() + "%" + getStreetName() + "%");
 //        params.setFilterByAddressPart(true);
 //        params.setMuni(selectedMuni);
   
-        try{
-            System.out.println("Got to the setPropList point actionEvent propprofbean.searchforpropparam");
-            setPropList(pi.searchForProperties(getSearchParams()));
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Your search completed with " + getPropList().size() + " results", ""));
-        } catch (IntegrationException ex) {
-            System.out.println("Search with params failed");
-            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to complete search! ", ""));
+        if(selectedPropQuery != null){
+            try{
+                System.out.println("Got to the setPropList point actionEvent propprofbean.searchforpropparam");
+                setPropList(sc.runQuery(selectedPropQuery).getBOBResultList());
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Your search completed with " + getPropList().size() + " results", ""));
+            } catch (SearchException ex) {
+                System.out.println("Search with params failed");
+                Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Unable to complete search! ", ""));
+            }
         }
     }
     
     public void executeQuery(ActionEvent event){
-        System.out.println("Property Search for props by params");
-        PropertyIntegrator pi = getPropertyIntegrator();
-        
-        try {            
-            setPropList(pi.searchForProperties(getSearchParams()));
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Your search completed with " + getPropList().size() + " results", ""));
-        } catch (IntegrationException ex) {
-            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        System.out.println("Property Search for props by params");
+//        SearchCoordinator sc = getSearchCoordinator();
+//        
+//        try {            
+//            setPropList(sc.runQuery());
+//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Your search completed with " + getPropList().size() + " results", ""));
+//        } catch (IntegrationException ex) {
+//            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
     
   
@@ -196,7 +197,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void addUnitToNewPropUnits() {
         PropertyUnit unitToAdd;
         PropertyCoordinator pc = getPropertyCoordinator();
-        unitToAdd = pc.initPropertyUnit();
+        unitToAdd = pc.initPropertyUnit(currProp);
         unitToAdd.setUnitNumber("");
 //        unitToAdd.setRental(false);
         unitToAdd.setNotes("");
@@ -219,12 +220,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         try {
             pi.updatePropertyUnit(pu);
             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Unit deactivated with ID " + pu.getUnitID(), ""));
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Unit deactivated with ID " + pu.getUnitID(), ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Could not deactivate unit with ID " + pu.getUnitID(), ""));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Could not deactivate unit with ID " + pu.getUnitID(), ""));
         }
         
     }
@@ -317,10 +318,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     private void refreshCurrPropWithLists(){
-        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            setCurrProp(pi.getPropertyDataHeavy(getCurrProp().getPropertyID()));
-        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
+            setCurrProp(pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessionUser().getMyCredential()));
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -345,22 +346,33 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public String manageOccPeriod(OccPeriod op){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         setCurrOccPeriod(op);
-        getSessionBean().setSessionOccPeriod(getCurrOccPeriod());
+        try {
+            getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(getCurrOccPeriod(), getSessionBean().getSessionUser().getMyCredential()));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not load occupancy period with data" + ex.getMessage(), ""));
+            
+        }
         return "occPeriodStatus";
         
     }
     
+    /**
+     * Called when the user initiates new occ period creation
+     * @param pu 
+     */
     public void initiateNewOccPeriodCreation(PropertyUnit pu){
         setSelectedOccPeriodType(null);
         setCurrPropUnit(pu);
     }
     
-    public void saveNewPropInfo(){
-        PropertyIntegrator pi = getPropertyIntegrator();
-        
-    }
-    
+    /**
+     * Final step in creating a new occ period
+     * @return 
+     */
     public String addNewOccPeriod(){
         
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -371,9 +383,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                 setCurrOccPeriod(oc.initOccPeriod(getCurrProp(), getCurrPropUnit(), getSelectedOccPeriodType(), getSessionBean().getSessionUser(), getSessionBean().getSessionMuni()));
                 getCurrOccPeriod().setType(getSelectedOccPeriodType());
                 int newID = 0;
-                System.out.println("PropertyProfileBB.initateNewOccPeriod | currOccPeriod: " + getCurrOccPeriod().getPeriodID());
                 newID = oc.insertNewOccPeriod(getCurrOccPeriod(), getSessionBean().getSessionUser());
-                getSessionBean().setSessionOccPeriod(oi.getOccPeriod(newID));
+                getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessionUser().getMyCredential()));
             } else {
                 getFacesContext().addMessage(null,
                                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -420,18 +431,16 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public void manageProperty(Property prop){
-        PropertyIntegrator pi = getPropertyIntegrator();
-        UserIntegrator ui = getUserIntegrator();
-        SystemIntegrator si = getSystemIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
         
         try {
-            setCurrProp(pi.getPropertyDataHeavy(prop.getPropertyID()));
-            si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), prop);
-            getSessionBean().setSessionProperty(prop);
+            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessionUser().getMyCredential()));
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Managing property at " + prop.getAddress() , ""));
-        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
+            sc.logObjectView(getSessionBean().getSessionUser(), prop);
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -443,17 +452,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      * @return the currentProperty
      */
     public PropertyDataHeavy getCurrProp() {
-        PropertyIntegrator pi = getPropertyIntegrator();
-        try {
-            if(currProp == null){
-                currProp = pi.getPropertyDataHeavy(getSessionBean().getSessionProperty().getPropertyID());
-            }
-        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        ex.getMessage(), ""));
-        }
         return currProp;
     }
     

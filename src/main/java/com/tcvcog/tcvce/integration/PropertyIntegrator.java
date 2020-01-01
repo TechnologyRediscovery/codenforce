@@ -890,30 +890,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
   
     
     
-    /**
-     * 
-     * @param propertyID
-     * @param u
-     * @return
-     * @throws IntegrationException
-     * @throws BObStatusException
-     * @throws EventException
-     * @throws AuthorizationException 
-     */
-    public PropertyDataHeavy getPropertyDataHeavy(int propertyID) throws IntegrationException, BObStatusException, EventException, AuthorizationException {
-            PropertyCoordinator pc = getPropertyCoordinator();
-            CaseIntegrator ci = getCaseIntegrator();
-            PersonIntegrator pi = getPersonIntegrator();
-            SearchCoordinator sc = getSearchCoordinator();
-            
-            
-            PropertyDataHeavy pdh = new PropertyDataHeavy(getProperty(propertyID));
-            
-            pdh.setUnitWithListsList(getPropertyUnitWithListsList(pdh.getUnitList()));
-            
-            
-        return 
-    }
+   
 
     /**
      * Dumps all Property records for a given User and lets the caller sort through them

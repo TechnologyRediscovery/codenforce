@@ -22,7 +22,6 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -33,17 +32,11 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -109,30 +102,6 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return p;
     }
     
-     /**
-     * Returns PropertyWithLists with all units, including default unit.
-     * @param prop
-     * @param cred
-     * @return PropertyWithLists object
-     * @throws BObStatusException 
-     * @throws com.tcvcog.tcvce.domain.EventException 
-     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
-     */
-    public PropertyDataHeavy getPropertyDataHeavy(Property prop, Credential cred) throws BObStatusException, EventException, AuthorizationException{
-        PropertyIntegrator pi = getPropertyIntegrator();
-        
-        PropertyDataHeavy pdh = null;
-        
-        try{
-            pdh = assemblePropertyDataHeavy(pi.getPropertyDataHeavy(prop.getPropertyID()), cred);
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }     
-        
-        return pdh;
-    }   
-    
     /**
      * Adapter method for folks who need a PropertyDataHeavy but who only have an
      * int propertyID; first it gets a simple property from the ID and then
@@ -146,7 +115,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @throws EventException 
      */
     public PropertyDataHeavy getPropertyDataHeavy(int propID, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException{
-        return getPropertyDataHeavy(getProperty(propID), cred);
+        return assemblePropertyDataHeavy(getProperty(propID), cred);
     }
     
     
@@ -165,7 +134,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public PropertyDataHeavy getPropertyDataHeavyByUnit(int propUnitID, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException{
         PropertyIntegrator pi = getPropertyIntegrator();
-        return getPropertyDataHeavy(pi.getPropertyUnitWithProp(propUnitID).getProperty(), cred);
+        return assemblePropertyDataHeavy(pi.getPropertyUnitWithProp(propUnitID).getProperty(), cred);
     }
     
     
@@ -207,25 +176,19 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         PropertyIntegrator pi = getPropertyIntegrator();
         MunicipalityCoordinator mc = getMuniCoordinator();
-        
+        PropertyCoordinator pc = getPropertyCoordinator();
         
         if(cred != null){
-            
-             
             try {
-                MunicipalityDataHeavy mdh = mc.getMuniDataHeavy(cred.getGoverningAuthPeriod().getMuni().getMuniCode());
+                MunicipalityDataHeavy mdh = mc.assembleMuniDataHeavy(cred.getGoverningAuthPeriod().getMuni(), cred);
                     if(mdh.getMuniOfficePropertyId() !=0){
-                        return pi.getPropertyDataHeavy(mdh.getMuniOfficePropertyId());
-                    } else {
-                        return pi.getPropertyDataHeavy(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("arbitraryPlaceholderPropertyID")));
-                    }
+                        return pc.assemblePropertyDataHeavy(pc.getProperty(mdh.getMuniOfficePropertyId()), cred);
+                    } 
             } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
                 System.out.println(ex);
             }
         }
-        
         return  null;
-        
     }
     
     

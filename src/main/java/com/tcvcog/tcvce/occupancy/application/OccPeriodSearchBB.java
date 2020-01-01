@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
@@ -94,7 +95,7 @@ public  class   OccPeriodSearchBB
         Credential cred = getSessionBean().getSessionUser().getMyCredential();
         
         try {
-            getSessionBean().setSessionOccPeriod(oc.getOccPeriodDataHeavy(op, cred));
+            getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(op, cred));
             getSessionBean().setSessionProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), cred));
             sc.logObjectView(getSessionBean().getSessionUser(), op);
         } catch (IntegrationException | BObStatusException | AuthorizationException | EventException ex) {
@@ -133,24 +134,18 @@ public  class   OccPeriodSearchBB
             occPeriodList.clear();
         }
         try {
-            occPeriodList.addAll(sc.runQuery(occPeriodQuerySelected, getSessionBean().getSessionUser().getMyCredential()).getBOBResultList());
+            occPeriodList.addAll(sc.runQuery(occPeriodQuerySelected).getBOBResultList());
             if (occPeriodList != null) {
                 listSize = occPeriodList.size();
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Your query completed with " + listSize + " results", ""));
-        } catch (IntegrationException ex) {
+        } catch (SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not query the database, sorry.", ""));
-        } catch (AuthorizationException | EventException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not query for Periods due to authorization errors, sorry.", ""));
-            
+                            "Could not query for Periods due to search errors, sorry.", ""));
         }
     }
     
