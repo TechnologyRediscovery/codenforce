@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -43,7 +43,7 @@ import javax.faces.event.ActionEvent;
  */
 public class NoticeOfViolationBB extends BackingBeanUtils implements Serializable {
     
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
 
     private NoticeOfViolation currentNotice;
     private List<CodeViolation> activeVList;
@@ -332,14 +332,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 

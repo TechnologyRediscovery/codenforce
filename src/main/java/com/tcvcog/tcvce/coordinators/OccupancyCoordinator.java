@@ -21,10 +21,12 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SessionException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.Credential;
@@ -84,6 +86,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.SysexMessage;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
+import com.tcvcog.tcvce.util.SubSysEnum;
 
 /**
  * King of all business logic implementation for the entire Occupancy object tree
@@ -199,8 +202,27 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     }
     
-    public OccPeriod selectDefaultOccPeriod(MunicipalityDataHeavy mdh, Credential cred){
+    
+    public OccPeriod selectDefaultOccPeriod(MunicipalityDataHeavy mdh, Credential cred) throws SessionException{
+        if(mdh.getMuniPropertyDH() != null 
+                &&
+            mdh.getMuniPropertyDH().getUnitWithListsList() != null
+                &&
+            !mdh.getMuniPropertyDH().getUnitWithListsList().isEmpty()
+                &&
+            mdh.getMuniPropertyDH().getUnitWithListsList().get(0) != null
+                &&
+            mdh.getMuniPropertyDH().getUnitWithListsList().get(0).getPeriodList() != null
+                &&
+            !mdh.getMuniPropertyDH().getUnitWithListsList().get(0).getPeriodList().isEmpty()){
+            
+            return mdh.getMuniPropertyDH().getUnitWithListsList().get(0).getPeriodList().get(0);
+        }
         
+        else {
+            throw new SessionException("Could not extract default occ period from muni", 
+                    SubSysEnum.VI_OCCPERIOD, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
+        }
         
     }
     
@@ -818,7 +840,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             // insert the event and grab the new ID
             insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
             // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
-            proposal.setResponseEvent(ei.getOccEvent(insertedEventID));
+            proposal.setResponseEvent(ec.getEvent(insertedEventID));
             cc.recordProposalEvaluation(proposal);
         } else {
             throw new BObStatusException("Unable to evaluate proposal due to business rule violation");

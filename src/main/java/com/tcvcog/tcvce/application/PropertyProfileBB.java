@@ -12,7 +12,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
@@ -339,7 +339,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return "addNewCase";
     }
     
-    public String viewCase(CECase c){
+    public String viewCase(CECaseDataHeavy c){
         getSessionBean().setSessionCECase(c);
         return "ceCases";
     }

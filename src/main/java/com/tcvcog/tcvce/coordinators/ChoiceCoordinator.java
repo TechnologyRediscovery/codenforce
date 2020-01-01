@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Directive;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Proposal;
@@ -51,7 +51,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     public ChoiceCoordinator() {
     }
     
-    public CECase configureProposals(CECase cse, UserAuthorized u) throws EventException, AuthorizationException{
+    public CECaseDataHeavy configureProposals(CECaseDataHeavy cse, UserAuthorized u) throws EventException, AuthorizationException{
         if(cse.getProposalList() != null && u != null){
             Iterator<Proposal> iter = cse.getProposalList().iterator();
             while(iter.hasNext()){
@@ -197,10 +197,10 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Takes in a Directive object and an OccPeriod or CECase and 
-     * implements that directive by assigning it via a Proposal given sensible initial values
+     * Takes in a Directive object and an OccPeriod or CECaseDataHeavy and 
+ implements that directive by assigning it via a Proposal given sensible initial values
      * @param dir Extracted from the EventCnF to be implemented
-     * @param propDriven which in beta v.0.9 are CECase and OccPeriod objects
+     * @param propDriven which in beta v.0.9 are CECaseDataHeavy and OccPeriod objects
      * @param ev 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
@@ -226,7 +226,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         
         if(propDriven instanceof OccPeriod){
             OccPeriod op = (OccPeriod) propDriven;
-            if(!op.isOpen() && !dir.isApplyToClosedBOBs()){
+            if(!dir.isApplyToClosedBOBs()){
                 return;
             }
             ProposalOccPeriod pop = new ProposalOccPeriod(pr);
@@ -234,8 +234,8 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
             pop.setPeriod(op);
             ci.insertProposal(pop);
             
-        } else if(propDriven instanceof CECase){
-            CECase cse = (CECase) propDriven;
+        } else if(propDriven instanceof CECaseDataHeavy){
+            CECaseDataHeavy cse = (CECaseDataHeavy) propDriven;
             if(!cse.isOpen() && !dir.isApplyToClosedBOBs()){
                 return;
             }
@@ -249,10 +249,10 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Processes requests to reject a proposal by checking user rank, required status, 
-     * and the CECase's or OccPeriod's open/closed status
+ and the CECaseDataHeavy's or OccPeriod's open/closed status
      * @param p to be rejected
      * @param bob this interface allows you to ask the object if it's open or closed. For Occbeta, this is only
-     * OccPeriod and CECase objects
+ OccPeriod and CECaseDataHeavy objects
      * @param u the current session user
      * @throws IntegrationException
      * @throws AuthorizationException

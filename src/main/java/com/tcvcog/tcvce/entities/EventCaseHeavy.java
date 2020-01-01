@@ -26,7 +26,7 @@ package com.tcvcog.tcvce.entities;
 public  class   EventCaseHeavy 
         extends EventCnF{
     
-    protected CECaseBase ceCase;
+    protected CECase ceCase;
     
     public EventCaseHeavy(EventCnF ev){
         this.eventID = ev.getEventID();
@@ -55,14 +55,14 @@ public  class   EventCaseHeavy
     /**
      * @return the ceCase
      */
-    public CECaseBase getCeCase() {
+    public CECase getCeCase() {
         return ceCase;
     }
 
     /**
      * @param ceCase the ceCase to set
      */
-    public void setCeCase(CECaseBase ceCase) {
+    public void setCeCase(CECase ceCase) {
         this.ceCase = ceCase;
     }
 

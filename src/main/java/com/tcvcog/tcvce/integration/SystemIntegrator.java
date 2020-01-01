@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
@@ -783,8 +783,8 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.execute();
 
                 System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
-            } else if (ob instanceof CECase) {
-                CECase c = (CECase) ob;
+            } else if (ob instanceof CECaseDataHeavy) {
+                CECaseDataHeavy c = (CECaseDataHeavy) ob;
                 
                 insertSB.append("(login_userid, cecase_caseid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
                 stmt = con.prepareStatement(insertSB.toString());
@@ -908,8 +908,8 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setInt(2, p.getPropertyID());
                 stmt.execute();
                 System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
-            } else if (ob instanceof CECase) {
-                CECase c = (CECase) ob;
+            } else if (ob instanceof CECaseDataHeavy) {
+                CECaseDataHeavy c = (CECaseDataHeavy) ob;
                 // prepare SELECT statement
                 selectSB.append("AND cecase_caseid = ? ");
                 stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);

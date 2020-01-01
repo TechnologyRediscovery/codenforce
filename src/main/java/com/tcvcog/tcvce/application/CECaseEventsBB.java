@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFCasePropBundle;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -45,7 +45,7 @@ public class CECaseEventsBB
         extends     BackingBeanUtils
         implements  Serializable {
 
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     private ArrayList<EventCnF> recentEventList;
     
     
@@ -278,7 +278,7 @@ public class CECaseEventsBB
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
     
@@ -287,7 +287,7 @@ public class CECaseEventsBB
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 

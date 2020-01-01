@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
@@ -45,17 +45,17 @@ public class CECaseSearchBB
         extends BackingBeanUtils
         implements Serializable {
     
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     
-    private List<CECase> caseList;
-    private ArrayList<CECase> filteredCaseList;
+    private List<CECaseDataHeavy> caseList;
+    private ArrayList<CECaseDataHeavy> filteredCaseList;
     private SearchParamsCECase searchParams;
     
     private List<QueryCECase> queryList;
     private QueryCECase selectedCECaseQuery;
     private Query selectedBOBQuery;
     
-    private ArrayList<CECase> filteredCaseHistoryList;
+    private ArrayList<CECaseDataHeavy> filteredCaseHistoryList;
     
     private List<User> usersForSearchConfig;
 
@@ -88,7 +88,7 @@ public class CECaseSearchBB
         if(!selectedCECaseQuery.isExecutedByIntegrator()){
             try {
                 sc.runQuery(getSelectedCECaseQuery());
-            } catch (IntegrationException | BObStatusExceptionex) {
+            } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex);
             }
         }
@@ -109,7 +109,7 @@ public class CECaseSearchBB
      *
      * @param c the case to be managed--comes from the data table row button
      */
-    public void manageCECase(CECase c) {
+    public void manageCECase(CECaseDataHeavy c) {
         SystemIntegrator si = getSystemIntegrator();
         
         System.out.println("CaseProfileBB.manageCECase | caseid: " + c.getCaseID());
@@ -194,21 +194,21 @@ public class CECaseSearchBB
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @return the caseList
      */
-    public List<CECase> getCaseList() {
+    public List<CECaseDataHeavy> getCaseList() {
         return caseList;
     }
 
     /**
      * @return the filteredCaseList
      */
-    public ArrayList<CECase> getFilteredCaseList() {
+    public ArrayList<CECaseDataHeavy> getFilteredCaseList() {
         return filteredCaseList;
     }
 
@@ -246,7 +246,7 @@ public class CECaseSearchBB
     /**
      * @return the filteredCaseHistoryList
      */
-    public ArrayList<CECase> getFilteredCaseHistoryList() {
+    public ArrayList<CECaseDataHeavy> getFilteredCaseHistoryList() {
         return filteredCaseHistoryList;
     }
 
@@ -267,21 +267,21 @@ public class CECaseSearchBB
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 
     /**
      * @param caseList the caseList to set
      */
-    public void setCaseList(List<CECase> caseList) {
+    public void setCaseList(List<CECaseDataHeavy> caseList) {
         this.caseList = caseList;
     }
 
     /**
      * @param filteredCaseList the filteredCaseList to set
      */
-    public void setFilteredCaseList(ArrayList<CECase> filteredCaseList) {
+    public void setFilteredCaseList(ArrayList<CECaseDataHeavy> filteredCaseList) {
         this.filteredCaseList = filteredCaseList;
     }
 
@@ -316,7 +316,7 @@ public class CECaseSearchBB
     /**
      * @param filteredCaseHistoryList the filteredCaseHistoryList to set
      */
-    public void setFilteredCaseHistoryList(ArrayList<CECase> filteredCaseHistoryList) {
+    public void setFilteredCaseHistoryList(ArrayList<CECaseDataHeavy> filteredCaseHistoryList) {
         this.filteredCaseHistoryList = filteredCaseHistoryList;
     }
 

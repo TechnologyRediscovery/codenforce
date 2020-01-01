@@ -25,7 +25,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -45,7 +45,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
 
     
     private CodeViolation currentViolation;
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     
     
     // violation update event fields
@@ -192,14 +192,14 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
     

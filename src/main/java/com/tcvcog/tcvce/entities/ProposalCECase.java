@@ -20,7 +20,7 @@ public class ProposalCECase
     
   
     private int ceCaseID;
-    private CECaseBase ceCase;
+    private CECase ceCase;
     
   
      public ProposalCECase(Proposal pr){
@@ -63,7 +63,7 @@ public class ProposalCECase
     /**
      * @return the ceCase
      */
-    public CECaseBase getCeCase() {
+    public CECase getCeCase() {
         return ceCase;
     }
 
@@ -77,7 +77,7 @@ public class ProposalCECase
     /**
      * @param ceCase the ceCase to set
      */
-    public void setCeCase(CECaseBase ceCase) {
+    public void setCeCase(CECase ceCase) {
         this.ceCase = ceCase;
     }
 

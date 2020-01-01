@@ -9,7 +9,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
@@ -57,11 +57,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         for(CEActionRequest cear: requestList){
             PublicInfoBundleCEActionRequest bundle = extractPublicInfo(cear);
             
-            // if the current action request is linked to a CECase,
+            // if the current action request is linked to a CECaseDataHeavy,
             // go grab that case and check for allowed forward access
             // if forwardLinking is allowed, scrape public data from case and add
             if(cear.getCaseID() != 0){
-                CECase caseFromActionRequest = caseInt.getCECase(cear.getCaseID());
+                CECaseDataHeavy caseFromActionRequest = caseInt.getCECase(cear.getCaseID());
                 if(caseFromActionRequest.isAllowForwardLinkedPublicAccess()){
                     infoBundleList.add(extractPublicInfo(caseFromActionRequest));
                 }
@@ -70,12 +70,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         }
         
 
-        // now go and get CECase bundles and add them to the list
+        // now go and get CECaseDataHeavy bundles and add them to the list
         
-        List<CECase> caseList = caseInt.getCECasesByPACC(pacc);
+        List<CECaseDataHeavy> caseList = caseInt.getCECasesByPACC(pacc);
         System.out.println("PublicInfoCoordinator.getPublicInfoBundles | num CE cases found: " + caseList.size());
         
-        for(CECase c: caseList){
+        for(CECaseDataHeavy c: caseList){
             // let the extraction method deal with all the assembly logic
             // and access control issues
             infoBundleList.add(extractPublicInfo(c));
@@ -85,7 +85,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return infoBundleList;
     }
     
-    private PublicInfoBundleCECase extractPublicInfo(CECase c){
+    private PublicInfoBundleCECase extractPublicInfo(CECaseDataHeavy c){
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
         pib.setCaseID(c.getCaseID());
         pib.setPacc(c.getPublicControlCode());

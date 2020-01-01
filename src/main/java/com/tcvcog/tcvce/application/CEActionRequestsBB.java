@@ -12,9 +12,10 @@ import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
@@ -77,11 +78,11 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     private Person selectedPersonForAttachment;
 
-    private ArrayList<CECase> caseListForSelectedProperty;
+    private ArrayList<CECaseDataHeavy> caseListForSelectedProperty;
     private String houseNumSearch;
     private String streetNameSearch;
 
-    private CECase selectedCaseForAttachment;
+    private CECaseDataHeavy selectedCaseForAttachment;
 
     private Municipality muniForPropSwitchSearch;
     private Property propertyForPropSwitch;
@@ -106,8 +107,13 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
         selectedRequest = getSessionBean().getSessionCEAR();
         ReportCEARList rpt = null;
+        
         try {
             requestList = sc.runQuery(sessionQuery).getResults();
+        } catch (SearchException ex) {
+            System.out.println(ex);
+            
+        }
             if (selectedRequest == null && requestList.size() > 0) {
                 selectedRequest = requestList.get(0);
                 generateCEARReasonDonutModel();
@@ -123,8 +129,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             rpt.setPrintFullCEARQueue(false);
             QueryCEAR query = searchCoord.initQuery(
                                                 QueryCEAREnum.CUSTOM, 
-                                                getSessionBean().getSessionUser().getMyCredential(), 
-                                                null);
+                                                getSessionBean().getSessionUser().getMyCredential());
             List<CEActionRequest> singleReqList = new ArrayList<>();
             if(selectedRequest != null){
                 selectedRequest.setInsertPageBreakBefore(false);
@@ -135,14 +140,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             rpt.setBOBQuery(query);
             rpt.setGenerationTimestamp(LocalDateTime.now());
             rpt.setTitle("Code enforcement request");
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Unable to build query, sorry!", ""));
-        } catch (AuthorizationException ex) {
-            System.out.println(ex);
-        }
+        
         reportConfig = rpt;
     }
 
@@ -172,16 +170,11 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                              "Your query completed with " + requestList.size() + " results!", ""));
-        } catch (IntegrationException ex) {
+        } catch (SearchException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                              "Unable to query action requests, sorry", ""));
-        } catch (AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             ex.getMessage(), ""));
-        }
+        } 
 
     }
 
@@ -190,25 +183,19 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SearchCoordinator searchCoord = getSearchCoordinator();
         try {
             
-            selectedQueryCEAR = searchCoord.initQuery(
-                                                    QueryCEAREnum.CUSTOM,
-                                                    getSessionBean().getSessionUser().getMyCredential(), 
-                                                    searchParams);
+            selectedQueryCEAR = searchCoord.initQuery(QueryCEAREnum.CUSTOM,
+                                                    getSessionBean().getSessionUser().getMyCredential());
             requestList =searchCoord.runQuery(selectedQueryCEAR).getResults();
             
             generateCEARReasonDonutModel();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                              "Your query completed with " + requestList.size() + " results!", ""));
-        } catch (IntegrationException ex) {
+        } catch (SearchException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                              "Unable to query action requests, sorry", ""));
-        } catch (AuthorizationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             ex.getMessage(), ""));
-        }
+        } 
     }
 
     public void prepareReportMultiCEAR(ActionEvent ev) {
@@ -221,10 +208,10 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         rpt.setPrintFullCEARQueue(true);
         if (selectedQueryCEAR != null) {
             //go run the Query if it hasn't been yet
-            if(!selectedQueryCEAR.isExecutedByIntegrator()){
+            if(selectedQueryCEAR.getExecutionTimestamp() == null){
                 try {
                     selectedQueryCEAR = searchCoord.runQuery(selectedQueryCEAR);
-                } catch (AuthorizationException | IntegrationException ex) {
+                } catch (SearchException ex) {
                     System.out.println(ex);
                 }
             }
@@ -303,7 +290,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         return "addNewCase";
     }
 
-    public void path2UseSelectedCaseForAttachment(CECase c) {
+    public void path2UseSelectedCaseForAttachment(CECaseDataHeavy c) {
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         selectedCaseForAttachment = c;
         try {
@@ -772,7 +759,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     /**
      * @return the caseListForSelectedProperty
      */
-    public ArrayList<CECase> getCaseListForSelectedProperty() {
+    public ArrayList<CECaseDataHeavy> getCaseListForSelectedProperty() {
         CaseIntegrator ci = getCaseIntegrator();
         if (selectedRequest != null) {
             try {
@@ -790,21 +777,21 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     /**
      * @param caseListForSelectedProperty the caseListForSelectedProperty to set
      */
-    public void setCaseListForSelectedProperty(ArrayList<CECase> caseListForSelectedProperty) {
+    public void setCaseListForSelectedProperty(ArrayList<CECaseDataHeavy> caseListForSelectedProperty) {
         this.caseListForSelectedProperty = caseListForSelectedProperty;
     }
 
     /**
      * @return the selectedCaseForAttachment
      */
-    public CECase getSelectedCaseForAttachment() {
+    public CECaseDataHeavy getSelectedCaseForAttachment() {
         return selectedCaseForAttachment;
     }
 
     /**
      * @param selectedCaseForAttachment the selectedCaseForAttachment to set
      */
-    public void setSelectedCaseForAttachment(CECase selectedCaseForAttachment) {
+    public void setSelectedCaseForAttachment(CECaseDataHeavy selectedCaseForAttachment) {
         this.selectedCaseForAttachment = selectedCaseForAttachment;
     }
 

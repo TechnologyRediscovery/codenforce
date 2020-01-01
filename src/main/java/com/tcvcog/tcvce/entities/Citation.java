@@ -35,7 +35,7 @@ public class Citation implements Serializable {
     
     private List<EventCnF> eventList;
     
-    private CECaseBase ceCaseNoLists;
+    private CECase ceCaseNoLists;
     private User userOwner;
     
     private LocalDateTime dateOfRecord;
@@ -261,14 +261,14 @@ public class Citation implements Serializable {
     /**
      * @return the ceCaseNoLists
      */
-    public CECaseBase getCeCaseNoLists() {
+    public CECase getCeCaseNoLists() {
         return ceCaseNoLists;
     }
 
     /**
      * @param ceCaseNoLists the ceCaseNoLists to set
      */
-    public void setCeCaseNoLists(CECaseBase ceCaseNoLists) {
+    public void setCeCaseNoLists(CECase ceCaseNoLists) {
         this.ceCaseNoLists = ceCaseNoLists;
     }
 

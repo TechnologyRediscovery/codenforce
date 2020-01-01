@@ -248,7 +248,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * case phase (closed cases cannot have action, origination, or compliance events.
      * Includes the instantiation of EventCnF objects
      * 
-     * @param erg which for Beta v0.9 includes CECase and OccPeriod object
+     * @param erg which for Beta v0.9 includes CECaseDataHeavy and OccPeriod object
      * @param ec the type of event to attach to the case
      * @return an initialized event with basic properties set
      * @throws BObStatusException thrown if the case is in an improper state for proposed event
@@ -257,15 +257,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         if(ec == null) return null;
         
-        CECase cse = null;
+        CECaseDataHeavy cse = null;
         OccPeriod op = null;
         
         // the moment of event instantiaion!!!!
         EventCnF e = new EventCnF();
         
         if(erg != null){
-            if(erg instanceof CECase){
-                cse = (CECase) erg;
+            if(erg instanceof CECaseDataHeavy){
+                cse = (CECaseDataHeavy) erg;
                  if(cse.getCasePhase() == CasePhase.Closed && 
                     (
                         ec.getEventType() == EventType.Action
@@ -329,17 +329,17 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
      /**
      * Implements business rules for determining which event types are allowed
-     * to be attached to the given CECase based on the case's phase and the
-     * user's permissions in the system.
+ to be attached to the given CECaseDataHeavy based on the case's phase and the
+ user's permissions in the system.
      *
      * Used for displaying the appropriate event types to the user on the
      * cecases.xhtml page
      *
-     * @param c the CECase on which the event would be attached
+     * @param c the CECaseDataHeavy on which the event would be attached
      * @param u the User doing the attaching
      * @return allowed EventTypes for attaching to the given case
      */
-    public List<EventType> getPermittedEventTypesForCECase(CECase c, UserAuthorized u) {
+    public List<EventType> getPermittedEventTypesForCECase(CECaseDataHeavy c, UserAuthorized u) {
         List<EventType> typeList = new ArrayList<>();
         RoleType role = u.getRole();
         if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
@@ -439,7 +439,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * The event is coming to us from the violationEditBB with the description and disclosures flags
      * correct. This method needs to set the description from the resource bundle, and 
      * set the date of record to the current date
-     * @param ceCase the CECase whose violation was updated
+     * @param ceCase the CECaseDataHeavy whose violation was updated
      * @param cv the code violation being updated
      * @param event An initialized event
      * @throws IntegrationException bubbled up from the integrator
@@ -447,7 +447,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
-    public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCnF event) 
+    public void generateAndInsertCodeViolationUpdateEvent(CECaseDataHeavy ceCase, CodeViolation cv, EventCnF event) 
             throws IntegrationException, EventException, BObStatusException, ViolationException{
         EventIntegrator ei = getEventIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -592,13 +592,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return ev;
     }
     
-    public void generateAndInsertManualCasePhaseOverrideEvent(CECase currentCase, CasePhase pastPhase) 
+    public void generateAndInsertManualCasePhaseOverrideEvent(CECaseDataHeavy currentCase, CasePhase pastPhase) 
             throws IntegrationException, BObStatusException, ViolationException{
         
           EventIntegrator ei = getEventIntegrator();
           CaseCoordinator cc = getCaseCoordinator();
         
-        EventCnF event = getInitializedEvent(currentCase, ei.getEventCategory(Integer.parseInt(getResourceBundle(
+        EventCnF event = initEvent(currentCase, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("casePhaseManualOverride"))));
         
         StringBuilder sb = new StringBuilder();
@@ -669,13 +669,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Attaches a single event rule to an EventRuleGoverned entity, the type of which is determined
-     * internally with instanceof checks for OccPeriod and CECase Objects
+ internally with instanceof checks for OccPeriod and CECaseDataHeavy Objects
      * 
      * @param era
      * @param rg
      * @param usr
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.BObStatusException if an IFaceEventRuleGoverned instances is neither a CECase or an OccPeriod
+     * @throws com.tcvcog.tcvce.domain.BObStatusException if an IFaceEventRuleGoverned instances is neither a CECaseDataHeavy or an OccPeriod
      */
     public void rules_attachEventRule(EventRuleAbstract era, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, BObStatusException{
         
@@ -688,8 +688,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                     cc.implementDirective(era.getPromptingDirective(), op, null);
                     System.out.println("EventCoordinator.rules_attachEventRule | Found not null prompting directive");
                 }
-            } else if (rg instanceof CECase){ 
-                CECase cec = (CECase) rg;
+            } else if (rg instanceof CECaseDataHeavy){ 
+                CECaseDataHeavy cec = (CECaseDataHeavy) rg;
                 rules_attachEventRuleAbstractToCECase(era, cec);
                 if(freshObjectID != 0 && era.getPromptingDirective() != null){
                     cc.implementDirective(era.getPromptingDirective(), cec, null);
@@ -726,13 +726,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * Primary entrance point for an EventRuleAbstract instance (not its connection to an Object)
      * @param era required instance
      * @param period optional--only if you're attaching to an OccPeriod
-     * @param cse Optional--only if you're attachign to a CECase
+     * @param cse Optional--only if you're attachign to a CECaseDataHeavy
      * @param connectToBOBRuleList Switch me on in order to 
      * @param usr 
      * @return
      * @throws IntegrationException 
      */
-    public int rules_createEventRuleAbstract(EventRuleAbstract era, OccPeriodDataHeavy period, CECase cse, boolean connectToBOBRuleList, UserAuthorized usr) throws IntegrationException{
+    public int rules_createEventRuleAbstract(EventRuleAbstract era, OccPeriodDataHeavy period, CECaseDataHeavy cse, boolean connectToBOBRuleList, UserAuthorized usr) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         ChoiceIntegrator ci = getChoiceIntegrator();
         
@@ -801,8 +801,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Takes in an EventRuleSet object which contains a list of EventRuleAbstract objects
-     * and either an OccPeriod or CECase and implements those abstract rules 
-     * on that particular business object
+ and either an OccPeriod or CECaseDataHeavy and implements those abstract rules 
+ on that particular business object
      * @param ers
      * @param rg
      * @param usr
@@ -814,8 +814,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             if(rg instanceof OccPeriodDataHeavy){
                 OccPeriodDataHeavy op = (OccPeriodDataHeavy) rg;
                 rules_attachEventRuleAbstractToOccPeriod(era, op, usr);
-            } else if (rg instanceof CECase){
-                CECase cec = (CECase) rg;
+            } else if (rg instanceof CECaseDataHeavy){
+                CECaseDataHeavy cec = (CECaseDataHeavy) rg;
                 rules_attachEventRuleAbstractToCECase(era, cec);
             } else {
                 throw new BObStatusException("Cannot attach rule set");
@@ -829,7 +829,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param era
      * @param cse 
      */
-    private void rules_attachEventRuleAbstractToCECase(EventRuleAbstract era, CECase cse){
+    private void rules_attachEventRuleAbstractToCECase(EventRuleAbstract era, CECaseDataHeavy cse){
     
         
     }
@@ -839,7 +839,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param era
      * @param cse 
      */
-    public void rules_attachEventRuleAbstractToMuniCERuleSet(EventRuleAbstract era, CECase cse){
+    public void rules_attachEventRuleAbstractToMuniCERuleSet(EventRuleAbstract era, CECaseDataHeavy cse){
         
     }
     
@@ -888,7 +888,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    private boolean rules_evalulateEventRule(CECase cse, EventCnF event) throws IntegrationException, BObStatusException, ViolationException {
+    private boolean rules_evalulateEventRule(CECaseDataHeavy cse, EventCnF event) throws IntegrationException, BObStatusException, ViolationException {
         EventRuleAbstract rule = new EventRuleAbstract();
         boolean rulePasses = false;
         CaseCoordinator cc = getCaseCoordinator();
@@ -906,7 +906,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return rulePasses;
     }
     
-    private boolean ruleSubcheck_requiredEventCategory(CECase cse, EventRuleAbstract rule) {
+    private boolean ruleSubcheck_requiredEventCategory(CECaseDataHeavy cse, EventRuleAbstract rule) {
         boolean subcheckPasses = true;
         if (rule.getRequiredEventCategory().getCategoryID() != 0) {
             subcheckPasses = false;
@@ -921,7 +921,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
 
-    private boolean ruleSubcheck_forbiddenEventType(CECase cse, EventRuleAbstract rule) {
+    private boolean ruleSubcheck_forbiddenEventType(CECaseDataHeavy cse, EventRuleAbstract rule) {
         boolean subcheckPasses = true;
         Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
         while (iter.hasNext()) {
@@ -933,7 +933,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
 
-    private boolean ruleSubcheck_requiredEventType(CECase cse, EventRuleAbstract rule) {
+    private boolean ruleSubcheck_requiredEventType(CECaseDataHeavy cse, EventRuleAbstract rule) {
         boolean subcheckPasses = true;
         if (rule.getRequiredEventType() != null) {
             subcheckPasses = false;
@@ -948,7 +948,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
 
-    private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, EventRuleAbstract rule) {
+    private boolean ruleSubcheck_forbiddenEventCategory(CECaseDataHeavy cse, EventRuleAbstract rule) {
         boolean subcheckPasses = true;
         Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
         while (iter.hasNext()) {

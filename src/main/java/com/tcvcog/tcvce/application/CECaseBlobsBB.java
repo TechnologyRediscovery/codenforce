@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
@@ -34,7 +34,7 @@ public  class       CECaseBlobsBB
 
     
     
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     
     /**
      * Creates a new instance of CECaseBlobs
@@ -73,14 +73,14 @@ public  class       CECaseBlobsBB
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
     

@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
@@ -32,7 +32,7 @@ public  class       CECasePaymentsBB
         extends     BackingBeanUtils
         implements  Serializable {
 
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     
     private List<MoneyCECaseFeeAssigned> filteredFeeList;
     private List<MoneyCECaseFeePayment> filteredPaymentList;
@@ -75,14 +75,14 @@ public  class       CECasePaymentsBB
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 

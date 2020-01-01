@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
@@ -47,7 +47,7 @@ public  class CECaseWorkflowBB
         extends BackingBeanUtils
         implements Serializable{
     
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
 
     private ReportConfigCECase reportCECase;
     
@@ -253,7 +253,7 @@ public  class CECaseWorkflowBB
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
@@ -287,7 +287,7 @@ public  class CECaseWorkflowBB
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 

@@ -13,7 +13,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECaseBase;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -170,7 +170,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     for(Integer i: ei.searchForEvents(sp)){
                         evTempList.add(ec.getEvent(i));
                     }
-                } catch (IntegrationException | BObStatusExceptionex) {
+                } catch (IntegrationException | BObStatusException ex) {
                     System.out.println(ex);
                     throw new SearchException("Integration or CaseLifecycle exception in query run;");
                 }
@@ -251,7 +251,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         prepareQueryForRun(q);
 
         List<SearchParamsCECase> paramsList = q.getParmsList();
-        List<CECaseBase> caseListTemp = new ArrayList<>();
+        List<CECase> caseListTemp = new ArrayList<>();
         
         for(SearchParamsCECase params: paramsList){
             caseListTemp.clear();
@@ -263,7 +263,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     for(Integer i: ci.searchForCECases(params)){
                         caseListTemp.add(cc.getCECase(i));
                     }
-                } catch (IntegrationException | BObStatusExceptionex) {
+                } catch (IntegrationException | BObStatusException ex) {
                     throw new SearchException("Exception during search: " + ex.toString());
                 }
             }
@@ -845,6 +845,19 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setPersonType_val(pList);
         
         return params;
+    }
+    
+    private SearchParamsPerson generateParams_person_prop(){
+        SearchParamsPerson params = new SearchParamsPerson();
+        params.setSearchName("Persons at property X");
+        params.setSearchDescription("Across all units");
+        
+        // TODO Finish this query
+        
+        return params;
+        
+        
+        
     }
    
     // END IV PERSON

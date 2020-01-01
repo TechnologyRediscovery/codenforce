@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleCECase;
 import com.tcvcog.tcvce.entities.EventCnF;
@@ -177,8 +177,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 OccPeriod op = (OccPeriod) erg;
                 queryStub.append("occperiod_periodid=?;");
                 stmt.setInt(1, op.getPeriodID());
-            } else if(erg instanceof CECase){
-                CECase cec = (CECase) erg;
+            } else if(erg instanceof CECaseDataHeavy){
+                CECaseDataHeavy cec = (CECaseDataHeavy) erg;
                 queryStub.append("cecase_caseid=?;");
                 stmt.setInt(1, cec.getCaseID());
             }
@@ -1060,7 +1060,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return s;
     }
     
-    public List<EventRuleCECase> rules_getEventRuleCECaseList(CECase cse) throws IntegrationException{
+    public List<EventRuleCECase> rules_getEventRuleCECaseList(CECaseDataHeavy cse) throws IntegrationException{
         EventRuleImplementation ruleImp = null;
         List<EventRuleCECase> ruleList = new ArrayList<>();
         String query =  "   SELECT cecase_caseid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
@@ -1512,9 +1512,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     private EventRuleOccPeriod rules_generateEventRuleOccPeriod(ResultSet rs, EventRuleImplementation imp) throws SQLException, IntegrationException{
+        EventCoordinator ec = getEventCoordinator();
         EventRuleOccPeriod evRule = new EventRuleOccPeriod(imp);
         evRule.setOccPeriodID(rs.getInt("occperiod_periodid"));
-        evRule.setPassedRuleEvent(getOccEvent(rs.getInt("passedrule_eventid")));
+        evRule.setPassedRuleEvent(ec.getEvent(rs.getInt("passedrule_eventid")));
         return evRule;
     }
     

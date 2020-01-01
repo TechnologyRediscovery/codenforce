@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
 import java.io.Serializable;
 import java.sql.Time;
@@ -61,7 +61,7 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
         // backing bean will interact with the caseintegrator
         // to enforce business logic concerning cases
         CaseCoordinator cc = getCaseCoordinator();
-        CECase newCase;
+        CECaseDataHeavy newCase;
         // check to see if we have an action request that needs to be connected
         // to this new case
         CEActionRequest cear = getSessionBean().getCeactionRequestForSubmission();

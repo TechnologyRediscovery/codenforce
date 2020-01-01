@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.SearchParams;
@@ -288,7 +288,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
     public void connectActionRequestToCECase(int actionRequestID, int cecaseID, int userid)
             throws BObStatusException, IntegrationException {
-        CECase cecase = null;
+        CECaseDataHeavy cecase = null;
 
         CaseIntegrator ci = getCaseIntegrator();
         try {

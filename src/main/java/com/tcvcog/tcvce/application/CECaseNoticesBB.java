@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -37,7 +37,7 @@ public class CECaseNoticesBB
         extends     BackingBeanUtils
         implements  Serializable {
 
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     
     @PostConstruct
     public void initBean() {
@@ -183,7 +183,7 @@ public class CECaseNoticesBB
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID()
                             + " has been marked as returned on today's date", ""));
-        } catch (IntegrationException | BObStatusExceptionex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
@@ -191,14 +191,14 @@ public class CECaseNoticesBB
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
     

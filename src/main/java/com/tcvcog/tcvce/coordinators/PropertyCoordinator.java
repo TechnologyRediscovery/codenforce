@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
@@ -56,18 +56,20 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
     /**
      * Logic container for initializing members on the Property subclass PropertyWithLists
-     * @param propWL
+     * @param pr
      * @param cred
      * @return
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    public PropertyDataHeavy configurePropertyDataHeavy(PropertyDataHeavy propWL, Credential cred) throws IntegrationException, BObStatusException{
+    public PropertyDataHeavy assemblePropertyDataHeavy(Property pr, Credential cred) throws IntegrationException, BObStatusException{
         
         PropertyIntegrator pi = getPropertyIntegrator();
         
+        PropertyDataHeavy propWL = new PropertyDataHeavy(pr);
+        
         if (propWL.getCeCaseList() == null) {
-            propWL.setCeCaseList(new ArrayList<CECase>());
+            propWL.setCeCaseList(new ArrayList<CECaseDataHeavy>());
         }
         if (propWL.getUnitWithListsList() == null) {
             propWL.setUnitWithListsList(new ArrayList<PropertyUnitDataHeavy>());
@@ -78,7 +80,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             propWL.setPersonList(new ArrayList<Person>());
         }
         if (propWL.getInfoCaseList() == null) {
-            propWL.setPropInfoCaseList(new ArrayList<CECase>());
+            propWL.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
         }
         if (propWL.getChangeList() == null) {
             propWL.setChangeList(new ArrayList<PropertyUnitChangeOrder>());
@@ -122,7 +124,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyDataHeavy pdh = null;
         
         try{
-            pdh = configurePropertyDataHeavy(pi.getPropertyDataHeavy(prop.getPropertyID()), cred);
+            pdh = assemblePropertyDataHeavy(pi.getPropertyDataHeavy(prop.getPropertyID()), cred);
             
         } catch (IntegrationException ex) {
             System.out.println(ex);

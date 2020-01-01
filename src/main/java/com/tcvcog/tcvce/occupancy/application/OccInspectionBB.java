@@ -234,9 +234,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 //                } 
 //            }
             propertyUnitCandidateList = pi.getPropertyUnitList(getSessionBean().getSessionProperty());
-        } catch (IntegrationException | EventException| AuthorizationException | BObStatusExceptionex) {
+        } catch (IntegrationException | EventException| AuthorizationException | BObStatusException ex) {
             System.out.println(ex);
-        }
+        } 
         
         
         // general setting of drop-down box lists
@@ -436,7 +436,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             choiceCoord.rejectProposal(p, currentOccPeriod, getSessionBean().getSessionUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             "Proposal id " + p.getProposalID() + " has been rejected!", ""));
-        } catch (IntegrationException | AuthorizationException | BObStatusExceptionex) {
+        } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             ex.getMessage(), ""));
         }
@@ -618,14 +618,15 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             EventCoordinator ec = getEventCoordinator();
             try {
                 currentEvent = ec.initEvent(currentOccPeriod, getSelectedEventCategory());
-                currentEvent.setDateOfRecord(LocalDateTime.now());
+                currentEvent.setTimeStart(LocalDateTime.now());
+                currentEvent.setTimeEnd(currentEvent.getTimeStart().plusMinutes(currentEvent.getCategory().getDefaultdurationmins()));
                 currentEvent.setDiscloseToMunicipality(true);
                 currentEvent.setDiscloseToPublic(false);
-            } catch (BObStatusException ex) {
+            } catch (BObStatusException | EventException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            }
+            } 
         } else {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -694,13 +695,13 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Success! added rule to occ period", ""));
-        } catch (IntegrationException | BObStatusExceptionex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 ex.getMessage(), ""));
             
-        }
+        } 
     }
     
     public void rules_addEventRuleSet(EventRuleSet ers){
@@ -710,7 +711,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Success! added rule set to occ period", ""));
-        } catch (IntegrationException | BObStatusExceptionex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -730,11 +731,11 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public void events_commitEventEdits(ActionEvent ev){
         EventCoordinator ec = getEventCoordinator();
         try {
-            ec.editEvent(currentEvent, getSessionBean().getSessionUser());
+            ec.editEvent(currentEvent);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Successfully updated event!", ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | EventException ex) {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 ex.getMessage(), ""));

@@ -10,7 +10,7 @@ import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.reports.Report;
@@ -58,7 +58,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     private DonutChartModel violationDonut;
     
     
-    private List<CECase> caseList;
+    private List<CECaseDataHeavy> caseList;
     private Map<CasePhase, Integer> cPhaseMap;
      
 
@@ -139,7 +139,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         Map<CaseStage, Integer> stageMap = null;
         try {
              stageMap = dc.getCaseCountsByStage(caseList);
-        } catch (IntegrationException | BObStatusExceptionex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
         Integer max = 0;
@@ -262,14 +262,14 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the caseList
      */
-    public List<CECase> getCaseList() {
+    public List<CECaseDataHeavy> getCaseList() {
         return caseList;
     }
 
     /**
      * @param caseList the caseList to set
      */
-    public void setCaseList(List<CECase> caseList) {
+    public void setCaseList(List<CECaseDataHeavy> caseList) {
         this.caseList = caseList;
     }
 

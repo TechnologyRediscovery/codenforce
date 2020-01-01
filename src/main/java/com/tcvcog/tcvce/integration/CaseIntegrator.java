@@ -22,8 +22,8 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseBase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventType;
@@ -74,7 +74,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public ArrayList getCECasesByProp(Property p) 
             throws IntegrationException, BObStatusException{
-        ArrayList<CECase> caseList = new ArrayList();
+        ArrayList<CECaseDataHeavy> caseList = new ArrayList();
         String query = "SELECT \n" +
             "  caseid\n" +
             "FROM \n" +
@@ -281,12 +281,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     
     
     /**
-     * Generates a CECase without the big, fat lists
+     * Generates a CECaseDataHeavy without the big, fat lists
      * @param ceCaseID
      * @return
      * @throws IntegrationException 
      */
-    public CECaseBase getCECaseBase(int ceCaseID) throws IntegrationException, BObStatusException{
+    public CECase getCECaseBase(int ceCaseID) throws IntegrationException, BObStatusException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
             "            login_userid, casename, casephase, originationdate, closingdate, \n" +
             "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
@@ -295,7 +295,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         PreparedStatement stmt = null;
         Connection con = null;
-        CECaseBase c = null;
+        CECase c = null;
         
         try {
             
@@ -324,13 +324,13 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     
     
     /**
-     * Primary retrieval method for CECase objects from the DB
+     * Primary retrieval method for CECaseDataHeavy objects from the DB
      * @param ceCaseID
      * @return
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public CECase getCECase(int ceCaseID) throws IntegrationException, BObStatusException{
+    public CECaseDataHeavy getCECase(int ceCaseID) throws IntegrationException, BObStatusException{
         if(ceCaseID == 0){
             throw new IntegrationException("Cannot get a case with ID 0");
         } else {
@@ -344,7 +344,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection con = null;
-        CECase cse = null;
+        CECaseDataHeavy cse = null;
         
         try {
             
@@ -355,8 +355,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                CECaseBase baseCase = generateCECaseNoLists(rs);
-                cse = generateCECase(baseCase);
+                CECase baseCase = generateCECaseNoLists(rs);
+                cse = generateCECaseDataHeavy(baseCase);
             }
             
         } catch (SQLException ex) {
@@ -371,30 +371,31 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         // send the case to the coordinator for the setting of casephase and such before returning
         if(cse != null){
-            return cc.configureCECase(cse);
+            return cc.assembleCECaseDataHeavy(cse);
         }
         else return cse;
     }
     
     /**
-     * Internal populator for CECase objects with lots of data
+     * Internal populator for CECaseDataHeavy objects with lots of data
      * 
      * @param caseBare
      * @return
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private CECase generateCECase(CECaseBase caseBare) throws SQLException, IntegrationException{
+    private CECaseDataHeavy generateCECaseDataHeavy(CECase caseBare) throws SQLException, IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         CitationIntegrator ci = getCitationIntegrator();
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        EventCoordinator ec = getEventCoordinator();
         
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
-        CECase cse = new CECase(caseBare);
+        CECaseDataHeavy cse = new CECaseDataHeavy(caseBare);
 
         // *** POPULATE LISTS OF EVENTS, NOTICES, CITATIONS, AND VIOLATIONS ***
-        cse.setCompleteEventList(ei.getEventsByCaseID(cse.getCaseID()));
+        cse.setCompleteEventList(ec.gete(cse.getCaseID()));
         cse.setNoticeList(cvi.novGetList(cse));
         cse.setCitationList(ci.getCitations(cse));
         cse.setViolationList(cvi.getCodeViolations(cse.getCaseID()));
@@ -408,13 +409,13 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Internal populator for CECaseBase objects
+     * Internal populator for CECase objects
      * @param rs
      * @return
      * @throws SQLException
      * @throws IntegrationException 
      */
-     private CECaseBase generateCECaseNoLists(ResultSet rs) throws SQLException, IntegrationException{
+     private CECase generateCECaseNoLists(ResultSet rs) throws SQLException, IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         SystemIntegrator si = getSystemIntegrator();
@@ -424,7 +425,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             throw new IntegrationException("cannot generate case with ID 0");
         }
         
-        CECaseBase c = new CECaseBase();
+        CECase c = new CECase();
 
         c.setCaseID(ceCaseID);
         c.setPublicControlCode(rs.getInt("cecasepubliccc"));
@@ -470,9 +471,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
       * @throws IntegrationException
       * @throws BObStatusException 
       */
-    public List<CECase> getCECasesByPACC(int pacc) throws IntegrationException, BObStatusException{
+    public List<CECaseDataHeavy> getCECasesByPACC(int pacc) throws IntegrationException, BObStatusException{
         
-        ArrayList<CECase> caseList = new ArrayList();
+        ArrayList<CECaseDataHeavy> caseList = new ArrayList();
         String query = "SELECT caseid FROM public.cecase WHERE cecasepubliccc = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -505,16 +506,16 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     
   
     /**
-     * Insertion point for CECase objects; must be called by Coordinator who checks 
-     * logic before sending to the DB. This method only copies from the passed in CECase
-     * into the SQL INSERT
+     * Insertion point for CECaseDataHeavy objects; must be called by Coordinator who checks 
+ logic before sending to the DB. This method only copies from the passed in CECaseDataHeavy
+ into the SQL INSERT
      * 
      * @param ceCase
      * @return
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    public CECase insertNewCECase(CECase ceCase) throws IntegrationException, BObStatusException{
+    public CECaseDataHeavy insertNewCECase(CECaseDataHeavy ceCase) throws IntegrationException, BObStatusException{
         
         String query = "INSERT INTO public.cecase(\n" +
                         "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
@@ -526,7 +527,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         PreparedStatement stmt = null;
         ResultSet rs = null;
         int insertedCaseID = 0;
-        CECase freshlyInsertedCase = null;
+        CECaseDataHeavy freshlyInsertedCase = null;
         Connection con = null;
         
         try {
@@ -578,7 +579,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Updates the values in the CECase in the DB but does NOT
+     * Updates the values in the CECaseDataHeavy in the DB but does NOT
  edit the data in connected tables, namely CodeViolation, EventCnF, and Person
  Use calls to other add methods in this class for adding additional
  violations, events, and people to a CE case.
@@ -586,7 +587,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param ceCase the case to updated, with updated member variables
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void updateCECaseMetadata(CECase ceCase) throws IntegrationException{
+    public void updateCECaseMetadata(CECaseDataHeavy ceCase) throws IntegrationException{
         String query =  "UPDATE public.cecase\n" +
                         "   SET cecasepubliccc=?, \n" +
                         "       casename=?, originationdate=?, closingdate=?, notes=?, \n" +
@@ -628,7 +629,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void deleteCECase(CECase cecase){
+    public void deleteCECase(CECaseDataHeavy cecase){
         
         
     }
@@ -640,7 +641,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param ceCase
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void changeCECasePhase(CECase ceCase) throws IntegrationException{
+    public void changeCECasePhase(CECaseDataHeavy ceCase) throws IntegrationException{
         String query = "UPDATE public.cecase\n" +
                     "   SET casephase= CAST (? AS casephase)\n" +
                     " WHERE caseid = ?;";

@@ -20,7 +20,7 @@ import com.sun.org.apache.xalan.internal.xsltc.compiler.Constants;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.ChoiceEventCat;
@@ -199,7 +199,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public List<Proposal> getProposalList(CECase cse) throws IntegrationException{
+    public List<Proposal> getProposalList(CECaseDataHeavy cse) throws IntegrationException{
         List<Proposal> proposalList = new ArrayList<>();
   
         StringBuilder sb = new StringBuilder();
@@ -388,13 +388,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                 if(ev instanceof EventCnF){
                     stmt.setInt(10, prop.getResponseEvent().getEventID());
                     stmt.setNull(15, java.sql.Types.NULL);
-                } else if (ev instanceof EventOccPeriod){
-                    stmt.setInt(15, prop.getResponseEvent().getEventID());
-                    stmt.setNull(10, java.sql.Types.NULL);
-                } else {
-                    stmt.setNull(10, java.sql.Types.NULL);
-                    stmt.setNull(15, java.sql.Types.NULL);
-                }
+                } 
             }
             stmt.setBoolean(11, prop.isActive());
             stmt.setString(12, prop.getNotes());
@@ -655,13 +649,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                 if(ev instanceof EventCnF){
                     stmt.setInt(2, prop.getGeneratingEvent().getEventID());
                     stmt.setNull(14, java.sql.Types.NULL);
-                } else if (ev instanceof EventOccPeriod){
-                    stmt.setInt(14, prop.getGeneratingEvent().getEventID());
-                    stmt.setNull(2, java.sql.Types.NULL);
-                } else {
-                    stmt.setNull(14, java.sql.Types.NULL);
-                    stmt.setNull(2, java.sql.Types.NULL);
-                }
+                } 
             }
             
             stmt.setInt(3, prop.getInitiator().getUserID());
@@ -695,16 +683,8 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             }
             ev = prop.getResponseEvent();
             if(ev != null){
-                if(ev instanceof EventCnF){
-                    stmt.setInt(10, prop.getResponseEvent().getEventID());
-                    stmt.setNull(15, java.sql.Types.NULL);
-                } else if (ev instanceof EventOccPeriod){
-                    stmt.setInt(15, prop.getResponseEvent().getEventID());
-                    stmt.setNull(10, java.sql.Types.NULL);
-                } else {
-                    stmt.setNull(10, java.sql.Types.NULL);
-                    stmt.setNull(15, java.sql.Types.NULL);
-                }
+                stmt.setInt(10, prop.getResponseEvent().getEventID());
+                stmt.setNull(15, java.sql.Types.NULL);
             }
             stmt.setBoolean(11, prop.isActive());
             stmt.setString(12, prop.getNotes());

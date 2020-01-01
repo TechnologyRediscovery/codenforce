@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -35,7 +35,7 @@ public class CECaseUtilitiesBB
         extends     BackingBeanUtils
         implements  Serializable {
 
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     
     @PostConstruct
     public void initBean() {
@@ -103,11 +103,11 @@ public class CECaseUtilitiesBB
      * @deprecated 
      * @param c
      */
-    private void updateCaseInCaseList(CECase c) {
+    private void updateCaseInCaseList(CECaseDataHeavy c) {
 
 //        CaseIntegrator ci = getCaseIntegrator();
 //        Iterator<CECase> it = caseList.iterator();
-//        CECase localCase;
+//        CECaseDataHeavy localCase;
 //        int idx = 0;
 //        while (it.hasNext()) {
 //            localCase = it.next();

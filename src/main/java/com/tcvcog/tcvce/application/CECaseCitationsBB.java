@@ -18,7 +18,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Citation;
 import java.io.Serializable;
 import java.util.List;
@@ -33,7 +33,7 @@ public class CECaseCitationsBB
         extends     BackingBeanUtils
         implements  Serializable {
 
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
   
     private List<Citation> citationList;
     private Citation selectedCitation;
@@ -89,14 +89,14 @@ public class CECaseCitationsBB
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 

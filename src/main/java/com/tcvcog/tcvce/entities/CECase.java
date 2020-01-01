@@ -5,87 +5,61 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.integration.EventIntegrator;
-import java.util.ArrayList;
-import java.util.Iterator;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
-import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 
 /**
  *
- * @author Ellen Bascomb
+ * @author sylvia
  */
-public class        CECase 
-        extends     CECaseBase 
-        implements  Cloneable,
-                    IFace_ProposalDriven, 
-                    IFace_EventRuleGoverned,
-                    IFace_CredentialSigned,
-                    IFace_Loggable{
+public class    CECase 
+        extends CECasePublic
+        implements Serializable, 
+                    IFace_Openable,
+                    Cloneable{
     
-    private List<CodeViolation> violationList;
-    
-    private boolean showHiddenEvents;
-    private boolean showInactiveEvents;
-    private List<EventCnF> completeEventList;
-    
-    // accessed through methods specified in the interfaces
-    private List<Proposal> proposalList;
-    private List<EventCnF> eventList;
-    private List<EventRuleImplementation> eventRuleList;
-    
-    private List<Citation> citationList;
-    private List<NoticeOfViolation> noticeList;
-    private List<CEActionRequest> ceActionRequestList;
-    
-    private List<MoneyCECaseFeeAssigned> feeList;
-    private List<MoneyCECaseFeePayment> paymentList;
-    
-    private String credentialSignature;
-    
-    public CECase(){
-    }
-
+    protected int caseID;
+    protected int publicControlCode;
+    protected boolean paccEnabled;
     /**
-     * Constructor used to create an instance of this object with a
-     * CECase without any lists. Transfers the member variables
-     * from the incoming object to this sublcass
-     * 
-     * ** CONSTRUCTORS ARE NOT INHERITED!
-     * ** but member variables and methods sure are!
-     * 
-     * @param cse 
+     * Code enforcement action requests are generally linked
+     * to a code enforcement case by the code officers.
+     * This switch allows the release of the allowed
+     * case info to any holder of a PACC for a CEActionRequest
+     * that contains a link to this case.
      */
-    public CECase(CECaseBase cse){
-        this.caseID = cse.caseID;
-        this.publicControlCode = cse.publicControlCode;
-        this.paccEnabled = cse.paccEnabled;
-        this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
-        this.property = cse.property;
-        this.propertyUnit = cse.propertyUnit;
-        this.caseManager = cse.caseManager;
-        this.caseName = cse.caseName;
-        this.casePhase = cse.casePhase;
-        this.casePhaseIcon = cse.casePhaseIcon;
-        this.originationDate = cse.originationDate;
-        this.closingDate = cse.closingDate;
-        this.creationTimestamp = cse.creationTimestamp;
-        this.notes = cse.notes;
-    }
+    protected boolean allowForwardLinkedPublicAccess;
+    protected Property property;
+    protected PropertyUnit propertyUnit;
     
-    @Override
-    public String getCredentialSignature() {
-        return credentialSignature;
-    }
+    protected User caseManager;
+    protected String caseName;
+    protected CasePhase casePhase;
+    
+    protected Icon casePhaseIcon;
+    
+    protected java.util.Date originationDateUtilDate;
+    protected LocalDateTime originationDate;
+    protected String originiationDatePretty;
+    
+    protected java.util.Date closingDateUtilDate;
+    protected LocalDateTime closingDate;
+    protected String closingDatePretty;
+    
+    protected LocalDateTime creationTimestamp;
+    protected String notes;
+    
+    private BOBSource source;
 
-        
-  
-    
+    @Override
+    public String toString() {
+        return caseName;
+    }
     
     /**
      *
@@ -96,372 +70,352 @@ public class        CECase
     public CECase clone() throws CloneNotSupportedException{
         super.clone();
         return null;
-    }
-    
-     @Override
-    public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
-         List<EventCnF> visEventList = new ArrayList<>();
-        if(eventList != null){
-            for (EventCnF ev : eventList) {
-                switch(voahle){
-                    case VIEW_ACTIVE_HIDDEN:
-                        if (ev.isActive()
-                                && ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ACTIVE_NOTHIDDEN:
-                        if (ev.isActive()
-                                && !ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ALL:
-                        visEventList.add(ev);
-                        break;
-                    case VIEW_INACTIVE:
-                        if (!ev.isActive()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    default:
-                        visEventList.add(ev);
-                } // close switch
-            } // close for   
-        } // close null check
-        return visEventList;
-    }
-
-    @Override
-    public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere) {
-         List<EventRuleImplementation> evRuleList = new ArrayList<>();
-        if(eventRuleList != null){
-            for(EventRuleImplementation eri: eventRuleList){
-                switch(voere){
-                    case VIEW_ACTIVE_NOT_PASSED:
-                        if(eri.isActiveRuleAbstract()
-                                && eri.getPassedRuleTS() == null){
-                            evRuleList.add(eri);
-                        }
-                        break;
-                    case VIEW_ACTIVE_PASSED:
-                        if(eri.isActiveRuleAbstract()
-                                && eri.getPassedRuleTS() != null){
-                            evRuleList.add(eri);
-                        }
-                        break;
-                    case VIEW_ALL:
-                        evRuleList.add(eri);
-                        break;
-                    case VIEW_INACTIVE:
-                        if(!eri.isActiveRuleAbstract()){
-                            evRuleList.add(eri);
-                        }
-                        break;
-                    default:
-                        evRuleList.add(eri);
-                } // close switch
-            } // close loop
-        } // close null check
-        return evRuleList;
-    }
-
-    @Override
-    public boolean isAllRulesPassed() {
-        boolean allPassed = true;
-        for(EventRuleImplementation er: eventRuleList){
-            if(er.getPassedRuleTS() == null){
-                allPassed = false;
-                break;
-            }
-        }
-        return allPassed;
-    }
-
-    @Override
-    public List<Proposal> assembleProposalList(ViewOptionsProposalsEnum vope) {
-        List<Proposal> proposalListVisible = new ArrayList<>();
-        if(proposalList != null && !proposalList.isEmpty()){
-            for(Proposal p: proposalList){
-                switch(vope){
-                    case VIEW_ALL:
-                        proposalListVisible.add(p);
-                        break;
-                    case VIEW_ACTIVE_HIDDEN:
-                        if(p.isActive() 
-                                && p.isHidden()){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_ACTIVE_NOTHIDDEN:
-                        if(p.isActive() 
-                                && !p.isHidden()
-                                && !p.getDirective().isRefuseToBeHidden()){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_EVALUATED:
-                        if(p.getResponseTS() != null){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_INACTIVE:
-                        if(!p.isActive()){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_NOT_EVALUATED:
-                        if(p.getResponseTS() == null){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    default:
-                        proposalListVisible.add(p);
-                } // switch
-            } // for
-        } // if
-        return proposalListVisible;
-    }
-    
-    /**
-     * @param eventRuleList the eventRuleList to set
-     */
-    public void setEventRuleList(List<EventRuleImplementation> eventRuleList) {
-        this.eventRuleList = eventRuleList;
-    }
-    
-    /**
-     * @return the violationList
-     */
-    public List<CodeViolation> getViolationList() {
-        return violationList;
-    }
-
-    /**
-     * @param violationList the violationList to set
-     */
-    public void setViolationList(List<CodeViolation> violationList) {
-        this.violationList = violationList;
-    }
-
-    /**
-     * Implements logic to check each event for hidden status and inactive 
-     * status and based on the value of the showHiddenEvents and showInactiveEvents
-     * flags, add the event from the complete list to the visible list
-     * @return the visibleEventList
-     */
-    public List<EventCnF> getVisibleEventList() {
-        List<EventCnF> visEventList = new ArrayList<>();
-        for (EventCnF ev : completeEventList) {
-            if (!ev.isActive() && !showInactiveEvents) {
-                continue;
-            }
-            if (ev.isHidden() && !showHiddenEvents) {
-                continue;
-            }
-            visEventList.add(ev);
-        } // close for   
-        return visEventList;
-    }
-
-
-    /**
-     * @return the citationList
-     */
-    public List<Citation> getCitationList() {
-        return citationList;
-    }
-
-    /**
-     * @param citationList the citationList to set
-     */
-    public void setCitationList(List<Citation> citationList) {
-        this.citationList = citationList;
-    }
-
-    /**
-     * @return the noticeList
-     */
-    public List<NoticeOfViolation> getNoticeList() {
-        return noticeList;
-    }
-
-    /**
-     * @param noticeList the noticeList to set
-     */
-    public void setNoticeList(List<NoticeOfViolation> noticeList) {
-        this.noticeList = noticeList;
-    }
-
-    /**
-     * @return the ceActionRequestList
-     */
-    public List<CEActionRequest> getCeActionRequestList() {
-        return ceActionRequestList;
-    }
-
-    /**
-     * @param ceActionRequestList the ceActionRequestList to set
-     */
-    public void setCeActionRequestList(List<CEActionRequest> ceActionRequestList) {
-        this.ceActionRequestList = ceActionRequestList;
-    }
-
-    
-
-    /**
-     * @return the violationListUnresolved
-     */
-    public List<CodeViolation> getViolationListUnresolved() {
         
-        List<CodeViolation> violationListUnresolved = new ArrayList<>();
-        if(violationList != null && violationList.size() > 0){
-            for(CodeViolation v: violationList){
-                if(v.getActualComplianceDate() == null){
-                    violationListUnresolved.add(v);
-                }
-            }
-        }
         
-
-        return violationListUnresolved;
     }
 
+    
+      @Override
+    public boolean isOpen() {
+        return this.casePhase.isCaseOpen();
+    }
+
+  
+    
+    public long getCaseAge() {
+        return EntityUtils.getTimePeriodAsDays(originationDate, LocalDateTime.now());
+    }
 
     /**
-     * @return the violationListResolved
+     * @return the caseID
      */
-    public List<CodeViolation> getViolationListResolved() {
-        List<CodeViolation>violationListResolved = new ArrayList<>();
-        if(violationList != null && violationList.size() > 0){
-            for(CodeViolation v: violationList){
-                if(v.getActualComplianceDate() != null){
-                    violationListResolved.add(v);
-                }
-            }
+    public int getCaseID() {
+        return caseID;
+    }
+
+    /**
+     * @param caseID the caseID to set
+     */
+    public void setCaseID(int caseID) {
+        this.caseID = caseID;
+    }
+
+    /**
+     * @return the property
+     */
+    public Property getProperty() {
+        return property;
+    }
+
+    /**
+     * @param property the property to set
+     */
+    public void setProperty(Property property) {
+        this.property = property;
+    }
+
+    /**
+     * @return the propertyUnit
+     */
+    public PropertyUnit getPropertyUnit() {
+        return propertyUnit;
+    }
+
+    /**
+     * @param propertyUnit the propertyUnit to set
+     */
+    public void setPropertyUnit(PropertyUnit propertyUnit) {
+        this.propertyUnit = propertyUnit;
+    }
+
+    /**
+     * @return the caseManager
+     */
+    public User getCaseManager() {
+        return caseManager;
+    }
+
+    /**
+     * @param caseManager the caseManager to set
+     */
+    public void setCaseManager(User caseManager) {
+        this.caseManager = caseManager;
+    }
+
+    /**
+     * @return the caseName
+     */
+    public String getCaseName() {
+        return caseName;
+    }
+
+    /**
+     * @param caseName the caseName to set
+     */
+    public void setCaseName(String caseName) {
+        this.caseName = caseName;
+    }
+
+    /**
+     * @return the casePhase
+     */
+    public CasePhase getCasePhase() {
+        return casePhase;
+    }
+
+    /**
+     * @param casePhase the casePhase to set
+     */
+    public void setCasePhase(CasePhase casePhase) {
+        this.casePhase = casePhase;
+    }
+
+    /**
+     * @return the originationDate
+     */
+    public LocalDateTime getOriginationDate() {
+        return originationDate;
+    }
+
+    /**
+     * @param originationDate the originationDate to set
+     */
+    public void setOriginationDate(LocalDateTime originationDate) {
+        this.originationDate = originationDate;
+    }
+
+    /**
+     * @return the closingDate
+     */
+    public LocalDateTime getClosingDate() {
+        return closingDate;
+    }
+
+    /**
+     * @param closingDate the closingDate to set
+     */
+    public void setClosingDate(LocalDateTime closingDate) {
+        this.closingDate = closingDate;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    /**
+     * @return the publicControlCode
+     */
+    public int getPublicControlCode() {
+        return publicControlCode;
+    }
+
+    /**
+     * @param publicControlCode the publicControlCode to set
+     */
+    public void setPublicControlCode(int publicControlCode) {
+        this.publicControlCode = publicControlCode;
+    }
+
+    /**
+     * @return the creationTimestamp
+     */
+    public LocalDateTime getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    /**
+     * @param creationTimestamp the creationTimestamp to set
+     */
+    public void setCreationTimestamp(LocalDateTime creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
+    }
+
+    /**
+     * @return the originiationDatePretty
+     */
+    public String getOriginiationDatePretty() {
+        if(originationDate != null){
+            originiationDatePretty = EntityUtils.getPrettyDate(originationDate);
         }
-        
-        return violationListResolved;
-    }
-
-
-    /**
-     * @return the completeEventList
-     */
-    public List<EventCnF> getCompleteEventList() {
-        return completeEventList;
+        return originiationDatePretty;
     }
 
     /**
-     * @param completeEventList the completeEventList to set
+     * @return the closingDatePretty
      */
-    public void setCompleteEventList(List<EventCnF> completeEventList) {
-        this.completeEventList = completeEventList;
+    public String getClosingDatePretty() {
+        if(closingDate != null){
+            closingDatePretty = EntityUtils.getPrettyDate(closingDate);
+        }
+        return closingDatePretty;
     }
 
     /**
-     * @return the showInactiveEvents
+     * @param originiationDatePretty the originiationDatePretty to set
      */
-    public boolean isShowInactiveEvents() {
-        return showInactiveEvents;
+    public void setOriginiationDatePretty(String originiationDatePretty) {
+        this.originiationDatePretty = originiationDatePretty;
     }
 
     /**
-     * @param showInactiveEvents the showInactiveEvents to set
+     * @param closingDatePretty the closingDatePretty to set
      */
-    public void setShowInactiveEvents(boolean showInactiveEvents) {
-        this.showInactiveEvents = showInactiveEvents;
+    public void setClosingDatePretty(String closingDatePretty) {
+        this.closingDatePretty = closingDatePretty;
     }
 
     /**
-     * @return the showHiddenEvents
+     * @return the paccEnabled
      */
-    public boolean isShowHiddenEvents() {
-        return showHiddenEvents;
+    public boolean isPaccEnabled() {
+        return paccEnabled;
     }
 
     /**
-     * @param showHiddenEvents the showHiddenEvents to set
+     * @param paccEnabled the paccEnabled to set
      */
-    public void setShowHiddenEvents(boolean showHiddenEvents) {
-        this.showHiddenEvents = showHiddenEvents;
+    public void setPaccEnabled(boolean paccEnabled) {
+        this.paccEnabled = paccEnabled;
     }
 
     /**
-     * @return the activeEventList
+     * @return the allowForwardLinkedPublicAccess
      */
-    public List<EventCnF> getActiveEventList() {
-        List<EventCnF> actEvList = new ArrayList<>();
-            Iterator<EventCnF> iter = completeEventList.iterator();
-                while(iter.hasNext()){
-                    EventCnF ev = iter.next();
-                    if(ev.isActive()){
-                        actEvList.add(ev);
-                    }
-                }
-        return actEvList;
-    }
-
-
-    /**
-     * @return the proposalList
-     */
-    public List<Proposal> getProposalList() {
-        return proposalList;
+    public boolean isAllowForwardLinkedPublicAccess() {
+        return allowForwardLinkedPublicAccess;
     }
 
     /**
-     * @param proposalList the proposalList to set
+     * @param allowForwardLinkedPublicAccess the allowForwardLinkedPublicAccess to set
      */
-    public void setProposalList(List<Proposal> proposalList) {
-        this.proposalList = proposalList;
+    public void setAllowForwardLinkedPublicAccess(boolean allowForwardLinkedPublicAccess) {
+        this.allowForwardLinkedPublicAccess = allowForwardLinkedPublicAccess;
+    }
+
+   
+
+    /**
+     * @return the casePhaseIcon
+     */
+    public Icon getCasePhaseIcon() {
+        return casePhaseIcon;
     }
 
     /**
-     * @return the eventList
+     * @param casePhaseIcon the casePhaseIcon to set
      */
-    public List<EventCnF> getEventList() {
-        return eventList;
+    public void setCasePhaseIcon(Icon casePhaseIcon) {
+        this.casePhaseIcon = casePhaseIcon;
     }
 
-    /**
-     * @param eventList the eventList to set
-     */
     @Override
-    public void setEventList(List<EventCnF> eventList) {
-        this.eventList = eventList;
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + this.caseID;
+        hash = 53 * hash + this.publicControlCode;
+        hash = 53 * hash + (this.paccEnabled ? 1 : 0);
+        hash = 53 * hash + (this.allowForwardLinkedPublicAccess ? 1 : 0);
+        hash = 53 * hash + Objects.hashCode(this.property);
+        hash = 53 * hash + Objects.hashCode(this.propertyUnit);
+        hash = 53 * hash + Objects.hashCode(this.caseManager);
+        hash = 53 * hash + Objects.hashCode(this.caseName);
+        hash = 53 * hash + Objects.hashCode(this.casePhase);
+        hash = 53 * hash + Objects.hashCode(this.casePhaseIcon);
+        hash = 53 * hash + Objects.hashCode(this.originationDate);
+        hash = 53 * hash + Objects.hashCode(this.originiationDatePretty);
+        hash = 53 * hash + Objects.hashCode(this.closingDate);
+        hash = 53 * hash + Objects.hashCode(this.closingDatePretty);
+        hash = 53 * hash + Objects.hashCode(this.creationTimestamp);
+        hash = 53 * hash + Objects.hashCode(this.notes);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CECase other = (CECase) obj;
+        if (this.caseID != other.caseID) {
+            return false;
+        }
+        return true;
+    }
+
+  
+
+    /**
+     * @return the closingDateUtilDate
+     */
+    public java.util.Date getClosingDateUtilDate() {
+        if(closingDate != null){
+            closingDateUtilDate = java.util.Date.from(
+                    closingDate.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return closingDateUtilDate;
     }
 
     /**
-     * @return the feeList
+     * @param cd     
      */
-    public List<MoneyCECaseFeeAssigned> getFeeList() {
-        return feeList;
+    public void setClosingDateUtilDate(java.util.Date cd) {
+        if(cd != null){
+            this.closingDate = cd.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        this.closingDateUtilDate = cd;
     }
 
     /**
-     * @return the paymentList
+     * @return the originationDateUtilDate
      */
-    public List<MoneyCECaseFeePayment> getPaymentList() {
-        return paymentList;
+    public java.util.Date getOriginationDateUtilDate() {
+        if(originationDate != null){
+            originationDateUtilDate = java.util.Date.from(
+                    originationDate.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return originationDateUtilDate;
     }
 
     /**
-     * @param feeList the feeList to set
+     * @param od     
      */
-    public void setFeeList(List<MoneyCECaseFeeAssigned> feeList) {
-        this.feeList = feeList;
+    public void setOriginationDateUtilDate(java.util.Date od) {
+        if(od != null){
+            originationDate = od.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        this.originationDateUtilDate = od;
     }
 
     /**
-     * @param paymentList the paymentList to set
+     * @return the source
      */
-    public void setPaymentList(List<MoneyCECaseFeePayment> paymentList) {
-        this.paymentList = paymentList;
+    public BOBSource getSource() {
+        return source;
     }
 
-    
-    
-    
-    
+    /**
+     * @param source the source to set
+     */
+    public void setSource(BOBSource source) {
+        this.source = source;
+    }
+
+  
+
 }

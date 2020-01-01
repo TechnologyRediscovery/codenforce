@@ -27,7 +27,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Photograph;
@@ -54,7 +54,7 @@ import org.primefaces.event.FileUploadEvent;
 public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     
     private CodeViolation currentViolation;
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     private List<Blob> blobList;
     
     /**
@@ -240,14 +240,14 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 

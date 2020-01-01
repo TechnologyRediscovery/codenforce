@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.entities.reports;
 
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.search.Query;
@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class ReportConfigCECase extends Report{
     
-    private CECase cse;
+    private CECaseDataHeavy cse;
     
     private List<EventCnF> eventListForReport;
     private List<NoticeOfViolation> noticeListForReport;
@@ -45,7 +45,7 @@ public class ReportConfigCECase extends Report{
     /**
      * @return the cse
      */
-    public CECase getCse() {
+    public CECaseDataHeavy getCse() {
         return cse;
     }
 
@@ -94,7 +94,7 @@ public class ReportConfigCECase extends Report{
     /**
      * @param cse the cse to set
      */
-    public void setCse(CECase cse) {
+    public void setCse(CECaseDataHeavy cse) {
         this.cse = cse;
     }
 

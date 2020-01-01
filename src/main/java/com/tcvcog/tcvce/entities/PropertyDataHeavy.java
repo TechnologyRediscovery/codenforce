@@ -31,13 +31,13 @@ public  class       PropertyDataHeavy
         implements  IFace_CredentialSigned{
     
     
-    private List<CECase> ceCaseList;
+    private List<CECaseDataHeavy> ceCaseList;
     
     private List<PropertyUnitDataHeavy> unitWithListsList;
     
     private List<Person> personList;
     
-    private List<CECase> propInfoCaseList;
+    private List<CECaseDataHeavy> propInfoCaseList;
     
     private List<PropertyUnitChangeOrder> changeList;
     
@@ -174,7 +174,7 @@ public  class       PropertyDataHeavy
     /**
      * @return the ceCaseList
      */
-    public List<CECase> getCeCaseList() {
+    public List<CECaseDataHeavy> getCeCaseList() {
         return ceCaseList;
     }
 
@@ -189,7 +189,7 @@ public  class       PropertyDataHeavy
     /**
      * @param ceCaseList the ceCaseList to set
      */
-    public void setCeCaseList(List<CECase> ceCaseList) {
+    public void setCeCaseList(List<CECaseDataHeavy> ceCaseList) {
         this.ceCaseList = ceCaseList;
     }
 
@@ -211,7 +211,7 @@ public  class       PropertyDataHeavy
     /**
      * @param propInfoCaseList the propInfoCaseList to set
      */
-    public void setPropInfoCaseList(List<CECase> propInfoCaseList) {
+    public void setPropInfoCaseList(List<CECaseDataHeavy> propInfoCaseList) {
         this.propInfoCaseList = propInfoCaseList;
     }
 

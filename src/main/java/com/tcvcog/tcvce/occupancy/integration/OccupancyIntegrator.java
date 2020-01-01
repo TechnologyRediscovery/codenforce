@@ -332,9 +332,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             case PASSEDINSPECTION_TS:
                 return "occinspection.passedinspectionts";
 
-            case THIRDPARTY_INSPECTOR_APPROVAL_TS:
-                return "occinspection.thirdpartyinspectorapprovalts";
-
             case PERMIT_ISSUANCE_DATE:
                 return "occpermit.dateissued";
 

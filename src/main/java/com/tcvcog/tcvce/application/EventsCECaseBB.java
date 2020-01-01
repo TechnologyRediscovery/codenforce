@@ -12,8 +12,8 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseBase;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
@@ -84,7 +84,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         if(!selectedBOBQuery.isExecutedByIntegrator()){
             try {
                 sc.runQuery((QueryEvent) selectedBOBQuery);
-            } catch (IntegrationException| BObStatusExceptionex) {
+            } catch (IntegrationException| BObStatusException ex) {
                 System.out.println(ex);
             }
             
@@ -186,7 +186,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     
     public String editEventInCaseManager(EventCnFCasePropBundle ev){
         CaseIntegrator ci = getCaseIntegrator();
-        CECaseBase caseNoLists = ev.getEventCaseBare();
+        CECase caseNoLists = ev.getEventCaseBare();
 //        try {
 //            getSessionBean().getSessionCECaseList().add(0, ci.generateCECase(caseNoLists));
 //        } catch (SQLException ex) {
@@ -248,7 +248,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
        if(!selectedBOBQuery.isExecutedByIntegrator()){
             try {
                 selectedBOBQuery = sc.runQuery((QueryEvent) selectedBOBQuery);
-            } catch (IntegrationException| BObStatusExceptionex) {
+            } catch (IntegrationException| BObStatusException ex) {
                 System.out.println(ex);
             }
             
