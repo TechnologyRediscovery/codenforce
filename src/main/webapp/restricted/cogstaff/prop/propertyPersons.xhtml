@@ -7,71 +7,236 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>_________NAMEME_________</title>
+        <title>Property Persons</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="_________NAMEME_________">
+                <f:view id="prop-pers-view-main">
 
                     <div class="mainContainer">
 
-                        <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
+                        <h:form id="prop-pers-messages-form">
+                            <h:messages id="prop-pers-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
-
-                        <h:form id="_________NAMEME_________">
                             
-                        <h1>_________NAMEME_________</h1>
+                        <h1>Property persons</h1>
 
-
-                        <p:panel    id="_________NAMEME_________"
+                        <p:panel    id="prop-pers-list-panel"
                                     toggleable="true"
-                                    widgetVar="_________NAMEME_________-var"
+                                    widgetVar="prop-pers-list-panel-var"
                                     collapsed="false"
-                                    header="Occupancy period settings">
+                                    header="Persons connected to #{propertyProfileBB.currProp.address} (#{propertyProfileBB.currProp.muni.muniName})">
                                
-                            <h:form id="_________NAMEME_________">
-                                        <h:panelGrid        id="_________NAMEME_________"
-                                                            columns="2"
-                                                            columnClasses="gridTd, gridTdg"
-                                                            rendered="true">
-                                            <h:panelGroup>
-                                                <h:outputText value="_________NAMEME_________"
-                                                              styleClass="ui-label font-smaller"/>
-                                                
-                                                    <h:outputText   id="_________NAMEME_________"
-                                                                    value="#{empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS ? 'block' : 'verified_user'}"/>
-                                                        
-                                                    <p:outputLabel  for="_________NAMEME_________"
-                                                                    value="_________NAMEME_________"
-                                                                    styleClass="ui-label" />
-                                                    <p:inputText    id="_________NAMEME_________" 
-                                                                    type="text"
-                                                                    value="#{occInspectionBB.formEventRuleIDToAdd}" />
-                                                    <h:message  for="_________NAMEME_________" showDetail="false" showSummary="true"  
-                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            <h:form id="prop-pers-list-form">
                                 
-                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.type.title}"
-                                                              styleClass="data-text"/>
-                                            </h:panelGroup>
+                                
 
-                                            <h:panelGroup>
-                                                <f:subview id="_________NAMEME_________">
-                                                
-                                                    <!--content-->
-                                                    
-                                                </f:subview>
-                                            </h:panelGroup>
-                                        </h:panelGrid>
-                               </h:form>
-                                                
+                                <p:dataTable
+                                    id="prop-persons-table"
+                                    var="person"
+                                    value="#{propertyProfileBB.currProp.personList}"
+                                    rowKey="#{person.personID}"
+                                    tableStyleClass="primeDataTable"
+                                    rowExpandMode="single"
+                                    expandedRow="false"
+                                    filteredValue="#{propertyProfileBB.filteredPersonList}"
+                                    >
+
+                                    <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Exp"/>
+                                        </f:facet>
+                                        <p:rowToggler/>
+                                    </p:column>
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{person.personID}"/>
+                                    </p:column>
 
 
+                                    <p:column width="10%" sortBy="#{person.personType.label}"
+                                              filterBy="#{person.personType.label}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Person Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{person.personType.label}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" sortBy="#{person.muniName}"
+                                              filterBy="#{person.muniName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Municipality" />
+                                        </f:facet>
+                                        <h:outputText value="#{person.muniName}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" sortBy="#{person.firstName}"
+                                              filterBy="#{person.firstName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="First" />
+                                        </f:facet>
+                                        <h:outputText value="#{person.firstName}"/>
+                                    </p:column>
+
+                                    <p:column width="15%" filterBy="#{person.lastName}"
+                                              sortBy="#{person.lastName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Last" />
+                                        </f:facet>
+                                        <h:outputText value="#{person.lastName}"/>
+                                    </p:column>
+
+                                    <p:column width="8%" exportable="false">
+                                        <f:facet name="header">
+                                            <h:outputText value="Edit" />
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-clipboard"
+                                                         action="#{propertyProfileBB.viewPersonProfile(p)}" 
+                                                         ajax="false" disabled="false"/>
+                                    </p:column>
+                                    <p:rowExpansion>
+                                        <div class="outlinedBox">
+                                            <h2>Full person listing for <h:outputText value="#{person.firstName} #{person.lastName}"/> </h2>
+                                            <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="First Name"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.firstName}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Last Name"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.lastName}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Muni"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.muniName}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Type"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.personType.label}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Job Title"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.jobTitle}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Email"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.email}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Address"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText escape="false" value="#{person.addressStreet}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Under 19"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.under18}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Active?"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.active}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Last Updated"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.lastUpdated}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Expires"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.expiryDate.toString}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Phone home"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.phoneHome}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Phone work"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.phoneWork}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Phone cell"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.phoneCell}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <f:facet name="footer">
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Person notes"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText escape="false" value="#{person.notes}"/>
+                                                    </div>
+                                                </f:facet>
+                                            </h:panelGrid>
+                                        </div>
+                                    </p:rowExpansion>
+                                </p:dataTable>
+
+                            </h:form>
                         </p:panel>
+                        
+                        
                         
                         <p:tabView id="_________NAMEME_________">
                             <p:tab title="_________NAMEME_________">
@@ -138,7 +303,6 @@
                         <p:spacer height="10px"/>
 
 
-                        </h:form>
 
 
                     <!--close main container-->

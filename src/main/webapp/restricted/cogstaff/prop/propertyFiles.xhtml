@@ -33,42 +33,72 @@
                                     widgetVar="_________NAMEME_________-var"
                                     collapsed="false"
                                     header="Occupancy period settings">
-                               
-                            <h:form id="_________NAMEME_________">
-                                        <h:panelGrid        id="_________NAMEME_________"
-                                                            columns="2"
-                                                            columnClasses="gridTd, gridTdg"
-                                                            rendered="true">
-                                            <h:panelGroup>
-                                                <h:outputText value="_________NAMEME_________"
-                                                              styleClass="ui-label font-smaller"/>
-                                                
-                                                    <h:outputText   id="_________NAMEME_________"
-                                                                    value="#{empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS ? 'block' : 'verified_user'}"/>
-                                                        
-                                                    <p:outputLabel  for="_________NAMEME_________"
-                                                                    value="_________NAMEME_________"
-                                                                    styleClass="ui-label" />
-                                                    <p:inputText    id="_________NAMEME_________" 
-                                                                    type="text"
-                                                                    value="#{occInspectionBB.formEventRuleIDToAdd}" />
-                                                    <h:message  for="_________NAMEME_________" showDetail="false" showSummary="true"  
-                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                
-                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.type.title}"
-                                                              styleClass="data-text"/>
-                                            </h:panelGroup>
+                                           
+                        <h:form id="propertyPhotoForm">    
+                            <h2>Attached Photos</h2>
+                            <p>View photographs of this property</p>
+                            
+                            <p:dataTable
+                                id="photoResultTable"
+                                var="blob" 
+                                value="#{propertyProfileBB.blobList}"
+                                tabindex="5"
+                                scrollable="true" scrollHeight="150"
+                                rowKey="#{blob.blobID}">
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <p:commandButton value="delete" actionListener="#{propertyProfileBB.deletePhoto(blob.blobID)}"
+                                                     immediate="true"
+                                                     rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
+                                                     update=":photoResultTable"/>
+                                    <h:outputText value="#{blob.blobID}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Description" />
+                                    </f:facet>
+                                    <h:outputText value="#{blob.description}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Timestamp" />
+                                    </f:facet>
+                                    <h:outputText value="#{blob.timestamp}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Image" />
+                                    </f:facet>
+                                    <p:graphicImage value="#{blobCoordinator.image}">
+                                        <f:param name="blobID" value="#{blob.blobID}"/>
+                                    </p:graphicImage>
+                                </p:column>
+                            </p:dataTable>
 
-                                            <h:panelGroup>
-                                                <f:subview id="_________NAMEME_________">
-                                                
-                                                    <!--content-->
-                                                    
-                                                </f:subview>
-                                            </h:panelGroup>
-                                        </h:panelGrid>
-                               </h:form>
-                                                
+                            <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
+                        </h:form>
+                        
+                        <h:form id="propertyUploadPhotoForm" enctype="multipart/form-data"> 
+                            <h2>Upload Photo</h2>
+                            <p>Upload a photo of this property</p>
+                            
+                            <p:fileUpload   fileUploadListener="#{propertyProfileBB.handleFileUpload}"
+                                           mode="advanced"
+                                           sizeLimit="900000000"
+                                           allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                           update="propertyPhotoForm:photoResultTable"
+                                           />
+                            
+                            <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
+
+                        </h:form>
+
 
 
                         </p:panel>

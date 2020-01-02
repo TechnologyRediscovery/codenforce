@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -170,6 +171,19 @@ public  class       PropertyDataHeavy
         return credentialSignature;
     }
 
+    public List<OccPeriod> assembleOccPeriodList(){
+        List<OccPeriod> perList = new ArrayList<>();
+        if(unitWithListsList != null && !unitWithListsList.isEmpty()){
+            for(PropertyUnitDataHeavy pudh: unitWithListsList){
+                if(pudh.getPeriodList() != null && !pudh.getPeriodList().isEmpty()){
+                    perList.addAll(pudh.getPeriodList());
+                }
+            }
+        }
+        
+        return perList;
+        
+    }
     
     /**
      * @return the ceCaseList

@@ -1,0 +1,240 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Property Info</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="prop-info-view">
+
+                    <div class="mainContainer">
+
+                        <h:form id="prop-info-messages-form">
+                            <h:messages id="prop-info-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                        <p:panel    id="prop-info-panel"
+                                    toggleable="true"
+                                    widgetVar="prop-info-var"
+                                    collapsed="false"
+                                    header="Property details">
+                               
+                            <h:form id="property-info-form">
+
+
+                                <h1 class="property-blue">
+                                    <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address}" />
+                                    <h:outputText value=" | " />
+                                    <h:outputText value="#{propertyProfileBB.currProp.muni.muniName}" />
+                                    <h:outputText value=" | " />
+                                    <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currProp.lotAndBlock}"/>  
+                                    <h:outputText value=" | " />
+                                    <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currProp.propertyID}"/>  
+                                </h1>
+
+                                <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                             columnClasses="gridTd, gridTd">
+
+                                    <h:panelGroup>
+                                        <div class="datum">
+                                        
+                                            
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address}" />
+                                            <p:spacer height="0px" />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_city}" />
+                                            <h:outputText value=", " />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_state}" />
+                                            <h:outputText value=" " />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_zip}" />
+                                            
+                                        </div>
+                                        
+                                        <div class="datum">
+                                            <h:outputText styleClass="ui-label-inline" value="Lot and block: " />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.lotAndBlock}" />
+                                            <p:spacer height="0px" />
+                                            <h:outputText styleClass="ui-label-inline" value="Parcel ID: " />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.parID}" />
+                                        </div>
+                                        
+                                    </h:panelGroup>
+
+                                  
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-usegroup-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Use Group:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-usegroup-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.useGroup}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-consttype-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Construction Type:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-consttype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.constructionType}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-countycode-ot" >
+                                            <h:outputText styleClass="uiLabel" value="County Code:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-countycode-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.countyCode}"/>
+                                    </h:panelGroup>
+
+                                  
+                                    <h:panelGroup>
+                                            <h:outputText styleClass="uiLabel" value="Notes:" />
+                                        <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.notes}"/>
+                                    </h:panelGroup>
+                                </h:panelGrid>
+
+                                <p:commandButton ajax="true" value="Update Selected Property Info" 
+                                                 action="#{propertyProfileBB.updateProperty}" 
+                                                 oncomplete="PF('dialog-widvar-propinfoedit').show()"
+                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                 icon="fa fa-edit"
+                                                 disabled="false"
+                                                 update="form-propinfoedit"/>
+                            </h:form>
+
+                       
+
+
+                        </p:panel>
+
+                    <!--close main container-->
+                    </div>
+                    
+                      <p:dialog id="dialog-propinfoedit"
+                              height="650" width="900"
+                              widgetVar="dialog-widvar-propinfoedit"
+                              closable="true">
+                        <h2>Edit Property Info</h2>
+                        <h:form id="form-propinfoedit">
+                            <h:messages id="messages-properties-editpropinfo"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                            <h:panelGrid id="panelgrid-propinfoedit" columns="2" cellpadding="10" cellspacing="30">
+                                <h:panelGroup>
+                                    <p:outputLabel value="Street Address"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                             
+                                <h:panelGroup>
+                                    <p:outputLabel value="City"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address_city}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+
+                                    <p:outputLabel value="Zip Code"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address_zip}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel value="State"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address_state}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel value="Lot and Block"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.lotAndBlock}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event)"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel value="ParcelID"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.parID}"
+                                                  onkeydown="PF('datatable').onKeyDown(event)"
+                                                  onkeyup="PF('datatable').onKeyUp(event)"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel value="Municipality"/>
+                                    <p:spacer width="5px"/>
+                                    <h:selectOneMenu id="propinfoedit-muni-som"
+                                                     value="#{propertyProfileBB.currProp.muni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="propinfoedit-muninamelist" 
+                                                       value="#{sessionBean.sessionUser.authMuniList}"
+                                                       var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+
+                                    </h:selectOneMenu>
+                                </h:panelGroup>
+                                
+                            </h:panelGrid>
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="true"
+                                                 actionListener="#{propertyProfileBB.beginPropertyUnitUpdates}"
+                                                 update="dialog-propinfoedit
+                                                 :property-info-form"
+                                                 icon="fa fa-plus"
+                                                 tabindex="1"
+                                                 value="Save Property Info"/>
+                            
+                            
+                            
+                        </h:form>
+                        <script type="text/javascript">
+                                $(function () {
+                                    $.extend(PF("datatable"), {
+                                        onKeyDown: function (e) {
+                                            var key = e.which,
+                                                    keyCode = $.ui.keyCode;
+                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                e.preventDefault();
+                                            }
+                                        },
+                                        onKeyUp: function (e, rowIndex) {
+                                            var key = e.which,
+                                                    keyCode = $.ui.keyCode;
+                                            //.ui-row-editor-check .ui-icon-check .ui-c
+                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                this.tbody
+                                                        .find('.ui-row-editor .ui-icon-check')
+                                                        .eq(rowIndex)
+                                                        .click();
+                                            }
+                                            if (key === keyCode.ESCAPE) {
+                                                this.tbody
+                                                        .find('.ui-row-editor .ui-icon-close')
+                                                        .eq(rowIndex)
+                                                        .click();
+                                            }
+                                        }
+                                    });
+                                });
+                            </script>
+                    </p:dialog>
+                            
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
