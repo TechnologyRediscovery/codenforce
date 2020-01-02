@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -42,12 +43,16 @@ public class PropertySearchBB extends BackingBeanUtils{
 
     
     private SearchParamsProperty searchParamsSelected;
+    
     private List<SearchParamsProperty> searchParamsCustomized;
+    
     private QueryProperty querySelected;
     private List<QueryProperty> queryList;
     
     private List<Property> propList;
     private boolean appendResultsToList;
+    
+    private List<PropertyUseType> putList;
     
     /**
      * Creates a new instance of SearchBB
@@ -59,6 +64,8 @@ public class PropertySearchBB extends BackingBeanUtils{
     public void initBean(){
         SearchCoordinator sc = getSearchCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
         
         if(getSessionBean().getSessionPropertyList() == null){
             propList = new ArrayList<>();
@@ -69,10 +76,24 @@ public class PropertySearchBB extends BackingBeanUtils{
         
         try {
             queryList = sc.buildQueryPropertyList(getSessionBean().getSessionUser().getMyCredential());
+            putList = pi.getPropertyUseTypeList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
     
+        querySelected = getSessionBean().getQueryProperty();
+        if(querySelected == null && !queryList.isEmpty()){
+            querySelected = queryList.get(0);
+        }
+        if(querySelected != null 
+                && 
+            querySelected.getParmsList() != null 
+                && 
+            !querySelected.getParmsList().isEmpty()){
+            
+            searchParamsSelected = querySelected.getParmsList().get(0);
+        }
+        
         
     }
     
@@ -206,6 +227,20 @@ public class PropertySearchBB extends BackingBeanUtils{
      */
     public void setAppendResultsToList(boolean appendResultsToList) {
         this.appendResultsToList = appendResultsToList;
+    }
+
+    /**
+     * @return the putList
+     */
+    public List<PropertyUseType> getPutList() {
+        return putList;
+    }
+
+    /**
+     * @param putList the putList to set
+     */
+    public void setPutList(List<PropertyUseType> putList) {
+        this.putList = putList;
     }
     
     

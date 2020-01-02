@@ -16,10 +16,20 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUseType;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -29,6 +39,7 @@ public class PropertyCreateBB
         extends BackingBeanUtils{
 
      private Property prop;
+     private List<PropertyUseType> putList;
     
     /**
      * Creates a new instance of PropertyCreateBB
@@ -36,31 +47,51 @@ public class PropertyCreateBB
     public PropertyCreateBB() {
     }
     
-    public void initiatePropertyCreation(ActionEvent ev){
-        
+    
+    
+     
+    @PostConstruct
+    public void initBean(){
+        PropertyIntegrator pi = getPropertyIntegrator();
+         try {
+             setPutList(pi.getPropertyUseTypeList());
+         } catch (IntegrationException ex) {
+             System.out.println(ex);
+         }
         
     }
     
     
-    public String insertProp(){
-        PropertyIntegrator pi = getPropertyIntegrator();
+    
+    public void initiatePropertyCreation(ActionEvent ev){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        prop = pc.initProperty(getSessionBean().getSessionMuni());
+    }
+    
+    
+    public void insertProp(ActionEvent ev){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        UserAuthorized ua = getSessionBean().getSessionUser();
+        SystemCoordinator sc = getSystemCoordinator();
+        int freshID = 0;
         try {
-            getProp().setPropertyID(pi.insertProperty(getProp()));
-//            getSessionBean().setActivePropWithLists(getProp());
+            freshID = pc.addProperty(prop, ua);
+            prop = pc.getProperty(freshID); 
+            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(prop, ua.getMyCredential()));
+            sc.logObjectView(ua, prop);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Successfully inserted property with ID " + getProp().getPropertyID() 
+                        "Successfully inserted property with ID " + freshID
                                 + ", which is now your 'active property'", ""));
-            return "properties";
             
-        } catch (IntegrationException ex) {
+            
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to insert property in database, sorry. ", 
                         "Please make sure all required fields are completed. "));
-            return "";
-        }
+        } 
     }
 
     /**
@@ -75,6 +106,20 @@ public class PropertyCreateBB
      */
     public void setProp(Property prop) {
         this.prop = prop;
+    }
+
+    /**
+     * @return the putList
+     */
+    public List<PropertyUseType> getPutList() {
+        return putList;
+    }
+
+    /**
+     * @param putList the putList to set
+     */
+    public void setPutList(List<PropertyUseType> putList) {
+        this.putList = putList;
     }
     
     

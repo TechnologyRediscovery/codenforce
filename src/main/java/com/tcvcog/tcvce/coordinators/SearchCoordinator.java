@@ -452,6 +452,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case OPENCECASES_OCCPERIODSINPROCESS:
                 paramsList.add(genParam_property_active());
                 break;
+            case HOUSESTREETNUM:
+                paramsList.add(genParams_property_address());
+                break;
             case CUSTOM:
                 break;
          }
@@ -770,6 +773,30 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
        -------------------------------------------- */
     
      
+    
+    
+    private SearchParamsProperty genParams_property_address(){
+        SearchParamsProperty params = new SearchParamsProperty();
+        
+        params.setSearchName("Properties updated in the past month");
+        params.setSearchDescription("Applies to properties with any field updated");
+        
+        params.setMuni_ctl(true);
+        
+        params.setDate_startEnd_ctl(true);
+        params.setDate_relativeDates_ctl(true);
+        params.setDate_field_val(SearchParamsPropertyDateFields.LAST_UPDATED);
+        params.setDate_relativeDates_start_val(-30);
+        params.setDate_realtiveDates_end_val(0);
+        
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+
+        return params;
+        
+    }
+    
     private SearchParamsProperty genParam_property_active(){
         SearchParamsProperty params = new SearchParamsProperty();
         
@@ -780,7 +807,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         params.setDate_startEnd_ctl(true);
         params.setDate_relativeDates_ctl(true);
-        params.setDateField(SearchParamsPropertyDateFields.LAST_UPDATED);
+        params.setDate_field_val(SearchParamsPropertyDateFields.LAST_UPDATED);
         params.setDate_relativeDates_start_val(-30);
         params.setDate_realtiveDates_end_val(0);
         
@@ -803,9 +830,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         propParams.setLimitResultCount_ctl(true);
         
         // subclass SearchParamsProperty
-        propParams.setFilterByLotAndBlock(false);
-        propParams.setFilterByParcelID(false);
-        propParams.setFilterByAddressPart(true);
+        propParams.setLotblock_ctl(false);
+        propParams.setParcelid_ctl(false);
+        propParams.setAddress_ctl(true);
 
         
         return propParams;

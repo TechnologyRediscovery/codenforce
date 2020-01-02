@@ -117,7 +117,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                                                 "Property created with signature: " + ua.getMyCredential().getSignature(), 
                                                 prop.getNotes()));
         
-        pi.updateProperty(prop);
+        return pi.insertProperty(prop);
         
         
         

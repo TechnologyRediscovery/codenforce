@@ -69,14 +69,6 @@ public class    Property
 
 
     /**
-     * @param useTypeString the useTypeString to set
-     */
-    public void setUseTypeString(String useTypeString) {
-        this.useTypeString = useTypeString;
-    }
-
-
-    /**
      * @param useGroup the useGroup to set
      */
     public void setUseGroup(String useGroup) {
@@ -409,12 +401,6 @@ public class    Property
     }
 
 
-    /**
-     * @param useTypeID the useTypeID to set
-     */
-    public void setUseTypeID(int useTypeID) {
-        this.useTypeID = useTypeID;
-    }
 
     /**
      * @return the unitList

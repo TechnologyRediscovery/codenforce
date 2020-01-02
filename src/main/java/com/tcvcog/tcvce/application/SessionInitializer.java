@@ -192,12 +192,13 @@ public  class       SessionInitializer
             System.out.println("SessionInitializer.intitiateInternalSession | Auth exception");
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
-            return "";
+            System.out.println(ex);
+            return "success";
         } catch (SessionException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Session exception");
-            System.out.println(ex.getMessage());
+            System.out.println(ex);
         }
-        return "";
+        return "success";
     }
     
     

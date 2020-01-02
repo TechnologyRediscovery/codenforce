@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
@@ -79,6 +80,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private OccPeriodType selectedOccPeriodType;
     private List<OccPeriodType> occPeriodTypeList;
     
+    private List<PropertyUseType> putList;
+    
     
     /**
      * Creates a new instance of PropertyProfileBB
@@ -91,19 +94,18 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         PropertyCoordinator pc = getPropertyCoordinator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
         SearchCoordinator sc = getSearchCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
         
         currProp = (getSessionBean().getSessionProperty());
         
         occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
         selectedMuni = getSessionBean().getSessionMuni();
 
-//        setSearchParams(getSelectedPropQuery().getParmsList().get(0));
-//        
-//        
-//        getSearchParams().setDate_startEnd_ctl(false);
-//        getSearchParams().setMuni_ctl(true);
-//        getSearchParams().setBobID_ctl(false);
-//        getSearchParams().setDate_relativeDates_ctl(false); 
+        try {
+            putList = pi.getPropertyUseTypeList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
     }
 
      public String updateProperty(){
@@ -541,6 +543,20 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setSelectedPhotoID(int selectedPhotoID) {
         this.selectedPhotoID = selectedPhotoID;
+    }
+
+    /**
+     * @return the putList
+     */
+    public List<PropertyUseType> getPutList() {
+        return putList;
+    }
+
+    /**
+     * @param putList the putList to set
+     */
+    public void setPutList(List<PropertyUseType> putList) {
+        this.putList = putList;
     }
 
    

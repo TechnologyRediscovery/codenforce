@@ -14,6 +14,11 @@ import com.tcvcog.tcvce.entities.RoleType;
 public  enum        QueryPropertyEnum 
         implements  IFace_RankLowerBounded{
     
+    HOUSESTREETNUM(                     "Search by address", 
+                                        "Enter house and street number to search in your current municipality", 
+                                        RoleType.MuniReader, 
+                                        false),
+    
     OPENCECASES_OCCPERIODSINPROCESS(    "Active properties", 
                                         "Properties with open code enf cases and occupancy period authorization in process", 
                                         RoleType.MuniReader, 

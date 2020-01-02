@@ -23,11 +23,20 @@
                             </h:messages>
                         </h:form>
 
-                        <h:form id="_________NAMEME_________">
                             
                         <h1>_________NAMEME_________</h1>
 
 
+                         <h:form id="gotounitchanges">
+                                        <p:commandButton id="goToUnitChangesButton"
+                                                         value="Go to unit changes"
+                                                         action="#{propertySearchBB.goToChanges()}"
+                                                         />
+
+                                        <h1 class="property-blue">Properties</h1>
+                                    </h:form>
+                        
+                        
                         <p:panel    id="_________NAMEME_________"
                                     toggleable="true"
                                     widgetVar="_________NAMEME_________-var"
@@ -135,7 +144,6 @@
                                         </p:dataScroller>
                                     </div>
                                 </p:dataScroller>
-                            </h:form>
 
                         </p:panel>
                         

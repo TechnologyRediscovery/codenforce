@@ -205,22 +205,24 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      */
     //Nav Bar
     //Sub NavItem: Property
-    private final NavigationSubItem propertyUnits = getNavSubItem("Units", "", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyEvents = getNavSubItem("Events", "", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyPersons = getNavSubItem("Persons", "", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyCases = getNavSubItem("Cases", "", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyDocuments = getNavSubItem("Documents", "", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyInfo = getNavSubItem("Info", "/restricted/cogstaff/prop/propertyInfo.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyUnits = getNavSubItem("Units", "/restricted/cogstaff/prop/propertyUnits.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyEvents = getNavSubItem("Events", "/restricted/cogstaff/prop/propertyEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyPersons = getNavSubItem("Persons", "/restricted/cogstaff/prop/propertyPersons.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyCases = getNavSubItem("Cases", "/restricted/cogstaff/prop/propertyCECases.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "/restricted/cogstaff/prop/propertyPeriods.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyDocuments = getNavSubItem("Files", "/restricted/cogstaff/prop/propertyFiles.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Property
     public List<NavigationSubItem> getPropertyNavList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
+        navList.add(propertyInfo);
         navList.add(propertyUnits);
-        navList.add(propertyEvents);
-        navList.add(propertyPersons);
         navList.add(propertyCases);
         navList.add(propertyPeriods);
+        navList.add(propertyPersons);
+        navList.add(propertyEvents);
         navList.add(propertyDocuments);
         return navList;
     }
@@ -309,13 +311,13 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             //NavItem: Dashboard
             NavigationItem dashboardItem = getNavItem("/restricted/missionControl.xhtml", "Dashboard", "fa fa-dashboard", getDashboardNavList());
             //NavItem: Property
-            NavigationItem propertyItem = getNavItem("/restricted/cogview/properties.xhtml", "Property", "fa fa-home", getPropertyNavList());
+            NavigationItem propertyItem = getNavItem("/restricted/cogstaff/prop/propertySearch.xhtml", "Property", "fa fa-home", getPropertyNavList());
             //NavItem: Code Enf
-            NavigationItem CEItem = getNavItem("/restricted/cogview/cECases.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
+            NavigationItem CEItem = getNavItem("/restricted/cogstaff/ce/ceCaseSearch.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
             //NavItem: Occupancy
-            NavigationItem occItem = getNavItem("/restricted/cogstaff/occ/occPeriodStatus.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
+            NavigationItem occItem = getNavItem("/restricted/cogstaff/occ/occPeriodsearch.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
             //NavItem: Persons
-            NavigationItem personItem = getNavItem("/restricted/cogview/persons.xhtml", "Person", "fa fa-female", getPersonNavList());
+            NavigationItem personItem = getNavItem("/restricted/cogstaff/person/personSearch.xhtml", "Person", "fa fa-female", getPersonNavList());
             //NavItem: Code
             NavigationItem codeItem = getNavItem("/restricted/cogstaff/code/codeSourceManage.xhtml", "Code", "fa fa-book", getCodeNavList());
 
