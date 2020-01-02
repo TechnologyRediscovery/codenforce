@@ -32,7 +32,9 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -101,6 +103,34 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         return p;
     }
+    
+    public int addProperty(Property prop, UserAuthorized ua) throws IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        prop.setLastUpdatedBy(ua);
+        prop.setBobSource(  si.getBOBSource(
+                                Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                .getString("bobsourcePropertyInternal"))));
+        prop.setNotes(sc.formatAndAppendNote(   ua, 
+                                                "Property created with signature: " + ua.getMyCredential().getSignature(), 
+                                                prop.getNotes()));
+        
+        pi.updateProperty(prop);
+        
+        
+        
+    }
+    
+    
+    public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        pi.updateProperty(prop);
+        
+        
+    }
+    
     
     /**
      * Adapter method for folks who need a PropertyDataHeavy but who only have an

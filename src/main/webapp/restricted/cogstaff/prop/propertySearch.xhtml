@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Property Searc</title>
+        <title>Property Search</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
@@ -16,6 +16,13 @@
 
                     <div class="mainContainer">
 
+                        
+                          <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                             columnClasses="gridTd, gridTd">
+
+                              <h:panelGroup id="prop-search-pg-addandquery">
+                                  
+                        
                         <h:form id="prop-search-messages-form">
                             <h:messages id="prop-search-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
@@ -23,6 +30,9 @@
                             </h:messages>
                         </h:form>
 
+                        
+                        
+                        
                         <p:panel    id="prop-search-query-panel"
                                     toggleable="true"
                                     widgetVar="prop-search-query-panel-var"
@@ -47,12 +57,6 @@
 
                             <h:form id="propertySearchForm">
 
-                                <p:commandButton id="propertyAddButton"
-                                                 value="Add new property in #{sessionBean.sessionMuni.muniName}" icon="fa fa-plus"
-                                                 action="#{propertyProfileBB.addProperty()}"
-                                                 disabled="false"
-
-                                                 />
                                 <p:spacer height="10px"/>
 
                                 <p:panelGrid columns="2" >
@@ -311,185 +315,241 @@
 
                                 </p:fieldset>
                             </h:form>
+                        </h:panelGroup>
+                              
+                              <h:panelGroup id="prop-search-pg-results">
 
-                                
+                                <h:form id="propSearchForm">
 
-                                <p:spacer height="5px"/>
-                                <p:spacer height="5px"/>
+                                    <p:dataTable
+                                        id="propSearchTable"
+                                        var="prop"
+                                        value="#{propertyProfileBB.propList}"
+                                        rowKey="#{prop.propertyID}"
+                                        filteredValue="#{propertyProfileBB.filteredPropList}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="false" tabindex="6"
+                                        >
+                                        <p:column width="8%">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID"/>
+                                            </f:facet>
+                                            <h:outputText value="#{prop.propertyID}" />
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Address"/>
+                                            </f:facet>
+                                            <h:outputText value="#{prop.address}" />
+                                        </p:column>
 
-                                <h2>Search Results:</h2>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Muni" />
+                                            </f:facet>
+                                            <h:outputText value="#{prop.muni.muniName}"/>
+                                        </p:column>
 
-                                <p:spacer height="5px"/>
-                            <h:form id="propSearchForm">
+                                        <p:column width="12%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Use Type"/>
+                                            </f:facet>
+                                            <h:outputText value="#{prop.useTypeString}" />
+                                        </p:column>
 
-                                <p:dataTable
-                                    id="propSearchTable"
-                                    var="prop"
-                                    value="#{propertyProfileBB.propList}"
-                                    rowKey="#{prop.propertyID}"
-                                    filteredValue="#{propertyProfileBB.filteredPropList}"
-                                    tableStyleClass="primeDataTable"
-                                    draggableRows="false" tabindex="6"
-                                    >
-                                    <p:column width="8%">
-                                        <f:facet name="header">
-                                            <h:outputText value="ID"/>
-                                        </f:facet>
-                                        <h:outputText value="#{prop.propertyID}" />
-                                    </p:column>
-                                    <p:column width="15%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Address"/>
-                                        </f:facet>
-                                        <h:outputText value="#{prop.address}" />
-                                    </p:column>
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value=""/>
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-hand-o-right"
+                                                             actionListener="#{propertyProfileBB.manageProperty(prop)}" 
+                                                             ajax="true"
+                                                             update="
+                                                             property-info-form
+                                                             property-lists-form
+                                                             form-propunits
+                                                             "/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </h:form>
+                                </p:panel>
+                                <p:panel    id="prop-search-query-panel"
+                                            toggleable="true"
+                                            widgetVar="prop-search-query-panel-var"
+                                            collapsed="false"
+                                            header="Add a property">
+                                            <p:commandButton id="propertyAddButton"
+                                                 value="Add new property in #{sessionBean.sessionMuni.muniName}" icon="fa fa-plus"
+                                                 actionListener="#{propertyProfileBB.addProperty()}"
+                                                 disabled="false"
 
-                                    <p:column width="10%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Muni" />
-                                        </f:facet>
-                                        <h:outputText value="#{prop.muni.muniName}"/>
-                                    </p:column>
-
-                                    <p:column width="12%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Use Type"/>
-                                        </f:facet>
-                                        <h:outputText value="#{prop.useTypeString}" />
-                                    </p:column>
-
-                                    <p:column width="5%">
-                                        <f:facet name="header">
-                                            <h:outputText value=""/>
-                                        </f:facet>
-                                        <p:commandButton icon="fa fa-hand-o-right"
-                                                         actionListener="#{propertyProfileBB.manageProperty(prop)}" 
-                                                         ajax="true"
-                                                         update="
-                                                         property-info-form
-                                                         property-lists-form
-                                                         form-propunits
-                                                         "/>
-                                    </p:column>
-                                </p:dataTable>
-                            </h:form>
-                               
-
-                        </p:panel>
-                        
-                        <p:tabView id="_________NAMEME_________">
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                        </p:tabView>
-                        
-                          <p:dataScroller
-                                                id="_________NAMEME_________"
-                                                widgetVar="_________NAMEME_________"
-                                                var="inelement"
-                                                value="#{inspace.inspectedElementListVisible}"
-                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
-                          
-                          
-                          
-                          </p:dataScroller>
-                        
-                          <p:dataTable
-                                            id="_________NAMEME_________"
-                                            var="_________NAMEME_________"
-                                            rowKey="#{permit.permitID}"
-                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
-                                            tableStyleClass="primeDataTable"
-                                            draggableColumns="true"
-                                            resizableColumns="true"
-                                            filteredValue="#{occInspectionBB.filteredEventList}"
-                                            widgetVar="caseEventTable">
-
-                                            <p:column width="3%" exportable="false">
-                                                <p:rowToggler/>
-                                            </p:column>
-                                            
-                                            <p:column width="10%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Print" />
-                                                </f:facet>
-                                                <p:commandButton ajax="false" 
-                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
-                                                                 value="print"
-                                                                 icon="fa fa-print"
-                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
-                                            </p:column>
-                          </p:dataTable>
-
-                        <p:commandButton   id="_________NAMEME_________" 
-                                           value="run selected query" 
-                                           ajax="true" 
-                                           actionListener="_________NAMEME_________"
-                                           icon="fa fa-print" 
-                                           styleClass="button"
-                                           update=""/>
-
-
-
-                        <p:commandButton    id="_________NAMEME_________"
-                                            value="help on this page" 
-                                            onclick="PF('_________NAMEME_________').show()" 
-                                            styleClass="noFill" 
-                                            icon="fa fa-question-circle"/>
-                        <p:spacer height="10px"/>
-
-
-                        </h:form>
-
+                                                 />
+                                </p:panel>
+                              </h:panelGroup>
+                        </h:panelGrid>
 
                     <!--close main container-->
                     </div>
                     
-                    
-                    <p:dialog   id="_________NAMEME_________"
-                                header="_________NAMEME_________" 
-                                widgetVar="_________NAMEME_________" 
-                                responsive="true" 
-                                width="400"
-                                modal="false"
-                                height="600">
-                        
-                          <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
+                        <p:dialog id="prop-addprop-dialog"
+                              height="650" width="900"
+                              header="Add new property in #{systemServicesBB.bbSessionMuni.muniName}"
+                              widgetVar="prop-addprop-dialog-var"
+                              closable="true">
+
+                        <h:form id="prop-addprop-form">
+                            
+                            <h:messages id="prop-addprop-form-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
-                        </h:form>
-                        
-                        <h:form id="_________NAMEME_________">
                             
+                              <h:panelGrid columns="4" border="0" 
+                                          cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd"
+                                         footerClass="gridFooter">
 
-                            <h2>_________NAMEME_________</h2>
+                                  <h:panelGroup>
+                                     <h:outputLabel for="propAddForm" >
+                                         <h:outputText styleClass="uiLabel" value="Address:" />
+                                     </h:outputLabel>
+                                  </h:panelGroup>
 
-                            
-                            
-                            <p:commandButton    id="_________NAMEME_________"
-                                                value="_________NAMEME_________" 
-                                                ajax="true" 
-                                                icon="fa fa-edit"
-                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
-                                                disabled="false"
-                                                rendered="true"
-                                                oncomplete="PF('_________NAMEME_________').hide()"
-                                                update=""/>
+                                  <h:panelGroup>
+                                      <p:inputText id="" value="#{propertyAddBB.prop.address}" 
+                                           style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                     <h:message for="propAddForm" showDetail="false" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                  </h:panelGroup>
 
-                            <p:commandLink  value="close" 
-                                            onclick="PF('_________NAMEME_________').hide()" 
-                                            styleClass="noFill"/>
+                                  <h:panelGroup>
+                                     <h:outputLabel for="parcelIdForm" >
+                                         <h:outputText styleClass="uiLabel" value="* Parcel ID:" />
+                                     </h:outputLabel>
+                                  </h:panelGroup>
 
-                        </h:form>
+                                  <h:panelGroup>
+                                      <p:inputText id="parcelIdForm" value="#{propertyAddBB.prop.parID}" 
+                                              style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                        <h:message for="parcelIdForm" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                  </h:panelGroup>
 
+                                  <h:panelGroup>
+                                     <h:outputLabel for="proplotandblockForm" >
+                                         <h:outputText styleClass="uiLabel" value="Lot and Block:" />
+                                     </h:outputLabel>
+                                  </h:panelGroup>
+                                  <h:panelGroup>
+                                      <p:inputText id="proplotandblockForm" value="#{propertyAddBB.prop.lotAndBlock}" 
+                                              style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                        <h:message for="proplotandblockForm" showDetail="false" showSummary="true"
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                  </h:panelGroup>
+
+                                  <h:panelGroup>
+                                     <h:outputLabel for="propUseTypeFormMenu" >
+                                         <h:outputText styleClass="uiLabel" value="Property Use Type:" />
+                                     </h:outputLabel>
+                                  </h:panelGroup>
+                                  <h:panelGroup>
+                                      <p:inputText id="propUseTypeFormMenu" value="#{propertyAddBB.prop.propertyUseTypeString}" 
+                                              style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                        <h:message for="propUseTypeFormMenu" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                  </h:panelGroup>
+
+                                  <h:panelGroup>
+                                     <h:outputLabel for="propUseGroupForm" >
+                                         <h:outputText styleClass="uiLabel" value="Use Group:" />
+                                     </h:outputLabel>
+                                  </h:panelGroup>
+                                  <h:panelGroup>
+                                      <p:inputText id="propUseGroupForm" value="#{propertyAddBB.prop.useGroup}" 
+                                              style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                        <h:message for="propUseGroupForm" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                  </h:panelGroup>
+
+                                  <h:panelGroup>
+                                     <h:outputLabel for="propConstTypeForm" >
+                                         <h:outputText styleClass="uiLabel" value="Construction Type:" />
+                                     </h:outputLabel>
+                                  </h:panelGroup>
+                                  <h:panelGroup>
+                                      <p:inputText id="propConstTypeForm" value="#{propertyAddBB.prop.constructionType}" 
+                                              style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                        <h:message for="propConstTypeForm" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                  </h:panelGroup>
+
+                                  <h:panelGroup>
+                                     <h:outputLabel for="propCountyCodeForm" >
+                                         <h:outputText styleClass="uiLabel" value="County Code:" />
+                                     </h:outputLabel>
+                                  </h:panelGroup>
+                                  <h:panelGroup>
+                                      <p:inputText id="propCountyCodeForm" value="#{propertyAddBB.prop.countyCode}" 
+                                              style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                        <h:message for="propCountyCodeForm" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                  </h:panelGroup>
+
+                                  <h:panelGroup>
+                                     <h:outputLabel for="propRentalForm" >
+                                         <h:outputText styleClass="uiLabel" value="Rental?" />
+                                     </h:outputLabel>
+                                  </h:panelGroup>
+                                 <h:panelGroup>
+                                     <p:selectBooleanCheckbox id="propRentalForm" value="#{propertyAddBB.prop.rental}" tabindex="14" disabled="false" >
+                                          <p:ajax />
+                                     </p:selectBooleanCheckbox>
+                                  </h:panelGroup>
+
+                                  <h:panelGroup>
+                                     <h:outputLabel for="propMultiForm" >
+                                         <h:outputText styleClass="uiLabel" value="Multi-Unit?" />
+                                     </h:outputLabel>
+                                  </h:panelGroup>
+                                  <h:panelGroup>
+                                     <p:selectBooleanCheckbox id="propMultiForm" value="#{propertyAddBB.prop.multiUnit}" tabindex="14" disabled="false">
+                                          <p:ajax />
+                                     </p:selectBooleanCheckbox> 
+                                  </h:panelGroup>
+
+                                  <h:panelGroup>
+                                     <h:outputLabel for="propVacantForm" >
+                                         <h:outputText styleClass="uiLabel" value="Vacant?" />
+                                     </h:outputLabel>
+                                  </h:panelGroup> 
+                                  <h:panelGroup>
+                                     <p:selectBooleanCheckbox id="propVacantForm" value="#{propertyAddBB.prop.vacant}" tabindex="14" disabled="false" >
+                                         <p:ajax />
+                                     </p:selectBooleanCheckbox>
+                                  </h:panelGroup>
+
+
+                                  <f:facet name="footer">
+                                     <h:panelGroup>
+
+                                         <h:outputText value="* required field"/>
+                                         <p:spacer width="10px"/>
+
+                                        <h:outputLabel for="propNotesForm" value="Notes:"/>
+                                        <p:inputTextarea id="propNotesForm" value="#{propertyAddBB.prop.notes}" 
+                                                 style="width: 100%;" tabindex="1" required="false" styleClass="inputText"/>
+                                           <h:message for="propNotesForm" showDetail="false" showSummary="true" 
+                                              warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                     </h:panelGroup>
+                                  </f:facet>
+                              </h:panelGrid>
+                            <p:spacer height="10px"/>
+
+
+                            <p:commandButton id="commitButton" value="Commit New Property Information"
+                                               icon="fa fa-floppy-o"
+                                               action="#{propertyAddBB.insertProp}"/>
+                         </h:form>
                     </p:dialog>
-
-
                 </f:view>
             </ui:define>
         </ui:composition>

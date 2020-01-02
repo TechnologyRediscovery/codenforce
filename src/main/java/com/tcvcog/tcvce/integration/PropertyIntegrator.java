@@ -136,6 +136,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if(rs.getTimestamp("vacantdatestop") != null){
                 p.setVacantDateStop(rs.getTimestamp("vacantdatestop").toLocalDateTime());
             }
+            if(rs.getTimestamp("creationts") != null){
+                p.setCreationTS(rs.getTimestamp("creationts").toLocalDateTime());
+            }
             p.setVacantBy(ui.getUser(rs.getInt("vacantby_userid")));
             p.setConditionIntensityClassID(rs.getInt("condition_intensityclassid"));
             
@@ -376,7 +379,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                         "            unfitby_userid, abandoneddatestart, abandoneddatestop, abandonedby_userid, \n" +
                         "            vacantdatestart, vacantdatestop, vacantby_userid, condition_intensityclassid, \n" +
                         "            landbankprospect_intensityclassid, landbankheld, active, nonaddressable, \n" +
-                        "            usetype_typeid)\n" +
+                        "            usetype_typeid, creationts)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, now(), ?, \n" +
@@ -384,7 +387,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                         "            ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
-                        "            ?);"; // im so sorry 
+                        "            ?, now());"; // im so sorry 
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -861,7 +864,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                         "       abandoneddatestart, abandoneddatestop, abandonedby_userid, vacantdatestart, \n" +
                         "       vacantdatestop, vacantby_userid, condition_intensityclassid, \n" +
                         "       landbankprospect_intensityclassid, landbankheld, active, nonaddressable, \n" +
-                        "       usetype_typeid\n" +
+                        "       usetype_typeid, creationts \n" +
                         "  FROM public.property WHERE propertyid=?;";
 
         Connection con = getPostgresCon();

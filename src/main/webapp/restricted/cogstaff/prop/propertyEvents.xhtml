@@ -7,68 +7,31 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>_________NAMEME_________</title>
+        <title>Property Events</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="_________NAMEME_________">
+                <f:view id="prop-events-view">
 
                     <div class="mainContainer">
 
-                        <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
+                        <h:form id="prop-events-messages-form">
+                            <h:messages id="prop-events-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
 
-                        <h:form id="_________NAMEME_________">
-                            
-                        <h1>_________NAMEME_________</h1>
 
-
-                        <p:panel    id="_________NAMEME_________"
+                        <p:panel    id="prop-events-list-panel"
                                     toggleable="true"
-                                    widgetVar="_________NAMEME_________-var"
+                                    widgetVar="prop-events-list-panel-var"
                                     collapsed="false"
-                                    header="Occupancy period settings">
+                                    header="Property events">
                                
-                            <h:form id="_________NAMEME_________">
-                                        <h:panelGrid        id="_________NAMEME_________"
-                                                            columns="2"
-                                                            columnClasses="gridTd, gridTdg"
-                                                            rendered="true">
-                                            <h:panelGroup>
-                                                <h:outputText value="_________NAMEME_________"
-                                                              styleClass="ui-label font-smaller"/>
-                                                
-                                                    <h:outputText   id="_________NAMEME_________"
-                                                                    value="#{empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS ? 'block' : 'verified_user'}"/>
-                                                        
-                                                    <p:outputLabel  for="_________NAMEME_________"
-                                                                    value="_________NAMEME_________"
-                                                                    styleClass="ui-label" />
-                                                    <p:inputText    id="_________NAMEME_________" 
-                                                                    type="text"
-                                                                    value="#{occInspectionBB.formEventRuleIDToAdd}" />
-                                                    <h:message  for="_________NAMEME_________" showDetail="false" showSummary="true"  
-                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                
-                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.type.title}"
-                                                              styleClass="data-text"/>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <f:subview id="_________NAMEME_________">
-                                                
-                                                    <!--content-->
-                                                    
-                                                </f:subview>
-                                            </h:panelGroup>
-                                        </h:panelGrid>
-                               </h:form>
-                                                
+                            <h:form id="prop-events-list-form">
+                                      
 
 
                         </p:panel>

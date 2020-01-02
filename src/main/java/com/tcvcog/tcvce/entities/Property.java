@@ -28,6 +28,7 @@ public class    Property
     
     protected String notes;
   
+    private LocalDateTime creationTS;
     protected LocalDateTime lastUpdatedTS;
     protected User lastUpdatedBy;
     protected OccLocationDescriptor  locationDescriptor;
@@ -427,6 +428,20 @@ public class    Property
      */
     public void setUnitList(List<PropertyUnit> unitList) {
         this.unitList = unitList;
+    }
+
+    /**
+     * @return the creationTS
+     */
+    public LocalDateTime getCreationTS() {
+        return creationTS;
+    }
+
+    /**
+     * @param creationTS the creationTS to set
+     */
+    public void setCreationTS(LocalDateTime creationTS) {
+        this.creationTS = creationTS;
     }
 
   

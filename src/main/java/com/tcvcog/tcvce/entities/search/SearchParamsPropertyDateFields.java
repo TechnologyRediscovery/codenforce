@@ -24,19 +24,22 @@ import java.util.List;
  * @author sylvia
  */
 public enum SearchParamsPropertyDateFields {
-    LAST_UPDATED("Last updated on"),
-    UNFIT_START("Declared to be unfit - start date"),
-    UNFIT_STOP("Declared to be unfit - stop date"),
-    ABANDONED_START("Declared abandoned - start date"),
-    ABANDONED_STOP("Declared abandoned - stop date"),
-    VACANT_START("Declared vacant - start date"),
-    VACANT_STOP("Declared vacant - start date"),
-    EXTERNAL_DATA_LASTUPDATED("Last recorded update date of external data");
+    CREATIONTS("Database insert timestamp", "creationts"),    
+    LAST_UPDATED("Last updated on", "lastupdated"),
+    UNFIT_START("Declared to be unfit - start date", "unfitdatestart"),
+    UNFIT_STOP("Declared to be unfit - stop date", "unfitdatestop"),
+    ABANDONED_START("Declared abandoned - start date", "abandoneddatestart"),
+    ABANDONED_STOP("Declared abandoned - stop date", "abandoneddatestop"),
+    VACANT_START("Declared vacant - start date", "vacantdatestart"),
+    VACANT_STOP("Declared vacant - start date", "vacantdatestop"),
+    EXTERNAL_DATA_LASTUPDATED("Last recorded update date of external data", "propertyexternaldata.lastupdated");
     
      private final String title;
+     private final String dbField;
     
-    private SearchParamsPropertyDateFields(String t){
+    private SearchParamsPropertyDateFields(String t, String db){
         this.title = t;
+        this.dbField = db;
     }
     
     public String getTitle(){
@@ -64,6 +67,13 @@ public enum SearchParamsPropertyDateFields {
         output.add(SearchParamsPropertyDateFields.VACANT_STOP);
         return output;
 }
+
+    /**
+     * @return the dbField
+     */
+    public String getDbField() {
+        return dbField;
+    }
      
     
 }

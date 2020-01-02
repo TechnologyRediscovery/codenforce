@@ -109,20 +109,15 @@
                                                  disabled="false"
                                                  update="form-propinfoedit"/>
                             </h:form>
-
-                       
-
-
                         </p:panel>
 
                     <!--close main container-->
                     </div>
-                    
                       <p:dialog id="dialog-propinfoedit"
                               height="650" width="900"
+                              header="Edit Property Info"
                               widgetVar="dialog-widvar-propinfoedit"
                               closable="true">
-                        <h2>Edit Property Info</h2>
                         <h:form id="form-propinfoedit">
                             <h:messages id="messages-properties-editpropinfo"
                                         globalOnly="true" showDetail="true" showSummary="true"
@@ -195,9 +190,6 @@
                                                  icon="fa fa-plus"
                                                  tabindex="1"
                                                  value="Save Property Info"/>
-                            
-                            
-                            
                         </h:form>
                         <script type="text/javascript">
                                 $(function () {
@@ -230,8 +222,6 @@
                                 });
                             </script>
                     </p:dialog>
-                            
-
                 </f:view>
             </ui:define>
         </ui:composition>
