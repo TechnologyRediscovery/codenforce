@@ -202,6 +202,134 @@
 
                         </h:form>    
 
+                        <h:form id="chooseCodeElementForm" rendered="#{feeManagementBB.editingOccPeriod()}">
+                            <h2>Occupancy Period Types</h2>
+                            <p:dataTable
+                                id="codeElementTable"
+                                var="element"
+                                value="#{feeManagementBB.elementList}"
+                                rowKey="#{element.codeSetElementID}"
+                                tableStyleClass="primeDataTable"
+                                rowExpandMode="single"
+                                expandedRow="false"
+                                selectionMode="single"
+                                selection="#{feeManagementBB.selectedCodeElement}"
+                                filteredValue="#{feeManagementBB.filteredElementList}"
+                                >
+
+                                <p:column width="3%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Expand"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.elementID}">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID#" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.elementID}"/>
+                                </p:column>
+
+                                <p:column width="10%" sortBy="#{element.guideEntry.category}"
+                                          filterBy="#{element.guideEntry.category}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.guideEntry.category}"/>
+                                </p:column>
+
+                                <p:column width="10%" sortBy="#{element.guideEntry.subCategory}"
+                                          filterBy="#{element.guideEntry.subCategory}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sub Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.guideEntry.subCategory}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.ordchapterNo}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Chap"/>
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordchapterNo}"/>
+                                </p:column>
+
+                                <p:column width="15%" sortBy="#{element.ordchapterTitle}"
+                                          filterBy="#{element.ordchapterTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Chapter"/>
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordchapterTitle}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.ordSecNum}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sec" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordSecNum}"/>
+                                </p:column>
+
+                                <p:column width="15%" sortBy="#{element.ordSecTitle}"
+                                          filterBy="#{element.ordSecTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sec. Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordSecTitle}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.ordSubSecNum}">
+                                    <f:facet name="header">
+                                        <h:outputText value="SubSec" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordSubSecNum}"/>
+                                </p:column>
+
+                                <p:column sortBy="#{element.ordSubSecTitle}" 
+                                          filterBy="#{element.ordSubSecTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="SubSec. Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordSubSecTitle}"/>
+                                </p:column>
+
+                                <p:rowExpansion>
+                                    <div class="outlinedBox">
+                                        <h3>Code element detail:</h3>
+
+                                        <h:outputLabel styleClass="bold" value="Technical Text"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.ordTechnicalText}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        <h:outputLabel styleClass="bold" value="Human friendly text"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.ordHumanFriendlyText}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.guideEntry.enforcementGuidelines}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.guideEntry.inspectionGuidelines}"/>
+                                        </div>
+                                    </div>
+                                </p:rowExpansion>
+
+                            </p:dataTable>
+                            <p:spacer height="10px"/>
+                            <p:commandButton 
+                                actionListener="#{feeManagementBB.editCodeElementFees}"
+                                oncomplete="PF('feePermissionsDialogVar').show()"
+                                ajax="true"
+                                update="feePermissionsForm messages"
+                                value="Edit the Fee Permissions of this Code Element" tabindex="2"/>
+
+                        </h:form> 
+
                         <p:dialog id="feePermissionsDialog"
                                   height="450" width="1000"
                                   widgetVar="feePermissionsDialogVar"
@@ -212,7 +340,7 @@
                                     applied to an Occupancy Period.</p>
 
 
-                                <h:outputLabel value="Permitted Fees:" for="permittedFeeTable"/>
+                                <h:outputLabel value="Currently Permitted Fees:" for="permittedFeeTable"/>
                                 <h:panelGroup>
                                     <p:dataTable
                                         id="permittedFeeTable"
@@ -256,25 +384,25 @@
                                         </p:column>
 
                                         <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Effective Date" />
-                                        </f:facet>
-                                        <p:cellEditor>
-                                            <f:facet name="output"><h:outputText value="#{fee.effectiveDate}" /></f:facet>
-                                            <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
-                                        </p:cellEditor>
+                                            <f:facet name="header">
+                                                <h:outputText value="Effective Date" />
+                                            </f:facet>
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{fee.effectiveDate}" /></f:facet>
+                                                <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
+                                            </p:cellEditor>
                                         </p:column>
-                                        
+
                                         <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Expire Date" />
-                                        </f:facet>
-                                        <p:cellEditor>
-                                            <f:facet name="output"><h:outputText value="#{fee.expiryDate}" /></f:facet>
-                                            <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
-                                        </p:cellEditor>
+                                            <f:facet name="header">
+                                                <h:outputText value="Expire Date" />
+                                            </f:facet>
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{fee.expiryDate}" /></f:facet>
+                                                <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
+                                            </p:cellEditor>
                                         </p:column>
-                                        
+
                                         <p:column>
                                             <f:facet name="header">
                                                 <h:outputText value="Autoassign" />
@@ -301,7 +429,7 @@
                                                 <h:outputText value="Remove?" />
                                             </f:facet>
                                             <p:commandButton ajax="true" value="Remove" 
-                                                             action="#{feeManagementBB.removeOccPeriodFee(fee)}"
+                                                             action="#{feeManagementBB.removePermittedFee(fee)}"
                                                              update="#{p:component('permittedFeeTable')}
                                                              feePermissionsForm"/>                                      
                                         </p:column>

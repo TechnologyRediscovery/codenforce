@@ -69,7 +69,7 @@ public class OccPeriodType implements Cloneable {
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        return super.clone(); //To change body of generated methods, choose Tools | Templates.
+        return super.clone();
     }
     
     /**

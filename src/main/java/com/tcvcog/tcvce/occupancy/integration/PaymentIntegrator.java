@@ -1140,6 +1140,152 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+        public void insertFeeCodeElementJoin(Fee fee, EnforcableCodeElement element) throws IntegrationException {
+        String query = "INSERT INTO public.moneycodesetelementfee(\n"
+                + "    fee_feeid, codesetelement_elementid, autoassign, active)\n"
+                + "    VALUES (?, ?, ?, true);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, element.getCodeSetElementID());
+            stmt.setBoolean(3, fee.isAutoAssigned());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.insertFeeCodeElementJoin | Error: ", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+    }
+
+    public void deactivateFeeCodeElementJoin(Fee fee, EnforcableCodeElement element) throws IntegrationException {
+
+        String query = "UPDATE public.moneycodesetelementfee\n"
+                + "   SET active=false\n"
+                + "   WHERE fee_feeid=? AND codesetelement_elementid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, element.getCodeSetElementID());
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot Fee Code Set Element join", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+    }
+
+    public void reactivateFeeCodeElementJoin(Fee fee, EnforcableCodeElement element) throws IntegrationException {
+
+        String query = "UPDATE public.moneycodesetelementfee\n"
+                + "   SET active=true\n"
+                + "   WHERE fee_feeid=? AND codesetelement_elementid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, element.getCodeSetElementID());
+            System.out.println("TRYING TO EXECUTE UPDATE METHOD");
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to reactivate fee and Code Set Element join", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        }
+
+    }
+
+    public void updateFeeCodeElementJoin(Fee fee, EnforcableCodeElement element) throws IntegrationException {
+
+        String query = "UPDATE public.moneyoccperiodtypefee\n"
+                + "   SET autoassign=?\n"
+                + "   WHERE fee_feeid=? AND occperiodtype_typeid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setBoolean(1, fee.isAutoAssigned());
+            stmt.setInt(2, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(3, element.getCodeSetElementID());
+            System.out.println("TRYING TO EXECUTE UPDATE METHOD");
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update fee and code set element join", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        }
+
+    }
+    
     public void insertPaymentPeriodJoin(Payment payment, MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
         String query = "INSERT INTO public.moneyoccperiodfeepayment(\n"
                 + "    payment_paymentid, occperiodassignedfee_id)\n"

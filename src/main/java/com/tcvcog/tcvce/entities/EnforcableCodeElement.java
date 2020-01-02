@@ -21,15 +21,16 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- *  Represents a codesetelement stated with fidelity to the ERD
+ * Represents a codesetelement stated with fidelity to the ERD
+ *
  * @author Eric C. Darsow
  */
-public class EnforcableCodeElement extends CodeElement implements Serializable{
-    
-    public EnforcableCodeElement(){
-    
+public class EnforcableCodeElement extends CodeElement implements Serializable, Cloneable {
+
+    public EnforcableCodeElement() {
+
     }
-    
+
     // code set elements and enforcable code elments are equivalent
     // TODO: unify these names
     private int codeSetElementID;
@@ -42,11 +43,17 @@ public class EnforcableCodeElement extends CodeElement implements Serializable{
     private String daysToComplyNotes;
     private String muniSpecificNotes;
     private List<Fee> feeList;
-    
-    public String toString(){
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    @Override
+    public String toString() {
         return codeElement.getHeaderString();
     }
-    
+
     /**
      * @return the maxPenalty
      */
@@ -180,5 +187,5 @@ public class EnforcableCodeElement extends CodeElement implements Serializable{
     public void setFeeList(List<Fee> feeList) {
         this.feeList = feeList;
     }
-    
+
 }

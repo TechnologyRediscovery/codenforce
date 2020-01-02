@@ -1,0 +1,2 @@
+﻿ALTER TABLE public.moneycodesetelementfee ADD COLUMN active boolean;
+ALTER TABLE public.moneycodesetelementfee ADD COLUMN autoassign boolean;
