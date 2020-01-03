@@ -494,13 +494,13 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                         "   SET municipality_municode=?, parid=?, lotandblock=?, \n" +
                         "       address=?, usegroup=?, constructiontype=?, countycode=?, notes=?, \n" +
                         "       addr_city=?, addr_state=?, addr_zip=?, ownercode=?, propclass=?, \n" +
-                        "       lastupdated=?, lastupdatedby=?, \n" +
+                        "       lastupdated=?, lastupdatedby=? WHERE propertyid=?;";
 //                        "       locationdescription=?, bobsource_sourceid=?, unfitdatestart=?, unfitdatestop=?, unfitby_userid=?, abandoneddatestart=?, \n" +
 //                        "       abandoneddatestop=?, abandonedby_userid=?, vacantdatestart=?, \n" +
 //                        "       vacantdatestop=?, vacantby_userid=?, condition_intensityclassid=?, \n" +
 //                        "       landbankprospect_intensityclassid=?, landbankheld=?, active=?, \n" +
 //                        "       nonaddressable=?, usetype_typeid=?\n" +
-                        " WHERE propertyid=?;";
+//                        " WHERE propertyid=?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -560,6 +560,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 //            stmt.setBoolean(31, prop.isNonAddressable());
 //            
 //            stmt.setInt(32, prop.getUseTypeID());
+            stmt.setInt(16, prop.getPropertyID());
 
             stmt.executeUpdate();
 
@@ -569,6 +570,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            System.out.println("Property ID = " + prop.getPropertyID());
+            System.out.println("Connection closed and update hopefully saved.");
         } // close finally
         return "propertyProfile";
     }
