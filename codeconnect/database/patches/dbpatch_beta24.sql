@@ -35,7 +35,7 @@ ALTER TABLE public.choiceproposal DROP COLUMN responseevent_occeventid;
 
 
 -- What is this?
-ALTER TABLE DROP COLUMN dateofrecord;
+ALTER TABLE event DROP COLUMN dateofrecord;
 
 ALTER TABLE event ADD COLUMN timestart TIMESTAMP WITH TIME ZONE;
 ALTER TABLE event ADD COLUMN timeend TIMESTAMP WITH TIME ZONE;

@@ -161,6 +161,7 @@ public  class       SessionInitializer
     public String configureSession(User u, Municipality muni, UserMuniAuthPeriod umap) throws BObStatusException, IntegrationException{
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
+        System.out.println("SessionInitializer.configureSession()");
         
         try {
             // The central call which initiates the User's session for a particular municipality
@@ -380,6 +381,7 @@ public  class       SessionInitializer
         try {
             muniHeavy = mc.assembleMuniDataHeavy(cred.getGoverningAuthPeriod().getMuni(), cred);
         } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
+            System.out.println(ex);
             throw new SessionException("Error creating muni data heavy", ex, ss, ExceptionSeverityEnum.SESSION_FATAL);
         }
         sb.setSessionMuni(muniHeavy);
@@ -442,6 +444,7 @@ public  class       SessionInitializer
                 sb.setQueryProperty(sb.getQueryPropertyList().get(0));
             }            
         } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
             throw new SessionException( "Error setting proerty query list", 
                                         ex, ss, 
                                         ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
@@ -481,6 +484,7 @@ public  class       SessionInitializer
                 sb.setQueryPerson(sb.getQueryPersonList().get(0));
             }
         } catch (IntegrationException ex) {
+            System.out.println(ex);
         }
     }
 
@@ -542,6 +546,7 @@ public  class       SessionInitializer
                 sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
             }
         } catch (IntegrationException ex) {
+            System.out.println(ex);
             throw new SessionException( "Occ period list or query assembly failure", 
                                         ex, 
                                         ss, 
@@ -584,6 +589,7 @@ public  class       SessionInitializer
                 sb.setSessionCECase(sb.getSessionCECaseList().get(0));
             }
         } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
             throw new SessionException("Error assembling session CECase list from history", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
         }
 
@@ -760,6 +766,7 @@ public  class       SessionInitializer
             try {
                 uc.logCredentialInvocation(umaple, authUser.getMyCredential().getGoverningAuthPeriod());
             } catch (IntegrationException | AuthorizationException ex) {
+                System.out.println(ex);
                 throw new SessionException( "Failure creating user muni auth period log entry", 
                                             ex, ss,
                                             ExceptionSeverityEnum.NONCRITICAL_FAILURE);

@@ -85,7 +85,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         }
 
         // add a unit number -1 to any PropertyWithoutAnyUnits
-        
+        System.out.println("PropertyCoordinator.assemblePropertyDataheavy()");
         return propWL;
     }
     

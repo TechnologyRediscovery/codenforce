@@ -1030,6 +1030,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
+        System.out.println("PropertyIntegrator.getPropertyHistoryList | returning list with size " + propList.size());
         return propList;
     }
     
