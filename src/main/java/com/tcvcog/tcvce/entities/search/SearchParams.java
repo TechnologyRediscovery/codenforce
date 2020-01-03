@@ -8,9 +8,11 @@ package com.tcvcog.tcvce.entities.search;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,19 +28,6 @@ import java.util.List;
 public  class           SearchParams 
         implements      Serializable{
 
-    /**
-     * @return the muni_rtMin
-     */
-    public RoleType getMuni_rtMin() {
-        return muni_rtMin;
-    }
-
-    /**
-     * @param muni_rtMin the muni_rtMin to set
-     */
-    public void setMuni_rtMin(RoleType muni_rtMin) {
-        this.muni_rtMin = muni_rtMin;
-    }
     
     private String searchName;
     private String searchDescription;
@@ -50,12 +39,17 @@ public  class           SearchParams
     
     private RoleType date_rtMin;
     private boolean date_startEnd_ctl;
+   private boolean date_null_ctl;
     private LocalDateTime date_start_val;
     private LocalDateTime date_end_val;
 
     private boolean date_relativeDates_ctl;
     private int date_relativeDates_start_val;
     private int date_realtiveDates_end_val;
+    
+   private boolean user_ctl;
+   // subclasses must have a user_field enum member to make these work
+   private User user_val;
     
     
     private boolean applyDateSearchToDateOfRecord;
@@ -73,9 +67,37 @@ public  class           SearchParams
     private boolean active_val;
     
    public SearchParams(){
+       muniList_val = new ArrayList<>();
        
    }
    
+    /**
+     * @return the date_null_ctl
+     */
+    public boolean isDate_null_ctl() {
+        return date_null_ctl;
+    }
+
+    /**
+     * @param date_null_ctl the date_null_ctl to set
+     */
+    public void setDate_null_ctl(boolean date_null_ctl) {
+        this.date_null_ctl = date_null_ctl;
+    }
+
+    /**
+     * @return the muni_rtMin
+     */
+    public RoleType getMuni_rtMin() {
+        return muni_rtMin;
+    }
+
+    /**
+     * @param muni_rtMin the muni_rtMin to set
+     */
+    public void setMuni_rtMin(RoleType muni_rtMin) {
+        this.muni_rtMin = muni_rtMin;
+    }
    
    
     /**
@@ -490,6 +512,34 @@ public  class           SearchParams
      */
     public void setLimitResultCount_rtMin(RoleType limitResultCount_rtMin) {
         this.limitResultCount_rtMin = limitResultCount_rtMin;
+    }
+
+    /**
+     * @return the user_ctl
+     */
+    public boolean isUser_ctl() {
+        return user_ctl;
+    }
+
+    /**
+     * @param user_ctl the user_ctl to set
+     */
+    public void setUser_ctl(boolean user_ctl) {
+        this.user_ctl = user_ctl;
+    }
+
+    /**
+     * @return the user_val
+     */
+    public User getUser_val() {
+        return user_val;
+    }
+
+    /**
+     * @param user_val the user_val to set
+     */
+    public void setUser_val(User user_val) {
+        this.user_val = user_val;
     }
 
    

@@ -68,7 +68,8 @@ public  class       PropertyDataHeavy
         this.lotAndBlock = prop.getLotAndBlock();
         this.address = prop.getAddress();
 
-        this.useType = prop.getUsegetUseType      this.useGroup = prop.getUseGroup();
+        this.useType = prop.getUseType();      
+        this.useGroup = prop.getUseGroup();
         this.constructionType = prop.getConstructionType();
         this.countyCode = prop.getCountyCode();
 
@@ -103,8 +104,7 @@ public  class       PropertyDataHeavy
         this.active = prop.isActive();
         this.nonAddressable = prop.isNonAddressable();
         
-        this.useTypeID = prop.getUseTypeID();
-        this.useType = prop.getUseTypeStgetUseTypethis.unitList = prop.getUnitList();
+        
         
         
     }
@@ -118,7 +118,8 @@ public  class       PropertyDataHeavy
         this.lotAndBlock = prop.getLotAndBlock();
         this.address = prop.getAddress();
 
-        this.useType = prop.getUseTypeString()getUseTypeseGroup = prop.getUseGroup();
+        this.useType = prop.getUseType();
+        this.useGroup = prop.getUseGroup();
         this.constructionType = prop.getConstructionType();
         this.countyCode = prop.getCountyCode();
 
@@ -153,9 +154,7 @@ public  class       PropertyDataHeavy
         this.active = prop.isActive();
         this.nonAddressable = prop.isNonAddressable();
         
-        this.useTypeID = prop.getUseTypeID();
-        this.useType = prop.getUseTypeString();
-    getUseTypet = prop.getUnitList();
+        this.unitList = prop.getUnitList();
         
         
     }

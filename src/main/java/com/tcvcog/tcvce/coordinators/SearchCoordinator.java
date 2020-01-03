@@ -347,11 +347,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         if(q == null){
             throw new SearchException("A null query object is not authorized for running");
         }
-        if( q.getCredential().getGoverningAuthPeriod().getRole().getRank() 
-                    < 
-                q.getUserRankAccessMinimum().getRank()){
-            
-            throw new SearchException("Credential below rank for running query");
+        if(q.getUserRankAccessMinimum() != null){
+            if( q.getCredential().getGoverningAuthPeriod().getRole().getRank() 
+                        < 
+                    q.getUserRankAccessMinimum().getRank()){
+
+                throw new SearchException("Credential below rank for running query");
+            }
         }
         auditSearchParams(q);
         
@@ -388,7 +390,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         for(SearchParams sp: splst){
-            if(sp.getMuniList_val().size() > 1){
+            
+            if(sp.getMuniList_val() != null && sp.getMuniList_val().size() > 1){
                 if(q.getCredential().getGoverningAuthPeriod().getRole().getRank() < MIN_ROLETYPEFORMULTIMUNI_QUERY.getRank()){
                     throw new SearchException(MIN_ROLETYPEFORMULTIMUNI_QUERY.getLabel() + " is required for muli-muni searching");
                 }
@@ -402,7 +405,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                         throw new SearchException("Invalid attempt to search for objects in an unauthorized Muni");
                     }
                 }
-            } else if(sp.getMuniList_val().size() == 1){
+            } else if( sp.getMuniList_val() != null && sp.getMuniList_val().size() == 1){
                 if(sp.getMuniList_val().get(0).getMuniCode() != q.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode()){
                     throw new SearchException("Requested muni for search does not match credential's governing auth period");
                 }
@@ -778,16 +781,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private SearchParamsProperty genParams_property_address(){
         SearchParamsProperty params = new SearchParamsProperty();
         
-        params.setSearchName("Properties updated in the past month");
-        params.setSearchDescription("Applies to properties with any field updated");
+        params.setSearchName("Search by house number and street name");
+        params.setSearchDescription("Standard search");
         
         params.setMuni_ctl(true);
-        
-        params.setDate_startEnd_ctl(true);
-        params.setDate_relativeDates_ctl(true);
-        params.setDate_field_val(SearchParamsPropertyDateFields.LAST_UPDATED);
-        params.setDate_relativeDates_start_val(-30);
-        params.setDate_realtiveDates_end_val(0);
+        params.setAddress_ctl(true);
+        params.setDate_startEnd_ctl(false);
+        params.setDate_relativeDates_ctl(false);
         
         params.setActive_ctl(true);
         params.setActive_val(true);

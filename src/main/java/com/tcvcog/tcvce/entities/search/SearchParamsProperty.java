@@ -78,6 +78,17 @@ public  class       SearchParamsProperty
    private int constructionYear_min_val;
    private int constructionYear_max_val;
    
+   
+   public SearchParamsPropertyDateFields[] getDateFieldList(){
+       SearchParamsPropertyDateFields[] fields = SearchParamsPropertyDateFields.values();
+       return fields;
+   }
+   
+   public SearchParamsPropertyUserFields[] getUserFieldList(){
+       SearchParamsPropertyUserFields[] fields = SearchParamsPropertyUserFields.values();
+       return fields;
+   }
+   
     /**
      * @return the lotblock_ctl
      */

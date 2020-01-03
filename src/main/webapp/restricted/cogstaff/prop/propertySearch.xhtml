@@ -40,10 +40,10 @@
 
                                         <h2>Search configuration</h2>
 
-                                        <p:selectOneMenu id="prop-search-query-som" tabindex="1" value="#{propertySearchBB.queryList}">
+                                        <p:selectOneMenu id="prop-search-query-som" tabindex="1" value="#{propertySearchBB.querySelected}">
                                             <f:converter converterId="bOBQueryConverter"/>
                                             <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                            <f:selectItems id="prop-search-query-si" value="#{propertySearchBB.querySelected}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                            <f:selectItems id="prop-search-query-si" value="#{propertySearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
                                             <p:ajax update="prop-search-query-desc-ot" />
                                         </p:selectOneMenu>
 
@@ -71,7 +71,7 @@
                                                            update=" prop-search-messages-form
                                                            prop-search-results-form"/>
 
-                                        <p:selectOneMenu id="prop-search-params-som" tabindex="1" value="#{propertySearchBB.queryList}">
+                                        <p:selectOneMenu id="prop-search-params-som" tabindex="1" value="#{propertySearchBB.searchParamsSelected}">
                                             <f:converter converterId="searchParamsConverter"/>
                                             <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
                                             <f:selectItems id="prop-search-params-si" value="#{propertySearchBB.querySelected.parmsList}" var="sp" itemValue="#{sp}" itemLabel="#{sp.searchName}" />
@@ -91,12 +91,12 @@
                                                             columnClasses="gridTd-solid-back"
                                                             footerClass="gridFooter">
 
-                            <!--filter: addr-->
+                                                <!--filter: addr-->
                                                 <h:panelGroup id="prop-search-filter-addr">
                                                     <h:panelGrid columns="2" 
                                                                  cellpadding="10" 
                                                                  columnClasses="topbottom-lines-left, topbottom-lines-right">
-                                                        
+
                                                         <h:panelGroup>
                                                             <p:outputLabel for="prop-search-filter-addr-ctl">
                                                                 <h:outputText value="House number and/or street name"
@@ -107,7 +107,7 @@
                                                                 <p:ajax update="prop-search-filter-addr-val"/>
                                                             </p:selectBooleanCheckbox>
                                                         </h:panelGroup>
-                                                        
+
                                                         <h:panelGroup>
 
                                                             <p:inputText id="prop-search-filter-addr-val" 
@@ -121,6 +121,7 @@
                                                             <h:message for="prop-search-filter-addr-val" showDetail="false" showSummary="true" 
                                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                         </h:panelGroup>
+                                                    </h:panelGrid>
                                                 </h:panelGroup>
                                             </h:panelGrid>
                                         </p:fieldset>
@@ -131,28 +132,28 @@
                                             toggleable="true" 
                                             collapsed="false" 
                                             style="background-color: white;">
-                        
+
                                             <h:panelGrid    id="prop-search-filters-grid"
                                                             columns="1" 
                                                             cellpadding="10" 
                                                             columnClasses="gridTd-solid-back"
                                                             footerClass="gridFooter">
-                            <!--filter: muni-->
+                                                <!--filter: muni-->
                                                 <h:panelGroup id="prop-search-filter-muni">
                                                     <h:panelGrid columns="2" 
                                                                  cellpadding="10" 
                                                                  columnClasses="topbottom-lines-left, topbottom-lines-right">
-                                                        
+
                                                         <h:panelGroup>
-                                                            <p:outputLabel for="prop-search-muni-ctl-chkbx"
+                                                            <p:outputLabel for="prop-search-muni-ctl"
                                                                            value="Municipality"
                                                                            styleClass="datum-label" />
-                                                            <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" 
+                                                            <p:selectBooleanCheckbox id="prop-search-muni-ctl" 
                                                                                      value="#{propertySearchBB.searchParamsSelected.muni_ctl}" >
                                                                 <p:ajax update="prop-search-muni-som"/>
                                                             </p:selectBooleanCheckbox>
                                                         </h:panelGroup>
-                                                        
+
                                                         <h:panelGroup>
                                                             <p:selectOneMenu id="prop-search-muni-som" 
                                                                              tabindex="1" 
@@ -169,332 +170,327 @@
                                                             <h:message for="prop-search-muni-som" showDetail="true" showSummary="true" 
                                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                         </h:panelGroup>
-                                                        
+                                                    </h:panelGrid>
+
                                                 </h:panelGroup>
 
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel for="prop-search-date-ctl" 
-                                                                   value="Date range"
-                                                                   />
-                                                    <p:selectBooleanCheckbox id="prop-search-startend-chkbx" value="#{propertySearchBB.searchParamsSelected.filterByStartEndDate}" >
-                                                        <p:ajax update="datetosearch-sor
-                                                                eventDateCalStart
-                                                                eventDateCalEnd
-                                                                prop-search-relative-dates-cb" />
-                                                    </p:selectBooleanCheckbox>
+                                                    <h:panelGrid    columns="2" 
+                                                                    cellpadding="10" 
+                                                                    columnClasses="topbottom-lines-left, topbottom-lines-right">
 
-                                                    <h4 style="margin-bottom: 2px;">case date search options:</h4>
+                                                        <h:panelGroup>
 
-                                                    <p:selectOneRadio id="datetosearch-sor" layout="pageDirection" value="#{propertySearchBB.searchParamsSelected.dateToSearchCECases}"
-                                                                      disabled="#{(!propertySearchBB.searchParamsSelected.filterByStartEndDate)}">
-                                                        <f:selectItems value="#{propertySearchBB.searchParamsSelected.dateSearchOptions}"/>
-                                                    </p:selectOneRadio>
+                                                            <p:outputLabel for="prop-search-date-ctl" 
+                                                                           value="Date range filter"
+                                                                           styleClass="datum-label"/>
+                                                            <p:selectBooleanCheckbox    id="prop-search-date-ctl" 
+                                                                                        value="#{propertySearchBB.searchParamsSelected.date_startEnd_ctl}" >
+                                                                <p:ajax update="prop-search-date-field-val
+                                                                        prop-search-date-start-val
+                                                                        prop-search-date-end-val
+                                                                        prop-search-date-relative-ctl" />
+                                                            </p:selectBooleanCheckbox>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <p:outputLabel for="prop-search-date-field-val" 
+                                                                           value="Date field"
+                                                                           styleClass="datum-label"/>
+                                                            <p:selectOneMenu  id="prop-search-date-field-val" 
+                                                                              tabindex="1" 
+                                                                              value="#{propertySearchBB.searchParamsSelected.date_field_val}"
+                                                                              disabled="#{!propertySearchBB.searchParamsSelected.date_startEnd_ctl}">
+                                                                <f:selectItem itemLabel="select a date field..." 
+                                                                              noSelectionOption="true" 
+                                                                              itemDisabled="true"/>
+                                                                <f:selectItems id="prop-search-date-field-val-items" 
+                                                                               value="#{propertySearchBB.searchParamsSelected.dateFieldList}" 
+                                                                               var="f" itemValue="#{f}" itemLabel="#{f.title}" />
+                                                            </p:selectOneMenu>
+                                                            <h:message for="prop-search-date-field-val" showDetail="true" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        </h:panelGroup>
+                                                    </h:panelGrid>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup id="datepickers-pg">
-                                                    <p:spacer height="5px" />
-                                                    <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="query start date: "/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:calendar id="eventDateCalStart" value="#{propertySearchBB.searchParamsSelected.startDateUtilDate}" 
-                                                                mode="popup" disabled="#{(!propertySearchBB.searchParamsSelected.filterByStartEndDate) or propertySearchBB.searchParamsSelected.useRelativeDates}"
-                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                showButtonPanel="true" showTodayButton="true"
-                                                                required="false"/>
-                                                    <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                    <h:panelGrid    columns="2" 
+                                                                    cellpadding="10" 
+                                                                    columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                                        <h:panelGroup>
 
-                                                    <p:spacer height="5px"/>
+                                                            <p:outputLabel for="prop-search-date-start-val" 
+                                                                           value="Start date"/>
 
-                                                    <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="query end date: "/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:calendar id="eventDateCalEnd" value="#{propertySearchBB.searchParamsSelected.endDateUtilDate}" 
-                                                                mode="popup" disabled="#{(!propertySearchBB.searchParamsSelected.filterByStartEndDate) or propertySearchBB.searchParamsSelected.useRelativeDates}"
-                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
-                                                                showButtonPanel="true" showTodayButton="true"
-                                                                required="false" />
-                                                    <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                </h:panelGroup>
+                                                            <p:spacer height="1px" />
 
-                                                <h:panelGroup>
+                                                            <p:calendar id="prop-search-date-start-val" 
+                                                                        value="#{propertySearchBB.searchParamsSelected.startDate_val_utilDate}" 
+                                                                        disabled="#{(!propertySearchBB.searchParamsSelected.date_startEnd_ctl) or propertySearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                                        mode="popup" 
+                                                                        showOn="button" 
+                                                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                                        navigator="true" 
+                                                                        tabindex="16" 
+                                                                        timeInput="true" 
+                                                                        showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                                        showButtonPanel="true" 
+                                                                        showTodayButton="true"
+                                                                        required="false"/>
+                                                            <h:message for="prop-search-date-start-val" showDetail="false" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                                    <p:outputLabel id="prop-search-relative-dates-ol" for="prop-search-relative-dates-cb" value="use relative dates? "/>
-                                                    <p:selectBooleanCheckbox id="prop-search-relative-dates-cb" 
-                                                                             value="#{propertySearchBB.searchParamsSelected.useRelativeDates}" 
-                                                                             disabled="#{!propertySearchBB.searchParamsSelected.filterByStartEndDate}">
-                                                        <p:ajax update="eventDateCalStart
-                                                                eventDateCalEnd
-                                                                prop-search-relative-dates-start-it
-                                                                prop-search-relative-dates-end-it" />
-                                                    </p:selectBooleanCheckbox>
+                                                        </h:panelGroup>
 
+                                                        <h:panelGroup>
 
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="prop-search-relative-dates-start-ol" for="prop-search-relative-dates-start-it" value="start date in days (relative to today)"/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:inputText id="prop-search-relative-dates-start-it" 
-                                                                 value="#{propertySearchBB.searchParamsSelected.startDateRelativeDays}" 
-                                                                 disabled="#{!(propertySearchBB.searchParamsSelected.filterByStartEndDate and propertySearchBB.searchParamsSelected.useRelativeDates)}" />
-                                                    <h:message for="prop-search-relative-dates-start-it" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                            <p:outputLabel for="prop-search-date-end-val" 
+                                                                           value="Start date"/>
 
-                                                    <p:spacer height="5px"/>
-                                                    <p:outputLabel id="prop-search-relative-dates-end-ol" for="prop-search-relative-dates-end-it" value="end date in days (relative to today)"/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:inputText id="prop-search-relative-dates-end-it" 
-                                                                 value="#{propertySearchBB.searchParamsSelected.endDateRelativeDays}" 
-                                                                 disabled="#{!(propertySearchBB.searchParamsSelected.filterByStartEndDate and propertySearchBB.searchParamsSelected.useRelativeDates)}" />
-                                                    <h:message for="prop-search-relative-dates-end-it" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                            <p:spacer height="1px" />
 
-                                                </h:panelGroup>
+                                                            <p:calendar id="prop-search-date-end-val" 
+                                                                        value="#{propertySearchBB.searchParamsSelected.endDate_val_utilDate}" 
+                                                                        disabled="#{(!propertySearchBB.searchParamsSelected.date_startEnd_ctl) or propertySearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                                        mode="popup" 
+                                                                        showOn="button" 
+                                                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                                        navigator="true" 
+                                                                        tabindex="16" 
+                                                                        timeInput="true" 
+                                                                        showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                                        showButtonPanel="true" 
+                                                                        showTodayButton="true"
+                                                                        required="false"/>
+                                                            <h:message for="prop-search-date-end-val" showDetail="false" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-
-
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="prop-filter-muni-lab" for="prop-filter-muni-chkbx" value="filter by muni?"/>
-                                                    <p:selectBooleanCheckbox id="prop-filter-muni-chkbx" value="#{propertySearchBB.searchParamsSelected.filterByMuni}" >
-                                                        <p:ajax update="prop-muni-som"/>
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-                                                    <p:selectOneMenu id="prop-muni-som" tabindex="1" value="#{propertySearchBB.searchParamsSelected.muni}" 
-                                                                     disabled="#{!propertySearchBB.searchParamsSelected.filterByMuni}">
-                                                        <f:converter converterId="muniConverter"/>
-                                                        <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                                        <f:selectItems id="muniNameList" value="#{sessionBean.sessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                                                    </p:selectOneMenu>
-                                                    <h:message for="prop-muni-som" showDetail="true" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="prop-id-search-ol" for="prop-id-search" value="filter by prop ID:"/>
-                                                    <p:selectBooleanCheckbox id="prop-id-search" value="#{propertySearchBB.searchParamsSelected.objectID_filterBy}"
-                                                                             disabled="false">
-                                                        <p:ajax update="prop-id-input" />
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="prop-search-propid-ol" for="prop-id-input" value="property ID:" />
-                                                    <p:spacer height="5px"/>
-                                                    <p:inputText id="prop-id-input"
-                                                                 value="#{propertySearchBB.searchParamsSelected.objectID}"
-                                                                 disabled="#{!propertySearchBB.searchParamsSelected.objectID_filterBy}"/>
-                                                    <h:message for="prop-id-input" showDetail="false" showSummary="true"
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="prop-parid-search-ol" for="prop-parid-filterby" value="filter by parcel ID:"/>
-                                                    <p:selectBooleanCheckbox id="prop-parid-filterby" value="#{propertySearchBB.searchParamsSelected.parcelid_ctl}"
-                                                                             disabled="false">
-                                                        <p:ajax update="prop-parid-search-inputText"/>
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="prop-parid-search-input-ol" for="prop-parid-search-inputText" value="parcel ID:"/>
-                                                    <p:spacer height="5px"/>
-                                                    <p:inputText id="prop-parid-search-inputText"
-                                                                 value="#{propertySearchBB.searchParamsSelected.parcelid_val}"
-                                                                 disabled="#{!propertySearchBB.searchParamsSelected.parcelid_ctl}"/>
-                                                    <h:message for="prop-parid-search-inputText" showDetail="false" showSummary="true"
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="prop-search-lotandblock-filter-ol" for="prop-search-lotandblock-filter" value="filter by lot and block:"/>
-                                                    <p:selectBooleanCheckbox id="prop-search-lotandblock-filter" value="#{propertySearchBB.searchParamsSelected.lotblock_ctl}"
-                                                                             disabled="false">
-                                                        <p:ajax update="prop-lotandblock-search"/>
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="prop-lotandblock-search-ol" for="prop-lotandblock-search" value="lot and block number"/>
-                                                    <p:spacer height="5px"/>
-                                                    <p:inputText id="prop-lotandblock-search"
-                                                                 value="#{propertySearchBB.searchParamsSelected.lotblock_val}"
-                                                                 disabled="#{!propertySearchBB.searchParamsSelected.lotblock_ctl}"/>
-                                                    <h:message for="prop-lotandblock-search" showDetail="false" showSummary="true"
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
-                                                </h:panelGroup>
-
-
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="prop-search-dates-ol" for="prop-search-dates-checkbox" value="filter by date range since updated?"/>
-                                                    <p:selectBooleanCheckbox id="prop-search-dates-checkbox"
-                                                                             value="#{propertySearchBB.searchParamsSelected.filterByStartEndDate}">
-                                                        <p:ajax update="date-picker-pg
-                                                                prop-search-relative-dates-chkbx
-                                                                prop-search-relative-dates-start-it
-                                                                prop-search-relative-dates-end-it
-                                                                dateFieldsor"/>
-                                                    </p:selectBooleanCheckbox>
-
-                                                    <h4 style="margin-bottom: 2px;">prop date search options:</h4>
-
-                                                    <p:selectOneRadio id="dateFieldsor" layout="pageDirection" value="#{propertySearchBB.searchParamsSelected.date_field_val}"
-                                                                      disabled="#{(!propertySearchBB.searchParamsSelected.filterByStartEndDate)}">
-                                                        <f:selectItems value="#{propertySearchBB.searchParamsSelected.dateSearchOptions}" var="c" itemLabel="#{c.title}" itemValue="#{c}"/>
-                                                    </p:selectOneRadio>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup id="date-picker-pg">
-                                                    <p:spacer height="5px"/>
-                                                    <p:outputLabel id="date-cal-start-ol" for="date-cal-start" value="start date: "/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:calendar id="date-cal-start" value="#{propertySearchBB.searchParamsSelected.startDateUtilDate}"
-                                                                mode="popup" disabled="#{(!propertySearchBB.searchParamsSelected.filterByStartEndDate) or propertySearchBB.searchParamsSelected.useRelativeDates}"
-                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss" navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="false"
-                                                                showSecond="false" showMillisec="false" showButtonPanel="true" showTodayButton="true" required="false"/>
-                                                    <h:message for="date-cal-start" showDetail="false" showSummary="true" warnClass="msgWarn" 
-                                                               infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
-
-                                                    <p:spacer height="5px"/>
-                                                    <p:outputLabel id="date-cal-end-ol" for="date-cal-end" value="end date: "/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:calendar id="date-cal-end" value="#{propertySearchBB.searchParamsSelected.endDateUtilDate}"
-                                                                mode="popup" disabled="#{(!propertySearchBB.searchParamsSelected.filterByStartEndDate) or propertySearchBB.searchParamsSelected.useRelativeDates}"
-                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss" navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="false"
-                                                                showSecond="false" showMillisec="false" showButtonPanel="true" showTodayButton="true" required="false"/>
-                                                    <h:message for="date-cal-end" showDetail="false" showSummary="true" warnClass="msgWarn" 
-                                                               infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
-
+                                                        </h:panelGroup>
+                                                    </h:panelGrid>
                                                 </h:panelGroup>
 
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="prop-search-relative-dates-ol" for="prop-search-relative-dates-chkbx" value="filter by relative dates?"/>
-                                                    <p:selectBooleanCheckbox id="prop-search-relative-dates-chkbx"
-                                                                             value="#{propertySearchBB.searchParamsSelected.useRelativeDates}"
-                                                                             disabled="#{!propertySearchBB.searchParamsSelected.filterByStartEndDate}">
-                                                        <p:ajax update="prop-search-relative-dates-start-it
-                                                                prop-search-relative-dates-end-it
-                                                                date-picker-pg"/>
-                                                    </p:selectBooleanCheckbox>
+                                                    <h:panelGrid    columns="3" 
+                                                                    cellpadding="10" 
+                                                                    columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                                        <h:panelGroup>
+                                                            <p:outputLabel for="prop-search-date-relative-ctl" 
+                                                                           value="Relative dates"
+                                                                           styleClass="datum-label"/>
+                                                            <p:selectBooleanCheckbox id="prop-search-date-relative-ctl" 
+                                                                                     value="#{propertySearchBB.searchParamsSelected.date_relativeDates_ctl}" 
+                                                                                     disabled="#{!propertySearchBB.searchParamsSelected.date_startEnd_ctl}">
+                                                                <p:ajax update="prop-search-date-end-val
+                                                                        prop-search-date-start-val
+                                                                        prop-search-date-end-val
+                                                                        prop-search-date-relative-start-val
+                                                                        prop-search-date-relative-end-val" />
+                                                            </p:selectBooleanCheckbox>
+                                                        </h:panelGroup>
+                                                        <h:panelGroup>
+                                                            <p:outputLabel for="prop-search-date-relative-start-val" 
+                                                                           value="Days start"/>
+                                                            <p:spacer height="1px"/>
+                                                            <p:inputText id="prop-search-date-relative-start-val" 
+                                                                         value="#{propertySearchBB.searchParamsSelected.date_relativeDates_start_val}" 
+                                                                         disabled="#{!(propertySearchBB.searchParamsSelected.date_startEnd_ctl and propertySearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                                            <h:message for="prop-search-date-relative-start-val" showDetail="false" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                        </h:panelGroup>
+                                                        <h:panelGroup>
+                                                            <p:outputLabel for="prop-search-date-relative-end-val" 
+                                                                           value="Days end"/>
+                                                            <p:spacer height="1px"/>
+                                                            <p:inputText id="prop-search-date-relative-end-val" 
+                                                                         value="#{propertySearchBB.searchParamsSelected.date_realtiveDates_end_val}" 
+                                                                         disabled="#{!(propertySearchBB.searchParamsSelected.date_startEnd_ctl and propertySearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                                            <h:message for="prop-search-date-relative-end-val" showDetail="false" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        </h:panelGroup>
+                                                    </h:panelGrid>
                                                 </h:panelGroup>
+
+
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="prop-search-relative-dates-start-ol" for="prop-search-relative-dates-start-it" value="oldest date in days (relative to today)"/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:inputText id="prop-search-relative-dates-start-it"
-                                                                 value="#{propertySearchBB.searchParamsSelected.startDateRelativeDays}"
-                                                                 disabled="#{!(propertySearchBB.searchParamsSelected.filterByStartEndDate and propertySearchBB.searchParamsSelected.useRelativeDates)}"/>
-                                                    <h:message for="prop-search-relative-dates-start-it" showDetail="false" showSummary="true"
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
-
-                                                    <p:spacer height="5px"/>
-                                                    <p:outputLabel id="prop-search-relative-dates-end-ol" for="prop-search-relative-dates-end-it" value="most recent date in days (relative to today)"/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:inputText id="prop-search-relative-dates-end-it"
-                                                                 value="#{propertySearchBB.searchParamsSelected.endDateRelativeDays}"
-                                                                 disabled="#{!(propertySearchBB.searchParamsSelected.filterByStartEndDate and propertySearchBB.searchParamsSelected.useRelativeDates)}"/>
-                                                    <h:message for="prop-search-relative-dates-end-it" showDetail="false" showSummary="true"
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
-
+                                                     <h:panelGrid   columns="2" 
+                                                                    cellpadding="10" 
+                                                                    columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                                         <h:panelGroup>
+                                                             <p:outputLabel for="prop-search-filter-id-ctl" 
+                                                                            value="Property id filter"/>
+                                                            <p:selectBooleanCheckbox id="prop-search-filter-id-ctl" 
+                                                                                     value="#{propertySearchBB.searchParamsSelected.bobID_ctl}"
+                                                                                     disabled="false">
+                                                                <p:ajax update="prop-search-filter-id-val" />
+                                                            </p:selectBooleanCheckbox>
+                                                             
+                                                         </h:panelGroup>
+                                                         <h:panelGroup>
+                                                            <p:outputLabel for="prop-search-filter-id-val" 
+                                                                           value="property ID:" />
+                                                            <p:spacer height="5px"/>
+                                                            <p:inputText id="prop-search-filter-id-val"
+                                                                         type="number"
+                                                                         value="#{propertySearchBB.searchParamsSelected.bobID_val}"
+                                                                         disabled="#{!propertySearchBB.searchParamsSelected.bobID_ctl}"/>
+                                                            <h:message for="prop-search-filter-id-val" showDetail="false" showSummary="true"
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        </h:panelGroup>
+                                                     </h:panelGrid>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <h:outputLabel for="prop-search-usetype-som" >
-                                                        <h:outputText styleClass="uiLabel" value="Property Use Type:" />
-                                                    </h:outputLabel>
-                                                    <p:selectOneMenu id="prop-search-usetype-som" tabindex="1" value="#{propertySearchBB.searchParamsSelected.useType_val}" >
-                                                        <f:converter converterId="propertyUseTypeConverter"/>
-                                                        <f:selectItem itemLabel="select a use type..." noSelectionOption="true" itemDisabled="true"/>
-                                                        <f:selectItems id="muniNameList" value="#{propertySearchBB.putList}" var="put" itemValue="#{put}" itemLabel="#{put.name}" />
-                                                    </p:selectOneMenu>
-                                                    <h:message for="prop-search-usetype-som" showDetail="true" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                     <h:panelGrid   columns="2" 
+                                                                    cellpadding="10" 
+                                                                    columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                                         <h:panelGroup>
+                                                             <p:outputLabel for="prop-search-filter-id-ctl" 
+                                                                            value="Parcel ID filter"/>
+                                                            <p:selectBooleanCheckbox id="prop-search-filter-parcelid-ctl" 
+                                                                                     value="#{propertySearchBB.searchParamsSelected.parcelid_ctl}"
+                                                                                     disabled="false">
+                                                                <p:ajax update="prop-search-filter-parcelid-val" />
+                                                            </p:selectBooleanCheckbox>
+                                                             
+                                                         </h:panelGroup>
+                                                         <h:panelGroup>
+                                                            <p:outputLabel for="prop-search-filter-parcelid-val" 
+                                                                           value="Parcel ID:" />
+                                                            <p:spacer height="5px"/>
+                                                            <p:inputText id="prop-search-filter-parcelid-val"
+                                                                         type="number"
+                                                                         value="#{propertySearchBB.searchParamsSelected.parcelid_val}"
+                                                                         disabled="#{!propertySearchBB.searchParamsSelected.parcelid_ctl}"/>
+                                                            <h:message for="prop-search-filter-parcelid-val" showDetail="false" showSummary="true"
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        </h:panelGroup>
+                                                     </h:panelGrid>
                                                 </h:panelGroup>
 
+                                                <h:panelGroup>
+                                                     <h:panelGrid   columns="2" 
+                                                                    cellpadding="10" 
+                                                                    columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                                         <h:panelGroup>
+                                                             <p:outputLabel for="prop-search-filter-id-ctl" 
+                                                                            value="Use type filter"/>
+                                                            <p:selectBooleanCheckbox id="prop-search-filter-usetype-ctl" 
+                                                                                     value="#{propertySearchBB.searchParamsSelected.useType_ctl}"
+                                                                                     disabled="false">
+                                                                <p:ajax update="prop-search-filter-usetype-val" />
+                                                            </p:selectBooleanCheckbox>
+                                                             
+                                                         </h:panelGroup>
+                                                         <h:panelGroup>
+                                                            <p:outputLabel for="prop-search-filter-usetype-val" 
+                                                                           value="Parcel ID:" />
+                                                            
+                                                            <p:spacer height="5px"/>
+                                                            
+                                                            <p:selectOneMenu    id="prop-search-filter-usetype-val" 
+                                                                                tabindex="1" 
+                                                                                value="#{propertySearchBB.searchParamsSelected.useType_val}" 
+                                                                                disabled="#{!propertySearchBB.searchParamsSelected.useType_ctl}">
+                                                                <f:converter    converterId="propertyUseTypeConverter"/>
+                                                                <f:selectItem   itemLabel="select a use type..." noSelectionOption="true" itemDisabled="true"/>
+                                                                <f:selectItems  id="prop-search-filter-usetype-items" 
+                                                                                value="#{propertySearchBB.putList}" 
+                                                                                var="put" itemValue="#{put}" itemLabel="#{put.name}" />
+                                                            </p:selectOneMenu>
+                                                            <h:message for="prop-search-filter-usetype-val" showDetail="true" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        </h:panelGroup>
+                                                     </h:panelGrid>
+                                                </h:panelGroup>
 
+                                                
 
                                             </h:panelGrid>
-                                            </h:panelGroup>
-                                            <h:panelGroup>
-                                                <p:commandButton id="queryButton"
-                                                                 ajax="true" value="Run Query" actionListener="#{propertySearchBB.searchForPropParams}" process="@form" disabled="false" update="propSearchForm"/>
-                                            </h:panelGroup>
-                                            </h:panelGrid>
-
                                         </p:fieldset>
-
                                     </h:form>
+                                </p:panel>
                             </h:panelGroup>
 
                             <!--start of second column-->
                             <h:panelGroup id="prop-search-results-pgrp">
+                                
+                                <p:panel    id="prop-search-results-panel"
+                                            toggleable="true"
+                                            widgetVar="prop-search-query-panel-var"
+                                            collapsed="false"
+                                            header="Search results">
 
-                                <h:form id="prop-search-results-form">
+                                    <h:form id="prop-search-results-form">
 
-                                    <p:dataTable
-                                        id="prop-search-results-table"
-                                        var="prop"
-                                        value="#{propertySearchBB.propList}"
-                                        rowKey="#{prop.propertyID}"
-                                        tableStyleClass="primeDataTable"
-                                        draggableRows="false" 
-                                        draggableColumns="true"
-                                        tabindex="6"
-                                        >
-                                        <p:column width="8%">
-                                            <f:facet name="header">
-                                                <h:outputText value="ID"/>
-                                            </f:facet>
-                                            <h:outputText value="#{prop.propertyID}" />
-                                        </p:column>
-                                        <p:column width="15%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Address"/>
-                                            </f:facet>
-                                            <h:outputText value="#{prop.address}" />
-                                        </p:column>
+                                        <p:dataTable
+                                            id="prop-search-results-table"
+                                            var="prop"
+                                            value="#{propertySearchBB.propList}"
+                                            rowKey="#{prop.propertyID}"
+                                            tableStyleClass="primeDataTable"
+                                            draggableRows="false" 
+                                            draggableColumns="true"
+                                            tabindex="6"
+                                            >
+                                            <p:column width="8%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="ID"/>
+                                                </f:facet>
+                                                <h:outputText value="#{prop.propertyID}" />
+                                            </p:column>
+                                            <p:column width="15%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Address"/>
+                                                </f:facet>
+                                                <h:outputText value="#{prop.address}" />
+                                            </p:column>
 
-                                        <p:column width="10%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Muni" />
-                                            </f:facet>
-                                            <h:outputText value="#{prop.muni.muniName}"/>
-                                        </p:column>
+                                            <p:column width="10%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Muni" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.muni.muniName}"/>
+                                            </p:column>
 
-                                        <p:column width="12%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Use Type"/>
-                                            </f:facet>
-                                            <h:outputText value="#{prop.useType}" />
-                                        </p:column>
+                                            <p:column width="12%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Use Type"/>
+                                                </f:facet>
+                                                <h:outputText value="#{prop.useType}" />
+                                            </p:column>
 
-                                        <p:column width="5%">
-                                            <f:facet name="header">
-                                                <h:outputText value=""/>
-                                            </f:facet>
-                                            <p:commandButton icon="fa fa-info-circle"
-                                                             action="#{propertySearchBB.exploreProperty(prop)}" 
-                                                             ajax="false"
-                                                             />
-                                        </p:column>
-                                    </p:dataTable>
-                                </h:form>
+                                            <p:column width="5%">
+                                                <f:facet name="header">
+                                                    <h:outputText value=""/>
+                                                </f:facet>
+                                                <p:commandButton icon="fa fa-info-circle"
+                                                                 action="#{propertySearchBB.exploreProperty(prop)}" 
+                                                                 ajax="false"
+                                                                 />
+                                            </p:column>
+                                        </p:dataTable>
+                                    </h:form>
                                 </p:panel>
 
-                                <p:panel    id="prop-search-query-panel"
+                                <p:panel    id="prop-add-panel"
                                             toggleable="true"
                                             widgetVar="prop-search-query-panel-var"
                                             collapsed="false"
                                             header="Add a property">
-
+                                    <h:form id="prop-addpanel-form">
+                                        
                                     <p:commandButton id="propertyAddButton"
                                                      value="Add new property in #{sessionBean.sessionMuni.muniName}" 
                                                      icon="fa fa-plus"
                                                      actionListener="#{propertyCreateBB.initiatePropertyCreation}"
-                                                     oncomplete=PF('prop-addprop-dialog-var').show()"
+                                                     oncomplete="PF('prop-addprop-dialog-var').show()"
                                                      disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                      />
+                                    </h:form>
                                 </p:panel>
                             </h:panelGroup>
                         </h:panelGrid>
