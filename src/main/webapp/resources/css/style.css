@@ -776,6 +776,13 @@ i.status-display-icon-i{
     font-family: mono;
 }
 
+.datum-label{
+    font-weight: bold;
+}
+
+.datum-data{
+    
+}
 
 .bold {
     font-weight: bold;
@@ -802,6 +809,14 @@ i.status-display-icon-i{
 
 
 /***************** CLOSE TEXT AND SPANS ***********************/
+
+/* --------------- SEARCH ---------------------------*/
+
+.search-inputtext{
+    
+}
+
+
 
 
 /* --------------- DIVS---------------------------*/
@@ -1697,7 +1712,7 @@ tr.caseOpen{
 
 .nav_containner:hover {
     color: black;
-    background-color: white;
+    background-color: #eeeeee;
     display: inline-block;
 
 }
@@ -1716,8 +1731,8 @@ tr.caseOpen{
 }
 
 .nav_containner:hover .subnav_containner{
-    color: #2F6381;
-    background-color: white;
+    color: black;
+    background-color: #eeeeee;
     display: inline-block;
 }
 
@@ -1739,7 +1754,7 @@ tr.caseOpen{
     position: absolute;
     left: 0;
     font-family: inherit;
-    background-color: white;
+    background-color: #eeeeee;
     color: #2F6381;
     width: 100%;
     z-index: 3;

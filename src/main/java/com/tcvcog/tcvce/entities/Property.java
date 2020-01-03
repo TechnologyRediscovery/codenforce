@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
@@ -14,36 +15,20 @@ import java.util.List;
 
 /**
  * Foundational entity for the system: Property
- * @author Eric Darsow
+ * @author Ellen Baskem
  */
 
-public class Property implements Serializable{
-    
-    
-    protected int propertyID;
-    
-    private PropertyStatus status;
+public class    Property 
+        extends PropertyPublic 
+        implements IFace_Loggable{
     
     protected List<PropertyUnit> unitList;
     
-    protected Municipality muni;
     protected int muniCode;
-    protected String parID;
-    protected String lotAndBlock;
-    protected String address;
-    
-    protected String useGroup;
-    protected String constructionType;
-    protected String countyCode;
     
     protected String notes;
-    protected String address_city;
-    protected String address_state;
-    protected String address_zip;
-    
-    protected String ownerCode;
-    protected String propclass;
   
+    private LocalDateTime creationTS;
     protected LocalDateTime lastUpdatedTS;
     protected User lastUpdatedBy;
     protected OccLocationDescriptor  locationDescriptor;
@@ -67,11 +52,6 @@ public class Property implements Serializable{
     protected boolean active;
     protected boolean nonAddressable;
     
-    // until we have an object
-    protected int  useTypeID;
-    protected String useTypeString;
-    
-    
     /**
      * Creates a new instance of Property
      */
@@ -79,68 +59,6 @@ public class Property implements Serializable{
       
     }
 
-    /**
-     * @return the propertyID
-     */
-    public int getPropertyID() {
-        return propertyID;
-    }
-
-    /**
-     * @param propertyID the propertyID to set
-     */
-    public void setPropertyID(int propertyID) {
-        this.propertyID = propertyID;
-    }
-
-    /**
-     * @return the muni
-     */
-    public Municipality getMuni() {
-        return muni;
-    }
-
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
-    }
-
-    /**
-     * @return the parID
-     */
-    public String getParID() {
-        return parID;
-    }
-
-    /**
-     * @param parID the parID to set
-     */
-    public void setParID(String parID) {
-        this.parID = parID;
-    }
-
-    /**
-     * @return the lotAndBlock
-     */
-    public String getLotAndBlock() {
-        return lotAndBlock;
-    }
-
-    /**
-     * @param lotAndBlock the lotAndBlock to set
-     */
-    public void setLotAndBlock(String lotAndBlock) {
-        this.lotAndBlock = lotAndBlock;
-    }
-
-    /**
-     * @return the address
-     */
-    public String getAddress() {
-        return address;
-    }
 
     /**
      * @param address the address to set
@@ -149,26 +67,6 @@ public class Property implements Serializable{
         this.address = address;
     }
 
-    /**
-     * @return the useTypeString
-     */
-    public String getUseTypeString() {
-        return useTypeString;
-    }
-
-    /**
-     * @param useTypeString the useTypeString to set
-     */
-    public void setUseTypeString(String useTypeString) {
-        this.useTypeString = useTypeString;
-    }
-
-    /**
-     * @return the useGroup
-     */
-    public String getUseGroup() {
-        return useGroup;
-    }
 
     /**
      * @param useGroup the useGroup to set
@@ -184,35 +82,6 @@ public class Property implements Serializable{
         return constructionType;
     }
 
-    /**
-     * @param constructionType the constructionType to set
-     */
-    public void setConstructionType(String constructionType) {
-        this.constructionType = constructionType;
-    }
-
-    /**
-     * @return the countyCode
-     */
-    public String getCountyCode() {
-        return countyCode;
-    }
-
-    /**
-     * @param countyCode the countyCode to set
-     */
-    public void setCountyCode(String countyCode) {
-        this.countyCode = countyCode;
-    }
-
-   
-
-    /**
-     * @return the muniCode
-     */
-    public int getMuniCode() {
-        return muniCode;
-    }
 
     /**
      * @param muniCode the muniCode to set
@@ -236,26 +105,6 @@ public class Property implements Serializable{
     }
 
    
-    /**
-     * @return the address_city
-     */
-    public String getAddress_city() {
-        return address_city;
-    }
-
-    /**
-     * @return the address_state
-     */
-    public String getAddress_state() {
-        return address_state;
-    }
-
-    /**
-     * @return the address_zip
-     */
-    public String getAddress_zip() {
-        return address_zip;
-    }
 
     /**
      * @param address_city the address_city to set
@@ -278,29 +127,15 @@ public class Property implements Serializable{
         this.address_zip = address_zip;
     }
 
-
-
-
-    /**
-     * @return the ownerCode
-     */
-    public String getOwnerCode() {
-        return ownerCode;
-    }
-
-    /**
-     * @return the propclass
-     */
-    public String getPropclass() {
-        return propclass;
-    }
-
-    /**
+ /**
      * @return the lastUpdatedTS
      */
     public LocalDateTime getLastUpdatedTS() {
         return lastUpdatedTS;
     }
+
+
+
 
     /**
      * @return the lastUpdatedBy
@@ -409,19 +244,6 @@ public class Property implements Serializable{
         return active;
     }
 
-    /**
-     * @param ownerCode the ownerCode to set
-     */
-    public void setOwnerCode(String ownerCode) {
-        this.ownerCode = ownerCode;
-    }
-
-    /**
-     * @param propclass the propclass to set
-     */
-    public void setPropclass(String propclass) {
-        this.propclass = propclass;
-    }
 
     /**
      * @param lastUpdatedTS the lastUpdatedTS to set
@@ -578,19 +400,7 @@ public class Property implements Serializable{
         this.status = status;
     }
 
-    /**
-     * @return the useTypeID
-     */
-    public int getUseTypeID() {
-        return useTypeID;
-    }
 
-    /**
-     * @param useTypeID the useTypeID to set
-     */
-    public void setUseTypeID(int useTypeID) {
-        this.useTypeID = useTypeID;
-    }
 
     /**
      * @return the unitList
@@ -604,6 +414,20 @@ public class Property implements Serializable{
      */
     public void setUnitList(List<PropertyUnit> unitList) {
         this.unitList = unitList;
+    }
+
+    /**
+     * @return the creationTS
+     */
+    public LocalDateTime getCreationTS() {
+        return creationTS;
+    }
+
+    /**
+     * @param creationTS the creationTS to set
+     */
+    public void setCreationTS(LocalDateTime creationTS) {
+        this.creationTS = creationTS;
     }
 
   

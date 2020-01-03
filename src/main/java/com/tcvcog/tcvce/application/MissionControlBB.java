@@ -19,7 +19,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
+
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -39,6 +39,7 @@ import javax.servlet.http.HttpSession;
 //import com.itextpdf.layout.element.Paragraph;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.entities.EventCaseHeavy;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalCECase;
@@ -63,7 +64,7 @@ import org.primefaces.model.DefaultDashboardModel;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
@@ -76,8 +77,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     private DashboardModel mainDash;
     
-    private List<EventCECaseCasePropBundle> timelineEventList;
-    private List<EventCECaseCasePropBundle> filteredEventWithCasePropList;
+    private List<EventCaseHeavy> filteredEventWithCasePropList;
     private int timelineEventViewDateRange;
     
     private List<ProposalCECase> ceProposalList;
@@ -157,14 +157,20 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
 //   
 //    
     
+    /**
+     * TODO: Push this logic into the coordinators and session folks!!
+     * @return
+     * @throws IntegrationException
+     * @throws SQLException 
+     */
     public String switchMuni() throws IntegrationException, SQLException{
         CodeIntegrator ci = getCodeIntegrator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         MunicipalityDataHeavy muniComp;
         try {
-            muniComp = mi.getMuniListified(selectedMuni.getMuniCode());
+            muniComp = mi.getMunDataHeavy(selectedMuni.getMuniCode());
             getSessionBean().setSessionMuni(muniComp);
-            getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
+            getSessionBean().setSessionCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
         } catch (IntegrationException ex) {
             FacesContext facesContext = getFacesContext();
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -236,39 +242,18 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         this.selectedMuni = selectedMuni;
     }
 
-    /**
-     * @return the timelineEventList
-     */
-    public List<EventCECaseCasePropBundle> getTimelineEventList() {
-        EventIntegrator ei = getEventIntegrator();
-        try {
-            timelineEventList = 
-                    (ArrayList<EventCECaseCasePropBundle>) ei.getUpcomingTimelineEvents(getSessionBean().getSessionMuni(), 
-                            LocalDateTime.now(), LocalDateTime.now().plusDays(365));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return timelineEventList;
-    }
-
-    /**
-     * @param timelineEventList the timelineEventList to set
-     */
-    public void setTimelineEventList(ArrayList<EventCECaseCasePropBundle> timelineEventList) {
-        this.timelineEventList = timelineEventList;
-    }
-
+    
     /**
      * @return the filteredEventWithCasePropList
      */
-    public List<EventCECaseCasePropBundle> getFilteredEventWithCasePropList() {
+    public List<EventCaseHeavy> getFilteredEventWithCasePropList() {
         return filteredEventWithCasePropList;
     }
 
     /**
      * @param filteredEventWithCasePropList the filteredEventWithCasePropList to set
      */
-    public void setFilteredEventWithCasePropList(ArrayList<EventCECaseCasePropBundle> filteredEventWithCasePropList) {
+    public void setFilteredEventWithCasePropList(ArrayList<EventCaseHeavy> filteredEventWithCasePropList) {
         this.filteredEventWithCasePropList = filteredEventWithCasePropList;
     }
 

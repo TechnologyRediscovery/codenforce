@@ -841,7 +841,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         PropertyUnit unit;
         Property prop = new Property();
         try {
-            unit = pi.getPropertyUnitByPropertyUnitID(currentOccPeriod.getPropertyUnitID());
+            unit = pi.getPropertyUnit(currentOccPeriod.getPropertyUnitID());
             prop = pi.getProperty(unit.getPropertyID());
         } catch (IntegrationException ex) {
             System.out.println("PaymentBB had problems getting the OccPeriodProperty");

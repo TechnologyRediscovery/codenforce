@@ -5,14 +5,17 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.BOB;
+import com.tcvcog.tcvce.entities.BOb;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EntityUtils;
+import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,12 +28,11 @@ import java.util.Objects;
  * @param <E> the Business Object of which this Query is used to 
  * retrieve sets
  */
-public abstract class Query<E extends BOB> 
-        extends EntityUtils 
-        implements Serializable{
+public abstract class   Query<E extends BOb> 
+        extends         EntityUtils 
+        implements      Serializable,
+                        IFace_CredentialSigned{
     
-    private Municipality muni;
-    private UserAuthorized user;
     
     /**
      * Security mechanism for controlling queried data: Coordinators
@@ -41,45 +43,95 @@ public abstract class Query<E extends BOB>
      * 
      */
     private RoleType userRankAccessMinimum;
+    private Credential credential;
     
     private String resultsMessage;
     private LocalDateTime executionTimestamp;
-    private String executionTimestampPretty;
     
-    private boolean executedByIntegrator;
     
-    public abstract List<E> getBOBResultList();
-    public abstract void setBOBResultList(List<E> l);
     
-    public abstract List getParmsList();
-    public abstract String getQueryTitle();
-    
-    public abstract void clearResultList();
-    
-    public Query(Municipality muni, UserAuthorized u) {
-        this.muni = muni;
-        this.user = u;
+    /**
+     * Creates an instance of Query by baking in the User's credential, which
+     * thus ties the Query to a particular municipality. Because a Credential is 
+     * required on object formation, there's no setCredential(Credential cr) method
+     * for general security reasons.
+     * 
+     * @param c 
+     */
+    public Query(Credential c) {
+        this.credential = c;
         
     }
     
     public Query(){
         //blank
     }
-
+    
     /**
-     * @return the muni
+     * Implementing classes must return a list of BObs
+     * @return 
      */
-    public Municipality getMuni() {
-        return muni;
+    public abstract List<E> getBOBResultList();
+    
+    /**
+     * Implementing classes must allow a BOb list to be set
+     * TODO: Fix inheritance snafoo here! 
+     * 
+     * @param l 
+     */
+    public abstract void addBObListToResults(List<E> l);
+    
+    /**
+     * Implementing classes must allow retrieval of the SearchParam subclasses
+     * @param <P>
+     * @return 
+     */
+    public abstract <P extends SearchParams> List<P> getParmsList();
+    
+    /**
+     * Used to include a given SaerchParams subclass in the Query
+     * @param params adds the given SearchParams subclass to the subclass's
+     * internal parameter list
+     * @return the size of the List after insertion
+     */
+    public abstract int addParams(SearchParams params);
+    
+    /**
+     * Accesses the size of the implementer's parameter list which is used to
+     * determine the proper search type
+     * @return the size of the parameter list
+     */
+    public abstract int getParamsListSize();
+    
+    /**
+     * Implementing classes will usually grab the title from the QueryXXXEnum
+     * @return 
+     */
+    public abstract String getQueryTitle();
+    
+    /**
+     * Implementing classes usually just call clear() on their Collections object
+     */
+    public abstract void clearResultList();
+    
+    
+    
+    /**
+     * @return the credentialSignature
+     */
+    @Override
+    public String getCredentialSignature() {
+        if(credential != null){
+            return credential.getSignature();
+        }
+        return null;
     }
 
-
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
+   
+    public Credential getCredential(){
+        return credential;
     }
+    
 
     /**
      * @return the userRankAccessMinimum
@@ -97,20 +149,7 @@ public abstract class Query<E extends BOB>
 
   
 
-    /**
-     * @return the user
-     */
-    public UserAuthorized getUser() {
-        return user;
-    }
-
-    /**
-     * @param user the user to set
-     */
-    public void setUser(UserAuthorized user) {
-        this.user = user;
-    }
-
+  
     /**
      * @return the resultsMessage
      */
@@ -146,26 +185,12 @@ public abstract class Query<E extends BOB>
      */
     public String getExecutionTimestampPretty() {
         if(executionTimestamp != null){
-            executionTimestampPretty = getPrettyDate(executionTimestamp);
+            return EntityUtils.getPrettyDate(executionTimestamp);
         }
-        return executionTimestampPretty;
+        return null;
     }
 
-    /**
-     * @return the executedByIntegrator
-     */
-    public boolean isExecutedByIntegrator() {
-        return executedByIntegrator;
-    }
-
-    /**
-     * @param executedByIntegrator the executedByIntegrator to set
-     */
-    public void setExecutedByIntegrator(boolean executedByIntegrator) {
-        this.executedByIntegrator = executedByIntegrator;
-    }
-
-    
+   
    
     
     

@@ -1,0 +1,255 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Person search</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="pers-search-view">
+
+                    <div class="mainContainer">
+
+                        <h:form id="pers-search-messages-form">
+                            <h:messages id="pers-search-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                            
+                        <p:panel    id="pers-search-query-panel"
+                                    toggleable="true"
+                                    widgetVar="pers-search-query-panel-var"
+                                    collapsed="false"
+                                    header="Search for persons">
+                               
+                            <h:form id="pers-search-query-form">
+                                
+                                
+                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                             columnClasses="gridTd-solid-back, gridTd-solid-back">
+
+                                    <h:panelGroup>
+                                        <p:outputLabel for="formFirstName-person">
+                                            <h:outputText value="First Name"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="formFirstName-person" value="#{personsBB.searchParams.name_first_val}" 
+                                                     style="width: 200px;" tabindex="1" required="false" styleClass="inputText">
+                                        </p:inputText>
+                                        <h:message for="formFirstName-person" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="lname-person-person">
+                                        <p:outputLabel for="formLastName-person">
+                                            <h:outputText value="Last Name"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="formLastName-person" value="#{personsBB.searchParams.name_last_val}" 
+                                                     style="width: 200px;" tabindex="2" required="false" styleClass="inputText">
+                                        </p:inputText>
+                                        <h:message for="formLastName-person" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                </h:panelGrid>
+
+                                <p:commandButton
+                                    value="Search by name only" tabindex="3" 
+                                    ajax="true" icon="fa fa-search"
+                                    process=    "@form
+                                    change-person-form:formFirstName-person
+                                    change-person-form:formLastName-person"
+                                    actionListener="#{personsBB.searchForPersons}" 
+                                    update=    ":search-params-form
+                                    change-person-form:formFirstName-person
+                                    change-person-form:formLastName-person
+                                    change-person-form:personTable
+                                    change-person-form:person-search-messages
+                                    messages-left-form:persons-messages-global"/>
+                                <hr />
+
+                                <p:commandButton    id="open-search-options-cb"
+                                                    ajax="true" process="@none"
+                                                    value="Advanced search options"
+                                                    disabled="!#{sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}"
+                                                    onclick="PF('search-params-dialog').show()"
+                                                    icon="fa fa-gears"/>
+
+                                        
+                            </h:form>
+                                                
+
+
+                        </p:panel>
+                        
+                            
+                        <p:panel    id="pers-search-results-panel"
+                                    toggleable="true"
+                                    widgetVar="pers-search-results-panel-var"
+                                    collapsed="false"
+                                    header="Person search results">
+                            
+                            
+
+                                <h2>Search Results in <h:outputText value="#{personsBB.searchParams.muni_val.muniName}" /></h2>
+
+                                <p:commandButton    id="load-history-cb"
+                                                    actionListener="#{personsBB.loadPersonHistory}"
+                                                    ajax="true" style="background-color: white;"
+                                                    value="Load person history"
+                                                    update="change-person-form:personTable
+                                                    messages-left-form:persons-messages-global"
+                                                    icon="fa fa-history"/>
+
+                                <p:spacer height="2px"/>
+
+                                <p:dataTable
+                                    id="personTable"
+                                    var="per"
+                                    value="#{personsBB.personList}"
+                                    rowKey="#{per.personID}"
+                                    tableStyleClass="primeDataTable"
+                                    rowExpandMode="single"
+                                    resizableColumns="true"
+                                    expandedRow="false"
+                                    filteredValue="#{personsBB.filteredPersonList}"
+                                    widgetVar="personSelectListTable">
+
+                                    <p:column width="4%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{per.personID}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" sortBy="#{per.personType.label}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Person Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{per.personType.label}"/>
+                                    </p:column>
+
+
+                                    <p:column width="10%" sortBy="#{per.firstName}"
+                                              filterBy="#{per.firstName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="First" />
+                                        </f:facet>
+                                        <h:outputText value="#{per.firstName}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" filterBy="#{per.lastName}"
+                                              sortBy="#{per.lastName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Last" />
+                                        </f:facet>
+                                        <h:outputText value="#{per.lastName}"/>
+                                    </p:column>
+
+                                    <p:column   width="20%"
+                                                sortBy="#{per.addressStreet}"
+                                                filterBy="#{per.addressStreet}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Address" />
+                                        </f:facet>
+                                        <h:outputText escape="false" value="#{per.addressStreet}"/>
+                                        <p:spacer height="5px"/>
+                                        <h:outputText value="#{per.addressCity}, #{per.addressState} #{per.addressZip}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" >
+                                        <f:facet name="header">
+                                            <h:outputText value="View" />
+                                        </f:facet>
+                                        <p:commandButton actionListener="#{personsBB.selectPerson(per)}"
+                                                         ajax="true" icon="fa fa-hand-o-right"
+                                                         value="view"
+                                                         update="selected-person-info-form
+                                                         connect-person-to-property-form"/>
+
+                                    </p:column>
+                                </p:dataTable>
+                            </h:form>
+                        </p:panel>
+                               
+                            
+                            
+                        <p:panel    id="pers-add-panel"
+                                    toggleable="true"
+                                    widgetVar="pers-search-query-panel-var"
+                                    collapsed="false"
+                                    header="Add a new person">
+                               
+                            
+                            <h:form id="start-new-person-form">
+
+                                <p:commandButton    id="new-person-cb"
+                                                    ajax="true" actionListener="#{personsBB.initiatePersonCreation}"
+                                                    oncomplete="PF('person-addupdate-dialog-var').show()"
+                                                    update="person-addupdate-form"
+                                                    value="Create new Person"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                    icon="fa fa-plus"
+                                                    />
+                            </h:form>
+
+                        </p:panel>
+                        
+
+                    <!--close main container-->
+                    </div>
+                    
+                    
+                    <p:dialog   id="_________NAMEME_________"
+                                header="_________NAMEME_________" 
+                                widgetVar="_________NAMEME_________" 
+                                responsive="true" 
+                                width="400"
+                                modal="false"
+                                height="600">
+                        
+                          <h:form id="_________NAMEME_________">
+                            <h:messages id="_________NAMEME_________"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+                        
+                        <h:form id="_________NAMEME_________">
+                            
+
+                            <h2>_________NAMEME_________</h2>
+
+                            
+                            
+                            <p:commandButton    id="_________NAMEME_________"
+                                                value="_________NAMEME_________" 
+                                                ajax="true" 
+                                                icon="fa fa-edit"
+                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
+                                                disabled="false"
+                                                rendered="true"
+                                                oncomplete="PF('_________NAMEME_________').hide()"
+                                                update=""/>
+
+                            <p:commandLink  value="close" 
+                                            onclick="PF('_________NAMEME_________').hide()" 
+                                            styleClass="noFill"/>
+
+                        </h:form>
+
+                    </p:dialog>
+
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -25,9 +25,9 @@ import java.util.List;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
-public class NoticeOfViolation extends EntityUtils implements Serializable, Comparable<NoticeOfViolation> {
+public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViolation> {
     
     private int noticeID;
     private Person recipient;
@@ -147,7 +147,7 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
      */
     public String getCreationTSPretty() {
         if(creationTS != null){
-            creationTSPretty = getPrettyDate(creationTS);
+            creationTSPretty = EntityUtils.getPrettyDate(creationTS);
         }
         return creationTSPretty;
     }
@@ -157,7 +157,7 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
      */
     public String getDateOfRecordPretty() {
         if(dateOfRecord != null){
-            dateOfRecordPretty = getPrettyDate(dateOfRecord);
+            dateOfRecordPretty = EntityUtils.getPrettyDate(dateOfRecord);
         }
         return dateOfRecordPretty;
     }
@@ -167,7 +167,7 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
      */
     public String getSentTSPretty() {
         if(sentTS != null){
-            sentTSPretty = getPrettyDate(sentTS);
+            sentTSPretty = EntityUtils.getPrettyDate(sentTS);
         }
         return sentTSPretty;
     }
@@ -212,7 +212,7 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
      */
     public String getReturnedTSPretty() {
         if(returnedTS != null){
-            returnedTSPretty = getPrettyDate(returnedTS);
+            returnedTSPretty = EntityUtils.getPrettyDate(returnedTS);
             
         }
         return returnedTSPretty;
@@ -279,7 +279,7 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
      */
     public String getLockedAndQueuedTSPretty() {
         if(lockedAndqueuedTS != null){
-            lockedAndQueuedTSPretty = getPrettyDate(lockedAndqueuedTS);
+            lockedAndQueuedTSPretty = EntityUtils.getPrettyDate(lockedAndqueuedTS);
         }
         return lockedAndQueuedTSPretty;
     }

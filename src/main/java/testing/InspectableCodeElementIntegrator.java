@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * in a subclass. Now it's all in the CodeGuide
  * 
  * @deprecated 
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class InspectableCodeElementIntegrator extends BackingBeanUtils implements Serializable {
     

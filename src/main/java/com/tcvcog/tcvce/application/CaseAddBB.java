@@ -19,11 +19,12 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
 import java.io.Serializable;
 import java.sql.Time;
@@ -36,7 +37,7 @@ import javax.faces.application.FacesMessage;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CaseAddBB extends BackingBeanUtils implements Serializable{
 
@@ -61,11 +62,11 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
         // backing bean will interact with the caseintegrator
         // to enforce business logic concerning cases
         CaseCoordinator cc = getCaseCoordinator();
-        CECase newCase;
+        CECaseDataHeavy newCase;
         // check to see if we have an action request that needs to be connected
         // to this new case
         CEActionRequest cear = getSessionBean().getCeactionRequestForSubmission();
-        newCase = cc.getInitializedCECase(caseProperty, getSessionBean().getSessionUser());
+        newCase = cc.initCECase(caseProperty, getSessionBean().getSessionUser());
         newCase.setCaseName(formCaseName);
         newCase.setOriginationDate(formOriginationDate.toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
@@ -83,7 +84,7 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             "Integration Module error: Unable to add case to current property.", 
                             "Best try again or note the error and complain to Eric."));
-        } catch (CaseLifecycleException ex) {
+        } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             "A code enf action request was found in queue to be attached to this case. "
@@ -91,6 +92,8 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
                             "Best try again or note the error and complain to Eric."));
             System.out.println(ex);
         } catch (ViolationException ex) {
+            System.out.println(ex);
+        } catch (EventException ex) {
             System.out.println(ex);
         }
         

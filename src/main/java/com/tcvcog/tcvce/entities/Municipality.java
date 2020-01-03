@@ -17,17 +17,14 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
-public class Municipality extends EntityUtils implements Serializable{
+public class    Municipality
+        extends BOb{
     
     protected int muniCode;
     protected String muniName;

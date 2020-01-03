@@ -18,7 +18,7 @@ import java.util.List;
  * @author sylvia
  */
 public abstract class Report
-        extends EntityUtils 
+         
         implements Serializable {
     
     private String title;
@@ -111,7 +111,7 @@ public abstract class Report
      */
     public String getGenerationTimestampPretty() {
         if(generationTimestamp != null){
-            generationTimestampPretty = getPrettyDate(generationTimestamp);
+            generationTimestampPretty = EntityUtils.getPrettyDate(generationTimestamp);
         }
         return generationTimestampPretty;
     }

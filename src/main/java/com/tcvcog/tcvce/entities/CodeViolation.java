@@ -28,9 +28,9 @@ import java.util.Objects;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
-public class CodeViolation extends EntityUtils implements Serializable{
+public class CodeViolation  implements Serializable{
     protected int violationID;
     protected EnforcableCodeElement violatedEnfElement;
     protected int ceCaseID;
@@ -76,7 +76,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     
     protected LocalDateTime complianceTimeStamp;
     protected User complianceUser;
-    protected CECaseEvent compTimeFrameComplianceEvent;
+    protected EventCnF compTimeFrameComplianceEvent;
     protected int complianceTimeframeEventID;
     
     protected List<Integer> photoList;
@@ -290,7 +290,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
      */
     public long getDaysUntilStipulatedComplianceDate() {
         daysUntilStipulatedComplianceDate = 
-                getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
+                EntityUtils.getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
         return daysUntilStipulatedComplianceDate;
     }
 
@@ -305,7 +305,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
      * @return the dateOfCitationPretty
      */
     public String getDateOfCitationPretty() {
-        dateOfCitationPretty = getPrettyDate(dateOfCitation);
+        dateOfCitationPretty = EntityUtils.getPrettyDate(dateOfCitation);
         return dateOfCitationPretty;
     }
 
@@ -313,7 +313,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
      * @return the dateOfRecordPretty
      */
     public String getDateOfRecordPretty() {
-        dateOfRecordPretty = getPrettyDate(dateOfRecord);
+        dateOfRecordPretty = EntityUtils.getPrettyDate(dateOfRecord);
         return dateOfRecordPretty;
     }
 
@@ -321,7 +321,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
      * @return the creationTSPretty
      */
     public String getCreationTSPretty() {
-        creationTSPretty = getPrettyDate(creationTS);
+        creationTSPretty = EntityUtils.getPrettyDate(creationTS);
         
         return creationTSPretty;
     }
@@ -330,7 +330,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
      * @return the stipulatedComplianceDatePretty
      */
     public String getStipulatedComplianceDatePretty() {
-        stipulatedComplianceDatePretty = getPrettyDate(stipulatedComplianceDate);
+        stipulatedComplianceDatePretty = EntityUtils.getPrettyDate(stipulatedComplianceDate);
         return stipulatedComplianceDatePretty;
     }
 
@@ -338,7 +338,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
      * @return the actualComplianceDatePretty
      */
     public String getActualComplianceDatePretty() {
-        actualComplianceDatePretty = getPrettyDate(actualComplianceDate);
+        actualComplianceDatePretty = EntityUtils.getPrettyDate(actualComplianceDate);
         
         return actualComplianceDatePretty;
     }
@@ -416,7 +416,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     /**
      * @return the compTimeFrameComplianceEvent
      */
-    public CECaseEvent getCompTimeFrameComplianceEvent() {
+    public EventCnF getCompTimeFrameComplianceEvent() {
         return compTimeFrameComplianceEvent;
     }
 
@@ -444,7 +444,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     /**
      * @param compTimeFrameComplianceEvent the compTimeFrameComplianceEvent to set
      */
-    public void setCompTimeFrameComplianceEvent(CECaseEvent compTimeFrameComplianceEvent) {
+    public void setCompTimeFrameComplianceEvent(EventCnF compTimeFrameComplianceEvent) {
         this.compTimeFrameComplianceEvent = compTimeFrameComplianceEvent;
     }
 

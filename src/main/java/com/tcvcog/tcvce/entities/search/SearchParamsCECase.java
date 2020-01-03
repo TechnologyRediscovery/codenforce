@@ -16,13 +16,10 @@ import java.util.List;
 
 /**
  *
- * @author Sylvia Garland
+ * @author Ellen Bascomb
  */
-public class SearchParamsCECase 
-        extends SearchParams 
-        implements Serializable{
-    
-    
+public class        SearchParamsCECase 
+        extends     SearchParams {
     
     private boolean useIsOpen;
     private boolean isOpen;

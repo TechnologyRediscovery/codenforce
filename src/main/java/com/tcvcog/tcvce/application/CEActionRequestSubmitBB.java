@@ -20,10 +20,9 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
-import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -40,27 +39,19 @@ import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-import java.io.ByteArrayInputStream;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import javax.faces.event.PhaseId;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
+
 /**
  *
  * @author cedba
@@ -137,12 +128,13 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             req != null 
                 && 
             currentRequest.getRequestProperty() != null){
-            try {
-                personCandidateList = pi.getPropertyWithLists(
-                        currentRequest.getRequestProperty().getPropertyID(), usr).getPersonList();
-            } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
-                System.out.println(ex);
-            }
+//            TODO: occbeta
+            
+//            try {
+//                personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonList();
+//            } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
+//                System.out.println(ex);
+//            }
         } else if (usr != null && req != null ) {
             personCandidateList = getSessionBean().getSessionPersonList();
         }
@@ -268,7 +260,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         Municipality m = currentRequest.getMuni();
-        Person skel = pc.getNewPersonSkeleton(m);
+        Person skel = pc.initPerson(m);
         try {
             skel.setCreatorUserID(uc.getUserRobot().getUserID());
         } catch (IntegrationException ex) {
@@ -434,20 +426,20 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
       
     public void searchForPropertiesSingleMuni(ActionEvent ev){
         PropertyIntegrator pi = getPropertyIntegrator();
-        
-        try {
-            propList = (ArrayList<Property>) pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Your search completed with " + getPropList().size() + " results", ""));
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to complete a property search! Sorry!", ""));
-            
-        }
+//        
+//        try {
+//            propList = (ArrayList<Property>) pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
+//            getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+//                        "Your search completed with " + getPropList().size() + " results", ""));
+//            
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+//                        "Unable to complete a property search! Sorry!", ""));
+//            
+//        }
     }
     
     

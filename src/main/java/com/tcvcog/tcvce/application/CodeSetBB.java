@@ -35,7 +35,7 @@ import javax.faces.event.ActionEvent;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CodeSetBB extends BackingBeanUtils implements Serializable {
 
@@ -52,7 +52,7 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
             muniNameIDMap = mi.getMunicipalityStringIDMap();
             
             //xiaohong add
-            getSessionBean().setActiveCodeSet(null);
+            getSessionBean().setSessionCodeSet(null);
             currentcodeSetMap=getCodeSetMap();
             
         } catch (IntegrationException ex) {
@@ -113,7 +113,7 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
         formCodeSetDescription = null;
         selected = false;
         
-        getSessionBean().setActiveCodeSet(null);
+        getSessionBean().setSessionCodeSet(null);
         
     }
     
@@ -157,7 +157,7 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
         if (selectedCodeSetID != null) {
             CodeIntegrator ci = getCodeIntegrator();
             try {
-                getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(selectedCodeSetID));
+                getSessionBean().setSessionCodeSet(ci.getCodeSetBySetID(selectedCodeSetID));
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
@@ -175,7 +175,7 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
         if (selectedCodeSetID != null) {
             CodeIntegrator ci = getCodeIntegrator();
             try {
-                getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(selectedCodeSetID));
+                getSessionBean().setSessionCodeSet(ci.getCodeSetBySetID(selectedCodeSetID));
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
@@ -252,7 +252,7 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
     public String makeSelectedCodeSetActive() {
 
         if (selectedCodeSet != null) {
-            getSessionBean().setActiveCodeSet(selectedCodeSet);
+            getSessionBean().setSessionCodeSet(selectedCodeSet);
             return "missionControl";
         } else {
             getFacesContext().addMessage(null,

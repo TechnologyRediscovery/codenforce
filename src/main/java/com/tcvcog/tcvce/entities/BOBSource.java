@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class BOBSource extends EntityUtils implements Serializable {
+public class BOBSource implements Serializable {
     
     private int sourceid;
     private String title;

@@ -21,7 +21,7 @@ import java.util.Objects;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class OccPermitApplicationReason {
     

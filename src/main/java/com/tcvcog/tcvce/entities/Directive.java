@@ -10,17 +10,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author sylvia
+ * Container for logic which can be converted into a 
+ * Proposal of one or more Choices attached to a specific BusinessObject
+ * and instantiated in a particular Authorization context
+ * 
+ * @author Ellen Bascomb
  */
-public class Directive extends EntityUtils {
+public class Directive  {
 
     private int directiveID;
     private String title;
     private String description;
     
-    private List<Proposable> choiceList;
-    private List<Proposable> choiceListVisible;
+    private List<IFace_Proposable> choiceList;
+    private List<IFace_Proposable> choiceListVisible;
     
     private User creator;
     
@@ -65,7 +68,7 @@ public class Directive extends EntityUtils {
       /**
      * @param choiceListVisible the choiceListVisible to set
      */
-    public void setChoiceListVisible(List<Proposable> choiceListVisible) {
+    public void setChoiceListVisible(List<IFace_Proposable> choiceListVisible) {
        
     }
     
@@ -176,14 +179,14 @@ public class Directive extends EntityUtils {
     /**
      * @return the choiceList
      */
-    public List<Proposable> getChoiceList() {
+    public List<IFace_Proposable> getChoiceList() {
         return choiceList;
     }
 
     /**
      * @param choiceList the choiceList to set
      */
-    public void setChoiceList(List<Proposable> choiceList) {
+    public void setChoiceList(List<IFace_Proposable> choiceList) {
         this.choiceList = choiceList;
     }
 
@@ -442,10 +445,10 @@ public class Directive extends EntityUtils {
     /**
      * @return the choiceListVisible
      */
-    public List<Proposable> getChoiceListVisible() {
-        List<Proposable> prvl = new ArrayList<>();
+    public List<IFace_Proposable> getChoiceListVisible() {
+        List<IFace_Proposable> prvl = new ArrayList<>();
         if(choiceList != null){
-             for(Proposable pr: choiceList ){
+             for(IFace_Proposable pr: choiceList ){
                  if(pr.isActive() && !pr.isHidden()){
                      prvl.add(pr);
                  }

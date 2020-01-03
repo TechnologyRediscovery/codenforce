@@ -19,14 +19,17 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.LogEntry;
+import com.tcvcog.tcvce.util.LogEntry;
 import com.tcvcog.tcvce.entities.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -40,6 +43,84 @@ public class LogIntegrator extends BackingBeanUtils {
     public LogIntegrator() {
     }
     
+    
+    public int writeLogEntry(LogEntry le){
+        Connection con = getPostgresCon();
+        int freshLogEntry = 0;
+        
+        String query = "INSERT INTO public.log(\n" +
+                        "            logentryid, timeofentry, user_userid, notes, error, category, \n" +
+                        "            credsig, subsys, severity)\n" +
+                        "    VALUES (DEFAULT, now(), ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?);";
+
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            
+            if(le.getUser() != null){
+                stmt.setInt(1, le.getUser().getUserID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            if(le.getNotes() != null){
+                stmt.setString(2, le.getNotes());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(3, le.getEntryCategory().isError());
+            stmt.setString(4, le.getEntryCategory().getTitle());
+            
+            // second line of insert vals
+            if(le.getCredSignature() != null){
+                stmt.setString(5, le.getCredSignature());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            if(le.getSubSys() != null){
+                stmt.setString(6, le.getSubSys().getSubSysID_Roman());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            if(le.getSeverity()!= null){
+                stmt.setString(7, le.getSeverity().toString());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+        
+              // grab the newly inserted propertyid
+            String idNumQuery = "SELECT currval('coglog_logeentryid_seq');";
+            Statement s = con.createStatement();
+            ResultSet rs;
+            rs = s.executeQuery(idNumQuery);
+            rs.next();
+            freshLogEntry = rs.getInt(1);
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+             
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        return freshLogEntry;
+    }
+    
+    
+    /**
+     * First gen log attempt
+     * 
+     * @deprecated 
+     * @param uid
+     * @param sid
+     * @param cat
+     * @param notes
+     * @param error
+     * @param reqview
+     * @throws IntegrationException 
+     */
     public void makeLogEntry(int uid, String sid, int cat, String notes, 
             boolean error, boolean reqview) throws IntegrationException{
         Connection con = getPostgresCon();

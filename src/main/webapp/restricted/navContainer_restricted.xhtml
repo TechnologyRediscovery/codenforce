@@ -110,8 +110,8 @@
                                         <div class="nav_containner">
 
                                             <div class="nav_content 
-                                                 #{navigationBB.getCurrentPageNavItemValue() eq navitem.value ? 'nav_active' : ''}
-                                                 #{view.viewId eq navitem.searchpageurl ? 'nav_active' : ''}">
+                                                 #{navigationBB.getCurrentPageNavItemValue() eq navitem.value or view.viewId eq navitem.searchpageurl ? 'nav_active' : ''}"
+                                                 >
 
                                                 <div class="nav_font">
                                                     <i class="#{navitem.icon} "/>
@@ -127,7 +127,7 @@
                                             <div class="subnav_containner">
 
                                                 <div class="currentinfo">
-                                                    <p:outputLabel value="#{navitem.getCurrentInfo()}"/>
+                                                    <p:outputLabel value="#{navigationBB.navCurrentInfoMap().get(navitem.value)}"/>
                                                 </div>
 
                                                 <ui:repeat value="#{navitem.subNavitem}" 
@@ -154,7 +154,7 @@
 
                                                  ">
                                                 <div class="currentinfo ">
-                                                    <p:outputLabel value="#{navitem.getCurrentInfo()}"/>
+                                                    <p:outputLabel value="#{navigationBB.navCurrentInfoMap().get(navitem.value)}"/>
                                                 </div>
 
 
@@ -182,93 +182,93 @@
 
 
 
-                                        <div class="navItem_logout">
-                                            <p:commandButton    id="navcontres-button-logout"
-                                                                action="#{systemServicesBB.logout}" 
-                                                                value="Logout #{systemServicesBB.bbSessionUser.person.firstName}"
-                                                                icon="fa fa-sign-out"
-                                                                ajax="false"/>
-                                        </div>
+                                    <div class="navItem_logout">
+                                        <p:commandButton    id="navcontres-button-logout"
+                                                            action="#{systemServicesBB.logout}" 
+                                                            value="Logout #{systemServicesBB.bbSessionUser.person.firstName}"
+                                                            icon="fa fa-sign-out"
+                                                            ajax="false"/>
+                                    </div>
 
-                                        <div class="navItem_logout">
-                                            <p:commandButton        id="navbar-button-usersettings"
-                                                                    ajax="true" 
-                                                                    actionListener="#{userBB.initiateUserUpdates}"
-                                                                    rendered="true"
-                                                                    disabled="false"
-                                                                    oncomplete="PF('navcontainer-dialog-usersettings').show()"
-                                                                    value="settings" 
-                                                                    update="usersettings-form"
-                                                                    icon="fa fa-gear"/>
-                                        </div>
+                                    <div class="navItem_logout">
+                                        <p:commandButton        id="navbar-button-usersettings"
+                                                                ajax="true" 
+                                                                actionListener="#{userBB.initiateUserUpdates}"
+                                                                rendered="true"
+                                                                disabled="false"
+                                                                oncomplete="PF('navcontainer-dialog-usersettings').show()"
+                                                                value="settings" 
+                                                                update="usersettings-form"
+                                                                icon="fa fa-gear"/>
+                                    </div>
 
                                 </div>
                             </h:form>
 
-                        <p:dialog header="User settings" 
-                                  widgetVar="navcontainer-dialog-usersettings" 
-                                  responsive="true" 
-                                  width="1000"
-                                  modal="false"
-                                  height="500">
+                            <p:dialog header="User settings" 
+                                      widgetVar="navcontainer-dialog-usersettings" 
+                                      responsive="true" 
+                                      width="1000"
+                                      modal="false"
+                                      height="500">
 
 
-                            <h2>
-                                <h:outputText value="User settings:" />
-                                
-                                <h:outputText value=" " />
-                                <h:outputText value="#{userBB.currentUser.person.firstName}" />
-                                <h:outputText value=" " />
-                                <h:outputText value="#{userBB.currentUser.person.lastName}" />
-                                <h:outputText value=" " />
-                                <h:outputText value="("/>
-                                <h:outputText value="#{userBB.currentUser.person.personID}" />
-                                <h:outputText value=")" />
-                                <h:outputText value=" " />
-                                <h:outputText value="+" />
-                                <h:outputText value="#{userBB.currentUser.username}" />
-                                <h:outputText value="("/>
-                                <h:outputText value="#{userBB.currentUser.userID}" />
-                                <h:outputText value=")" />
-                            </h2>
-                            
-                            <h:panelGrid
-                                columns="2"
-                                id="usersettings-grid-outer-twocol">
-                                <h:panelGroup>
-                                    
-                                    
+                                <h2>
+                                    <h:outputText value="User settings:" />
+
+                                    <h:outputText value=" " />
+                                    <h:outputText value="#{userBB.currentUser.person.firstName}" />
+                                    <h:outputText value=" " />
+                                    <h:outputText value="#{userBB.currentUser.person.lastName}" />
+                                    <h:outputText value=" " />
+                                    <h:outputText value="("/>
+                                    <h:outputText value="#{userBB.currentUser.person.personID}" />
+                                    <h:outputText value=")" />
+                                    <h:outputText value=" " />
+                                    <h:outputText value="+" />
+                                    <h:outputText value="#{userBB.currentUser.username}" />
+                                    <h:outputText value="("/>
+                                    <h:outputText value="#{userBB.currentUser.userID}" />
+                                    <h:outputText value=")" />
+                                </h2>
+
+                                <h:panelGrid
+                                    columns="2"
+                                    id="usersettings-grid-outer-twocol">
+                                    <h:panelGroup>
+
+
                                         <p:panelGrid
                                             columns="1"
                                             id="usersettings-grid-innerleft"
                                             layout="grid">
-                                            
+
                                             <p:row>
                                                 <p:column>
-                                                        <h:outputText value="#{userBB.currentUser.role.label}" />
-                                                        <h:outputText value=":" />
-                                                        <h:outputText value="rnk" 
-                                                                      class="dtype-label"/>
-                                                        <h:outputText value=":" />
-                                                        <h:outputText value="#{userBB.currentUser.role.rank}" />
+                                                    <h:outputText value="#{userBB.currentUser.role.label}" />
+                                                    <h:outputText value=":" />
+                                                    <h:outputText value="rnk" 
+                                                                  class="dtype-label"/>
+                                                    <h:outputText value=":" />
+                                                    <h:outputText value="#{userBB.currentUser.role.rank}" />
                                                 </p:column>
                                             </p:row>
-                                            
+
                                             <p:row>
                                                 <p:column>
                                                     <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}" />
                                                     <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}" />
-                                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.userMuniAuthPeriodID}" />
-                                                        <h:outputText value=" | " />
-                                                        <h:outputText value="Period created TS:: #{userBB.getPrettyDate(userBB.currentUser.keyCard.governingAuthPeriod.createdTS)}" />
-                                                        <h:outputText value=" | " />
-                                                        <h:outputText value="Assignment priority:: #{userBB.currentUser.keyCard.governingAuthPeriod.assignmentRelativeOrder} " />
+                                                    <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.userMuniAuthPeriodID}" />
+                                                    <h:outputText value=" | " />
+                                                    <h:outputText value="Period created TS:: #{userBB.getPrettyDate(userBB.currentUser.keyCard.governingAuthPeriod.createdTS)}" />
+                                                    <h:outputText value=" | " />
+                                                    <h:outputText value="Assignment priority:: #{userBB.currentUser.keyCard.governingAuthPeriod.assignmentRelativeOrder} " />
                                                 </p:column>
                                             </p:row>
                                             <p:row>
-                                                
+
                                                 <p:column>
-                                                     <h:form id="usersettings-messages-form-username">
+                                                    <h:form id="usersettings-messages-form-username">
                                                         <h:messages id="usersettings-messages-username"
                                                                     globalOnly="true" showDetail="true" showSummary="true"
                                                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
@@ -296,14 +296,14 @@
                                                                             actionListener="#{userBB.commitUsernameUpdates}"
                                                                             icon="fa fa-thumbs-o-up"
                                                                             update="    usersettings-it-username
-                                                                                        usersettings-messages-form-username
-                                                                                        usersettings-notes-form"
+                                                                            usersettings-messages-form-username
+                                                                            usersettings-notes-form"
                                                                             value="Update username" 
                                                                             tabindex="3"/>
                                                     </h:form>
                                                 </p:column>
                                             </p:row>
-                                            
+
                                             <p:row>
                                                 <p:column>
                                                     <h:form id="usersettings-messages-form-personlink">
@@ -338,7 +338,7 @@
                                                         <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                                        
+
                                                         <p:commandButton    id="usersettings-button-genuserpersonlist"
                                                                             ajax="true"
                                                                             actionListener="#{userBB.generateUserPersonList}"
@@ -346,23 +346,23 @@
                                                                             icon="fa fa-thumbs-0-up"
                                                                             value="Gemerate person list" 
                                                                             tabindex="3"/>
-                                                        
+
                                                         <p:commandButton    id="usersettings-button-updatepersonlink"
                                                                             ajax="true"
                                                                             actionListener="#{userBB.commitUserPersonUpdates}"
                                                                             update="usersettings-messages-form-personlink
-                                                                                    usersettings-form-userpersonlink
-                                                                                    usersettings-notes-form"
+                                                                            usersettings-form-userpersonlink
+                                                                            usersettings-notes-form"
                                                                             icon="fa fa-thumbs-0-up"
                                                                             value="Update person link" 
                                                                             tabindex="4"/>
                                                     </h:form>
                                                 </p:column>
                                             </p:row>
-                                            
+
                                             <p:row>
                                                 <p:column>
-                                                         <h:form id="usersettings-messages-form-updatepassword">
+                                                    <h:form id="usersettings-messages-form-updatepassword">
                                                         <h:messages id="usersettings-messages-updategepassword"
                                                                     globalOnly="true" showDetail="true" showSummary="true"
                                                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
@@ -395,214 +395,214 @@
                                                                             value="Update password" 
                                                                             tabindex="3"/>
                                                     </h:form>
-                                                    
+
                                                 </p:column>
                                             </p:row>
-                                            
+
                                         </p:panelGrid>
-                                    
+
                                     </h:panelGroup>
-                                <h:panelGroup>
-                                    
-                                    
-                                    <h:form id="usersettings-notes-form">
-                                        
+                                    <h:panelGroup>
+
+
+                                        <h:form id="usersettings-notes-form">
+
                                             <h:outputText value="Notes: " styleClass="bold"/>
                                             <p:spacer height="3px" />
                                             <h:outputText   id="usersettings-notes-ot"
                                                             value="#{userBB.currentUser.notes}" 
                                                             escape="false" />
-                                    </h:form>
+                                        </h:form>
 
-                                </h:panelGroup>
-                                
-                                        
-                            
+                                    </h:panelGroup>
 
 
-                                <f:facet name="footer">
+
+
+
+                                    <f:facet name="footer">
 
                                         <h:form id="usersettings-umaps-messages-form">
-                                          <h:messages id="usersettings-umaps-messages"
-                                                      globalOnly="true" showDetail="true" showSummary="true"
-                                                      warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                          </h:messages>
-                                      </h:form>
+                                            <h:messages id="usersettings-umaps-messages"
+                                                        globalOnly="true" showDetail="true" showSummary="true"
+                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                            </h:messages>
+                                        </h:form>
 
 
-                                      <p:dataTable
-                                          id="usersettings-umaps-table"
-                                          var="period"
-                                          value="#{systemServicesBB.bbSessionUser.muniAuthPeriodListForCredMuni}"
-                                          rowKey="#{period.userMuniAuthPeriodID}"
-                                          tableStyleClass="primeDataTable">
+                                        <p:dataTable
+                                            id="usersettings-umaps-table"
+                                            var="period"
+                                            value="#{systemServicesBB.bbSessionUser.muniAuthPeriodListForCredMuni}"
+                                            rowKey="#{period.userMuniAuthPeriodID}"
+                                            tableStyleClass="primeDataTable">
 
-                                          <p:column width="3%" exportable="false">
-                                              <f:facet name="header">
-                                                  <h:outputText value="Expand row" />
-                                              </f:facet>
-                                              <p:rowToggler/>
-                                          </p:column>
+                                            <p:column width="3%" exportable="false">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Expand row" />
+                                                </f:facet>
+                                                <p:rowToggler/>
+                                            </p:column>
 
-                                          <p:column>
-                                              <f:facet name="header">
-                                                  <h:outputText value="Period ID" />
-                                              </f:facet>
-                                              <h:outputText value="#{period.userMuniAuthPeriodID}"/>
-                                          </p:column>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Period ID" />
+                                                </f:facet>
+                                                <h:outputText value="#{period.userMuniAuthPeriodID}"/>
+                                            </p:column>
 
-                                          <p:column>
-                                              <f:facet name="header">
-                                                  <h:outputText value="Muni" />
-                                              </f:facet>
-                                              <h:outputText value="#{period.muni.muniName}"/>
-                                          </p:column>
-
-
-                                          <p:column>
-                                              <f:facet name="header">
-                                                  <h:outputText value="Access start" />
-                                              </f:facet>
-                                              <h:outputText value="#{systemServicesBB.getPrettyDate(period.startDate)}"/>
-                                          </p:column>
-
-                                          <p:column>
-                                              <f:facet name="header">
-                                                  <h:outputText value="Access stop" />
-                                              </f:facet>
-                                              <h:outputText value="#{systemServicesBB.getPrettyDate(period.stopDate)}"/>
-                                          </p:column>
-
-                                          <p:column>
-                                              <f:facet name="header">
-                                                  <h:outputText value="Role" />
-                                              </f:facet>
-                                              <h:outputText value="#{period.role.label}"/>
-                                              <h:outputText value=" (rank: #{period.role.rank})"/>
-                                          </p:column>
-
-                                          <p:column>
-                                              <f:facet name="header">
-                                                  <h:outputText value="Deactivated TS" />
-                                              </f:facet>
-                                              <h:outputText value="#{systemServicesBB.getPrettyDate(period.recorddeactivatedTS)}"/>
-                                          </p:column>
-                                          <p:column>
-                                              <f:facet name="header">
-                                                  <h:outputText value="Assignment rank" />
-                                              </f:facet>
-                                              <h:outputText value="#{period.assignmentRelativeOrder}"/>
-                                          </p:column>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Muni" />
+                                                </f:facet>
+                                                <h:outputText value="#{period.muni.muniName}"/>
+                                            </p:column>
 
 
-                                          <p:column>
-                                              <f:facet name="header">
-                                                  <h:outputText value="Actions" />
-                                              </f:facet>
-                                              <p:commandButton ajax="true"
-                                                               id="usersettings-umaps-button-credentialize" 
-                                                               value="credentialize" 
-                                                               icon="fa fa-credit-card"
-                                                               styleClass="multiButtonLineButton" 
-                                                               actionListener="#{userBB.credentializeUserMuniAuthPeriod(period)}"
-                                                               update="usersettings-umaps-messages-form" />
-                                          </p:column>
-                                          <p:rowExpansion>
-                                              <div class="outlinedBox">
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Access start" />
+                                                </f:facet>
+                                                <h:outputText value="#{systemServicesBB.getPrettyDate(period.startDate)}"/>
+                                            </p:column>
 
-                                                  <h:panelGrid columns="2" border="0" 
-                                                               cellpadding="5" columnClasses="gridTd, gridTd"
-                                                               footerClass="gridFooter">
-                                                      <h:panelGroup>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Access stop" />
+                                                </f:facet>
+                                                <h:outputText value="#{systemServicesBB.getPrettyDate(period.stopDate)}"/>
+                                            </p:column>
 
-                                                          <h:outputLabel value="Created by: " />
-                                                          <p:spacer height="0px" />
-                                                          <h:outputLabel value="user id: " />
-                                                          <h:outputText value="#{period.createdByUserID}" />
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Role" />
+                                                </f:facet>
+                                                <h:outputText value="#{period.role.label}"/>
+                                                <h:outputText value=" (rank: #{period.role.rank})"/>
+                                            </p:column>
 
-                                                      </h:panelGroup>
-
-                                                      <h:panelGroup>
-                                                          <h:outputLabel value="Created TS:" />
-                                                          <h:outputText value="#{systemServicesBB.getPrettyDate(period.createdTS)}"/>
-                                                      </h:panelGroup>
-                                                      <h:panelGroup>
-
-                                                          <h:outputLabel value="Notes" />
-                                                          <h:outputText value="#{period.notes}" escape="false"/>
-                                                      </h:panelGroup>
-
-                                                      <f:facet name="footer">
-
-                                                          <h4>Log entries associated with this authorization period</h4>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Deactivated TS" />
+                                                </f:facet>
+                                                <h:outputText value="#{systemServicesBB.getPrettyDate(period.recorddeactivatedTS)}"/>
+                                            </p:column>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Assignment rank" />
+                                                </f:facet>
+                                                <h:outputText value="#{period.assignmentRelativeOrder}"/>
+                                            </p:column>
 
 
-                                                          <p:scrollPanel id="usersettings-umaps-log-scrollpanel"
-                                                                         style="height: 200px;">
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Actions" />
+                                                </f:facet>
+                                                <p:commandButton ajax="true"
+                                                                 id="usersettings-umaps-button-credentialize" 
+                                                                 value="credentialize" 
+                                                                 icon="fa fa-credit-card"
+                                                                 styleClass="multiButtonLineButton" 
+                                                                 actionListener="#{userBB.credentializeUserMuniAuthPeriod(period)}"
+                                                                 update="usersettings-umaps-messages-form" />
+                                            </p:column>
+                                            <p:rowExpansion>
+                                                <div class="outlinedBox">
 
-                                                              <p:dataTable
-                                                                  id="usersettings-umaps-log-table"
-                                                                  var="entry"
-                                                                  value="#{period.periodActivityLogBook}"
-                                                                  rowKey="#{entry.logBookEntryID}"
-                                                                  tableStyleClass="primeDataTable">
+                                                    <h:panelGrid columns="2" border="0" 
+                                                                 cellpadding="5" columnClasses="gridTd, gridTd"
+                                                                 footerClass="gridFooter">
+                                                        <h:panelGroup>
 
-                                                                  <p:column>
-                                                                      <f:facet name="header">
-                                                                          <h:outputText value="Log entry ID" />
-                                                                      </f:facet>
-                                                                      <h:outputText value="#{entry.logBookEntryID}"/>
-                                                                  </p:column>
-                                                                  <p:column>
-                                                                      <f:facet name="header">
-                                                                          <h:outputText value="AuthPerID" />
-                                                                      </f:facet>
-                                                                      <h:outputText value="#{entry.userMuniAuthPeriodID}"/>
-                                                                  </p:column>
-                                                                  <p:column>
-                                                                      <f:facet name="header">
-                                                                          <h:outputText value="Cat" />
-                                                                      </f:facet>
-                                                                      <h:outputText value="#{entry.category}"/>
-                                                                  </p:column>
-                                                                  <p:column>
-                                                                      <f:facet name="header">
-                                                                          <h:outputText value="TS" />
-                                                                      </f:facet>
-                                                                      <h:outputText value="#{entry.entryTS}"/>
-                                                                  </p:column>
-                                                                  <p:column>
-                                                                      <f:facet name="header">
-                                                                          <h:outputText value="Client address" />
-                                                                      </f:facet>
-                                                                      <h:outputText value="#{entry.header_remoteaddr}"/>
-                                                                  </p:column>
-                                                              </p:dataTable>
-                                                          </p:scrollPanel>
+                                                            <h:outputLabel value="Created by: " />
+                                                            <p:spacer height="0px" />
+                                                            <h:outputLabel value="user id: " />
+                                                            <h:outputText value="#{period.createdByUserID}" />
 
-                                                      </f:facet>
-                                                  </h:panelGrid>
-                                              </div>
-                                          </p:rowExpansion>
-                                      </p:dataTable>
-                                </f:facet>
-                            </h:panelGrid>
+                                                        </h:panelGroup>
 
-                            <h:form id="usersettings-form-close">                             
+                                                        <h:panelGroup>
+                                                            <h:outputLabel value="Created TS:" />
+                                                            <h:outputText value="#{systemServicesBB.getPrettyDate(period.createdTS)}"/>
+                                                        </h:panelGroup>
+                                                        <h:panelGroup>
 
-                                <p:commandButton ajax="true" 
-                                                 value="Cancel" icon="fa fa-stop" 
-                                                 onclick="PF('navcontainer-dialog-usersettings').hide()"
-                                                 tabindex="4"/>
+                                                            <h:outputLabel value="Notes" />
+                                                            <h:outputText value="#{period.notes}" escape="false"/>
+                                                        </h:panelGroup>
+
+                                                        <f:facet name="footer">
+
+                                                            <h4>Log entries associated with this authorization period</h4>
 
 
-                                <p:commandButton ajax="true" 
-                                                 value="Done!" icon="fa thumbs-up" 
-                                                 onclick="PF('navcontainer-dialog-usersettings').hide()"
-                                                 tabindex="4"/>
-                            </h:form>
+                                                            <p:scrollPanel id="usersettings-umaps-log-scrollpanel"
+                                                                           style="height: 200px;">
 
-                        </p:dialog>
+                                                                <p:dataTable
+                                                                    id="usersettings-umaps-log-table"
+                                                                    var="entry"
+                                                                    value="#{period.periodActivityLogBook}"
+                                                                    rowKey="#{entry.logBookEntryID}"
+                                                                    tableStyleClass="primeDataTable">
+
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Log entry ID" />
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{entry.logBookEntryID}"/>
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="AuthPerID" />
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{entry.userMuniAuthPeriodID}"/>
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Cat" />
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{entry.category}"/>
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="TS" />
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{entry.entryTS}"/>
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Client address" />
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{entry.header_remoteaddr}"/>
+                                                                    </p:column>
+                                                                </p:dataTable>
+                                                            </p:scrollPanel>
+
+                                                        </f:facet>
+                                                    </h:panelGrid>
+                                                </div>
+                                            </p:rowExpansion>
+                                        </p:dataTable>
+                                    </f:facet>
+                                </h:panelGrid>
+
+                                <h:form id="usersettings-form-close">                             
+
+                                    <p:commandButton ajax="true" 
+                                                     value="Cancel" icon="fa fa-stop" 
+                                                     onclick="PF('navcontainer-dialog-usersettings').hide()"
+                                                     tabindex="4"/>
+
+
+                                    <p:commandButton ajax="true" 
+                                                     value="Done!" icon="fa thumbs-up" 
+                                                     onclick="PF('navcontainer-dialog-usersettings').hide()"
+                                                     tabindex="4"/>
+                                </h:form>
+
+                            </p:dialog>
 
                             <p:spacer height="35px;"/>
 
@@ -638,16 +638,16 @@
         <script type="text/javascript">
             var dropdown = document.getElementsByClassName("sidebar_firstmenu_item");
             for (var i = 0; i &lt; dropdown.length; i++) {
-                var n = dropdown[i];
-                n.addEventListener("click", function() {
-                this.classList.toggle("sidebar_firstmenu_font_active");
-                var dropdownContent = this.nextElementSibling;
-                if (dropdownContent.style.display === "block") {
-                    dropdownContent.style.display = "none";
-                } else {
-                    dropdownContent.style.display = "block";
-                }
-                });
+            var n = dropdown[i];
+            n.addEventListener("click", function() {
+            this.classList.toggle("sidebar_firstmenu_font_active");
+            var dropdownContent = this.nextElementSibling;
+            if (dropdownContent.style.display === "block") {
+            dropdownContent.style.display = "none";
+            } else {
+            dropdownContent.style.display = "block";
+            }
+            });
             }
 
         </script>

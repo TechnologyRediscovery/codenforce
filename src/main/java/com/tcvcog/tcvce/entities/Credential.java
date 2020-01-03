@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -25,6 +26,8 @@ import java.io.Serializable;
 public class Credential implements Serializable{
     
     private final UserMuniAuthPeriod governingAuthPeriod;
+    
+    private final String signature;
     
     private final boolean hasDeveloperPermissions;
     private final boolean hasSysAdminPermissions;
@@ -49,7 +52,48 @@ public class Credential implements Serializable{
         hasEnfOfficialPermissions = ceo;
         hasMuniStaffPermissions = munistaff;
         hasMuniReaderPermissions = munireader;
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("CREDSIG:V0.9|");
+        sb.append("MC:");
+        sb.append(governingAuthPeriod.getMuni().muniCode);
+        sb.append("|");
+        sb.append("UID:");
+        sb.append(governingAuthPeriod.getUserID());
+        sb.append("|");
+        sb.append("UMAPID:");
+        sb.append(governingAuthPeriod.getUserMuniAuthPeriodID());
+        sb.append("|");
+        sb.append("UMAPEVALTS:");
+        sb.append(governingAuthPeriod.getValidityEvaluatedTS());
+        sb.append("|");
+        sb.append("UMAPISVALTS:");
+        sb.append(governingAuthPeriod.getValidatedTS());
+        sb.append("|");
+        sb.append("UMAPLOGID:");
+        sb.append(governingAuthPeriod.getPeriodActivityLogBook().get(0));
+        sb.append("|");
+        sb.append("POSTCON:");
+        sb.append("|");
+        signature = sb.toString();
+    }
+
+    /**
+     * @return the signature
+     */
+    public String getSignature() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(signature);
+        sb.append("SIGTS:");
+        sb.append(generateSignatureTimeStr());
+        sb.append("|");
+        
+        return sb.toString();
+    }
+
     
+    private String generateSignatureTimeStr(){
+        return LocalDateTime.now().toString();
     }
 
 
@@ -101,5 +145,6 @@ public class Credential implements Serializable{
     public UserMuniAuthPeriod getGoverningAuthPeriod() {
         return governingAuthPeriod;
     }
+
     
 }

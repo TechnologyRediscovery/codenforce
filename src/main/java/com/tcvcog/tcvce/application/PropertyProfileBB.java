@@ -4,26 +4,30 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
-import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -40,8 +44,7 @@ import javax.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
 
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) 2018 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,38 +62,26 @@ Council of Governments, PA
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
-    private PropertyWithLists currProp;
+    private PropertyDataHeavy currProp;
     private PropertyUnit currPropUnit;
-    private PropertyUnitWithLists currPropUnitWithLists;
+    private PropertyUnitDataHeavy currPropUnitWithLists;
     private OccPeriod currOccPeriod;
     
     private int selectedPhotoID;
     
     private List<Person> filteredPersonList;
     
-    private String parid;
-    private String address;
-    private String houseNum;
-    private String streetName;
-    private String addrPartAllMunis;
-    private boolean allMunis;
-    
-    private List<Property> propList;
-    private List<Property> filteredPropList;
-    private UIInput addressInput;
-    
     private Municipality selectedMuni;
     
     private OccPeriodType selectedOccPeriodType;
     private List<OccPeriodType> occPeriodTypeList;
     
-    private SearchParamsProperty searchParams;
-    private QueryProperty selectedPropQuery;
-    private List<QueryProperty> queryList;
+    private List<PropertyUseType> putList;
+    
     
     /**
      * Creates a new instance of PropertyProfileBB
@@ -100,82 +91,34 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
         SearchCoordinator sc = getSearchCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
         
+        currProp = (getSessionBean().getSessionProperty());
+        
+        occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
+        selectedMuni = getSessionBean().getSessionMuni();
+
         try {
-            this.setCurrProp(pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser()));
-        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
+            putList = pi.getPropertyUseTypeList();
+        } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        setPropList(getSessionBean().getSessionPropertyList());
-        setOccPeriodTypeList(getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList());
-        setSelectedMuni(getSessionBean().getSessionMuni());
-
-        setSelectedPropQuery(getSessionBean().getQueryProperty());
-        setSearchParams(getSelectedPropQuery().getParmsList().get(0));
-        try {
-            setQueryList(sc.buildQueryPropertyList(getSessionBean().getSessionUser(), getSessionBean().getSessionMuni()));
-        } catch (IntegrationException ex) {
-            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    
-        getSearchParams().setFilterByStartEndDate(false);
-        getSearchParams().setFilterByMuni(true);
-        getSearchParams().setFilterByObjectID(false);
-        getSearchParams().setUseRelativeDates(false); 
     }
 
-    public void searchForProperties(ActionEvent event){
-        System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
-        PropertyIntegrator pi = getPropertyIntegrator();
+     public String updateProperty(){
+        PropertyCoordinator pc = getPropertyCoordinator();
         
-        try {
-            setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSessionBean().getSessionMuni().getMuniCode()));
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Your search completed with " + getPropList().size() + " results", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to complete search! ", ""));
-        }
+        getSessionBean().getSessionPropertyList().add(0, currProp);
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Successfully updated property with ID " + getCurrProp().getPropertyID() 
+                                + ", which is now your 'active property'", ""));
+        return "propertyProfile";
     }
     
-    public void searchForPropParams(ActionEvent event){
-        System.out.println("PropSearchBean.searchwithparams");
-        PropertyIntegrator pi = getPropertyIntegrator();
-        SearchParamsProperty params = getSearchParams();
-//        params.setAddressPart("%" + getHouseNum() + "%" + getStreetName() + "%");
-//        params.setFilterByAddressPart(true);
-//        params.setMuni(selectedMuni);
-  
-        try{
-            System.out.println("Got to the setPropList point actionEvent propprofbean.searchforpropparam");
-            setPropList(pi.searchForProperties(getSearchParams()));
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Your search completed with " + getPropList().size() + " results", ""));
-        } catch (IntegrationException ex) {
-            System.out.println("Search with params failed");
-            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to complete search! ", ""));
-        }
-    }
-    
-    public void executeQuery(ActionEvent event){
-        System.out.println("Property Search for props by params");
-        PropertyIntegrator pi = getPropertyIntegrator();
-        
-        try {            
-            setPropList(pi.searchForProperties(getSearchParams()));
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Your search completed with " + getPropList().size() + " results", ""));
-        } catch (IntegrationException ex) {
-            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
   
     public String goToChanges() {
@@ -202,7 +145,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void addUnitToNewPropUnits() {
         PropertyUnit unitToAdd;
         PropertyCoordinator pc = getPropertyCoordinator();
-        unitToAdd = pc.getNewPropertyUnit();
+        unitToAdd = pc.initPropertyUnit(currProp);
         unitToAdd.setUnitNumber("");
 //        unitToAdd.setRental(false);
         unitToAdd.setNotes("");
@@ -225,12 +168,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         try {
             pi.updatePropertyUnit(pu);
             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Unit deactivated with ID " + pu.getUnitID(), ""));
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Unit deactivated with ID " + pu.getUnitID(), ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Could not deactivate unit with ID " + pu.getUnitID(), ""));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Could not deactivate unit with ID " + pu.getUnitID(), ""));
         }
         
     }
@@ -323,10 +266,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     private void refreshCurrPropWithLists(){
-        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            setCurrProp(pi.getPropertyWithLists(getCurrProp().getPropertyID(), getSessionBean().getSessionUser()));
-        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
+            setCurrProp(pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessionUser().getMyCredential()));
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -345,28 +288,39 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return "addNewCase";
     }
     
-    public String viewCase(CECase c){
+    public String viewCase(CECaseDataHeavy c){
         getSessionBean().setSessionCECase(c);
         return "ceCases";
     }
     
     public String manageOccPeriod(OccPeriod op){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         setCurrOccPeriod(op);
-        getSessionBean().setSessionOccPeriod(getCurrOccPeriod());
+        try {
+            getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(getCurrOccPeriod(), getSessionBean().getSessionUser().getMyCredential()));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not load occupancy period with data" + ex.getMessage(), ""));
+            
+        }
         return "occPeriodStatus";
         
     }
     
+    /**
+     * Called when the user initiates new occ period creation
+     * @param pu 
+     */
     public void initiateNewOccPeriodCreation(PropertyUnit pu){
         setSelectedOccPeriodType(null);
         setCurrPropUnit(pu);
     }
     
-    public void saveNewPropInfo(){
-        PropertyIntegrator pi = getPropertyIntegrator();
-        
-    }
-    
+    /**
+     * Final step in creating a new occ period
+     * @return 
+     */
     public String addNewOccPeriod(){
         
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -374,19 +328,18 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         try {
             if(getSelectedOccPeriodType() != null){
                 System.out.println("PropertyProfileBB.initateNewOccPeriod | selectedType: " + getSelectedOccPeriodType().getTypeID());
-                setCurrOccPeriod(oc.initializeNewOccPeriod(getCurrProp(), getCurrPropUnit(), getSelectedOccPeriodType(), getSessionBean().getSessionUser(), getSessionBean().getSessionMuni()));
+                setCurrOccPeriod(oc.initOccPeriod(getCurrProp(), getCurrPropUnit(), getSelectedOccPeriodType(), getSessionBean().getSessionUser(), getSessionBean().getSessionMuni()));
                 getCurrOccPeriod().setType(getSelectedOccPeriodType());
                 int newID = 0;
-                System.out.println("PropertyProfileBB.initateNewOccPeriod | currOccPeriod: " + getCurrOccPeriod().getPeriodID());
                 newID = oc.insertNewOccPeriod(getCurrOccPeriod(), getSessionBean().getSessionUser());
-                getSessionBean().setSessionOccPeriod(oi.getOccPeriod(newID));
+                getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessionUser().getMyCredential()));
             } else {
                 getFacesContext().addMessage(null,
                                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                             "Please select a period type" , ""));
                 return "";
             }
-        } catch (EventException | AuthorizationException | CaseLifecycleException | ViolationException | IntegrationException ex) {
+        } catch (EventException | AuthorizationException | BObStatusException | ViolationException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -425,39 +378,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return "persons";
     }
     
-    public void manageProperty(Property prop){
-        PropertyIntegrator pi = getPropertyIntegrator();
-        UserIntegrator ui = getUserIntegrator();
-        try {
-            setCurrProp(pi.getPropertyWithLists(prop.getPropertyID(), getSessionBean().getSessionUser()));
-            ui.logObjectView(getSessionBean().getSessionUser(), prop);
-            getSessionBean().setSessionProperty(prop);
-            getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Managing property at " + prop.getAddress() , ""));
-        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        ex.getMessage(), ""));
-        }
-    }
     
     /**
      * @return the currentProperty
      */
-    public PropertyWithLists getCurrProp() {
-        PropertyIntegrator pi = getPropertyIntegrator();
-        try {
-            if(currProp == null){
-                currProp = pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser());
-            }
-        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        ex.getMessage(), ""));
-        }
+    public PropertyDataHeavy getCurrProp() {
         return currProp;
     }
     
@@ -489,141 +414,13 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @param currentProperty the currentProperty to set
      */
-    public void setCurrProp(PropertyWithLists currentProperty) {
+    public void setCurrProp(PropertyDataHeavy currentProperty) {
         this.currProp = currentProperty;
     }
     
-    public String updateProperty(){
-        getSessionBean().getSessionPropertyList().add(0, getCurrProp());
-        return "propertyUpdate";
-        
-    }
+ 
     
-        /**
-     * @return the propList
-     */
-    public List<Property> getPropList() {
-        return propList;
-    }
-
-    
-    /**
-     * @return the parid
-     */
-    public String getParid() {
-        return parid;
-    }
-
-    /**
-     * @return the address
-     */
-    public String getAddress() {
-        return address;
-    }
-
-    /**
-     * @return the houseNum
-     */
-    public String getHouseNum() {
-        return houseNum;
-    }
-
-    /**
-     * @return the streetName
-     */
-    public String getStreetName() {
-        return streetName;
-    }
-
-    /**
-     * @return the addrPartAllMunis
-     */
-    public String getAddrPartAllMunis() {
-        return addrPartAllMunis;
-    }
-
-    /**
-     * @return the allMunis
-     */
-    public boolean isAllMunis() {
-        return allMunis;
-    }
-
-
-
-    /**
-     * @return the filteredPropList
-     */
-    public List<Property> getFilteredPropList() {
-        return filteredPropList;
-    }
-
-    /**
-     * @return the addressInput
-     */
-    public UIInput getAddressInput() {
-        return addressInput;
-    }
-
    
-
-    /**
-     * @param parid the parid to set
-     */
-    public void setParid(String parid) {
-        this.parid = parid;
-    }
-
-    /**
-     * @param address the address to set
-     */
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    /**
-     * @param houseNum the houseNum to set
-     */
-    public void setHouseNum(String houseNum) {
-        this.houseNum = houseNum;
-    }
-
-    /**
-     * @param streetName the streetName to set
-     */
-    public void setStreetName(String streetName) {
-        this.streetName = streetName;
-    }
-
-    /**
-     * @param addrPartAllMunis the addrPartAllMunis to set
-     */
-    public void setAddrPartAllMunis(String addrPartAllMunis) {
-        this.addrPartAllMunis = addrPartAllMunis;
-    }
-
-    /**
-     * @param allMunis the allMunis to set
-     */
-    public void setAllMunis(boolean allMunis) {
-        this.allMunis = allMunis;
-    }
-
-    /**
-     * @param propList the propList to set
-     */
-    public void setPropList(List<Property> propList) {
-        this.propList = propList;
-    }
-
-    /**
-     * @param filteredPropList the filteredPropList to set
-     */
-    public void setFilteredPropList(List<Property> filteredPropList) {
-        this.filteredPropList = filteredPropList;
-    }
-
-    
 
     /**
      * @return the selectedPhotoID
@@ -681,14 +478,14 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the currPropUnitWithLists
      */
-    public PropertyUnitWithLists getCurrPropUnitWithLists() {
+    public PropertyUnitDataHeavy getCurrPropUnitWithLists() {
         return currPropUnitWithLists;
     }
 
     /**
      * @param currPropUnitWithLists the currPropUnitWithLists to set
      */
-    public void setCurrPropUnitWithLists(PropertyUnitWithLists currPropUnitWithLists) {
+    public void setCurrPropUnitWithLists(PropertyUnitDataHeavy currPropUnitWithLists) {
         this.currPropUnitWithLists = currPropUnitWithLists;
     }
 
@@ -756,52 +553,17 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param addressInput the addressInput to set
+     * @return the putList
      */
-    public void setAddressInput(UIInput addressInput) {
-        this.addressInput = addressInput;
+    public List<PropertyUseType> getPutList() {
+        return putList;
     }
 
     /**
-     * @return the searchParams
+     * @param putList the putList to set
      */
-    public SearchParamsProperty getSearchParams() {
-        return searchParams;
-    }
-
-    /**
-     * @param searchParams the searchParams to set
-     */
-    public void setSearchParams(SearchParamsProperty searchParams) {
-        this.searchParams = searchParams;
-    }
-
-    /**
-     * @return the selectedPropQuery
-     */
-    public QueryProperty getSelectedPropQuery() {
-        return selectedPropQuery;
-    }
-
-    /**
-     * @param selectedPropQuery the selectedPropQuery to set
-     */
-    public void setSelectedPropQuery(QueryProperty selectedPropQuery) {
-        this.selectedPropQuery = selectedPropQuery;
-    }
-
-    /**
-     * @return the queryList
-     */
-    public List<QueryProperty> getQueryList() {
-        return queryList;
-    }
-
-    /**
-     * @param queryList the queryList to set
-     */
-    public void setQueryList(List<QueryProperty> queryList) {
-        this.queryList = queryList;
+    public void setPutList(List<PropertyUseType> putList) {
+        this.putList = putList;
     }
 
    

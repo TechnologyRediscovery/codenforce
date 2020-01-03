@@ -17,8 +17,9 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ChangeOrderAction;
@@ -26,9 +27,10 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitChange;
-import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -54,10 +56,10 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
     private String houseNum;
     private String streetName;
     private Property selectedProperty;
-    private PropertyWithLists propWithLists;
+    private PropertyDataHeavy propWithLists;
 
     private List<PropertyUnit> existingUnitList;
-    private List<PropertyUnitChange> proposedUnitList;
+    private List<PropertyUnitChangeOrder> proposedUnitList;
     private Person existingOwner;
     private Person proposedOwner;
     private List<ChangeOrderAction> actionList;
@@ -107,15 +109,19 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
     public void manageProperty(Property prop) {
         PropertyIntegrator pi = getPropertyIntegrator();
-        UserIntegrator ui = getUserIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
         try {
-            selectedProperty = pi.getPropertyWithLists(prop.getPropertyID(), getSessionBean().getSessionUser());
+            selectedProperty = pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessionUser().getMyCredential());
             existingUnitList = pi.getPropertyUnitList(selectedProperty);
             proposedUnitList = pi.getPropertyUnitChangeList(selectedProperty);
-            ui.logObjectView(getSessionBean().getSessionUser(), prop);
+            
+            si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), prop);
+            
             getSessionBean().getSessionPropertyList().add(prop);
 
-        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -127,7 +133,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            for (PropertyUnitChange change : proposedUnitList) {
+            for (PropertyUnitChangeOrder change : proposedUnitList) {
 
                 if (change.getAction() == ChangeOrderAction.Accept) {
 
@@ -176,7 +182,12 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
     public String goToChangeDetail() {
 
-        getSessionBean().setSessionProperty(selectedProperty);
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(selectedProperty, getSessionBean().getSessionUser().getMyCredential()));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        }
 
         return "unitchangedetail";
 
@@ -222,11 +233,11 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         this.selectedProperty = selectedProperty;
     }
 
-    public PropertyWithLists getPropWithLists() {
+    public PropertyDataHeavy getPropWithLists() {
         return propWithLists;
     }
 
-    public void setPropWithLists(PropertyWithLists propWithLists) {
+    public void setPropWithLists(PropertyDataHeavy propWithLists) {
         this.propWithLists = propWithLists;
     }
 
@@ -238,11 +249,11 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         this.existingUnitList = existingUnitList;
     }
 
-    public List<PropertyUnitChange> getProposedUnitList() {
+    public List<PropertyUnitChangeOrder> getProposedUnitList() {
         return proposedUnitList;
     }
 
-    public void setProposedUnitList(List<PropertyUnitChange> proposedUnitList) {
+    public void setProposedUnitList(List<PropertyUnitChangeOrder> proposedUnitList) {
         this.proposedUnitList = proposedUnitList;
     }
 

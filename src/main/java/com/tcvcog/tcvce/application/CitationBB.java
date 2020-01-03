@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.CodeViolation;
@@ -38,13 +38,13 @@ import javax.faces.application.FacesMessage;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CitationBB extends BackingBeanUtils implements Serializable{
 
     
     private Citation currentCitation;
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     
     private List<CitationStatus> citationStatusList;
     private List<CourtEntity> courtEntityList;
@@ -85,7 +85,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         if(c != null){
             currentCitation = c;
         } else {
-            CECase ceCase = getSessionBean().getSessionCECaseList().get(0);
+            CECaseDataHeavy ceCase = getSessionBean().getSessionCECaseList().get(0);
             currentCitation = new Citation();
             currentCitation.setCeCaseNoLists(ceCase);
             currentCitation.setDateOfRecord(LocalDateTime.now());
@@ -250,14 +250,14 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 

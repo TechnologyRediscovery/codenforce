@@ -20,13 +20,18 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseBase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeePayment;
+import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
@@ -46,7 +51,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
@@ -56,66 +61,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     public CaseIntegrator() {
     }
     
-    public ArrayList getCECasesByProp(Property p) 
-            throws IntegrationException, CaseLifecycleException{
-        ArrayList<CECase> caseList = new ArrayList();
-        String query = "SELECT \n" +
-            "  caseid\n" +
-            "FROM \n" +
-            "  public.cecase, \n" +
-            "  public.property\n" +
-            "WHERE \n" +
-            "  cecase.property_propertyid = property.propertyid AND\n" +
-            "  property.propertyid = ?;";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, p.getPropertyID());
-            //System.out.println("CaseIntegrator.getCECasesByProp| sql: " + stmt.toString());
-            rs = stmt.executeQuery();
-            
-            while(rs.next()){
-                caseList.add(getCECase(rs.getInt("caseid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot get cases by property", ex);
-            
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        
-        return caseList;
-    }
     
-    /**
-     * Entry point for all Queries of Code Enforcement cases. Note that this 
-     * method takes in a QUery object and will inject into its results list
-     * the returned ojects from each of its searchParams.
-     * @param q
-     * @return
-     * @throws IntegrationException
-     * @throws CaseLifecycleException 
-     */
-     public QueryCECase runQueryCECase(QueryCECase q) throws IntegrationException, CaseLifecycleException{
-        List<SearchParamsCECase> pList = q.getParmsList();
-        
-        for(SearchParamsCECase sp: pList){
-            q.addToResults(searchForCECase(sp));
-        }
-        q.setExecutionTimestamp(LocalDateTime.now());
-        System.out.println("CaseIntegrator.QueryCECases | returning list of size: " + q.getBOBResultList().size());
-        q.setExecutedByIntegrator(true);
-        return q;
-        
-    }
+   
     
     /**
      * Internal serach method for Code Enforcement case using a SearchParam
@@ -123,10 +70,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param params
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecycleException 
+     * @throws BObStatusException 
      */
-    private List<CECase> searchForCECase(SearchParamsCECase params) throws IntegrationException, CaseLifecycleException{
-        List<CECase> caseList = new ArrayList<>();
+    public List<Integer> searchForCECases(SearchParamsCECase params) throws IntegrationException, BObStatusException{
+        List<Integer> cseidlst = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -135,16 +82,14 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         sb.append("SELECT caseid ");
         sb.append("FROM public.cecase INNER JOIN public.property ON (property_propertyid = propertyid) ");
-        sb.append("WHERE ");
+        sb.append("WHERE caseid IS NOT NULL AND ");
         
-         if (!params.isFilterByObjectID()) {
-            if (params.isFilterByMuni()) {
-                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+         if (!params.isBobID_ctl()) {
+            if (params.isMuni_ctl()) {
                 sb.append("municipality_municode = ? "); // param 1
             }
 
-            if (params.isFilterByStartEndDate()){
-                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+            if (params.isDate_startEnd_ctl()){
                 switch (params.getDateToSearchCECases()) {
                     case "Opening date of record":
                         sb.append("originationdate ");
@@ -164,14 +109,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
 
             if (params.isUseCasePhase()) {
-                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 if(params.getCasePhase() != null){
                     sb.append("casephase = ?::casephase ");
                 }
             }
 
             if (params.isUseCaseStage() && !params.isUseCasePhase()) {
-                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 List<CasePhase> phList = params.getCaseStageAsPhaseList();
                 if(phList != null){
                     int listLen = phList.size();
@@ -189,7 +132,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             }
 
             if (params.isUseProperty()) {
-                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 sb.append("property_propertyid = ? ");
             }
             if (params.isUseCaseManager()) {
@@ -200,7 +142,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             }
 
             if (params.isUsePropertyInfoCase()) {
-                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 if (params.isPropertyInfoCase()) {
                     sb.append("propertyinfocase = TRUE ");
                 } else {
@@ -208,7 +149,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 }
             }
             if (params.isUseIsOpen()) {
-                if(notFirstCriteria){sb.append("AND ");}
                 if (params.isIsOpen()) {
                     sb.append("closingdate IS NULL ");
                 } else {
@@ -225,13 +165,13 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         try {
             stmt = con.prepareStatement(sb.toString());
 
-            if (!params.isFilterByObjectID()) {
-                if (params.isFilterByMuni()) {
-                    stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+            if (!params.isBobID_ctl()) {
+                if (params.isMuni_ctl()) {
+                    stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
-                if (params.isFilterByStartEndDate()) {
-                    stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
-                    stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
+                if (params.isDate_startEnd_ctl()) {
+                    stmt.setTimestamp(++paramCounter, params.getStartDate_val_SQLDate());
+                    stmt.setTimestamp(++paramCounter, params.getEndDate_val_SQLDate());
                 }
                 if (params.isUseCasePhase()) {
                     stmt.setString(++paramCounter, params.getCasePhase().name());
@@ -258,20 +198,20 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     }
                 }
             } else {
-                stmt.setInt(++paramCounter, params.getObjectID());
+                stmt.setInt(++paramCounter, params.getBobID_val());
             }
 
             rs = stmt.executeQuery();
 
             int counter = 0;
             int maxResults;
-            if (params.isLimitResultCountTo100()) {
+            if (params.isLimitResultCount_ctl()) {
                 maxResults = 100;
             } else {
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                caseList.add(getCECase(rs.getInt("caseid")));
+                cseidlst.add(rs.getInt("caseid"));
                 counter++;
             }
             
@@ -285,98 +225,19 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return caseList;
+        return cseidlst;
         
     }
-    
-    public ArrayList getOpenCECases(int muniCode) throws IntegrationException, CaseLifecycleException{
-        
-        ArrayList<CECase> caseList = new ArrayList();
-        String query = "SELECT \n" +
-            "  caseid, \n" +
-            "  property.municipality_municode\n" +
-            "FROM public.cecase INNER JOIN public.property ON (property_propertyid = propertyid)\n" +
-            "WHERE \n" +
-            "  property.municipality_municode = ? AND casephase <> 'Closed'::casephase AND casephase <> 'LegacyImported'::casephase;";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, muniCode);
-            //System.out.println("CaseIntegrator.| sql: " + stmt.toString());
-            rs = stmt.executeQuery();
-            System.out.println("CaseIntegrator.getOpenCECases | stmt: " + stmt.toString());
-            System.out.println("CaseIntegrator.getOpenCECases | rs count: " + rs.getFetchSize());
-            
-            while(rs.next()){
-                caseList.add(getCECase(rs.getInt("caseid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot get open cecases", ex);
-            
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        
-        return caseList;
-    }
-    public List getCECaseHistory(int muniCode) throws IntegrationException, CaseLifecycleException{
-        
-        ArrayList<CECase> caseList = new ArrayList();
-        String query = "SELECT \n" +
-            "  caseid, \n" +
-            "  municipality.municode\n" +
-            "FROM \n" +
-            "  public.cecase, \n" +
-            "  public.property, \n" +
-            "  public.municipality\n" +
-            "WHERE \n" +
-            "  cecase.property_propertyid = property.propertyid AND\n" +
-            "  property.municipality_municode = municipality.municode AND\n" +
-            "  municipality.municode = ? AND (casephase = 'Closed'::casephase OR casephase = 'LegacyImported'::casephase);";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, muniCode);
-            //System.out.println("CaseIntegrator.| sql: " + stmt.toString());
-            rs = stmt.executeQuery();
-            
-            while(rs.next()){
-                caseList.add(getCECase(rs.getInt("caseid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot get case history list", ex);
-            
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        
-        return caseList;
-    }
+ 
     
     
     /**
-     * Generates a CECase without the big, fat lists
+     * Generates a CECaseDataHeavy without the big, fat lists
      * @param ceCaseID
      * @return
      * @throws IntegrationException 
      */
-    public CECaseBase getCECaseBase(int ceCaseID) throws IntegrationException, CaseLifecycleException{
+    public CECase getCECase(int ceCaseID) throws IntegrationException, BObStatusException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
             "            login_userid, casename, casephase, originationdate, closingdate, \n" +
             "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
@@ -385,7 +246,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         PreparedStatement stmt = null;
         Connection con = null;
-        CECaseBase c = null;
+        CECase c = null;
         
         try {
             
@@ -396,7 +257,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                c = generateCECaseNoLists(rs);
+                c = generateCECase(rs);
             }
             
         } catch (SQLException ex) {
@@ -413,78 +274,18 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     
+  
+    
+  
+    
     /**
-     * This method generates a new CECase
-     * @param ceCaseID
+     * Internal populator for CECase objects
+     * @param rs
      * @return
+     * @throws SQLException
      * @throws IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
      */
-    public CECase getCECase(int ceCaseID) throws IntegrationException, CaseLifecycleException{
-        if(ceCaseID == 0){
-            throw new IntegrationException("Cannot get a case with ID 0");
-        } else {
-            System.out.println("CaseIntegrator.getCECase | getting case with id: " + ceCaseID);
-        }
-        CaseCoordinator cc = getCaseCoordinator();
-        String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
-            "            login_userid, casename, casephase, originationdate, closingdate, \n" +
-            "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
-            "  FROM public.cecase WHERE caseid = ?;";
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection con = null;
-        CECase cse = null;
-        
-        try {
-            
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, ceCaseID);
-            //System.out.println("CaseIntegrator.getCECase| sql: " + stmt.toString());
-            rs = stmt.executeQuery();
-            
-            while(rs.next()){
-                CECaseBase baseCase = generateCECaseNoLists(rs);
-                cse = generateCECase(baseCase);
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot get cecase by id", ex);
-            
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        
-        // send the case to the coordinator for the setting of casephase and such before returning
-        if(cse != null){
-            return cc.configureCECase(cse);
-        }
-        else return cse;
-    }
-    
-    public CECase generateCECase(CECaseBase caseBare) throws SQLException, IntegrationException{
-        EventIntegrator ei = getEventIntegrator();
-        CitationIntegrator ci = getCitationIntegrator();
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        
-        // Wrap our base class in the subclass wrapper--an odd design structure, indeed
-        CECase cse = new CECase(caseBare);
-
-        // *** POPULATE LISTS OF EVENTS, NOTICES, CITATIONS, AND VIOLATIONS ***
-        cse.setCompleteEventList(ei.getEventsByCaseID(cse.getCaseID()));
-        cse.setNoticeList(cvi.novGetList(cse));
-        cse.setCitationList(ci.getCitations(cse));
-        cse.setViolationList(cvi.getCodeViolations(cse.getCaseID()));
-        cse.setCeActionRequestList(ceari.getCEActionRequestListByCase(cse.getCaseID()));
-        return cse;
-    }
-    
-     public CECaseBase generateCECaseNoLists(ResultSet rs) throws SQLException, IntegrationException{
+     private CECase generateCECase(ResultSet rs) throws SQLException, IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         SystemIntegrator si = getSystemIntegrator();
@@ -494,7 +295,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             throw new IntegrationException("cannot generate case with ID 0");
         }
         
-        CECaseBase c = new CECaseBase();
+        CECase c = new CECase();
 
         c.setCaseID(ceCaseID);
         c.setPublicControlCode(rs.getInt("cecasepubliccc"));
@@ -533,7 +334,14 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return c;
     }
     
-    public List<CECase> getCECasesByPACC(int pacc) throws IntegrationException, CaseLifecycleException{
+     /**
+      * First gen search method to be deprecated in Beta
+      * @param pacc
+      * @return
+      * @throws IntegrationException
+      * @throws BObStatusException 
+      */
+    public List<CECase> getCECasesByPACC(int pacc) throws IntegrationException, BObStatusException{
         
         ArrayList<CECase> caseList = new ArrayList();
         String query = "SELECT caseid FROM public.cecase WHERE cecasepubliccc = ?;";
@@ -567,8 +375,18 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
   
-
-    public CECase insertNewCECase(CECase ceCase) throws IntegrationException, CaseLifecycleException{
+    /**
+     * Insertion point for CECaseDataHeavy objects; must be called by Coordinator who checks 
+ logic before sending to the DB. This method only copies from the passed in CECaseDataHeavy
+ into the SQL INSERT
+     * 
+     * @param ceCase
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public int insertNewCECase(CECase ceCase) throws IntegrationException, BObStatusException{
+        CaseCoordinator cc = getCaseCoordinator();
         
         String query = "INSERT INTO public.cecase(\n" +
                         "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
@@ -615,8 +433,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 insertedCaseID = rs.getInt(1);
             }
             
-            freshlyInsertedCase = getCECase(insertedCaseID);
-            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Case Integrator: cannot insert new case, sorry", ex);
@@ -627,20 +443,20 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return freshlyInsertedCase;
+        return insertedCaseID;
         
     }
     
     /**
-     * Updates the values in the CECase in the DB but does NOT
- edit the data in connected tables, namely CodeViolation, CECaseEvent, and Person
+     * Updates the values in the CECaseDataHeavy in the DB but does NOT
+ edit the data in connected tables, namely CodeViolation, EventCnF, and Person
  Use calls to other add methods in this class for adding additional
  violations, events, and people to a CE case.
      * 
      * @param ceCase the case to updated, with updated member variables
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void updateCECaseMetadata(CECase ceCase) throws IntegrationException{
+    public void updateCECaseMetadata(CECaseDataHeavy ceCase) throws IntegrationException{
         String query =  "UPDATE public.cecase\n" +
                         "   SET cecasepubliccc=?, \n" +
                         "       casename=?, originationdate=?, closingdate=?, notes=?, \n" +
@@ -682,7 +498,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void deleteCECase(CECase cecase){
+    public void deleteCECase(CECaseDataHeavy cecase){
         
         
     }
@@ -694,7 +510,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param ceCase
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void changeCECasePhase(CECase ceCase) throws IntegrationException{
+    public void changeCECasePhase(CECaseDataHeavy ceCase) throws IntegrationException{
         String query = "UPDATE public.cecase\n" +
                     "   SET casephase= CAST (? AS casephase)\n" +
                     " WHERE caseid = ?;";
@@ -717,9 +533,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
-    public List<CECase> getCECaseHistoryList(User u) 
-            throws IntegrationException, CaseLifecycleException{
-        List<CECase> cList = new ArrayList<>();
+    public List<Integer> getCECaseHistoryList(int userID) 
+            throws IntegrationException, BObStatusException{
+        List<Integer> cseidl = new ArrayList<>();
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -730,16 +546,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     + "AND cecase_caseid IS NOT NULL "
                     + "ORDER BY entrytimestamp DESC;";
             stmt = con.prepareStatement(s);
-            stmt.setInt(1, u.getUserID());
+            stmt.setInt(1, userID);
 
             rs = stmt.executeQuery();
-            int MAX_RES = 27;  //behold a MAGICAL number
-            int iter = 0;
             
-            while (rs.next() && iter < MAX_RES) {
-                CECase c = getCECase(rs.getInt("cecase_caseid"));
-                cList.add(c);
-                iter++;
+            while (rs.next()) {
+                cseidl.add(rs.getInt("cecase_caseid"));
             }
 
         } catch (SQLException ex) {
@@ -751,11 +563,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return cList;
+        return cseidl;
     }
-    
-   
-   
-        
-    
+     
 }

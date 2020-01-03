@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class ImprovementSuggestion implements Serializable {
     private int suggestionID;

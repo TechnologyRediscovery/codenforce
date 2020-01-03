@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.MuniCoordinator;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
@@ -87,7 +87,8 @@ import javax.sql.DataSource;
  * @author Xander Darsow
  */
 
-public class BackingBeanUtils implements Serializable{
+public class        BackingBeanUtils 
+        implements  Serializable{
     
 //    @ManagedProperty(value="sessionBean")
     private SessionBean sessionBean;
@@ -127,7 +128,7 @@ public class BackingBeanUtils implements Serializable{
     private SystemIntegrator systemIntegrator;
     private SystemCoordinator systemCoordinator;
     private LogIntegrator logIntegrator;
-    private MuniCoordinator muniCoordinator;
+    private MunicipalityCoordinator muniCoordinator;
     
     private SearchCoordinator searchCoordinator;
     
@@ -884,19 +885,19 @@ public class BackingBeanUtils implements Serializable{
     /**
      * @return the muniCoordinator
      */
-    public MuniCoordinator getMuniCoordinator() {
+    public MunicipalityCoordinator getMuniCoordinator() {
         
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{muniCoordinator}", MuniCoordinator.class);
-        muniCoordinator = (MuniCoordinator) ve.getValue(context.getELContext());
+                .createValueExpression(context.getELContext(), "#{muniCoordinator}", MunicipalityCoordinator.class);
+        muniCoordinator = (MunicipalityCoordinator) ve.getValue(context.getELContext());
         return muniCoordinator;
     }
 
     /**
      * @param muniCoordinator the muniCoordinator to set
      */
-    public void setMuniCoordinator(MuniCoordinator muniCoordinator) {
+    public void setMuniCoordinator(MunicipalityCoordinator muniCoordinator) {
         this.muniCoordinator = muniCoordinator;
     }
 

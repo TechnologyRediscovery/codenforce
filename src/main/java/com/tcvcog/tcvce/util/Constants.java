@@ -41,11 +41,9 @@ public class Constants implements Serializable {
     // blasted unit numbers often have letters in them!
     public final static String DEFAULT_UNIT_NUMBER = "-1";
     
+    // Object management configuration parameters
+    public final static int MAX_BOB_HISTORY_SIZE = 30;
     
-    public final static String SERVER_NAME = "localhost:5432";
-    public final static String DB_NAME = "cogdb";
-    public final static String DB_USERNAME = "sylvia";
-    public final static String DB_PASS = "c0d3";
     public final static int MAX_CONNECTIONS = 1000;
     
     // these are the names of the properties files/bundles

@@ -19,20 +19,23 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class PersonCoordinator extends BackingBeanUtils implements Serializable{
 
@@ -45,7 +48,25 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public PersonCoordinator() {
     }
     
-    public int addNewPerson(Person p) throws IntegrationException{
+    /**
+     * Logic intermediary for receiving requests for a Person 
+     * @param personID
+     * @return
+     * @throws IntegrationException 
+     */
+    public Person getPerson(int personID) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        return pi.getPerson(personID);
+    }
+    
+    
+    /**
+     * Entry point for new Person object requests
+     * @param p
+     * @return
+     * @throws IntegrationException 
+     */
+    public int createPerson(Person p) throws IntegrationException{
         int newid;
         PersonIntegrator pi = getPersonIntegrator();
         newid = pi.insertPerson(p);
@@ -56,29 +77,35 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsPerson getDefaultSearchParamsPersons(Municipality m){
         SearchParamsPerson spp = new SearchParamsPerson();
         // on the parent class SearchParams
-        spp.setFilterByStartEndDate(false);
-        spp.setLimitResultCountTo100(true);
-        spp.setMuni(m);
+        spp.setDate_startEnd_ctl(false);
+        spp.setLimitResultCount_ctl(true);
+        spp.setMuni_val(m);
         
         // on the subclass SearchParamsPerson
-        spp.setFilterByFirstName(true);
-        spp.setFilterByLastName(true);
-        spp.setOnlySearchCompositeLastNames(false);
+        spp.setName_first_ctl(true);
+        spp.setName_last_ctl(true);
+        spp.setName_compositeLNameOnly_ctl(false);
         
-        spp.setFilterByPersonTypes(false);
-        spp.setFilterByEmail(false);
-        spp.setFilterByAddressStreet(false);
+        spp.setPersonType_ctl(false);
+        spp.setEmail_ctl(false);
+        spp.setAddress_streetNum_ctl(false);
         
-        spp.setFilterByActiveSwitch(false);
-        spp.setFilterByVerifiedSwitch(false);
+        spp.setVerified_ctl(false);
+        spp.setVerified_val(false);
         
         
         return spp;
         
     }
     
-    
-    public void updatePerson(Person p, User u, String updateNotes) throws IntegrationException{
+    /**
+     * Logic intermediary for Updates to the Person listing
+     * @param p
+     * @param u
+     * @param updateNotes
+     * @throws IntegrationException 
+     */
+    public void editPerson(Person p, User u, String updateNotes) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         StringBuilder sb = new StringBuilder();
         // create the new note header
@@ -91,7 +118,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public Person getNewPersonSkeleton(Municipality m){
+    public Person initPerson(Municipality m){
         Person newP = new Person();
         newP.setPersonType(PersonType.Public);
         newP.setActive(true);
@@ -151,10 +178,39 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return newCloneID;
     }
     
-    public List<Person> loadPersonHistoryList(User u) throws IntegrationException{
-        PersonIntegrator pi = getPersonIntegrator();
-        return pi.getPersonHistory(u);
+    
+    /**
+     * Logic container for choosing a default person if the SessionInitializer
+     * does not have a session List to work from
+     * @param cred
+     * @return the selected person proposed for becoming the sessionPerson
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public Person selectDefaultPerson(Credential cred) throws IntegrationException{
+        UserCoordinator uc = getUserCoordinator();
+        return uc.getUser(cred.getGoverningAuthPeriod().getUserID()).getPerson();
         
+    }
+
+    
+    /**
+     * Intermediary logic unit for configuring histories of Person object views
+     * given an authorization context
+     * @param cred
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Person> assemblePersonHistory(Credential cred) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        List<Person> pl = new ArrayList<>();
+        List<Integer> idList = null;
+        if(cred != null){
+            idList = pi.getPersonHistory(cred.getGoverningAuthPeriod().getUserID());
+            while(!idList.isEmpty() && pl.size() <= Constants.MAX_BOB_HISTORY_SIZE){
+                pl.add(pi.getPerson(idList.remove(0)));
+            }
+        }
+        return pl;
     }   
 
     /**
@@ -165,12 +221,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return personTypes;
     }
 
-    /**
-     * @param personTypes the personTypes to set
-     */
-    public void setPersonTypes(PersonType[] personTypes) {
-        this.personTypes = personTypes;
-    }
+   
     /**
      * Returns SearchParamsPerson object with its member variables set to default values.
      * @return params
@@ -179,41 +230,26 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         SearchParamsPerson params = new SearchParamsPerson();
         
         // superclass parameters
-        params.setFilterByMuni(false);
-        params.setFilterByObjectID(false);
-        params.setFilterByStartEndDate(false);
-        params.setLimitResultCountTo100(true);
+        params.setMuni_ctl(false);
+        params.setBobID_ctl(false);
+        params.setDate_startEnd_ctl(false);
+        params.setLimitResultCount_ctl(true);
         
         // subclass specific parameters
-        params.setFilterByLastName(true);
-        params.setFilterByAddressStreet(false);
+        params.setName_last_ctl(true);
+        params.setAddress_streetNum_ctl(false);
         
-        params.setFilterByFirstName(false);
-        params.setFilterByPhoneNumber(false);
-        params.setFilterByEmail(false);        
-        params.setFilterByCity(false);
-        params.setFilterByZipCode(false);
+        params.setName_first_ctl(false);
+        params.setPhoneNumber_ctl(false);
+        params.setEmail_ctl(false);        
+        params.setCity_ctl(false);
+        params.setZip_ctl(false);
         
         return params;
     }
-    /**
-     * Queries the person table and returns a list of Person objects. The results are anonymized if
-     * the anonymizeResults parameter is true.
-     * @param params
-     * @param anonymizeResults
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Person> queryPersons(SearchParamsPerson params, boolean anonymizeResults) throws IntegrationException {
-        PersonIntegrator pi = getPersonIntegrator();
-        List<Person> results = pi.searchForPersons(params);
-        
-        if (anonymizeResults){
-            results = anonymizePersonList(results);          
-        }
-        
-        return results;
-    }
+   
+    
+    
     
     public List<Person> anonymizePersonList(List<Person> personList) {
         for (Person person:personList){

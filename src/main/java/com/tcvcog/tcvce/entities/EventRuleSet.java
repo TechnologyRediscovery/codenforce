@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author sylvia
  */
-public class EventRuleSet extends EntityUtils implements Serializable {
+public class EventRuleSet  implements Serializable {
     
     private int rulseSetID;
     private String title;

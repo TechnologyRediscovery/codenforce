@@ -33,7 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author Adam Gutonski and Sylvia
  */
-public class OccInspection extends EntityUtils implements Comparable<OccInspection> {
+public class OccInspection  implements Comparable<OccInspection> {
     
     private int inspectionID;
     private User inspector;

@@ -36,6 +36,7 @@ public class EventCategory implements Serializable {
     private boolean publicdeployable;
     
     private boolean notifycasemonitors;
+    protected int defaultdurationmins;
     
     private Directive directive;
     
@@ -287,6 +288,20 @@ public class EventCategory implements Serializable {
      */
     public void setHostEventDescriptionSuggestedText(String hostEventDescriptionSuggestedText) {
         this.hostEventDescriptionSuggestedText = hostEventDescriptionSuggestedText;
+    }
+
+    /**
+     * @return the defaultdurationmins
+     */
+    public int getDefaultdurationmins() {
+        return defaultdurationmins;
+    }
+
+    /**
+     * @param defaultdurationmins the defaultdurationmins to set
+     */
+    public void setDefaultdurationmins(int defaultdurationmins) {
+        this.defaultdurationmins = defaultdurationmins;
     }
 
     

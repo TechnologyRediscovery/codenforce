@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Eric C. Darsow
+ * Copyright (C) 2017 ellen bascomb of apt 31y
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,13 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.SearchParams;
@@ -38,7 +40,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CEActionRequestIntegrator extends BackingBeanUtils implements Serializable {
 
@@ -287,17 +289,18 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     }
 
     public void connectActionRequestToCECase(int actionRequestID, int cecaseID, int userid)
-            throws CaseLifecycleException, IntegrationException {
+            throws BObStatusException, IntegrationException {
+        CaseCoordinator cc = getCaseCoordinator();
         CECase cecase = null;
-
-        CaseIntegrator ci = getCaseIntegrator();
+        
+        
         try {
-            cecase = ci.getCECase(cecaseID);
+            cecase = cc.getCECase(cecaseID);
         } catch (IntegrationException ex) {
-            throw new CaseLifecycleException("Cannot find a CECase to which the action request can be connected");
+            throw new BObStatusException("Cannot find a CECase to which the action request can be connected");
         }
         if (cecase == null) {
-            throw new CaseLifecycleException("Case returned has ID of zero");
+            throw new BObStatusException("Case returned has ID of zero");
         }
 
         String q = "UPDATE ceactionrequest SET cecase_caseid =?, "
@@ -613,30 +616,11 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     }
     
     
-    /**
-     * Unpacks a Query object and asks selectWithSearchParams for a set of CEARs
- for each of SearchParams object in the given Query
-     * @param q a fully-baked Query, meaning it has its own Params
-     * @return The set of returned CEARs from each SearchParams inside this Query
-     * @throws IntegrationException 
-     */
-    public QueryCEAR runQueryCEAR(QueryCEAR q) throws IntegrationException{
-        List<SearchParamsCEActionRequests> pList = q.getParmsList();
-        
-        for(SearchParamsCEActionRequests sp: pList){
-            q.addToResults(getCEARs(sp));
-        }
-        q.setExecutionTimestamp(LocalDateTime.now());
-        System.out.println("CEActionRequestIntegrator.QueryCEARs | returning list of size: " + q.getBOBResultList().size());
-        q.setExecutedByIntegrator(true);
-        return q;
-        
-    }
     
     /**
-     * Called by runQueryCECase() only!
+     * Called by the SearchCoordinator's queryCEAR methods
  
- Internal retrieval method for Code Enforcement Action Requests. Implements
+   Implements
      * a multi-stage SQL statement building process based on the settings on the
      * SearchParams object passed into this method.
      *
@@ -649,8 +633,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
      * 
      * @throws IntegrationException
      */
-    private List<CEActionRequest> getCEARs(SearchParamsCEActionRequests params) throws IntegrationException {
-        List<CEActionRequest> list = new ArrayList();
+    public List<Integer> searchForCEActionRequests(SearchParamsCEActionRequests params) throws IntegrationException {
+        List<Integer> cearidlst = new ArrayList();
         StringBuilder sb = new StringBuilder();
 
         sb.append("SELECT requestid FROM public.ceactionrequest ");
@@ -701,11 +685,11 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         try {
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+            stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
             // as long as we're not searching by ID only
             if (!params.isUseRequestID()) {
-                stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
-                stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
+                stmt.setTimestamp(++paramCounter, params.getStartDate_val_SQLDate());
+                stmt.setTimestamp(++paramCounter, params.getEndDate_val_SQLDate());
                 
                 if(params.isUseRequestStatus()){
                     stmt.setInt(++paramCounter, params.getRequestStatus().getStatusID());
@@ -718,8 +702,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println("CEActionRequestIntegrator.getCEActionRequestList | stmt: " + stmt.toString());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                cear = getActionRequestByRequestID(rs.getInt(1));
-                list.add(cear);
+                cearidlst.add(rs.getInt(1));
             } // close while
 
         } catch (SQLException ex) {
@@ -733,7 +716,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         }// close try/catch
 
-        return list;
+        return cearidlst;
     } // close method
 
     public List getCEActionRequestListByCase(int ceCaseID) throws IntegrationException {

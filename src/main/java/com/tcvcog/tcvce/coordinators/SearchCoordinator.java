@@ -8,36 +8,24 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.search.Query;
-import com.tcvcog.tcvce.entities.search.QueryCEAR;
-import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
-import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
-import com.tcvcog.tcvce.entities.search.QueryEventCECase;
-import com.tcvcog.tcvce.entities.search.QueryEventCECaseEnum;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
-import com.tcvcog.tcvce.entities.search.QueryPerson;
-import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
-import com.tcvcog.tcvce.entities.search.QueryProperty;
-import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
-import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
-import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
-import com.tcvcog.tcvce.entities.search.SearchParamsPropertyDateFields;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
@@ -48,6 +36,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,6 +47,8 @@ import javax.annotation.PostConstruct;
  * @author sylvia
  */
 public class SearchCoordinator extends BackingBeanUtils implements Serializable{
+    
+    private static final RoleType MIN_ROLETYPEFORMULTIMUNI_QUERY = RoleType.CogStaff;
     
     /**
      * Creates a new instance of SearchCoordinator
@@ -70,260 +61,491 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-     public QueryCEAR getQueryInitialCEAR(UserAuthorized u, Municipality m) throws IntegrationException{
-        return assembleQueryCEAR(QueryCEAREnum.UNPROCESSED, u, m, null);
+    
+    
+//    --------------------------------------------------------------------------
+//    ***************************** RUN QUERIES ********************************
+//    --------------------------------------------------------------------------
+       
+    /**
+     * Single point of entry for queries on Property objects
+     * 
+     * @param q an assembled QueryOccPeriod
+     * @return a reference to the same QueryOccPeriod instance passed in with the business
+     * objects returned from the integrator accessible via getResults()
+     * @throws com.tcvcog.tcvce.domain.SearchException
+     */
+    public QueryProperty runQuery(QueryProperty q) throws SearchException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
+        if(q == null) return null;
+        
+        prepareQueryForRun(q);
+
+        List<SearchParamsProperty> paramsList = q.getParmsList();
+        List<Property> propTempList = new ArrayList<>();
+        
+        for(SearchParamsProperty sp: paramsList){
+            propTempList.clear();
+            for(Municipality muni: sp.getMuniList_val()){
+                sp.setMuni_val(muni);
+                try {
+                    for(Integer i: pi.searchForProperties(sp)){
+                        propTempList.add(pc.getProperty(i));
+                    }
+                } catch (IntegrationException ex) {
+                    Logger.getLogger(SearchCoordinator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            q.addToResults(propTempList);
+        }
+        
+        postRunConfigureQuery(q);
+        
+        return q;
     }
     
     /**
-     * These are just skeleton subQuery objects for Action Requests used for
-     * user selection drop down boxes on faces pages
-     * @param u session user
-     * @param m session user's current municipality
-     * @return each existing CEAR Query capable of being passed into runQuery()
+     * Single point of entry for queries on Person objects
+     * 
+     * @param q an assembled QueryOccPeriod
+     * @return a reference to the same QueryOccPeriod instance passed in with the business
+     * objects returned from the integrator accessible via getResults()
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public List<QueryCEAR> buildQueryCEARList(UserAuthorized u, Municipality m) throws IntegrationException{
-        QueryCEAREnum[] nameArray = QueryCEAREnum.values();
-        List<QueryCEAR> queryList = new ArrayList<>();
-//        qList.add(assembleQueryCEAR(QueryCEAREnum.ALL_PAST30, u, m));
-        for(QueryCEAREnum queryTitle: nameArray){
-            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(assembleQueryCEAR(queryTitle, u, m, null));
+    public QueryPerson runQuery(QueryPerson q) throws SearchException{
+        PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
+        
+        if(q == null) return null;
+        
+        prepareQueryForRun(q);
+
+        List<SearchParamsPerson> paramsList = q.getParmsList();
+        List<Person> persTempList = new ArrayList<>();
+        
+        for(SearchParamsPerson sp: paramsList){
+            persTempList.clear();
+            for(Municipality muni: sp.getMuniList_val()){
+                sp.setMuni_val(muni);
+                try {
+                    for(Integer i: pi.searchForPersons(sp)){
+                        persTempList.add(pc.getPerson(i));
+                    }
+                } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                    throw new SearchException("Integration error when querying properties");
+                }
+            }
+            q.addToResults(persTempList);
         }
-        return queryList;
+        postRunConfigureQuery(q);
+        return q;
+    }
+     
+    /**
+     * Single point of entry for queries against the EventCnF tables
+     * @param q
+     * @return
+     * @throws SearchException 
+     */
+     public QueryEvent runQuery(QueryEvent q) throws SearchException{
+         EventIntegrator ei = getEventIntegrator();
+         EventCoordinator ec = getEventCoordinator();
+         
+         if(q == null) return null;
+        
+        prepareQueryForRun(q);
+
+        List<SearchParamsEvent> paramsList = q.getParmsList();
+        List<EventCnF> evTempList = new ArrayList<>();
+        
+        for(SearchParamsEvent sp: paramsList){
+            evTempList.clear();
+            // audit the params and get the result list back
+            for(Municipality muni: sp.getMuniList_val()){
+                sp.setMuni_val(muni);
+                try {
+                    for(Integer i: ei.searchForEvents(sp)){
+                        evTempList.add(ec.getEvent(i));
+                    }
+                } catch (IntegrationException | BObStatusException ex) {
+                    System.out.println(ex);
+                    throw new SearchException("Integration or CaseLifecycle exception in query run;");
+                }
+            }
+            // add each batch of OccPeriod objects from the SearchParam run to our
+            // ongoing list
+            q.addToResults(evTempList);
+        }
+        
+        postRunConfigureQuery(q);
+        
+        return q;
+     }
+    
+     /**
+     * Single point of entry for queries on Occupancy Periods
+     * As of Dec 2019 this is the first of the runQuery methods to implement
+     * the upgraded separation of concerns such that Integration classes ONLY
+     * see SearchParam objects and leave all the manipulation of Query objects
+     * to this Search Coordinator. 
+     * 
+     * Additionally, the runQuery methods in this class are responsible for
+     * interacting with the appropriate object Coordinators to retrieve and properly 
+     * configure any objects before injecting them into the Query objects and 
+     * returning them to the callers.
+     * 
+     * @param q an assembled QueryOccPeriod
+     * @return a reference to the same QueryOccPeriod instance passed in with the business
+     * objects returned from the integrator accessible via getResults()
+     * @throws com.tcvcog.tcvce.domain.SearchException
+     */
+    public QueryOccPeriod runQuery(QueryOccPeriod q) throws SearchException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        
+        if(q == null){ return null; }
+        
+        prepareQueryForRun(q);
+
+        List<SearchParamsOccPeriod> paramsList = q.getParmsList();
+        List<OccPeriod> periodListTemp = new ArrayList<>();
+        
+        for(SearchParamsOccPeriod sp: paramsList){
+            periodListTemp.clear();
+            for(Municipality muni: sp.getMuniList_val()){
+                sp.setMuni_val(muni);
+                for(Integer i: oi.searchForOccPeriods(sp)){
+                    try {
+                        periodListTemp.add(oc.getOccPeriod(i));
+                    } catch (IntegrationException ex) {
+                        System.out.println(ex);
+                        throw new SearchException("Integration exception when querying OccPeriods");
+                    }
+                }
+            }
+            q.addToResults(periodListTemp);
+        }
+        
+        postRunConfigureQuery(q);
+        
+        return q;
     }
     
+    
+    
+     /**
+      * Single point of entry for queries against the CECase table
+      * @param q search params with the credential set
+      * @return a Query subclass with results accessible via q.getResults
+      * @throws SearchException 
+      */
+     public QueryCECase runQuery(QueryCECase q) throws SearchException{
+        CaseIntegrator ci = getCaseIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(q == null){ return null; }
+        
+        prepareQueryForRun(q);
+
+        List<SearchParamsCECase> paramsList = q.getParmsList();
+        List<CECase> caseListTemp = new ArrayList<>();
+        
+        for(SearchParamsCECase params: paramsList){
+            caseListTemp.clear();
+            for(Municipality muni: params.getMuniList_val()){
+                try {
+                    // the integrator will only look at the single muni val, 
+                    // so we'll call searchForXXX once for each muni
+                    params.setMuni_val(muni);
+                    for(Integer i: ci.searchForCECases(params)){
+                        caseListTemp.add(cc.getCECase(i));
+                    }
+                } catch (IntegrationException | BObStatusException ex) {
+                    throw new SearchException("Exception during search: " + ex.toString());
+                }
+            }
+            // add each batch of OccPeriod objects from the SearchParam run to our
+            // ongoing list
+            q.addToResults(caseListTemp);
+        }
+        
+        postRunConfigureQuery(q);
+        
+        return q;
+     }
+     
     /**
      * Single point of entry for queries on Code Enforcement Requests
      * 
-     * @param query an assembled QueryCEAR
+     * @param q must be initialized
      * @return a reference to the same QueryCEAR instance passed in with the business
      * objects returned from the integrator accessible via getResults()
-     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
-     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
-     * @throws IntegrationException fatal error in the integration code
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public QueryCEAR runQuery(QueryCEAR query) throws AuthorizationException, IntegrationException{
-        query.clearResultList();
+    public QueryCEAR runQuery(QueryCEAR q) throws SearchException{
+        
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-//        if(query.getUser().getRole().getRank() > query.getQueryName().getUserRankMinimum() ){
-        //TODO: get this to actually work
-        if(query.getUser().getMyCredential().getGoverningAuthPeriod().getRole().getRank() >9999 ){
-            throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(q == null){
+            return null;
         }
         
-        if(query.getQueryName().logQueryRun()){
-            logRun(query);
+        prepareQueryForRun(q);
+
+        List<SearchParamsCEActionRequests> paramsList = q.getParmsList();
+        List<CEActionRequest> ceariListTemp = new ArrayList<>();
+        
+        for(SearchParamsCEActionRequests sp: paramsList){
+            ceariListTemp.clear();
+            for(Municipality muni: sp.getMuniList_val()){
+                sp.setMuni_val(muni);
+                try {
+                    for(Integer i: ceari.searchForCEActionRequests(sp)){
+                            ceariListTemp.add(cc.getCEActionRequest(i));
+                    }
+                } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                    throw new SearchException("Integration error when querying CEARS");
+                }
+            }
+            q.addToResults(ceariListTemp);
         }
-        return ceari.runQueryCEAR(query);
+        postRunConfigureQuery(q);
+        return q;
     }
     
-    public void logRun(Query q){
-        // TODO: write guts for query logging
+//    --------------------------------------------------------------------------
+//    ***************************** UTILITIES **********************************
+//    --------------------------------------------------------------------------
+    
+    
+    /**
+     * Container for consolidating calls to any methods that need to be run
+     * on a Query before passing it to an Integrator class
+     * @param q
+     * @throws SearchException 
+     */
+    private void prepareQueryForRun(Query q) throws SearchException{
+        q.clearResultList();
+        auditQueryBeforeRun(q);
+        
+    }
+    
+    
+    /**
+     * Security and authorization logic container -- throws exceptions for all errors
+     * Query must have a Credential object and the Credential must meet rank requirements
+     * for the Query
+     * 
+     * @param q happy to accept any subclass :)
+     */
+    private void auditQueryBeforeRun(Query q) throws SearchException{
+        if(q == null){
+            throw new SearchException("A null query object is not authorized for running");
+        }
+        if(q.getUserRankAccessMinimum() != null){
+            if( q.getCredential().getGoverningAuthPeriod().getRole().getRank() 
+                        < 
+                    q.getUserRankAccessMinimum().getRank()){
+
+                throw new SearchException("Credential below rank for running query");
+            }
+        }
+        auditSearchParams(q);
+        
+    }
+ 
+    /**
+     * Logic container for checking the configuration of any instance of the 
+     * SearchParams family of objects. Only throws exceptions for errors with
+     * useful error messages meant for the testing user. Normal query operations
+     * should not trigger an audit Exception since configXXX methods should 
+     * be doing their jobs
+     * 
+     * @param q
+     * @throws SearchException 
+     */
+    private void auditSearchParams(Query q) throws SearchException{
+        
+        UserCoordinator uc = getUserCoordinator();
+        
+        if(q == null){
+            throw new SearchException("Cannot audit null query");
+        }
+        
+        Credential cred = q.getCredential();
+        List<Municipality> muniSafeList = new ArrayList<>();
+        List<SearchParams> splst = new ArrayList<>();
+        
+        
+        
+        for (Iterator it = q.getParmsList().iterator(); it.hasNext();) {
+            SearchParams sp = (SearchParams) it.next();
+            // logic could be run here on SPs before adding them to the list to run
+            splst.add(sp);
+        }
+        
+        for(SearchParams sp: splst){
+            
+            if(sp.getMuniList_val() != null && sp.getMuniList_val().size() > 1){
+                if(q.getCredential().getGoverningAuthPeriod().getRole().getRank() < MIN_ROLETYPEFORMULTIMUNI_QUERY.getRank()){
+                    throw new SearchException(MIN_ROLETYPEFORMULTIMUNI_QUERY.getLabel() + " is required for muli-muni searching");
+                }
+                try {
+                    muniSafeList = uc.getUnauthorizedMunis(uc.getUser(cred.getGoverningAuthPeriod().getUserID()));
+                } catch (IntegrationException ex) {
+                    throw new SearchException("Could not load user associated with Credential; IntegrationException ");
+                }
+                for(Municipality m: sp.getMuniList_val()){
+                    if(!muniSafeList.contains(m)){
+                        throw new SearchException("Invalid attempt to search for objects in an unauthorized Muni");
+                    }
+                }
+            } else if( sp.getMuniList_val() != null && sp.getMuniList_val().size() == 1){
+                if(sp.getMuniList_val().get(0).getMuniCode() != q.getCredential().getGoverningAuthPeriod().getMuni().getMuniCode()){
+                    throw new SearchException("Requested muni for search does not match credential's governing auth period");
+                }
+            } else {
+                System.out.println("SearchCoordinator.auditSearchparams | adding cred muni" + q.getCredential().getGoverningAuthPeriod().getMuni().getMuniName());
+                sp.addMuni(q.getCredential().getGoverningAuthPeriod().getMuni());
+            }
+        }        
     }
     
     /**
-     * Factory method for Query subclass: QueryCEAR.
-     * 
-     * @param qName an instance of the Enum QueryCEAREnum which is used by a switch
-     * to grab the assigned SearchParams subclass
-     * @param u the requesting User
-     * @param m the requesting Municipality. NOTE: It's up to the CaseCoordinator
-     * to enforce access rules here
-     * @param params optional params. If this object is not null, the query will
-     * automatically become a custom query
-     * @return assembled instance ready for sending to runQuery
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * Called after a Query is passed to its respective integrator
+     * @param q 
      */
-    public QueryCEAR assembleQueryCEAR(QueryCEAREnum qName, UserAuthorized u, Municipality m, SearchParamsCEActionRequests params) throws IntegrationException{
-        QueryCEAR query;
-        List<SearchParamsCEActionRequests> paramList = new ArrayList<>();
+    private void postRunConfigureQuery(Query q){
+        q.setExecutionTimestamp(LocalDateTime.now());
+        logQueryRun(q);
         
-        if(params != null){
-            qName = QueryCEAREnum.CUSTOM;
-        }
-        
-        switch(qName){
-            case UNPROCESSED:
-                paramList.add(generateParams_CEAR_Unprocessed(m));
-                break;
-            case ATTACHED_TO_CECASE:
-                paramList.add(generateParams_CEAR_attachedToCase(m, 30));
-                break;
-            
-            case ALL_TODAY:
-                paramList.add(generateParams_CEAR_pastXDays(m, 1));
-                break;
-                
-            case ALL_PAST7DAYS:
-                paramList.add(generateParams_CEAR_pastXDays(m, 7));
-                break;
-                
-            case ALL_PAST30:
-                paramList.add(generateParams_CEAR_pastXDays(m, 30));
-                break;
-
-            case ALL_PASTYEAR:
-                paramList.add(generateParams_CEAR_pastXDays(m, 365));
-                break;
-                
-            case BY_CURRENT_USER:
-                paramList.add(generateParams_CEAR_Unprocessed(m));
-                break;
-                
-            case CUSTOM:
-                paramList.add(params);
-                break;
-                
-            default:
-                paramList.add(generateParams_CEAR_Unprocessed(m));
-        }
-        
-        query = new QueryCEAR(qName, m, paramList, u);
-        query.setExecutedByIntegrator(false);
-        return query;
     }
     
-    
-    
-    
-     public SearchParamsCEActionRequests generateParams_CEAR_Unprocessed(Municipality m) throws IntegrationException{
-            
-        CEActionRequestIntegrator cari = getcEActionRequestIntegrator();
-
-        SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
-
-        sps.setMuni(m);
-        LocalDateTime pastTenYears = LocalDateTime.now().minusYears(10);
-        sps.setStartDate(pastTenYears);
-        // action requests cannot have a time stamp past the current datetime
-        sps.setEndDate(LocalDateTime.now());
-        
-        sps.setLimitResultCountTo100(true);
-        sps.setUseAttachedToCase(false);
-        sps.setAttachedToCase(false);
-        sps.setUseMarkedUrgent(false);
-        sps.setUseNotAtAddress(false);
-        sps.setUseRequestStatus(true);
-        sps.setRequestStatus(cari.getRequestStatus(Integer.parseInt(
-                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestInitialStatusCode"))));
-        
-        return sps;
+    private void logQueryRun(Query q){
+        // TODO: write guts for query logging
     }
     
-     /**
-      * TODO : Finish!
-      * @param m
-      * @param u
-      * @return
-      * @throws IntegrationException 
-      */
-     public SearchParamsCEActionRequests generateParams_CEAR_RequestorCurrentU(Municipality m, User u) throws IntegrationException{
-            
-        CEActionRequestIntegrator cari = getcEActionRequestIntegrator();
-
-        SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
-
-        sps.setMuni(m);
-        LocalDateTime pastTenYears = LocalDateTime.now().minusDays(30);
-        // action requests cannot have a time stamp past the current datetime
-        sps.setEndDate(LocalDateTime.now());
+     
+    /**
+     * 
+     * @param q
+     * @param cred
+     * @return 
+     */
+    private Query initQueryFinalizeInit(Query q){
+       
         
-        sps.setLimitResultCountTo100(true);
-        sps.setUseAttachedToCase(false);
-        sps.setAttachedToCase(false);
-        sps.setUseMarkedUrgent(false);
-        sps.setUseNotAtAddress(false);
-        
-        
-        return sps;
+        return q;
     }
     
+//    --------------------------------------------------------------------------
+//    ***************************** INITIALIZERS *******************************
+//    --------------------------------------------------------------------------
     
     
-     public SearchParamsCEActionRequests generateParams_CEAR_pastXDays(Municipality m, int days){
-            
-        SearchCoordinator sc = getSearchCoordinator();
-
-        SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
-
-        sps.setMuni(m);
-        LocalDateTime pastxDays = LocalDateTime.now().minusDays(days);
-        sps.setStartDate(pastxDays);
-
-        // action requests cannot have a time stamp past the current datetime
-        sps.setEndDate(LocalDateTime.now());
-
-        sps.setUseAttachedToCase(false);
-        sps.setUseMarkedUrgent(false);
-        sps.setUseNotAtAddress(false);
-        sps.setUseRequestStatus(false);
-        
-        return sps;
-    }
-    
-    
-     public SearchParamsCEActionRequests generateParams_CEAR_attachedToCase(Municipality m, int days){
-            
-        SearchCoordinator sc = getSearchCoordinator();
-
-        SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
-
-        sps.setMuni(m);
-        LocalDateTime pastxDays = LocalDateTime.now().minusDays(days);
-        sps.setStartDate(pastxDays);
-
-        // action requests cannot have a time stamp past the current datetime
-        sps.setEndDate(LocalDateTime.now());
-
-        sps.setUseAttachedToCase(true);
-        sps.setAttachedToCase(true);
-        
-        sps.setUseMarkedUrgent(false);
-        sps.setUseNotAtAddress(false);
-        sps.setUseRequestStatus(false);
-        
-        return sps;
-    }
-    
-//    CODE ENFORCEMENT CASE QUERIES
-   
-     public QueryCECase getQueryInitialCECASE(Municipality m, UserAuthorized u){
-         return assembleQueryCECase(QueryCECaseEnum.OPENCASES, u, m, null);
+    public QueryProperty initQuery(QueryPropertyEnum qName, Credential cred){
+         QueryProperty  query;
+         List<SearchParamsProperty> paramsList = new ArrayList<>();
          
+         switch(qName){
+            case OPENCECASES_OCCPERIODSINPROCESS:
+                paramsList.add(genParam_property_active());
+                break;
+            case HOUSESTREETNUM:
+                paramsList.add(genParams_property_address());
+                break;
+            case CUSTOM:
+                break;
+         }
+         
+         query = new QueryProperty(qName, paramsList, cred);
+         return (QueryProperty) initQueryFinalizeInit(query);
+     }
+    
+    
+    
+    public QueryPerson initQuery(QueryPersonEnum qName, Credential cred){
+         QueryPerson  query;
+         List<SearchParamsPerson> paramsList = new ArrayList<>();
+         
+         switch(qName){
+            case ACTIVE_PERSONS:
+                paramsList.add(generateParams_persons_active());
+                break;
+            case USER_PERSONS:
+                paramsList.add(generateParams_persons_users());
+            case PROPERTY_PERSONS:
+                paramsList.add(generateParams_person_prop());
+            
+         }
+         query = new QueryPerson(qName, paramsList, cred);
+         return (QueryPerson) initQueryFinalizeInit(query);
      }
      
-     public List<QueryCECase> buildQueryCECaseList(Municipality m, UserAuthorized u){
-        QueryCECaseEnum[] nameArray = QueryCECaseEnum.values();
-        List<QueryCECase> queryList = new ArrayList<>();
-//        for(QueryCECaseEnum queryTitle: nameArray){
-//            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-//            queryList.add(assembleQueryCECase(queryTitle, u, m, null));
-//        }
-        queryList.add(assembleQueryCECase(QueryCECaseEnum.OPENCASES, u, m, null));
-        return queryList;
+    
+     public QueryEvent initQuery(QueryEventEnum qName, Credential cred){
+         QueryEvent query;
+         List<SearchParamsEvent> paramsList = new ArrayList<>();
+         
+         switch(qName){
+             case REQUESTED_ACTIONS:
+                paramsList.add(getSearchParamsEventsRequiringAction());
+                break;
+             case MUNICODEOFFICER_ACTIVITY_PAST30DAYS:
+                 paramsList.add(getSearchParamsOfficerActivity());
+                 break;
+             case COMPLIANCE_EVENTS:
+                 paramsList.add(getSearchParamsComplianceEvPastMonth());
+                 break;
+            case CUSTOM:
+                break;
+            default:
+         }
+         
+         query = new QueryEvent(qName, paramsList, cred);
+         return (QueryEvent) initQueryFinalizeInit(query);
      }
      
-     public QueryCECase runQuery(QueryCECase query) throws IntegrationException, CaseLifecycleException{
-         query.clearResultList();
-         CaseIntegrator ci = getCaseIntegrator();
-         if(query.getQueryName().logQueryRun()){
-            logRun(query);
-        }
-        return ci.runQueryCECase(query);
-     }
+    
      
-     public QueryCECase assembleQueryCECase(QueryCECaseEnum qName, UserAuthorized u, Municipality m, SearchParamsCECase params){
+     
+    
+    public QueryOccPeriod initQuery(QueryOccPeriodEnum qName, Credential cred){
+         QueryOccPeriod  query;
+         List<SearchParamsOccPeriod> paramsList = new ArrayList<>();
+         
+         switch(qName){
+            
+            case ALL_PERIODS_IN_MUNI:
+                 
+            case AUTHWORKINPROGRESS:
+                paramsList.add(generateParams_occPeriod_wip());
+                break;
+            case RENTAL_ALL:
+                break;
+            case RENTAL_REGISTERED:
+                break;
+            case RENTAL_UNREGISTERED:
+                break;
+            
+         }
+         query = new QueryOccPeriod(qName, paramsList, null);
+         return (QueryOccPeriod) initQueryFinalizeInit(query);
+     }
+ 
+    
+     public QueryCECase initQuery(QueryCECaseEnum qName, Credential cred){
          QueryCECase query;
          List<SearchParamsCECase> paramsList = new ArrayList<>();
          
-         if(params != null){
-             qName = QueryCECaseEnum.CUSTOM;
-         }
-         
          switch(qName){
             case OPENCASES:
-                paramsList.add(getDefaultSearchParams_CECase_allOpen(m));
+                paramsList.add(getDefaultSearchParams_CECase_allOpen());
                  break;
             case EXPIRED_TIMEFRAMES:
                 break;
@@ -332,7 +554,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case OPENED_30DAYS:
                 break;
             case CLOSED_30DAYS:
-                paramsList.add(getSearchParams_CECase_closedPast30Days(m));
+                paramsList.add(getSearchParams_CECase_closedPast30Days());
                 break;
             case UNRESOLVED_CITATIONS:
                 break;
@@ -345,12 +567,489 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             default:
          }
          
-         query = new QueryCECase(qName, m, paramsList, u);
-         query.setExecutedByIntegrator(false);
-         return query;
+         query = new QueryCECase(qName, paramsList, cred);
+         return (QueryCECase) initQueryFinalizeInit(query);
      }
      
      
+    
+     /**
+     * Factory method for Query subclass: QueryCEAR.
+     * 
+     * @param qName an instance of the Enum QueryCEAREnum which is used by a switch
+     * to grab the assigned SearchParams subclass
+     * @param cred
+     * @return assembled instance ready for sending to runQuery
+     */
+    public QueryCEAR initQuery(QueryCEAREnum qName, Credential cred) {
+            QueryCEAR query = null;
+            List<SearchParamsCEActionRequests> paramList = new ArrayList<>();
+            
+        try {
+            switch(qName){
+                case UNPROCESSED:
+                    paramList.add(generateParams_CEAR_Unprocessed());
+                    break;
+                case ATTACHED_TO_CECASE:
+                    paramList.add(generateParams_CEAR_attachedToCase(30));
+                    break;
+                    
+                case ALL_TODAY:
+                    paramList.add(generateParams_CEAR_pastXDays(1));
+                    break;
+                    
+                case ALL_PAST7DAYS:
+                    paramList.add(generateParams_CEAR_pastXDays(7));
+                    break;
+                    
+                case ALL_PAST30:
+                    paramList.add(generateParams_CEAR_pastXDays(30));
+                    break;
+                    
+                case ALL_PASTYEAR:
+                    paramList.add(generateParams_CEAR_pastXDays(365));
+                    break;
+                    
+                case BY_CURRENT_USER:
+                    paramList.add(generateParams_CEAR_Unprocessed());
+                    break;
+                    
+                case CUSTOM:
+                    break;
+                    
+                default:
+                    paramList.add(generateParams_CEAR_Unprocessed());
+            }
+            
+            query = new QueryCEAR(qName, paramList, null);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return (QueryCEAR) initQueryFinalizeInit(query);
+    }
+    
+    
+    
+//    --------------------------------------------------------------------------
+//    ***************************** QUERY LIST BUILDERS ************************
+//    --------------------------------------------------------------------------
+    
+        
+    /**
+     * Logic container to check if a Query from the main set can be added to a 
+     * particular User's list of possible queries
+     * 
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private boolean checkAuthorizationToAddQueryToList(IFace_RankLowerBounded params, Credential cred){
+        boolean isAuthToAdd = false;
+        
+        if(params.getRequiredRoleMin().getRank() <= cred.getGoverningAuthPeriod().getRole().getRank()){
+            isAuthToAdd = true;
+        }
+        
+        return isAuthToAdd;
+        
+    }
+    
+    
+    /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<QueryProperty> buildQueryPropertyList(Credential cred) throws IntegrationException{
+        QueryPropertyEnum[] nameArray = QueryPropertyEnum.values();
+        List<QueryProperty> queryList = new ArrayList<>();
+       
+        for(QueryPropertyEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        
+        return queryList;
+    }
+    
+    
+    /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @return
+     * @throws IntegrationException 
+     */
+     public List<QueryPerson> buildQueryPersonList(Credential cred) throws IntegrationException{
+        QueryPersonEnum[] nameArray = QueryPersonEnum.values();
+        List<QueryPerson> queryList = new ArrayList<>();
+        for(QueryPersonEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        return queryList;
+    }
+    
+     /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @return 
+     */
+    public List<QueryEvent> buildQueryEventList(Credential cred){
+        QueryEventEnum[] nameArray = QueryEventEnum.values();
+        List<QueryEvent> queryList = new ArrayList<>();
+        for(QueryEventEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        return queryList;
+    }
+      
+    
+    /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @param m
+     * @return 
+     */
+    public List<QueryOccPeriod> buildQueryOccPeriodList(Credential cred){
+        QueryOccPeriodEnum[] nameArray = QueryOccPeriodEnum.values();
+        List<QueryOccPeriod> queryList = new ArrayList<>();
+        for(QueryOccPeriodEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+               queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        return queryList;
+    }
+    
+
+    /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @return 
+     */
+     public List<QueryCECase> buildQueryCECaseList(Credential cred){
+        QueryCECaseEnum[] nameArray = QueryCECaseEnum.values();
+        List<QueryCECase> queryList = new ArrayList<>();
+        for(QueryCECaseEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        return queryList;
+     }
+     
+    
+    /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @return each existing CEAR Query capable of being passed into runQuery()
+     */
+    public List<QueryCEAR> buildQueryCEARList(Credential cred){
+        QueryCEAREnum[] nameArray = QueryCEAREnum.values();
+        List<QueryCEAR> queryList = new ArrayList<>();
+        for(QueryCEAREnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        return queryList;
+    }
+    
+    
+//    --------------------------------------------------------------------------
+//    ***************************** PARAM GENERATORS ***************************
+//    --------------------------------------------------------------------------
+    
+    
+    /* --------------------------------------------
+                     III. Property
+       -------------------------------------------- */
+    
+     
+    
+    
+    private SearchParamsProperty genParams_property_address(){
+        SearchParamsProperty params = new SearchParamsProperty();
+        
+        params.setSearchName("Search by house number and street name");
+        params.setSearchDescription("Standard search");
+        
+        params.setMuni_ctl(true);
+        params.setAddress_ctl(true);
+        params.setDate_startEnd_ctl(false);
+        params.setDate_relativeDates_ctl(false);
+        
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+
+        return params;
+        
+    }
+    
+    private SearchParamsProperty genParam_property_active(){
+        SearchParamsProperty params = new SearchParamsProperty();
+        
+        params.setSearchName("Properties updated in the past month");
+        params.setSearchDescription("Applies to properties with any field updated");
+        
+        params.setMuni_ctl(true);
+        
+        params.setDate_startEnd_ctl(true);
+        params.setDate_relativeDates_ctl(true);
+        params.setDate_field_val(SearchParamsPropertyDateFields.LAST_UPDATED);
+        params.setDate_relativeDates_start_val(-30);
+        params.setDate_realtiveDates_end_val(0);
+        
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+
+        return params;
+        
+    }
+
+
+
+    
+    protected SearchParamsProperty getSearchParamsSkeletonProperties(){
+        SearchParamsProperty propParams = new SearchParamsProperty();
+        // superclass
+        propParams.setDate_startEnd_ctl(false);
+        propParams.setBobID_ctl(false);
+        propParams.setLimitResultCount_ctl(true);
+        
+        // subclass SearchParamsProperty
+        propParams.setLotblock_ctl(false);
+        propParams.setParcelid_ctl(false);
+        propParams.setAddress_ctl(true);
+
+        
+        return propParams;
+    }
+    
+    // END V PROPERTY
+    
+    
+    /* --------------------------------------------
+                    IV. Person
+       -------------------------------------------- */
+   
+    
+    private SearchParamsPerson generateParams_persons_active(){
+        SearchParamsPerson params = new SearchParamsPerson();
+        
+        params.setSearchName("Public person types");
+        params.setSearchDescription("All persons declared to be public");
+        
+        params.setPersonType_ctl(true);
+        List<PersonType> pList = new ArrayList<>();
+        pList.add(PersonType.Public);
+        params.setPersonType_val(pList);
+        
+         return params;
+        
+    }
+    
+    private SearchParamsPerson generateParams_persons_users(){
+        SearchParamsPerson params = new SearchParamsPerson();
+        params.setSearchName("User Persons");
+        params.setSearchDescription("Persons whose type is a User");
+        
+        params.setPersonType_ctl(true);
+        List<PersonType> pList = new ArrayList<>();
+        pList.add(PersonType.User);
+        params.setPersonType_val(pList);
+        
+        return params;
+    }
+    
+    private SearchParamsPerson generateParams_person_prop(){
+        SearchParamsPerson params = new SearchParamsPerson();
+        params.setSearchName("Persons at property X");
+        params.setSearchDescription("Across all units");
+        
+        // TODO Finish this query
+        
+        return params;
+        
+        
+        
+    }
+   
+    // END IV PERSON
+    
+    /* --------------------------------------------
+                    V. Event
+       -------------------------------------------- */
+    
+    
+       
+    public SearchParamsEvent getSearchParamsEventsRequiringAction(){
+        EventCoordinator ec = getEventCoordinator();
+        
+        // event types are always bundled in an EventCategory
+        // so in this case of this query, we don't care about the Category title,
+        // only the type
+        EventCategory timelineEventTypeCategory = ec.initEventCategory();
+        timelineEventTypeCategory.setEventType(EventType.Timeline);
+        
+        SearchParamsEvent eventParams = new SearchParamsEvent();
+        
+        eventParams.setMuni_ctl(true);
+        eventParams.setDate_startEnd_ctl(false);
+        eventParams.setBobID_ctl(false);
+        eventParams.setLimitResultCount_ctl(true);
+        
+        eventParams.setFilterByEventCategory(false);
+        eventParams.setFilterByEventType(false);
+        
+        eventParams.setFilterByCaseID(false);
+        
+        eventParams.setFilterByEventOwner(false);
+        
+        eventParams.setActive_ctl(true);
+        eventParams.setIsActive(true);
+        
+        eventParams.setFilterByPerson(false);
+        eventParams.setUseRespondedAtDateRange(false);
+        
+        eventParams.setFilterByHidden(false);
+        
+        return eventParams;
+    }
+    
+    public SearchParamsEvent getSearchParamsOfficerActivity(){
+        // event types are always bundled in an EventCategory
+        // so in this case of this query, we don't care about the Category title,
+        // only the type
+        
+        SearchParamsEvent eventParams = new SearchParamsEvent();
+        
+        eventParams.setMuni_ctl(true);
+        
+        eventParams.setDate_startEnd_ctl(true);
+        eventParams.setDate_relativeDates_ctl(true);
+        
+        eventParams.setApplyDateSearchToDateOfRecord(true);
+        // query from a week ago to now
+        eventParams.setDate_relativeDates_start_val(-30);
+        eventParams.setDate_realtiveDates_end_val(0);
+        
+        eventParams.setBobID_ctl(false);
+        eventParams.setLimitResultCount_ctl(true);
+        
+        eventParams.setFilterByEventCategory(false);
+        eventParams.setFilterByEventType(false);
+        
+        eventParams.setFilterByCaseID(false);
+        
+        eventParams.setFilterByEventOwner(true);
+        
+        eventParams.setActive_ctl(true);
+        eventParams.setIsActive(true);
+        
+        eventParams.setFilterByPerson(false);
+        eventParams.setUseRespondedAtDateRange(false);
+        
+        eventParams.setFilterByHidden(false);
+        
+        return eventParams;
+    }
+    
+    
+    public SearchParamsEvent getSearchParamsComplianceEvPastMonth(){
+        EventCoordinator ec = getEventCoordinator();
+        
+        // event types are always bundled in an EventCategory
+        // so in this case of this query, we don't care about the Category title,
+        // only the type
+        EventCategory complianceEventCategory = ec.initEventCategory();
+        complianceEventCategory.setEventType(EventType.Compliance);
+        
+        SearchParamsEvent eventParams = new SearchParamsEvent();
+        
+        eventParams.setMuni_ctl(true);
+        eventParams.setDate_startEnd_ctl(true);
+        eventParams.setDate_relativeDates_ctl(true);
+        eventParams.setApplyDateSearchToDateOfRecord(true);
+        // query from a week ago to now
+        eventParams.setDate_relativeDates_start_val(-400);
+        eventParams.setDate_realtiveDates_end_val(0);
+        
+        eventParams.setBobID_ctl(false);
+        eventParams.setLimitResultCount_ctl(true);
+        
+        eventParams.setFilterByEventCategory(false);
+        eventParams.setFilterByEventType(true);
+        eventParams.setEvtType(EventType.Compliance);
+        
+        eventParams.setFilterByCaseID(false);
+        
+        eventParams.setFilterByEventOwner(false);
+        
+        eventParams.setActive_ctl(true);
+        eventParams.setIsActive(true);
+        
+        eventParams.setFilterByPerson(false);
+        eventParams.setUseRespondedAtDateRange(false);
+        
+        eventParams.setFilterByHidden(false);
+        
+        return eventParams;
+    }
+    
+    // END V EVENT
+    
+    /* --------------------------------------------
+                   VI. OccPeriod
+       -------------------------------------------- */
+    private SearchParamsOccPeriod generateParams_occPeriod_wip(){
+        SearchParamsOccPeriod params = new SearchParamsOccPeriod();
+        
+        params.setSearchName("Periods with outstanding inspections");
+        params.setSearchDescription("Inspections have been started by not certified as passed");
+        
+        params.setInspectionPassed_filterBy(true);
+        params.setInspectionPassed_switch_passedInspection(false);
+        
+        return params;
+        
+    }
+    
+    
+    private SearchParamsOccPeriod generateParams_occPeriod(){
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        SearchParamsOccPeriod params = new SearchParamsOccPeriod();
+        
+        params.setSearchName("All periods in credentialed muni");
+        params.setSearchDescription("All periods regardless of status");
+        
+        params.setInspectionPassed_filterBy(false);
+        params.setInspectionPassed_switch_passedInspection(false);
+        
+        return params;
+        
+    }
+   
+    // END VI OccPeriod
+    
+    
+    /* --------------------------------------------
+                     VII. CECase
+       -------------------------------------------- */
+    
     
     /**
      * Returns a SearchParams subclass for retrieving all open
@@ -360,14 +1059,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECase getDefaultSearchParams_CECase_allOpen(Municipality m){
+    public SearchParamsCECase getDefaultSearchParams_CECase_allOpen(){
         SearchParamsCECase params = new SearchParamsCECase();
         
         // superclass 
-        params.setFilterByMuni(true);
-        params.setMuni(m);
-        params.setFilterByObjectID(false);
-        params.setLimitResultCountTo100(true);
+        params.setMuni_ctl(true);
+        params.setBobID_ctl(false);
+        params.setLimitResultCount_ctl(true);
         
         // subclass specific
         params.setUseIsOpen(true);
@@ -393,15 +1091,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECase getSearchParams_CECase_closedPast30Days (Municipality m){
+    public SearchParamsCECase getSearchParams_CECase_closedPast30Days(){
         SearchParamsCECase params = new SearchParamsCECase();
         params.setSearchName("CECases");
         
         // superclass 
-        params.setFilterByMuni(true);
-        params.setMuni(m);
-        params.setFilterByObjectID(false);
-        params.setLimitResultCountTo100(true);
+        params.setMuni_ctl(true);
+        params.setBobID_ctl(false);
+        params.setLimitResultCount_ctl(true);
         
         // subclass specific
         params.setUseIsOpen(false);
@@ -411,8 +1108,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         LocalDateTime pastXDays = LocalDateTime.now().minusDays(30);
         
-        params.setStartDate(pastXDays);
-        params.setEndDate(LocalDateTime.now());
+        params.setDate_start_val(pastXDays);
+        params.setDate_end_val(LocalDateTime.now());
         
         params.setUseCasePhase(false);
         params.setUseCaseStage(false);
@@ -424,455 +1121,109 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
    
+    // END VII CECase
     
-    protected SearchParamsProperty getSearchParamsSkeletonProperties(){
-        SearchParamsProperty propParams = new SearchParamsProperty();
-        // superclass
-        propParams.setFilterByStartEndDate(false);
-        propParams.setFilterByObjectID(false);
-        propParams.setLimitResultCountTo100(true);
-        
-        // subclass SearchParamsProperty
-        propParams.setFilterByLotAndBlock(false);
-        propParams.setFilterByParcelID(false);
-        propParams.setFilterByAddressPart(true);
-
-        
-        return propParams;
-    }
+    /* --------------------------------------------
+                  VIII. CEActionRequest
+       -------------------------------------------- */
     
     
-    // CODE ENFORCEMENT EVENTS
-    
-     public QueryEventCECase getQueryInitialEventCECASE(Municipality m, UserAuthorized u){
-         return assembleQueryEventCECase(QueryEventCECaseEnum.REQUESTED_ACTIONS, u, m, null);
-         
-     }
-     
-     public List<QueryEventCECase> buildQueryEventCECaseList(Municipality m, UserAuthorized u){
-        QueryEventCECaseEnum[] nameArray = QueryEventCECaseEnum.values();
-        List<QueryEventCECase> queryList = new ArrayList<>();
-        for(QueryEventCECaseEnum queryTitle: nameArray){
-            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(assembleQueryEventCECase(queryTitle, u, m, null));
-        }
-
-        return queryList;
-         
-     }
-     
-     public QueryEventCECase runQuery(QueryEventCECase query) throws IntegrationException, CaseLifecycleException{
-         EventIntegrator ei = getEventIntegrator();
-         query.clearResultList();
-         
-         if(query.getQueryName().logQueryRun()){
-            logRun(query);
-        }
-        return ei.runQueryEventCECase(query);
-     }
-     
-     public QueryEventCECase assembleQueryEventCECase(QueryEventCECaseEnum qName, UserAuthorized u, Municipality m, SearchParamsEventCECase params){
-         QueryEventCECase query;
-         List<SearchParamsEventCECase> paramsList = new ArrayList<>();
-         
-         if(params != null){
-             qName = QueryEventCECaseEnum.CUSTOM;
-         }
-         
-         switch(qName){
-             case REQUESTED_ACTIONS:
-                paramsList.add(getSearchParamsEventsRequiringAction(u, m));
-                break;
-             case MUNICODEOFFICER_ACTIVITY_PAST30DAYS:
-                 paramsList.add(getSearchParamsOfficerActivity(u, m));
-                 break;
-             case COMPLIANCE_EVENTS:
-                 paramsList.add(getSearchParamsComplianceEvPastMonth(m));
-                 break;
-            case CUSTOM:
-                paramsList.add(params);
-                break;
-            default:
-         }
-         
-         query = new QueryEventCECase(qName, m, u, paramsList);
-         query.setExecutedByIntegrator(false);
-         return query;
-     }
-    
-    /**
-     * First gen queries. Replaced by the rest of this class
-     * 
-     * @deprecated 
-     * @param u
-     * @param m
-     * @return 
-     */
-    public List<Query> getEventQueryList(User u, Municipality m){
-        List<Query> queryList = new ArrayList<>();
-//        
-//        QueryEventCECase eq = new QueryEventCECase("Compliance follow-up events: Today", m);
-//        eq.setEventSearchParams(getSearchParamsEventsRequiringAction(u, m));
-//        queryList.add(eq);
-//        
-//        eq = new QueryEventCECase("Officer Activity Report", m);
-//        eq.setEventSearchParams(getSearchParamsOfficerActivity(u, m));
-//        queryList.add(eq);
-//        
-//        
-//        eq = new QueryEventCECase("Compliance events: Past Month", m);
-//        eq.setEventSearchParams(getSearchParamsComplianceEvPastMonth(m));
-//        queryList.add(eq);
-        
-        return queryList;
-    }
-    
-    public SearchParamsEventCECase getSearchParamsEventsRequiringAction(User u, Municipality muni){
-        EventCoordinator ec = getEventCoordinator();
-        
-        // event types are always bundled in an EventCategory
-        // so in this case of this query, we don't care about the Category title,
-        // only the type
-        EventCategory timelineEventTypeCategory = ec.getInitializedEventCateogry();
-        timelineEventTypeCategory.setEventType(EventType.Timeline);
-        
-        SearchParamsEventCECase eventParams = new SearchParamsEventCECase();
-        
-        eventParams.setFilterByMuni(true);
-        eventParams.setMuni(muni);
-        eventParams.setFilterByStartEndDate(false);
-        eventParams.setFilterByObjectID(false);
-        eventParams.setLimitResultCountTo100(true);
-        
-        eventParams.setFilterByEventCategory(false);
-        eventParams.setFilterByEventType(false);
-        
-        eventParams.setFilterByCaseID(false);
-        
-        eventParams.setFilterByEventOwner(false);
-        eventParams.setOwnerUserID(u);
-        
-        eventParams.setActive_filterBy(true);
-        eventParams.setIsActive(true);
-        
-        eventParams.setFilterByPerson(false);
-        eventParams.setUseRespondedAtDateRange(false);
-        
-        eventParams.setFilterByHidden(false);
-        
-        return eventParams;
-    }
-    
-    public SearchParamsEventCECase getSearchParamsOfficerActivity(User u, Municipality m){
-        // event types are always bundled in an EventCategory
-        // so in this case of this query, we don't care about the Category title,
-        // only the type
-        
-        SearchParamsEventCECase eventParams = new SearchParamsEventCECase();
-        
-        eventParams.setFilterByMuni(true);
-        eventParams.setMuni(m);
-        
-        eventParams.setFilterByStartEndDate(true);
-        eventParams.setUseRelativeDates(true);
-        
-        eventParams.setApplyDateSearchToDateOfRecord(true);
-        // query from a week ago to now
-        eventParams.setStartDateRelativeDays(-30);
-        eventParams.setEndDateRelativeDays(0);
-        
-        eventParams.setFilterByObjectID(false);
-        eventParams.setLimitResultCountTo100(true);
-        
-        eventParams.setFilterByEventCategory(false);
-        eventParams.setFilterByEventType(false);
-        
-        eventParams.setFilterByCaseID(false);
-        
-        eventParams.setFilterByEventOwner(true);
-        eventParams.setOwnerUserID(u);
-        
-        eventParams.setActive_filterBy(true);
-        eventParams.setIsActive(true);
-        
-        eventParams.setFilterByPerson(false);
-        eventParams.setUseRespondedAtDateRange(false);
-        
-        eventParams.setFilterByHidden(false);
-        
-        return eventParams;
-    }
-    
-    
-    public SearchParamsEventCECase getSearchParamsComplianceEvPastMonth(Municipality m){
-        EventCoordinator ec = getEventCoordinator();
-        
-        // event types are always bundled in an EventCategory
-        // so in this case of this query, we don't care about the Category title,
-        // only the type
-        EventCategory complianceEventCategory = ec.getInitializedEventCateogry();
-        complianceEventCategory.setEventType(EventType.Compliance);
-        
-        SearchParamsEventCECase eventParams = new SearchParamsEventCECase();
-        
-        eventParams.setFilterByMuni(true);
-        eventParams.setMuni(m);
-        eventParams.setFilterByStartEndDate(true);
-        eventParams.setUseRelativeDates(true);
-        eventParams.setApplyDateSearchToDateOfRecord(true);
-        // query from a week ago to now
-        eventParams.setStartDateRelativeDays(-400);
-        eventParams.setEndDateRelativeDays(0);
-        
-        eventParams.setFilterByObjectID(false);
-        eventParams.setLimitResultCountTo100(true);
-        
-        eventParams.setFilterByEventCategory(false);
-        eventParams.setFilterByEventType(true);
-        eventParams.setEvtType(EventType.Compliance);
-        
-        eventParams.setFilterByCaseID(false);
-        
-        eventParams.setFilterByEventOwner(false);
-        
-        eventParams.setActive_filterBy(true);
-        eventParams.setIsActive(true);
-        
-        eventParams.setFilterByPerson(false);
-        eventParams.setUseRespondedAtDateRange(false);
-        
-        eventParams.setFilterByHidden(false);
-        
-        return eventParams;
-    }
-
-    
-    public QueryOccPeriod assembleQueryOccPeriod(QueryOccPeriodEnum qName, UserAuthorized u, Municipality m, SearchParamsOccPeriod params){
-         QueryOccPeriod  query;
-         List<SearchParamsOccPeriod> paramsList = new ArrayList<>();
-         
-         if(params != null){
-             qName = QueryOccPeriodEnum.CUSTOM;
-         }
-         
-         switch(qName){
-            case AUTHWORKINPROGRESS:
-                paramsList.add(generateParams_occPeriod_wip(m));
-                break;
-            case RENTAL_ALL:
-                break;
-            case RENTAL_REGISTERED:
-                break;
-            case RENTAL_UNREGISTERED:
-                break;
+     /**
+      * TODO : Finish!
+      * @param m
+      * @param u
+      * @return
+      * @throws IntegrationException 
+      */
+     public SearchParamsCEActionRequests generateParams_CEAR_RequestorCurrentU(User u) throws IntegrationException{
             
-         }
-         query = new QueryOccPeriod(qName, m, paramsList, u);
-         query.setExecutedByIntegrator(false);
-         return query;
-     }
-    
-    private SearchParamsOccPeriod generateParams_occPeriod_wip(Municipality m){
-        SearchParamsOccPeriod params = new SearchParamsOccPeriod();
-        
-        params.setSearchName("Periods with outstanding inspections");
-        params.setSearchDescription("Inspections have been started by not certified as passed");
-        
-        params.setInspectionPassed_filterBy(true);
-        params.setInspectionPassed_switch_passedInspection(false);
-        
-        return params;
-        
-    }
-    
-    public List<QueryOccPeriod> buildQueryOccPeriodList(UserAuthorized u, Municipality m) throws IntegrationException{
-        QueryOccPeriodEnum[] nameArray = QueryOccPeriodEnum.values();
-        List<QueryOccPeriod> queryList = new ArrayList<>();
-        for(QueryOccPeriodEnum queryTitle: nameArray){
-            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(assembleQueryOccPeriod(queryTitle, u, m, null));
-        }
-        return queryList;
-    }
-    
-    /**
-     * Single point of entry for queries on Occupancy Periods
-     * 
-     * @param query an assembled QueryOccPeriod
-     * @param u
-     * @return a reference to the same QueryOccPeriod instance passed in with the business
-     * objects returned from the integrator accessible via getResults()
-     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
-     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
-     * @throws IntegrationException fatal error in the integration code
-     */
-    public QueryOccPeriod runQuery(QueryOccPeriod query, UserAuthorized u) throws AuthorizationException, IntegrationException, EventException{
-        QueryOccPeriod qop = null;
-        query.clearResultList();
-        OccupancyIntegrator oi = getOccupancyIntegrator();
-//        if(query.getUser().getRole().getRank() > query.getQueryName().getUserRankMinimum() ){
-        //TODO: get this to actually work
-        if(query.getUser().getMyCredential().getGoverningAuthPeriod().getRole().getRank() < query.getUserRankAccessMinimum().getRank() ){
-            throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
-        }
-        
-        if(query.getQueryName().logQueryRun()){
-            logRun(query);
-        }
-        try {
-            qop = oi.runQueryOccPeriod(query, u);
-        } catch (CaseLifecycleException | ViolationException ex) {
-            System.out.println(ex);
-        }
-        
-        return qop;
-    }
-    
-    
-    public QueryPerson assembleQueryPerson(QueryPersonEnum qName, UserAuthorized u, Municipality m, SearchParamsPerson params){
-         QueryPerson  query;
-         List<SearchParamsPerson> paramsList = new ArrayList<>();
-         
-         if(params != null){
-             qName = QueryPersonEnum.CUSTOM;
-         }
-         
-         switch(qName){
-            case ACTIVE_PERSONS:
-                paramsList.add(generateParams_persons_active(m));
-                break;
-            
-         }
-         query = new QueryPerson(qName, m, paramsList, u);
-         query.setExecutedByIntegrator(false);
-         return query;
-     }
-    
-    private SearchParamsPerson generateParams_persons_active(Municipality m){
-        SearchParamsPerson params = new SearchParamsPerson();
-        
-        params.setSearchName("Public person types");
-        params.setSearchDescription("All persons declared to be public");
-        
-        params.setFilterByPersonTypes(true);
-        List<PersonType> pList = new ArrayList<>();
-        pList.add(PersonType.Public);
-        params.setPersonTypes(pList);
-        
-        return params;
-        
-    }
-    
-    public List<QueryPerson> buildQueryPersonList(UserAuthorized u, Municipality m) throws IntegrationException{
-        QueryPersonEnum[] nameArray = QueryPersonEnum.values();
-        List<QueryPerson> queryList = new ArrayList<>();
-        for(QueryPersonEnum queryTitle: nameArray){
-            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(assembleQueryPerson(queryTitle, u, m, null));
-        }
-        return queryList;
-    }
-    
-    /**
-     * Single point of entry for queries on Person objects
-     * 
-     * @param query an assembled QueryOccPeriod
-     * @return a reference to the same QueryOccPeriod instance passed in with the business
-     * objects returned from the integrator accessible via getResults()
-     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
-     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
-     * @throws IntegrationException fatal error in the integration code
-     */
-    public QueryPerson runQuery(QueryPerson query) throws AuthorizationException, IntegrationException{
-        query.clearResultList();
-        PersonIntegrator pi = getPersonIntegrator();
-        if(query.getUser().getMyCredential().getGoverningAuthPeriod().getRole().getRank() < query.getUserRankAccessMinimum().getRank() ){
-            throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
-        }
-        
-        if(query.getQueryName().logQueryRun()){
-            logRun(query);
-        }
-        return pi.runQueryPerson(query);
-    }
-    
-     
-    public QueryProperty assembleQueryProperty(QueryPropertyEnum qName, UserAuthorized u, Municipality m, SearchParamsProperty params){
-         QueryProperty  query;
-         List<SearchParamsProperty> paramsList = new ArrayList<>();
-         
-         if(params != null){
-             qName = QueryPropertyEnum.CUSTOM;
-         }
-         
-         switch(qName){
-            case OPENCECASES_OCCPERIODSINPROCESS:
-                paramsList.add(generateParams_property_active(m));
-                break;
-            case CUSTOM:
-                paramsList.add(params);
-                break;
-            
-         }
-         query = new QueryProperty(qName, m, paramsList, u);
-         query.setExecutedByIntegrator(false);
-         return query;
-     }
-    
-    private SearchParamsProperty generateParams_property_active(Municipality m){
-        SearchParamsProperty params = new SearchParamsProperty();
-        
-        params.setSearchName("Properties updated in the past month");
-        params.setSearchDescription("Applies to properties with any field updated");
-        
-        params.setFilterByMuni(true);
-        params.setMuni(m);
-        
-        params.setFilterByStartEndDate(true);
-        params.setUseRelativeDates(true);
-        params.setDateField(SearchParamsPropertyDateFields.LAST_UPDATED);
-        params.setStartDateRelativeDays(-30);
-        params.setEndDateRelativeDays(0);
-        
-        params.setActive_filterBy(true);
-        params.setActive(true);
-        
+        CEActionRequestIntegrator cari = getcEActionRequestIntegrator();
 
-        return params;
+        SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
+
+        LocalDateTime pastTenYears = LocalDateTime.now().minusDays(30);
+        // action requests cannot have a time stamp past the current datetime
+        sps.setDate_end_val(LocalDateTime.now());
         
-    }
-    
-    public List<QueryProperty> buildQueryPropertyList(UserAuthorized u, Municipality m) throws IntegrationException{
-        QueryPropertyEnum[] nameArray = QueryPropertyEnum.values();
-        List<QueryProperty> queryList = new ArrayList<>();
-        for(QueryPropertyEnum queryTitle: nameArray){
-            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(assembleQueryProperty(queryTitle, u, m, null));
-        }
-        return queryList;
-    }
-    
-    /**
-     * Single point of entry for queries on Property objects
-     * 
-     * @param query an assembled QueryOccPeriod
-     * @return a reference to the same QueryOccPeriod instance passed in with the business
-     * objects returned from the integrator accessible via getResults()
-     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
-     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
-     * @throws IntegrationException fatal error in the integration code
-     */
-    public QueryProperty runQuery(QueryProperty query) throws AuthorizationException, IntegrationException{
-        query.clearResultList();
-        PropertyIntegrator pi = getPropertyIntegrator();
-        if(query.getUser().getMyCredential().getGoverningAuthPeriod().getRole().getRank() < query.getUserRankAccessMinimum().getRank() ){
-            throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
-        }
+        sps.setLimitResultCount_ctl(true);
+        sps.setUseAttachedToCase(false);
+        sps.setAttachedToCase(false);
+        sps.setUseMarkedUrgent(false);
+        sps.setUseNotAtAddress(false);
         
-        if(query.getQueryName().logQueryRun()){
-            logRun(query);
-        }
-        return pi.runQueryProperties(query);
+        
+        return sps;
     }
     
+    
+     public SearchParamsCEActionRequests generateParams_CEAR_Unprocessed() throws IntegrationException{
+            
+        CEActionRequestIntegrator cari = getcEActionRequestIntegrator();
+
+        SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
+
+        LocalDateTime pastTenYears = LocalDateTime.now().minusYears(10);
+        sps.setDate_start_val(pastTenYears);
+        // action requests cannot have a time stamp past the current datetime
+        sps.setDate_end_val(LocalDateTime.now());
+        
+        sps.setLimitResultCount_ctl(true);
+        sps.setUseAttachedToCase(false);
+        sps.setAttachedToCase(false);
+        sps.setUseMarkedUrgent(false);
+        sps.setUseNotAtAddress(false);
+        sps.setUseRequestStatus(true);
+        sps.setRequestStatus(cari.getRequestStatus(Integer.parseInt(
+                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestInitialStatusCode"))));
+        
+        return sps;
+    }
+    
+     public SearchParamsCEActionRequests generateParams_CEAR_pastXDays(int days){
+            
+        SearchCoordinator sc = getSearchCoordinator();
+
+        SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
+
+        LocalDateTime pastxDays = LocalDateTime.now().minusDays(days);
+        sps.setDate_start_val(pastxDays);
+
+        // action requests cannot have a time stamp past the current datetime
+        sps.setDate_end_val(LocalDateTime.now());
+
+        sps.setUseAttachedToCase(false);
+        sps.setUseMarkedUrgent(false);
+        sps.setUseNotAtAddress(false);
+        sps.setUseRequestStatus(false);
+        
+        return sps;
+    }
+    
+    
+     public SearchParamsCEActionRequests generateParams_CEAR_attachedToCase(int days){
+            
+        SearchCoordinator sc = getSearchCoordinator();
+
+        SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
+
+        LocalDateTime pastxDays = LocalDateTime.now().minusDays(days);
+        sps.setDate_start_val(pastxDays);
+
+        // action requests cannot have a time stamp past the current datetime
+        sps.setDate_end_val(LocalDateTime.now());
+
+        sps.setUseAttachedToCase(true);
+        sps.setAttachedToCase(true);
+        
+        sps.setUseMarkedUrgent(false);
+        sps.setUseNotAtAddress(false);
+        sps.setUseRequestStatus(false);
+        
+        return sps;
+    }
+    
+    // END VIII. CEActionRequest
+    
+    
+  
 }

@@ -26,15 +26,15 @@ import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class ViolationSelectElementBB extends BackingBeanUtils implements Serializable {
 
-    private ArrayList<EnforcableCodeElement> enfElementList;
     private ArrayList<EnforcableCodeElement> filteredElementList;
     private CodeSet currentCodeSet;
 
@@ -42,6 +42,16 @@ public class ViolationSelectElementBB extends BackingBeanUtils implements Serial
      * Creates a new instance of ViolationSelectElementBB
      */
     public ViolationSelectElementBB() {
+    }
+    
+    
+    @PostConstruct
+    public void initBean(){
+        CodeIntegrator integrator = getCodeIntegrator();
+        CodeSet codeSet = getSessionBean().getSessionCodeSet();
+        
+        currentCodeSet = getSessionBean().getSessionCodeSet();
+        
     }
 
     public String useSelectedElement(EnforcableCodeElement ece) {
@@ -54,42 +64,7 @@ public class ViolationSelectElementBB extends BackingBeanUtils implements Serial
     }
 
 
-    /**
-     * @return the enfElementList
-     */
-    public ArrayList<EnforcableCodeElement> getEnfElementList() {
-        
-        CodeIntegrator integrator = getCodeIntegrator();
-        CodeSet codeSet = getSessionBean().getActiveCodeSet();
-        System.out.println("ViolationSelectElement.getElementList| retrievedset: " + codeSet);
-
-        if (codeSet != null) {
-            int setID = codeSet.getCodeSetID();
-            try {
-                enfElementList = integrator.getEnforcableCodeElementList(setID);
-//                System.out.println("ViolationSelectElement.getElementList| retrievdedList: "
-//                        + enfElementList.peek().getCodeElement().getOrdchapterTitle());
-//                getFacesContext().addMessage(null,
-//                        new FacesMessage(FacesMessage.SEVERITY_WARN, 
-//                                "Loaded Enforcable Code Elements for set named: " +codeSet.getCodeSetName() , ""));
-            } catch (IntegrationException ex) {
-                System.out.println(ex.toString());
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_WARN,
-                                "No Enforcable Code Elements were found with SetID: " + setID, ""));
-            }
-        }
-        return enfElementList;
-    }
-
-
-    /**
-     * @param enfElementList the enfElementList to set
-     */
-    public void setEnfElementList(ArrayList<EnforcableCodeElement> enfElementList) {
-        this.enfElementList = enfElementList;
-    }
-
+   
     /**
      * @return the currentCodeSet
      */

@@ -26,7 +26,7 @@ import javax.faces.convert.FacesConverter;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 @FacesConverter(forClass=PaymentType.class, value="paymentTypeConverter")
 public class PaymentTypeConverter extends EntityConverter implements Converter{

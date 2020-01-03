@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,7 +31,9 @@ import java.util.Objects;
  * 
  * @author Eric Darsow
  */
-public class Person extends EntityUtils implements Serializable{
+public  class       Person 
+        extends     BOb
+        implements  IFace_Loggable{
     
     protected int personID;
     
@@ -40,6 +43,7 @@ public class Person extends EntityUtils implements Serializable{
      * but now with a super and subclass of muni, we don't need them
      * @deprecated 
      */
+    
     protected int muniCode;
     /**
      * Used this to avoid cycles in Municipality creation
@@ -47,8 +51,6 @@ public class Person extends EntityUtils implements Serializable{
      * @deprecated 
      */
     protected String muniName;
-    
-    private Municipality muni;
     
     protected int sourceID;
     
@@ -124,7 +126,7 @@ public class Person extends EntityUtils implements Serializable{
     protected ArrayList<Integer> ghostsList;
     protected ArrayList<Integer> cloneList;
     protected ArrayList<Integer> mergedList;
-    //used in applying for occupancy.
+    
     
     
 
@@ -635,7 +637,7 @@ public class Person extends EntityUtils implements Serializable{
      * @return the expireString
      */
     public String getExpireString() {
-        expireString = getPrettyDate(expiryDate);
+        expireString = EntityUtils.getPrettyDate(expiryDate);
         return expireString;
         
     }
@@ -651,7 +653,7 @@ public class Person extends EntityUtils implements Serializable{
      * @return the lastUpdatedPretty
      */
     public String getLastUpdatedPretty() {
-        lastUpdatedPretty = getPrettyDate(lastUpdated);
+        lastUpdatedPretty = EntityUtils.getPrettyDate(lastUpdated);
         return lastUpdatedPretty;
     }
 
@@ -917,20 +919,7 @@ public class Person extends EntityUtils implements Serializable{
         this.mergedList = mergedList;
     }
 
-    /**
-     * @return the muni
-     */
-    public Municipality getMuni() {
-        return muni;
-    }
-
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
-    }
-
+    
     /**
      * @return the source
      */
@@ -944,6 +933,7 @@ public class Person extends EntityUtils implements Serializable{
     public void setSource(BOBSource source) {
         this.source = source;
     }
-    
+
+   
 
 }

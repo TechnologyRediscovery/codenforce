@@ -17,29 +17,17 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPermit;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
-public class PropertyUnit {
-    protected int unitID;
-    protected int propertyID;
-    protected String unitNumber;
+public class    PropertyUnit 
+        extends PropertyUnitPublic {
     
     protected String notes;
-    protected String otherKnownAddress;
-    
-    protected LocalDateTime rentalIntentDateStart;
-    protected LocalDateTime rentalIntentDateStop;
-    protected User rentalIntentLastUpdatedBy;
     protected String rentalNotes;
     protected boolean active;
     
@@ -116,33 +104,6 @@ public class PropertyUnit {
     }
     
 
-    /**
-     * @return the unitID
-     */
-    public int getUnitID() {
-        return unitID;
-    }
-
-    /**
-     * @param unitID the unitID to set
-     */
-    public void setUnitID(int unitID) {
-        this.unitID = unitID;
-    }
-
-    /**
-     * @return the unitNumber
-     */
-    public String getUnitNumber() {
-        return unitNumber;
-    }
-
-    /**
-     * @param unitNumber the unitNumber to set
-     */
-    public void setUnitNumber(String unitNumber) {
-        this.unitNumber = unitNumber;
-    }
 
     /**
      * @return the notes
@@ -166,12 +127,6 @@ public class PropertyUnit {
         return otherKnownAddress;
     }
 
-    /**
-     * @param otherKnownAddress the otherKnownAddress to set
-     */
-    public void setOtherKnownAddress(String otherKnownAddress) {
-        this.otherKnownAddress = otherKnownAddress;
-    }
 
     /**
   
@@ -260,19 +215,6 @@ public class PropertyUnit {
         this.conditionIntensityClassID = conditionIntensityClassID;
     }
 
-    /**
-     * @return the propertyID
-     */
-    public int getPropertyID() {
-        return propertyID;
-    }
-
-    /**
-     * @param propertyID the propertyID to set
-     */
-    public void setPropertyID(int propertyID) {
-        this.propertyID = propertyID;
-    }
 
     /**
      * @return the lastUpdatedTS

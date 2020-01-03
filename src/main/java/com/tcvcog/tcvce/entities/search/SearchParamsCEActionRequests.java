@@ -13,7 +13,8 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class SearchParamsCEActionRequests extends SearchParams implements Serializable {
+public  class   SearchParamsCEActionRequests 
+        extends SearchParams {
     
     private boolean useRequestStatus;
     private CEActionRequestStatus requestStatus;

@@ -31,7 +31,7 @@ import javax.faces.application.FacesMessage;
 
 /** 
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 
 public class CodeSetElementBB extends BackingBeanUtils implements Serializable{
@@ -128,7 +128,7 @@ public class CodeSetElementBB extends BackingBeanUtils implements Serializable{
      * @return the currentCodeSet
      */
     public CodeSet getCurrentCodeSet() {
-        currentCodeSet = getSessionBean().getActiveCodeSet();
+        currentCodeSet = getSessionBean().getSessionCodeSet();
         if(eCEList != null){
             eCEList = currentCodeSet.getEnfCodeElementList();
         }

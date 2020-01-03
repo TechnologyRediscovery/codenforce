@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
@@ -35,7 +35,7 @@ import javax.faces.context.FacesContext;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class NavigationBB extends BackingBeanUtils implements Serializable {
 
@@ -60,24 +60,114 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         SystemCoordinator ssc = getSystemCoordinator();
         NavList = ssc.navList();
         sideBarNavList = ssc.sideBarNavList();
-        currentPageNavItemValue = ssc.getCurrentPageNavItemValue();
+
         System.out.println("NavigationBB.initBean");
 
+    }
+
+    public String getCurrentDashBoardInfo() {
+        SessionBean s = getSessionBean();
+        try {
+            String info = s.getSessionMuni().getMuniName();
+            return "Current Municipality: " + info;
+        } catch (Exception ex) {
+            return "Current Municipality: ";
+        }
+
+    }
+
+    public String getCurrentPropertyInfo() {
+        SessionBean s = getSessionBean();
+        try {
+            String propertyAddress = s.getSessionProperty().getAddress();
+            String propertyId = String.valueOf(s.getSessionProperty().getPropertyID());
+            return "Current Property: " + propertyAddress + " | ID: " + propertyId;
+        } catch (Exception ex) {
+            return "Current Property: " + " | ID: ";
+        }
+
+    }
+
+    public String getCurrentCEInfo() {
+        SessionBean s = getSessionBean();
+        try {
+            String caseName = s.getSessionCECase().getCaseName();
+            String caseId = String.valueOf(s.getSessionCECase().getCaseID());
+            return "Current Case: " + caseName + " | ID: " + caseId;
+        } catch (Exception ex) {
+            return "Current Case: " + " | ID: ";
+        }
+
+    }
+
+    public String getCurrentPersonInfo() {
+        SessionBean s = getSessionBean();
+        try {
+            String personName = s.getSessionPerson().getFirstName();
+            String personId = String.valueOf(s.getSessionPerson().getPersonID());
+            return "Current Person: " + personName + " | ID: " + personId;
+        } catch (Exception ex) {
+            return "Current Person: " + " | ID: ";
+        }
+
+    }
+
+    public String getCurrentPeriodInfo() {
+        SessionBean s = getSessionBean();
+        try {
+            String periodId = String.valueOf(s.getSessionOccPeriod().getPeriodID());
+            String periodType = s.getSessionOccPeriod().getType().getTitle();
+            return "Current Person: " + periodType + " | ID: " + periodId;
+        } catch (Exception ex) {
+            return "Current Person: " + " | ID: ";
+        }
+
+    }
+
+    public Map<String, String> navCurrentInfoMap() {
+        HashMap<String, String> navCurrentInfoMap;
+        navCurrentInfoMap = new HashMap<>();
+        navCurrentInfoMap.put("Dashboard", getCurrentDashBoardInfo());
+        navCurrentInfoMap.put("Property", getCurrentPropertyInfo());
+        navCurrentInfoMap.put("Code Enf", getCurrentCEInfo());
+        navCurrentInfoMap.put("Occupancy", getCurrentPersonInfo());
+        navCurrentInfoMap.put("Person", getCurrentPeriodInfo());
+        navCurrentInfoMap.put("Code", "Current Code: ");
+        return navCurrentInfoMap;
+    }
+
+    public Map<String, String> navCategoryMap() {
+
+        HashMap<String, String> categoryMap;
+        categoryMap = new HashMap<>();
+
+        for (int i = 0; i < NavList.size(); i++) {
+            NavigationItem navitem = (NavigationItem) NavList.get(i);
+            List subnavList = navitem.getSubNavitem();
+            String categoryName = navitem.getValue();
+            for (int m = 0; m < subnavList.size(); m++) {
+                NavigationSubItem subnavitem = (NavigationSubItem) subnavList.get(m);
+                String pagePath = subnavitem.getPagePath();
+                categoryMap.put(pagePath, categoryName);
+            }
+        }
+        return categoryMap;
+    }
+
+    public String getCurrentPageNavItemValue() {
+        String currentViewPagePath = getviewPagePath();
+        return navCategoryMap().get(currentViewPagePath);
+    }
+
+    public String getviewPagePath() {
+        FacesContext fc = FacesContext.getCurrentInstance();
+        String viewID = fc.getViewRoot().getViewId();
+        return viewID;
     }
 
     private List<NavigationItem> NavList;
 
     private List<NavigationItem> sideBarNavList;
-
-    private String currentPageNavItemValue;
-
-    public String getCurrentPageNavItemValue() {
-        return currentPageNavItemValue;
-    }
-
-    public void setCurrentPageNavItemValue(String currentPageNavItemValue) {
-        this.currentPageNavItemValue = currentPageNavItemValue;
-    }
 
     public List<NavigationItem> getNavList() {
         return NavList;
@@ -138,7 +228,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveCase
      */
     public boolean isNoActiveCase() {
-        CECase c = getSessionBean().getSessionCECase();
+        CECaseDataHeavy c = getSessionBean().getSessionCECase();
         noActiveCase = (c == null);
         return noActiveCase;
     }

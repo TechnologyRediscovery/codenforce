@@ -21,13 +21,13 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.CECaseEvent;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -39,13 +39,13 @@ import javax.faces.application.FacesMessage;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class ViolationEditBB extends BackingBeanUtils implements Serializable{
 
     
     private CodeViolation currentViolation;
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     
     
     // violation update event fields
@@ -68,28 +68,28 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
          formDiscloseToPublic = true;
     }
     
-    public String editViolation() throws IntegrationException, CaseLifecycleException{
+    public String editViolation() throws IntegrationException, BObStatusException{
        CaseCoordinator cc = getCaseCoordinator();
        EventCoordinator eventCoordinator = getEventCoordinator();     
        SystemCoordinator sc = getSystemCoordinator();
        
-       EventCategory ec = eventCoordinator.getInitiatlizedEventCategory(
+       EventCategory ec = eventCoordinator.initEventCategory(
                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
        
-       CECaseEvent event = eventCoordinator.getInitializedEvent(getCurrentCase(), ec);
-        
-        // load up edit event data
-        event.setNotes(formEventNotes);
-        event.setDiscloseToMunicipality(formDiscloseToMuni);
-        event.setDiscloseToPublic(formDiscloseToPublic);
-        
-        MessageBuilderParams mcc = new MessageBuilderParams();
-        mcc.setExistingContent(currentViolation.getNotes());
-        mcc.setNewMessageContent(formEventNotes);
-        mcc.setUser(getSessionBean().getSessionUser());
-        currentViolation.setNotes(sc.appendNoteBlock(mcc));
-        
         try {
+            EventCnF event = eventCoordinator.initEvent(getCurrentCase(), ec);
+
+            // load up edit event data
+            event.setNotes(formEventNotes);
+            event.setDiscloseToMunicipality(formDiscloseToMuni);
+            event.setDiscloseToPublic(formDiscloseToPublic);
+
+            MessageBuilderParams mcc = new MessageBuilderParams();
+            mcc.setExistingContent(currentViolation.getNotes());
+            mcc.setNewMessageContent(formEventNotes);
+            mcc.setUser(getSessionBean().getSessionUser());
+            currentViolation.setNotes(sc.appendNoteBlock(mcc));
+
             
              cc.updateCodeViolation(currentCase, currentViolation, getSessionBean().getSessionUser());
              
@@ -192,14 +192,14 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
     

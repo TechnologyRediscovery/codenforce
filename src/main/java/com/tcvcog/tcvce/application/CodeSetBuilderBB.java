@@ -32,7 +32,7 @@ import javax.faces.event.ActionEvent;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
 
@@ -134,7 +134,7 @@ public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
 
     public String viewCodeSetElementsInSet() {
 
-        getSessionBean().setActiveCodeSet(currentCodeSet);
+        getSessionBean().setSessionCodeSet(currentCodeSet);
         if (currentCodeSet != null) {
             //System.out.println("CodeSetBB.buildCodeSet | selected set: " + selectedCodeSet.getCodeSetName());
             return "codeSetBuilder";
@@ -148,7 +148,7 @@ public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
      */
     public CodeSet getCurrentCodeSet() {
         CodeIntegrator ci = getCodeIntegrator();
-        CodeSet cs = getSessionBean().getActiveCodeSet();
+        CodeSet cs = getSessionBean().getSessionCodeSet();
         try {
             if(cs != null){
                 currentCodeSet = ci.getCodeSetBySetID(cs.getCodeSetID());

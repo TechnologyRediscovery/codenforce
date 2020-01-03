@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.CodeViolation;
@@ -38,7 +38,7 @@ import javax.faces.application.FacesMessage;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CitationIntegrator extends BackingBeanUtils implements Serializable{
     
@@ -198,7 +198,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         return citationList;
     }
     
-    public List<Citation> getCitations(CECase ceCase) throws IntegrationException{
+    public List<Citation> getCitations(CECaseDataHeavy ceCase) throws IntegrationException{
             
         String query =  "SELECT DISTINCT ON (citationID) citation.citationid, codeviolation.cecase_caseID FROM public.citationviolation 	\n" +
                         "	INNER JOIN public.citation ON citation.citationid = citationviolation.citation_citationid\n" +

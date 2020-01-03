@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.entities.CECaseEvent;
+import com.tcvcog.tcvce.entities.EventCnF;
 import java.io.Serializable;
 
 /**
@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 public class CENoticeAcknowledgementsBB extends BackingBeanUtils implements Serializable {
 
-    private CECaseEvent selectedCENoticeAcknowledgement;
+    private EventCnF selectedCENoticeAcknowledgement;
     
     
     /**

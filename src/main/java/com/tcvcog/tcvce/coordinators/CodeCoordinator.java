@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CodeCoordinator extends BackingBeanUtils implements Serializable {
 

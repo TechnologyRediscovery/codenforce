@@ -15,7 +15,7 @@ import java.util.Objects;
  * 
  * @author sylvia
  */
-public class Proposal extends EntityUtils implements Serializable, Comparable<Proposal> {
+public class Proposal  implements Serializable, Comparable<Proposal> {
     
     protected int proposalID ;
     protected Directive directive;
@@ -34,15 +34,15 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
     protected boolean hidden;
     
     protected int generatingEventID;
-    protected Event generatingEvent;
-    protected Event responseEvent;
+    protected EventCnF generatingEvent;
+    protected EventCnF responseEvent;
 
     protected String notes;
     protected boolean proposalRejected;
     
     protected int order;
     
-    protected Proposable chosenChoice;
+    protected IFace_Proposable chosenChoice;
 
     /**
      * @param responderIntended the responderIntended to set
@@ -255,14 +255,14 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
     /**
      * @return the generatingEvent
      */
-    public Event getGeneratingEvent() {
+    public EventCnF getGeneratingEvent() {
         return generatingEvent;
     }
 
     /**
      * @return the responseEvent
      */
-    public Event getResponseEvent() {
+    public EventCnF getResponseEvent() {
         return responseEvent;
     }
 
@@ -276,14 +276,14 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
     /**
      * @param generatingEvent the generatingEvent to set
      */
-    public void setGeneratingEvent(Event generatingEvent) {
+    public void setGeneratingEvent(EventCnF generatingEvent) {
         this.generatingEvent = generatingEvent;
     }
 
     /**
      * @param responseEvent the responseEvent to set
      */
-    public void setResponseEvent(Event responseEvent) {
+    public void setResponseEvent(EventCnF responseEvent) {
         this.responseEvent = responseEvent;
     }
 
@@ -363,14 +363,14 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
     /**
      * @return the chosenChoice
      */
-    public Proposable getChosenChoice() {
+    public IFace_Proposable getChosenChoice() {
         return chosenChoice;
     }
 
     /**
      * @param chosenChoice the chosenChoice to set
      */
-    public void setChosenChoice(Proposable chosenChoice) {
+    public void setChosenChoice(IFace_Proposable chosenChoice) {
         this.chosenChoice = chosenChoice;
     }
 

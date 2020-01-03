@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class OccPermitApplication {
     private int id;

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CodeSet implements Serializable {
     

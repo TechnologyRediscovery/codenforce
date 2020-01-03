@@ -1,0 +1,497 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Open code enforcement cases</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="cases-view">
+
+                    <div class="two-column-page-flex-container">
+                        <div class="list-column">
+
+                            <h:form id="cecases-messages-form">
+                                <h:messages id="cecases-messages-global"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
+
+                            <h1><h:outputText value="Code enforcement case manager"/></h1>
+
+
+                            <h2>CE Case docket</h2>
+
+                            <h:form id="cecase-search-form">
+
+                                <p:selectOneMenu id="casequery-som" tabindex="1" value="#{ceCaseSearchBB.selectedBOBQuery}">
+                                    <f:converter converterId="bOBQueryConverter"/>
+                                    <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                    <f:selectItems id="querylist-si" value="#{ceCaseSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                    <p:ajax update="cease-query-desc-ot" />
+                                </p:selectOneMenu>
+
+                                <p:commandButton   id="cecases-executequery-cb" 
+                                                   ajax="true" 
+                                                   actionListener="#{ceCaseSearchBB.executeQuery}"
+                                                   icon="fa fa-print" 
+                                                   styleClass="button"
+                                                   value="run selected query" 
+                                                   update="cecase-search-form
+                                                   cecase-results-form
+                                                   cecases-messages-form"/>
+
+                                <p:spacer height="5px" />
+
+
+
+
+                                <h:outputLabel styleClass="bold" value="Query description: " for="cears-query-desc-ot" />
+                                <h:outputText id="cease-query-desc-ot" value="#{ceCaseSearchBB.selectedCECaseQuery.queryName.desc}" />
+                                <h:outputText id="cease-query-ts-ot" value="; timestamp: #{ceCaseSearchBB.selectedCECaseQuery.executionTimestampPretty}" />
+                                <p:spacer height="5px" />
+                            </h:form>
+
+                            <h:form id="cecases-search-form">
+                                <p:fieldset legend="search options" 
+                                            toggleable="true" collapsed="true" style="background-color: white;">
+                                    <h:panelGrid columns="1" cellpadding="10" columnClasses="gridTd-solid-back"
+                                                 footerClass="gridFooter">
+                                        <h:panelGroup>
+                                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-muni-ol" for="seev-filter-muni-chkbx" value="filter by municipality? "/>
+                                                    <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{ceCaseSearchBB.searchParams.filterByMuni}" >
+                                                        <p:ajax update="cecases-search-muni-som"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:selectOneMenu id="cecases-search-muni-som" tabindex="1" value="#{ceCaseSearchBB.searchParams.muni}"
+                                                                     disabled="#{!ceCaseSearchBB.searchParams.filterByMuni}">
+                                                        <f:converter converterId="muniConverter"/>
+                                                        <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                                        <f:selectItems id="muniNameList" value="#{sessionBean.sessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                    </p:selectOneMenu>
+                                                    <h:message for="cecases-search-muni-som" showDetail="true" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-search-startend-chkbx-ol" for="cecases-search-startend-chkbx" value="filter by date range? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-search-startend-chkbx" value="#{ceCaseSearchBB.searchParams.filterByStartEndDate}" >
+                                                        <p:ajax update="datetosearch-sor
+                                                                eventDateCalStart
+                                                                eventDateCalEnd
+                                                                cecases-search-relative-dates-cb" />
+                                                    </p:selectBooleanCheckbox>
+
+                                                    <h4 style="margin-bottom: 2px;">case date search options:</h4>
+
+                                                    <p:selectOneRadio id="datetosearch-sor" layout="pageDirection" value="#{ceCaseSearchBB.searchParams.dateToSearchCECases}"
+                                                                      disabled="#{(!ceCaseSearchBB.searchParams.filterByStartEndDate)}">
+                                                        <f:selectItems value="#{ceCaseSearchBB.searchParams.dateSearchOptions}"/>
+                                                    </p:selectOneRadio>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup id="datepickers-pg">
+                                                    <p:spacer height="5px" />
+                                                    <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="query start date: "/>
+                                                    <p:spacer height="1px"/>
+                                                    <p:calendar id="eventDateCalStart" value="#{ceCaseSearchBB.searchParams.startDateUtilDate}" 
+                                                                mode="popup" disabled="#{(!ceCaseSearchBB.searchParams.filterByStartEndDate) or ceCaseSearchBB.searchParams.useRelativeDates}"
+                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                                showButtonPanel="true" showTodayButton="true"
+                                                                required="false"/>
+                                                    <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                    <p:spacer height="5px"/>
+
+                                                    <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="query end date: "/>
+                                                    <p:spacer height="1px"/>
+                                                    <p:calendar id="eventDateCalEnd" value="#{ceCaseSearchBB.searchParams.endDateUtilDate}" 
+                                                                mode="popup" disabled="#{(!ceCaseSearchBB.searchParams.filterByStartEndDate) or ceCaseSearchBB.searchParams.useRelativeDates}"
+                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                                showButtonPanel="true" showTodayButton="true"
+                                                                required="false" />
+                                                    <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+
+                                                    <p:outputLabel id="cecases-search-relative-dates-ol" for="cecases-search-relative-dates-cb" value="use relative dates? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-search-relative-dates-cb" 
+                                                                             value="#{ceCaseSearchBB.searchParams.useRelativeDates}" 
+                                                                             disabled="#{!ceCaseSearchBB.searchParams.filterByStartEndDate}">
+                                                        <p:ajax update="eventDateCalStart
+                                                                eventDateCalEnd
+                                                                cecases-search-relative-dates-start-it
+                                                                cecases-search-relative-dates-end-it" />
+                                                    </p:selectBooleanCheckbox>
+
+
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-search-relative-dates-start-ol" for="cecases-search-relative-dates-start-it" value="start date in days (relative to today)"/>
+                                                    <p:spacer height="1px"/>
+                                                    <p:inputText id="cecases-search-relative-dates-start-it" 
+                                                                 value="#{ceCaseSearchBB.searchParams.startDateRelativeDays}" 
+                                                                 disabled="#{!(ceCaseSearchBB.searchParams.filterByStartEndDate and ceCaseSearchBB.searchParams.useRelativeDates)}" />
+                                                    <h:message for="cecases-search-relative-dates-start-it" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                    <p:spacer height="5px"/>
+                                                    <p:outputLabel id="cecases-search-relative-dates-end-ol" for="cecases-search-relative-dates-end-it" value="end date in days (relative to today)"/>
+                                                    <p:spacer height="1px"/>
+                                                    <p:inputText id="cecases-search-relative-dates-end-it" 
+                                                                 value="#{ceCaseSearchBB.searchParams.endDateRelativeDays}" 
+                                                                 disabled="#{!(ceCaseSearchBB.searchParams.filterByStartEndDate and ceCaseSearchBB.searchParams.useRelativeDates)}" />
+                                                    <h:message for="cecases-search-relative-dates-end-it" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-phase-ol" for="cecases-filter-phase" value="filter by case phase? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-phase" value="#{ceCaseSearchBB.searchParams.useCasePhase}" >
+                                                        <p:ajax update="casePhaseSOM" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-critera-phase" for="casePhaseSOM" value="case phases? "/>
+                                                    <p:selectOneMenu value="#{ceCaseSearchBB.searchParams.casePhase}"
+                                                                     id="casePhaseSOM">
+
+                                                        <f:selectItems value="#{ceCaseSearchBB.casePhaseList}"
+                                                                       var="cp"
+                                                                       itemValue="#{cp}"
+                                                                       itemLabel="#{cp.label}"/>
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-stage-ol" for="cecases-filter-stage" value="filter by case stage? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-stage" value="#{ceCaseSearchBB.searchParams.useCaseStage}" >
+                                                        <p:ajax update="cecases-criteria-user" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-criteria-stage-ol" for="case-stage-som" value="case stages:"/>
+                                                    <p:selectOneMenu value="#{ceCaseSearchBB.searchParams.caseStage}"
+                                                                     id="case-stage-som">
+
+                                                        <f:selectItems value="#{ceCaseSearchBB.caseStageArray}"
+                                                                       var="cs"
+                                                                       itemValue="#{cs}"
+                                                                       itemLabel="#{cs.label}"/>
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-id-ol" for="cecases-filter-id" value="filter by ce case ID? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-id" value="#{ceCaseSearchBB.searchParams.objectID_filterBy}" 
+                                                                             disabled="false" >
+                                                        <p:ajax update="cecases-criteria-caseid" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-criteria-caseid-ol" for="cecases-criteria-caseid" value="ce case ID:"/>
+                                                    <p:spacer height="5px"/>
+                                                    <p:inputText id="cecases-criteria-caseid" 
+                                                                 value="#{ceCaseSearchBB.searchParams.objectID}" 
+                                                                 disabled="#{!ceCaseSearchBB.searchParams.objectID_filterBy}"/>
+                                                    <h:message for="cecases-criteria-caseid" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-manager-ol" for="cecases-filter-manager" value="filter by case manager? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-manager" 
+                                                                             disabled="false"
+                                                                             value="#{ceCaseSearchBB.searchParams.useCaseManager}" >
+                                                        <p:ajax update="cecases-criteria-user" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel for="cecases-criteria-user" id="cecases-criteria-user-ol">
+                                                        <h:outputText value="system user list:"/>
+                                                    </h:outputLabel>
+                                                    <p:spacer height="5px"/>
+
+                                                    <p:selectOneMenu id="cecases-criteria-user" required="false" 
+                                                                     value="#{ceCaseSearchBB.searchParams.caseManagerUser}"
+                                                                     disabled="#{!ceCaseSearchBB.searchParams.useCaseManager}">
+                                                        <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
+                                                        <f:selectItems value="#{ceCaseSearchBB.usersForSearchConfig}"  var="u" itemValue="#{u}" 
+                                                                       itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
+                                                        <f:converter converterId="userConverter"/>
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-property-ol" for="cecases-filter-property" value="filter by property? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-property" value="#{ceCaseSearchBB.searchParams.useProperty}" >
+                                                        <p:ajax update="cecases-criteria-property-som" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel for="cecases-criteria-property-som" id="cecases-criteria-property-ol">
+                                                        <h:outputText value="property list:"/>
+                                                    </h:outputLabel>
+                                                    <p:spacer height="5px"/>
+
+                                                    <p:selectOneMenu id="cecases-criteria-property-som" required="false" 
+                                                                     value="#{ceCaseSearchBB.searchParams.property}"
+                                                                     disabled="#{!ceCaseSearchBB.searchParams.useProperty}">
+
+                                                        <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
+                                                        <f:selectItems value="#{sessionBean.sessionPropertyList}"  var="p" itemValue="#{p}" 
+                                                                       itemLabel="#{p.address} (#{p.muni.managerName})"/>
+                                                        <f:converter converterId="propertyConverter"/>
+
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-open-ol" for="cecases-filter-open" value="filter by open case? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-open" value="#{ceCaseSearchBB.searchParams.useIsOpen}" >
+                                                        <p:ajax update="cecases-criteria-open" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:selectBooleanCheckbox id="cecases-criteria-open" 
+                                                                             value="#{ceCaseSearchBB.searchParams.isOpen}" 
+                                                                             disabled="#{!ceCaseSearchBB.searchParams.useIsOpen}" />
+                                                    <p:outputLabel id="cecases-criteria-open-ol" for="cecases-criteria-open" 
+                                                                   value="(checked = only open cases)" styleClass="italic"/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-propinfo-ol" for="cecases-filter-propinfo" value="filter by property info flag? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-propinfo" value="#{ceCaseSearchBB.searchParams.usePropertyInfoCase}" >
+                                                        <p:ajax update="cecases-criteria-propinfo" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:selectBooleanCheckbox id="cecases-criteria-propinfo" 
+                                                                             value="#{ceCaseSearchBB.searchParams.propertyInfoCase}" 
+                                                                             disabled="#{!ceCaseSearchBB.searchParams.usePropertyInfoCase}" />
+                                                    <p:outputLabel id="cecases-criteria-propinfo-ol" for="cecases-criteria-propinfo" 
+                                                                   value="(checked = only cases that store property info)" styleClass="italic"/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-query-limit-ol" for="cecases-query-limit" value="limit results to 100? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-query-limit" value="#{ceCaseSearchBB.searchParams.limitResultCountTo100}" />
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+
+                                                </h:panelGroup>
+                                            </h:panelGrid>                                        
+                                        </h:panelGroup>
+                                    </h:panelGrid>                               
+                                    <p:commandButton    id="queryButton"
+                                                        ajax="true" value="Run query" actionListener="#{ceCaseSearchBB.executeQuery}"
+                                                        process="@form"
+                                                        disabled="false"
+                                                        update="cecase-results-form
+                                                        cecases-messages-form"
+                                                        />
+                                </p:fieldset>
+                            </h:form>
+
+                            <p:spacer height="5px" />
+                            <h:form id="cecase-results-form" >
+
+                                <p:dataTable
+                                    id="caseTable"
+                                    var="c"
+                                    filteredValue="#{ceCaseSearchBB.filteredCaseList}"
+                                    rowKey="#{c.caseID}"
+                                    rowExpandMode="multiple"
+                                    widgetVar="ceViewTable"
+                                    value="#{ceCaseSearchBB.caseList}"
+                                    tableStyleClass="primeDataTable">
+
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseID}"/>
+                                    </p:column>
+                                    <p:column width="15%" sortBy="#{c.property.address}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Property" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.property.address} (#{c.property.muni.muniName})"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Name" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseName}"/>
+                                    </p:column>
+                                    <p:column width="8%" sortBy="#{c.caseStage}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Stage" />
+                                        </f:facet>
+                                        <div class="#{c.casePhaseIcon.styleClass}">
+                                            <i class="material-icons status-display-icon-i"><h:outputText value="#{c.casePhaseIcon.materialIcon}"/></i>
+                                        </div>
+                                    </p:column>
+                                    <p:column width="5%" sortBy="#{c.caseAge}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Age" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseAge}"/>
+                                    </p:column>
+                                    <p:column width="12%">
+                                        <f:facet name="header">
+                                            <h:outputText value="view" />
+                                        </f:facet>
+                                        <p:commandButton    id="cecases-viewcase-cb"
+                                                            icon="fa fa-hand-o-right" 
+                                                            value="view"
+                                                            actionListener="#{ceCaseSearchBB.manageCECase(c)}"
+                                                            ajax="true"
+                                                            update="
+                                                            case-details-form
+                                                            event-dt-form
+                                                            violation-form
+                                                            sessionInfoForm
+                                                            notices-form:notices-ds
+                                                            action-requests-form
+                                                            events-datascroller-form" />
+                                    </p:column>
+                                </p:dataTable>
+
+
+                                <p:spacer height="10px"/>
+
+                                <p:commandButton   id="print-case-list-cb" 
+                                                   ajax="true" actionListener="#{ceCaseSearchBB.prepareReportCECaseList}"
+                                                   icon="fa fa-print" styleClass="button"
+                                                   oncomplete="PF('report-caselist-profile-diaglog-var').show()"
+                                                   value="generate case list report" 
+                                                   update="report-caselist-profile-form"/>
+                                
+                                
+                                
+                                <p:chart type="donut" rendered="false"
+                                             model="#{ceCaseSearchBB.violationDonut}" 
+                                             style="width:500px; height: 600px;"/>
+
+
+                            </h:form>
+                        </div>
+                        <div class="object-column">
+                        </div>
+
+                        
+                    </div>
+               
+                        
+                        
+
+
+
+
+
+
+                    <p:confirmDialog message="Create case list report" 
+                                     severity="alert" widgetVar="report-caselist-profile-diaglog-var"
+                                     closable="true" responsive="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}">
+
+                        <h:form id="report-caselist-profile-form">
+
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+
+                                <f:facet name="header">
+
+
+                                    <h:outputLabel for="report-caselist-profile-title-it" value="Report title"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <p:inputText id="report-caselist-title-it" style="width: 300px;" value="#{ceCaseSearchBB.reportCECaseList.title}"/>
+                                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeCaseNames}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
+                                    <p:spacer height="5px"/>
+                                    <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchBB.reportCECaseList.notes}"/>
+                                    <p:spacer height="5px"/>
+                                </f:facet>
+
+                                <h:panelGroup>
+                                    <h3>Additional case list report options</h3>
+
+                                    <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeListSummaryFigures}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeViolationList}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeEventSummaryByCase}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
+                                    <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchBB.reportCECaseList.includeExtendedPropertyDetails}" />
+
+
+                                </h:panelGroup>
+
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" immediate="true"
+                                             onclick="PF('report-caselist-profile-diaglog-var').hide()"/>
+
+                            <p:commandButton ajax="true" action="#{ceCaseSearchBB.generateReportCECaseList}"
+                                             value="Generate" icon="fa fa-print" 
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                             />
+
+                        </h:form>
+                    </p:confirmDialog>
+
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
