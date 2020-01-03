@@ -143,7 +143,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             p.setActive(rs.getBoolean("active"));
             p.setNonAddressable(rs.getBoolean("nonaddressable"));
             
-            p.setUseType(getPropertyUseType(rs.getInt("propertyusetype")));
+            p.setUseType(getPropertyUseType(rs.getInt("usetype_typeid")));
             
             p.setUnitList(getPropertyUnitList(p));
             
@@ -336,76 +336,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return p;
     }
 
-    /**
-     * First gen simple search method for properties
-     * 
-     * @deprecated 
-     * @param houseNum
-     * @param street
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Property> searchForProperties(String houseNum, String street) throws IntegrationException {
-
-        String query = "select propertyid FROM property WHERE address ILIKE ?;";
-
-        System.out.println("PropertyIntegrator.searchForPropertiesAddOnly - query: " + query);
-
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        List<Property> propList = new ArrayList<>();
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + houseNum + "%" + street + "%");
-            System.out.println("PropertyIntegrator.searchForProperties | SQL: " + stmt.toString());
-            rs = stmt.executeQuery();
-            int counter = 0;
-            while (rs.next() && counter <= MAX_RESULTS) {
-                propList.add(getProperty(rs.getInt("propertyid")));
-                counter++;
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return propList;
-    }
-
-    public List<Property> searchForProperties(String houseNum, String street, int muniID) throws IntegrationException {
-        String query = "SELECT propertyid FROM property WHERE address ILIKE ? AND municipality_muniCode=?;";
-
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        List<Property> propList = new ArrayList<>();
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + houseNum + "%" + street + "%");
-            stmt.setInt(2, muniID);
-            rs = stmt.executeQuery();
-            System.out.println("PropertyIntegrator.searchForProperties - with muni | sql: " + stmt.toString());
-            int counter = 0;
-            while (rs.next() && counter <= MAX_RESULTS) {
-                propList.add(getProperty(rs.getInt("propertyid")));
-                counter++;
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Error searching for properties", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return propList;
-    }
+   
 
     
     public List<Property> searchForChangedProperties(String houseNum, String street, int muniID) throws IntegrationException {
@@ -761,7 +692,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         System.out.println(params.getParams());
         if (!params.isBobID_ctl()) {
             if (params.isMuni_ctl()) {
-                sb.append("AND municipality_municode = ? "); // param 1
+                sb.append("AND municipality_municode=? "); // param 1
             }
 
 
@@ -794,7 +725,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
 
             if (params.isAddress_ctl()) {
-                sb.append("AND address ILIKE ? ");
+                sb.append("AND address ILIKE ?  ");
             }
 
             if (params.isCondition_ctl()) {
@@ -890,7 +821,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     stmt.setString(++paramCounter, params.getParcelid_val());
                 }
                 if (params.isAddress_ctl()) {
-                    stmt.setString(++paramCounter, params.getAddress_val());
+                    StringBuilder strb = new StringBuilder();
+                    strb.append("%");
+                    strb.append(params.getAddress_val());
+                    strb.append("%");
+                    stmt.setString(++paramCounter, strb.toString());
                 }
                 if (params.isCondition_ctl()) {
                     stmt.setInt(++paramCounter, params.getCondition_intensityClass_val());
@@ -920,6 +855,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
             rs = stmt.executeQuery();
+            
             int counter = 0;
             int maxResults;
             if (params.isLimitResultCount_ctl()) {
@@ -934,13 +870,12 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(String.format("number of returned props = %d", counter));
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot search for code enf cases, sorry!", ex);
+            throw new IntegrationException("Cannot search for properties, sorry!", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        System.out.println("about to return proplist");
         return propIDList;
     }
 

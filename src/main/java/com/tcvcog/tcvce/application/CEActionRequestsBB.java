@@ -419,16 +419,16 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void searchForProperties(ActionEvent ev) {
 
         PropertyIntegrator pi = getPropertyIntegrator();
-        try {
-            propertyList = pi.searchForProperties(houseNumSearch, streetNameSearch, muniForPropSwitchSearch.getMuniCode());
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Your search completed with " + propertyList.size() + " results", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to complete a property search! Sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-        }
+//        try {
+//            propertyList = pi.searchForProperties(houseNumSearch, streetNameSearch, muniForPropSwitchSearch.getMuniCode());
+//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+//                    "Your search completed with " + propertyList.size() + " results", ""));
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                     "Unable to complete a property search! Sorry!",
+//                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+//        }
 
     }
 

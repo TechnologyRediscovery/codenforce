@@ -426,20 +426,20 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
       
     public void searchForPropertiesSingleMuni(ActionEvent ev){
         PropertyIntegrator pi = getPropertyIntegrator();
-        
-        try {
-            propList = (ArrayList<Property>) pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Your search completed with " + getPropList().size() + " results", ""));
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to complete a property search! Sorry!", ""));
-            
-        }
+//        
+//        try {
+//            propList = (ArrayList<Property>) pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
+//            getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+//                        "Your search completed with " + getPropList().size() + " results", ""));
+//            
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+//                        "Unable to complete a property search! Sorry!", ""));
+//            
+//        }
     }
     
     

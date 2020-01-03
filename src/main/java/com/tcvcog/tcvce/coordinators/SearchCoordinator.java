@@ -410,6 +410,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     throw new SearchException("Requested muni for search does not match credential's governing auth period");
                 }
             } else {
+                System.out.println("SearchCoordinator.auditSearchparams | adding cred muni" + q.getCredential().getGoverningAuthPeriod().getMuni().getMuniName());
                 sp.addMuni(q.getCredential().getGoverningAuthPeriod().getMuni());
             }
         }        
@@ -437,7 +438,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return 
      */
     private Query initQueryFinalizeInit(Query q){
-        
+       
         
         return q;
     }

@@ -216,8 +216,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         PropertyIntegrator pi = getPropertyIntegrator();
         Municipality activeMuni = getSessionBean().getSessionMuni();
 
-        try {
-            propList = pi.searchForProperties(houseNum, streetName, activeMuni.getMuniCode());
+        // TODO: occ beta adapt to new search params
+//        try {
+//            propList = pi.searchForProperties(houseNum, streetName, activeMuni.getMuniCode());
 
             if (propList.size() > 50) {
                 propList.subList(50, propList.size()).clear(); //Limits the search to 50 results.  
@@ -225,12 +226,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Your search completed with " + getPropList().size() + " result(s)", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to complete a property search! Sorry!", ""));
-        }
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            "Unable to complete a property search! Sorry!", ""));
+//        }
     }
 
     /**

@@ -71,6 +71,15 @@ public  class           SearchParams
        
    }
    
+   
+    @Override
+   public String toString(){
+       StringBuilder sb = new StringBuilder();
+       sb.append("Muni: ");
+       sb.append(muni_val.getMuniName());
+       return sb.toString();
+   }
+   
     /**
      * @return the date_null_ctl
      */

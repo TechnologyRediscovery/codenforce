@@ -16,11 +16,9 @@
 
                     <div class="mainContainer">
 
-                        <!--START whole page two-column layout PG-->
                         <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                      columnClasses="gridTd, gridTd">
 
-                            <!--START left search config column PGrp-->
                             <h:panelGroup id="prop-search-pg-query">
 
                                 <h:form id="prop-search-messages-form">
@@ -34,6 +32,7 @@
                                             toggleable="true"
                                             widgetVar="prop-search-query-panel-var"
                                             collapsed="false"
+                                            style="width:100%;"
                                             header="Search for properties">
 
                                     <h:form id="prop-search-form">
@@ -46,6 +45,7 @@
                                             <f:selectItems id="prop-search-query-si" value="#{propertySearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
                                             <p:ajax update="prop-search-query-desc-ot" />
                                         </p:selectOneMenu>
+                                        <p:spacer height="5px" />
 
                                         <h:outputLabel styleClass="bold" value="Query description: " for="cears-query-desc-ot" />
 
@@ -80,18 +80,11 @@
 
                                         <p:spacer height="5px" />                                      
 
-                                        <p:fieldset 
-                                            legend="basic search options" 
-                                            toggleable="true" 
-                                            collapsed="false" 
-                                            style="background-color: white;">
-
                                             <h:panelGrid    columns="1" 
                                                             cellpadding="10" 
                                                             columnClasses="gridTd-solid-back"
                                                             footerClass="gridFooter">
 
-                                                <!--filter: addr-->
                                                 <h:panelGroup id="prop-search-filter-addr">
                                                     <h:panelGrid columns="2" 
                                                                  cellpadding="10" 
@@ -124,21 +117,13 @@
                                                     </h:panelGrid>
                                                 </h:panelGroup>
                                             </h:panelGrid>
-                                        </p:fieldset>
 
-
-                                        <p:fieldset 
-                                            legend="advanced search options" 
-                                            toggleable="true" 
-                                            collapsed="false" 
-                                            style="background-color: white;">
 
                                             <h:panelGrid    id="prop-search-filters-grid"
                                                             columns="1" 
                                                             cellpadding="10" 
                                                             columnClasses="gridTd-solid-back"
                                                             footerClass="gridFooter">
-                                                <!--filter: muni-->
                                                 <h:panelGroup id="prop-search-filter-muni">
                                                     <h:panelGrid columns="2" 
                                                                  cellpadding="10" 
@@ -410,21 +395,30 @@
                                                 
 
                                             </h:panelGrid>
-                                        </p:fieldset>
                                     </h:form>
                                 </p:panel>
                             </h:panelGroup>
 
-                            <!--start of second column-->
                             <h:panelGroup id="prop-search-results-pgrp">
                                 
                                 <p:panel    id="prop-search-results-panel"
                                             toggleable="true"
                                             widgetVar="prop-search-query-panel-var"
                                             collapsed="false"
+                                            style="width:100%;"
                                             header="Search results">
 
+                                    
                                     <h:form id="prop-search-results-form">
+                                          <p:commandButton   id="prop-search-results-clear" 
+                                                           ajax="true" 
+                                                           actionListener="#{propertySearchBB.clearPropertyList}"
+                                                           icon="fa fa-eraser" 
+                                                           styleClass="button"
+                                                           value="clear results list" 
+                                                           update=" prop-search-messages-form
+                                                           prop-search-results-form"/>
+                                        <p:spacer height="3px" />
 
                                         <p:dataTable
                                             id="prop-search-results-table"
@@ -480,6 +474,7 @@
                                             toggleable="true"
                                             widgetVar="prop-search-query-panel-var"
                                             collapsed="false"
+                                            style="width:50%;"
                                             header="Add a property">
                                     <h:form id="prop-addpanel-form">
                                         
