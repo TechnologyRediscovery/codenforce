@@ -595,7 +595,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             stmt.setInt(15, prop.getLastUpdatedBy().getUserID());
             
-<<<<<<< HEAD
 //            stmt.setInt(16, prop.getLocationDescriptor().getLocationID());
 //            stmt.setInt(17, prop.getBobSource().getSourceid());
 //            if(prop.getUnfitDateStart() != null){
@@ -630,7 +629,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 //            
 //            stmt.setInt(32, prop.getUseTypeID());
             stmt.setInt(16, prop.getPropertyID());
-=======
             stmt.setInt(16, prop.getLocationDescriptor().getLocationID());
             stmt.setInt(17, prop.getBobSource().getSourceid());
             if(prop.getUnfitDateStart() != null){
@@ -666,7 +664,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if(prop.getUseType() != null){
                 stmt.setInt(32, prop.getUseType().getTypeID());
             }
->>>>>>> d52b4d0bf4a0fe1a78cb1153be5c4817ff732fe0
 
             stmt.executeUpdate();
 
