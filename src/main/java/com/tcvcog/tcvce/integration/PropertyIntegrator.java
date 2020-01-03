@@ -899,7 +899,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     stmt.setInt(++paramCounter, params.getLandbankprospect_intensityClass_val());
                 }
                 if (params.isUseType_ctl()) {
-                    stmt.setInt(++paramCounter, params.getUserType_valsdf());
+                    stmt.setInt(++paramCounter, params.getUseType_val().getTypeID());
                 }
                 if (params.isZoneClass_ctl()) {
                     stmt.setString(++paramCounter, params.getZoneClass_val());

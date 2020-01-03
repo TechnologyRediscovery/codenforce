@@ -40,7 +40,6 @@ import javax.faces.event.ActionEvent;
  * @author sylvia
  */
 public class PropertySearchBB extends BackingBeanUtils{
-
     
     private SearchParamsProperty searchParamsSelected;
     
@@ -142,7 +141,6 @@ public class PropertySearchBB extends BackingBeanUtils{
                                         ex.getMessage(), ""));
         }
     }
-    
     
 
     /**

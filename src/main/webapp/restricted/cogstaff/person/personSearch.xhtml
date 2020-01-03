@@ -7,139 +7,200 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>_________NAMEME_________</title>
+        <title>Person search</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="_________NAMEME_________">
+                <f:view id="pers-search-view">
 
                     <div class="mainContainer">
 
-                        <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
+                        <h:form id="pers-search-messages-form">
+                            <h:messages id="pers-search-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
 
-                        <h:form id="_________NAMEME_________">
                             
-                        <h1>_________NAMEME_________</h1>
-
-
-                        <p:panel    id="_________NAMEME_________"
+                        <p:panel    id="pers-search-query-panel"
                                     toggleable="true"
-                                    widgetVar="_________NAMEME_________-var"
+                                    widgetVar="pers-search-query-panel-var"
                                     collapsed="false"
-                                    header="Occupancy period settings">
+                                    header="Search for persons">
                                
-                            <h:form id="_________NAMEME_________">
-                                        <h:panelGrid        id="_________NAMEME_________"
-                                                            columns="2"
-                                                            columnClasses="gridTd, gridTdg"
-                                                            rendered="true">
-                                            <h:panelGroup>
-                                                <h:outputText value="_________NAMEME_________"
-                                                              styleClass="ui-label font-smaller"/>
-                                                
-                                                    <h:outputText   id="_________NAMEME_________"
-                                                                    value="#{empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS ? 'block' : 'verified_user'}"/>
-                                                        
-                                                    <p:outputLabel  for="_________NAMEME_________"
-                                                                    value="_________NAMEME_________"
-                                                                    styleClass="ui-label" />
-                                                    <p:inputText    id="_________NAMEME_________" 
-                                                                    type="text"
-                                                                    value="#{occInspectionBB.formEventRuleIDToAdd}" />
-                                                    <h:message  for="_________NAMEME_________" showDetail="false" showSummary="true"  
-                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            <h:form id="pers-search-query-form">
                                 
-                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.type.title}"
-                                                              styleClass="data-text"/>
-                                            </h:panelGroup>
+                                
+                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                             columnClasses="gridTd-solid-back, gridTd-solid-back">
 
-                                            <h:panelGroup>
-                                                <f:subview id="_________NAMEME_________">
-                                                
-                                                    <!--content-->
-                                                    
-                                                </f:subview>
-                                            </h:panelGroup>
-                                        </h:panelGrid>
-                               </h:form>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="formFirstName-person">
+                                            <h:outputText value="First Name"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="formFirstName-person" value="#{personsBB.searchParams.name_first_val}" 
+                                                     style="width: 200px;" tabindex="1" required="false" styleClass="inputText">
+                                        </p:inputText>
+                                        <h:message for="formFirstName-person" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="lname-person-person">
+                                        <p:outputLabel for="formLastName-person">
+                                            <h:outputText value="Last Name"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="formLastName-person" value="#{personsBB.searchParams.name_last_val}" 
+                                                     style="width: 200px;" tabindex="2" required="false" styleClass="inputText">
+                                        </p:inputText>
+                                        <h:message for="formLastName-person" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                </h:panelGrid>
+
+                                <p:commandButton
+                                    value="Search by name only" tabindex="3" 
+                                    ajax="true" icon="fa fa-search"
+                                    process=    "@form
+                                    change-person-form:formFirstName-person
+                                    change-person-form:formLastName-person"
+                                    actionListener="#{personsBB.searchForPersons}" 
+                                    update=    ":search-params-form
+                                    change-person-form:formFirstName-person
+                                    change-person-form:formLastName-person
+                                    change-person-form:personTable
+                                    change-person-form:person-search-messages
+                                    messages-left-form:persons-messages-global"/>
+                                <hr />
+
+                                <p:commandButton    id="open-search-options-cb"
+                                                    ajax="true" process="@none"
+                                                    value="Advanced search options"
+                                                    disabled="!#{sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}"
+                                                    onclick="PF('search-params-dialog').show()"
+                                                    icon="fa fa-gears"/>
+
+                                        
+                            </h:form>
                                                 
 
 
                         </p:panel>
                         
-                        <p:tabView id="_________NAMEME_________">
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                        </p:tabView>
+                            
+                        <p:panel    id="pers-search-results-panel"
+                                    toggleable="true"
+                                    widgetVar="pers-search-results-panel-var"
+                                    collapsed="false"
+                                    header="Person search results">
+                            
+                            
+
+                                <h2>Search Results in <h:outputText value="#{personsBB.searchParams.muni_val.muniName}" /></h2>
+
+                                <p:commandButton    id="load-history-cb"
+                                                    actionListener="#{personsBB.loadPersonHistory}"
+                                                    ajax="true" style="background-color: white;"
+                                                    value="Load person history"
+                                                    update="change-person-form:personTable
+                                                    messages-left-form:persons-messages-global"
+                                                    icon="fa fa-history"/>
+
+                                <p:spacer height="2px"/>
+
+                                <p:dataTable
+                                    id="personTable"
+                                    var="per"
+                                    value="#{personsBB.personList}"
+                                    rowKey="#{per.personID}"
+                                    tableStyleClass="primeDataTable"
+                                    rowExpandMode="single"
+                                    resizableColumns="true"
+                                    expandedRow="false"
+                                    filteredValue="#{personsBB.filteredPersonList}"
+                                    widgetVar="personSelectListTable">
+
+                                    <p:column width="4%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{per.personID}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" sortBy="#{per.personType.label}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Person Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{per.personType.label}"/>
+                                    </p:column>
+
+
+                                    <p:column width="10%" sortBy="#{per.firstName}"
+                                              filterBy="#{per.firstName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="First" />
+                                        </f:facet>
+                                        <h:outputText value="#{per.firstName}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" filterBy="#{per.lastName}"
+                                              sortBy="#{per.lastName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Last" />
+                                        </f:facet>
+                                        <h:outputText value="#{per.lastName}"/>
+                                    </p:column>
+
+                                    <p:column   width="20%"
+                                                sortBy="#{per.addressStreet}"
+                                                filterBy="#{per.addressStreet}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Address" />
+                                        </f:facet>
+                                        <h:outputText escape="false" value="#{per.addressStreet}"/>
+                                        <p:spacer height="5px"/>
+                                        <h:outputText value="#{per.addressCity}, #{per.addressState} #{per.addressZip}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" >
+                                        <f:facet name="header">
+                                            <h:outputText value="View" />
+                                        </f:facet>
+                                        <p:commandButton actionListener="#{personsBB.selectPerson(per)}"
+                                                         ajax="true" icon="fa fa-hand-o-right"
+                                                         value="view"
+                                                         update="selected-person-info-form
+                                                         connect-person-to-property-form"/>
+
+                                    </p:column>
+                                </p:dataTable>
+                            </h:form>
+                        </p:panel>
+                               
+                            
+                            
+                        <p:panel    id="pers-add-panel"
+                                    toggleable="true"
+                                    widgetVar="pers-search-query-panel-var"
+                                    collapsed="false"
+                                    header="Add a new person">
+                               
+                            
+                            <h:form id="start-new-person-form">
+
+                                <p:commandButton    id="new-person-cb"
+                                                    ajax="true" actionListener="#{personsBB.initiatePersonCreation}"
+                                                    oncomplete="PF('person-addupdate-dialog-var').show()"
+                                                    update="person-addupdate-form"
+                                                    value="Create new Person"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                    icon="fa fa-plus"
+                                                    />
+                            </h:form>
+
+                        </p:panel>
                         
-                          <p:dataScroller
-                                                id="_________NAMEME_________"
-                                                widgetVar="_________NAMEME_________"
-                                                var="inelement"
-                                                value="#{inspace.inspectedElementListVisible}"
-                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
-                          
-                          
-                          
-                          </p:dataScroller>
-                        
-                          <p:dataTable
-                                            id="_________NAMEME_________"
-                                            var="_________NAMEME_________"
-                                            rowKey="#{permit.permitID}"
-                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
-                                            tableStyleClass="primeDataTable"
-                                            draggableColumns="true"
-                                            resizableColumns="true"
-                                            filteredValue="#{occInspectionBB.filteredEventList}"
-                                            widgetVar="caseEventTable">
-
-                                            <p:column width="3%" exportable="false">
-                                                <p:rowToggler/>
-                                            </p:column>
-                                            
-                                            <p:column width="10%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Print" />
-                                                </f:facet>
-                                                <p:commandButton ajax="false" 
-                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
-                                                                 value="print"
-                                                                 icon="fa fa-print"
-                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
-                                            </p:column>
-                          </p:dataTable>
-
-                        <p:commandButton   id="_________NAMEME_________" 
-                                           value="run selected query" 
-                                           ajax="true" 
-                                           actionListener="_________NAMEME_________"
-                                           icon="fa fa-print" 
-                                           styleClass="button"
-                                           update=""/>
-
-
-
-                        <p:commandButton    id="_________NAMEME_________"
-                                            value="help on this page" 
-                                            onclick="PF('_________NAMEME_________').show()" 
-                                            styleClass="noFill" 
-                                            icon="fa fa-question-circle"/>
-                        <p:spacer height="10px"/>
-
-
-                        </h:form>
-
 
                     <!--close main container-->
                     </div>

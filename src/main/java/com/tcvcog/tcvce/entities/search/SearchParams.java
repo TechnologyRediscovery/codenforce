@@ -23,7 +23,7 @@ import java.util.List;
  * @author Sylvia, no wait, Lauren
  */
 
-public  class  SearchParams 
+public  class           SearchParams 
         implements      Serializable{
 
     /**

@@ -776,6 +776,13 @@ i.status-display-icon-i{
     font-family: mono;
 }
 
+.datum-label{
+    font-weight: bold;
+}
+
+.datum-data{
+    
+}
 
 .bold {
     font-weight: bold;
@@ -802,6 +809,14 @@ i.status-display-icon-i{
 
 
 /***************** CLOSE TEXT AND SPANS ***********************/
+
+/* --------------- SEARCH ---------------------------*/
+
+.search-inputtext{
+    
+}
+
+
 
 
 /* --------------- DIVS---------------------------*/
