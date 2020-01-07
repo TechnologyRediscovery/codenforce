@@ -98,7 +98,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         
         currProp = (getSessionBean().getSessionProperty());
         
-        //occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
+        occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
         selectedMuni = getSessionBean().getSessionMuni();
 
         try {
