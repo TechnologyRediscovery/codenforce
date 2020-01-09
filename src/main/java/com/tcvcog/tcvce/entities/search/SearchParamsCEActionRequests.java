@@ -16,58 +16,58 @@ import java.io.Serializable;
 public  class   SearchParamsCEActionRequests 
         extends SearchParams {
     
-    private boolean useRequestStatus;
-    private CEActionRequestStatus requestStatus;
+    private boolean requestStatus_ctl;
+    private CEActionRequestStatus requestStatus_val;
     
-    private boolean useNotAtAddress;
-    private boolean notAtAnAddress;
+    private boolean nonaddressable_ctl;
+    private boolean nonaddressable_val;
     
-    private boolean useMarkedUrgent;
-    private boolean markedUrgent;
+    private boolean urgent_ctl;
+    private boolean urgent_val;
     
-    private boolean useAttachedToCase;
-    private boolean attachedToCase;
+    private boolean caseAttachment_ctl;
+    private boolean caseAttachment_val;
     
     private boolean useRequestID;
     private int requestID;
     
 
     /**
-     * @return the requestStatus
+     * @return the requestStatus_val
      */
-    public CEActionRequestStatus getRequestStatus() {
-        return requestStatus;
+    public CEActionRequestStatus getRequestStatus_val() {
+        return requestStatus_val;
     }
 
     /**
-     * @param requestStatus the requestStatus to set
+     * @param requestStatus_val the requestStatus_val to set
      */
-    public void setRequestStatus(CEActionRequestStatus requestStatus) {
-        this.requestStatus = requestStatus;
+    public void setRequestStatus_val(CEActionRequestStatus requestStatus_val) {
+        this.requestStatus_val = requestStatus_val;
     }
 
    
     /**
-     * @return the notAtAnAddress
+     * @return the nonaddressable_val
      */
-    public boolean isNotAtAnAddress() {
-        return notAtAnAddress;
+    public boolean isNonaddressable_val() {
+        return nonaddressable_val;
     }
 
 
 
     /**
-     * @return the markedUrgent
+     * @return the urgent_val
      */
-    public boolean isMarkedUrgent() {
-        return markedUrgent;
+    public boolean isUrgent_val() {
+        return urgent_val;
     }
 
     /**
-     * @return the attachedToCase
+     * @return the caseAttachment_val
      */
-    public boolean isAttachedToCase() {
-        return attachedToCase;
+    public boolean isCaseAttachment_val() {
+        return caseAttachment_val;
     }
 
     /**
@@ -79,24 +79,24 @@ public  class   SearchParamsCEActionRequests
 
    
     /**
-     * @param notAtAnAddress the notAtAnAddress to set
+     * @param nonaddressable_val the nonaddressable_val to set
      */
-    public void setNotAtAnAddress(boolean notAtAnAddress) {
-        this.notAtAnAddress = notAtAnAddress;
+    public void setNonaddressable_val(boolean nonaddressable_val) {
+        this.nonaddressable_val = nonaddressable_val;
     }
 
     /**
-     * @param markedUrgent the markedUrgent to set
+     * @param urgent_val the urgent_val to set
      */
-    public void setMarkedUrgent(boolean markedUrgent) {
-        this.markedUrgent = markedUrgent;
+    public void setUrgent_val(boolean urgent_val) {
+        this.urgent_val = urgent_val;
     }
 
     /**
-     * @param attachedToCase the attachedToCase to set
+     * @param caseAttachment_val the caseAttachment_val to set
      */
-    public void setAttachedToCase(boolean attachedToCase) {
-        this.attachedToCase = attachedToCase;
+    public void setCaseAttachment_val(boolean caseAttachment_val) {
+        this.caseAttachment_val = caseAttachment_val;
     }
 
     /**
@@ -107,33 +107,33 @@ public  class   SearchParamsCEActionRequests
     }
 
     /**
-     * @return the useRequestStatus
+     * @return the requestStatus_ctl
      */
-    public boolean isUseRequestStatus() {
-        return useRequestStatus;
+    public boolean isRequestStatus_ctl() {
+        return requestStatus_ctl;
     }
 
     /**
-     * @return the useNotAtAddress
+     * @return the nonaddressable_ctl
      */
-    public boolean isUseNotAtAddress() {
-        return useNotAtAddress;
+    public boolean isNonaddressable_ctl() {
+        return nonaddressable_ctl;
     }
 
     
 
     /**
-     * @return the useMarkedUrgent
+     * @return the urgent_ctl
      */
-    public boolean isUseMarkedUrgent() {
-        return useMarkedUrgent;
+    public boolean isUrgent_ctl() {
+        return urgent_ctl;
     }
 
     /**
-     * @return the useAttachedToCase
+     * @return the caseAttachment_ctl
      */
-    public boolean isUseAttachedToCase() {
-        return useAttachedToCase;
+    public boolean isCaseAttachment_ctl() {
+        return caseAttachment_ctl;
     }
 
     /**
@@ -144,33 +144,33 @@ public  class   SearchParamsCEActionRequests
     }
 
     /**
-     * @param useRequestStatus the useRequestStatus to set
+     * @param requestStatus_ctl the requestStatus_ctl to set
      */
-    public void setUseRequestStatus(boolean useRequestStatus) {
-        this.useRequestStatus = useRequestStatus;
+    public void setRequestStatus_ctl(boolean requestStatus_ctl) {
+        this.requestStatus_ctl = requestStatus_ctl;
     }
 
 
     /**
-     * @param useNotAtAddress the useNotAtAddress to set
+     * @param nonaddressable_ctl the nonaddressable_ctl to set
      */
-    public void setUseNotAtAddress(boolean useNotAtAddress) {
-        this.useNotAtAddress = useNotAtAddress;
+    public void setNonaddressable_ctl(boolean nonaddressable_ctl) {
+        this.nonaddressable_ctl = nonaddressable_ctl;
     }
 
 
     /**
-     * @param useMarkedUrgent the useMarkedUrgent to set
+     * @param urgent_ctl the urgent_ctl to set
      */
-    public void setUseMarkedUrgent(boolean useMarkedUrgent) {
-        this.useMarkedUrgent = useMarkedUrgent;
+    public void setUrgent_ctl(boolean urgent_ctl) {
+        this.urgent_ctl = urgent_ctl;
     }
 
     /**
-     * @param useAttachedToCase the useAttachedToCase to set
+     * @param caseAttachment_ctl the caseAttachment_ctl to set
      */
-    public void setUseAttachedToCase(boolean useAttachedToCase) {
-        this.useAttachedToCase = useAttachedToCase;
+    public void setCaseAttachment_ctl(boolean caseAttachment_ctl) {
+        this.caseAttachment_ctl = caseAttachment_ctl;
     }
 
     /**

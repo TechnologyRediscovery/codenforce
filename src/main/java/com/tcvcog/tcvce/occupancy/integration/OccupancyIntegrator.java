@@ -41,7 +41,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
-import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriodDateFields;
+import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriodDateFieldsEnum;
 import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
@@ -302,7 +302,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     }
 
-    private String getDBDateField(SearchParamsOccPeriodDateFields enumVal) {
+    private String getDBDateField(SearchParamsOccPeriodDateFieldsEnum enumVal) {
 
         switch (enumVal) {
             case CREATED_TS:

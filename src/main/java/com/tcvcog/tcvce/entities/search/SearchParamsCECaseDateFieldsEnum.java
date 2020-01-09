@@ -17,25 +17,27 @@
 package com.tcvcog.tcvce.entities.search;
 
 /**
- *
- * @author sylvia
+ * Utility enum for allowing users to choose a date field for building query
+ * search param objects. Contains direct mapping of DB field names to 
+ * human friendly descriptions of dates available
+ * 
+ * @author ellen bascomb
  */
-public enum SearchParamsOccPeriodUserFields {
+public enum SearchParamsCECaseDateFieldsEnum {
     
-    CREATED_USER                ("Period creator", "createdby_userid"),
-    MANAGER_USER                ("Period manager", "manager_userid"),
-    TYPE_CERTIFYING_USER        ("Period certifier", "typecertifiedby_userid"),
-    START_DATE_CERTIFYING_USER  ("Period start date certifier", "startdatecertifiedby_userid"),
-    END_DATE_CERTIFYING_USER    ("Period end date certifier", "enddatecertifiedby_userid"),
-    AUTHORIZIING_USER           ("Period authorizer", "authorizedby_userid"),
-    INSPECTOR_USER              ("Inspector", "inspector_userid"),
-    PASSEDINSPETION_AUTH_USER   ("Inspection pass certifier", "passedinspection_userid"),
-    PERMIT_ISSUEDBY_USER        ("Permit issuer", "issuedby_userid");
+    ORIGINATIONTS              ("Creation timestamp", 
+                                "creationtimestamp"), 
+    
+    ORIGINATION_DOFRECORD       ("Case origination date",
+                                "originationdate"), 
+    
+    CLOSE                       ("Period start date", 
+                                "closingdate");
     
     private final String title;
     private final String dbField;
     
-    private SearchParamsOccPeriodUserFields(String t, String db){
+    private SearchParamsCECaseDateFieldsEnum(String t, String db){
         title = t;
         dbField = db;
     }

@@ -28,13 +28,13 @@ public  class       SearchParamsProperty
     // The filter by date switch is on the superclass SearchParams
     // if that's swich is on, the integrator will look at this Enum value
     // to decide which field to use in the query against the db
-   private SearchParamsPropertyDateFields date_field_val;
+   private SearchParamsPropertyDateFieldsEnum date_field_val;
     
    private boolean date_null_ctl;
-   private SearchParamsPropertyDateFields date_null_val;
+   private SearchParamsPropertyDateFieldsEnum date_null_val;
     
    private boolean user_ctl;
-   private SearchParamsPropertyUserFields user_field_val;
+   private SearchParamsPropertyUserFieldsEnum user_field_val;
    private User user_val;
    
    private boolean zip_ctl;
@@ -79,13 +79,13 @@ public  class       SearchParamsProperty
    private int constructionYear_max_val;
    
    
-   public SearchParamsPropertyDateFields[] getDateFieldList(){
-       SearchParamsPropertyDateFields[] fields = SearchParamsPropertyDateFields.values();
+   public SearchParamsPropertyDateFieldsEnum[] getDateFieldList(){
+       SearchParamsPropertyDateFieldsEnum[] fields = SearchParamsPropertyDateFieldsEnum.values();
        return fields;
    }
    
-   public SearchParamsPropertyUserFields[] getUserFieldList(){
-       SearchParamsPropertyUserFields[] fields = SearchParamsPropertyUserFields.values();
+   public SearchParamsPropertyUserFieldsEnum[] getUserFieldList(){
+       SearchParamsPropertyUserFieldsEnum[] fields = SearchParamsPropertyUserFieldsEnum.values();
        return fields;
    }
    
@@ -181,7 +181,7 @@ public  class       SearchParamsProperty
     /**
      * @return the date_field_val
      */
-    public SearchParamsPropertyDateFields getDate_field_val() {
+    public SearchParamsPropertyDateFieldsEnum getDate_field_val() {
         return date_field_val;
     }
 
@@ -195,7 +195,7 @@ public  class       SearchParamsProperty
     /**
      * @return the date_null_val
      */
-    public SearchParamsPropertyDateFields getDate_null_val() {
+    public SearchParamsPropertyDateFieldsEnum getDate_null_val() {
         return date_null_val;
     }
 
@@ -209,7 +209,7 @@ public  class       SearchParamsProperty
     /**
      * @return the user_field_val
      */
-    public SearchParamsPropertyUserFields getUser_field_val() {
+    public SearchParamsPropertyUserFieldsEnum getUser_field_val() {
         return user_field_val;
     }
 
@@ -351,7 +351,7 @@ public  class       SearchParamsProperty
     /**
      * @param date_field_val the date_field_val to set
      */
-    public void setDate_field_val(SearchParamsPropertyDateFields date_field_val) {
+    public void setDate_field_val(SearchParamsPropertyDateFieldsEnum date_field_val) {
         this.date_field_val = date_field_val;
     }
 
@@ -365,7 +365,7 @@ public  class       SearchParamsProperty
     /**
      * @param date_null_val the date_null_val to set
      */
-    public void setDate_null_val(SearchParamsPropertyDateFields date_null_val) {
+    public void setDate_null_val(SearchParamsPropertyDateFieldsEnum date_null_val) {
         this.date_null_val = date_null_val;
     }
 
@@ -379,7 +379,7 @@ public  class       SearchParamsProperty
     /**
      * @param user_field_val the user_field_val to set
      */
-    public void setUser_field_val(SearchParamsPropertyUserFields user_field_val) {
+    public void setUser_field_val(SearchParamsPropertyUserFieldsEnum user_field_val) {
         this.user_field_val = user_field_val;
     }
 

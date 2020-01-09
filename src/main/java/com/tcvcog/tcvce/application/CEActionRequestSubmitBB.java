@@ -77,10 +77,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private String houseNum;
     private String streetName;
     
-    private Map<String, Integer> violationTypeMap;
-    private int violationTypeID;
-    private String violationTypeName;
-    
     private Municipality selectedMuni;
     
     private Property selectedProperty;
@@ -532,34 +528,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
    
 
-    /**
-     * @return the violationTypeID
-     */
-    public int getViolationTypeID() {
-        return violationTypeID;
-    }
-
-    /**
-     * @param violationTypeID the violationTypeID to set
-     */
-    public void setViolationTypeID(int violationTypeID) {
-        this.violationTypeID = violationTypeID;
-    }
-
-    /**
-     * @return the violationTypeName
-     */
-    public String getViolationTypeName() {
-        return violationTypeName;
-    }
-
-    /**
-     * @param violationTypeName the violationTypeName to set
-     */
-    public void setViolationTypeName(String violationTypeName) {
-        this.violationTypeName = violationTypeName;
-    }
-
+    
     
 
     /**
@@ -693,21 +662,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     
 
    
-    /**
-     * @return the violationTypeMap
-     */
-    public Map<String, Integer> getViolationTypeMap() {
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        violationTypeMap = ceari.getViolationMap();
-        return violationTypeMap;
-    }
-
-    /**
-     * @param violationTypeMap the violationTypeMap to set
-     */
-    public void setViolationTypeMap(Map<String, Integer> violationTypeMap) {
-        this.violationTypeMap = violationTypeMap;
-    }
 
     /**
      * @return the currentDate

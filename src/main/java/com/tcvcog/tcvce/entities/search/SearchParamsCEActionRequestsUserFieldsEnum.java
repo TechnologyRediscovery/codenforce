@@ -17,25 +17,37 @@
 package com.tcvcog.tcvce.entities.search;
 
 /**
- *
- * @author sylvia
+ * Utility enum for allowing users to choose a date field for building query
+ * search param objects. Contains direct mapping of DB field names to 
+ * human friendly descriptions of dates available
+ * 
+ * @author ellen bascomb
  */
-public enum SearchParamsPropertyUserFields {
+public enum SearchParamsCEActionRequestsUserFieldsEnum {
     
-    UNFIT_BY("Declared unfit for occupancy by"),
-    ABANDONED_BY("Declared abandoned by"),
-    VACANT_BY("Declared vacant by"),
-    PROPERTY_UPDATEDBY("Property data last updated by");
+    USERSUBMITTER              ("Internal submitter", 
+                                "usersubmitter_userid");
     
     private final String title;
+    private final String dbField;
     
-    private SearchParamsPropertyUserFields (String t){
-        this.title = t;
+    private SearchParamsCEActionRequestsUserFieldsEnum(String t, String db){
+        title = t;
+        dbField = db;
     }
-    
-    public String getTitle(){
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
         return title;
     }
-     
+
+    /**
+     * @return the dbField
+     */
+    public String getDbField() {
+        return dbField;
+    }
     
 }

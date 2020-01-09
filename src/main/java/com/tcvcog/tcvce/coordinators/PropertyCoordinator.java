@@ -38,16 +38,12 @@ import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
-import com.tcvcog.tcvce.entities.search.QueryProperty;
-import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -76,8 +72,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         if (propWL.getCeCaseList() == null) {
             QueryCECase qp = null;
-            qp = sc.initQuery(QueryCECaseEnum.CASES_BY_PROPERTY, cred);
-            qp.getSearchParamsList().get(0).setProperty(pr);
+            qp = sc.initQuery(QueryCECaseEnum., cred);
+            qp.getSearchParamsList().get(0).setProperty_val(pr);
             propWL.setCeCaseList(sc.runQuery(qp).getResults());
         }
         if (propWL.getUnitWithListsList() == null) {

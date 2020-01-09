@@ -562,7 +562,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 break;
             case ANY_ACTIVITY_30Days:
                 break;
-            case CASES_BY_PROPERTY:
+            case PROPERTY:
                 paramsList.add(getDefaultSearchParams_CasesByProp());
                 break;
             case CUSTOM:
@@ -811,7 +811,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         params.setDate_startEnd_ctl(true);
         params.setDate_relativeDates_ctl(true);
-        params.setDate_field_val(SearchParamsPropertyDateFields.LAST_UPDATED);
+        params.setDate_field_val(SearchParamsPropertyDateFieldsEnum.LAST_UPDATED);
         params.setDate_relativeDates_start_val(-30);
         params.setDate_realtiveDates_end_val(0);
         
@@ -1071,16 +1071,16 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setLimitResultCount_ctl(true);
         
         // subclass specific
-        params.setUseIsOpen(true);
-        params.setIsOpen(true);
+        params.setOpen_ctl(true);
+        params.setOpen_val(true);
         
         params.setDateToSearchCECases("Opening date of record");
         params.setUseCaseManager(false);
         
         params.setUseCasePhase(false);
         params.setUseCaseStage(false);
-        params.setUseProperty(false);
-        params.setUsePropertyInfoCase(false);
+        params.setProperty_ctl(false);
+        params.setPropInfoCase_ctl(false);
         params.setUseCaseManager(false);
         
         return params;
@@ -1089,7 +1089,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsCECase getDefaultSearchParams_CasesByProp(){
         SearchParamsCECase params = new SearchParamsCECase();
         
-        params.setUseProperty(true);
+        params.setProperty_ctl(true);
         return params;
     }
     
@@ -1111,7 +1111,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setLimitResultCount_ctl(true);
         
         // subclass specific
-        params.setUseIsOpen(false);
+        params.setOpen_ctl(false);
         
         params.setDateToSearchCECases("Closing date");
         params.setUseCaseManager(false);
@@ -1123,8 +1123,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         params.setUseCasePhase(false);
         params.setUseCaseStage(false);
-        params.setUseProperty(false);
-        params.setUsePropertyInfoCase(false);
+        params.setProperty_ctl(false);
+        params.setPropInfoCase_ctl(false);
         params.setUseCaseManager(false);
         
         return params;
@@ -1156,10 +1156,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         sps.setDate_end_val(LocalDateTime.now());
         
         sps.setLimitResultCount_ctl(true);
-        sps.setUseAttachedToCase(false);
-        sps.setAttachedToCase(false);
-        sps.setUseMarkedUrgent(false);
-        sps.setUseNotAtAddress(false);
+        sps.setCaseAttachment_ctl(false);
+        sps.setCaseAttachment_val(false);
+        sps.setUrgent_ctl(false);
+        sps.setNonaddressable_ctl(false);
         
         
         return sps;
@@ -1178,12 +1178,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         sps.setDate_end_val(LocalDateTime.now());
         
         sps.setLimitResultCount_ctl(true);
-        sps.setUseAttachedToCase(false);
-        sps.setAttachedToCase(false);
-        sps.setUseMarkedUrgent(false);
-        sps.setUseNotAtAddress(false);
-        sps.setUseRequestStatus(true);
-        sps.setRequestStatus(cari.getRequestStatus(Integer.parseInt(
+        sps.setCaseAttachment_ctl(false);
+        sps.setCaseAttachment_val(false);
+        sps.setUrgent_ctl(false);
+        sps.setNonaddressable_ctl(false);
+        sps.setRequestStatus_ctl(true);
+        sps.setRequestStatus_val(cari.getRequestStatus(Integer.parseInt(
                 getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestInitialStatusCode"))));
         
         return sps;
@@ -1201,10 +1201,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         // action requests cannot have a time stamp past the current datetime
         sps.setDate_end_val(LocalDateTime.now());
 
-        sps.setUseAttachedToCase(false);
-        sps.setUseMarkedUrgent(false);
-        sps.setUseNotAtAddress(false);
-        sps.setUseRequestStatus(false);
+        sps.setCaseAttachment_ctl(false);
+        sps.setUrgent_ctl(false);
+        sps.setNonaddressable_ctl(false);
+        sps.setRequestStatus_ctl(false);
         
         return sps;
     }
@@ -1222,12 +1222,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         // action requests cannot have a time stamp past the current datetime
         sps.setDate_end_val(LocalDateTime.now());
 
-        sps.setUseAttachedToCase(true);
-        sps.setAttachedToCase(true);
+        sps.setCaseAttachment_ctl(true);
+        sps.setCaseAttachment_val(true);
         
-        sps.setUseMarkedUrgent(false);
-        sps.setUseNotAtAddress(false);
-        sps.setUseRequestStatus(false);
+        sps.setUrgent_ctl(false);
+        sps.setNonaddressable_ctl(false);
+        sps.setRequestStatus_ctl(false);
         
         return sps;
     }

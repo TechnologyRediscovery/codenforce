@@ -23,7 +23,7 @@ package com.tcvcog.tcvce.entities.search;
  * 
  * @author ellen bascomb
  */
-public enum SearchParamsOccPeriodDateFields {
+public enum SearchParamsEventUserFieldsEnum {
     
     CREATED_TS              ("Creation timestamp", 
                             "createdts"), 
@@ -58,7 +58,7 @@ public enum SearchParamsOccPeriodDateFields {
     private final String title;
     private final String dbField;
     
-    private SearchParamsOccPeriodDateFields(String t, String db){
+    private SearchParamsEventUserFieldsEnum(String t, String db){
         title = t;
         dbField = db;
     }

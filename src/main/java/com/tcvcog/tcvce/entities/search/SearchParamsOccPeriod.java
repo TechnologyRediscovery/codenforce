@@ -27,16 +27,16 @@ public class SearchParamsOccPeriod
     // The filter by date switch is on the superclass SearchParams
     // if that's swich is on, the integrator will look at this Enum value
     // to decide which field to use in the query against the db
-    private SearchParamsOccPeriodDateFields dateField;
+    private SearchParamsOccPeriodDateFieldsEnum dateField;
     
     private boolean nullDateField_filterBy;
-    private SearchParamsOccPeriodDateFields nullDateField_EnumValue;
+    private SearchParamsOccPeriodDateFieldsEnum nullDateField_EnumValue;
     
     private boolean occPeriodType_filterBy;
     private OccPeriodType occPeriodType_type;
     
     private boolean userField_filter;
-    private SearchParamsOccPeriodUserFields userField_enumValue;
+    private SearchParamsOccPeriodUserFieldsEnum userField_enumValue;
     private User userFieldUser;
     
     private boolean overrideTypeConfig_filterBy;
@@ -61,7 +61,7 @@ public class SearchParamsOccPeriod
     /**
      * @return the dateField
      */
-    public SearchParamsOccPeriodDateFields getDateField() {
+    public SearchParamsOccPeriodDateFieldsEnum getDateField() {
         return dateField;
     }
 
@@ -75,7 +75,7 @@ public class SearchParamsOccPeriod
     /**
      * @return the nullDateField_EnumValue
      */
-    public SearchParamsOccPeriodDateFields getNullDateField_EnumValue() {
+    public SearchParamsOccPeriodDateFieldsEnum getNullDateField_EnumValue() {
         return nullDateField_EnumValue;
     }
 
@@ -103,7 +103,7 @@ public class SearchParamsOccPeriod
     /**
      * @return the userField_enumValue
      */
-    public SearchParamsOccPeriodUserFields getUserField_enumValue() {
+    public SearchParamsOccPeriodUserFieldsEnum getUserField_enumValue() {
         return userField_enumValue;
     }
 
@@ -111,7 +111,7 @@ public class SearchParamsOccPeriod
     /**
      * @param dateField the dateField to set
      */
-    public void setDateField(SearchParamsOccPeriodDateFields dateField) {
+    public void setDateField(SearchParamsOccPeriodDateFieldsEnum dateField) {
         this.dateField = dateField;
     }
 
@@ -125,7 +125,7 @@ public class SearchParamsOccPeriod
     /**
      * @param nullDateField_EnumValue the nullDateField_EnumValue to set
      */
-    public void setNullDateField_EnumValue(SearchParamsOccPeriodDateFields nullDateField_EnumValue) {
+    public void setNullDateField_EnumValue(SearchParamsOccPeriodDateFieldsEnum nullDateField_EnumValue) {
         this.nullDateField_EnumValue = nullDateField_EnumValue;
     }
 
@@ -153,7 +153,7 @@ public class SearchParamsOccPeriod
     /**
      * @param userField_enumValue the userField_enumValue to set
      */
-    public void setUserField_enumValue(SearchParamsOccPeriodUserFields userField_enumValue) {
+    public void setUserField_enumValue(SearchParamsOccPeriodUserFieldsEnum userField_enumValue) {
         this.userField_enumValue = userField_enumValue;
     }
 

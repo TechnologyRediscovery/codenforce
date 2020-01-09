@@ -116,7 +116,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 }
             }
 
-            if (params.isUseProperty()) {
+            if (params.isProperty_ctl()) {
                 sb.append("property_propertyid = ? ");
             }
             if (params.isUseCaseManager()) {
@@ -126,15 +126,15 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 }
             }
 
-            if (params.isUsePropertyInfoCase()) {
-                if (params.isPropertyInfoCase()) {
+            if (params.isPropInfoCase_ctl()) {
+                if (params.isPropInfoCase_val()) {
                     sb.append("propertyinfocase = TRUE ");
                 } else {
                     sb.append("propertyinfocase = FALSE ");
                 }
             }
-            if (params.isUseIsOpen()) {
-                if (params.isIsOpen()) {
+            if (params.isOpen_ctl()) {
+                if (params.isOpen_val()) {
                     sb.append("closingdate IS NULL ");
                 } else {
                     sb.append("closingdate IS NOT NULL ");
@@ -171,9 +171,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     }
                 }
 
-                if (params.isUseProperty()) {
-                    if(params.getProperty() != null){
-                        stmt.setInt(++paramCounter, params.getProperty().getPropertyID());
+                if (params.isProperty_ctl()) {
+                    if(params.getProperty_val() != null){
+                        stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
                     }
                 }
 

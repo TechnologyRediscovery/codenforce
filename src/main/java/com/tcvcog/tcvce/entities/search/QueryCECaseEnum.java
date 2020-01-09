@@ -54,6 +54,11 @@ public  enum QueryCECaseEnum
                             RoleType.MuniReader, 
                             true),
     
+    PROPERTY(               "CE cases by property",
+                            "CE Cases attached to a single specified property", 
+                            RoleType.MuniReader, 
+                            true),
+    
     CUSTOM(                 "Custom case query", 
                             "Customized search parameters", 
                             RoleType.MuniReader, 

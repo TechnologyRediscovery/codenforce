@@ -5,14 +5,8 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.BOb;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

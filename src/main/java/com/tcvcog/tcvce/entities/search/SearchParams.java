@@ -37,9 +37,10 @@ public  class           SearchParams
     private Municipality muni_val;
     protected List<Municipality> muniList_val;
     
+    // subclasses will have a DateEnum member to specify which date field
     private RoleType date_rtMin;
     private boolean date_startEnd_ctl;
-   private boolean date_null_ctl;
+    private boolean date_null_ctl;
     private LocalDateTime date_start_val;
     private LocalDateTime date_end_val;
 
@@ -50,7 +51,6 @@ public  class           SearchParams
    private boolean user_ctl;
    // subclasses must have a user_field enum member to make these work
    private User user_val;
-    
     
     private boolean applyDateSearchToDateOfRecord;
     private boolean useEntryTimestamp;

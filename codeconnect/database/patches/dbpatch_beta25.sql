@@ -1,0 +1,1 @@
+ALTER TABLE public.actionrqstissuetype RENAME TO ceactionrequestissuetype;

@@ -644,28 +644,28 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
          if (!params.isUseRequestID()) {
             sb.append("AND submittedtimestamp BETWEEN ? AND ? "); // parm 2 and 3 without ID
             
-            if(params.isUseRequestStatus()){
+            if(params.isRequestStatus_ctl()){
                 sb.append("AND status_id = ? "); // param 4 without ID search
             } // close request status
             
-            if(params.isUseNotAtAddress()){
-                if(params.isNotAtAnAddress()){
+            if(params.isNonaddressable_ctl()){
+                if(params.isNonaddressable_val()){
                     sb.append("AND notataddress = TRUE ");
                 } else {
                     sb.append("AND notataddress = FALSE ");
                 }
             } // close not at address
             
-            if(params.isUseMarkedUrgent()){
-                if(params.isMarkedUrgent()){
+            if(params.isUrgent_ctl()){
+                if(params.isUrgent_val()){
                     sb.append("AND isurgent = TRUE ");
                 } else {
                     sb.append("AND isurgent = FALSE ");
                 }
             } // close urgent
 
-            if (params.isUseAttachedToCase()) {
-                if (params.isAttachedToCase()) {
+            if (params.isCaseAttachment_ctl()) {
+                if (params.isCaseAttachment_val()) {
                     sb.append("AND cecase_caseid IS NOT NULL ");
                 } else {
                     sb.append("AND cecase_caseid IS NULL ");
@@ -691,8 +691,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 stmt.setTimestamp(++paramCounter, params.getStartDate_val_SQLDate());
                 stmt.setTimestamp(++paramCounter, params.getEndDate_val_SQLDate());
                 
-                if(params.isUseRequestStatus()){
-                    stmt.setInt(++paramCounter, params.getRequestStatus().getStatusID());
+                if(params.isRequestStatus_ctl()){
+                    stmt.setInt(++paramCounter, params.getRequestStatus_val().getStatusID());
                 }
 
             } else {

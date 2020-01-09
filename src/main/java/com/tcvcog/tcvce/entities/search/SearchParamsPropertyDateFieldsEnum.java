@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author sylvia
  */
-public enum SearchParamsPropertyDateFields {
+public enum SearchParamsPropertyDateFieldsEnum {
     CREATIONTS("Database insert timestamp", "creationts"),    
     LAST_UPDATED("Last updated on", "lastupdated"),
     UNFIT_START("Declared to be unfit - start date", "unfitdatestart"),
@@ -37,7 +37,7 @@ public enum SearchParamsPropertyDateFields {
      private final String title;
      private final String dbField;
     
-    private SearchParamsPropertyDateFields(String t, String db){
+    private SearchParamsPropertyDateFieldsEnum(String t, String db){
         this.title = t;
         this.dbField = db;
     }
@@ -47,7 +47,7 @@ public enum SearchParamsPropertyDateFields {
     }
      
     public Enum getEnumByTitle(String title){
-        for(SearchParamsPropertyDateFields field: SearchParamsPropertyDateFields.values()){
+        for(SearchParamsPropertyDateFieldsEnum field: SearchParamsPropertyDateFieldsEnum.values()){
             if(field.getTitle().equals(title)){
                 return field;
             }
@@ -57,14 +57,14 @@ public enum SearchParamsPropertyDateFields {
     
     public List<Enum> getAllTitles(){
         List<Enum> output = new ArrayList<>();
-        output.add(SearchParamsPropertyDateFields.ABANDONED_START);
-        output.add(SearchParamsPropertyDateFields.ABANDONED_STOP);
-        output.add(SearchParamsPropertyDateFields.EXTERNAL_DATA_LASTUPDATED);
-        output.add(SearchParamsPropertyDateFields.LAST_UPDATED);
-        output.add(SearchParamsPropertyDateFields.UNFIT_START);
-        output.add(SearchParamsPropertyDateFields.UNFIT_STOP);
-        output.add(SearchParamsPropertyDateFields.VACANT_START);
-        output.add(SearchParamsPropertyDateFields.VACANT_STOP);
+        output.add(SearchParamsPropertyDateFieldsEnum.ABANDONED_START);
+        output.add(SearchParamsPropertyDateFieldsEnum.ABANDONED_STOP);
+        output.add(SearchParamsPropertyDateFieldsEnum.EXTERNAL_DATA_LASTUPDATED);
+        output.add(SearchParamsPropertyDateFieldsEnum.LAST_UPDATED);
+        output.add(SearchParamsPropertyDateFieldsEnum.UNFIT_START);
+        output.add(SearchParamsPropertyDateFieldsEnum.UNFIT_STOP);
+        output.add(SearchParamsPropertyDateFieldsEnum.VACANT_START);
+        output.add(SearchParamsPropertyDateFieldsEnum.VACANT_STOP);
         return output;
 }
 

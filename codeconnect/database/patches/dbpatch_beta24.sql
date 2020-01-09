@@ -1,7 +1,7 @@
 -- ****************************************************************************
 -- First patch post re-braining
 -- 
--- 
+-- closed!!!
 -- 
 -- 
 -- 
@@ -55,6 +55,7 @@ ALTER TABLE log ADD COLUMN severity TEXT;
 
 ALTER TABLE property ADD COLUMN creationts TIMESTAMP WITH TIME ZONE;
 
+-- close
 
 
 
