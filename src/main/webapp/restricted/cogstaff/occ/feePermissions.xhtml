@@ -202,7 +202,7 @@
 
                         </h:form>    
 
-                        <h:form id="chooseCodeElementForm" rendered="#{feeManagementBB.editingOccPeriod()}">
+                        <h:form id="chooseCodeElementForm" rendered="#{feeManagementBB.editingCECase()}">
                             <h2>Occupancy Period Types</h2>
                             <p:dataTable
                                 id="codeElementTable"
@@ -224,51 +224,15 @@
                                     <p:rowToggler/>
                                 </p:column>
 
-                                <p:column width="5%" sortBy="#{element.elementID}">
+                                <p:column width="5%" sortBy="#{element.codeSetElementID}">
                                     <f:facet name="header">
                                         <h:outputText value="ID#" />
                                     </f:facet>
-                                    <h:outputText value="#{element.elementID}"/>
+                                    <h:outputText value="#{element.codeSetElementID}"/>
                                 </p:column>
 
-                                <p:column width="10%" sortBy="#{element.guideEntry.category}"
-                                          filterBy="#{element.guideEntry.category}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Category" />
-                                    </f:facet>
-                                    <h:outputText value="#{element.guideEntry.category}"/>
-                                </p:column>
-
-                                <p:column width="10%" sortBy="#{element.guideEntry.subCategory}"
-                                          filterBy="#{element.guideEntry.subCategory}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Sub Category" />
-                                    </f:facet>
-                                    <h:outputText value="#{element.guideEntry.subCategory}"/>
-                                </p:column>
-
-                                <p:column width="5%" sortBy="#{element.ordchapterNo}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Chap"/>
-                                    </f:facet>
-                                    <h:outputText value="#{element.ordchapterNo}"/>
-                                </p:column>
-
-                                <p:column width="15%" sortBy="#{element.ordchapterTitle}"
-                                          filterBy="#{element.ordchapterTitle}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Chapter"/>
-                                    </f:facet>
-                                    <h:outputText value="#{element.ordchapterTitle}"/>
-                                </p:column>
-
-                                <p:column width="5%" sortBy="#{element.ordSecNum}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Sec" />
-                                    </f:facet>
-                                    <h:outputText value="#{element.ordSecNum}"/>
-                                </p:column>
-
+                                <!--Resume column changing from here.-->
+                                
                                 <p:column width="15%" sortBy="#{element.ordSecTitle}"
                                           filterBy="#{element.ordSecTitle}">
                                     <f:facet name="header">
@@ -296,25 +260,69 @@
                                     <div class="outlinedBox">
                                         <h3>Code element detail:</h3>
 
+                                        <h:outputLabel styleClass="bold" value="Code Element ID:"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.elementID}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        
+                                        <h:outputLabel styleClass="bold" value="Category:"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.category}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        
+                                        <h:outputLabel styleClass="bold" value="Sub Category:"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.subCategory}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        
+                                        <h:outputLabel styleClass="bold" value="Chap"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordchapterNo}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        
+                                        <h:outputLabel styleClass="bold" value="Chapter"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordchapterTitle}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        
+                                        <h:outputLabel styleClass="bold" value="Sec"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordSecNum}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        
+                                        
+                                        
                                         <h:outputLabel styleClass="bold" value="Technical Text"/>
                                         <p:spacer height="15px"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.ordTechnicalText}"/>
+                                            <h:outputText escape="false" value="#{element.codeElement.ordTechnicalText}"/>
                                         </div>
                                         <p:spacer height="15px"/>
                                         <h:outputLabel styleClass="bold" value="Human friendly text"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.ordHumanFriendlyText}"/>
+                                            <h:outputText escape="false" value="#{element.codeElement.ordHumanFriendlyText}"/>
                                         </div>
                                         <p:spacer height="15px"/>
                                         <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.guideEntry.enforcementGuidelines}"/>
+                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.enforcementGuidelines}"/>
                                         </div>
                                         <p:spacer height="15px"/>
                                         <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.guideEntry.inspectionGuidelines}"/>
+                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.inspectionGuidelines}"/>
                                         </div>
                                     </div>
                                 </p:rowExpansion>
