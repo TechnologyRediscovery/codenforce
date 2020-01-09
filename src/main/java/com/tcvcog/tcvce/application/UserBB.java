@@ -116,23 +116,23 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     }
 
     
-    public void credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
-        // TODO: finish me!
-        
-        
-    }
     
+    
+    /**
+     * We must do a full re-init of the session!
+     * @deprecated  
+     */
     public void refreshCurrentUser(){
         System.out.println("UserBB.refreshCurrentUser");
         UserCoordinator uc = getUserCoordinator();
-        try {
-            currentUser = uc.authorizeUser(currentUser, getSessionBean().getSessionMuni(), null);
-            
-        } catch (IntegrationException ex) {
-            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (AuthorizationException ex) {
-            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            currentUser = uc.authorizeUser(currentUser, getSessionBean().getSessionMuni(), null);
+//            
+//        } catch (IntegrationException ex) {
+//            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (AuthorizationException ex) {
+//            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         
         
     }

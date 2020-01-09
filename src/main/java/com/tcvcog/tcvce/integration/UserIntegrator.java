@@ -99,6 +99,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     /**
      *
+     * Creates sekeletonized UserAuthorized
+     * 
      * @param u
      * @return
      * @throws IntegrationException 

@@ -48,6 +48,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -216,6 +218,26 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         }
             
         return ua;
+    }
+    
+    /**
+     * Asks the integrtaor for all UMAPs for a given u, cleans that list, 
+     * and returns the sorted Collection
+     * @param u
+     * @return sorted UMAP list which can then be passed to authorizeUser.
+     */
+    public List<UserMuniAuthPeriod> assembleValidAuthPeriods(User u){
+        UserIntegrator ui = getUserIntegrator();
+        List<UserMuniAuthPeriod> umapList = null;
+        
+        try {
+            umapList = ui.getUserMuniAuthPeriodsRaw(u);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            
+        }
+        
+        return cleanUserMuniAuthPeriodList(umapList);
     }
     
     

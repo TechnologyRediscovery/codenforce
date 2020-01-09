@@ -50,6 +50,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -68,6 +70,8 @@ public  class       SessionInitializer
     private Municipality muniQueuedForSession;
     private SessionBean sb;
     
+    private List<UserMuniAuthPeriod> umapListValidForUserSelect;
+    
     /**
      * Creates a new instance of SessionInitializer
      */
@@ -82,24 +86,23 @@ public  class       SessionInitializer
         UserCoordinator uc = getUserCoordinator();
         // check to see if we have an internal session created already
         // to determine which user we authenticate with
-        muniQueuedForSession = sb.getSessionMuni();
-        userQueuedForSession = sb.getSessionUserForReInitSession();
-        umapQueuedForSession = sb.getUmapRequestedForReInit();
+//        muniQueuedForSession = sb.getSessionMuni();
+//        userQueuedForSession = sb.getSessionUserForReInitSession();
+//        umapQueuedForSession = sb.getUmapRequestedForReInit();
         
         
-        try {
-            if(muniQueuedForSession == null
-                    &&
-                userQueuedForSession == null
-                    &&
-                umapQueuedForSession == null){
-                // we have a first init! Ask the container for its user
-                userQueuedForSession = getContainerAuthenticatedUser();
+            if( userQueuedForSession == null){
+                try {
+                    // we have a first init! Ask the container for its user
+                    userQueuedForSession = getContainerAuthenticatedUser();
+                } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                }
             } 
-            userAuthorizedQueuedForSession = uc.authorizeUser(userQueuedForSession, muniQueuedForSession, umapQueuedForSession);
-        } catch (AuthorizationException | IntegrationException ex) {
-            System.out.println(ex);
-        }
+            
+            
+            umapListValidForUserSelect = uc.assembleValidAuthPeriods(userQueuedForSession);
+//            userAuthorizedQueuedForSession = uc.authorizeUser(userQueuedForSession, muniQueuedForSession, umapQueuedForSession);
     }
     
     /**
@@ -142,12 +145,34 @@ public  class       SessionInitializer
         return ui.getUser(ui.getUserID(request.getRemoteUser()));
     }
     
+    /**
+     * Used by developers to load a session that isn't their own.
+     * This button will only exist on a session re-init since 
+     * it won't be rendered before the user is granted a developer-level
+     * permissions under their own authority.
+     * 
+     * @param u 
+     */
+    public void loadAuthPeriodsForAlternateUser(User u){
+        
+        
+        
+    }
+    
+    /**
+     * Processes the user's choice of their authorization period
+     * and initiates the entire auth process to create a fully populted session
+     * @param umap the chosen UMAP, which should be valid
+     */
+    public void credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
+        // TODO: finish me!
+        
+        
+    }
     
     
     /**
-     * Core configuration method for sessions; called both during an initial login
-     * and subsequent changes to the current municipality. It does the work
-     * of gathering all necessary info for session config
+     * Core configuration method for sessions
      * 
      * @param u The base authenticated User who will be transformed into a UserAuthorized through
      * the long and multifaceted journey of the UserAuthorization 
@@ -170,11 +195,7 @@ public  class       SessionInitializer
             
             // as long as we have an actual user, proceed with session config
             if(authUser != null){
-                // The stadnard Municipality object is simple, but we need the full deal
-                
                 initializeSubsystems(authUser);
-              
-             
                return "success";
             } else {
                 return "noAuth";
@@ -221,6 +242,7 @@ public  class       SessionInitializer
         Credential cred = ua.getMyCredential();
         List<SessionException> exlist = new ArrayList<>();
         
+     
         for(SubSysEnum ss: SubSysEnum.values()){
             try{
                 if(ss.isInitialize()){
@@ -429,19 +451,20 @@ public  class       SessionInitializer
         printSubsystemInit(ss);
         PropertyCoordinator pc = getPropertyCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
+        SessionBean sessBean = getSessionBean();
         try {
 
-            sb.setSessionPropertyList(pc.assemblePropertyHistoryList(cred));
-            if(sb.getSessionPropertyList().isEmpty()){
-                sb.setSessionProperty(pc.selectDefaultProperty(cred));
+            sessBean.setSessionPropertyList(pc.assemblePropertyHistoryList(cred));
+            if(sessBean.getSessionPropertyList().isEmpty()){
+                sessBean.setSessionProperty(pc.selectDefaultProperty(cred));
             } else {
-                sb.setSessionProperty(pc.assemblePropertyDataHeavy(sb.getSessionPropertyList().get(0), cred));
+                sessBean.setSessionProperty(pc.assemblePropertyDataHeavy(sessBean.getSessionPropertyList().get(0), cred));
             }
         
-            sb.setQueryPropertyList(sc.buildQueryPropertyList(cred));
+            sessBean.setQueryPropertyList(sc.buildQueryPropertyList(cred));
 
-            if(!sb.getQueryPropertyList().isEmpty()){
-                sb.setQueryProperty(sb.getQueryPropertyList().get(0));
+            if(!sessBean.getQueryPropertyList().isEmpty()){
+                sessBean.setQueryProperty(sessBean.getQueryPropertyList().get(0));
             }            
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
@@ -839,5 +862,19 @@ public  class       SessionInitializer
      */
     public void setUmapQueuedForSession(UserMuniAuthPeriod umapQueuedForSession) {
         this.umapQueuedForSession = umapQueuedForSession;
+    }
+
+    /**
+     * @return the umapListValidForUserSelect
+     */
+    public List<UserMuniAuthPeriod> getUmapListValidForUserSelect() {
+        return umapListValidForUserSelect;
+    }
+
+    /**
+     * @param umapListValidForUserSelect the umapListValidForUserSelect to set
+     */
+    public void setUmapListValidForUserSelect(List<UserMuniAuthPeriod> umapListValidForUserSelect) {
+        this.umapListValidForUserSelect = umapListValidForUserSelect;
     }
 }

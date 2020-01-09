@@ -63,26 +63,26 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         PropertyDataHeavy propWL = new PropertyDataHeavy(pr);
         
-        if (propWL.getCeCaseList() == null) {
-            propWL.setCeCaseList(new ArrayList<CECaseDataHeavy>());
-        }
-        if (propWL.getUnitWithListsList() == null) {
-            propWL.setUnitWithListsList(new ArrayList<PropertyUnitDataHeavy>());
-            // since it was empty
-        }
-        
-        if (propWL.getPersonList() == null) {
-            propWL.setPersonList(new ArrayList<Person>());
-        }
-        if (propWL.getInfoCaseList() == null) {
-            propWL.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
-        }
-        if (propWL.getChangeList() == null) {
-            propWL.setChangeList(new ArrayList<PropertyUnitChangeOrder>());
-        }
-        if (propWL.getBlobList() == null) {
-            propWL.setBlobList(new ArrayList<Integer>());
-        }
+//        if (propWL.getCeCaseList() == null) {
+//            propWL.setCeCaseList(new ArrayList<CECaseDataHeavy>());
+//        }
+//        if (propWL.getUnitWithListsList() == null) {
+//            propWL.setUnitWithListsList(new ArrayList<PropertyUnitDataHeavy>());
+//            // since it was empty
+//        }
+//        
+//        if (propWL.getPersonList() == null) {
+//            propWL.setPersonList(new ArrayList<Person>());
+//        }
+//        if (propWL.getInfoCaseList() == null) {
+//            propWL.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
+//        }
+//        if (propWL.getChangeList() == null) {
+//            propWL.setChangeList(new ArrayList<PropertyUnitChangeOrder>());
+//        }
+//        if (propWL.getBlobList() == null) {
+//            propWL.setBlobList(new ArrayList<Integer>());
+//        }
 
         // add a unit number -1 to any PropertyWithoutAnyUnits
         System.out.println("PropertyCoordinator.assemblePropertyDataheavy()");
