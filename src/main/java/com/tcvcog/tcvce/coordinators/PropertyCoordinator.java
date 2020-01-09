@@ -22,6 +22,9 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -33,12 +36,18 @@ import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -57,32 +66,37 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    public PropertyDataHeavy assemblePropertyDataHeavy(Property pr, Credential cred) throws IntegrationException, BObStatusException{
+    public PropertyDataHeavy assemblePropertyDataHeavy(Property pr, Credential cred) throws IntegrationException, BObStatusException, SearchException{
         
         PropertyIntegrator pi = getPropertyIntegrator();
+        SearchCoordinator sc = getSearchCoordinator();
+        
         
         PropertyDataHeavy propWL = new PropertyDataHeavy(pr);
         
-//        if (propWL.getCeCaseList() == null) {
-//            propWL.setCeCaseList(new ArrayList<CECaseDataHeavy>());
-//        }
-//        if (propWL.getUnitWithListsList() == null) {
-//            propWL.setUnitWithListsList(new ArrayList<PropertyUnitDataHeavy>());
-//            // since it was empty
-//        }
-//        
-//        if (propWL.getPersonList() == null) {
-//            propWL.setPersonList(new ArrayList<Person>());
-//        }
-//        if (propWL.getInfoCaseList() == null) {
-//            propWL.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
-//        }
-//        if (propWL.getChangeList() == null) {
-//            propWL.setChangeList(new ArrayList<PropertyUnitChangeOrder>());
-//        }
-//        if (propWL.getBlobList() == null) {
-//            propWL.setBlobList(new ArrayList<Integer>());
-//        }
+        if (propWL.getCeCaseList() == null) {
+            QueryCECase qp = null;
+            qp = sc.initQuery(QueryCECaseEnum.CASES_BY_PROPERTY, cred);
+            qp.getSearchParamsList().get(0).setProperty(pr);
+            propWL.setCeCaseList(sc.runQuery(qp).getResults());
+        }
+        if (propWL.getUnitWithListsList() == null) {
+            propWL.setUnitWithListsList(new ArrayList<PropertyUnitDataHeavy>());
+            // since it was empty
+        }
+        
+        if (propWL.getPersonList() == null) {
+            propWL.setPersonList(new ArrayList<Person>());
+        }
+        if (propWL.getInfoCaseList() == null) {
+            propWL.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
+        }
+        if (propWL.getChangeList() == null) {
+            propWL.setChangeList(new ArrayList<PropertyUnitChangeOrder>());
+        }
+        if (propWL.getBlobList() == null) {
+            propWL.setBlobList(new ArrayList<Integer>());
+        }
 
         // add a unit number -1 to any PropertyWithoutAnyUnits
         System.out.println("PropertyCoordinator.assemblePropertyDataheavy()");
@@ -101,6 +115,31 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         }
         
+        return p;
+    }
+    
+    /**
+     * Logic container for checking the existence of a property info case on a given property and 
+     * if none exists creating one.
+     * @param p
+     * @param cred
+     * @return 
+     */
+    public PropertyDataHeavy configurePDHInfoCase(PropertyDataHeavy p, Credential cred){
+        CaseCoordinator cc = getCaseCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        CECase cse = null;
+        try {
+            cse = cc.initCECase(p, uc.getUser(cred.getGoverningAuthPeriod().getUserID()));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        try {
+            //review all case mems and set app ones for info case
+            cc.insertNewCECase(cse, cred, null);
+        } catch (IntegrationException | BObStatusException | ViolationException | EventException ex) {
+            System.out.println(ex);
+        }
         return p;
     }
     
@@ -176,7 +215,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public Property getProperty(int propID) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
-        return pi.getProperty(propID);
+        return configureProperty(pi.getProperty(propID));
         
     }
     

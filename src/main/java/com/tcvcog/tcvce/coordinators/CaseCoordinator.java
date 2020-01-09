@@ -361,28 +361,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws BObStatusException
      * @throws ViolationException 
      */
-    public void insertNewCECase(CECaseDataHeavy newCase, UserAuthorized ua, CEActionRequest cear) throws IntegrationException, BObStatusException, ViolationException, EventException{
+    public void insertNewCECase(CECase newCase, Credential cred, CEActionRequest cear) throws IntegrationException, BObStatusException, ViolationException, EventException{
         
         CaseIntegrator ci = getCaseIntegrator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         EventCoordinator ec = getEventCoordinator();
         EventCategory originationCategory;
         EventCnF originationEvent;
+        UserCoordinator uc = getUserCoordinator();
+        User us = uc.getUser(cred.getGoverningAuthPeriod().getUserID());
         
         
         
         // the integrator returns to us a CECaseDataHeavy with the correct ID after it has
         // been written into the DB
         int freshID = ci.insertNewCECase(newCase);
+        CECaseDataHeavy cedh = assembleCECaseDataHeavy(newCase, cred);
         
 
         // If we were passed in an action request, connect it to the new case we just made
         if(cear != null){
-            ceari.connectActionRequestToCECase(cear.getRequestID(), freshID, ua.getUserID());
+            ceari.connectActionRequestToCECase(cear.getRequestID(), freshID,us.getUserID());
             originationCategory = ec.initEventCategory(
                     Integer.parseInt(getResourceBundle(
                     Constants.EVENT_CATEGORY_BUNDLE).getString("originiationByActionRequest")));
-            originationEvent = ec.initEvent(newCase, originationCategory);
+            originationEvent = ec.initEvent(cedh, originationCategory);
             StringBuilder sb = new StringBuilder();
             sb.append("Case generated from the submission of a Code Enforcement Action Request");
             sb.append("<br />");
@@ -402,14 +405,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationCategory = ec.initEventCategory(
             Integer.parseInt(getResourceBundle(
             Constants.EVENT_CATEGORY_BUNDLE).getString("originiationByObservation")));
-            originationEvent = ec.initEvent(newCase, originationCategory);
+            originationEvent = ec.initEvent(cedh, originationCategory);
             StringBuilder sb = new StringBuilder();
             sb.append("Case opened directly on property by code officer assigned to this event");
             originationEvent.setNotes(sb.toString());
             
         }
-            originationEvent.setOwner(ua);
-            attachNewEventToCECase(assembleCECaseDataHeavy(getCECase(freshID), ua.getMyCredential()), originationEvent, null);
+            originationEvent.setOwner(us);
+            attachNewEventToCECase(assembleCECaseDataHeavy(getCECase(freshID), cred), originationEvent, null);
     }
     
     /**

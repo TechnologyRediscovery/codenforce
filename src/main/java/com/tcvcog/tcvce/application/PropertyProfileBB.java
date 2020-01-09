@@ -128,7 +128,14 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
       
     public void beginPropertyUnitUpdates(ActionEvent ev){
-        
+        PropertyIntegrator pi = getPropertyIntegrator();
+        currProp.setLastUpdatedBy(getSessionBean().getSessionUser());
+        System.out.println(currProp.getLastUpdatedBy().getUserID());
+        try{
+            pi.updateProperty(currProp);
+        } catch (IntegrationException ex) {
+            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
      /**

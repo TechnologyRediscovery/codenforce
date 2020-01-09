@@ -562,6 +562,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 break;
             case ANY_ACTIVITY_30Days:
                 break;
+            case CASES_BY_PROPERTY:
+                paramsList.add(getDefaultSearchParams_CasesByProp());
+                break;
             case CUSTOM:
                 break;
             default:
@@ -1080,6 +1083,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setUsePropertyInfoCase(false);
         params.setUseCaseManager(false);
         
+        return params;
+    }
+    
+    public SearchParamsCECase getDefaultSearchParams_CasesByProp(){
+        SearchParamsCECase params = new SearchParamsCECase();
+        
+        params.setUseProperty(true);
         return params;
     }
     
