@@ -18,16 +18,16 @@ import java.io.Serializable;
 public class SearchParamsOccPeriod 
         extends SearchParams implements Serializable {
     
-    private boolean propertyUnit_filterBy;
-    private int propertyUnit_unitID;
+    private boolean propertyUnit_ctl;
+    private int propertyUnit_val;
     
-    private boolean property_filterBy;
-    private int property_propertyid;
+    private boolean property_ctl;
+    private int property_val;
     
     // The filter by date switch is on the superclass SearchParams
     // if that's swich is on, the integrator will look at this Enum value
     // to decide which field to use in the query against the db
-    private SearchParamsOccPeriodDateFieldsEnum dateField;
+    private SearchParamsOccPeriodDateFieldsEnum date_field;
     
     private boolean nullDateField_filterBy;
     private SearchParamsOccPeriodDateFieldsEnum nullDateField_EnumValue;
@@ -59,10 +59,10 @@ public class SearchParamsOccPeriod
     private int checklistImplemented_checklistID;
 
     /**
-     * @return the dateField
+     * @return the date_field
      */
-    public SearchParamsOccPeriodDateFieldsEnum getDateField() {
-        return dateField;
+    public SearchParamsOccPeriodDateFieldsEnum getDate_field() {
+        return date_field;
     }
 
     /**
@@ -109,10 +109,10 @@ public class SearchParamsOccPeriod
 
    
     /**
-     * @param dateField the dateField to set
+     * @param date_field the date_field to set
      */
-    public void setDateField(SearchParamsOccPeriodDateFieldsEnum dateField) {
-        this.dateField = dateField;
+    public void setDate_field(SearchParamsOccPeriodDateFieldsEnum date_field) {
+        this.date_field = date_field;
     }
 
     /**
@@ -340,59 +340,59 @@ public class SearchParamsOccPeriod
     }
 
     /**
-     * @return the propertyUnit_filterBy
+     * @return the propertyUnit_ctl
      */
-    public boolean isPropertyUnit_filterBy() {
-        return propertyUnit_filterBy;
+    public boolean isPropertyUnit_ctl() {
+        return propertyUnit_ctl;
     }
 
     /**
-     * @return the propertyUnit_unitID
+     * @return the propertyUnit_val
      */
-    public int getPropertyUnit_unitID() {
-        return propertyUnit_unitID;
+    public int getPropertyUnit_val() {
+        return propertyUnit_val;
     }
 
     /**
-     * @return the property_filterBy
+     * @return the property_ctl
      */
-    public boolean isProperty_filterBy() {
-        return property_filterBy;
+    public boolean isProperty_ctl() {
+        return property_ctl;
     }
 
     /**
-     * @return the property_propertyid
+     * @return the property_val
      */
-    public int getProperty_propertyid() {
-        return property_propertyid;
+    public int getProperty_val() {
+        return property_val;
     }
 
     /**
-     * @param propertyUnit_filterBy the propertyUnit_filterBy to set
+     * @param propertyUnit_ctl the propertyUnit_ctl to set
      */
-    public void setPropertyUnit_filterBy(boolean propertyUnit_filterBy) {
-        this.propertyUnit_filterBy = propertyUnit_filterBy;
+    public void setPropertyUnit_ctl(boolean propertyUnit_ctl) {
+        this.propertyUnit_ctl = propertyUnit_ctl;
     }
 
     /**
-     * @param propertyUnit_unitID the propertyUnit_unitID to set
+     * @param propertyUnit_val the propertyUnit_val to set
      */
-    public void setPropertyUnit_unitID(int propertyUnit_unitID) {
-        this.propertyUnit_unitID = propertyUnit_unitID;
+    public void setPropertyUnit_val(int propertyUnit_val) {
+        this.propertyUnit_val = propertyUnit_val;
     }
 
     /**
-     * @param property_filterBy the property_filterBy to set
+     * @param property_ctl the property_ctl to set
      */
-    public void setProperty_filterBy(boolean property_filterBy) {
-        this.property_filterBy = property_filterBy;
+    public void setProperty_ctl(boolean property_ctl) {
+        this.property_ctl = property_ctl;
     }
 
     /**
-     * @param property_propertyid the property_propertyid to set
+     * @param property_val the property_val to set
      */
-    public void setProperty_propertyid(int property_propertyid) {
-        this.property_propertyid = property_propertyid;
+    public void setProperty_val(int property_val) {
+        this.property_val = property_val;
     }
 
     /**

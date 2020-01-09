@@ -20,20 +20,22 @@ public  class   SearchParamsPerson
         extends SearchParams {
     
         protected RoleType names_rtMin;
-        private String name_first_val;
         private boolean name_first_ctl;
+        private String name_first_val;
         
-        private String name_last_val;
         private boolean name_last_ctl;
+        private String name_last_val;
+        
         private boolean name_compositeLNameOnly_ctl;
+        private boolean name_compositeLNameOnly_val;
         
         protected RoleType phoneNumber_rtMin;
         private boolean phoneNumber_ctl;
         private String phoneNumber_val;
         
         protected RoleType email_rtMin;
-        private String email_val;
         private boolean email_ctl;
+        private String email_val;
 
         protected RoleType address_rtMin;
         private boolean address_streetNum_ctl;
@@ -45,14 +47,14 @@ public  class   SearchParamsPerson
                 
         protected RoleType personType_rtMin;
         private boolean personType_ctl;
-        private List<PersonType> personType_val; 
+        private PersonType personType_val; 
         
         protected RoleType verified_rtMin;
         private boolean verified_ctl;
         private boolean verified_val;       
         
    public SearchParamsPerson(){
-       personType_val = new ArrayList<>();
+       
    }
 
     /**
@@ -93,7 +95,7 @@ public  class   SearchParamsPerson
     /**
      * @return the personType_val
      */
-    public List<PersonType> getPersonType_val() {
+    public PersonType getPersonType_val() {
         return personType_val;
     }
 
@@ -184,7 +186,7 @@ public  class   SearchParamsPerson
     /**
      * @param personType_val the personType_val to set
      */
-    public void setPersonType_val(List<PersonType> personType_val) {
+    public void setPersonType_val(PersonType personType_val) {
         this.personType_val = personType_val;
     }
 
@@ -405,6 +407,20 @@ public  class   SearchParamsPerson
      */
     public void setVerified_rtMin(RoleType verified_rtMin) {
         this.verified_rtMin = verified_rtMin;
+    }
+
+    /**
+     * @return the name_compositeLNameOnly_val
+     */
+    public boolean isName_compositeLNameOnly_val() {
+        return name_compositeLNameOnly_val;
+    }
+
+    /**
+     * @param name_compositeLNameOnly_val the name_compositeLNameOnly_val to set
+     */
+    public void setName_compositeLNameOnly_val(boolean name_compositeLNameOnly_val) {
+        this.name_compositeLNameOnly_val = name_compositeLNameOnly_val;
     }
     
 }

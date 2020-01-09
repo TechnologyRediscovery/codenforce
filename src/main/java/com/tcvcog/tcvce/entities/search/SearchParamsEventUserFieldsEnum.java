@@ -23,37 +23,11 @@ package com.tcvcog.tcvce.entities.search;
  * 
  * @author ellen bascomb
  */
-public enum SearchParamsEventUserFieldsEnum {
+public enum SearchParamsEventUserFieldsEnum 
+        implements IFace_userFieldHolder{
     
-    CREATED_TS              ("Creation timestamp", 
-                            "createdts"), 
-    
-    TYPE_CERTIFIED_TS       ("Period type certification timestamp",
-                            "typecertifiedts"), 
-    
-    PERIOD_START_DATE       ("Period start date", 
-                            "startdate"), 
-    
-    PERIOD_END_DATE         ("Period end date", 
-                            "enddate"), 
-    
-    START_DATE_CERTIFIED_TS ("Period start date certification timestamp", 
-                            "startdatecertifiedts"), 
-    
-    END_DATE_CERTIFIED_TS  ("Period end date certification timestamp",
-                            "enddatecertifiedts"),
-    
-    AUTHORIZATION_TS        ("Period authorization timestamp",
-                            "authorizationts"),
-            
-    INSPECTION_EFFECTIVEDATE    ("Inspection effective date",
-                                "effectivedate"), // in occinspection
-    
-    PASSEDINSPECTION_TS         ("Inspection passed",
-                                "passedinspectionts"), // in occinspection
-    
-    PERMIT_ISSUANCE_DATE        ("Permit date issued",
-                                "dateissued");
+    CREATOR              ("Event creator", 
+                            "owner_userid"); 
     
     private final String title;
     private final String dbField;
@@ -70,11 +44,9 @@ public enum SearchParamsEventUserFieldsEnum {
         return title;
     }
 
-    /**
-     * @return the dbField
-     */
-    public String getDbField() {
-        return dbField;
+    @Override
+   public String extractUserFieldString() {
+       return dbField;
     }
     
 }

@@ -127,22 +127,22 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         if (!params.isBobID_ctl()) {
             if (params.isMuni_ctl()) {
                 sb.append("AND ");
-                sb.append("municipality_municode = ? "); // param 1
+                sb.append("municipality_municode=? "); // param 1
             }
 
-            if (params.isProperty_filterBy()) {
+            if (params.isProperty_ctl()) {
                 sb.append("AND ");
                 sb.append("property.propertyid=? ");
             }
 
-            if (params.isPropertyUnit_filterBy()) {
+            if (params.isPropertyUnit_ctl()) {
                 sb.append("AND ");
                 sb.append("propertyunit.propertyunit_unitid=? ");
             }
 
             if (params.isDate_startEnd_ctl()) {
                 sb.append("AND ");
-                sb.append(getDBDateField(params.getDateField()));
+                sb.append(getDBDateField(params.getDate_field()));
                 sb.append(" ");
                 sb.append("BETWEEN ? AND ? "); // parm 2 and 3 without ID
             }
@@ -245,12 +245,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
 
-                if (params.isProperty_filterBy()) {
-                    stmt.setInt(++paramCounter, params.getProperty_propertyid());
+                if (params.isProperty_ctl()) {
+                    stmt.setInt(++paramCounter, params.getProperty_val());
                 }
 
-                if (params.isPropertyUnit_filterBy()) {
-                    stmt.setInt(++paramCounter, params.getPropertyUnit_unitID());
+                if (params.isPropertyUnit_ctl()) {
+                    stmt.setInt(++paramCounter, params.getPropertyUnit_val());
                 }
 
                 if (params.isDate_startEnd_ctl()) {

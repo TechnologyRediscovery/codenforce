@@ -35,7 +35,6 @@ public  class       EventCnF
     protected EventCategory category;
     
     protected EventDomainEnum domain;
-    
     protected int ceCaseID;
     protected int occPeriodID;
     

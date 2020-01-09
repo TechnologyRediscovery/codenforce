@@ -23,7 +23,8 @@ package com.tcvcog.tcvce.entities.search;
  * 
  * @author ellen bascomb
  */
-public enum SearchParamsOccPeriodDateFieldsEnum {
+public  enum SearchParamsOccPeriodDateFieldsEnum 
+        implements IFace_dateFieldHolder {
     
     CREATED_TS              ("Creation timestamp", 
                             "createdts"), 
@@ -70,10 +71,9 @@ public enum SearchParamsOccPeriodDateFieldsEnum {
         return title;
     }
 
-    /**
-     * @return the dbField
-     */
-    public String getDbField() {
+
+    @Override
+    public String extractDateFieldString() {
         return dbField;
     }
     

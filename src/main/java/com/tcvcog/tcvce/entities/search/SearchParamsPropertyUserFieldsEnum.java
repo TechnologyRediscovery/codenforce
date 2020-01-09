@@ -20,21 +20,29 @@ package com.tcvcog.tcvce.entities.search;
  *
  * @author sylvia
  */
-public enum SearchParamsPropertyUserFieldsEnum {
+public enum SearchParamsPropertyUserFieldsEnum
+        implements IFace_userFieldHolder{
     
-    UNFIT_BY("Declared unfit for occupancy by"),
-    ABANDONED_BY("Declared abandoned by"),
-    VACANT_BY("Declared vacant by"),
-    PROPERTY_UPDATEDBY("Property data last updated by");
+    UNFIT_BY("Declared unfit for occupancy by", "unfitby_userid" ),
+    ABANDONED_BY("Declared abandoned by", "abandonedby_userid"),
+    VACANT_BY("Declared vacant by", "vacantby_userid"),
+    PROPERTY_UPDATEDBY("Property data last updated by", "lastupdatedby");
     
     private final String title;
+    private final String dbField;
     
-    private SearchParamsPropertyUserFieldsEnum (String t){
+    private SearchParamsPropertyUserFieldsEnum (String t, String db){
         this.title = t;
+        dbField = db;
     }
     
     public String getTitle(){
         return title;
+    }
+
+    @Override
+    public String extractUserFieldString() {
+        return dbField;
     }
      
     

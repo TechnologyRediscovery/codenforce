@@ -23,10 +23,14 @@ package com.tcvcog.tcvce.entities.search;
  * 
  * @author ellen bascomb
  */
-public enum SearchParamsPersonDateFieldsEnum {
+public enum SearchParamsPersonDateFieldsEnum  
+        implements  IFace_dateFieldHolder {
     
-    LAST_UPDATED            ("Creation timestamp", 
+    CREATED_TS            ("Creation timestamp", 
                             "creationtimestamp"), 
+    
+    LAST_UPDATED            ("Last update  timestamp", 
+                            "lastupdated"), 
     
     
     GHOSTCREATION_TS        ("Ghost creation timestamp", 
@@ -55,10 +59,8 @@ public enum SearchParamsPersonDateFieldsEnum {
         return title;
     }
 
-    /**
-     * @return the dbField
-     */
-    public String getDbField() {
+    @Override
+    public String extractDateFieldString() {
         return dbField;
     }
     

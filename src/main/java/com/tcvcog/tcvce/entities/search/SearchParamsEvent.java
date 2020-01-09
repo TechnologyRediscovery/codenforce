@@ -20,285 +20,215 @@ public class        SearchParamsEvent
         extends     SearchParams 
         implements  Serializable{
     
-    private boolean useRespondedAtDateRange;
     
-    private boolean filterByEventCategory;
-    private EventCategory eventCategory;
+    private boolean eventCat_ctl;
+    private EventCategory eventCat_val;
     
-    private boolean filterByEventType;
-    private EventType evtType;
+    private boolean eventType_ctl;
+    private EventType eventType_val;
     
-    protected boolean filterByEventDomain;
-    protected EventDomainEnum domain;
-    
-    private boolean filterByCaseID;
-    private int caseId;
-    
-    private boolean filterByEventOwner;
-    private int userID;
+    private boolean eventDomain_ctl;
+    private EventDomainEnum eventDomain_val;
+    private int eventDomainID_val;
   
-    private boolean filterByPerson;
-    private Person person;
+    private boolean person_ctl;
+    private Person person_val;
     
-    private boolean filterByActive;
-    private boolean isActive;
+    private boolean discloseToMuni_ctl;
+    private boolean discloseToMuni_val;
     
-    private boolean filterByHidden;
-    private boolean isHidden;
+    private boolean discloseToPublic_ctl;
+    private boolean discloseToPublic_val;
+    
     
    public SearchParamsEvent(){
        
    }
 
     /**
-     * @return the filterByEventCategory
+     * @return the eventCat_ctl
      */
-    public boolean isFilterByEventCategory() {
-        return filterByEventCategory;
+    public boolean isEventCat_ctl() {
+        return eventCat_ctl;
     }
 
     /**
-     * @return the eventCategory
+     * @return the eventCat_val
      */
-    public EventCategory getEventCategory() {
-        return eventCategory;
+    public EventCategory getEventCat_val() {
+        return eventCat_val;
     }
 
     /**
-     * @return the filterByCaseID
+     * @return the person_ctl
      */
-    public boolean isFilterByCaseID() {
-        return filterByCaseID;
+    public boolean isPerson_ctl() {
+        return person_ctl;
+    }
+
+
+    /**
+     * @param eventCat_ctl the eventCat_ctl to set
+     */
+    public void setEventCat_ctl(boolean eventCat_ctl) {
+        this.eventCat_ctl = eventCat_ctl;
     }
 
     /**
-     * @return the caseId
+     * @param eventCat_val the eventCat_val to set
      */
-    public int getCaseId() {
-        return caseId;
+    public void setEventCat_val(EventCategory eventCat_val) {
+        this.eventCat_val = eventCat_val;
     }
 
     /**
-     * @return the filterByEventOwner
+     * @param person_ctl the person_ctl to set
      */
-    public boolean isFilterByEventOwner() {
-        return filterByEventOwner;
-    }
-
-    
-
-    /**
-     * @return the filterByActive
-     */
-    public boolean isActive_ctl() {
-        return filterByActive;
+    public void setPerson_ctl(boolean person_ctl) {
+        this.person_ctl = person_ctl;
     }
 
     /**
-     * @return the isActive
+     * @return the eventType_ctl
      */
-    public boolean isIsActive() {
-        return isActive;
-    }
-
-  
-    /**
-     * @return the filterByHidden
-     */
-    public boolean isFilterByHidden() {
-        return filterByHidden;
+    public boolean isEventType_ctl() {
+        return eventType_ctl;
     }
 
     /**
-     * @return the isHidden
+     * @param eventType_ctl the eventType_ctl to set
      */
-    public boolean isIsHidden() {
-        return isHidden;
-    }
-
-    /**
-     * @return the filterByPerson
-     */
-    public boolean isFilterByPerson() {
-        return filterByPerson;
-    }
-
-    
-    /**
-     * @return the useRespondedAtDateRange
-     */
-    public boolean isUseRespondedAtDateRange() {
-        return useRespondedAtDateRange;
-    }
-
-    /**
-     * @param filterByEventCategory the filterByEventCategory to set
-     */
-    public void setFilterByEventCategory(boolean filterByEventCategory) {
-        this.filterByEventCategory = filterByEventCategory;
-    }
-
-    /**
-     * @param eventCategory the eventCategory to set
-     */
-    public void setEventCategory(EventCategory eventCategory) {
-        this.eventCategory = eventCategory;
-    }
-
-    /**
-     * @param filterByCaseID the filterByCaseID to set
-     */
-    public void setFilterByCaseID(boolean filterByCaseID) {
-        this.filterByCaseID = filterByCaseID;
-    }
-
-    /**
-     * @param caseId the caseId to set
-     */
-    public void setCaseId(int caseId) {
-        this.caseId = caseId;
-    }
-
-    /**
-     * @param filterByEventOwner the filterByEventOwner to set
-     */
-    public void setFilterByEventOwner(boolean filterByEventOwner) {
-        this.filterByEventOwner = filterByEventOwner;
-    }
-
-    
-    /**
-     * @param filterByActive the filterByActive to set
-     */
-    public void setActive_ctl(boolean filterByActive) {
-        this.filterByActive = filterByActive;
-    }
-
-    /**
-     * @param isActive the isActive to set
-     */
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    /**
-  
-
-    /**
-     * @param filterByHidden the filterByHidden to set
-     */
-    public void setFilterByHidden(boolean filterByHidden) {
-        this.filterByHidden = filterByHidden;
-    }
-
-    /**
-     * @param isHidden the isHidden to set
-     */
-    public void setIsHidden(boolean isHidden) {
-        this.isHidden = isHidden;
-    }
-
-    /**
-     * @param filterByPerson the filterByPerson to set
-     */
-    public void setFilterByPerson(boolean filterByPerson) {
-        this.filterByPerson = filterByPerson;
-    }
-
-   
-    /**
-     * @param useRespondedAtDateRange the useRespondedAtDateRange to set
-     */
-    public void setUseRespondedAtDateRange(boolean useRespondedAtDateRange) {
-        this.useRespondedAtDateRange = useRespondedAtDateRange;
-    }
-
-    /**
-     * @return the filterByEventType
-     */
-    public boolean isFilterByEventType() {
-        return filterByEventType;
-    }
-
-    /**
-     * @param filterByEventType the filterByEventType to set
-     */
-    public void setFilterByEventType(boolean filterByEventType) {
-        this.filterByEventType = filterByEventType;
+    public void setEventType_ctl(boolean eventType_ctl) {
+        this.eventType_ctl = eventType_ctl;
     }
 
    
 
     /**
-     * @return the evtType
+     * @return the eventType_val
      */
-    public EventType getEvtType() {
-        return evtType;
+    public EventType getEventType_val() {
+        return eventType_val;
     }
 
     /**
-     * @param evtType the evtType to set
+     * @param eventType_val the eventType_val to set
      */
-    public void setEvtType(EventType evtType) {
-        this.evtType = evtType;
+    public void setEventType_val(EventType eventType_val) {
+        this.eventType_val = eventType_val;
     }
 
     /**
-     * @return the person
+     * @return the person_val
      */
-    public Person getPerson() {
-        return person;
+    public Person getPerson_val() {
+        return person_val;
     }
 
     /**
-     * @param person the person to set
+     * @param person_val the person_val to set
      */
-    public void setPerson(Person person) {
-        this.person = person;
+    public void setPerson_val(Person person_val) {
+        this.person_val = person_val;
     }
 
    
-
     /**
-     * @return the userID
+     * @return the eventDomain_ctl
      */
-    public int getUserID() {
-        return userID;
+    public boolean isEventDomain_ctl() {
+        return eventDomain_ctl;
     }
 
     /**
-     * @param userID the userID to set
+     * @param eventDomain_ctl the eventDomain_ctl to set
      */
-    public void setUserID(int userID) {
-        this.userID = userID;
+    public void setEventDomain_ctl(boolean eventDomain_ctl) {
+        this.eventDomain_ctl = eventDomain_ctl;
     }
 
     /**
-     * @return the filterByEventDomain
+     * @return the eventDomain_val
      */
-    public boolean isFilterByEventDomain() {
-        return filterByEventDomain;
+    public EventDomainEnum getEventDomain_val() {
+        return eventDomain_val;
     }
 
     /**
-     * @param filterByEventDomain the filterByEventDomain to set
+     * @param eventDomain_val the eventDomain_val to set
      */
-    public void setFilterByEventDomain(boolean filterByEventDomain) {
-        this.filterByEventDomain = filterByEventDomain;
+    public void setEventDomain_val(EventDomainEnum eventDomain_val) {
+        this.eventDomain_val = eventDomain_val;
     }
 
     /**
-     * @return the domain
+     * @return the eventDomainID_val
      */
-    public EventDomainEnum getDomain() {
-        return domain;
+    public int getEventDomainID_val() {
+        return eventDomainID_val;
     }
 
     /**
-     * @param domain the domain to set
+     * @param eventDomainID_val the eventDomainID_val to set
      */
-    public void setDomain(EventDomainEnum domain) {
-        this.domain = domain;
+    public void setEventDomainID_val(int eventDomainID_val) {
+        this.eventDomainID_val = eventDomainID_val;
+    }
+
+    /**
+     * @return the discloseToMuni_ctl
+     */
+    public boolean isDiscloseToMuni_ctl() {
+        return discloseToMuni_ctl;
+    }
+
+    /**
+     * @return the discloseToMuni_val
+     */
+    public boolean isDiscloseToMuni_val() {
+        return discloseToMuni_val;
+    }
+
+    /**
+     * @return the discloseToPublic_ctl
+     */
+    public boolean isDiscloseToPublic_ctl() {
+        return discloseToPublic_ctl;
+    }
+
+    /**
+     * @return the discloseToPublic_val
+     */
+    public boolean isDiscloseToPublic_val() {
+        return discloseToPublic_val;
+    }
+
+    /**
+     * @param discloseToMuni_ctl the discloseToMuni_ctl to set
+     */
+    public void setDiscloseToMuni_ctl(boolean discloseToMuni_ctl) {
+        this.discloseToMuni_ctl = discloseToMuni_ctl;
+    }
+
+    /**
+     * @param discloseToMuni_val the discloseToMuni_val to set
+     */
+    public void setDiscloseToMuni_val(boolean discloseToMuni_val) {
+        this.discloseToMuni_val = discloseToMuni_val;
+    }
+
+    /**
+     * @param discloseToPublic_ctl the discloseToPublic_ctl to set
+     */
+    public void setDiscloseToPublic_ctl(boolean discloseToPublic_ctl) {
+        this.discloseToPublic_ctl = discloseToPublic_ctl;
+    }
+
+    /**
+     * @param discloseToPublic_val the discloseToPublic_val to set
+     */
+    public void setDiscloseToPublic_val(boolean discloseToPublic_val) {
+        this.discloseToPublic_val = discloseToPublic_val;
     }
 
    

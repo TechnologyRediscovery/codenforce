@@ -23,7 +23,8 @@ package com.tcvcog.tcvce.entities.search;
  * 
  * @author ellen bascomb
  */
-public enum SearchParamsCECaseUserFieldsEnum {
+public  enum SearchParamsCECaseUserFieldsEnum 
+        implements IFace_userFieldHolder {
     
         
     CASE_MANAGER                ("Case manager",
@@ -44,10 +45,8 @@ public enum SearchParamsCECaseUserFieldsEnum {
         return title;
     }
 
-    /**
-     * @return the dbField
-     */
-    public String getDbField() {
+    @Override
+    public String extractUserFieldString() {
         return dbField;
     }
     

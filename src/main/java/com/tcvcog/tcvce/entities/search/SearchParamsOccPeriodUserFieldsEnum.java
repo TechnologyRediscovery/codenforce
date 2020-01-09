@@ -20,7 +20,8 @@ package com.tcvcog.tcvce.entities.search;
  *
  * @author sylvia
  */
-public enum SearchParamsOccPeriodUserFieldsEnum {
+public enum SearchParamsOccPeriodUserFieldsEnum 
+        implements IFace_userFieldHolder{
     
     CREATED_USER                ("Period creator", "createdby_userid"),
     MANAGER_USER                ("Period manager", "manager_userid"),
@@ -47,10 +48,8 @@ public enum SearchParamsOccPeriodUserFieldsEnum {
         return title;
     }
 
-    /**
-     * @return the dbField
-     */
-    public String getDbField() {
+    @Override
+    public String extractUserFieldString() {
         return dbField;
     }
     

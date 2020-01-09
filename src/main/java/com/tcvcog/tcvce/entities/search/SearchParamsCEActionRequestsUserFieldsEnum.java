@@ -23,7 +23,8 @@ package com.tcvcog.tcvce.entities.search;
  * 
  * @author ellen bascomb
  */
-public enum SearchParamsCEActionRequestsUserFieldsEnum {
+public  enum SearchParamsCEActionRequestsUserFieldsEnum 
+        implements IFace_userFieldHolder{
     
     USERSUBMITTER              ("Internal submitter", 
                                 "usersubmitter_userid");
@@ -43,10 +44,9 @@ public enum SearchParamsCEActionRequestsUserFieldsEnum {
         return title;
     }
 
-    /**
-     * @return the dbField
-     */
-    public String getDbField() {
+
+    @Override
+    public String extractUserFieldString() {
         return dbField;
     }
     

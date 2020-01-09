@@ -11,6 +11,7 @@ import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public  class           SearchParams
     
     private String searchName;
     private String searchDescription;
+    private StringBuilder sql;
     
     private RoleType muni_rtMin;
     private boolean muni_ctl;
@@ -40,7 +42,7 @@ public  class           SearchParams
     // subclasses will have a DateEnum member to specify which date field
     private RoleType date_rtMin;
     private boolean date_startEnd_ctl;
-    private boolean date_null_ctl;
+    private IFace_dateFieldHolder date_field;
     private LocalDateTime date_start_val;
     private LocalDateTime date_end_val;
 
@@ -49,11 +51,8 @@ public  class           SearchParams
     private int date_realtiveDates_end_val;
     
    private boolean user_ctl;
-   // subclasses must have a user_field enum member to make these work
+   private IFace_userFieldHolder user_field;
    private User user_val;
-    
-    private boolean applyDateSearchToDateOfRecord;
-    private boolean useEntryTimestamp;
     
     private RoleType bobID_rtMin;
     private boolean bobID_ctl;
@@ -66,9 +65,12 @@ public  class           SearchParams
     private boolean active_ctl;
     private boolean active_val;
     
+    private StringBuilder log;
+    
    public SearchParams(){
        muniList_val = new ArrayList<>();
-       
+       sql = new StringBuilder();
+       log = new StringBuilder();
    }
    
    
@@ -80,19 +82,29 @@ public  class           SearchParams
        return sb.toString();
    }
    
-    /**
-     * @return the date_null_ctl
-     */
-    public boolean isDate_null_ctl() {
-        return date_null_ctl;
-    }
-
-    /**
-     * @param date_null_ctl the date_null_ctl to set
-     */
-    public void setDate_null_ctl(boolean date_null_ctl) {
-        this.date_null_ctl = date_null_ctl;
-    }
+   public void appendSQL(String str){
+       if(str != null){
+            sql.append(str);
+       }
+   }
+   
+   
+   public String extractRawSQL(){
+        return sql.toString();
+   }
+   
+   public void logMessage(String str){
+       if(str != null){
+            log.append(str);
+       }
+   }
+   
+   public String getLog(){
+        return log.toString();
+   }
+   
+   
+   
 
     /**
      * @return the muni_rtMin
@@ -221,7 +233,7 @@ public  class           SearchParams
     /**
      * @return the startDate_val_SQLDate
      */
-    public java.sql.Timestamp getStartDate_val_SQLDate() {
+    public java.sql.Timestamp getDateStart_val_sql() {
         if(date_relativeDates_ctl){
             return java.sql.Timestamp.valueOf(LocalDateTime.now().plusDays(date_relativeDates_start_val));
         } else {
@@ -229,13 +241,13 @@ public  class           SearchParams
                 return java.sql.Timestamp.valueOf(getDate_start_val());
             }
         }
-        return null;
+        return java.sql.Timestamp.valueOf(LocalDateTime.of(2100, 1, 1, 0, 0));
     }
 
     /**
      * @return the endDate_val_SQLDate
      */
-    public java.sql.Timestamp getEndDate_val_SQLDate() {
+    public java.sql.Timestamp getDateEnd_val_sql() {
         if(date_relativeDates_ctl){
             return java.sql.Timestamp.valueOf(LocalDateTime.now().plusDays(date_realtiveDates_end_val));
         } else {
@@ -243,7 +255,8 @@ public  class           SearchParams
                 return java.sql.Timestamp.valueOf(getDate_end_val());
             }
         }
-        return null;
+        // the EPOCH!
+        return java.sql.Timestamp.valueOf(LocalDateTime.of(1970, 1, 1, 0, 0));
     }
 
     /**
@@ -386,33 +399,6 @@ public  class           SearchParams
         this.date_realtiveDates_end_val = date_realtiveDates_end_val;
     }
 
-    /**
-     * @return the useEntryTimestamp
-     */
-    public boolean isUseEntryTimestamp() {
-        return useEntryTimestamp;
-    }
-
-    /**
-     * @param useEntryTimestamp the useEntryTimestamp to set
-     */
-    public void setUseEntryTimestamp(boolean useEntryTimestamp) {
-        this.useEntryTimestamp = useEntryTimestamp;
-    }
-
-    /**
-     * @return the applyDateSearchToDateOfRecord
-     */
-    public boolean isApplyDateSearchToDateOfRecord() {
-        return applyDateSearchToDateOfRecord;
-    }
-
-    /**
-     * @param applyDateSearchToDateOfRecord the applyDateSearchToDateOfRecord to set
-     */
-    public void setApplyDateSearchToDateOfRecord(boolean applyDateSearchToDateOfRecord) {
-        this.applyDateSearchToDateOfRecord = applyDateSearchToDateOfRecord;
-    }
 
     /**
      * Used for printing search params on reports: since the correct SQL timestamp
@@ -549,6 +535,51 @@ public  class           SearchParams
      */
     public void setUser_val(User user_val) {
         this.user_val = user_val;
+    }
+
+    /**
+     * @return the date_field
+     */
+    public IFace_dateFieldHolder getDate_field() {
+        return date_field;
+    }
+
+    /**
+     * @param date_field the date_field to set
+     */
+    public void setDate_field(IFace_dateFieldHolder date_field) {
+        this.date_field = date_field;
+    }
+
+    /**
+     * @return the user_field
+     */
+    public IFace_userFieldHolder getUser_field() {
+        return user_field;
+    }
+
+    /**
+     * @param user_field the user_field to set
+     */
+    public void setUser_field(IFace_userFieldHolder user_field) {
+        this.user_field = user_field;
+    }
+    
+    
+
+
+    /**
+     * @return the sql
+     */
+    public StringBuilder getSql() {
+        return sql;
+    }
+
+    /**
+     * @param sql the sql to set
+     */
+    public void setSql(StringBuilder sql) {
+        this.sql = sql;
     }
 
    

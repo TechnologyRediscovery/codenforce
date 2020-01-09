@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Icon;
-import com.tcvcog.tcvce.entities.Intensity;
+import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
@@ -34,9 +34,9 @@ import javax.faces.event.ActionEvent;
  */
 public class IntensityBB extends BackingBeanUtils implements Serializable {
 
-    private Intensity workingIntensityClass;
-    private Intensity selectedIntensityClass;
-    private ArrayList<Intensity> existingIntensityList;
+    private IntensityClass workingIntensityClass;
+    private IntensityClass selectedIntensityClass;
+    private ArrayList<IntensityClass> existingIntensityList;
     private IntensitySchema selectedSchema;
     private IntensitySchema workingSchema;
     private ArrayList<IntensitySchema> schemaList;
@@ -53,7 +53,7 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
 
         if (workingIntensityClass == null) {
 
-            workingIntensityClass = new Intensity();
+            workingIntensityClass = new IntensityClass();
 
             workingSchema = new IntensitySchema();
 
@@ -93,7 +93,7 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
         try {
             si.updateIntensityClass(workingIntensityClass);
 
-            workingIntensityClass = new Intensity();
+            workingIntensityClass = new IntensityClass();
 
             queryIntensityClasses();
 
@@ -110,7 +110,7 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
 
     public void cancelEdits() {
 
-        workingIntensityClass = new Intensity();
+        workingIntensityClass = new IntensityClass();
 
         queryIntensityClasses();
 
@@ -129,7 +129,7 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
             try {
                 si.insertIntensityClass(workingIntensityClass);
 
-                workingIntensityClass = new Intensity();
+                workingIntensityClass = new IntensityClass();
 
                 queryIntensityClasses();
 
@@ -158,7 +158,7 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
             SystemIntegrator si = new SystemIntegrator();
 
             try {
-                existingIntensityList = (ArrayList<Intensity>) si.getIntensityClassList(selectedSchema);
+                existingIntensityList = (ArrayList<IntensityClass>) si.getIntensityClassList(selectedSchema);
             } catch (IntegrationException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -199,19 +199,19 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
         System.out.println("IntensityBB.addIntensitySchema | Completed method ");
     }
 
-    public Intensity getWorkingIntensityClass() {
+    public IntensityClass getWorkingIntensityClass() {
         return workingIntensityClass;
     }
 
-    public void setWorkingIntensityClass(Intensity workingIntensityClass) {
+    public void setWorkingIntensityClass(IntensityClass workingIntensityClass) {
         this.workingIntensityClass = workingIntensityClass;
     }
 
-    public ArrayList<Intensity> getExistingIntensityList() {
+    public ArrayList<IntensityClass> getExistingIntensityList() {
         return existingIntensityList;
     }
 
-    public void setExistingIntensityList(ArrayList<Intensity> existingIntensityList) {
+    public void setExistingIntensityList(ArrayList<IntensityClass> existingIntensityList) {
         this.existingIntensityList = existingIntensityList;
     }
 
@@ -250,11 +250,11 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
         this.schemaList = schemaList;
     }
 
-    public Intensity getSelectedIntensityClass() {
+    public IntensityClass getSelectedIntensityClass() {
         return selectedIntensityClass;
     }
 
-    public void setSelectedIntensityClass(Intensity selectedIntensityClass) {
+    public void setSelectedIntensityClass(IntensityClass selectedIntensityClass) {
         this.selectedIntensityClass = selectedIntensityClass;
     }
 

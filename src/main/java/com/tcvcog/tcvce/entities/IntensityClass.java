@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.entities;
  *
  * @author Nathan Dietz
  */
-public class Intensity {
+public class IntensityClass {
     
     private int classID;
     private String title;
@@ -30,7 +30,7 @@ public class Intensity {
     private boolean active;
     private Icon icon;
     
-    public Intensity() {
+    public IntensityClass() {
         
         
     }

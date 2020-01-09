@@ -23,7 +23,8 @@ package com.tcvcog.tcvce.entities.search;
  * 
  * @author ellen bascomb
  */
-public enum SearchParamsPersonUserFieldsTnum {
+public enum SearchParamsPersonUserFieldsEnum 
+        implements IFace_userFieldHolder{
     
     CREATOR                 ("Creator", 
                             "creator"), 
@@ -41,7 +42,7 @@ public enum SearchParamsPersonUserFieldsTnum {
     private final String title;
     private final String dbField;
     
-    private SearchParamsPersonUserFieldsTnum(String t, String db){
+    private SearchParamsPersonUserFieldsEnum(String t, String db){
         title = t;
         dbField = db;
     }
@@ -53,10 +54,8 @@ public enum SearchParamsPersonUserFieldsTnum {
         return title;
     }
 
-    /**
-     * @return the dbField
-     */
-    public String getDbField() {
+    @Override
+    public String extractUserFieldString() {
         return dbField;
     }
     

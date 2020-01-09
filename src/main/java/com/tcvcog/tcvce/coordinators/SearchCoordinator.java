@@ -323,6 +323,101 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //    --------------------------------------------------------------------------
     
     
+    
+    
+    public String selectDateFieldString(SearchParams sp){
+        String f = null;
+        if(sp.getDate_field().extractDateFieldString() != null){
+            f = sp.getDate_field().extractDateFieldString();
+        } else {
+            if(sp instanceof SearchParamsProperty){
+                f = SearchParamsPropertyDateFieldsEnum.CREATIONTS.extractDateFieldString();
+            } else if(sp instanceof SearchParamsPerson){
+                f = SearchParamsPersonDateFieldsEnum.CREATED_TS.extractDateFieldString();
+            } else if(sp instanceof SearchParamsEvent){
+                f = SearchParamsEventDateFieldsEnum.CREATED_TS.extractDateFieldString();
+            } else if(sp instanceof SearchParamsOccPeriod){
+                f = SearchParamsOccPeriodDateFieldsEnum.CREATED_TS.extractDateFieldString();
+            } else if(sp instanceof SearchParamsCECase){
+                f = SearchParamsOccPeriodDateFieldsEnum.CREATED_TS.extractDateFieldString();
+            } else if(sp instanceof SearchParamsCEActionRequests){
+                f = SearchParamsCEActionRequestsDateFieldsEnum.SUBMISSION_TS.extractDateFieldString();
+            } else {
+                return null;
+            }
+            
+        } // close logic for default date field name selection
+        
+        return f;
+    }
+    
+    
+    /**
+     * Shared SQL builder for the search fields on the SearchParams superclass 
+     * whose subclasses are passed to the searchForXXX(SearchParamsXXX params) method family spread across the
+     * main Integrators. We remove duplication of building these shared search criteria across all 6 searchable
+     * BOBs as of the beta: Property, Person, Event, OccPeriod, CECase, and CEActionRequest
+     * @param params
+     * @return the configured apram for      */
+    public SearchParams assembleBObSearchSQL_muniDatesUserActive(SearchParams params){
+        
+         // ****************************
+            // **         MUNI           **
+            // ****************************
+             if(params.isMuni_ctl()){
+                 if(params.getMuni_val() != null){
+                    params.appendSQL("AND muni_municode=? ");
+                 } else {
+                    params.setMuni_ctl(false);
+                    params.logMessage("MUNI: found null Muni value for filter; Muni filter turned off; | ");
+                     
+                 }
+             }
+            
+            // ****************************
+            // **         DATES          **
+            // ****************************
+            if (params.isDate_startEnd_ctl()) {
+                params.appendSQL("AND ");
+                params.appendSQL(selectDateFieldString(params));
+                params.appendSQL(" BETWEEN ? AND ? ");
+            } 
+
+            // ****************************
+            // **         USER           **
+            // **************************** 
+            if (params.isUser_ctl()) {
+                if(params.getUser_field() != null && params.getUser_val() != null){
+                    params.appendSQL("AND ");
+                    params.appendSQL(params.getUser_field().extractUserFieldString());
+                    params.appendSQL("=? ");
+                } else {
+                    // if the parameter wasn't set and a user wasn't passed in, turn off date and note
+                    params.setUser_ctl(false);
+                    params.logMessage("USER: found null User object ref; User filter turned off; | ");
+                }
+            }
+            
+            // ****************************
+            // **         ACTIVE         **
+            // **************************** 
+            if(params.isActive_ctl()){
+                if(params.isActive_val()){
+                    params.appendSQL("AND active = TRUE ");
+                } else {
+                    params.appendSQL("AND active = FALSE ");
+                }
+            } 
+        
+        return params;
+        
+    }
+    
+    
+    
+    
+    
+    
     /**
      * Container for consolidating calls to any methods that need to be run
      * on a Query before passing it to an Integrator class
@@ -915,8 +1010,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setBobID_ctl(false);
         eventParams.setLimitResultCount_ctl(true);
         
-        eventParams.setFilterByEventCategory(false);
-        eventParams.setFilterByEventType(false);
+        eventParams.setEventCat_ctl(false);
+        eventParams.setEventType_ctl(false);
         
         eventParams.setFilterByCaseID(false);
         
@@ -925,7 +1020,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setActive_ctl(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByPerson(false);
+        eventParams.setPerson_ctl(false);
         eventParams.setUseRespondedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
@@ -953,8 +1048,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setBobID_ctl(false);
         eventParams.setLimitResultCount_ctl(true);
         
-        eventParams.setFilterByEventCategory(false);
-        eventParams.setFilterByEventType(false);
+        eventParams.setEventCat_ctl(false);
+        eventParams.setEventType_ctl(false);
         
         eventParams.setFilterByCaseID(false);
         
@@ -963,7 +1058,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setActive_ctl(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByPerson(false);
+        eventParams.setPerson_ctl(false);
         eventParams.setUseRespondedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
@@ -994,9 +1089,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setBobID_ctl(false);
         eventParams.setLimitResultCount_ctl(true);
         
-        eventParams.setFilterByEventCategory(false);
-        eventParams.setFilterByEventType(true);
-        eventParams.setEvtType(EventType.Compliance);
+        eventParams.setEventCat_ctl(false);
+        eventParams.setEventType_ctl(true);
+        eventParams.setEventType_val(EventType.Compliance);
         
         eventParams.setFilterByCaseID(false);
         
@@ -1005,7 +1100,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setActive_ctl(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByPerson(false);
+        eventParams.setPerson_ctl(false);
         eventParams.setUseRespondedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
@@ -1157,7 +1252,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         sps.setLimitResultCount_ctl(true);
         sps.setCaseAttachment_ctl(false);
-        sps.setCaseAttachment_val(false);
+        sps.setCaseAttachment_valsdfa(false);
         sps.setUrgent_ctl(false);
         sps.setNonaddressable_ctl(false);
         
@@ -1179,7 +1274,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         sps.setLimitResultCount_ctl(true);
         sps.setCaseAttachment_ctl(false);
-        sps.setCaseAttachment_val(false);
+        sps.setCaseAttachment_valsdfa(false);
         sps.setUrgent_ctl(false);
         sps.setNonaddressable_ctl(false);
         sps.setRequestStatus_ctl(true);
@@ -1223,7 +1318,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         sps.setDate_end_val(LocalDateTime.now());
 
         sps.setCaseAttachment_ctl(true);
-        sps.setCaseAttachment_val(true);
+        sps.setCaseAttachment_valsdfa(true);
         
         sps.setUrgent_ctl(false);
         sps.setNonaddressable_ctl(false);

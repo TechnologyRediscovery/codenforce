@@ -23,7 +23,8 @@ import java.util.List;
  *
  * @author sylvia
  */
-public enum SearchParamsPropertyDateFieldsEnum {
+public  enum        SearchParamsPropertyDateFieldsEnum 
+        implements  IFace_dateFieldHolder{
     CREATIONTS("Database insert timestamp", "creationts"),    
     LAST_UPDATED("Last updated on", "lastupdated"),
     UNFIT_START("Declared to be unfit - start date", "unfitdatestart"),
@@ -68,10 +69,8 @@ public enum SearchParamsPropertyDateFieldsEnum {
         return output;
 }
 
-    /**
-     * @return the dbField
-     */
-    public String getDbField() {
+    @Override
+    public String extractDateFieldString() {
         return dbField;
     }
      

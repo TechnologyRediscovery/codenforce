@@ -28,6 +28,7 @@ import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -711,169 +712,232 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws IntegrationException 
      */
     public List<Integer> searchForProperties(SearchParamsProperty params) throws IntegrationException {
-
+        SearchCoordinator sc = getSearchCoordinator();
+        
         List<Integer> propIDList = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        StringBuilder sb = new StringBuilder();
 
-        sb.append("SELECT DISTINCT propertyid\n");
-        sb.append("	FROM property LEFT OUTER JOIN propertyexternaldata ON (property.propertyid = propertyexternaldata.property_propertyid)\n");
-        sb.append("	LEFT OUTER JOIN propertyusetype ON (property.usetype_typeid = propertyusetype.propertyusetypeid)\n");
-        //sb.append("	LEFT OUTER JOIN propertystatus ON (property.status_statusid = propertystatus.statusid)\n");
-        sb.append("	WHERE propertyid IS NOT NULL ");
+        params.appendSQL("SELECT DISTINCT propertyid ");
+        params.appendSQL("FROM property LEFT OUTER JOIN propertyexternaldata ON (property.propertyid = propertyexternaldata.property_propertyid) \n");
+        
+         // ****************************
+        // **         OBJECT ID      **
+        // ****************************
+         if (!params.isBobID_ctl()) {
+           
+            //*******************************
+           // **   MUNI,DATES,USER,ACTIVE  **
+           // *******************************
+             params = (SearchParamsProperty) sc.assembleBObSearchSQL_muniDatesUserActive(params);
 
-        System.out.println("PropertyIntegrator.searchForPropWParams");
-        System.out.println(params.getParams());
-        if (!params.isBobID_ctl()) {
-            if (params.isMuni_ctl()) {
-                sb.append("AND municipality_municode=? "); // param 1
-            }
-
-
-            if (params.isDate_null_ctl()) {
-                sb.append("AND ");
-                sb.append(getDBDateField(params));
-                sb.append("IS NULL ");
-            }
-
-            if (params.isUser_ctl()) {
-                sb.append("AND ");
-                sb.append(getDBUserField(params));
-                sb.append("=? ");
-            }
-
+            //****************************
+           // **         ZIP            **
+           // ****************************
             if (params.isZip_ctl()) {
-                sb.append("AND addr_zip=? ");
+                params.appendSQL("AND addr_zip ILIKE ? ");
             }
 
+            //****************************
+           // **     LOT AND BLOCK      **
+           // ****************************
             if (params.isLotblock_ctl()) {
-                sb.append("AND lotandblock=? ");
+                params.appendSQL("AND lotandblock LIKE ? ");
             }
 
+            //****************************
+           // **     BOB SOURCE         **
+           // ****************************
             if (params.isBobSource_ctl()) {
-                sb.append("AND bobsource_sourceid=? ");
+                if(params.getBobSource_val() != null){
+                    params.appendSQL("AND bobsource_sourceid=? ");
+                } else {
+                    params.setBobSource_ctl(false);
+                    params.logMessage("SOURCE: no BOb source object; source filter disabled");
+                }
             }
 
+            //****************************
+           // **     PARCEL ID          **
+           // ****************************
             if (params.isParcelid_ctl()) {
-                sb.append("AND parid=? ");
+                params.appendSQL("AND parid ILIKE ? ");
             }
 
+           // ****************************
+           // **         ADDRESS        **
+           // ****************************
             if (params.isAddress_ctl()) {
-                sb.append("AND address ILIKE ?  ");
+                params.appendSQL("AND address ILIKE ? ");
             }
 
+           // ****************************
+           // **         CONDITION      **
+           // ****************************
             if (params.isCondition_ctl()) {
-                sb.append("AND condition_intensityclassid=?");
+                if(params.getCondition_intensityClass_val() != null){
+                    params.appendSQL("AND condition_intensityclassid=? ");
+                } else {
+                    params.setCondition_ctl(false);
+                    params.logMessage("CONDITION: no condition object; condition filter disabled; |");
+                }
             }
 
+           // ****************************
+           // **   LAND BANK PROSPECT   **
+           // ****************************
             if (params.isLandbankprospect_ctl()) {
-                sb.append("AND landbankprospect_intensityclassid=?");
+                if(params.getLandbankprospect_intensityClass_val() != null){
+                    params.appendSQL("AND landbankprospect_intensityclassid=? ");
+                } else {
+                    params.setLandbankprospect_ctl(false);
+                    params.logMessage("LANDBANKPROSPECT: No intensity object; land bank prospect disabled; |");
+                }
             }
 
+           // ****************************
+           // **   LAND BANK HELD  **
+           // ****************************
             if (params.isLandbankheld_ctl()) {
-                sb.append("AND landbankheld= ");
+                params.appendSQL("AND landbankheld= ");
                 if (params.isActive_val()) {
-                    sb.append("TRUE ");
+                    params.appendSQL("TRUE ");
                 } else {
-                    sb.append("FALSE ");
+                    params.appendSQL("FALSE ");
                 }
             }
 
+           // ****************************
+           // **   NONADDRESSABLE       **
+           // ****************************
             if (params.isNonaddressable_ctl()) {
-                sb.append("AND landbankheld= ");
+                params.appendSQL("AND nonaddressable= ");
                 if (params.isActive_val()) {
-                    sb.append("TRUE ");
+                    params.appendSQL("TRUE ");
                 } else {
-                    sb.append("FALSE ");
+                    params.appendSQL("FALSE ");
                 }
             }
 
+           // ****************************
+           // **        USE TYPE        **
+           // ****************************
             if (params.isUseType_ctl()) {
-                sb.append("AND property.usetype_typeid=?");
-            }
-
-            if (params.isZoneClass_ctl()) {
-                sb.append("AND propertyusetype.zoneclass=?");
-            }
-
-            if (params.isPropValue_ctl()) {
-                sb.append("AND propertyexternaldata.assessedlandvalue+propertyexternaldata.assessedlandvalue>? ");
-                sb.append("AND propertyexternaldata.assessedlandvalue+propertyexternaldata.assessedlandvalue<? ");
-            }
-
-            if (params.isConstructionYear_ctl()) {
-                sb.append("AND propertyexternaldata.yearbuilt>? ");
-                sb.append("AND propertyexternaldata.yearbuilt<? ");
-            }
-
-            if (params.isActive_ctl()) {
-                sb.append("AND ");
-                if (params.isActive_val()) {
-                    sb.append("active=TRUE ");
+                if(params.getUseType_val() != null){
+                    params.appendSQL("AND property.usetype_typeid=? ");
                 } else {
-                    sb.append("active=FALSE ");
+                    params.setUseType_ctl(false);
+                    params.logMessage("USE TYPE: No intensity object found; use type filter disabled; | " );
                 }
             }
 
-            if (params.isDate_startEnd_ctl()) {
-                sb.append(" AND ");
-                sb.append(getDBDateField(params));
-                sb.append(" BETWEEN ? AND ? "); // parm 2 and 3 without ID
+           // ****************************
+           // **        ZONE            **
+           // ****************************
+            if (params.isZoneClass_ctl()) {
+                params.appendSQL("AND propertyusetype.zoneclass ILIKE ? ");
+            }
+            
+           // ****************************
+           // **        TAX STATUS      **
+           // ****************************
+            if(params.isTaxStatus_ctl()){
+                params.appendSQL("AND taxstatus ILIKE ?");
             }
 
-        } else {  //object ID filter
-            sb.append("AND ");
-            sb.append("propertyid=? "); // will be param 1 with ID search
+           // ****************************
+           // **        PROP VALUE      **
+           // ****************************
+            if (params.isPropValue_ctl()) {
+                params.appendSQL("AND propertyexternaldata.assessedlandvalue+propertyexternaldata.assessedlandvalue>? ");
+                params.appendSQL("AND propertyexternaldata.assessedlandvalue+propertyexternaldata.assessedlandvalue<? ");
+            }
+
+           // ****************************
+           // **    CONSTRUCTION YEAR   **
+           // ****************************
+            if (params.isConstructionYear_ctl()) {
+                params.appendSQL("AND propertyexternaldata.yearbuilt>? ");
+                params.appendSQL("AND propertyexternaldata.yearbuilt<? ");
+            }
+           
+        // ****************************
+        // **      OBJECT ID         **
+        // **************************** 
+        } else {
+            params.appendSQL("AND propertyid=? "); // will be param 2 with ID search
         }
-        sb.append(";");
-        
-        System.out.println(sb.toString());
-        
+        params.appendSQL(";");
         int paramCounter = 0;
+        StringBuilder str = null;
 
         try {
-            stmt = con.prepareStatement(sb.toString());
+            stmt = con.prepareStatement(params.extractRawSQL());
 
             if (!params.isBobID_ctl()) {
+                
                 if (params.isMuni_ctl()) {
                      stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
                 
+                if(params.isDate_startEnd_ctl()){
+                    stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
+                    stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
+                 }
+                
                 if (params.isUser_ctl()) {
                    stmt.setInt(++paramCounter, params.getUser_val().getUserID());
                 }
+                
                 if (params.isZip_ctl()) {
-                   stmt.setString(++paramCounter, params.getZip_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getZoneClass_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }
+                
                 if (params.isLotblock_ctl()) {
-                   stmt.setString(++paramCounter, params.getLotblock_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getLotblock_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }
                 if (params.isBobSource_ctl()) {
-                    stmt.setInt(++paramCounter, params.getBobSource_val());
+                    stmt.setInt(++paramCounter, params.getBobSource_val().getSourceid());
                 }
                 if (params.isParcelid_ctl()) {
-                    stmt.setString(++paramCounter, params.getParcelid_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getParcelid_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
+                    
                 }
                 if (params.isAddress_ctl()) {
-                    StringBuilder strb = new StringBuilder();
-                    strb.append("%");
-                    strb.append(params.getAddress_val());
-                    strb.append("%");
-                    stmt.setString(++paramCounter, strb.toString());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getAddress_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }
                 if (params.isCondition_ctl()) {
-                    stmt.setInt(++paramCounter, params.getCondition_intensityClass_val());
+                    stmt.setInt(++paramCounter, params.getCondition_intensityClass_val().getClassID());
                 }
                 if (params.isLandbankprospect_ctl()) {
-                    stmt.setInt(++paramCounter, params.getLandbankprospect_intensityClass_val());
+                    stmt.setInt(++paramCounter, params.getLandbankprospect_intensityClass_val().getClassID());
                 }
                 if (params.isUseType_ctl()) {
                     stmt.setInt(++paramCounter, params.getUseType_val().getTypeID());
                 }
                 if (params.isZoneClass_ctl()) {
-                    stmt.setString(++paramCounter, params.getZoneClass_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getZip_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }
                 if (params.isPropValue_ctl()) {
                     stmt.setInt(++paramCounter, params.getPropValue_min_val());
@@ -884,12 +948,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     stmt.setInt(++paramCounter, params.getConstructionYear_max_val());
                 }
                 if (params.isDate_startEnd_ctl()) {
-                    stmt.setTimestamp(++paramCounter, params.getStartDate_val_SQLDate());
-                    stmt.setTimestamp(++paramCounter, params.getEndDate_val_SQLDate());
+                    stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
+                    stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
                 }
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
+            
+            params.logMessage("Property Integrator SQL before execution: ");
+            params.logMessage(stmt.toString());
             rs = stmt.executeQuery();
             
             int counter = 0;
@@ -915,43 +982,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return propIDList;
     }
 
-    private String getDBDateField(SearchParamsProperty params) {
-        switch (params.getDate_field_val()) {
-            case ABANDONED_START:
-                return "property.abandoneddatestart";
-            case ABANDONED_STOP:
-                return "property.abandoneddatestop";
-            case EXTERNAL_DATA_LASTUPDATED:
-                return "propertyexternaldata.lastupdated";
-            case LAST_UPDATED:
-                return "property.lastupdated";
-            case UNFIT_START:
-                return "property.unfitdatestart";
-            case UNFIT_STOP:
-                return "property.unfitdatestop";
-            case VACANT_START:
-                return "property.vacantdatestart";
-            case VACANT_STOP:
-                return "property.vacantdatestart";
-            default:
-                return "property.lastupdated";
-        }
-    }
-
-    private String getDBUserField(SearchParamsProperty params) {
-        switch (params.getUser_field_val()) {
-            case ABANDONED_BY:
-                return "property.abandonedby_userid";
-            case UNFIT_BY:
-                return "unfitby_userid";
-            case VACANT_BY:
-                return "vacantby_userid";
-            case PROPERTY_UPDATEDBY:
-                return "property.lastupdatedby";
-            default:
-                return "property.lastupdatedby";
-        }
-    }
 
     public Property getProperty(int propertyID) throws IntegrationException {
         Property p = new Property();

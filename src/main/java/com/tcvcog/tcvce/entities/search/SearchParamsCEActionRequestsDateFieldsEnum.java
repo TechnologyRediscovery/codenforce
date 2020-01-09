@@ -23,7 +23,8 @@ package com.tcvcog.tcvce.entities.search;
  * 
  * @author ellen bascomb
  */
-public enum SearchParamsCEActionRequestsDateFieldsEnum {
+public  enum SearchParamsCEActionRequestsDateFieldsEnum 
+        implements IFace_dateFieldHolder {
     
     SUBMISSION_TS              ("Insertion timestamp", 
                                 "submittedtimestamp"), 
@@ -49,10 +50,8 @@ public enum SearchParamsCEActionRequestsDateFieldsEnum {
         return title;
     }
 
-    /**
-     * @return the dbField
-     */
-    public String getDbField() {
+    @Override
+    public String extractDateFieldString() {
         return dbField;
     }
     

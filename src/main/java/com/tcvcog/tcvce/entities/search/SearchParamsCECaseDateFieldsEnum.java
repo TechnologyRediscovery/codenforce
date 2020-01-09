@@ -23,7 +23,8 @@ package com.tcvcog.tcvce.entities.search;
  * 
  * @author ellen bascomb
  */
-public enum SearchParamsCECaseDateFieldsEnum {
+public  enum SearchParamsCECaseDateFieldsEnum 
+        implements IFace_dateFieldHolder{
     
     ORIGINATIONTS              ("Creation timestamp", 
                                 "creationtimestamp"), 
@@ -49,10 +50,8 @@ public enum SearchParamsCECaseDateFieldsEnum {
         return title;
     }
 
-    /**
-     * @return the dbField
-     */
-    public String getDbField() {
+    @Override
+    public String extractDateFieldString() {
         return dbField;
     }
     

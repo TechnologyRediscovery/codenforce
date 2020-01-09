@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -407,77 +408,79 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      */
     public List<Integer> searchForEvents(SearchParamsEvent params) 
             throws IntegrationException, BObStatusException {
+        
+        SearchCoordinator sc = getSearchCoordinator();
         List<Integer> evidlst = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection con = getPostgresCon();
-        boolean notFirstCriteria = false;
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT event.eventid ");
-        sb.append("FROM event INNER JOIN eventcategory ON (category_catid = categoryid) ");
-        sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
-        sb.append("INNER JOIN property ON (property_propertyid = propertyid) ");
-        sb.append("WHERE eventid IS NOT NULL AND ");
+        
+        params.appendSQL("SELECT DISTINCT eventid ");
+        params.appendSQL("FROM event  WHERE eventid IS NOT NULL AND ");
         // as long as this isn't an ID only search, do the normal SQL building process
         if (!params.isBobID_ctl()) {
+            
+            
+            params = (SearchParamsEvent) sc.assembleBObSearchSQL_muniDatesUserActive(params);
+            
+            
             if (params.isMuni_ctl()) {
-                sb.append("municipality_municode = ? "); // param 1
+                params.appendSQL("municipality_municode = ? "); // param 1
             }
 
             if (params.isDate_startEnd_ctl()){
                 if(params.isApplyDateSearchToDateOfRecord()){
-                    sb.append("dateofrecord "); 
+                    params.appendSQL("dateofrecord "); 
                 } else if(params.isUseRespondedAtDateRange()){
-                    sb.append("viewconfirmedat ");
+                    params.appendSQL("viewconfirmedat ");
                 } else if(params.isUseEntryTimestamp()){
-                    sb.append("entrytimestamp "); 
+                    params.appendSQL("entrytimestamp "); 
                 } else {
-                    sb.append("dateofrecord "); 
+                    params.appendSQL("dateofrecord "); 
                 }
-                sb.append("BETWEEN ? AND ? "); // parm 2 and 3 without ID
+                params.appendSQL("BETWEEN ? AND ? "); // parm 2 and 3 without ID
             }
 
-            if (params.isFilterByEventType() ) {
-                sb.append("categorytype = CAST (? AS ceeventtype) ");
+            if (params.isEventType_ctl() ) {
+                params.appendSQL("categorytype = CAST (? AS ceeventtype) ");
             }
 
-            if (params.isFilterByEventCategory() ) {
-                sb.append("eventcategory_catid = ? ");
+            if (params.isEventCat_ctl() ) {
+                params.appendSQL("eventcategory_catid = ? ");
             }
 
 
             if (params.isFilterByCaseID()) {
-                sb.append("cecase_caseid = ? ");
+                params.appendSQL("cecase_caseid = ? ");
             }
 
             if (params.isFilterByEventOwner() && params.getUserID() != 0) {
-                    sb.append("ceevent.owner_userid = ? ");
+                    params.appendSQL("ceevent.owner_userid = ? ");
             }
             
-            if (params.isFilterByPerson()) {
-//                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-//                sb.append("person_personid = ?");
+            if (params.isPerson_ctl()) {
+//                if(notFirstCriteria){params.appendSQL("AND ");} else {notFirstCriteria = true;}
+//                params.appendSQL("person_personid = ?");
             }
 
 
             if (params.isActive_ctl()) {
                 if (params.isIsActive()) {
-                    sb.append("activeevent = TRUE ");
+                    params.appendSQL("activeevent = TRUE ");
                 } else {
-                    sb.append("activeevent = FALSE ");
+                    params.appendSQL("activeevent = FALSE ");
                 }
             }
             
             if (params.isFilterByHidden()) {
                 if (params.isIsHidden()) {
-                    sb.append("hidden = TRUE ");
+                    params.appendSQL("hidden = TRUE ");
                 } else {
-                    sb.append("hidden = FALSE ");
+                    params.appendSQL("hidden = FALSE ");
                 }
             }
         } else {
-            sb.append("eventid = ? "); // will be param 1 with ID search
+            params.appendSQL("eventid = ? "); // will be param 1 with ID search
         }
         int paramCounter = 0;
             
@@ -489,17 +492,17 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
                 if (params.isDate_startEnd_ctl()) {
-                    stmt.setTimestamp(++paramCounter, params.getStartDate_val_SQLDate());
-                    stmt.setTimestamp(++paramCounter, params.getEndDate_val_SQLDate());
+                    stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
+                    stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
                 }
-                if (params.isFilterByEventType()) {
-                    stmt.setString(++paramCounter, params.getEvtType().name());
+                if (params.isEventType_ctl()) {
+                    stmt.setString(++paramCounter, params.getEventType_val().name());
                 }
 
-                if (params.isFilterByEventCategory() 
+                if (params.isEventCat_ctl() 
                         && 
-                    params.getEventCategory() != null) {
-                    stmt.setInt(++paramCounter, params.getEventCategory().getCategoryID());
+                    params.getEventCat_val() != null) {
+                    stmt.setInt(++paramCounter, params.getEventCat_val().getCategoryID());
                 }
 
                 if (params.isFilterByCaseID()) {
@@ -512,7 +515,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                         stmt.setInt(++paramCounter, params.getUserID());
                 }
 
-                if (params.isFilterByPerson()) {
+                if (params.isPerson_ctl()) {
 //                    stmt.setInt(++paramCounter, params.getPerson().getPersonID());
                 }
                 

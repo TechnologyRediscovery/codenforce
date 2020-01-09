@@ -257,9 +257,9 @@ public class EventExplorerBB extends BackingBeanUtils implements Serializable {
     public List<EventCategory> getEventCatList() {
          EventIntegrator ei = getEventIntegrator();
         
-        if(searchParams.getEvtType() != null){
+        if(searchParams.getEventType_val() != null){
             try {
-                eventCatList = ei.getEventCategoryList(searchParams.getEvtType() );
+                eventCatList = ei.getEventCategoryList(searchParams.getEventType_val() );
             } catch (IntegrationException ex) {
                 // do nothing
             }

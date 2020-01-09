@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Citation;
@@ -31,6 +32,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -1061,74 +1063,162 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
+    /**
+     * Single point of entry for all queries against the person table, one SearchParamsPerson
+     * at a time
+     * @param params
+     * @return the PKs of person records selected by the SQL
+     * @throws IntegrationException 
+     */
     public List<Integer> searchForPersons(SearchParamsPerson params) throws IntegrationException {
-        ArrayList<Integer> persIDList = new ArrayList();
+        SearchCoordinator sc = getSearchCoordinator();
+        List<Integer> persIDList = new ArrayList();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        String defaultQuery = "SELECT personId "
-                + "FROM person "
-                + "WHERE personid IS NOT NULL AND ";
-        StringBuilder query = new StringBuilder(defaultQuery);
-        boolean notFirstCriteria = false;
+        params.appendSQL("SELECT personid ");
+        params.appendSQL("FROM person WHERE personid IS NOT NULL ");
         
         
         if (!params.isBobID_ctl()){
-            if (params.isName_last_ctl()){
-                query.append("lname ILIKE ? ");
-            }
+            
+            //*******************************
+            // **   MUNI,DATES,USER,ACTIVE  **
+            // *******************************
+            params = (SearchParamsPerson) sc.assembleBObSearchSQL_muniDatesUserActive(params);
+            
             if (params.isName_first_ctl()){
-                query.append("fname ILIKE ? ");
-            }
-            if (params.isAddress_streetNum_ctl()){
-                query.append("address_street ILIKE ? ");
-            }
-            if (params.isCity_ctl()){
-                query.append("address_city ILIKE ? ");
-            }
-            if (params.isZip_ctl()){
-                query.append("address_zip ILIKE ? ");
-            }            
-            if (params.isEmail_ctl()){
-                query.append("email ILIKE ? ");
-            }
-            if (params.isPhoneNumber_ctl()){
-                query.append("phonecell ILIKE ? OR phonework ILIKE ? OR phonehome ILIKE ? ");
+                params.appendSQL("fname ILIKE ? ");
             }
             
+            if (params.isName_last_ctl()){
+                params.appendSQL("lname ILIKE ? ");
+            }
+            
+            if(params.isName_compositeLNameOnly_ctl()){
+                params.appendSQL("AND compositelname=");
+                if(params.isName_compositeLNameOnly_val()){
+                    params.appendSQL("TRUE ");
+                } else {
+                    params.appendSQL("FALSE ");
+                }
+            }
+            
+            if (params.isPhoneNumber_ctl()){
+                params.appendSQL("phonecell ILIKE ? OR phonework ILIKE ? OR phonehome ILIKE ? ");
+            }
+            
+            if (params.isEmail_ctl()){
+                params.appendSQL("email ILIKE ? ");
+            }
+            
+            if (params.isAddress_streetNum_ctl()){
+                params.appendSQL("address_street ILIKE ? ");
+            }
+            
+            if (params.isCity_ctl()){
+                params.appendSQL("address_city ILIKE ? ");
+            }
+            
+            if (params.isZip_ctl()){
+                params.appendSQL("address_zip ILIKE ? ");
+            }
+
+            if(params.isPersonType_ctl()){
+                params.appendSQL("persontype = CAST(? AS persontype) ");
+            }
+            
+            if(params.isVerified_ctl()){
+                params.appendSQL("humanverifiedby IS ");
+                if(params.isVerified_val()){
+                    params.appendSQL("NOT NULL ");
+                } else {
+                    params.appendSQL("NULL ");
+                }
+            }
+            
+            
         } else {
-            query.append("caseid = ? ");
+            params.appendSQL("caseid=? ");
         }
+        params.appendSQL(";");
         
         int paramCounter = 0;
+        StringBuilder str = null;
         
         try {
-            stmt = con.prepareStatement(query.toString());
+            stmt = con.prepareStatement(params.extractRawSQL());
+            
             if (!params.isBobID_ctl()){
+                 if (params.isMuni_ctl()) {
+                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
+                }
+                
+                if(params.isDate_startEnd_ctl()){
+                    stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
+                    stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
+                 }
+                
+                if (params.isUser_ctl()) {
+                   stmt.setInt(++paramCounter, params.getUser_val().getUserID());
+                }
+                
                 if (params.isName_last_ctl()){
-                    stmt.setString(++paramCounter, params.getName_last_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getName_last_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }
                 if (params.isName_first_ctl()){
-                    stmt.setString(++paramCounter, params.getName_first_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getName_first_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }
                 if (params.isAddress_streetNum_ctl()){
-                    stmt.setString(++paramCounter, params.getAddress_streetNum_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getAddress_streetNum_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }
                 if (params.isCity_ctl()){
-                    stmt.setString(++paramCounter, params.getCity_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getCity_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }
                 if (params.isZip_ctl()){
-                    stmt.setString(++paramCounter, params.getZip_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getZip_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }            
                 if (params.isEmail_ctl()){
-                    stmt.setString(++paramCounter, params.getEmail_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getEmail_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }
                 if (params.isPhoneNumber_ctl()){
-                    stmt.setString(++paramCounter, params.getPhoneNumber_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getPhoneNumber_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
                 }
+                
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
+            
+            params.logMessage("PersonIntegrator SQL before execution: ");
+            params.logMessage(stmt.toString());
             
             rs = stmt.executeQuery();
             

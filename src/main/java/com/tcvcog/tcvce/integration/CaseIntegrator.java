@@ -75,46 +75,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             }
 
             if (params.isDate_startEnd_ctl()){
-                switch (params.getDateToSearchCECases()) {
-                    case "Opening date of record":
-                        sb.append("originationdate ");
-                        break;
-                    case "Database record timestamp":
-                        sb.append("creationtimestamp ");
-                        break;
-                    case "Closing date": 
-                        sb.append("closingdate ");
-                        break;
-                    default:
-                        sb.append("originationdate ");
-                        break;
-                }
                 sb.append("BETWEEN ? AND ? "); // parm 2 and 3 without ID
             }
 
-
-            if (params.isUseCasePhase()) {
-                if(params.getCasePhase() != null){
-                    sb.append("casephase = ?::casephase ");
-                }
-            }
-
-            if (params.isUseCaseStage() && !params.isUseCasePhase()) {
-                List<CasePhase> phList = params.getCaseStageAsPhaseList();
-                if(phList != null){
-                    int listLen = phList.size();
-                    sb.append("(");
-                    for(CasePhase cp : phList){
-                        sb.append("casephase = ?::casephase ");
-                        if(listLen > 1){
-                            sb.append("OR ");
-                            listLen--;
-                        } else {
-                            sb.append(") ");
-                        }
-                    }
-                }
-            }
 
             if (params.isProperty_ctl()) {
                 sb.append("property_propertyid = ? ");
@@ -155,20 +118,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
                 if (params.isDate_startEnd_ctl()) {
-                    stmt.setTimestamp(++paramCounter, params.getStartDate_val_SQLDate());
-                    stmt.setTimestamp(++paramCounter, params.getEndDate_val_SQLDate());
-                }
-                if (params.isUseCasePhase()) {
-                    stmt.setString(++paramCounter, params.getCasePhase().name());
-                }
-
-                if (params.isUseCaseStage() && !params.isUseCasePhase()) {
-                    List<CasePhase> phList = params.getCaseStageAsPhaseList();
-                    if(phList != null){
-                        for(CasePhase cp : phList){
-                            stmt.setString(++paramCounter, cp.name());
-                        }
-                    }
+                    stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
+                    stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
                 }
 
                 if (params.isProperty_ctl()) {
@@ -177,11 +128,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     }
                 }
 
-                if (params.isUseCaseManager()) {
-                    if(params.getCaseManagerUser() != null){
-                        stmt.setInt(++paramCounter, params.getCaseManagerUser().getUserID());
-                    }
-                }
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }

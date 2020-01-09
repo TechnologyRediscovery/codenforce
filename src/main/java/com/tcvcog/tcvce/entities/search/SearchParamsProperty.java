@@ -5,7 +5,9 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
+import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParams;
@@ -25,18 +27,6 @@ public  class       SearchParamsProperty
         implements  Serializable {
     
    
-    // The filter by date switch is on the superclass SearchParams
-    // if that's swich is on, the integrator will look at this Enum value
-    // to decide which field to use in the query against the db
-   private SearchParamsPropertyDateFieldsEnum date_field_val;
-    
-   private boolean date_null_ctl;
-   private SearchParamsPropertyDateFieldsEnum date_null_val;
-    
-   private boolean user_ctl;
-   private SearchParamsPropertyUserFieldsEnum user_field_val;
-   private User user_val;
-   
    private boolean zip_ctl;
    private String zip_val;
     
@@ -44,7 +34,7 @@ public  class       SearchParamsProperty
    private String lotblock_val;
    
    private boolean bobSource_ctl;
-   private int bobSource_val;
+   private BOBSource bobSource_val;
    
    private boolean parcelid_ctl;
    private String parcelid_val;
@@ -53,10 +43,10 @@ public  class       SearchParamsProperty
    private String address_val;
    
    private boolean condition_ctl;
-   private int condition_intensityClass_val;
+   private IntensityClass condition_intensityClass_val;
    
    private boolean landbankprospect_ctl;
-   private int landbankprospect_intensityClass_val;
+   private IntensityClass landbankprospect_intensityClass_val;
    
    private boolean landbankheld_ctl;
    private boolean landbankheld_val;
@@ -69,6 +59,9 @@ public  class       SearchParamsProperty
    
    private boolean zoneClass_ctl;
    private String zoneClass_val;
+   
+   private boolean taxStatus_ctl;
+   private String taxStatus_val;
    
    private boolean propValue_ctl;
    private int propValue_min_val;
@@ -176,43 +169,6 @@ public  class       SearchParamsProperty
     }
 
 
- 
-
-    /**
-     * @return the date_field_val
-     */
-    public SearchParamsPropertyDateFieldsEnum getDate_field_val() {
-        return date_field_val;
-    }
-
-    /**
-     * @return the date_null_ctl
-     */
-    public boolean isDate_null_ctl() {
-        return date_null_ctl;
-    }
-
-    /**
-     * @return the date_null_val
-     */
-    public SearchParamsPropertyDateFieldsEnum getDate_null_val() {
-        return date_null_val;
-    }
-
-    /**
-     * @return the user_ctl
-     */
-    public boolean isUser_ctl() {
-        return user_ctl;
-    }
-
-    /**
-     * @return the user_field_val
-     */
-    public SearchParamsPropertyUserFieldsEnum getUser_field_val() {
-        return user_field_val;
-    }
-
     /**
      * @return the zip_ctl
      */
@@ -234,12 +190,6 @@ public  class       SearchParamsProperty
         return bobSource_ctl;
     }
 
-    /**
-     * @return the bobSource_val
-     */
-    public int getBobSource_val() {
-        return bobSource_val;
-    }
 
     /**
      * @return the condition_ctl
@@ -248,12 +198,6 @@ public  class       SearchParamsProperty
         return condition_ctl;
     }
 
-    /**
-     * @return the condition_intensityClass_val
-     */
-    public int getCondition_intensityClass_val() {
-        return condition_intensityClass_val;
-    }
 
     /**
      * @return the landbankprospect_ctl
@@ -262,12 +206,6 @@ public  class       SearchParamsProperty
         return landbankprospect_ctl;
     }
 
-    /**
-     * @return the landbankprospect_intensityClass_val
-     */
-    public int getLandbankprospect_intensityClass_val() {
-        return landbankprospect_intensityClass_val;
-    }
 
     /**
      * @return the landbankheld_ctl
@@ -349,41 +287,6 @@ public  class       SearchParamsProperty
     }
 
     /**
-     * @param date_field_val the date_field_val to set
-     */
-    public void setDate_field_val(SearchParamsPropertyDateFieldsEnum date_field_val) {
-        this.date_field_val = date_field_val;
-    }
-
-    /**
-     * @param date_null_ctl the date_null_ctl to set
-     */
-    public void setDate_null_ctl(boolean date_null_ctl) {
-        this.date_null_ctl = date_null_ctl;
-    }
-
-    /**
-     * @param date_null_val the date_null_val to set
-     */
-    public void setDate_null_val(SearchParamsPropertyDateFieldsEnum date_null_val) {
-        this.date_null_val = date_null_val;
-    }
-
-    /**
-     * @param user_ctl the user_ctl to set
-     */
-    public void setUser_ctl(boolean user_ctl) {
-        this.user_ctl = user_ctl;
-    }
-
-    /**
-     * @param user_field_val the user_field_val to set
-     */
-    public void setUser_field_val(SearchParamsPropertyUserFieldsEnum user_field_val) {
-        this.user_field_val = user_field_val;
-    }
-
-    /**
      * @param zip_ctl the zip_ctl to set
      */
     public void setZip_ctl(boolean zip_ctl) {
@@ -404,12 +307,6 @@ public  class       SearchParamsProperty
         this.bobSource_ctl = bobSource_ctl;
     }
 
-    /**
-     * @param bobSource_val the bobSource_val to set
-     */
-    public void setBobSource_val(int bobSource_val) {
-        this.bobSource_val = bobSource_val;
-    }
 
     /**
      * @param condition_ctl the condition_ctl to set
@@ -418,12 +315,6 @@ public  class       SearchParamsProperty
         this.condition_ctl = condition_ctl;
     }
 
-    /**
-     * @param condition_intensityClass_val the condition_intensityClass_val to set
-     */
-    public void setCondition_intensityClass_val(int condition_intensityClass_val) {
-        this.condition_intensityClass_val = condition_intensityClass_val;
-    }
 
     /**
      * @param landbankprospect_ctl the landbankprospect_ctl to set
@@ -432,12 +323,6 @@ public  class       SearchParamsProperty
         this.landbankprospect_ctl = landbankprospect_ctl;
     }
 
-    /**
-     * @param landbankprospect_intensityClass_val the landbankprospect_intensityClass_val to set
-     */
-    public void setLandbankprospect_intensityClass_val(int landbankprospect_intensityClass_val) {
-        this.landbankprospect_intensityClass_val = landbankprospect_intensityClass_val;
-    }
 
     /**
      * @param landbankheld_ctl the landbankheld_ctl to set
@@ -546,19 +431,6 @@ public  class       SearchParamsProperty
         this.constructionYear_max_val = constructionYear_max_val;
     }
 
-    /**
-     * @return the user_val
-     */
-    public User getUser_val() {
-        return user_val;
-    }
-
-    /**
-     * @param user_val the user_val to set
-     */
-    public void setUser_val(User user_val) {
-        this.user_val = user_val;
-    }
    
     /**
      *
@@ -575,7 +447,6 @@ public  class       SearchParamsProperty
         m.put("Fil by Lot and block:", this.isLotblock_ctl());
         m.put("Fil by Muni:", this.isMuni_ctl());
         m.put("Fil by Nonaddressable:", this.isNonaddressable_ctl());
-        m.put("Fil by Null date field:", this.isDate_null_ctl());
         m.put("Fil by Object ID:", this.isBobID_ctl());
         m.put("Fil by Parcel ID:", this.isParcelid_ctl());
         m.put("Fil by Start End Date:", this.isDate_startEnd_ctl());
@@ -601,6 +472,76 @@ public  class       SearchParamsProperty
      */
     public void setUseType_val(PropertyUseType useType_val) {
         this.useType_val = useType_val;
+    }
+
+    /**
+     * @return the bobSource_val
+     */
+    public BOBSource getBobSource_val() {
+        return bobSource_val;
+    }
+
+    /**
+     * @param bobSource_val the bobSource_val to set
+     */
+    public void setBobSource_val(BOBSource bobSource_val) {
+        this.bobSource_val = bobSource_val;
+    }
+
+    /**
+     * @return the taxStatus_ctl
+     */
+    public boolean isTaxStatus_ctl() {
+        return taxStatus_ctl;
+    }
+
+    /**
+     * @param taxStatus_ctl the taxStatus_ctl to set
+     */
+    public void setTaxStatus_ctl(boolean taxStatus_ctl) {
+        this.taxStatus_ctl = taxStatus_ctl;
+    }
+
+    /**
+     * @return the taxStatus_val
+     */
+    public String getTaxStatus_val() {
+        return taxStatus_val;
+    }
+
+    /**
+     * @param taxStatus_val the taxStatus_val to set
+     */
+    public void setTaxStatus_val(String taxStatus_val) {
+        this.taxStatus_val = taxStatus_val;
+    }
+
+    /**
+     * @return the condition_intensityClass_val
+     */
+    public IntensityClass getCondition_intensityClass_val() {
+        return condition_intensityClass_val;
+    }
+
+    /**
+     * @param condition_intensityClass_val the condition_intensityClass_val to set
+     */
+    public void setCondition_intensityClass_val(IntensityClass condition_intensityClass_val) {
+        this.condition_intensityClass_val = condition_intensityClass_val;
+    }
+
+    /**
+     * @return the landbankprospect_intensityClass_val
+     */
+    public IntensityClass getLandbankprospect_intensityClass_val() {
+        return landbankprospect_intensityClass_val;
+    }
+
+    /**
+     * @param landbankprospect_intensityClass_val the landbankprospect_intensityClass_val to set
+     */
+    public void setLandbankprospect_intensityClass_val(IntensityClass landbankprospect_intensityClass_val) {
+        this.landbankprospect_intensityClass_val = landbankprospect_intensityClass_val;
     }
     
 }
