@@ -1687,7 +1687,7 @@ tr.caseOpen{
 }
 
 .nav_containner{
-    color:#00B4ED;
+    color:#6C6D70;
     float:left;
     display: inline-block;
 
@@ -1736,7 +1736,7 @@ tr.caseOpen{
     position: absolute;
     left: 0;
     font-family: inherit;
-    color:#00B4ED;
+    color:#6C6D70;
     background-color: #EEEEEE;
     width: 100%;
     z-index: 3;
