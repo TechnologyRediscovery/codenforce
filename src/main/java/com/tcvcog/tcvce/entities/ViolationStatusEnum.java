@@ -28,7 +28,7 @@ package com.tcvcog.tcvce.entities;
 public enum ViolationStatusEnum {
 
     RESOLVED(                               "Resolved", 
-                                            "",
+                                            "Issue no longer remains on property",
                                             "codeviolation_resolved_iconid",
                                             0),
     

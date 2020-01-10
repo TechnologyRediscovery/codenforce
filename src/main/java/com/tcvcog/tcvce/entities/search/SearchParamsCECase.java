@@ -6,15 +6,11 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseStage;
+import com.tcvcog.tcvce.entities.CasePhaseEnum;
+import com.tcvcog.tcvce.entities.CaseStageEnum;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.User;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -23,20 +19,8 @@ import java.util.List;
 public class        SearchParamsCECase 
         extends     SearchParams {
     
-    
-    /**
-     * Required by superclass to know which field to search. 
-     * Superclass which has the _ctl and _val components
-     */
-    private SearchParamsCECaseDateFieldsEnum date_field;
-    
-    /**
-     * Required by superclass which has the _ctl and _val components
-     */
-    private SearchParamsCECaseUserFieldsEnum user_field;
-    
-    private boolean open_ctl;
-    private boolean open_val;
+    private boolean caseOpen_ctl;
+    private boolean caseOpen_val;
     
     private boolean property_ctl;
     private Property property_val;
@@ -50,47 +34,28 @@ public class        SearchParamsCECase
     private boolean personInfoCase_ctl;
     private boolean personInfoCase_val;
     
+    private boolean personInfoCaseID_ctl;
+    private Person personInfoCaseID_val;
+    
     private boolean source_ctl;
     private BOBSource source_val;
     
     private boolean pacc_ctl;
     private boolean pacc_val;
+
+    // *******************************
+    // ** JavaLand switches only!   **
+    // *******************************
     
+    private boolean casePhase_ctl;
+    private CasePhaseEnum casePhase_val;
     
+    // ****** END JAVALAND ONLY ********
     
     
    public SearchParamsCECase(){
        
    }
-
-    /**
-     * @return the open_ctl
-     */
-    public boolean isOpen_ctl() {
-        return open_ctl;
-    }
-
-    /**
-     * @return the open_val
-     */
-    public boolean isOpen_val() {
-        return open_val;
-    }
-
-    /**
-     * @param open_ctl the open_ctl to set
-     */
-    public void setOpen_ctl(boolean open_ctl) {
-        this.open_ctl = open_ctl;
-    }
-
-    /**
-     * @param open_val the open_val to set
-     */
-    public void setOpen_val(boolean open_val) {
-        this.open_val = open_val;
-    }
-
    
     /**
      * @return the property_ctl
@@ -149,33 +114,6 @@ public class        SearchParamsCECase
         this.propInfoCase_val = propInfoCase_val;
     }
 
-    /**
-     * @return the date_field
-     */
-    public SearchParamsCECaseDateFieldsEnum getDate_field() {
-        return date_field;
-    }
-
-    /**
-     * @param date_field the date_field to set
-     */
-    public void setDate_field(SearchParamsCECaseDateFieldsEnum date_field) {
-        this.date_field = date_field;
-    }
-
-    /**
-     * @return the user_field
-     */
-    public SearchParamsCECaseUserFieldsEnum getUser_field() {
-        return user_field;
-    }
-
-    /**
-     * @param user_field the user_field to set
-     */
-    public void setUser_field(SearchParamsCECaseUserFieldsEnum user_field) {
-        this.user_field = user_field;
-    }
 
     /**
      * @return the propertyUnit_ctl
@@ -287,6 +225,92 @@ public class        SearchParamsCECase
      */
     public void setPacc_val(boolean pacc_val) {
         this.pacc_val = pacc_val;
+    }
+
+
+    /**
+     * @return the casePhase_ctl
+     */
+    public boolean isCasePhase_ctl() {
+        return casePhase_ctl;
+    }
+
+    /**
+     * @return the casePhase_val
+     */
+    public CasePhaseEnum getCasePhase_val() {
+        return casePhase_val;
+    }
+
+
+    /**
+     * @param casePhase_ctl the casePhase_ctl to set
+     */
+    public void setCasePhase_ctl(boolean casePhase_ctl) {
+        this.casePhase_ctl = casePhase_ctl;
+    }
+
+    /**
+     * @param casePhase_val the casePhase_val to set
+     */
+    public void setCasePhase_val(CasePhaseEnum casePhase_val) {
+        this.casePhase_val = casePhase_val;
+    }
+
+    /**
+     * @return the caseOpen_ctl
+     */
+    public boolean isCaseOpen_ctl() {
+        return caseOpen_ctl;
+    }
+
+    /**
+     * @return the caseOpen_val
+     */
+    public boolean isCaseOpen_val() {
+        return caseOpen_val;
+    }
+
+    /**
+     * @param caseOpen_ctl the caseOpen_ctl to set
+     */
+    public void setCaseOpen_ctl(boolean caseOpen_ctl) {
+        this.caseOpen_ctl = caseOpen_ctl;
+    }
+
+    /**
+     * @param caseOpen_val the caseOpen_val to set
+     */
+    public void setCaseOpen_val(boolean caseOpen_val) {
+        this.caseOpen_val = caseOpen_val;
+    }
+
+    /**
+     * @return the personInfoCaseID_ctl
+     */
+    public boolean isPersonInfoCaseID_ctl() {
+        return personInfoCaseID_ctl;
+    }
+
+    /**
+     * @param personInfoCaseID_ctl the personInfoCaseID_ctl to set
+     */
+    public void setPersonInfoCaseID_ctl(boolean personInfoCaseID_ctl) {
+        this.personInfoCaseID_ctl = personInfoCaseID_ctl;
+    }
+
+    /**
+     * @return the personInfoCaseID_val
+     */
+    public Person getPersonInfoCaseID_val() {
+        return personInfoCaseID_val;
+    }
+
+    /**
+     * @param personInfoCaseID_val the personInfoCaseID_val to set
+     */
+    public void setPersonInfoCaseID_val(Person personInfoCaseID_val) {
+        this.personInfoCaseID_val = personInfoCaseID_val;
     }
 
     

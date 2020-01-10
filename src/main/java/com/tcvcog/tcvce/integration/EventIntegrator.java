@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleCECase;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
@@ -394,10 +395,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
-   
- 
-    
-    
     
     /**
      * Primary search method for EventCnF objects system wide!
@@ -415,108 +412,142 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
         Connection con = getPostgresCon();
         
-        params.appendSQL("SELECT DISTINCT eventid ");
-        params.appendSQL("FROM event  WHERE eventid IS NOT NULL AND ");
+        params.appendSQL("SELECT DISTINCT eventid, person_personid ");
+        params.appendSQL("FROM public.event INNER JOIN public.eventcategory ON category_catid = categoryid \n");
+        params.appendSQL("LEFT OUTER JOIN public.eventperson ON ceevent_eventid = eventid ");
+        params.appendSQL("WHERE eventid IS NOT NULL ");
         // as long as this isn't an ID only search, do the normal SQL building process
         if (!params.isBobID_ctl()) {
             
-            
+            //*******************************
+           // **   MUNI,DATES,USER,ACTIVE  **
+           // *******************************
             params = (SearchParamsEvent) sc.assembleBObSearchSQL_muniDatesUserActive(params);
-            
-            
-            if (params.isMuni_ctl()) {
-                params.appendSQL("municipality_municode = ? "); // param 1
-            }
 
-            if (params.isDate_startEnd_ctl()){
-                if(params.isApplyDateSearchToDateOfRecord()){
-                    params.appendSQL("dateofrecord "); 
-                } else if(params.isUseRespondedAtDateRange()){
-                    params.appendSQL("viewconfirmedat ");
-                } else if(params.isUseEntryTimestamp()){
-                    params.appendSQL("entrytimestamp "); 
-                } else {
-                    params.appendSQL("dateofrecord "); 
-                }
-                params.appendSQL("BETWEEN ? AND ? "); // parm 2 and 3 without ID
-            }
-
-            if (params.isEventType_ctl() ) {
-                params.appendSQL("categorytype = CAST (? AS ceeventtype) ");
-            }
-
+            //*******************************
+           // **      EVENT CATEGORY       **
+           // *******************************
             if (params.isEventCat_ctl() ) {
-                params.appendSQL("eventcategory_catid = ? ");
+                if(params.getEventCat_val() != null){
+                    params.appendSQL("AND eventcategory.categoryid=? ");
+                } else {
+                    params.setEventCat_ctl(false);
+                    params.logMessage("EVENT CATEGORY: no object specified; event cat filter disabled; |"); 
+                }
             }
 
-
-            if (params.isFilterByCaseID()) {
-                params.appendSQL("cecase_caseid = ? ");
-            }
-
-            if (params.isFilterByEventOwner() && params.getUserID() != 0) {
-                    params.appendSQL("ceevent.owner_userid = ? ");
+           // *******************************
+           // **      EVENT TYPE           **
+           // *******************************
+            if (params.isEventType_ctl() ) {
+                if(params.getEventType_val()!= null){
+                    params.appendSQL("AND public.eventcategory.categorytype = CAST(? AS eventType ");
+                } else {
+                    params.setEventType_ctl(false);
+                    params.logMessage("EVENT TYPE: no object specified; event type filter disabled; | ");
+                }
             }
             
+            // we need an EventDomain for the BOBID, too, so set it arbitrarily if it's null
+            if(params.getEventDomain_val() == null){
+                params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+                params.logMessage("DOMAIN CONTROL: no object specified - Code Enforcement chosen as default; | ");
+            }
+            
+           // *******************************
+           // **      EVENT DOMAIN         **
+           // *******************************
+            if(params.isEventDomain_ctl()){
+                params.appendSQL("AND ");
+                params.appendSQL(params.getEventDomain_val().getDbField());
+                params.appendSQL(" ");
+                params.appendSQL("IS NOT NULL ");
+            }
+            
+           // *******************************
+           // **   EVENT DOMAIN BOB ID     **
+           // *******************************
+            if(params.isEventDomainPK_ctl()){
+                params.appendSQL("AND ");
+                params.appendSQL(params.getEventDomain_val().getDbField());
+                params.appendSQL("=? ");
+            }
+            
+           // *******************************
+           // **   EVENT PERSONS           **
+           // *******************************
             if (params.isPerson_ctl()) {
-//                if(notFirstCriteria){params.appendSQL("AND ");} else {notFirstCriteria = true;}
-//                params.appendSQL("person_personid = ?");
+                if(params.getPerson_val() != null){
+                    params.appendSQL("AND person_personid=? ");
+                } else {
+                    params.setPerson_ctl(false);
+                    params.logMessage("EVENT PERSONS: No Person object specified; person filter disabled; | ");
+                }
+            }
+
+           // *******************************
+           // **      DISCLOSE TO MUNI     **
+           // *******************************
+            if (params.isDiscloseToMuni_ctl()) {
+                params.appendSQL("AND disclosetomunicipality=");
+                if (params.isDiscloseToMuni_val()) {
+                    params.appendSQL("TRUE ");
+                } else {
+                    params.appendSQL("FALSE ");
+                }
             }
 
 
-            if (params.isActive_ctl()) {
-                if (params.isIsActive()) {
-                    params.appendSQL("activeevent = TRUE ");
+           // *******************************
+           // **      DISCLOSE TO PUBLIC   **
+           // *******************************
+            if (params.isDiscloseToPublic_ctl()) {
+                params.appendSQL("AND disclosetopublic=");
+                if (params.isDiscloseToPublic_val()) {
+                    params.appendSQL("TRUE ");
                 } else {
-                    params.appendSQL("activeevent = FALSE ");
+                    params.appendSQL("FALSE ");
                 }
             }
             
-            if (params.isFilterByHidden()) {
-                if (params.isIsHidden()) {
-                    params.appendSQL("hidden = TRUE ");
-                } else {
-                    params.appendSQL("hidden = FALSE ");
-                }
-            }
         } else {
-            params.appendSQL("eventid = ? "); // will be param 1 with ID search
+            params.appendSQL("eventid=? "); // will be param 1 with ID search
         }
         int paramCounter = 0;
+        params.appendSQL(";");
             
         try {
-            stmt = con.prepareStatement(sb.toString());
+            stmt = con.prepareStatement(params.extractRawSQL());
 
             if (!params.isBobID_ctl()) {
+                
                 if (params.isMuni_ctl()) {
-                    stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
+                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
-                if (params.isDate_startEnd_ctl()) {
+                
+                if(params.isDate_startEnd_ctl()){
                     stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
                     stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
+                 }
+                
+                if (params.isUser_ctl()) {
+                   stmt.setInt(++paramCounter, params.getUser_val().getUserID());
                 }
+
+                if (params.isEventCat_ctl()) {
+                    stmt.setInt(++paramCounter, params.getEventCat_val().getCategoryID());
+                }
+                
                 if (params.isEventType_ctl()) {
                     stmt.setString(++paramCounter, params.getEventType_val().name());
                 }
 
-                if (params.isEventCat_ctl() 
-                        && 
-                    params.getEventCat_val() != null) {
-                    stmt.setInt(++paramCounter, params.getEventCat_val().getCategoryID());
+                if(params.isEventDomainPK_ctl()){
+                    stmt.setInt(++paramCounter, params.getEventDomainPK_val());
                 }
-
-                if (params.isFilterByCaseID()) {
-                    stmt.setInt(++paramCounter, params.getCaseId());
-                }
-
-                if (params.isFilterByEventOwner() 
-                        && 
-                    params.getUserID() != 0) {
-                        stmt.setInt(++paramCounter, params.getUserID());
-                }
-
+                
                 if (params.isPerson_ctl()) {
-//                    stmt.setInt(++paramCounter, params.getPerson().getPersonID());
+                    stmt.setInt(++paramCounter, params.getPerson_val().getPersonID());
                 }
                 
             } else {
@@ -544,9 +575,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-
-        }// close try/catch
-
+        }
         return evidlst;
     }
         

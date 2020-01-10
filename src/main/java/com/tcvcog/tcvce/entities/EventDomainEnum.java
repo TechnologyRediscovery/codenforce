@@ -25,7 +25,33 @@ package com.tcvcog.tcvce.entities;
  */
 public enum EventDomainEnum {
     
-    CODE_ENFORCEMENT,
-    OCCUPANCY;
+    CODE_ENFORCEMENT        (   "Code enforcement cases", 
+                                "cecase_caseid"             ),
+    OCCUPANCY               (   "Code enforcement cases", 
+                                "cecase_caseid"             );
+    
+    private final String title;
+    private final String dbField;
+    
+    private EventDomainEnum(String t, String db){
+        title = t;
+        dbField = db;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @return the dbField
+     */
+    public String getDbField() {
+        return dbField;
+    }
+
+
     
 }

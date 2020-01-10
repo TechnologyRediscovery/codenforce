@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.RoleType;
 import java.util.ArrayList;
@@ -52,6 +53,10 @@ public  class   SearchParamsPerson
         protected RoleType verified_rtMin;
         private boolean verified_ctl;
         private boolean verified_val;       
+        
+        private boolean source_ctl;
+        private BOBSource source_val;
+        
         
    public SearchParamsPerson(){
        
@@ -421,6 +426,34 @@ public  class   SearchParamsPerson
      */
     public void setName_compositeLNameOnly_val(boolean name_compositeLNameOnly_val) {
         this.name_compositeLNameOnly_val = name_compositeLNameOnly_val;
+    }
+
+    /**
+     * @return the source_ctl
+     */
+    public boolean isSource_ctl() {
+        return source_ctl;
+    }
+
+    /**
+     * @param source_ctl the source_ctl to set
+     */
+    public void setSource_ctl(boolean source_ctl) {
+        this.source_ctl = source_ctl;
+    }
+
+    /**
+     * @return the source_val
+     */
+    public BOBSource getSource_val() {
+        return source_val;
+    }
+
+    /**
+     * @param source_val the source_val to set
+     */
+    public void setSource_val(BOBSource source_val) {
+        this.source_val = source_val;
     }
     
 }

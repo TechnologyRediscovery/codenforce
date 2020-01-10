@@ -10,8 +10,8 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseStage;
+import com.tcvcog.tcvce.entities.CasePhaseEnum;
+import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.ViolationStatusEnum;
@@ -38,26 +38,26 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
     private DonutChartModel violationDonut;
 
     
-    public Map<CasePhase, Integer> getCaseCountsByPhase(List<CECaseDataHeavy> caseList) throws IntegrationException {
-        Map<CasePhase, Integer> phaseCountMap = null;
+    public Map<CasePhaseEnum, Integer> getCaseCountsByPhase(List<CECaseDataHeavy> caseList) throws IntegrationException {
+        Map<CasePhaseEnum, Integer> phaseCountMap = null;
         if(caseList != null && !caseList.isEmpty()){
 
             phaseCountMap = new LinkedHashMap<>();
-            phaseCountMap.put(CasePhase.PrelimInvestigationPending, 0);
-            phaseCountMap.put(CasePhase.NoticeDelivery, 0);
-            phaseCountMap.put(CasePhase.InitialComplianceTimeframe, 0);
-            phaseCountMap.put(CasePhase.SecondaryComplianceTimeframe, 0);
-            phaseCountMap.put(CasePhase.AwaitingHearingDate, 0);
-            phaseCountMap.put(CasePhase.HearingPreparation, 0);
-            phaseCountMap.put(CasePhase.InitialPostHearingComplianceTimeframe, 0);
-            phaseCountMap.put(CasePhase.SecondaryPostHearingComplianceTimeframe, 0);
-            phaseCountMap.put(CasePhase.Closed, 0);
-            phaseCountMap.put(CasePhase.LegacyImported, 0);
-            phaseCountMap.put(CasePhase.InactiveHolding, 0);
-            //CasePhase[] phaseValuesArray = CasePhase.values();
+            phaseCountMap.put(CasePhaseEnum.PrelimInvestigationPending, 0);
+            phaseCountMap.put(CasePhaseEnum.NoticeDelivery, 0);
+            phaseCountMap.put(CasePhaseEnum.InitialComplianceTimeframe, 0);
+            phaseCountMap.put(CasePhaseEnum.SecondaryComplianceTimeframe, 0);
+            phaseCountMap.put(CasePhaseEnum.AwaitingHearingDate, 0);
+            phaseCountMap.put(CasePhaseEnum.HearingPreparation, 0);
+            phaseCountMap.put(CasePhaseEnum.InitialPostHearingComplianceTimeframe, 0);
+            phaseCountMap.put(CasePhaseEnum.SecondaryPostHearingComplianceTimeframe, 0);
+            phaseCountMap.put(CasePhaseEnum.Closed, 0);
+            phaseCountMap.put(CasePhaseEnum.LegacyImported, 0);
+            phaseCountMap.put(CasePhaseEnum.InactiveHolding, 0);
+            //CasePhase[] phaseValuesArray = CasePhaseEnum.values();
             Iterator<CECaseDataHeavy> caseIter = caseList.iterator();
             while (caseIter.hasNext()) {
-                CasePhase p = caseIter.next().getCasePhase();
+                CasePhaseEnum p = caseIter.next().getCasePhase();
                 phaseCountMap.put(p, phaseCountMap.get(p) + 1);
             }
         }
@@ -65,18 +65,18 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
     }
 
     
-    public Map<CaseStage, Integer> getCaseCountsByStage(List<CECaseDataHeavy> caseList) throws IntegrationException, BObStatusException {
-        Map<CaseStage, Integer> stageCountMap = null;
+    public Map<CaseStageEnum, Integer> getCaseCountsByStage(List<CECaseDataHeavy> caseList) throws IntegrationException, BObStatusException {
+        Map<CaseStageEnum, Integer> stageCountMap = null;
         if(caseList != null && !caseList.isEmpty()){
 
             stageCountMap = new LinkedHashMap<>();
-            List<CaseStage> stageList = Arrays.asList(CaseStage.values());
+            List<CaseStageEnum> stageList = Arrays.asList(CaseStageEnum.values());
             CaseCoordinator cc = getCaseCoordinator();
-            for (CaseStage cs : stageList) {
+            for (CaseStageEnum cs : stageList) {
                 stageCountMap.put(cs, 0);
             }
             for (CECaseDataHeavy c : caseList) {
-                CaseStage stg = c.getCasePhase().getCaseStage();
+                CaseStageEnum stg = c.getCasePhase().getCaseStage();
                 stageCountMap.put(stg, stageCountMap.get(stg) + 1);
             }
         }

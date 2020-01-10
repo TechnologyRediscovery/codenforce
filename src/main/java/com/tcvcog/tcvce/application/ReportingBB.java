@@ -11,8 +11,8 @@ import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseStage;
+import com.tcvcog.tcvce.entities.CasePhaseEnum;
+import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.reports.Report;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
@@ -59,7 +59,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     
     private List<CECaseDataHeavy> caseList;
-    private Map<CasePhase, Integer> cPhaseMap;
+    private Map<CasePhaseEnum, Integer> cPhaseMap;
      
 
     /**
@@ -105,9 +105,9 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         
         ChartSeries caseCountSeries = new ChartSeries();
         caseCountSeries.setLabel("Count of CE cases");
-        Set<CasePhase> phaseSet = cPhaseMap.keySet();
+        Set<CasePhaseEnum> phaseSet = cPhaseMap.keySet();
         Integer max = 0;
-        for(CasePhase p : phaseSet) {
+        for(CasePhaseEnum p : phaseSet) {
             Integer cnt = cPhaseMap.get(p);
             if(cnt > max){
                 max = cnt;
@@ -136,7 +136,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
          DataCoordinator dc = getDataCoordinator();
         ChartSeries caseCountSeries = new ChartSeries();
         caseCountSeries.setLabel("Count of CE cases");
-        Map<CaseStage, Integer> stageMap = null;
+        Map<CaseStageEnum, Integer> stageMap = null;
         try {
              stageMap = dc.getCaseCountsByStage(caseList);
         } catch (IntegrationException | BObStatusException ex) {
@@ -145,8 +145,8 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         Integer max = 0;
         if(stageMap != null && stageMap.keySet() != null){
             
-            Set<CaseStage> stageSet = stageMap.keySet();
-            for(CaseStage s : stageSet) {
+            Set<CaseStageEnum> stageSet = stageMap.keySet();
+            for(CaseStageEnum s : stageSet) {
                 Integer cnt = stageMap.get(s);
                 if(cnt > max){
                     max = cnt;
@@ -276,14 +276,14 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the cPhaseMap
      */
-    public Map<CasePhase, Integer> getcPhaseMap() {
+    public Map<CasePhaseEnum, Integer> getcPhaseMap() {
         return cPhaseMap;
     }
 
     /**
      * @param cPhaseMap the cPhaseMap to set
      */
-    public void setcPhaseMap(Map<CasePhase, Integer> cPhaseMap) {
+    public void setcPhaseMap(Map<CasePhaseEnum, Integer> cPhaseMap) {
         this.cPhaseMap = cPhaseMap;
     }
 

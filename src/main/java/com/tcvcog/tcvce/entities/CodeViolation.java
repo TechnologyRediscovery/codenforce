@@ -30,7 +30,10 @@ import java.util.Objects;
  *
  * @author ellen bascomb of apt 31y
  */
-public class CodeViolation  implements Serializable{
+public  class       CodeViolation  
+        implements  Serializable,
+                    Comparable<CodeViolation>{
+    
     protected int violationID;
     protected EnforcableCodeElement violatedEnfElement;
     protected int ceCaseID;
@@ -61,14 +64,9 @@ public class CodeViolation  implements Serializable{
     
     protected User createdBy;
     
-    protected long daysUntilStipulatedComplianceDate;
     protected LocalDateTime stipulatedComplianceDate;
-    protected java.util.Date stipulatedComplianceDateUtilDate;
-    protected String stipulatedComplianceDatePretty;
     
     protected LocalDateTime actualComplianceDate;
-    protected java.util.Date actualComplianceDateUtilDate;
-    protected String actualComplianceDatePretty;
     
     protected boolean leagacyImport;
     
@@ -86,6 +84,26 @@ public class CodeViolation  implements Serializable{
     private int severityIntensityClassID;
     
     
+     /**
+     * @return the daysUntilStipulatedComplianceDate
+     */
+    public long getDaysUntilStipulatedComplianceDate() {
+        return EntityUtils.getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
+    }
+    
+     @Override
+    public int compareTo(CodeViolation o) {
+        if(o == null){
+            throw new NullPointerException("Cannot compare to Null");
+        }
+        if(this.getDaysUntilStipulatedComplianceDate() < o.getDaysUntilStipulatedComplianceDate()){
+            return -1;
+        }
+        if(this.getDaysUntilStipulatedComplianceDate() == o.getDaysUntilStipulatedComplianceDate()){
+            return 0;
+        }
+        return 1;
+    }
     
     /**
      * @return the violationID
@@ -285,21 +303,7 @@ public class CodeViolation  implements Serializable{
         this.citationListAsString = citationListAsString;
     }
 
-    /**
-     * @return the daysUntilStipulatedComplianceDate
-     */
-    public long getDaysUntilStipulatedComplianceDate() {
-        daysUntilStipulatedComplianceDate = 
-                EntityUtils.getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
-        return daysUntilStipulatedComplianceDate;
-    }
-
-    /**
-     * @param daysUntilStipulatedComplianceDate the daysUntilStipulatedComplianceDate to set
-     */
-    public void setDaysUntilStipulatedComplianceDate(long daysUntilStipulatedComplianceDate) {
-        this.daysUntilStipulatedComplianceDate = daysUntilStipulatedComplianceDate;
-    }
+   
 
     /**
      * @return the dateOfCitationPretty
@@ -330,17 +334,14 @@ public class CodeViolation  implements Serializable{
      * @return the stipulatedComplianceDatePretty
      */
     public String getStipulatedComplianceDatePretty() {
-        stipulatedComplianceDatePretty = EntityUtils.getPrettyDate(stipulatedComplianceDate);
-        return stipulatedComplianceDatePretty;
+        return EntityUtils.getPrettyDate(stipulatedComplianceDate);
     }
 
     /**
      * @return the actualComplianceDatePretty
      */
     public String getActualComplianceDatePretty() {
-        actualComplianceDatePretty = EntityUtils.getPrettyDate(actualComplianceDate);
-        
-        return actualComplianceDatePretty;
+        return EntityUtils.getPrettyDate(actualComplianceDate);
     }
 
     /**
@@ -364,19 +365,7 @@ public class CodeViolation  implements Serializable{
         this.creationTSPretty = creationTSPretty;
     }
 
-    /**
-     * @param stipulatedComplianceDatePretty the stipulatedComplianceDatePretty to set
-     */
-    public void setStipulatedComplianceDatePretty(String stipulatedComplianceDatePretty) {
-        this.stipulatedComplianceDatePretty = stipulatedComplianceDatePretty;
-    }
-
-    /**
-     * @param actualComplianceDatePretty the actualComplianceDatePretty to set
-     */
-    public void setActualComplianceDatePretty(String actualComplianceDatePretty) {
-        this.actualComplianceDatePretty = actualComplianceDatePretty;
-    }
+    
 
     /**
      * @return the list of blobIDs associated with this Violation
@@ -497,11 +486,8 @@ public class CodeViolation  implements Serializable{
         hash = 53 * hash + Objects.hashCode(this.dateOfRecordPretty);
         hash = 53 * hash + Objects.hashCode(this.creationTS);
         hash = 53 * hash + Objects.hashCode(this.creationTSPretty);
-        hash = 53 * hash + (int) (this.daysUntilStipulatedComplianceDate ^ (this.daysUntilStipulatedComplianceDate >>> 32));
         hash = 53 * hash + Objects.hashCode(this.stipulatedComplianceDate);
-        hash = 53 * hash + Objects.hashCode(this.stipulatedComplianceDatePretty);
         hash = 53 * hash + Objects.hashCode(this.actualComplianceDate);
-        hash = 53 * hash + Objects.hashCode(this.actualComplianceDatePretty);
         hash = 53 * hash + (this.leagacyImport ? 1 : 0);
         hash = 53 * hash + Objects.hashCode(this.complianceTimeStamp);
         hash = 53 * hash + Objects.hashCode(this.complianceUser);
@@ -524,9 +510,6 @@ public class CodeViolation  implements Serializable{
         }
         final CodeViolation other = (CodeViolation) obj;
         if (this.violationID != other.violationID) {
-            return false;
-        }
-        if (!Objects.equals(this.actualComplianceDatePretty, other.actualComplianceDatePretty)) {
             return false;
         }
         return true;
@@ -593,10 +576,9 @@ public class CodeViolation  implements Serializable{
      */
     public java.util.Date getDateOfRecordUtilDate() {
         if(dateOfRecord != null){
-            dateOfRecordUtilDate 
-                    = java.util.Date.from(dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
+            return java.util.Date.from(dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
         }
-        return dateOfRecordUtilDate;
+        return null;
     }
 
     /**
@@ -604,10 +586,9 @@ public class CodeViolation  implements Serializable{
      */
     public java.util.Date getStipulatedComplianceDateUtilDate() {
         if(stipulatedComplianceDate != null){
-            stipulatedComplianceDateUtilDate 
-                    = java.util.Date.from(stipulatedComplianceDate.atZone(ZoneId.systemDefault()).toInstant());
+            return java.util.Date.from(stipulatedComplianceDate.atZone(ZoneId.systemDefault()).toInstant());
         }
-        return stipulatedComplianceDateUtilDate;
+        return null;
     }
 
     /**
@@ -615,10 +596,9 @@ public class CodeViolation  implements Serializable{
      */
     public java.util.Date getActualComplianceDateUtilDate() {
         if(actualComplianceDate != null){
-            actualComplianceDateUtilDate 
-                    = java.util.Date.from(actualComplianceDate.atZone(ZoneId.systemDefault()).toInstant());
+            return java.util.Date.from(actualComplianceDate.atZone(ZoneId.systemDefault()).toInstant());
         }
-        return actualComplianceDateUtilDate;
+        return null;
     }
 
     /**
@@ -649,11 +629,8 @@ public class CodeViolation  implements Serializable{
      * @param stipulatedComplianceDateUtilDate the stipulatedComplianceDateUtilDate to set
      */
     public void setStipulatedComplianceDateUtilDate(java.util.Date stipulatedComplianceDateUtilDate) {
-            
-        this.stipulatedComplianceDateUtilDate = stipulatedComplianceDateUtilDate;
         if(stipulatedComplianceDateUtilDate != null){
             stipulatedComplianceDate = stipulatedComplianceDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            
         }
     }
 
@@ -661,13 +638,9 @@ public class CodeViolation  implements Serializable{
      * @param actualComplianceDateUtilDate the actualComplianceDateUtilDate to set
      */
     public void setActualComplianceDateUtilDate(java.util.Date actualComplianceDateUtilDate) {
-        
-        this.actualComplianceDateUtilDate = actualComplianceDateUtilDate;
-        
         if(actualComplianceDateUtilDate != null){
             actualComplianceDate = actualComplianceDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
-        
     }
 
     /**
@@ -697,5 +670,7 @@ public class CodeViolation  implements Serializable{
     public void setSeverityIntensityClassID(int severityIntensityClassID) {
         this.severityIntensityClassID = severityIntensityClassID;
     }
+
+   
 
 }

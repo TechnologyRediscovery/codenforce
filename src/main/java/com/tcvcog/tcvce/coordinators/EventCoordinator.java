@@ -276,7 +276,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(erg != null){
             if(erg instanceof CECaseDataHeavy){
                 cse = (CECaseDataHeavy) erg;
-                 if(cse.getCasePhase() == CasePhase.Closed && 
+                 if(cse.getCasePhase() == CasePhaseEnum.Closed && 
                     (
                         ec.getEventType() == EventType.Action
                         || 
@@ -614,7 +614,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws ViolationException
      * @throws EventException 
      */
-    public void generateAndInsertManualCasePhaseOverrideEvent(CECaseDataHeavy currentCase, CasePhase pastPhase) 
+    public void generateAndInsertManualCasePhaseOverrideEvent(CECaseDataHeavy currentCase, CasePhaseEnum pastPhase) 
             throws IntegrationException, BObStatusException, ViolationException, EventException{
         
           EventIntegrator ei = getEventIntegrator();

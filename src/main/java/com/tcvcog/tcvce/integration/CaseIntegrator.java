@@ -19,12 +19,14 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,87 +47,167 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public CaseIntegrator() {
     }
-    
-    
    
     
     /**
-     * Internal serach method for Code Enforcement case using a SearchParam
+     * Single focal point of serach method for Code Enforcement case using a SearchParam
      * subclass. Outsiders will use runQueryCECase or runQueryCECase
      * @param params
-     * @return
+     * @return a list of CECase IDs
      * @throws IntegrationException
      * @throws BObStatusException 
      */
     public List<Integer> searchForCECases(SearchParamsCECase params) throws IntegrationException, BObStatusException{
+        SearchCoordinator sc = getSearchCoordinator();
         List<Integer> cseidlst = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        StringBuilder sb = new StringBuilder();
-        boolean notFirstCriteria = false;
         
-        sb.append("SELECT caseid ");
-        sb.append("FROM public.cecase INNER JOIN public.property ON (property_propertyid = propertyid) ");
-        sb.append("WHERE caseid IS NOT NULL AND ");
+        params.appendSQL("SELECT DISTINCT caseid ");
+        params.appendSQL("FROM public.cecase ");
+        params.appendSQL("WHERE caseid IS NOT NULL AND ");
         
+        // *******************************
+        // **         BOb ID            **
+        // *******************************
          if (!params.isBobID_ctl()) {
-            if (params.isMuni_ctl()) {
-                sb.append("municipality_municode = ? "); // param 1
-            }
 
-            if (params.isDate_startEnd_ctl()){
-                sb.append("BETWEEN ? AND ? "); // parm 2 and 3 without ID
-            }
-
-
-            if (params.isProperty_ctl()) {
-                sb.append("property_propertyid = ? ");
-            }
-            if (params.isUseCaseManager()) {
-                if(params.getCaseManagerUser() != null){
-                    if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                    sb.append("login_userid = ? ");
-                }
-            }
-
-            if (params.isPropInfoCase_ctl()) {
-                if (params.isPropInfoCase_val()) {
-                    sb.append("propertyinfocase = TRUE ");
+            //*******************************
+            // **   MUNI,DATES,USER,ACTIVE  **
+            // *******************************
+            params = (SearchParamsCECase) sc.assembleBObSearchSQL_muniDatesUserActive(params);
+            
+            // *******************************
+            // **         OPEN/CLOSED       **
+            // *******************************
+            if (params.isCaseOpen_ctl()) {
+                if(params.isCaseOpen_val()){
+                    params.appendSQL("AND closingdate IS NULL ");
                 } else {
-                    sb.append("propertyinfocase = FALSE ");
-                }
-            }
-            if (params.isOpen_ctl()) {
-                if (params.isOpen_val()) {
-                    sb.append("closingdate IS NULL ");
-                } else {
-                    sb.append("closingdate IS NOT NULL ");
+                    params.appendSQL("AND closingdate IS NOT NULL ");
                 }
             }
             
+            // *******************************
+            // **        PROPERTY           **
+            // *******************************
+             if (params.isProperty_ctl()) {
+                if(params.getProperty_val()!= null){
+                    params.appendSQL("AND property_propertyid=? ");
+                } else {
+                    params.setProperty_ctl(false);
+                    params.logMessage("PROPERTY: no Property object; prop filter disabled");
+                }
+            }
+            
+            // *******************************
+            // **       PROPERTY UNIT       **
+            // *******************************
+             if (params.isPropertyUnit_ctl()) {
+                if(params.getPropertyUnit_val()!= null){
+                    params.appendSQL("AND propertyunit_unitid=? ");
+                } else {
+                    params.setPropertyUnit_ctl(false);
+                    params.logMessage("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
+                }
+            }
+            
+            // *******************************
+            // **      PROP INFO CASES      **
+            // *******************************
+            if (params.isPropInfoCase_ctl()) {
+                if (params.isPropInfoCase_val()) {
+                    params.appendSQL("AND propertyinfocase = TRUE ");
+                } else {
+                    params.appendSQL("AND propertyinfocase = FALSE ");
+                }
+            }
+            
+            // *******************************
+            // ** PERSONS INFO CASES BOOL   **
+            // *******************************
+            if (params.isPersonInfoCase_ctl()) {
+                if (params.isPersonInfoCase_val()) {
+                    params.appendSQL("AND personinfocase_personid IS NOT NULL");
+                } else {
+                    params.appendSQL("AND personinfocase_personid IS NULL");
+                }
+            }
+            
+            // *******************************
+            // ** PERSONS INFO CASES ID    **
+            // *******************************
+            if (params.isPersonInfoCaseID_ctl()) {
+                if(params.getPersonInfoCaseID_val() != null){
+                    params.appendSQL("AND personinfocase_personid=? ");
+                } else {
+                    params.setPersonInfoCaseID_ctl(false);
+                    params.logMessage("PERSONINFO: no Person object; Person Info case filter disabled");
+                }
+            }
+            
+            // *******************************
+            // **       BOb SOURCE          **
+            // *******************************
+             if (params.isSource_ctl()) {
+                if(params.getSource_val() != null){
+                    params.appendSQL("AND bobsource_sourceid=? ");
+                } else {
+                    params.setSource_ctl(false);
+                    params.logMessage("SOURCE: no BOb source object; source filter disabled");
+                }
+            }
+           
+            // *******************************
+            // **           PACC            **
+            // *******************************
+             if (params.isPacc_ctl()) {
+                if(params.isPacc_val()){
+                    params.appendSQL("AND paccenabled = TRUE ");
+                } else {
+                    params.appendSQL("AND paccenabled = TRUE ");
+                }
+            }
+            
+            
         } else {
-            sb.append("caseid = ? "); // will be param 1 with ID search
+            params.appendSQL("caseid = ? "); // will be param 1 with ID search
         }
 
         int paramCounter = 0;
             
         try {
-            stmt = con.prepareStatement(sb.toString());
+            stmt = con.prepareStatement(params.extractRawSQL());
 
             if (!params.isBobID_ctl()) {
-                if (params.isMuni_ctl()) {
-                    stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
+                 if (params.isMuni_ctl()) {
+                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
-                if (params.isDate_startEnd_ctl()) {
+                
+                if(params.isDate_startEnd_ctl()){
                     stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
                     stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
+                 }
+                
+                if (params.isUser_ctl()) {
+                   stmt.setInt(++paramCounter, params.getUser_val().getUserID());
                 }
-
+                
                 if (params.isProperty_ctl()) {
-                    if(params.getProperty_val() != null){
-                        stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
-                    }
+                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                }
+                
+                if (params.isPropertyUnit_ctl()) {
+                    stmt.setInt(++paramCounter, params.getPropertyUnit_val().getUnitID());
+                }
+                
+                 if (params.isPersonInfoCaseID_ctl()) {
+                    stmt.setInt(++paramCounter, params.getPersonInfoCaseID_val().getPersonID());
+                }
+                 
+                if(params.isSource_ctl()){
+                    stmt.setInt(++paramCounter, params.getSource_val().getSourceid());
                 }
 
             } else {
@@ -159,7 +241,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return cseidlst;
         
     }
- 
     
     
     /**
@@ -221,48 +302,39 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         UserIntegrator ui = getUserIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         
-        int ceCaseID = rs.getInt("caseid");
-        if(ceCaseID == 0){
-            throw new IntegrationException("cannot generate case with ID 0");
-        }
         
-        CECase c = new CECase();
+        CECase cse = new CECase();
 
-        c.setCaseID(ceCaseID);
-        c.setPublicControlCode(rs.getInt("cecasepubliccc"));
-        c.setProperty(pi.getProperty(rs.getInt("property_propertyid")));
-        c.setPropertyUnit(null); // change when units are integrated
+        cse.setCaseID(rs.getInt("caseid"));
+        cse.setPublicControlCode(rs.getInt("cecasepubliccc"));
+        cse.setProperty(pi.getProperty(rs.getInt("property_propertyid")));
+        cse.setPropertyUnit(null); // change when units are integrated
 
-        c.setCaseManager(ui.getUser(rs.getInt("login_userid")));
+        cse.setCaseManager(ui.getUser(rs.getInt("login_userid")));
 
-        c.setCaseName(rs.getString("casename"));
+        cse.setCaseName(rs.getString("casename"));
         
-        
-        // let business logic in coordinators set the icon
-//        CasePhase cp = CasePhase.valueOf(rs.getString("casephase"));
-//        c.setCasePhase(cp);
-//        c.setCasePhaseIcon(si.getIcon(cp));
-
-        c.setOriginationDate(rs.getTimestamp("originationdate")
+        cse.setOriginationDate(rs.getTimestamp("originationdate")
                 .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        c.setOriginiationDatePretty(getPrettyDate(c.getOriginationDate()));
 
         if(rs.getTimestamp("closingdate") != null){
-            c.setClosingDate(rs.getTimestamp("closingdate")
+            cse.setClosingDate(rs.getTimestamp("closingdate")
                     .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            c.setClosingDatePretty(getPrettyDate(c.getClosingDate()));
-
         }
-        c.setNotes(rs.getString("notes"));
+        
+        cse.setNotes(rs.getString("notes"));
+        
         if(rs.getTimestamp("creationtimestamp") != null){
-            c.setCreationTimestamp(rs.getTimestamp("creationtimestamp")
+            cse.setCreationTimestamp(rs.getTimestamp("creationtimestamp")
                     .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
 
-        c.setPaccEnabled(rs.getBoolean("paccenabled"));
-        c.setAllowForwardLinkedPublicAccess(rs.getBoolean("allowuplinkaccess"));
+        cse.setPaccEnabled(rs.getBoolean("paccenabled"));
+        cse.setAllowForwardLinkedPublicAccess(rs.getBoolean("allowuplinkaccess"));
+        
+        
 
-        return c;
+        return cse;
     }
     
      /**

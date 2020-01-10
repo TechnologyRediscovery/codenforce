@@ -21,7 +21,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     private int caseID;
     private boolean paccEnabled;
 
-    private CasePhase casePhase;
+    private CasePhaseEnum casePhase;
     // extract only the publicly released events from the CECase's list
     
     
@@ -231,7 +231,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @return the casePhase
      */
-    public CasePhase getCasePhase() {
+    public CasePhaseEnum getCasePhase() {
         return casePhase;
     }
 
@@ -289,7 +289,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @param casePhase the casePhase to set
      */
-    public void setCasePhase(CasePhase casePhase) {
+    public void setCasePhase(CasePhaseEnum casePhase) {
         this.casePhase = casePhase;
     }
 

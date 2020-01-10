@@ -234,6 +234,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return q;
     }
     
+   
     
     
      /**
@@ -261,7 +262,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     // so we'll call searchForXXX once for each muni
                     params.setMuni_val(muni);
                     for(Integer i: ci.searchForCECases(params)){
-                        caseListTemp.add(cc.getCECase(i));
+                        CECase cse = cc.getCECase(i);
+                        if(params.isCasePhase_ctl() && params.getCasePhase_val() != null){
+                            if(cse.getCasePhase() == params.getCasePhase_val()){
+                                caseListTemp.add(cse);
+                            } else {
+                                // skip adding
+                            }
+                        // if the filter is off, or we don't have an object, add it to the list
+                        } else {
+                            caseListTemp.add(cse);
+                        }
                     }
                 } catch (IntegrationException | BObStatusException ex) {
                     throw new SearchException("Exception during search: " + ex.toString());

@@ -5,22 +5,18 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.domain.BObStatusException;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
-import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 
 /**
  *
  * @author sylvia
  */
-public class    CECase 
-        extends CECasePublic
-        implements Serializable, 
-                    IFace_Openable,
+public class        CECase 
+        extends     CECasePublic
+        implements  IFace_Openable,
                     Cloneable{
     
     protected int caseID;
@@ -39,22 +35,21 @@ public class    CECase
     
     protected User caseManager;
     protected String caseName;
-    protected CasePhase casePhase;
     
+    protected CasePhaseEnum casePhase;
     protected Icon casePhaseIcon;
     
-    protected java.util.Date originationDateUtilDate;
     protected LocalDateTime originationDate;
-    protected String originiationDatePretty;
-    
-    protected java.util.Date closingDateUtilDate;
     protected LocalDateTime closingDate;
-    protected String closingDatePretty;
-    
     protected LocalDateTime creationTimestamp;
+    
     protected String notes;
     
     private BOBSource source;
+    
+    protected List<Citation> citationList;
+    protected List<NoticeOfViolation> noticeList;
+    protected List<CodeViolation> violationList;
 
     @Override
     public String toString() {
@@ -159,14 +154,14 @@ public class    CECase
     /**
      * @return the casePhase
      */
-    public CasePhase getCasePhase() {
+    public CasePhaseEnum getCasePhase() {
         return casePhase;
     }
 
     /**
      * @param casePhase the casePhase to set
      */
-    public void setCasePhase(CasePhase casePhase) {
+    public void setCasePhase(CasePhaseEnum casePhase) {
         this.casePhase = casePhase;
     }
 
@@ -245,9 +240,9 @@ public class    CECase
      */
     public String getOriginiationDatePretty() {
         if(originationDate != null){
-            originiationDatePretty = EntityUtils.getPrettyDate(originationDate);
+            return EntityUtils.getPrettyDate(originationDate);
         }
-        return originiationDatePretty;
+        return null;
     }
 
     /**
@@ -255,25 +250,12 @@ public class    CECase
      */
     public String getClosingDatePretty() {
         if(closingDate != null){
-            closingDatePretty = EntityUtils.getPrettyDate(closingDate);
+            return EntityUtils.getPrettyDate(closingDate);
         }
-        return closingDatePretty;
+        return null;
     }
 
-    /**
-     * @param originiationDatePretty the originiationDatePretty to set
-     */
-    public void setOriginiationDatePretty(String originiationDatePretty) {
-        this.originiationDatePretty = originiationDatePretty;
-    }
-
-    /**
-     * @param closingDatePretty the closingDatePretty to set
-     */
-    public void setClosingDatePretty(String closingDatePretty) {
-        this.closingDatePretty = closingDatePretty;
-    }
-
+    
     /**
      * @return the paccEnabled
      */
@@ -332,9 +314,7 @@ public class    CECase
         hash = 53 * hash + Objects.hashCode(this.casePhase);
         hash = 53 * hash + Objects.hashCode(this.casePhaseIcon);
         hash = 53 * hash + Objects.hashCode(this.originationDate);
-        hash = 53 * hash + Objects.hashCode(this.originiationDatePretty);
         hash = 53 * hash + Objects.hashCode(this.closingDate);
-        hash = 53 * hash + Objects.hashCode(this.closingDatePretty);
         hash = 53 * hash + Objects.hashCode(this.creationTimestamp);
         hash = 53 * hash + Objects.hashCode(this.notes);
         return hash;
@@ -365,10 +345,9 @@ public class    CECase
      */
     public java.util.Date getClosingDateUtilDate() {
         if(closingDate != null){
-            closingDateUtilDate = java.util.Date.from(
-                    closingDate.atZone(ZoneId.systemDefault()).toInstant());
+            return  java.util.Date.from(closingDate.atZone(ZoneId.systemDefault()).toInstant());
         }
-        return closingDateUtilDate;
+        return null;
     }
 
     /**
@@ -378,7 +357,6 @@ public class    CECase
         if(cd != null){
             this.closingDate = cd.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
-        this.closingDateUtilDate = cd;
     }
 
     /**
@@ -386,10 +364,9 @@ public class    CECase
      */
     public java.util.Date getOriginationDateUtilDate() {
         if(originationDate != null){
-            originationDateUtilDate = java.util.Date.from(
-                    originationDate.atZone(ZoneId.systemDefault()).toInstant());
+            return  java.util.Date.from(originationDate.atZone(ZoneId.systemDefault()).toInstant());
         }
-        return originationDateUtilDate;
+        return null;
     }
 
     /**
@@ -397,9 +374,8 @@ public class    CECase
      */
     public void setOriginationDateUtilDate(java.util.Date od) {
         if(od != null){
-            originationDate = od.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            this.originationDate = od.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
-        this.originationDateUtilDate = od;
     }
 
     /**
@@ -414,6 +390,48 @@ public class    CECase
      */
     public void setSource(BOBSource source) {
         this.source = source;
+    }
+
+    /**
+     * @return the citationList
+     */
+    public List<Citation> getCitationList() {
+        return citationList;
+    }
+
+    /**
+     * @return the noticeList
+     */
+    public List<NoticeOfViolation> getNoticeList() {
+        return noticeList;
+    }
+
+    /**
+     * @return the violationList
+     */
+    public List<CodeViolation> getViolationList() {
+        return violationList;
+    }
+
+    /**
+     * @param citationList the citationList to set
+     */
+    public void setCitationList(List<Citation> citationList) {
+        this.citationList = citationList;
+    }
+
+    /**
+     * @param noticeList the noticeList to set
+     */
+    public void setNoticeList(List<NoticeOfViolation> noticeList) {
+        this.noticeList = noticeList;
+    }
+
+    /**
+     * @param violationList the violationList to set
+     */
+    public void setViolationList(List<CodeViolation> violationList) {
+        this.violationList = violationList;
     }
 
   

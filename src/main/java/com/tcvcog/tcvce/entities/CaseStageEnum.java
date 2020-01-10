@@ -9,7 +9,7 @@ package com.tcvcog.tcvce.entities;
  *
  * @author sylvia
  */
-public enum CaseStage {
+public enum CaseStageEnum {
     
     Investigation("Investigation", "caseStageInvestigationIconID"),
     Enforcement("Enforcement", "caseStageEnforcementIconID"),
@@ -20,7 +20,7 @@ public enum CaseStage {
     private final String label;
     private final String iconPropertyLookup;
     
-    private CaseStage(String label, String icon){
+    private CaseStageEnum(String label, String icon){
         this.label = label;
         this.iconPropertyLookup = icon;
     }

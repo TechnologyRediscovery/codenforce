@@ -29,7 +29,9 @@ public class        SearchParamsEvent
     
     private boolean eventDomain_ctl;
     private EventDomainEnum eventDomain_val;
-    private int eventDomainID_val;
+    
+    private boolean eventDomainPK_ctl;
+    private int eventDomainPK_val;
   
     private boolean person_ctl;
     private Person person_val;
@@ -162,20 +164,6 @@ public class        SearchParamsEvent
     }
 
     /**
-     * @return the eventDomainID_val
-     */
-    public int getEventDomainID_val() {
-        return eventDomainID_val;
-    }
-
-    /**
-     * @param eventDomainID_val the eventDomainID_val to set
-     */
-    public void setEventDomainID_val(int eventDomainID_val) {
-        this.eventDomainID_val = eventDomainID_val;
-    }
-
-    /**
      * @return the discloseToMuni_ctl
      */
     public boolean isDiscloseToMuni_ctl() {
@@ -229,6 +217,34 @@ public class        SearchParamsEvent
      */
     public void setDiscloseToPublic_val(boolean discloseToPublic_val) {
         this.discloseToPublic_val = discloseToPublic_val;
+    }
+
+    /**
+     * @return the eventDomainPK_ctl
+     */
+    public boolean isEventDomainPK_ctl() {
+        return eventDomainPK_ctl;
+    }
+
+    /**
+     * @param eventDomainPK_ctl the eventDomainPK_ctl to set
+     */
+    public void setEventDomainPK_ctl(boolean eventDomainPK_ctl) {
+        this.eventDomainPK_ctl = eventDomainPK_ctl;
+    }
+
+    /**
+     * @return the eventDomainPK_val
+     */
+    public int getEventDomainPK_val() {
+        return eventDomainPK_val;
+    }
+
+    /**
+     * @param eventDomainPK_val the eventDomainPK_val to set
+     */
+    public void setEventDomainPK_val(int eventDomainPK_val) {
+        this.eventDomainPK_val = eventDomainPK_val;
     }
 
    

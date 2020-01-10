@@ -20,48 +20,45 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
  *
  * @author Ellen Bascomb
  */
-public class        CECaseDataHeavy 
-        extends     CECase 
-        implements  Cloneable,
-                    IFace_ProposalDriven, 
-                    IFace_EventRuleGoverned,
-                    IFace_CredentialSigned,
-                    IFace_Loggable{
-    
-    private List<CodeViolation> violationList;
-    
+public class CECaseDataHeavy
+        extends CECase
+        implements Cloneable,
+        IFace_ProposalDriven,
+        IFace_EventRuleGoverned,
+        IFace_CredentialSigned,
+        IFace_Loggable {
+
+
     private boolean showHiddenEvents;
     private boolean showInactiveEvents;
     private List<EventCnF> completeEventList;
-    
+
     // accessed through methods specified in the interfaces
     private List<Proposal> proposalList;
     private List<EventCnF> eventList;
     private List<EventRuleImplementation> eventRuleList;
-    
-    private List<Citation> citationList;
-    private List<NoticeOfViolation> noticeList;
+
     private List<CEActionRequest> ceActionRequestList;
-    
+
     private List<MoneyCECaseFeeAssigned> feeList;
     private List<MoneyCECaseFeePayment> paymentList;
-    
+
     private String credentialSignature;
-    
-    public CECaseDataHeavy(){
+
+    public CECaseDataHeavy() {
     }
 
     /**
-     * Constructor used to create an instance of this object with a
-     * CECase without any lists. Transfers the member variables
-     * from the incoming object to this sublcass
-     * 
-     * ** CONSTRUCTORS ARE NOT INHERITED!
-     * ** but member variables and methods sure are!
-     * 
-     * @param cse 
+     * Constructor used to create an instance of this object with a CECase
+     * without any lists. Transfers the member variables from the incoming
+     * object to this sublcass
+     *
+     * ** CONSTRUCTORS ARE NOT INHERITED! ** but member variables and methods
+     * sure are!
+     *
+     * @param cse
      */
-    public CECaseDataHeavy(CECase cse){
+    public CECaseDataHeavy(CECase cse) {
         this.caseID = cse.caseID;
         this.publicControlCode = cse.publicControlCode;
         this.paccEnabled = cse.paccEnabled;
@@ -77,33 +74,28 @@ public class        CECaseDataHeavy
         this.creationTimestamp = cse.creationTimestamp;
         this.notes = cse.notes;
     }
-    
+
     @Override
     public String getCredentialSignature() {
         return credentialSignature;
     }
 
-        
-  
-    
-    
     /**
      *
-     * @return
-     * @throws CloneNotSupportedException
+     * @return @throws CloneNotSupportedException
      */
     @Override
-    public CECaseDataHeavy clone() throws CloneNotSupportedException{
+    public CECaseDataHeavy clone() throws CloneNotSupportedException {
         super.clone();
         return null;
     }
-    
-     @Override
+
+    @Override
     public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
-         List<EventCnF> visEventList = new ArrayList<>();
-        if(eventList != null){
+        List<EventCnF> visEventList = new ArrayList<>();
+        if (eventList != null) {
             for (EventCnF ev : eventList) {
-                switch(voahle){
+                switch (voahle) {
                     case VIEW_ACTIVE_HIDDEN:
                         if (ev.isActive()
                                 && ev.isHidden()) {
@@ -134,19 +126,19 @@ public class        CECaseDataHeavy
 
     @Override
     public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere) {
-         List<EventRuleImplementation> evRuleList = new ArrayList<>();
-        if(eventRuleList != null){
-            for(EventRuleImplementation eri: eventRuleList){
-                switch(voere){
+        List<EventRuleImplementation> evRuleList = new ArrayList<>();
+        if (eventRuleList != null) {
+            for (EventRuleImplementation eri : eventRuleList) {
+                switch (voere) {
                     case VIEW_ACTIVE_NOT_PASSED:
-                        if(eri.isActiveRuleAbstract()
-                                && eri.getPassedRuleTS() == null){
+                        if (eri.isActiveRuleAbstract()
+                                && eri.getPassedRuleTS() == null) {
                             evRuleList.add(eri);
                         }
                         break;
                     case VIEW_ACTIVE_PASSED:
-                        if(eri.isActiveRuleAbstract()
-                                && eri.getPassedRuleTS() != null){
+                        if (eri.isActiveRuleAbstract()
+                                && eri.getPassedRuleTS() != null) {
                             evRuleList.add(eri);
                         }
                         break;
@@ -154,7 +146,7 @@ public class        CECaseDataHeavy
                         evRuleList.add(eri);
                         break;
                     case VIEW_INACTIVE:
-                        if(!eri.isActiveRuleAbstract()){
+                        if (!eri.isActiveRuleAbstract()) {
                             evRuleList.add(eri);
                         }
                         break;
@@ -169,8 +161,8 @@ public class        CECaseDataHeavy
     @Override
     public boolean isAllRulesPassed() {
         boolean allPassed = true;
-        for(EventRuleImplementation er: eventRuleList){
-            if(er.getPassedRuleTS() == null){
+        for (EventRuleImplementation er : eventRuleList) {
+            if (er.getPassedRuleTS() == null) {
                 allPassed = false;
                 break;
             }
@@ -181,37 +173,37 @@ public class        CECaseDataHeavy
     @Override
     public List<Proposal> assembleProposalList(ViewOptionsProposalsEnum vope) {
         List<Proposal> proposalListVisible = new ArrayList<>();
-        if(proposalList != null && !proposalList.isEmpty()){
-            for(Proposal p: proposalList){
-                switch(vope){
+        if (proposalList != null && !proposalList.isEmpty()) {
+            for (Proposal p : proposalList) {
+                switch (vope) {
                     case VIEW_ALL:
                         proposalListVisible.add(p);
                         break;
                     case VIEW_ACTIVE_HIDDEN:
-                        if(p.isActive() 
-                                && p.isHidden()){
+                        if (p.isActive()
+                                && p.isHidden()) {
                             proposalListVisible.add(p);
                         }
                         break;
                     case VIEW_ACTIVE_NOTHIDDEN:
-                        if(p.isActive() 
+                        if (p.isActive()
                                 && !p.isHidden()
-                                && !p.getDirective().isRefuseToBeHidden()){
+                                && !p.getDirective().isRefuseToBeHidden()) {
                             proposalListVisible.add(p);
                         }
                         break;
                     case VIEW_EVALUATED:
-                        if(p.getResponseTS() != null){
+                        if (p.getResponseTS() != null) {
                             proposalListVisible.add(p);
                         }
                         break;
                     case VIEW_INACTIVE:
-                        if(!p.isActive()){
+                        if (!p.isActive()) {
                             proposalListVisible.add(p);
                         }
                         break;
                     case VIEW_NOT_EVALUATED:
-                        if(p.getResponseTS() == null){
+                        if (p.getResponseTS() == null) {
                             proposalListVisible.add(p);
                         }
                         break;
@@ -222,32 +214,26 @@ public class        CECaseDataHeavy
         } // if
         return proposalListVisible;
     }
-    
+
     /**
      * @param eventRuleList the eventRuleList to set
      */
     public void setEventRuleList(List<EventRuleImplementation> eventRuleList) {
         this.eventRuleList = eventRuleList;
     }
-    
     /**
      * @return the violationList
      */
-    public List<CodeViolation> getViolationList() {
-        return violationList;
-    }
-
     /**
      * @param violationList the violationList to set
      */
-    public void setViolationList(List<CodeViolation> violationList) {
-        this.violationList = violationList;
-    }
 
     /**
-     * Implements logic to check each event for hidden status and inactive 
-     * status and based on the value of the showHiddenEvents and showInactiveEvents
-     * flags, add the event from the complete list to the visible list
+     * Implements logic to check each event for hidden status and inactive
+     * status and based on the value of the showHiddenEvents and
+     * showInactiveEvents flags, add the event from the complete list to the
+     * visible list
+     *
      * @return the visibleEventList
      */
     public List<EventCnF> getVisibleEventList() {
@@ -263,35 +249,18 @@ public class        CECaseDataHeavy
         } // close for   
         return visEventList;
     }
-
-
     /**
      * @return the citationList
      */
-    public List<Citation> getCitationList() {
-        return citationList;
-    }
-
     /**
      * @param citationList the citationList to set
      */
-    public void setCitationList(List<Citation> citationList) {
-        this.citationList = citationList;
-    }
-
     /**
      * @return the noticeList
      */
-    public List<NoticeOfViolation> getNoticeList() {
-        return noticeList;
-    }
-
     /**
      * @param noticeList the noticeList to set
      */
-    public void setNoticeList(List<NoticeOfViolation> noticeList) {
-        this.noticeList = noticeList;
-    }
 
     /**
      * @return the ceActionRequestList
@@ -307,43 +276,38 @@ public class        CECaseDataHeavy
         this.ceActionRequestList = ceActionRequestList;
     }
 
-    
-
     /**
      * @return the violationListUnresolved
      */
     public List<CodeViolation> getViolationListUnresolved() {
-        
+
         List<CodeViolation> violationListUnresolved = new ArrayList<>();
-        if(violationList != null && violationList.size() > 0){
-            for(CodeViolation v: violationList){
-                if(v.getActualComplianceDate() == null){
+        if (violationList != null && violationList.size() > 0) {
+            for (CodeViolation v : violationList) {
+                if (v.getActualComplianceDate() == null) {
                     violationListUnresolved.add(v);
                 }
             }
         }
-        
 
         return violationListUnresolved;
     }
-
 
     /**
      * @return the violationListResolved
      */
     public List<CodeViolation> getViolationListResolved() {
-        List<CodeViolation>violationListResolved = new ArrayList<>();
-        if(violationList != null && violationList.size() > 0){
-            for(CodeViolation v: violationList){
-                if(v.getActualComplianceDate() != null){
+        List<CodeViolation> violationListResolved = new ArrayList<>();
+        if (violationList != null && violationList.size() > 0) {
+            for (CodeViolation v : violationList) {
+                if (v.getActualComplianceDate() != null) {
                     violationListResolved.add(v);
                 }
             }
         }
-        
+
         return violationListResolved;
     }
-
 
     /**
      * @return the completeEventList
@@ -392,16 +356,15 @@ public class        CECaseDataHeavy
      */
     public List<EventCnF> getActiveEventList() {
         List<EventCnF> actEvList = new ArrayList<>();
-            Iterator<EventCnF> iter = completeEventList.iterator();
-                while(iter.hasNext()){
-                    EventCnF ev = iter.next();
-                    if(ev.isActive()){
-                        actEvList.add(ev);
-                    }
-                }
+        Iterator<EventCnF> iter = completeEventList.iterator();
+        while (iter.hasNext()) {
+            EventCnF ev = iter.next();
+            if (ev.isActive()) {
+                actEvList.add(ev);
+            }
+        }
         return actEvList;
     }
-
 
     /**
      * @return the proposalList
@@ -460,8 +423,4 @@ public class        CECaseDataHeavy
         this.paymentList = paymentList;
     }
 
-    
-    
-    
-    
 }

@@ -1137,6 +1137,19 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 }
             }
             
+             
+            // *******************************
+            // **       BOb SOURCE          **
+            // *******************************
+             if (params.isSource_ctl()) {
+                if(params.getSource_val() != null){
+                    params.appendSQL("AND bobsource_sourceid=? ");
+                } else {
+                    params.setSource_ctl(false);
+                    params.logMessage("SOURCE: no BOb source object; source filter disabled");
+                }
+            }
+            
             
         } else {
             params.appendSQL("caseid=? ");
@@ -1150,7 +1163,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(params.extractRawSQL());
             
             if (!params.isBobID_ctl()){
-                 if (params.isMuni_ctl()) {
+                if (params.isMuni_ctl()) {
                      stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
                 
@@ -1212,6 +1225,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     str.append("%");
                     stmt.setString(++paramCounter, str.toString());
                 }
+                
+                
                 
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());

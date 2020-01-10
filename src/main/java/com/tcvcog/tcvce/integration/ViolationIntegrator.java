@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
@@ -503,7 +504,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         return notice;
     }
 
-    public List<NoticeOfViolation> novGetList(CECaseDataHeavy ceCase) throws IntegrationException {
+    public List<NoticeOfViolation> novGetList(CECase ceCase) throws IntegrationException {
         String query = "SELECT noticeid FROM public.noticeofviolation WHERE caseid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;

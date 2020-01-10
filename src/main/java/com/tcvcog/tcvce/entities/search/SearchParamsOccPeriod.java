@@ -61,6 +61,7 @@ public class SearchParamsOccPeriod
     /**
      * @return the date_field
      */
+    @Override
     public SearchParamsOccPeriodDateFieldsEnum getDate_field() {
         return date_field;
     }

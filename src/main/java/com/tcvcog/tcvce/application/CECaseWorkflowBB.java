@@ -24,8 +24,8 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseStage;
+import com.tcvcog.tcvce.entities.CasePhaseEnum;
+import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalCECase;
@@ -52,10 +52,10 @@ public  class CECaseWorkflowBB
     private ReportConfigCECase reportCECase;
     
     
-    private CasePhase nextPhase;
-    private CasePhase[] casePhaseList;
-    private CasePhase selectedCasePhase;
-    private CaseStage[] caseStageArray;
+    private CasePhaseEnum nextPhase;
+    private CasePhaseEnum[] casePhaseList;
+    private CasePhaseEnum selectedCasePhase;
+    private CaseStageEnum[] caseStageArray;
 
     
     private String styleClassStatusIcon;
@@ -115,7 +115,7 @@ public  class CECaseWorkflowBB
     /**
      * @return the currentCase's phase
      */
-    public CasePhase getCurrentCasePhase() {
+    public CasePhaseEnum getCurrentCasePhase() {
         return currentCase.getCasePhase();
     }
 
@@ -168,7 +168,7 @@ public  class CECaseWorkflowBB
     public String getStyleClassInvestigation() {
         String style = null;
         
-        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStage.Investigation) {
+        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStageEnum.Investigation) {
             style = currentCase.getCasePhaseIcon().getStyleClass();
             
         } else {
@@ -183,7 +183,7 @@ public  class CECaseWorkflowBB
      */
     public String getStyleClassEnforcement() {
         String style = null;
-        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStage.Enforcement) {
+        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStageEnum.Enforcement) {
             style = currentCase.getCasePhaseIcon().getStyleClass();
             
         } else {
@@ -198,7 +198,7 @@ public  class CECaseWorkflowBB
      */
     public String getSytleClassCitation() {
         String style = null;
-        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStage.Citation) {
+        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStageEnum.Citation) {
             style = currentCase.getCasePhaseIcon().getStyleClass();
             
         } else {
@@ -213,7 +213,7 @@ public  class CECaseWorkflowBB
      */
     public String getSytleClassClosed() {
         String style = null;
-        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStage.Closed) {
+        if (currentCase != null && currentCase.getCasePhase().getCaseStage() == CaseStageEnum.Closed) {
             style = currentCase.getCasePhaseIcon().getStyleClass();
             
         } else {
@@ -319,57 +319,57 @@ public  class CECaseWorkflowBB
     /**
      * @return the nextPhase
      */
-    public CasePhase getNextPhase() {
+    public CasePhaseEnum getNextPhase() {
         return nextPhase;
     }
 
     /**
      * @return the casePhaseList
      */
-    public CasePhase[] getCasePhaseList() {
-         casePhaseList = (CasePhase.values());
+    public CasePhaseEnum[] getCasePhaseList() {
+         casePhaseList = (CasePhaseEnum.values());
         return casePhaseList;
     }
 
     /**
      * @return the selectedCasePhase
      */
-    public CasePhase getSelectedCasePhase() {
+    public CasePhaseEnum getSelectedCasePhase() {
         return selectedCasePhase;
     }
 
     /**
      * @return the caseStageArray
      */
-    public CaseStage[] getCaseStageArray() {
+    public CaseStageEnum[] getCaseStageArray() {
         return caseStageArray;
     }
 
     /**
      * @param nextPhase the nextPhase to set
      */
-    public void setNextPhase(CasePhase nextPhase) {
+    public void setNextPhase(CasePhaseEnum nextPhase) {
         this.nextPhase = nextPhase;
     }
 
     /**
      * @param casePhaseList the casePhaseList to set
      */
-    public void setCasePhaseList(CasePhase[] casePhaseList) {
+    public void setCasePhaseList(CasePhaseEnum[] casePhaseList) {
         this.casePhaseList = casePhaseList;
     }
 
     /**
      * @param selectedCasePhase the selectedCasePhase to set
      */
-    public void setSelectedCasePhase(CasePhase selectedCasePhase) {
+    public void setSelectedCasePhase(CasePhaseEnum selectedCasePhase) {
         this.selectedCasePhase = selectedCasePhase;
     }
 
     /**
      * @param caseStageArray the caseStageArray to set
      */
-    public void setCaseStageArray(CaseStage[] caseStageArray) {
+    public void setCaseStageArray(CaseStageEnum[] caseStageArray) {
         this.caseStageArray = caseStageArray;
     }
     
