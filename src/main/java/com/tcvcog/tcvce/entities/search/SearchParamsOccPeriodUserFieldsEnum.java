@@ -23,15 +23,15 @@ package com.tcvcog.tcvce.entities.search;
 public enum SearchParamsOccPeriodUserFieldsEnum 
         implements IFace_userFieldHolder{
     
-    CREATED_USER                ("Period creator", "createdby_userid"),
-    MANAGER_USER                ("Period manager", "manager_userid"),
-    TYPE_CERTIFYING_USER        ("Period certifier", "typecertifiedby_userid"),
-    START_DATE_CERTIFYING_USER  ("Period start date certifier", "startdatecertifiedby_userid"),
-    END_DATE_CERTIFYING_USER    ("Period end date certifier", "enddatecertifiedby_userid"),
-    AUTHORIZIING_USER           ("Period authorizer", "authorizedby_userid"),
-    INSPECTOR_USER              ("Inspector", "inspector_userid"),
-    PASSEDINSPETION_AUTH_USER   ("Inspection pass certifier", "passedinspection_userid"),
-    PERMIT_ISSUEDBY_USER        ("Permit issuer", "issuedby_userid");
+    CREATED_USER                ("Period creator", "occperiod.createdby_userid"),
+    MANAGER_USER                ("Period manager", "occperiod.manager_userid"),
+    TYPE_CERTIFYING_USER        ("Period certifier", "occperiod.typecertifiedby_userid"),
+    START_DATE_CERTIFYING_USER  ("Period start date certifier", "occperiod.startdatecertifiedby_userid"),
+    END_DATE_CERTIFYING_USER    ("Period end date certifier", "occperiod.enddatecertifiedby_userid"),
+    AUTHORIZIING_USER           ("Period authorizer", "occperiod.authorizedby_userid"),
+    INSPECTOR_USER              ("Inspector", "occperiod.inspector_userid"),
+    PASSEDINSPETION_AUTH_USER   ("Inspection pass certifier", "occperiod.passedinspection_userid"),
+    PERMIT_ISSUEDBY_USER        ("Permit issuer", "occperiod.issuedby_userid");
     
     private final String title;
     private final String dbField;

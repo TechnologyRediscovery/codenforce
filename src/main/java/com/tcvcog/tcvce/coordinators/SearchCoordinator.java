@@ -6,10 +6,7 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -263,6 +260,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     params.setMuni_val(muni);
                     for(Integer i: ci.searchForCECases(params)){
                         CECase cse = cc.getCECase(i);
+                        // Case Phases only exist in JavaJavaLand, so we'll evaluate the
+                        // search params here before adding the new objects to the
+                        // final query result list
                         if(params.isCasePhase_ctl() && params.getCasePhase_val() != null){
                             if(cse.getCasePhase() == params.getCasePhase_val()){
                                 caseListTemp.add(cse);
@@ -1130,8 +1130,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setSearchName("Periods with outstanding inspections");
         params.setSearchDescription("Inspections have been started by not certified as passed");
         
-        params.setInspectionPassed_filterBy(true);
-        params.setInspectionPassed_switch_passedInspection(false);
+        params.setInspectionPassed_ctl(true);
+        params.setInspectionPassed_val(false);
         
         return params;
         
@@ -1145,8 +1145,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setSearchName("All periods in credentialed muni");
         params.setSearchDescription("All periods regardless of status");
         
-        params.setInspectionPassed_filterBy(false);
-        params.setInspectionPassed_switch_passedInspection(false);
+        params.setInspectionPassed_ctl(false);
+        params.setInspectionPassed_val(false);
         
         return params;
         

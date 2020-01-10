@@ -181,7 +181,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt = con.prepareStatement(params.extractRawSQL());
 
             if (!params.isBobID_ctl()) {
-                 if (params.isMuni_ctl()) {
+                if (params.isMuni_ctl()) {
                      stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
                 

@@ -27,34 +27,34 @@ public  enum SearchParamsOccPeriodDateFieldsEnum
         implements IFace_dateFieldHolder {
     
     CREATED_TS              ("Creation timestamp", 
-                            "createdts"), 
+                            "occperiod.createdts"), 
     
     TYPE_CERTIFIED_TS       ("Period type certification timestamp",
-                            "typecertifiedts"), 
+                            "occperiod.typecertifiedts"), 
     
     PERIOD_START_DATE       ("Period start date", 
-                            "startdate"), 
+                            "occperiod.startdate"), 
     
     PERIOD_END_DATE         ("Period end date", 
-                            "enddate"), 
+                            "occperiod.enddate"), 
     
     START_DATE_CERTIFIED_TS ("Period start date certification timestamp", 
-                            "startdatecertifiedts"), 
+                            "occperiod.startdatecertifiedts"), 
     
     END_DATE_CERTIFIED_TS  ("Period end date certification timestamp",
-                            "enddatecertifiedts"),
+                            "occperiod.enddatecertifiedts"),
     
     AUTHORIZATION_TS        ("Period authorization timestamp",
-                            "authorizationts"),
+                            "occperiod.authorizationts"),
             
     INSPECTION_EFFECTIVEDATE    ("Inspection effective date",
-                                "effectivedate"), // in occinspection
+                                "occperiod.effectivedate"), // in occinspection
     
     PASSEDINSPECTION_TS         ("Inspection passed",
-                                "passedinspectionts"), // in occinspection
+                                "occperiod.passedinspectionts"), // in occinspection
     
     PERMIT_ISSUANCE_DATE        ("Permit date issued",
-                                "dateissued");
+                                "occperiod.dateissued");
     
     private final String title;
     private final String dbField;

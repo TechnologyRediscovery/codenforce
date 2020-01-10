@@ -5,10 +5,9 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.CEActionRequestStatus;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
-import com.tcvcog.tcvce.entities.search.SearchParams;
 import java.io.Serializable;
 
 /**
@@ -18,327 +17,184 @@ import java.io.Serializable;
 public class SearchParamsOccPeriod 
         extends SearchParams implements Serializable {
     
-    private boolean propertyUnit_ctl;
-    private int propertyUnit_val;
     
     private boolean property_ctl;
-    private int property_val;
+    private Property property_val;
     
-    // The filter by date switch is on the superclass SearchParams
-    // if that's swich is on, the integrator will look at this Enum value
-    // to decide which field to use in the query against the db
-    private SearchParamsOccPeriodDateFieldsEnum date_field;
+    private boolean propertyUnit_ctl;
+    private PropertyUnit propertyUnit_val;
     
-    private boolean nullDateField_filterBy;
-    private SearchParamsOccPeriodDateFieldsEnum nullDateField_EnumValue;
+    private boolean periodType_ctl;
+    private OccPeriodType periodType_val;
     
-    private boolean occPeriodType_filterBy;
-    private OccPeriodType occPeriodType_type;
+    private boolean permitIssuance_ctl;
+    private boolean permitIssuance_val;
     
-    private boolean userField_filter;
-    private SearchParamsOccPeriodUserFieldsEnum userField_enumValue;
-    private User userFieldUser;
+    private boolean inspectionPassed_ctl;
+    private boolean inspectionPassed_val;
     
-    private boolean overrideTypeConfig_filterBy;
-    private boolean overrideTypeConfig_switch_overridesTypeConfig;
+    private boolean thirdPartyInspector_ctl;
+    private boolean thirdPartyInspector_registered_val;
+    private boolean thirdPartyInspector_approved_val;
     
-    private boolean permitIssuance_filterBy;
-    private boolean permitIssuance_switch_permitIssued;
+    private boolean pacc_ctl;
+    private boolean pacc_val;
     
-    private boolean inspectionPassed_filterBy;
-    private boolean inspectionPassed_switch_passedInspection;
-    
-    private boolean thirdPartyInspector_filterBy;
-    private boolean thirdPartyInspector_switch_thirdPartyRegistered;
-    private boolean thirdPartyInspector_switch_thirdPartyApproval;
-    
-    private boolean paccEnabled_filterBy;
-    private boolean paccEnabled_switch_paccIsEnabled;
-    
-    private boolean checklistImplemented_filterBy;
-    private int checklistImplemented_checklistID;
-
     /**
-     * @return the date_field
+     * @return the periodType_ctl
      */
-    @Override
-    public SearchParamsOccPeriodDateFieldsEnum getDate_field() {
-        return date_field;
+    public boolean isPeriodType_ctl() {
+        return periodType_ctl;
     }
 
     /**
-     * @return the nullDateField_filterBy
+     * @return the periodType_val
      */
-    public boolean isNullDateField_filterBy() {
-        return nullDateField_filterBy;
+    public OccPeriodType getPeriodType_val() {
+        return periodType_val;
     }
 
     /**
-     * @return the nullDateField_EnumValue
+     * @param periodType_ctl the periodType_ctl to set
      */
-    public SearchParamsOccPeriodDateFieldsEnum getNullDateField_EnumValue() {
-        return nullDateField_EnumValue;
+    public void setPeriodType_ctl(boolean periodType_ctl) {
+        this.periodType_ctl = periodType_ctl;
     }
 
     /**
-     * @return the occPeriodType_filterBy
+     * @param periodType_val the periodType_val to set
      */
-    public boolean isOccPeriodType_filterBy() {
-        return occPeriodType_filterBy;
+    public void setPeriodType_val(OccPeriodType periodType_val) {
+        this.periodType_val = periodType_val;
     }
 
     /**
-     * @return the occPeriodType_type
+     * @return the permitIssuance_ctl
      */
-    public OccPeriodType getOccPeriodType_type() {
-        return occPeriodType_type;
+    public boolean isPermitIssuance_ctl() {
+        return permitIssuance_ctl;
     }
 
     /**
-     * @return the userField_filter
+     * @return the permitIssuance_val
      */
-    public boolean isUserField_filter() {
-        return userField_filter;
+    public boolean isPermitIssuance_val() {
+        return permitIssuance_val;
     }
 
     /**
-     * @return the userField_enumValue
+     * @return the inspectionPassed_ctl
      */
-    public SearchParamsOccPeriodUserFieldsEnum getUserField_enumValue() {
-        return userField_enumValue;
-    }
-
-   
-    /**
-     * @param date_field the date_field to set
-     */
-    public void setDate_field(SearchParamsOccPeriodDateFieldsEnum date_field) {
-        this.date_field = date_field;
+    public boolean isInspectionPassed_ctl() {
+        return inspectionPassed_ctl;
     }
 
     /**
-     * @param nullDateField_filterBy the nullDateField_filterBy to set
+     * @return the inspectionPassed_val
      */
-    public void setNullDateField_filterBy(boolean nullDateField_filterBy) {
-        this.nullDateField_filterBy = nullDateField_filterBy;
+    public boolean isInspectionPassed_val() {
+        return inspectionPassed_val;
     }
 
     /**
-     * @param nullDateField_EnumValue the nullDateField_EnumValue to set
+     * @return the thirdPartyInspector_ctl
      */
-    public void setNullDateField_EnumValue(SearchParamsOccPeriodDateFieldsEnum nullDateField_EnumValue) {
-        this.nullDateField_EnumValue = nullDateField_EnumValue;
+    public boolean isThirdPartyInspector_ctl() {
+        return thirdPartyInspector_ctl;
     }
 
     /**
-     * @param occPeriodType_filterBy the occPeriodType_filterBy to set
+     * @return the thirdPartyInspector_registered_val
      */
-    public void setOccPeriodType_filterBy(boolean occPeriodType_filterBy) {
-        this.occPeriodType_filterBy = occPeriodType_filterBy;
+    public boolean isThirdPartyInspector_registered_val() {
+        return thirdPartyInspector_registered_val;
     }
 
     /**
-     * @param occPeriodType_type the occPeriodType_type to set
+     * @return the thirdPartyInspector_approved_val
      */
-    public void setOccPeriodType_type(OccPeriodType occPeriodType_type) {
-        this.occPeriodType_type = occPeriodType_type;
+    public boolean isThirdPartyInspector_approved_val() {
+        return thirdPartyInspector_approved_val;
     }
 
     /**
-     * @param userField_filter the userField_filter to set
+     * @return the pacc_ctl
      */
-    public void setUserField_filter(boolean userField_filter) {
-        this.userField_filter = userField_filter;
+    public boolean isPacc_ctl() {
+        return pacc_ctl;
     }
 
     /**
-     * @param userField_enumValue the userField_enumValue to set
+     * @return the pacc_val
      */
-    public void setUserField_enumValue(SearchParamsOccPeriodUserFieldsEnum userField_enumValue) {
-        this.userField_enumValue = userField_enumValue;
+    public boolean isPacc_val() {
+        return pacc_val;
+    }
+
+
+    /**
+     * @param permitIssuance_ctl the permitIssuance_ctl to set
+     */
+    public void setPermitIssuance_ctl(boolean permitIssuance_ctl) {
+        this.permitIssuance_ctl = permitIssuance_ctl;
     }
 
     /**
-     * @return the overrideTypeConfig_filterBy
+     * @param permitIssuance_val the permitIssuance_val to set
      */
-    public boolean isOverrideTypeConfig_filterBy() {
-        return overrideTypeConfig_filterBy;
+    public void setPermitIssuance_val(boolean permitIssuance_val) {
+        this.permitIssuance_val = permitIssuance_val;
     }
 
     /**
-     * @return the overrideTypeConfig_switch_overridesTypeConfig
+     * @param inspectionPassed_ctl the inspectionPassed_ctl to set
      */
-    public boolean isOverrideTypeConfig_switch_overridesTypeConfig() {
-        return overrideTypeConfig_switch_overridesTypeConfig;
+    public void setInspectionPassed_ctl(boolean inspectionPassed_ctl) {
+        this.inspectionPassed_ctl = inspectionPassed_ctl;
     }
 
     /**
-     * @param overrideTypeConfig_filterBy the overrideTypeConfig_filterBy to set
+     * @param inspectionPassed_val the inspectionPassed_val to set
      */
-    public void setOverrideTypeConfig_filterBy(boolean overrideTypeConfig_filterBy) {
-        this.overrideTypeConfig_filterBy = overrideTypeConfig_filterBy;
+    public void setInspectionPassed_val(boolean inspectionPassed_val) {
+        this.inspectionPassed_val = inspectionPassed_val;
     }
 
     /**
-     * @param overrideTypeConfig_switch_overridesTypeConfig the overrideTypeConfig_switch_overridesTypeConfig to set
+     * @param thirdPartyInspector_ctl the thirdPartyInspector_ctl to set
      */
-    public void setOverrideTypeConfig_switch_overridesTypeConfig(boolean overrideTypeConfig_switch_overridesTypeConfig) {
-        this.overrideTypeConfig_switch_overridesTypeConfig = overrideTypeConfig_switch_overridesTypeConfig;
+    public void setThirdPartyInspector_ctl(boolean thirdPartyInspector_ctl) {
+        this.thirdPartyInspector_ctl = thirdPartyInspector_ctl;
     }
 
     /**
-     * @return the permitIssuance_filterBy
+     * @param thirdPartyInspector_registered_val the thirdPartyInspector_registered_val to set
      */
-    public boolean isPermitIssuance_filterBy() {
-        return permitIssuance_filterBy;
+    public void setThirdPartyInspector_registered_val(boolean thirdPartyInspector_registered_val) {
+        this.thirdPartyInspector_registered_val = thirdPartyInspector_registered_val;
     }
 
     /**
-     * @return the permitIssuance_switch_permitIssued
+     * @param thirdPartyInspector_approved_val the thirdPartyInspector_approved_val to set
      */
-    public boolean isPermitIssuance_switch_permitIssued() {
-        return permitIssuance_switch_permitIssued;
+    public void setThirdPartyInspector_approved_val(boolean thirdPartyInspector_approved_val) {
+        this.thirdPartyInspector_approved_val = thirdPartyInspector_approved_val;
     }
 
     /**
-     * @return the inspectionPassed_filterBy
+     * @param pacc_ctl the pacc_ctl to set
      */
-    public boolean isInspectionPassed_filterBy() {
-        return inspectionPassed_filterBy;
+    public void setPacc_ctl(boolean pacc_ctl) {
+        this.pacc_ctl = pacc_ctl;
     }
 
     /**
-     * @return the inspectionPassed_switch_passedInspection
+     * @param pacc_val the pacc_val to set
      */
-    public boolean isInspectionPassed_switch_passedInspection() {
-        return inspectionPassed_switch_passedInspection;
+    public void setPacc_val(boolean pacc_val) {
+        this.pacc_val = pacc_val;
     }
 
-    /**
-     * @return the thirdPartyInspector_filterBy
-     */
-    public boolean isThirdPartyInspector_filterBy() {
-        return thirdPartyInspector_filterBy;
-    }
-
-    /**
-     * @return the thirdPartyInspector_switch_thirdPartyRegistered
-     */
-    public boolean isThirdPartyInspector_switch_thirdPartyRegistered() {
-        return thirdPartyInspector_switch_thirdPartyRegistered;
-    }
-
-    /**
-     * @return the thirdPartyInspector_switch_thirdPartyApproval
-     */
-    public boolean isThirdPartyInspector_switch_thirdPartyApproval() {
-        return thirdPartyInspector_switch_thirdPartyApproval;
-    }
-
-    /**
-     * @return the paccEnabled_filterBy
-     */
-    public boolean isPaccEnabled_filterBy() {
-        return paccEnabled_filterBy;
-    }
-
-    /**
-     * @return the paccEnabled_switch_paccIsEnabled
-     */
-    public boolean isPaccEnabled_switch_paccIsEnabled() {
-        return paccEnabled_switch_paccIsEnabled;
-    }
-
-    /**
-     * @return the checklistImplemented_filterBy
-     */
-    public boolean isChecklistImplemented_filterBy() {
-        return checklistImplemented_filterBy;
-    }
-
-    /**
-     * @return the checklistImplemented_checklistID
-     */
-    public int getChecklistImplemented_checklistID() {
-        return checklistImplemented_checklistID;
-    }
-
-    /**
-     * @param permitIssuance_filterBy the permitIssuance_filterBy to set
-     */
-    public void setPermitIssuance_filterBy(boolean permitIssuance_filterBy) {
-        this.permitIssuance_filterBy = permitIssuance_filterBy;
-    }
-
-    /**
-     * @param permitIssuance_switch_permitIssued the permitIssuance_switch_permitIssued to set
-     */
-    public void setPermitIssuance_switch_permitIssued(boolean permitIssuance_switch_permitIssued) {
-        this.permitIssuance_switch_permitIssued = permitIssuance_switch_permitIssued;
-    }
-
-    /**
-     * @param inspectionPassed_filterBy the inspectionPassed_filterBy to set
-     */
-    public void setInspectionPassed_filterBy(boolean inspectionPassed_filterBy) {
-        this.inspectionPassed_filterBy = inspectionPassed_filterBy;
-    }
-
-    /**
-     * @param inspectionPassed_switch_passedInspection the inspectionPassed_switch_passedInspection to set
-     */
-    public void setInspectionPassed_switch_passedInspection(boolean inspectionPassed_switch_passedInspection) {
-        this.inspectionPassed_switch_passedInspection = inspectionPassed_switch_passedInspection;
-    }
-
-    /**
-     * @param thirdPartyInspector_filterBy the thirdPartyInspector_filterBy to set
-     */
-    public void setThirdPartyInspector_filterBy(boolean thirdPartyInspector_filterBy) {
-        this.thirdPartyInspector_filterBy = thirdPartyInspector_filterBy;
-    }
-
-    /**
-     * @param thirdPartyInspector_switch_thirdPartyRegistered the thirdPartyInspector_switch_thirdPartyRegistered to set
-     */
-    public void setThirdPartyInspector_switch_thirdPartyRegistered(boolean thirdPartyInspector_switch_thirdPartyRegistered) {
-        this.thirdPartyInspector_switch_thirdPartyRegistered = thirdPartyInspector_switch_thirdPartyRegistered;
-    }
-
-    /**
-     * @param thirdPartyInspector_switch_thirdPartyApproval the thirdPartyInspector_switch_thirdPartyApproval to set
-     */
-    public void setThirdPartyInspector_switch_thirdPartyApproval(boolean thirdPartyInspector_switch_thirdPartyApproval) {
-        this.thirdPartyInspector_switch_thirdPartyApproval = thirdPartyInspector_switch_thirdPartyApproval;
-    }
-
-    /**
-     * @param paccEnabled_filterBy the paccEnabled_filterBy to set
-     */
-    public void setPaccEnabled_filterBy(boolean paccEnabled_filterBy) {
-        this.paccEnabled_filterBy = paccEnabled_filterBy;
-    }
-
-    /**
-     * @param paccEnabled_switch_paccIsEnabled the paccEnabled_switch_paccIsEnabled to set
-     */
-    public void setPaccEnabled_switch_paccIsEnabled(boolean paccEnabled_switch_paccIsEnabled) {
-        this.paccEnabled_switch_paccIsEnabled = paccEnabled_switch_paccIsEnabled;
-    }
-
-    /**
-     * @param checklistImplemented_filterBy the checklistImplemented_filterBy to set
-     */
-    public void setChecklistImplemented_filterBy(boolean checklistImplemented_filterBy) {
-        this.checklistImplemented_filterBy = checklistImplemented_filterBy;
-    }
-
-    /**
-     * @param checklistImplemented_checklistID the checklistImplemented_checklistID to set
-     */
-    public void setChecklistImplemented_checklistID(int checklistImplemented_checklistID) {
-        this.checklistImplemented_checklistID = checklistImplemented_checklistID;
-    }
 
     /**
      * @return the propertyUnit_ctl
@@ -347,12 +203,6 @@ public class SearchParamsOccPeriod
         return propertyUnit_ctl;
     }
 
-    /**
-     * @return the propertyUnit_val
-     */
-    public int getPropertyUnit_val() {
-        return propertyUnit_val;
-    }
 
     /**
      * @return the property_ctl
@@ -361,25 +211,12 @@ public class SearchParamsOccPeriod
         return property_ctl;
     }
 
-    /**
-     * @return the property_val
-     */
-    public int getProperty_val() {
-        return property_val;
-    }
 
     /**
      * @param propertyUnit_ctl the propertyUnit_ctl to set
      */
     public void setPropertyUnit_ctl(boolean propertyUnit_ctl) {
         this.propertyUnit_ctl = propertyUnit_ctl;
-    }
-
-    /**
-     * @param propertyUnit_val the propertyUnit_val to set
-     */
-    public void setPropertyUnit_val(int propertyUnit_val) {
-        this.propertyUnit_val = propertyUnit_val;
     }
 
     /**
@@ -390,24 +227,31 @@ public class SearchParamsOccPeriod
     }
 
     /**
+     * @return the property_val
+     */
+    public Property getProperty_val() {
+        return property_val;
+    }
+
+    /**
      * @param property_val the property_val to set
      */
-    public void setProperty_val(int property_val) {
+    public void setProperty_val(Property property_val) {
         this.property_val = property_val;
     }
 
     /**
-     * @return the userFieldUser
+     * @return the propertyUnit_val
      */
-    public User getUserFieldUser() {
-        return userFieldUser;
+    public PropertyUnit getPropertyUnit_val() {
+        return propertyUnit_val;
     }
 
     /**
-     * @param userFieldUser the userFieldUser to set
+     * @param propertyUnit_val the propertyUnit_val to set
      */
-    public void setUserFieldUser(User userFieldUser) {
-        this.userFieldUser = userFieldUser;
+    public void setPropertyUnit_val(PropertyUnit propertyUnit_val) {
+        this.propertyUnit_val = propertyUnit_val;
     }
 
    
