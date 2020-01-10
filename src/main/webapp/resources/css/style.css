@@ -1694,8 +1694,9 @@ tr.caseOpen{
 }
 
 .nav_containner:hover {
-    color:#6C6D70;
-    background-color: #DEE461;
+    color:#E6E7E8;
+    background-color: #007AD9;
+    
 }
 
 .nav_content{
@@ -1712,9 +1713,10 @@ tr.caseOpen{
 }
 
 .nav_containner:hover .subnav_containner{
-    color:#6C6D70;
-    background-color: #DEE461;
+    color:#E6E7E8;
+    background-color: #007AD9;
     display: inline-block;
+    
     
 }
 
@@ -1759,8 +1761,8 @@ tr.caseOpen{
 }
 
 .subnav_content:hover{
-    color: #6C6D70;
-    border-bottom: 2px solid #2F6381;
+    color: #000000;
+    border-bottom: 2px solid #000000;
 }
 
 .nav_display{
@@ -1776,7 +1778,7 @@ tr.caseOpen{
     background-color: #6C6D70;
 }
 .navsub_active{
-    color:#2F6381;
+    color:#000000;
     border-bottom: 2px solid #6C6D70;
 
 }
@@ -1861,7 +1863,7 @@ tr.caseOpen{
     cursor: pointer;
 }
 .toolSidebarCollapse i:hover,.toolSidebarExpansion i:hover{
-    color: #2F6381;
+    color: #00B4ED;
 }
 
 
@@ -1892,7 +1894,7 @@ tr.caseOpen{
     cursor: pointer;
 }
 .sidebar_firstmenu_item:hover{
-    border-bottom: 1px solid #00B4ED;
+    border-bottom: 1px solid #007AD9;
 }
 
 
@@ -1904,7 +1906,7 @@ tr.caseOpen{
     display: none;
 }
 .sidebar_secondmenu_item{
-    color: #00B4ED;
+    color: #6C6D70;
     height: 40px;
     display: flex;
     flex-direction: column;
@@ -1914,8 +1916,8 @@ tr.caseOpen{
 }
 
 .sidebar_secondmenu_item:hover{
-    background-color:#DEE461;
-    color:#6C6D70;
+    background-color:#007AD9;
+    color:#000000;
 }
 .sidebar_secondmenu_item i{
     width: 25px;
@@ -1930,9 +1932,10 @@ tr.caseOpen{
     cursor: pointer;
 }
 
-/*body .ui-panel .ui-panel-titlebar{
+body .ui-panel .ui-panel-titlebar{
     background-color: #6C6D70;
-}*/
+    border: 1px solid #6C6D70;
+}
 
 
 
