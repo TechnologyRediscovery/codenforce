@@ -215,6 +215,8 @@
                                 selectionMode="single"
                                 selection="#{feeManagementBB.selectedCodeElement}"
                                 filteredValue="#{feeManagementBB.filteredElementList}"
+                                scrollable="true"
+                                scrollHeight="500"
                                 >
 
                                 <p:column width="3%">
@@ -231,79 +233,123 @@
                                     <h:outputText value="#{element.codeSetElementID}"/>
                                 </p:column>
 
-                                <!--Resume column changing from here.-->
-                                
-                                <p:column width="15%" sortBy="#{element.ordSecTitle}"
-                                          filterBy="#{element.ordSecTitle}">
+                                <p:column width="5%" sortBy="#{element.maxPenalty}">
                                     <f:facet name="header">
-                                        <h:outputText value="Sec. Title" />
+                                        <h:outputText value="Max Penalty" />
                                     </f:facet>
-                                    <h:outputText value="#{element.ordSecTitle}"/>
+                                    <h:outputText value="$#{element.maxPenalty}"/>
                                 </p:column>
 
-                                <p:column width="5%" sortBy="#{element.ordSubSecNum}">
+                                <p:column width="5%" sortBy="#{element.minPenalty}">
                                     <f:facet name="header">
-                                        <h:outputText value="SubSec" />
+                                        <h:outputText value="Min Penalty" />
                                     </f:facet>
-                                    <h:outputText value="#{element.ordSubSecNum}"/>
+                                    <h:outputText value="$#{element.minPenalty}"/>
                                 </p:column>
 
-                                <p:column sortBy="#{element.ordSubSecTitle}" 
-                                          filterBy="#{element.ordSubSecTitle}">
+                                <p:column width="5%" sortBy="#{element.normPenalty}">
                                     <f:facet name="header">
-                                        <h:outputText value="SubSec. Title" />
+                                        <h:outputText value="Norm Penalty" />
                                     </f:facet>
-                                    <h:outputText value="#{element.ordSubSecTitle}"/>
+                                    <h:outputText value="$#{element.normPenalty}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.normDaysToComply}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Norm Days to Comply" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.normDaysToComply}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.daysToComplyNotes}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Days to Comply" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.daysToComplyNotes}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.dateCreated}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Date Created" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.dateCreated}"/>
                                 </p:column>
 
                                 <p:rowExpansion>
                                     <div class="outlinedBox">
                                         <h3>Code element detail:</h3>
 
-                                        <h:outputLabel styleClass="bold" value="Code Element ID:"/>
+                                        <h:outputLabel styleClass="bold" value="Penalty Notes:"/>
+                                        <p:spacer height="10px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.penaltyNotes}"/>
+                                        </div>
                                         <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Days to Comply Notes:"/>
+                                        <p:spacer height="10px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.daysToComplyNotes}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Muni-Specific Notes:"/>
+                                        <p:spacer height="10px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.muniSpecificNotes}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Code Element ID:"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.codeElement.elementID}"/>
                                         </div>
                                         <p:spacer height="15px"/>
-                                        
+
+
                                         <h:outputLabel styleClass="bold" value="Category:"/>
-                                        <p:spacer height="15px"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.codeElement.guideEntry.category}"/>
                                         </div>
-                                        <p:spacer height="15px"/>
-                                        
+
                                         <h:outputLabel styleClass="bold" value="Sub Category:"/>
-                                        <p:spacer height="15px"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.codeElement.guideEntry.subCategory}"/>
                                         </div>
                                         <p:spacer height="15px"/>
-                                        
+
                                         <h:outputLabel styleClass="bold" value="Chap"/>
-                                        <p:spacer height="15px"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.codeElement.ordchapterNo}"/>
                                         </div>
-                                        <p:spacer height="15px"/>
-                                        
+
                                         <h:outputLabel styleClass="bold" value="Chapter"/>
-                                        <p:spacer height="15px"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.codeElement.ordchapterTitle}"/>
                                         </div>
                                         <p:spacer height="15px"/>
                                         
                                         <h:outputLabel styleClass="bold" value="Sec"/>
-                                        <p:spacer height="15px"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.codeElement.ordSecNum}"/>
                                         </div>
+
+                                        <h:outputLabel styleClass="bold" value="Sec. Title"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordSecTitle}"/>
+                                        </div>
+
+                                        <h:outputLabel styleClass="bold" value="SubSec"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordSubSecNum}"/>
+                                        </div>
+
+                                        <h:outputLabel styleClass="bold" value="SubSec. Title"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordSubSecTitle}"/>
+                                        </div>
                                         <p:spacer height="15px"/>
-                                        
-                                        
-                                        
+
                                         <h:outputLabel styleClass="bold" value="Technical Text"/>
                                         <p:spacer height="15px"/>
                                         <div class="rowExpansion">

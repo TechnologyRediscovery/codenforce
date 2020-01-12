@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
@@ -796,8 +797,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                             "Oops! We encountered a problem trying to fetch the OccPeriodType List!", ""));
         }
 
-        try {
-            elementList = ci.getCodeSets(getSessionBean().getSessionMuni().getMuniCode());
+        try {      
+            ArrayList<CodeSet> codeSetList = ci.getCodeSets(getSessionBean().getSessionMuni().getMuniCode());
+            
+            elementList = new ArrayList<>();
+            
+            for(CodeSet set : codeSetList){
+                
+             elementList.addAll(ci.getEnforcableCodeElementList(set.getCodeSetID()));
+                
+            }
+            
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
