@@ -61,21 +61,19 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @return
      * @throws IntegrationException
      * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.SearchException 
      */
     public PropertyDataHeavy assemblePropertyDataHeavy(Property pr, Credential cred) throws IntegrationException, BObStatusException, SearchException{
         
         PropertyIntegrator pi = getPropertyIntegrator();
         SearchCoordinator sc = getSearchCoordinator();
-        
+        CaseCoordinator cc = getCaseCoordinator();
         
         PropertyDataHeavy propWL = new PropertyDataHeavy(pr);
         
-        if (propWL.getCeCaseList() == null) {
-            QueryCECase qp = null;
-            qp = sc.initQuery(QueryCECaseEnum., cred);
+            QueryCECase qp = sc.initQuery(QueryCECaseEnum.PROPERTY, cred);
             qp.getSearchParamsList().get(0).setProperty_val(pr);
-            propWL.setCeCaseList(sc.runQuery(qp).getResults());
-        }
+            propWL.setCeCaseList(cc.getCECaseHeavyList(sc.runQuery(qp).getResults(), cred));
         if (propWL.getUnitWithListsList() == null) {
             propWL.setUnitWithListsList(new ArrayList<PropertyUnitDataHeavy>());
             // since it was empty
@@ -179,7 +177,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @throws AuthorizationException
      * @throws EventException 
      */
-    public PropertyDataHeavy getPropertyDataHeavy(int propID, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException{
+    public PropertyDataHeavy getPropertyDataHeavy(int propID, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException, SearchException{
         return assemblePropertyDataHeavy(getProperty(propID), cred);
     }
     
@@ -197,7 +195,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @throws AuthorizationException
      * @throws EventException 
      */
-    public PropertyDataHeavy getPropertyDataHeavyByUnit(int propUnitID, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException{
+    public PropertyDataHeavy getPropertyDataHeavyByUnit(int propUnitID, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException, SearchException{
         PropertyIntegrator pi = getPropertyIntegrator();
         return assemblePropertyDataHeavy(pi.getPropertyUnitWithProp(propUnitID).getProperty(), cred);
     }
@@ -249,7 +247,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                     if(mdh.getMuniOfficePropertyId() !=0){
                         return pc.assemblePropertyDataHeavy(pc.getProperty(mdh.getMuniOfficePropertyId()), cred);
                     } 
-            } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
+            } catch (IntegrationException | AuthorizationException | BObStatusException | EventException | SearchException ex) {
                 System.out.println(ex);
             }
         }

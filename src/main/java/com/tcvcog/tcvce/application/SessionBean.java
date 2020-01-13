@@ -50,6 +50,8 @@ public class    SessionBean
     private User sessionUserForReInitSession;
     
     private UserMuniAuthPeriod umapRequestedForReInit;
+    private List<UserMuniAuthPeriod> sessionUMAPListValidOnly;
+    
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                    I Municipality                              <<< */
@@ -1153,6 +1155,20 @@ public class    SessionBean
      */
     public void setSessionEventList(List<EventCnF> sessionEventList) {
         this.sessionEventList = sessionEventList;
+    }
+
+    /**
+     * @return the sessionUMAPListValidOnly
+     */
+    public List<UserMuniAuthPeriod> getSessionUMAPListValidOnly() {
+        return sessionUMAPListValidOnly;
+    }
+
+    /**
+     * @param sessionUMAPListValidOnly the sessionUMAPListValidOnly to set
+     */
+    public void setSessionUMAPListValidOnly(List<UserMuniAuthPeriod> sessionUMAPListValidOnly) {
+        this.sessionUMAPListValidOnly = sessionUMAPListValidOnly;
     }
     
     

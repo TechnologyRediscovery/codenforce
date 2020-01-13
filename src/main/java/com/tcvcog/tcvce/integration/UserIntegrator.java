@@ -101,11 +101,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      *
      * Creates sekeletonized UserAuthorized
      * 
-     * @param u
+     * @param usr
      * @return
      * @throws IntegrationException 
      */
-    public UserAuthorized getUserAuthorizedNoAuthPeriods(User u) throws IntegrationException{
+    public UserAuthorized getUserAuthorizedNoAuthPeriods(User usr) throws IntegrationException{
         
         
         Connection con = getPostgresCon();
@@ -119,17 +119,16 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, u.getUserID());
+            stmt.setInt(1, usr.getUserID());
             rs = stmt.executeQuery();
             while(rs.next()){
-                ua = new UserAuthorized(u);
+                ua = new UserAuthorized(usr);
                 if(rs.getTimestamp("pswdlastupdated") != null){
                     ua.setPswdLastUpdated(rs.getTimestamp("pswdlastupdated").toLocalDateTime());
                 }
                 if(rs.getTimestamp("forcepasswordreset") != null){
                     ua.setForcePasswordResetTS(rs.getTimestamp("forcepasswordreset").toLocalDateTime());
                 }
-                System.out.println("UserIntegrator.getAuthorizedUser | uaid: " + ua.getUserID());
                 ua.setCreatedByUserId(rs.getInt("createdby"));
                 if(rs.getTimestamp("createdts") != null){
                     ua.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
@@ -165,6 +164,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setUsername(rs.getString("username"));
             user.setNotes(rs.getString("notes"));
             user.setActive(rs.getBoolean("active"));
+            user.setPersonID(rs.getInt("personlink"));
             user.setPerson(pi.getPerson(rs.getInt("personlink")));
             user.setNoLoginVirtualUser(rs.getBoolean("nologinvirtualonly"));
             
@@ -181,11 +181,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * Provides a complete list of records by User in the table loginmuniauthperiod.
      * Client is responsible for validating the UMAP object by the UserCoordinator
-     * @param u
+     * @param userID
      * @return
      * @throws IntegrationException 
      */
-    public List<UserMuniAuthPeriod> getUserMuniAuthPeriodsRaw(User u) throws IntegrationException{
+    public List<UserMuniAuthPeriod> getUserMuniAuthPeriodsRaw(int userID) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         List<UserMuniAuthPeriod> perList = null;
@@ -193,11 +193,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query = "SELECT muniauthperiodid FROM public.loginmuniauthperiod WHERE authuser_userid=?;";
         
         PreparedStatement stmt = null;
-        if(u != null){
+        if(userID != 0){
             perList = new ArrayList<>();
             try {
                 stmt = con.prepareStatement(query);
-                stmt.setInt(1, u.getUserID());
+                stmt.setInt(1, userID);
                 rs = stmt.executeQuery();
                 while(rs.next()){
                     perList.add(getUserMuniAuthPeriod(rs.getInt("muniauthperiodid")));

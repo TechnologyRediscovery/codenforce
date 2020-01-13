@@ -722,33 +722,33 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         params.appendSQL("SELECT DISTINCT propertyid ");
         params.appendSQL("FROM property LEFT OUTER JOIN propertyexternaldata ON (property.propertyid = propertyexternaldata.property_propertyid) \n");
         
-         // ****************************
-        // **         OBJECT ID      **
-        // ****************************
+        // **********************************
+        // **    FILTER COM-4 OBJECT ID     **
+        // ***********************************
          if (!params.isBobID_ctl()) {
            
-            //*******************************
-           // **   MUNI,DATES,USER,ACTIVE  **
-           // *******************************
+            //******************************************************************
+           // **   FILTERS COM-1, COM-2, COM-3, COM-6 MUNI,DATES,USER,ACTIVE  **
+           // ******************************************************************
              params = (SearchParamsProperty) sc.assembleBObSearchSQL_muniDatesUserActive(params);
 
-            //****************************
-           // **         ZIP            **
-           // ****************************
+            //**************************************
+           // **   FILTER PROP-1   ZIP            **
+           // **************************************
             if (params.isZip_ctl()) {
                 params.appendSQL("AND addr_zip ILIKE ? ");
             }
 
-            //****************************
-           // **     LOT AND BLOCK      **
-           // ****************************
+            //***************************************
+           // **   FILTER PROP-2:  LOT AND BLOCK   **
+           // ***************************************
             if (params.isLotblock_ctl()) {
                 params.appendSQL("AND lotandblock LIKE ? ");
             }
 
-            //****************************
-           // **     BOB SOURCE         **
-           // ****************************
+            //*****************************************
+           // **   FILTER PROP-3: BOB SOURCE         **
+           // *****************************************
             if (params.isBobSource_ctl()) {
                 if(params.getBobSource_val() != null){
                     params.appendSQL("AND bobsource_sourceid=? ");
@@ -759,21 +759,21 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
 
             //****************************
-           // **     PARCEL ID          **
+           // **   4:PARCEL ID          **
            // ****************************
             if (params.isParcelid_ctl()) {
                 params.appendSQL("AND parid ILIKE ? ");
             }
 
-           // ****************************
-           // **         ADDRESS        **
-           // ****************************
+           // *****************************
+           // **       5: ADDRESS        **
+           // *****************************
             if (params.isAddress_ctl()) {
                 params.appendSQL("AND address ILIKE ? ");
             }
 
            // ****************************
-           // **         CONDITION      **
+           // **       6:CONDITION      **
            // ****************************
             if (params.isCondition_ctl()) {
                 if(params.getCondition_intensityClass_val() != null){
@@ -785,7 +785,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
 
            // ****************************
-           // **   LAND BANK PROSPECT   **
+           // ** 7:LAND BANK PROSPECT   **
            // ****************************
             if (params.isLandbankprospect_ctl()) {
                 if(params.getLandbankprospect_intensityClass_val() != null){
@@ -797,7 +797,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
 
            // ****************************
-           // **   LAND BANK HELD  **
+           // ** 8:LAND BANK HELD  **
            // ****************************
             if (params.isLandbankheld_ctl()) {
                 params.appendSQL("AND landbankheld= ");
@@ -809,7 +809,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
 
            // ****************************
-           // **   NONADDRESSABLE       **
+           // ** 9:NONADDRESSABLE       **
            // ****************************
             if (params.isNonaddressable_ctl()) {
                 params.appendSQL("AND nonaddressable= ");
@@ -821,7 +821,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
 
            // ****************************
-           // **        USE TYPE        **
+           // **    10: USE TYPE        **
            // ****************************
             if (params.isUseType_ctl()) {
                 if(params.getUseType_val() != null){
@@ -833,21 +833,21 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
 
            // ****************************
-           // **        ZONE            **
+           // **     11:ZONE            **
            // ****************************
             if (params.isZoneClass_ctl()) {
                 params.appendSQL("AND propertyusetype.zoneclass ILIKE ? ");
             }
             
            // ****************************
-           // **        TAX STATUS      **
+           // **     12:TAX STATUS      **
            // ****************************
             if(params.isTaxStatus_ctl()){
                 params.appendSQL("AND taxstatus ILIKE ?");
             }
 
            // ****************************
-           // **        PROP VALUE      **
+           // **     13:PROP VALUE      **
            // ****************************
             if (params.isPropValue_ctl()) {
                 params.appendSQL("AND propertyexternaldata.assessedlandvalue+propertyexternaldata.assessedlandvalue>? ");
@@ -855,7 +855,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
 
            // ****************************
-           // **    CONSTRUCTION YEAR   **
+           // **   14:CONSTRUCTION YEAR   **
            // ****************************
             if (params.isConstructionYear_ctl()) {
                 params.appendSQL("AND propertyexternaldata.yearbuilt>? ");
@@ -863,7 +863,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
            
         // ****************************
-        // **      OBJECT ID         **
+        // ** COM-4  OBJECT ID       **
         // **************************** 
         } else {
             params.appendSQL("AND propertyid=? "); // will be param 2 with ID search

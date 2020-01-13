@@ -137,6 +137,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
     }
     
+    public List<CECaseDataHeavy> getCECaseHeavyList(List<CECase> cseList, Credential cred){
+        List<CECaseDataHeavy> heavyList = new ArrayList<>();
+        for(CECase cse: cseList){
+            try {
+                heavyList.add(assembleCECaseDataHeavy(cse, cred));
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+            } 
+        }
+        return heavyList;
+        
+    }
+    
     /**
      * Primary pathway for retrieving the CECaseDataHeavy data-light 
  superclass CECase. Implements business logic.

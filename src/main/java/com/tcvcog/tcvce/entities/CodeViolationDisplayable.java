@@ -22,7 +22,7 @@ public class CodeViolationDisplayable extends CodeViolation {
         this.violationID = cv.violationID;
         this.ceCaseID = cv.ceCaseID;
         this.penalty = cv.penalty;
-        this.daysUntilStipulatedComplianceDate = cv.daysUntilStipulatedComplianceDate;
+        
         this.leagacyImport = cv.leagacyImport;
         this.complianceTimeframeEventID = cv.complianceTimeframeEventID;
 

@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
@@ -69,7 +70,7 @@ public class CECaseNoticesBB
                     nov.setCreationBy(getSessionBean().getSessionUser());
                     getSessionBean().setSessionNotice(nov);
                     return "noticeOfViolationBuilder";
-                } catch (AuthorizationException | IntegrationException | BObStatusException ex) {
+                } catch (AuthorizationException | IntegrationException | BObStatusException | SearchException ex) {
                     System.out.println(ex);
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Cannot build new notice", ""));

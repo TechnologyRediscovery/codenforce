@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -85,13 +86,13 @@ public class PropertyCreateBB
                                 + ", which is now your 'active property'", ""));
             
             
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to insert property in database, sorry. ", 
                         "Please make sure all required fields are completed. "));
-        } 
+        }
     }
 
     /**

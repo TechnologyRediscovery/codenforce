@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
 import com.tcvcog.tcvce.domain.SessionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
@@ -46,12 +47,9 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.SubSysEnum;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -64,7 +62,7 @@ public  class       SessionInitializer
         extends     BackingBeanUtils 
         implements  Serializable {
 
-    private User userQueuedForSession;
+    private String userQueuedForSession;
     private UserAuthorized userAuthorizedQueuedForSession;
     private UserMuniAuthPeriod umapQueuedForSession;
     private Municipality muniQueuedForSession;
@@ -102,47 +100,22 @@ public  class       SessionInitializer
             
             
             umapListValidForUserSelect = uc.assembleValidAuthPeriods(userQueuedForSession);
+            getSessionBean().setSessionUMAPListValidOnly(umapListValidForUserSelect);
 //            userAuthorizedQueuedForSession = uc.authorizeUser(userQueuedForSession, muniQueuedForSession, umapQueuedForSession);
     }
     
-    /**
-     * Central method for setting up the user's session:
-     * 1) First get the user from the system
-     * 2) User comes back with a default municipality object, which is stored in the session
-     * 3) From this muni, extract the default code set ID, which is then used to grab
-     * the code set from the DB and store this in the session as well.
-     * 4) Fill in a bunch of session objects to quash those null pointers
-     * 
-     * @return success or failure String used by faces to navigate to the internal page
-     * or the error page
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     * @throws com.tcvcog.tcvce.domain.BObStatusException
-     * @throws java.sql.SQLException
-     */
-    public String initiateInternalSession() throws IntegrationException, BObStatusException, SQLException{
-        System.out.println("SessionInitializer.initiateInternalSession");
-        UserCoordinator uc = getUserCoordinator();
-        if(sb.getSessionUser() == null){
-            return configureSession(getContainerAuthenticatedUser(), null, null);
-        } else {
-            // if we have an existing session, send in the userAuthorizedQueuedForSession and let the
-            // auth logic choose the muni
-            return configureSession(userAuthorizedQueuedForSession, muniQueuedForSession, umapQueuedForSession);
-        }
-    }
-
+    
     /**
      * JBoss is responsible for the first query against the DB. If a username/pass
      * matches the query, this method will extract the username from any old request
      * @return the username string of an authenticated user from the container
      */
-    private User getContainerAuthenticatedUser() throws IntegrationException {
+    private String getContainerAuthenticatedUser() throws IntegrationException {
         System.out.println("SessionInitializer.getContainerAuthenticatedUser");
-        UserIntegrator ui  = getUserIntegrator();
         FacesContext fc = getFacesContext();
         ExternalContext ec = fc.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ec.getRequest();
-        return ui.getUser(ui.getUserID(request.getRemoteUser()));
+        return request.getRemoteUser();
     }
     
     /**
@@ -165,25 +138,27 @@ public  class       SessionInitializer
      * @param umap the chosen UMAP, which should be valid
      */
     public void credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
-        // TODO: finish me!
-        
-        
+        try {
+            configureSession(umap);
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println("SessionInitializer.credentializeUserMuniAuthPeriod | error configuring session");
+            System.out.println(ex);
+        }
     }
     
     
     /**
-     * Core configuration method for sessions
+     * Core configuration method for sessions that takes in a chosen UMAP from
+     * a pre-assembled list of valid UMAPs
      * 
-     * @param u The base authenticated User who will be transformed into a UserAuthorized through
-     * the long and multifaceted journey of the UserAuthorization 
-     * @param muni if null, the system will choose the highest ranked role in the
-     * muni record added most recently
+     * The logic work is passed up to the UserCoordinator
+     * 
      * @param umap
      * @return nav string
      * @throws BObStatusException
      * @throws IntegrationException 
      */
-    public String configureSession(User u, Municipality muni, UserMuniAuthPeriod umap) throws BObStatusException, IntegrationException{
+    public String configureSession(UserMuniAuthPeriod umap) throws BObStatusException, IntegrationException{
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
         System.out.println("SessionInitializer.configureSession()");
@@ -191,7 +166,7 @@ public  class       SessionInitializer
         try {
             // The central call which initiates the User's session for a particular municipality
             // Muni will be null when called from initiateInternalSession
-            UserAuthorized authUser = uc.authorizeUser(u, muni, umap);
+            UserAuthorized authUser = uc.authorizeUser(umap, getSessionBean().getSessionUMAPListValidOnly());
             
             // as long as we have an actual user, proceed with session config
             if(authUser != null){
@@ -202,25 +177,25 @@ public  class       SessionInitializer
             }
         
         } catch (IntegrationException ex) {
-            getLogIntegrator().makeLogEntry(99, getSessionID(),2,"SessionInitializer.initiateInternalSession | user lookup integration error", 
-                    true, true);
+//            getLogIntegrator().makeLogEntry(99, getSessionID(),2,"SessionInitializer.initiateInternalSession | user lookup integration error", 
+//                    true, true);
             System.out.println("SessionInitializer.intitiateInternalSession | error getting facesUser");
             System.out.println(ex);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, 
                     "Integration module error. Unable to connect your server user to the COG system user.", 
                     "Please contact system administrator Eric Darsow at 412.923.9907"));
-            return "sessionLoadError";
+            return "";
         } catch (AuthorizationException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Auth exception");
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
             System.out.println(ex);
-            return "success";
+            return "";
         } catch (SessionException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Session exception");
             System.out.println(ex);
+            return "";
         }
-        return "success";
     }
     
     
@@ -241,7 +216,6 @@ public  class       SessionInitializer
         
         Credential cred = ua.getMyCredential();
         List<SessionException> exlist = new ArrayList<>();
-        
      
         for(SubSysEnum ss: SubSysEnum.values()){
             try{
@@ -291,8 +265,10 @@ public  class       SessionInitializer
                             initSubsystem_XIII_PublicInfoBundle(cred, ss);
                             break;
                     } // close switch
+                    printSubsystemInitComplete(ss);
                 } // close if
             } catch (SessionException ex){
+                System.out.println(ex.getLocalizedMessage());
                 throw new SessionException("Subsystem init catch all", ex);
             }
         } // close for over subsystem enum
@@ -350,12 +326,26 @@ public  class       SessionInitializer
      * @param ss 
      */
     private void printSubsystemInit(SubSysEnum ss){
-        StringBuilder sb = new StringBuilder();
-        sb.append("Initializing subsystem ");
-        sb.append(ss.getSubSysID_Roman());
-        sb.append(" ");
-        sb.append(ss.getTitle());
-        System.out.println(sb.toString());
+        StringBuilder initString = new StringBuilder();
+        initString.append("Initializing subsystem ");
+        initString.append(ss.getSubSysID_Roman());
+        initString.append(" ");
+        initString.append(ss.getTitle());
+        System.out.println(initString.toString());
+        
+    }
+    /**
+     * Utility method for printing to the console notes about session init
+     * @param ss 
+     */
+    private void printSubsystemInitComplete(SubSysEnum ss){
+        StringBuilder initString = new StringBuilder();
+        initString.append("Initializing subsystem ");
+        initString.append(ss.getSubSysID_Roman());
+        initString.append(" ");
+        initString.append(ss.getTitle());
+        initString.append(": COMPLETE ");
+        System.out.println(initString.toString());
         
     }
 
@@ -396,7 +386,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_I_Municipality(Credential cred, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
         MunicipalityCoordinator mc = getMuniCoordinator();
         
         MunicipalityDataHeavy muniHeavy;
@@ -425,7 +414,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_II_CodeBook(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
-        printSubsystemInit(ss);
         sb.setSessionCodeSet(mdh.getCodeSet());
         
     }
@@ -448,7 +436,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */  
     private void initSubsystem_III_Property(Credential cred, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
         PropertyCoordinator pc = getPropertyCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         SessionBean sessBean = getSessionBean();
@@ -466,13 +453,12 @@ public  class       SessionInitializer
             if(!sessBean.getQueryPropertyList().isEmpty()){
                 sessBean.setQueryProperty(sessBean.getQueryPropertyList().get(0));
             }            
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             throw new SessionException( "Error setting proerty query list", 
                                         ex, ss, 
                                         ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
-        }
-        
+        }        
     }
 
 
@@ -491,7 +477,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_IV_Person(Credential cred, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
         SearchCoordinator sc = getSearchCoordinator();
         PersonCoordinator persc = getPersonCoordinator();
         
@@ -526,7 +511,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_V_Event(Credential cred, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
         SearchCoordinator sc = getSearchCoordinator();
         sb.setQueryEventList(sc.buildQueryEventList(cred));
         if(!sb.getQueryEventList().isEmpty()){
@@ -550,7 +534,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_VI_OccPeriod(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
-        printSubsystemInit(ss);
         SearchCoordinator sc = getSearchCoordinator();
         OccupancyCoordinator occCord = getOccupancyCoordinator();
         
@@ -592,7 +575,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_VII_CECase(Credential cred, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
         CaseCoordinator caseCoord = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         
@@ -639,7 +621,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_VIII_CEActionRequest(Credential cred, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
         SearchCoordinator sc = getSearchCoordinator();
         sb.setQueryCEARList(sc.buildQueryCEARList(cred));
         if(!sb.getQueryCEARList().isEmpty()){
@@ -664,7 +645,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_VIV_OccApp(Credential cred, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
         
     }
     
@@ -686,7 +666,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_X_Payment(Credential cred, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
         
     }
 
@@ -706,7 +685,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_XI_Report(Credential cred, SubSysEnum ss) throws SessionException{ 
-        printSubsystemInit(ss);
         
         
     }
@@ -728,7 +706,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_XII_Blob(Credential cred, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
         
     }
 
@@ -749,7 +726,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_XIII_PublicInfoBundle(Credential cred, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
         
         
     }
@@ -772,7 +748,6 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_logSession(UserAuthorized authUser, SubSysEnum ss) throws SessionException{
-        printSubsystemInit(ss);
          UserMuniAuthPeriodLogEntry umaple;
          UserCoordinator uc = getUserCoordinator();
          
@@ -839,14 +814,14 @@ public  class       SessionInitializer
 
      * @return the userQueuedForSession
      */
-    public User getUserQueuedForSession() {
+    public String getUserQueuedForSession() {
         return userQueuedForSession;
     }
 
     /**
      * @param userQueuedForSession the userQueuedForSession to set
      */
-    public void setUserQueuedForSession(User userQueuedForSession) {
+    public void setUserQueuedForSession(String userQueuedForSession) {
         this.userQueuedForSession = userQueuedForSession;
     }
 

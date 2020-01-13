@@ -1076,24 +1076,45 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        params.appendSQL("SELECT personid ");
-        params.appendSQL("FROM person WHERE personid IS NOT NULL ");
+        params.appendSQL    ("SELECT DISTINC personid FROM public.person \n");
+        params.appendSQL    ("LEFT OUTER JOIN public.propertyperson ON (person.personid = propertyperson.person_personid)\n");
+        params.appendSQL    ("LEFT OUTER JOIN public.occperiodperson ON (person.personid = occperiodperson.person_personid)\n");
+        params.appendSQL    ("LEFT OUTER JOIN public.eventperson ON (person.personid = eventperson.person_personid)\n");
+        params.appendSQL    ("LEFT OUTER JOIN public.citationperson ON (person.personid = citationperson.person_personid)\n");
+        params.appendSQL    ("LEFT OUTER JOIN public.personmergehistory ON (person.personid = personmergehistory.mergetarget_personid)\n");
+        params.appendSQL    ("LEFT OUTER JOIN public.personmunilink ON (person.personid = personmunilink.person_personid)\n");
+        params.appendSQL    ("WHERE personid IS NOT NULL \n");
         
         
+        // ***********************************
+        // **    FILTER COM-4 OBJECT ID     **
+        // ***********************************
         if (!params.isBobID_ctl()){
             
-            //*******************************
-            // **   MUNI,DATES,USER,ACTIVE  **
-            // *******************************
+            
+            //******************************************************************
+           // **   FILTERS COM-1, COM-2, COM-3, COM-6 MUNI,DATES,USER,ACTIVE  **
+           // ******************************************************************
             params = (SearchParamsPerson) sc.assembleBObSearchSQL_muniDatesUserActive(params);
             
+
+            // ***********************************
+            // **    FILTER PERS-1              **
+            // ***********************************
             if (params.isName_first_ctl()){
-                params.appendSQL("fname ILIKE ? ");
+                params.appendSQL("AND fname ILIKE ? ");
             }
             
+            // ***********************************
+            // **    FILTER PERS-2              **
+            // ***********************************
             if (params.isName_last_ctl()){
-                params.appendSQL("lname ILIKE ? ");
+                params.appendSQL("AND lname ILIKE ? ");
             }
+
+            // ***********************************
+            // **    FILTER PERS-3              **
+            // ***********************************
             
             if(params.isName_compositeLNameOnly_ctl()){
                 params.appendSQL("AND compositelname=");
@@ -1103,33 +1124,54 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("FALSE ");
                 }
             }
-            
+          
+            // ***********************************
+            // **    FILTER PERS-4              **
+            // ***********************************
             if (params.isPhoneNumber_ctl()){
-                params.appendSQL("phonecell ILIKE ? OR phonework ILIKE ? OR phonehome ILIKE ? ");
+                params.appendSQL("AND phonecell ILIKE ? OR phonework ILIKE ? OR phonehome ILIKE ? ");
             }
             
+            // ***********************************
+            // **    FILTER PERS-5              **
+            // ***********************************
             if (params.isEmail_ctl()){
-                params.appendSQL("email ILIKE ? ");
+                params.appendSQL("AND email ILIKE ? ");
             }
             
+            // ***********************************
+            // **    FILTER PERS-6              **
+            // ***********************************
             if (params.isAddress_streetNum_ctl()){
-                params.appendSQL("address_street ILIKE ? ");
+                params.appendSQL("AND address_street ILIKE ? ");
             }
             
-            if (params.isCity_ctl()){
-                params.appendSQL("address_city ILIKE ? ");
+            // ***********************************
+            // **    FILTER PERS-7              **
+            // ***********************************
+            if (params.isAddress_city_ctl()){
+                params.appendSQL("AND address_city ILIKE ? ");
             }
             
-            if (params.isZip_ctl()){
-                params.appendSQL("address_zip ILIKE ? ");
+            // ***********************************
+            // **    FILTER PERS-8              **
+            // ***********************************
+            if (params.isAddress_zip_ctl()){
+                params.appendSQL("AND  address_zip ILIKE ? ");
             }
-
+            
+            // ***********************************
+            // **    FILTER PERS-9              **
+            // ***********************************
             if(params.isPersonType_ctl()){
-                params.appendSQL("persontype = CAST(? AS persontype) ");
+                params.appendSQL("AND persontype = CAST(? AS persontype) ");
             }
             
+            // ***********************************
+            // **    FILTER PERS-10              **
+            // ***********************************
             if(params.isVerified_ctl()){
-                params.appendSQL("humanverifiedby IS ");
+                params.appendSQL("AND humanverifiedby IS ");
                 if(params.isVerified_val()){
                     params.appendSQL("NOT NULL ");
                 } else {
@@ -1137,10 +1179,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 }
             }
             
-             
-            // *******************************
-            // **       BOb SOURCE          **
-            // *******************************
+            // ***********************************************
+            // **       FILTER PERS-11: BOb SOURCE          **
+            // ***********************************************
              if (params.isSource_ctl()) {
                 if(params.getSource_val() != null){
                     params.appendSQL("AND bobsource_sourceid=? ");
@@ -1150,9 +1191,92 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 }
             }
             
+             
+             
+            // *******************************************
+            // **    FILTER PERS-12: PROPERTY           **
+            // *******************************************
+             if (params.isProperty_ctl()) {
+                if(params.getProperty_val()!= null){
+                    params.appendSQL("AND property_propertyid=? ");
+                } else {
+                    params.setProperty_ctl(false);
+                    params.logMessage("PROPERTY: no Property object; prop filter disabled");
+                }
+            }
+            
+            // ***********************************************
+            // **       FILTER PERS-13: PROPERTY UNIT       **
+            // ***********************************************
+             if (params.isPropertyUnit_ctl()) {
+                if(params.getPropertyUnit_val()!= null){
+                    params.appendSQL("AND propertyunit_unitid=? ");
+                } else {
+                    params.setPropertyUnit_ctl(false);
+                    params.logMessage("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
+                }
+            }
+            
+            // ***********************************
+            // **    FILTER PERS-14             **
+            // ***********************************
+             if(params.isOccPeriod_ctl()){
+                if(params.getOccPeriod_val() != null){
+                    params.appendSQL("AND occperiod.periodid=? ");
+                } else {
+                    params.setOccPeriod_ctl(false);
+                    params.logMessage("OCC PERIOD: no OccPeriod object; occ period filter disabled");
+                }
+                params.appendSQL("AND event.ceevent_eventid=? ");
+            }
+            
+            // ***********************************
+            // **    FILTER PERS-15             **
+            // ***********************************
+            if(params.isEvent_ctl()){
+                if(params.getEvent_Val() != null){
+                    params.appendSQL("AND event.ceevent_eventid=? ");
+                } else {
+                    params.setEvent_ctl(false);
+                    params.logMessage("EVENT: no EventCnF object; event filter disabled");
+                }
+            }
+            // ***********************************
+            // **    FILTER PERS-16             **
+            // ***********************************
+            if(params.isCitation_ctl()){
+                if(params.getCitation_val() != null){
+                    params.appendSQL("AND citation.citation_citationid=? ");
+                } else {
+                    params.setCitation_ctl(false);
+                    params.logMessage("CITATION: no Citation object; citation filter disabled");
+                }
+            }
+            // ***********************************
+            // **    FILTER PERS-17             **
+            // ***********************************
+            if(params.isMergeTarget_ctl()){
+                if(params.getMergeTarget_val() != null){
+                    params.appendSQL("AND personmergehistory.mergetarget_personid=? ");
+                } else {
+                    params.setMergeTarget_ctl(false);
+                    params.logMessage("MergeTarget: no Person object as tartget; merge target filter disabled");
+                }
+            }
+            // ***********************************
+            // **    FILTER PERS-18             **
+            // ***********************************
+            if(params.isMergeTarget_ctl()){
+                if(params.getMergeTarget_val() != null){
+                    params.appendSQL("AND personmunilink.person_personid=? ");
+                } else {
+                    params.setMergeTarget_ctl(false);
+                    params.logMessage("MUNICIPALITY: no MUNI object; muni filter disabled");
+                }
+            }
             
         } else {
-            params.appendSQL("caseid=? ");
+            params.appendSQL("AND caseid=? ");
         }
         params.appendSQL(";");
         
@@ -1162,27 +1286,22 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(params.extractRawSQL());
             
+            // filter COM-4
             if (!params.isBobID_ctl()){
                 if (params.isMuni_ctl()) {
                      stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
-                
+                // filter COM-2
                 if(params.isDate_startEnd_ctl()){
                     stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
                     stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
                  }
-                
+                // filter COM-3
                 if (params.isUser_ctl()) {
                    stmt.setInt(++paramCounter, params.getUser_val().getUserID());
                 }
                 
-                if (params.isName_last_ctl()){
-                    str = new StringBuilder();
-                    str.append("%");
-                    str.append(params.getName_last_val());
-                    str.append("%");
-                    stmt.setString(++paramCounter, str.toString());
-                }
+                // filter PERS-1
                 if (params.isName_first_ctl()){
                     str = new StringBuilder();
                     str.append("%");
@@ -1190,34 +1309,17 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     str.append("%");
                     stmt.setString(++paramCounter, str.toString());
                 }
-                if (params.isAddress_streetNum_ctl()){
+                
+                // filter PERS-2
+                if (params.isName_last_ctl()){
                     str = new StringBuilder();
                     str.append("%");
-                    str.append(params.getAddress_streetNum_val());
+                    str.append(params.getName_last_val());
                     str.append("%");
                     stmt.setString(++paramCounter, str.toString());
                 }
-                if (params.isCity_ctl()){
-                    str = new StringBuilder();
-                    str.append("%");
-                    str.append(params.getCity_val());
-                    str.append("%");
-                    stmt.setString(++paramCounter, str.toString());
-                }
-                if (params.isZip_ctl()){
-                    str = new StringBuilder();
-                    str.append("%");
-                    str.append(params.getZip_val());
-                    str.append("%");
-                    stmt.setString(++paramCounter, str.toString());
-                }            
-                if (params.isEmail_ctl()){
-                    str = new StringBuilder();
-                    str.append("%");
-                    str.append(params.getEmail_val());
-                    str.append("%");
-                    stmt.setString(++paramCounter, str.toString());
-                }
+                
+                // filter PERS-4
                 if (params.isPhoneNumber_ctl()){
                     str = new StringBuilder();
                     str.append("%");
@@ -1226,7 +1328,78 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     stmt.setString(++paramCounter, str.toString());
                 }
                 
+                // filter PERS-5
+                if (params.isEmail_ctl()){
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getEmail_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
+                }
                 
+                // filter PERS-6
+                if (params.isAddress_streetNum_ctl()){
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getAddress_streetNum_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
+                }
+                
+                // filter PERS-7
+                if (params.isAddress_city_ctl()){
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getAddress_city_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
+                }
+                
+                // filter PERS-8
+                if (params.isAddress_zip_ctl()){
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getAddress_zip_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
+                }
+                
+                // filters PERS-9 and PERS-10 take zero arguments
+                
+                // filter PERS-11
+                if (params.isSource_ctl()) {
+                     stmt.setInt(++paramCounter, params.getSource_val().getSourceid());
+                }
+                
+                // filter PERS-12
+                if (params.isProperty_ctl()) {
+                     stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                }
+                
+                // filter PERS-13
+                if (params.isPropertyUnit_ctl()) {
+                     stmt.setInt(++paramCounter, params.getPropertyUnit_val().getUnitID());
+                }
+                // filter PERS-14
+                if (params.isOccPeriod_ctl()) {
+                     stmt.setInt(++paramCounter, params.getOccPeriod_val().getPeriodID());
+                }
+                // filter PERS-15
+                if (params.isEvent_ctl()) {
+                     stmt.setInt(++paramCounter, params.getEvent_Val().getEventID());
+                }
+                // filter PERS-16
+                if (params.isCitation_ctl()) {
+                     stmt.setInt(++paramCounter, params.getCitation_val().getCitationID());
+                }
+                // filter PERS-17
+                if (params.isMergeTarget_ctl()) {
+                     stmt.setInt(++paramCounter, params.getMergeTarget_val().getPersonID());
+                }
+                // filter PERS-18
+                if (params.isMuni_ctl()) {
+                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
+                }
                 
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());

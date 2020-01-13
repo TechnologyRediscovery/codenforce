@@ -129,7 +129,7 @@ public class CECaseSearchBB
         try {
             getSessionBean().setSessionCECase(cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessionUser().getMyCredential()));
             getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(c.getProperty(), getSessionBean().getSessionUser().getMyCredential()));
-        } catch (BObStatusException | IntegrationException ex) {
+        } catch (BObStatusException | IntegrationException | SearchException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Cannot load full case with data.", ""));

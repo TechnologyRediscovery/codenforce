@@ -6,17 +6,10 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.PropertyUseType;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.SearchParams;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -26,47 +19,60 @@ public  class       SearchParamsProperty
         extends     SearchParams 
         implements  Serializable {
     
-   
+   // filter PROP-1
    private boolean zip_ctl;
    private String zip_val;
     
+   // filter #PROP-2
    private boolean lotblock_ctl;
    private String lotblock_val;
    
+   // filter #PROP-3
    private boolean bobSource_ctl;
    private BOBSource bobSource_val;
    
+   // filter #PROP-4
    private boolean parcelid_ctl;
    private String parcelid_val;
    
+   // filter #PROP-5
    private boolean address_ctl; 
    private String address_val;
    
+   // filter #PROP-6
    private boolean condition_ctl;
    private IntensityClass condition_intensityClass_val;
    
+   // filter #PROP-7
    private boolean landbankprospect_ctl;
    private IntensityClass landbankprospect_intensityClass_val;
    
+   // filter #PROP-8
    private boolean landbankheld_ctl;
    private boolean landbankheld_val;
 
+   // filter #PROP-9
    private boolean nonaddressable_ctl;
    private boolean nonaddressable_val;
    
+   // filter #PROP-10
    private boolean useType_ctl;
    private PropertyUseType useType_val;
    
+   // filter #PROP-11
    private boolean zoneClass_ctl;
    private String zoneClass_val;
    
+   // filter #PROP-12
    private boolean taxStatus_ctl;
    private String taxStatus_val;
    
+   // filter #PROP-13
    private boolean propValue_ctl;
    private int propValue_min_val;
    private int propValue_max_val;
    
+   // filter #PROP-14
    private boolean constructionYear_ctl;
    private int constructionYear_min_val;
    private int constructionYear_max_val;

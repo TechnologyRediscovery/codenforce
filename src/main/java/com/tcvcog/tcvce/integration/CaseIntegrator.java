@@ -66,7 +66,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         params.appendSQL("SELECT DISTINCT caseid ");
         params.appendSQL("FROM public.cecase ");
-        params.appendSQL("WHERE caseid IS NOT NULL AND ");
+        params.appendSQL("WHERE caseid IS NOT NULL ");
         
         // *******************************
         // **         BOb ID            **
@@ -129,9 +129,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             // *******************************
             if (params.isPersonInfoCase_ctl()) {
                 if (params.isPersonInfoCase_val()) {
-                    params.appendSQL("AND personinfocase_personid IS NOT NULL");
+                    params.appendSQL("AND personinfocase_personid IS NOT NULL ");
                 } else {
-                    params.appendSQL("AND personinfocase_personid IS NULL");
+                    params.appendSQL("AND personinfocase_personid IS NULL ");
                 }
             }
             
@@ -213,6 +213,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
+            
+            System.out.println("CaseIntegrator.searchForCECases | metadata: " + stmt.getMetaData().toString());
+            System.out.println("CaseIntegrator.searchForCECases | params: " + stmt.getParameterMetaData().toString());
 
             rs = stmt.executeQuery();
 

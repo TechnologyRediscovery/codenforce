@@ -256,7 +256,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         if (selectedRequest != null) {
             try {
                 if (selectedRequest.getRequestProperty() != null) {
-                        getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(selectedRequest.getRequestProperty(), getSessionBean().getSessionUser().getMyCredential()));
+                    getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(selectedRequest.getRequestProperty(), getSessionBean().getSessionUser().getMyCredential()));
                 }
 
                 MessageBuilderParams mbp = new MessageBuilderParams();
@@ -272,13 +272,20 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                 // list of action requests
                 ceari.updateActionRequestNotes(selectedRequest);
             } catch (IntegrationException ex) {
+                System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                  "Unable to update action request with case attachment notes", ""));
             } catch (BObStatusException ex) {
+                System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                  "Unable to create a new case at property due to a BobStatusException", ""));
+            } catch (SearchException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                 "Unable to create a new case at property due to a SearchException", ""));
             }
         } else {
             getFacesContext().addMessage(null,

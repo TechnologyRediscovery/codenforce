@@ -134,12 +134,12 @@ public class PropertySearchBB extends BackingBeanUtils{
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Managing property at " + prop.getAddress() , ""));
             sc.logObjectView(getSessionBean().getSessionUser(), prop);
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                         ex.getMessage(), ""));
-        }
+        } 
     }
     
 

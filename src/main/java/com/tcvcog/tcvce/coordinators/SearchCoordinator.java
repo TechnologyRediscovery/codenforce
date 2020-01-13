@@ -46,6 +46,16 @@ import javax.annotation.PostConstruct;
 public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     private static final RoleType MIN_ROLETYPEFORMULTIMUNI_QUERY = RoleType.CogStaff;
+    private static final int RESULT_COUNT_LIMIT_DEFAULT = 100;
+    private static final int FILTER_OFF_DEFVALUE_INT = 0;
+    
+    
+    private static final int PASTPERIOD_RECENT = 30;
+    private static final int PASTPERIOD_WEEK = 7;
+    private static final int PASTPERIOD_MONTH = 30;
+    private static final int PASTPERIOD_YEAR = 365;
+    private static final int PASTPERIOD_TODAY = 0;
+    
     
     /**
      * Creates a new instance of SearchCoordinator
@@ -336,7 +346,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     
     
-    public String selectDateFieldString(SearchParams sp){
+    /**
+     * Chooses the default date field to search for any subclass of our SearchParams
+     * family of objects
+     * @param sp
+     * @return 
+     */
+    public String selectDefaultDateFieldString(SearchParams sp){
         String f = null;
         if(sp.getDate_field().extractDateFieldString() != null){
             f = sp.getDate_field().extractDateFieldString();
@@ -390,7 +406,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             // ****************************
             if (params.isDate_startEnd_ctl()) {
                 params.appendSQL("AND ");
-                params.appendSQL(selectDateFieldString(params));
+                params.appendSQL(selectDefaultDateFieldString(params));
                 params.appendSQL(" BETWEEN ? AND ? ");
             } 
 
@@ -424,11 +440,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    
-    
-    
-    
-    
     /**
      * Container for consolidating calls to any methods that need to be run
      * on a Query before passing it to an Integrator class
@@ -438,7 +449,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private void prepareQueryForRun(Query q) throws SearchException{
         q.clearResultList();
         auditQueryBeforeRun(q);
-        
     }
     
     
@@ -462,7 +472,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             }
         }
         auditSearchParams(q);
-        
     }
  
     /**
@@ -516,8 +525,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     throw new SearchException("Requested muni for search does not match credential's governing auth period");
                 }
             } else {
-                System.out.println("SearchCoordinator.auditSearchparams | adding cred muni" + q.getCredential().getGoverningAuthPeriod().getMuni().getMuniName());
-                sp.addMuni(q.getCredential().getGoverningAuthPeriod().getMuni());
+//                sp.addMuni(q.getCredential().getGoverningAuthPeriod().getMuni());
             }
         }        
     }
@@ -538,14 +546,28 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
      
     /**
+     * Logic container applied to all implemented members of the SearchParams family
+     * Unifies certain RoleType minimums for various search parameter options
      * 
      * @param q
      * @param cred
      * @return 
      */
     private Query initQueryFinalizeInit(Query q){
-       
-        
+        for(SearchParams sp: (List<SearchParams>) q.getParmsList()){
+            
+            sp.setMuni_rtMin(RoleType.Developer);
+            sp.setMuni_ctl(true);
+            sp.setMuni_val(q.getCredential().getGoverningAuthPeriod().getMuni());
+            
+            sp.setLimitResultCount_rtMin(RoleType.EnforcementOfficial);
+            sp.setLimitResultCount_ctl(true);
+            sp.setLimitResultCount_val(RESULT_COUNT_LIMIT_DEFAULT);
+            
+            sp.setActive_rtMin(RoleType.MuniStaff);
+            sp.setActive_ctl(true);
+            sp.setActive_val(true);
+        }
         return q;
     }
     
@@ -554,59 +576,93 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //    --------------------------------------------------------------------------
     
     
+    /**
+     * Container for query initialization logic based on the given Enum val
+     * for this method's associated Query subclass. Delegates configuration of
+     * filter-level settings on parameter objects to methods grouped later in this
+     * class prefixed by genParams_XXXX
+     * @param qName the desired Query to be configured
+     * @param cred of the requesting User
+     * @return 
+     */
     public QueryProperty initQuery(QueryPropertyEnum qName, Credential cred){
          QueryProperty  query;
          List<SearchParamsProperty> paramsList = new ArrayList<>();
+         SearchParamsProperty params = genParams_property_initParams(cred);
+         
          
          switch(qName){
             case OPENCECASES_OCCPERIODSINPROCESS:
-                paramsList.add(genParam_property_active());
+                paramsList.add(genParams_property_recentlyUpdated(params, cred));
                 break;
             case HOUSESTREETNUM:
-                paramsList.add(genParams_property_address());
+                paramsList.add(genParams_property_address(params, cred));
                 break;
             case CUSTOM:
                 break;
          }
-         
          query = new QueryProperty(qName, paramsList, cred);
          return (QueryProperty) initQueryFinalizeInit(query);
      }
     
     
     
+    /**
+     * Container for query initialization logic based on the given Enum val
+     * for this method's associated Query subclass. Delegates configuration of
+     * filter-level settings on parameter objects to methods grouped later in this
+     * class prefixed by genParams_XXXX
+     * @param qName the desired Query to be configured
+     * @param cred of the requesting User
+     * @return 
+     */
     public QueryPerson initQuery(QueryPersonEnum qName, Credential cred){
          QueryPerson  query;
          List<SearchParamsPerson> paramsList = new ArrayList<>();
+         SearchParamsPerson params = genParams_person_initParams(cred);
+         
          
          switch(qName){
             case ACTIVE_PERSONS:
-                paramsList.add(generateParams_persons_active());
+                paramsList.add(generateParams_persons_active(params, cred));
                 break;
             case USER_PERSONS:
-                paramsList.add(generateParams_persons_users());
+                paramsList.add(generateParams_persons_users(params, cred));
             case PROPERTY_PERSONS:
-                paramsList.add(generateParams_person_prop());
+                paramsList.add(generateParams_person_prop(params, cred));
             
          }
+         
+         
          query = new QueryPerson(qName, paramsList, cred);
          return (QueryPerson) initQueryFinalizeInit(query);
      }
      
     
+    /**
+     * Container for query initialization logic based on the given Enum val
+     * for this method's associated Query subclass. Delegates configuration of
+     * filter-level settings on parameter objects to methods grouped later in this
+     * class prefixed by genParams_XXXX
+     * @param qName the desired Query to be configured
+     * @param cred of the requesting User
+     * @return 
+     */
      public QueryEvent initQuery(QueryEventEnum qName, Credential cred){
          QueryEvent query;
          List<SearchParamsEvent> paramsList = new ArrayList<>();
+         SearchParamsEvent params = genPerams_event_initParams(cred);
+         
          
          switch(qName){
              case REQUESTED_ACTIONS:
-                paramsList.add(getSearchParamsEventsRequiringAction());
+                paramsList.add(getSearchParamsEventsRequiringAction(params, cred));
                 break;
              case MUNICODEOFFICER_ACTIVITY_PAST30DAYS:
-                 paramsList.add(getSearchParamsOfficerActivity());
+                 paramsList.add(getSearchParamsOfficerActivity(params, cred));
                  break;
              case COMPLIANCE_EVENTS:
-                 paramsList.add(getSearchParamsComplianceEvPastMonth());
+                 paramsList.add(getSearchParamsComplianceEvPastMonth(params, cred));
                  break;
             case CUSTOM:
                 break;
@@ -616,21 +672,27 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          query = new QueryEvent(qName, paramsList, cred);
          return (QueryEvent) initQueryFinalizeInit(query);
      }
-     
     
-     
-     
-    
+    /**
+     * Container for query initialization logic based on the given Enum val
+     * for this method's associated Query subclass. Delegates configuration of
+     * filter-level settings on parameter objects to methods grouped later in this
+     * class prefixed by genParams_XXXX
+     * @param qName the desired Query to be configured
+     * @param cred of the requesting User
+     * @return 
+     */
     public QueryOccPeriod initQuery(QueryOccPeriodEnum qName, Credential cred){
          QueryOccPeriod  query;
          List<SearchParamsOccPeriod> paramsList = new ArrayList<>();
+         SearchParamsOccPeriod params = genParams_occPeriod_initParams(cred);
          
          switch(qName){
             
             case ALL_PERIODS_IN_MUNI:
                  
             case AUTHWORKINPROGRESS:
-                paramsList.add(generateParams_occPeriod_wip());
+                paramsList.add(generateParams_occPeriod_wip(params, cred));
                 break;
             case RENTAL_ALL:
                 break;
@@ -645,13 +707,23 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      }
  
     
+    /**
+     * Container for query initialization logic based on the given Enum val
+     * for this method's associated Query subclass. Delegates configuration of
+     * filter-level settings on parameter objects to methods grouped later in this
+     * class prefixed by genParams_XXXX
+     * @param qName the desired Query to be configured
+     * @param cred of the requesting User
+     * @return 
+     */
      public QueryCECase initQuery(QueryCECaseEnum qName, Credential cred){
          QueryCECase query;
          List<SearchParamsCECase> paramsList = new ArrayList<>();
+         SearchParamsCECase params = genParams_ceCase_initParams(cred);
          
          switch(qName){
             case OPENCASES:
-                paramsList.add(getDefaultSearchParams_CECase_allOpen());
+                paramsList.add(getDefaultSearchParams_CECase_allOpen(params, cred));
                  break;
             case EXPIRED_TIMEFRAMES:
                 break;
@@ -660,7 +732,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case OPENED_30DAYS:
                 break;
             case CLOSED_30DAYS:
-                paramsList.add(getSearchParams_CECase_closedPast30Days());
+                paramsList.add(getSearchParams_CECase_closedPast30Days(params, cred));
                 break;
             case UNRESOLVED_CITATIONS:
                 break;
@@ -669,7 +741,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case ANY_ACTIVITY_30Days:
                 break;
             case PROPERTY:
-                paramsList.add(getDefaultSearchParams_CasesByProp());
+                paramsList.add(getDefaultSearchParams_CasesByProp(params, cred));
                 break;
             case CUSTOM:
                 break;
@@ -681,23 +753,25 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      }
      
      
-    
-     /**
-     * Factory method for Query subclass: QueryCEAR.
-     * 
-     * @param qName an instance of the Enum QueryCEAREnum which is used by a switch
-     * to grab the assigned SearchParams subclass
-     * @param cred
-     * @return assembled instance ready for sending to runQuery
+    /**
+     * Container for query initialization logic based on the given Enum val
+     * for this method's associated Query subclass. Delegates configuration of
+     * filter-level settings on parameter objects to methods grouped later in this
+     * class prefixed by genParams_XXXX
+     * @param qName the desired Query to be configured
+     * @param cred of the requesting User
+     * @return 
      */
     public QueryCEAR initQuery(QueryCEAREnum qName, Credential cred) {
             QueryCEAR query = null;
             List<SearchParamsCEActionRequests> paramList = new ArrayList<>();
+            SearchParamsCEActionRequests params = genParams_CEAR_initParams(cred);
+            
             
         try {
             switch(qName){
                 case UNPROCESSED:
-                    paramList.add(generateParams_CEAR_Unprocessed());
+                    paramList.add(generateParams_CEAR_Unprocessed(params, cred));
                     break;
                 case ATTACHED_TO_CECASE:
                     paramList.add(generateParams_CEAR_attachedToCase(30));
@@ -880,73 +954,164 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //    ***************************** PARAM GENERATORS ***************************
 //    --------------------------------------------------------------------------
     
+    /**
+     * Sets switches on all shared parameter filter bundles in the SearchParams
+     * family during init building process
+     * 
+     * @param params the caller should make an instance of its subclass
+     * and pass it in for configuration
+     * @param cred
+     * @return 
+     */
+    private SearchParams genParams_initParams(SearchParams params, Credential cred){
+        
+        // Shared param #1
+        params.setMuni_rtMin(RoleType.Developer);
+        params.setMuni_ctl(true);
+        params.setMuni_val(cred.getGoverningAuthPeriod().getMuni());
+        
+        // Shared param #2
+        params.setDate_startEnd_ctl(false);
+        params.setDate_field(null);
+        params.setDate_rtMin(RoleType.MuniReader);
+        params.setDate_start_val(null);
+        params.setDate_end_val(null);
+        
+        // Shared param #3
+        params.setDate_relativeDates_ctl(false);
+        params.setDate_relativeDates_start_val(FILTER_OFF_DEFVALUE_INT);
+        params.setDate_realtiveDates_end_val(FILTER_OFF_DEFVALUE_INT);
+
+        // Shared param #4
+        params.setUser_ctl(false);
+        params.setUser_rtMin(RoleType.MuniStaff);
+        params.setUser_field(null);
+        params.setUser_val(null);
+        
+        // Shared param #5
+        params.setBobID_ctl(false);
+        params.setBobID_rtMin(null);
+        params.setBobID_val(FILTER_OFF_DEFVALUE_INT);
+        
+        // Shared param #6
+        params.setLimitResultCount_rtMin(RoleType.EnforcementOfficial);
+        params.setLimitResultCount_ctl(true);
+        params.setLimitResultCount_val(RESULT_COUNT_LIMIT_DEFAULT);
+
+        // Shared param #7
+        params.setActive_rtMin(RoleType.MuniStaff);
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        return params;
+    }
+    
+    
     
     /* --------------------------------------------
                      III. Property
        -------------------------------------------- */
     
-     
     
-    
-    private SearchParamsProperty genParams_property_address(){
+    /**
+     * Factory and config method for Property search params. They are delivered
+     * to the caller with the most sensible defaults on all parameter sets 
+     * so all it has to do is set the ones specific to its role
+     * @return a configured instance
+     */
+    private SearchParamsProperty genParams_property_initParams(Credential cred){
         SearchParamsProperty params = new SearchParamsProperty();
         
-        params.setSearchName("Search by house number and street name");
-        params.setSearchDescription("Standard search");
+        params = (SearchParamsProperty) genParams_initParams(params, cred);
         
-        params.setMuni_ctl(true);
+        // ------------------------------------------------
+        // ********* PROPERTY-SPECIFIC PARAMETERS *********
+        // ------------------------------------------------
+        
+        // Param #PROP-1
+        params.setZip_ctl(false);
+        params.setZip_val(null);
+        
+        // Param #PROP-2
+        params.setLotblock_ctl(false);
+        params.setLotblock_val(null);
+        
+        // Param #PROP-3
+        params.setBobID_ctl(false);
+        params.setBobSource_val(null);
+        
+        // Param #PROP-4
+        params.setParcelid_ctl(false);
+        params.setParcelid_val(null);
+        
+        // Param #PROP-5
+        params.setAddress_ctl(false);
+        params.setAddress_val(null);
+        
+        // Param #PROP-6
+        params.setCondition_ctl(false);
+        params.setCondition_intensityClass_val(null);
+        
+        // Param #PROP-7
+        params.setLandbankprospect_ctl(false);
+        params.setLandbankprospect_intensityClass_val(null);
+        
+        // Param #PROP-8
+        params.setLandbankheld_ctl(true);
+        params.setLandbankheld_val(false);
+        
+        // Param #PROP-9
+        params.setNonaddressable_ctl(false);
+        params.setNonaddressable_val(false);
+        
+        // Param #PROP-10
+        params.setUseType_ctl(false);
+        params.setUseType_val(null);
+        
+        // Param #PROP-11
+        params.setZoneClass_ctl(false);
+        params.setZoneClass_val(null);
+        
+        // Param #PROP-12
+        params.setTaxStatus_ctl(false);
+        params.setTaxStatus_val(null);
+        
+        // Param #PROP-13
+        params.setPropValue_ctl(false);
+        params.setPropValue_max_val(FILTER_OFF_DEFVALUE_INT);
+        params.setPropValue_min_val(FILTER_OFF_DEFVALUE_INT);
+        
+        // Param #PROP-14
+        params.setConstructionYear_ctl(false);
+        params.setConstructionYear_min_val(FILTER_OFF_DEFVALUE_INT);
+        params.setConstructionYear_max_val(FILTER_OFF_DEFVALUE_INT);
+        
+        return params;
+    }
+    
+    private SearchParamsProperty genParams_property_address(SearchParamsProperty params, Credential cred){
+        params.setSearchName("Lead parameter bundle for property search by address");
+        params.setSearchDescription("search by address");
         params.setAddress_ctl(true);
-        params.setDate_startEnd_ctl(false);
-        params.setDate_relativeDates_ctl(false);
-        
-        params.setActive_ctl(true);
-        params.setActive_val(true);
-        
 
         return params;
         
     }
     
-    private SearchParamsProperty genParam_property_active(){
-        SearchParamsProperty params = new SearchParamsProperty();
-        
+    private SearchParamsProperty genParams_property_recentlyUpdated(SearchParamsProperty params, Credential cred){
         params.setSearchName("Properties updated in the past month");
         params.setSearchDescription("Applies to properties with any field updated");
         
-        params.setMuni_ctl(true);
-        
         params.setDate_startEnd_ctl(true);
         params.setDate_relativeDates_ctl(true);
-        params.setDate_field_val(SearchParamsPropertyDateFieldsEnum.LAST_UPDATED);
-        params.setDate_relativeDates_start_val(-30);
-        params.setDate_realtiveDates_end_val(0);
+        params.setDate_field(SearchParamsPropertyDateFieldsEnum.LAST_UPDATED);
+        params.setDate_relativeDates_start_val(PASTPERIOD_RECENT);
+        params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         
-        params.setActive_ctl(true);
-        params.setActive_val(true);
-        
-
         return params;
         
     }
 
-
-
-    
-    protected SearchParamsProperty getSearchParamsSkeletonProperties(){
-        SearchParamsProperty propParams = new SearchParamsProperty();
-        // superclass
-        propParams.setDate_startEnd_ctl(false);
-        propParams.setBobID_ctl(false);
-        propParams.setLimitResultCount_ctl(true);
-        
-        // subclass SearchParamsProperty
-        propParams.setLotblock_ctl(false);
-        propParams.setParcelid_ctl(false);
-        propParams.setAddress_ctl(true);
-
-        
-        return propParams;
-    }
     
     // END V PROPERTY
     
@@ -956,45 +1121,101 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
        -------------------------------------------- */
    
     
-    private SearchParamsPerson generateParams_persons_active(){
+    private SearchParamsPerson genParams_person_initParams(Credential cred){
         SearchParamsPerson params = new SearchParamsPerson();
+        
+        params = (SearchParamsPerson) genParams_initParams(params, cred);
+        
+        // filter PERS-1
+        params.setNames_rtMin(RoleType.MuniStaff);
+        params.setName_first_ctl(false);
+        params.setName_first_val(null);
+        
+        // filter PERS-2
+        params.setName_last_ctl(false);
+        params.setName_last_val(null);
+        
+        // filter PERS-3
+        params.setName_compositeLNameOnly_ctl(false);
+        params.setName_compositeLNameOnly_val(false);
+        
+        // filter PERS-4
+        params.setPhoneNumber_rtMin(RoleType.MuniStaff);
+        params.setPhoneNumber_ctl(false);
+        params.setPhoneNumber_val(null);
+        
+        // filter PERS-5
+        params.setEmail_rtMin(RoleType.MuniStaff);
+        params.setEmail_ctl(false);
+        params.setEmail_val(null);
+        
+        // filter PERS-6
+        params.setAddress_rtMin(RoleType.MuniStaff);
+        params.setAddress_streetNum_ctl(false);
+        params.setAddress_streetNum_val(null);
+        
+        // filter PERS-7
+        params.setAddress_city_ctl(false);
+        params.setAddress_city_val(null);
+        
+        // filter PERS-8
+        params.setAddress_zip_ctl(false);
+        params.setAddress_zip_val(null);
+        
+        // filter PERS-9
+        params.setPersonType_rtMin(RoleType.MuniStaff);
+        params.setPersonType_ctl(false);
+        params.setPersonType_val(null);
+        
+        // filter PERS-10
+        params.setVerified_rtMin(RoleType.MuniStaff);
+        params.setVerified_ctl(false);
+        params.setVerified_val(false);
+       
+        // filter PERS-11
+        params.setSource_ctl(false);
+        params.setSource_val(null);
+                
+        return params;
+                
+    }
+    
+    
+    
+    private SearchParamsPerson generateParams_persons_active(SearchParamsPerson params, Credential cred){
+        
         
         params.setSearchName("Public person types");
         params.setSearchDescription("All persons declared to be public");
         
-        params.setPersonType_ctl(true);
-        List<PersonType> pList = new ArrayList<>();
-        pList.add(PersonType.Public);
-        params.setPersonType_val(pList);
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsPersonDateFieldsEnum.LAST_UPDATED);
+        params.setDate_relativeDates_ctl(true);
+        params.setDate_relativeDates_start_val(PASTPERIOD_RECENT);
+        params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         
          return params;
         
     }
     
-    private SearchParamsPerson generateParams_persons_users(){
-        SearchParamsPerson params = new SearchParamsPerson();
+    private SearchParamsPerson generateParams_persons_users(SearchParamsPerson params, Credential cred){
         params.setSearchName("User Persons");
         params.setSearchDescription("Persons whose type is a User");
         
         params.setPersonType_ctl(true);
-        List<PersonType> pList = new ArrayList<>();
-        pList.add(PersonType.User);
-        params.setPersonType_val(pList);
+        params.setPersonType_val(PersonType.User);
         
         return params;
     }
     
-    private SearchParamsPerson generateParams_person_prop(){
-        SearchParamsPerson params = new SearchParamsPerson();
+    private SearchParamsPerson generateParams_person_prop(SearchParamsPerson params, Credential cred){
         params.setSearchName("Persons at property X");
         params.setSearchDescription("Across all units");
         
-        // TODO Finish this query
+        params.setProperty_ctl(true);
+        // how do we signal we need downstream data?
         
         return params;
-        
-        
-        
     }
    
     // END IV PERSON
@@ -1002,130 +1223,110 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     /* --------------------------------------------
                     V. Event
        -------------------------------------------- */
-    
-    
-       
-    public SearchParamsEvent getSearchParamsEventsRequiringAction(){
-        EventCoordinator ec = getEventCoordinator();
+    private SearchParamsEvent genPerams_event_initParams(Credential cred){
+        SearchParamsEvent params = new SearchParamsEvent();
+        params = (SearchParamsEvent) genParams_initParams(params, cred);
         
-        // event types are always bundled in an EventCategory
-        // so in this case of this query, we don't care about the Category title,
-        // only the type
-        EventCategory timelineEventTypeCategory = ec.initEventCategory();
-        timelineEventTypeCategory.setEventType(EventType.Timeline);
+        // filter EVENT-1
+        params.setEventCat_ctl(false);
+        params.setEventCat_val(null);
         
-        SearchParamsEvent eventParams = new SearchParamsEvent();
+        // filter EVENT-2
+        params.setEventType_ctl(false);
+        params.setEventType_val(null);
         
-        eventParams.setMuni_ctl(true);
-        eventParams.setDate_startEnd_ctl(false);
-        eventParams.setBobID_ctl(false);
-        eventParams.setLimitResultCount_ctl(true);
+        // filter EVENT-3
+        params.setEventDomain_ctl(false);
+        params.setEventDomain_val(null);
+
+        // filter EVENT-4
+        params.setEventDomainPK_ctl(false);
+        params.setEventDomainPK_val(FILTER_OFF_DEFVALUE_INT);
         
-        eventParams.setEventCat_ctl(false);
-        eventParams.setEventType_ctl(false);
+        // filter EVENT-5
+        params.setPerson_ctl(false);
+        params.setPerson_val(null);
         
-        eventParams.setFilterByCaseID(false);
+        // filter EVENT-6
+        params.setDiscloseToMuni_ctl(false);
+        params.setDiscloseToMuni_val(false);
         
-        eventParams.setFilterByEventOwner(false);
+        // filter EVENT-7
+        params.setDiscloseToPublic_ctl(false);
+        params.setDiscloseToPublic_val(false);
         
-        eventParams.setActive_ctl(true);
-        eventParams.setIsActive(true);
+        return params;
         
-        eventParams.setPerson_ctl(false);
-        eventParams.setUseRespondedAtDateRange(false);
-        
-        eventParams.setFilterByHidden(false);
-        
-        return eventParams;
     }
     
-    public SearchParamsEvent getSearchParamsOfficerActivity(){
+    
+    public SearchParamsEvent getSearchParamsOfficerActivity(SearchParamsEvent params, Credential cred ){
         // event types are always bundled in an EventCategory
         // so in this case of this query, we don't care about the Category title,
         // only the type
         
-        SearchParamsEvent eventParams = new SearchParamsEvent();
         
-        eventParams.setMuni_ctl(true);
+        params.setDate_startEnd_ctl(true);
+        params.setDate_relativeDates_ctl(true);
         
-        eventParams.setDate_startEnd_ctl(true);
-        eventParams.setDate_relativeDates_ctl(true);
-        
-        eventParams.setApplyDateSearchToDateOfRecord(true);
+//        params.setApplyDateSearchToDateOfRecord(true);
         // query from a week ago to now
-        eventParams.setDate_relativeDates_start_val(-30);
-        eventParams.setDate_realtiveDates_end_val(0);
+        params.setDate_relativeDates_start_val(PASTPERIOD_MONTH);
+        params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         
-        eventParams.setBobID_ctl(false);
-        eventParams.setLimitResultCount_ctl(true);
+        params.setUser_ctl(true);
         
-        eventParams.setEventCat_ctl(false);
-        eventParams.setEventType_ctl(false);
-        
-        eventParams.setFilterByCaseID(false);
-        
-        eventParams.setFilterByEventOwner(true);
-        
-        eventParams.setActive_ctl(true);
-        eventParams.setIsActive(true);
-        
-        eventParams.setPerson_ctl(false);
-        eventParams.setUseRespondedAtDateRange(false);
-        
-        eventParams.setFilterByHidden(false);
-        
-        return eventParams;
+        return params;
     }
     
     
-    public SearchParamsEvent getSearchParamsComplianceEvPastMonth(){
-        EventCoordinator ec = getEventCoordinator();
-        
-        // event types are always bundled in an EventCategory
-        // so in this case of this query, we don't care about the Category title,
-        // only the type
-        EventCategory complianceEventCategory = ec.initEventCategory();
-        complianceEventCategory.setEventType(EventType.Compliance);
-        
-        SearchParamsEvent eventParams = new SearchParamsEvent();
-        
-        eventParams.setMuni_ctl(true);
-        eventParams.setDate_startEnd_ctl(true);
-        eventParams.setDate_relativeDates_ctl(true);
-        eventParams.setApplyDateSearchToDateOfRecord(true);
-        // query from a week ago to now
-        eventParams.setDate_relativeDates_start_val(-400);
-        eventParams.setDate_realtiveDates_end_val(0);
-        
-        eventParams.setBobID_ctl(false);
-        eventParams.setLimitResultCount_ctl(true);
-        
-        eventParams.setEventCat_ctl(false);
-        eventParams.setEventType_ctl(true);
-        eventParams.setEventType_val(EventType.Compliance);
-        
-        eventParams.setFilterByCaseID(false);
-        
-        eventParams.setFilterByEventOwner(false);
-        
-        eventParams.setActive_ctl(true);
-        eventParams.setIsActive(true);
-        
-        eventParams.setPerson_ctl(false);
-        eventParams.setUseRespondedAtDateRange(false);
-        
-        eventParams.setFilterByHidden(false);
-        
-        return eventParams;
-    }
     
     // END V EVENT
     
     /* --------------------------------------------
                    VI. OccPeriod
        -------------------------------------------- */
-    private SearchParamsOccPeriod generateParams_occPeriod_wip(){
+    
+    private SearchParamsOccPeriod genParams_occPeriod_initParams(Credential cred){
+        
         SearchParamsOccPeriod params = new SearchParamsOccPeriod();
+        params = (SearchParamsOccPeriod) genParams_initParams(params, cred);
+        
+        // filter OCC-1
+        params.setProperty_ctl(false);
+        params.setProperty_val(null);
+        
+        // filter OCC-2
+        params.setPropertyUnit_ctl(false);
+        params.setPropertyUnit_val(null);
+        
+        // filter OCC-3
+        params.setPeriodType_ctl(false);
+        params.setPeriodType_val(null);
+        
+        // filter OCC-4
+        params.setPermitIssuance_ctl(false);
+        params.setPermitIssuance_val(false);
+        
+        // filter OCC-5
+        params.setInspectionPassed_ctl(false);
+        params.setInspectionPassed_val(false);
+        
+        // filter OCC-6
+        params.setThirdPartyInspector_ctl(false);
+        params.setThirdPartyInspector_registered_val(false);
+        params.setThirdPartyInspector_approved_val(false);
+        
+        // filter OCC-7
+        params.setPacc_ctl(false);
+        params.setPacc_val(false);
+        
+        return params;
+    }
+    
+    
+    
+    private SearchParamsOccPeriod generateParams_occPeriod_wip(SearchParamsOccPeriod params, Credential cred){
         
         params.setSearchName("Periods with outstanding inspections");
         params.setSearchDescription("Inspections have been started by not certified as passed");
@@ -1137,20 +1338,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    
-    private SearchParamsOccPeriod generateParams_occPeriod(){
-        MunicipalityCoordinator mc = getMuniCoordinator();
-        SearchParamsOccPeriod params = new SearchParamsOccPeriod();
-        
-        params.setSearchName("All periods in credentialed muni");
-        params.setSearchDescription("All periods regardless of status");
-        
-        params.setInspectionPassed_ctl(false);
-        params.setInspectionPassed_val(false);
-        
-        return params;
-        
-    }
    
     // END VI OccPeriod
     
@@ -1159,6 +1346,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                      VII. CECase
        -------------------------------------------- */
     
+    
+    private SearchParamsCECase genParams_ceCase_initParams(Credential cred){
+        
+        return new SearchParamsCECase();
+    }
     
     /**
      * Returns a SearchParams subclass for retrieving all open
@@ -1177,17 +1369,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setLimitResultCount_ctl(true);
         
         // subclass specific
-        params.setOpen_ctl(true);
-        params.setOpen_val(true);
-        
-        params.setDateToSearchCECases("Opening date of record");
-        params.setUseCaseManager(false);
-        
-        params.setUseCasePhase(false);
-        params.setUseCaseStage(false);
-        params.setProperty_ctl(false);
-        params.setPropInfoCase_ctl(false);
-        params.setUseCaseManager(false);
+//        params.setOpen_ctl(true);
+//        params.setOpen_val(true);
+//        
+//        params.setDateToSearchCECases("Opening date of record");
+//        params.setUseCaseManager(false);
+//        
+//        params.setUseCasePhase(false);
+//        params.setUseCaseStage(false);
+//        params.setProperty_ctl(false);
+//        params.setPropInfoCase_ctl(false);
+//        params.setUseCaseManager(false);
         
         return params;
     }
@@ -1217,21 +1409,21 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setLimitResultCount_ctl(true);
         
         // subclass specific
-        params.setOpen_ctl(false);
-        
-        params.setDateToSearchCECases("Closing date");
-        params.setUseCaseManager(false);
+//        params.setOpen_ctl(false);
+//        
+//        params.setDateToSearchCECases("Closing date");
+//        params.setUseCaseManager(false);
         
         LocalDateTime pastXDays = LocalDateTime.now().minusDays(30);
         
         params.setDate_start_val(pastXDays);
         params.setDate_end_val(LocalDateTime.now());
         
-        params.setUseCasePhase(false);
-        params.setUseCaseStage(false);
+//        params.setUseCasePhase(false);
+//        params.setUseCaseStage(false);
         params.setProperty_ctl(false);
         params.setPropInfoCase_ctl(false);
-        params.setUseCaseManager(false);
+//        params.setUseCaseManager(false);
         
         return params;
     }
@@ -1242,6 +1434,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     /* --------------------------------------------
                   VIII. CEActionRequest
        -------------------------------------------- */
+    
+    private SearchParamsCEActionRequests genParams_CEAR_initParams(Credential cred){
+        
+        return new SearchParamsCEActionRequests();
+        
+    }
     
     
      /**
@@ -1263,7 +1461,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         sps.setLimitResultCount_ctl(true);
         sps.setCaseAttachment_ctl(false);
-        sps.setCaseAttachment_valsdfa(false);
+//        sps.setCaseAttachment_valsdfa(false);
         sps.setUrgent_ctl(false);
         sps.setNonaddressable_ctl(false);
         
@@ -1285,7 +1483,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         sps.setLimitResultCount_ctl(true);
         sps.setCaseAttachment_ctl(false);
-        sps.setCaseAttachment_valsdfa(false);
+//        sps.setCaseAttachment_valsdfa(false);
         sps.setUrgent_ctl(false);
         sps.setNonaddressable_ctl(false);
         sps.setRequestStatus_ctl(true);
@@ -1297,8 +1495,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
      public SearchParamsCEActionRequests generateParams_CEAR_pastXDays(int days){
             
-        SearchCoordinator sc = getSearchCoordinator();
-
         SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
 
         LocalDateTime pastxDays = LocalDateTime.now().minusDays(days);
@@ -1329,7 +1525,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         sps.setDate_end_val(LocalDateTime.now());
 
         sps.setCaseAttachment_ctl(true);
-        sps.setCaseAttachment_valsdfa(true);
+//        sps.setCaseAttachment_valsdfa(true);
         
         sps.setUrgent_ctl(false);
         sps.setNonaddressable_ctl(false);

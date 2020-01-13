@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
@@ -18,27 +19,38 @@ public class SearchParamsOccPeriod
         extends SearchParams implements Serializable {
     
     
+    // filter OCC-1
     private boolean property_ctl;
     private Property property_val;
     
+    // filter OCC-2
     private boolean propertyUnit_ctl;
     private PropertyUnit propertyUnit_val;
     
+    // filter OCC-3
     private boolean periodType_ctl;
     private OccPeriodType periodType_val;
     
+    // filter OCC-4
     private boolean permitIssuance_ctl;
     private boolean permitIssuance_val;
     
+    // filter OCC-5
     private boolean inspectionPassed_ctl;
     private boolean inspectionPassed_val;
     
+    // filter OCC-6
     private boolean thirdPartyInspector_ctl;
     private boolean thirdPartyInspector_registered_val;
     private boolean thirdPartyInspector_approved_val;
     
+    // filter OCC-7
     private boolean pacc_ctl;
     private boolean pacc_val;
+    
+    // filter OCC-8
+    private boolean person_ctl;
+    private Person person_val;
     
     /**
      * @return the periodType_ctl
@@ -252,6 +264,34 @@ public class SearchParamsOccPeriod
      */
     public void setPropertyUnit_val(PropertyUnit propertyUnit_val) {
         this.propertyUnit_val = propertyUnit_val;
+    }
+
+    /**
+     * @return the person_ctl
+     */
+    public boolean isPerson_ctl() {
+        return person_ctl;
+    }
+
+    /**
+     * @param person_ctl the person_ctl to set
+     */
+    public void setPerson_ctl(boolean person_ctl) {
+        this.person_ctl = person_ctl;
+    }
+
+    /**
+     * @return the person_val
+     */
+    public Person getPerson_val() {
+        return person_val;
+    }
+
+    /**
+     * @param person_val the person_val to set
+     */
+    public void setPerson_val(Person person_val) {
+        this.person_val = person_val;
     }
 
    

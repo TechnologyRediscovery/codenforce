@@ -21,24 +21,31 @@ public class        SearchParamsEvent
         implements  Serializable{
     
     
+    // filter EVENT-1
     private boolean eventCat_ctl;
     private EventCategory eventCat_val;
     
+    // filter EVENT-2
     private boolean eventType_ctl;
     private EventType eventType_val;
     
+    // filter EVENT-3
     private boolean eventDomain_ctl;
     private EventDomainEnum eventDomain_val;
     
+    // filter EVENT-4
     private boolean eventDomainPK_ctl;
     private int eventDomainPK_val;
   
+    // filter EVENT-5
     private boolean person_ctl;
     private Person person_val;
     
+    // filter EVENT-6
     private boolean discloseToMuni_ctl;
     private boolean discloseToMuni_val;
     
+    // filter EVENT-7
     private boolean discloseToPublic_ctl;
     private boolean discloseToPublic_val;
     

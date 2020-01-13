@@ -98,7 +98,7 @@ public  class   OccPeriodSearchBB
             getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(op, cred));
             getSessionBean().setSessionProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), cred));
             sc.logObjectView(getSessionBean().getSessionUser(), op);
-        } catch (IntegrationException | BObStatusException | AuthorizationException | EventException ex) {
+        } catch (IntegrationException | BObStatusException | AuthorizationException | EventException | SearchException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

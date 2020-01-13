@@ -242,8 +242,8 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         params.setName_first_ctl(false);
         params.setPhoneNumber_ctl(false);
         params.setEmail_ctl(false);        
-        params.setCity_ctl(false);
-        params.setZip_ctl(false);
+        params.setAddress_city_ctl(false);
+        params.setAddress_zip_ctl(false);
         
         return params;
     }

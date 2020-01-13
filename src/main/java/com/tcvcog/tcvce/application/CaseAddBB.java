@@ -73,7 +73,7 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
         newCase.setNotes(formCaseNotes);
         
         try {
-            cc.insertNewCECase(newCase, getSessionBean().getSessionUser(), cear);
+            cc.insertNewCECase(newCase, getSessionBean().getSessionUser().getMyCredential(), cear);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully added case to property! Access the case from the list below.", ""));

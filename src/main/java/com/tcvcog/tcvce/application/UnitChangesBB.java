@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.ChangeOrderAction;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -121,12 +122,12 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
             
             getSessionBean().getSessionPropertyList().add(prop);
 
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
-        }
+        } 
     }
 
     public String submitUnitChanges() {
@@ -185,7 +186,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
             getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(selectedProperty, getSessionBean().getSessionUser().getMyCredential()));
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
         }
 

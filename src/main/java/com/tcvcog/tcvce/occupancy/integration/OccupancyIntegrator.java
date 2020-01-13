@@ -40,10 +40,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
-import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
-import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriodDateFieldsEnum;
 import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
@@ -52,7 +49,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,8 +125,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         sb.append("FROM occperiod INNER JOIN occperiodtype ON (type_typeid = typeid) \n");
         sb.append("INNER JOIN propertyunit ON (occperiod.propertyunit_unitid = unitid) \n");
         sb.append("INNER JOIN property ON (propertyunit.property_propertyid = property.propertyid) \n ");
-        sb.append("RIGHT OUTER JOIN occinspection ON (occinspection.occperiod_periodid = periodid) \n");
-        sb.append("RIGHT OUTER JOIN occpermit ON (occpermit.occperiod_periodid = periodid) \n ");
+        sb.append("LEFT OUTER JOIN occinspection ON (occinspection.occperiod_periodid = periodid) \n");
+        sb.append("LEFT OUTER JOIN occpermit ON (occpermit.occperiod_periodid = periodid) \n ");
+        sb.append("LEFT OUTER JOIN occperiodperson ON (occperiod.periodid = occperiodperson.person_personid) \n");
         sb.append("WHERE occperiodid IS NOT NULL AND ");
 
         
@@ -221,13 +218,25 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             }
 
            // *******************************
-            // **           PACC            **
+            // **          7:PACC          **
             // *******************************
              if (params.isPacc_ctl()) {
                 if(params.isPacc_val()){
                     params.appendSQL("AND paccenabled = TRUE ");
                 } else {
                     params.appendSQL("AND paccenabled = TRUE ");
+                }
+            }
+             
+            // *******************************
+            // **       8:PERSON            **
+            // *******************************
+             if (params.isPerson_ctl()) {
+                if(params.getPerson_val()!= null){
+                    params.appendSQL("AND occperiodperson.person_personid=? ");
+                } else {
+                    params.setPropertyUnit_ctl(false);
+                    params.logMessage("PERSON: no Person object found; person filter disabled");
                 }
             }
 
@@ -269,6 +278,11 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                     stmt.setInt(++paramCounter, params.getPeriodType_val().getTypeID());
                 }
 
+                // filter OCC-8
+                if (params.isPerson_ctl()) {
+                    stmt.setInt(++paramCounter, params.getPerson_val().getPersonID());
+                }
+
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
@@ -278,7 +292,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             int counter = 0;
             int maxResults;
             if (params.isLimitResultCount_ctl()) {
-                maxResults = 100;
+                maxResults = params.getLimitResultCount_val();
             } else {
                 maxResults = Integer.MAX_VALUE;
             }

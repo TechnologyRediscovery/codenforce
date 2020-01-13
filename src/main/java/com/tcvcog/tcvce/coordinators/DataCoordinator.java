@@ -128,17 +128,22 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
     
 
 
-    
+    /**
+     * Test method for metrics
+     * 
+     * @param reqList
+     * @return 
+     */
     public Map<String, Number> computeCountsByCEARReason(List<CEActionRequest> reqList){
         CEActionRequest cear;
         Map<String, Number> map = new LinkedHashMap<>();
-        for(CEActionRequest req: reqList){
-            if(map.containsKey(req.getIssueTypeString())){
-                map.put(req.getIssueTypeString(), map.get(req.getIssueTypeString()).intValue() + 1);
-            } else {
-                map.put(req.getIssueTypeString(), 1);
-            }
-        }
+//        for(CEActionRequest req: reqList){
+//            if(map.containsKey(req.getIssueTypeString())){
+//                map.put(req.getIssueTypeString(), map.get(req.getIssueTypeString()).intValue() + 1);
+//            } else {
+//                map.put(req.getIssueTypeString(), 1);
+//            }
+//        }
         return map;
     }
     

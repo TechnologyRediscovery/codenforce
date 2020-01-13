@@ -100,7 +100,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot generate list of event categories", ex);
+            throw new IntegrationException("Cannot generate event list", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -172,16 +172,21 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             return el;
         }
         
+        if(erg instanceof OccPeriod){
+            queryStub.append("occperiod_periodid=?;");
+        } else if(erg instanceof CECaseDataHeavy){
+            queryStub.append("cecase_caseid=?;");
+        }
+
         try {
-            stmt = con.prepareStatement(queryStub.toString());
         
+            stmt = con.prepareStatement(queryStub.toString());
+            
             if(erg instanceof OccPeriod){
                 OccPeriod op = (OccPeriod) erg;
-                queryStub.append("occperiod_periodid=?;");
                 stmt.setInt(1, op.getPeriodID());
             } else if(erg instanceof CECaseDataHeavy){
                 CECaseDataHeavy cec = (CECaseDataHeavy) erg;
-                queryStub.append("cecase_caseid=?;");
                 stmt.setInt(1, cec.getCaseID());
             }
             
@@ -193,7 +198,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot generate list of event categories", ex);
+            throw new IntegrationException("Cannot generate list of events", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

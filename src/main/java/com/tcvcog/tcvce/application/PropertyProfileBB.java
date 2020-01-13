@@ -4,7 +4,6 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -17,18 +16,13 @@ import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
-import com.tcvcog.tcvce.entities.search.QueryProperty;
-import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import com.tcvcog.tcvce.integration.SystemIntegrator;
-import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -38,7 +32,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
@@ -269,7 +262,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
             setCurrProp(pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessionUser().getMyCredential()));
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

@@ -6,8 +6,15 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.Citation;
+import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,43 +27,84 @@ import java.util.List;
 public  class   SearchParamsPerson 
         extends SearchParams {
     
-        protected RoleType names_rtMin;
-        private boolean name_first_ctl;
-        private String name_first_val;
-        
-        private boolean name_last_ctl;
-        private String name_last_val;
-        
-        private boolean name_compositeLNameOnly_ctl;
-        private boolean name_compositeLNameOnly_val;
-        
-        protected RoleType phoneNumber_rtMin;
-        private boolean phoneNumber_ctl;
-        private String phoneNumber_val;
-        
-        protected RoleType email_rtMin;
-        private boolean email_ctl;
-        private String email_val;
+    
+    // filter PERS-1
+    protected RoleType names_rtMin;
+    private boolean name_first_ctl;
+    private String name_first_val;
 
-        protected RoleType address_rtMin;
-        private boolean address_streetNum_ctl;
-        private String address_streetNum_val;
-        private boolean city_ctl;
-        private String city_val;
-        private boolean zip_ctl;
-        private String zip_val;
-                
-        protected RoleType personType_rtMin;
-        private boolean personType_ctl;
-        private PersonType personType_val; 
-        
-        protected RoleType verified_rtMin;
-        private boolean verified_ctl;
-        private boolean verified_val;       
-        
-        private boolean source_ctl;
-        private BOBSource source_val;
-        
+    // filter PERS-2
+    private boolean name_last_ctl;
+    private String name_last_val;
+
+    // filter PERS-3
+    private boolean name_compositeLNameOnly_ctl;
+    private boolean name_compositeLNameOnly_val;
+
+    // filter PERS-4
+    protected RoleType phoneNumber_rtMin;
+    private boolean phoneNumber_ctl;
+    private String phoneNumber_val;
+
+    // filter PERS-5
+    protected RoleType email_rtMin;
+    private boolean email_ctl;
+    private String email_val;
+
+    // filter PERS-6
+    protected RoleType address_rtMin;
+    private boolean address_streetNum_ctl;
+    private String address_streetNum_val;
+    
+    // filter PERS-7
+    private boolean address_city_ctl;
+    private String address_city_val;
+    
+    // filter PERS-8
+    private boolean address_zip_ctl;
+    private String address_zip_val;
+
+    // filter PERS-9
+    protected RoleType personType_rtMin;
+    private boolean personType_ctl;
+    private PersonType personType_val; 
+
+    // filter PERS-10
+    protected RoleType verified_rtMin;
+    private boolean verified_ctl;
+    private boolean verified_val;       
+
+    // filter PERS-11
+    private boolean source_ctl;
+    private BOBSource source_val;
+    
+    // filter PERS-12
+    private boolean property_ctl;
+    private Property property_val;
+    
+    // filter PERS-13
+    private boolean propertyUnit_ctl;
+    private PropertyUnit propertyUnit_val;
+    
+    // filter PERS-14
+    private boolean occPeriod_ctl;
+    private OccPeriod occPeriod_val;
+    
+    // filter PERS-15
+    private boolean event_ctl;
+    private EventCnF event_Val;
+    
+    // filter PERS-16
+    private boolean citation_ctl;
+    private Citation citation_val;
+    
+    // filter PERS-17
+    private boolean mergeTarget_ctl;
+    private Person mergeTarget_val;
+    
+    // filter PERS-18
+    private boolean muni_ctl;
+    private Municipality muni_val;
         
    public SearchParamsPerson(){
        
@@ -274,59 +322,59 @@ public  class   SearchParamsPerson
     }
 
     /**
-     * @return the city_val
+     * @return the address_city_val
      */
-    public String getCity_val() {
-        return city_val;
+    public String getAddress_city_val() {
+        return address_city_val;
     }
 
     /**
-     * @param city_val the city_val to set
+     * @param address_city_val the address_city_val to set
      */
-    public void setCity_val(String city_val) {
-        this.city_val = city_val;
+    public void setAddress_city_val(String address_city_val) {
+        this.address_city_val = address_city_val;
     }
 
     /**
-     * @return the city_ctl
+     * @return the address_city_ctl
      */
-    public boolean isCity_ctl() {
-        return city_ctl;
+    public boolean isAddress_city_ctl() {
+        return address_city_ctl;
     }
 
     /**
-     * @param city_ctl the city_ctl to set
+     * @param address_city_ctl the address_city_ctl to set
      */
-    public void setCity_ctl(boolean city_ctl) {
-        this.city_ctl = city_ctl;
+    public void setAddress_city_ctl(boolean address_city_ctl) {
+        this.address_city_ctl = address_city_ctl;
     }
 
     /**
-     * @return the zip_val
+     * @return the address_zip_val
      */
-    public String getZip_val() {
-        return zip_val;
+    public String getAddress_zip_val() {
+        return address_zip_val;
     }
 
     /**
-     * @param zip_val the zip_val to set
+     * @param address_zip_val the address_zip_val to set
      */
-    public void setZip_val(String zip_val) {
-        this.zip_val = zip_val;
+    public void setAddress_zip_val(String address_zip_val) {
+        this.address_zip_val = address_zip_val;
     }
 
     /**
-     * @return the zip_ctl
+     * @return the address_zip_ctl
      */
-    public boolean isZip_ctl() {
-        return zip_ctl;
+    public boolean isAddress_zip_ctl() {
+        return address_zip_ctl;
     }
 
     /**
-     * @param zip_ctl the zip_ctl to set
+     * @param address_zip_ctl the address_zip_ctl to set
      */
-    public void setZip_ctl(boolean zip_ctl) {
-        this.zip_ctl = zip_ctl;
+    public void setAddress_zip_ctl(boolean address_zip_ctl) {
+        this.address_zip_ctl = address_zip_ctl;
     }  
 
     /**
@@ -454,6 +502,202 @@ public  class   SearchParamsPerson
      */
     public void setSource_val(BOBSource source_val) {
         this.source_val = source_val;
+    }
+
+    /**
+     * @return the property_ctl
+     */
+    public boolean isProperty_ctl() {
+        return property_ctl;
+    }
+
+    /**
+     * @param property_ctl the property_ctl to set
+     */
+    public void setProperty_ctl(boolean property_ctl) {
+        this.property_ctl = property_ctl;
+    }
+
+    /**
+     * @return the property_val
+     */
+    public Property getProperty_val() {
+        return property_val;
+    }
+
+    /**
+     * @param property_val the property_val to set
+     */
+    public void setProperty_val(Property property_val) {
+        this.property_val = property_val;
+    }
+
+    /**
+     * @return the propertyUnit_ctl
+     */
+    public boolean isPropertyUnit_ctl() {
+        return propertyUnit_ctl;
+    }
+
+    /**
+     * @return the propertyUnit_val
+     */
+    public PropertyUnit getPropertyUnit_val() {
+        return propertyUnit_val;
+    }
+
+    /**
+     * @param propertyUnit_ctl the propertyUnit_ctl to set
+     */
+    public void setPropertyUnit_ctl(boolean propertyUnit_ctl) {
+        this.propertyUnit_ctl = propertyUnit_ctl;
+    }
+
+    /**
+     * @param propertyUnit_val the propertyUnit_val to set
+     */
+    public void setPropertyUnit_val(PropertyUnit propertyUnit_val) {
+        this.propertyUnit_val = propertyUnit_val;
+    }
+
+    /**
+     * @return the occPeriod_ctl
+     */
+    public boolean isOccPeriod_ctl() {
+        return occPeriod_ctl;
+    }
+
+    /**
+     * @return the occPeriod_val
+     */
+    public OccPeriod getOccPeriod_val() {
+        return occPeriod_val;
+    }
+
+    /**
+     * @return the event_ctl
+     */
+    public boolean isEvent_ctl() {
+        return event_ctl;
+    }
+
+    /**
+     * @return the event_Val
+     */
+    public EventCnF getEvent_Val() {
+        return event_Val;
+    }
+
+    /**
+     * @return the citation_ctl
+     */
+    public boolean isCitation_ctl() {
+        return citation_ctl;
+    }
+
+    /**
+     * @return the citation_val
+     */
+    public Citation getCitation_val() {
+        return citation_val;
+    }
+
+    /**
+     * @return the mergeTarget_ctl
+     */
+    public boolean isMergeTarget_ctl() {
+        return mergeTarget_ctl;
+    }
+
+    /**
+     * @return the mergeTarget_val
+     */
+    public Person getMergeTarget_val() {
+        return mergeTarget_val;
+    }
+
+    /**
+     * @param occPeriod_ctl the occPeriod_ctl to set
+     */
+    public void setOccPeriod_ctl(boolean occPeriod_ctl) {
+        this.occPeriod_ctl = occPeriod_ctl;
+    }
+
+    /**
+     * @param occPeriod_val the occPeriod_val to set
+     */
+    public void setOccPeriod_val(OccPeriod occPeriod_val) {
+        this.occPeriod_val = occPeriod_val;
+    }
+
+    /**
+     * @param event_ctl the event_ctl to set
+     */
+    public void setEvent_ctl(boolean event_ctl) {
+        this.event_ctl = event_ctl;
+    }
+
+    /**
+     * @param event_Val the event_Val to set
+     */
+    public void setEvent_Val(EventCnF event_Val) {
+        this.event_Val = event_Val;
+    }
+
+    /**
+     * @param citation_ctl the citation_ctl to set
+     */
+    public void setCitation_ctl(boolean citation_ctl) {
+        this.citation_ctl = citation_ctl;
+    }
+
+    /**
+     * @param citation_val the citation_val to set
+     */
+    public void setCitation_val(Citation citation_val) {
+        this.citation_val = citation_val;
+    }
+
+    /**
+     * @param mergeTarget_ctl the mergeTarget_ctl to set
+     */
+    public void setMergeTarget_ctl(boolean mergeTarget_ctl) {
+        this.mergeTarget_ctl = mergeTarget_ctl;
+    }
+
+    /**
+     * @param mergeTarget_val the mergeTarget_val to set
+     */
+    public void setMergeTarget_val(Person mergeTarget_val) {
+        this.mergeTarget_val = mergeTarget_val;
+    }
+
+    /**
+     * @return the muni_ctl
+     */
+    public boolean isMuni_ctl() {
+        return muni_ctl;
+    }
+
+    /**
+     * @param muni_ctl the muni_ctl to set
+     */
+    public void setMuni_ctl(boolean muni_ctl) {
+        this.muni_ctl = muni_ctl;
+    }
+
+    /**
+     * @return the muni_val
+     */
+    public Municipality getMuni_val() {
+        return muni_val;
+    }
+
+    /**
+     * @param muni_val the muni_val to set
+     */
+    public void setMuni_val(Municipality muni_val) {
+        this.muni_val = muni_val;
     }
     
 }

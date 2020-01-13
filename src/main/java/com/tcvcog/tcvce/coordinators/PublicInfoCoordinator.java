@@ -166,7 +166,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setActionRequestorFLname(req.getRequestor().getFirstName() 
                                         + " " + req.getRequestor().getLastName());
 
-            pib.setIssueTypeString(req.getIssueTypeString());
+//            pib.setIssueTypeString(req.getIssueTypeString());
 
             if(req.getCaseID() == 0){
                 pib.setCaseLinkStatus("Request not linked to a code enforcement case");

@@ -16,7 +16,7 @@ public class BOBSource implements Serializable {
     private int sourceid;
     private String title;
     private String description;
-    private User creator;
+    private int creatorUserID;
     private Municipality muni;
     private boolean userattributable;
     private boolean active;
@@ -43,12 +43,6 @@ public class BOBSource implements Serializable {
         return description;
     }
 
-    /**
-     * @return the creator
-     */
-    public User getCreator() {
-        return creator;
-    }
 
     /**
      * @return the muni
@@ -99,12 +93,6 @@ public class BOBSource implements Serializable {
         this.description = description;
     }
 
-    /**
-     * @param creator the creator to set
-     */
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
 
     /**
      * @param muni the muni to set
@@ -132,6 +120,20 @@ public class BOBSource implements Serializable {
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the creatorUserID
+     */
+    public int getCreatorUserID() {
+        return creatorUserID;
+    }
+
+    /**
+     * @param creatorUserID the creatorUserID to set
+     */
+    public void setCreatorUserID(int creatorUserID) {
+        this.creatorUserID = creatorUserID;
     }
     
 }

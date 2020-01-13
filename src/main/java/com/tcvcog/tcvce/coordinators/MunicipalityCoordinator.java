@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
@@ -61,7 +62,11 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
 
     private MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException{
         PropertyCoordinator pc = getPropertyCoordinator();
-        pc.getPropertyDataHeavy(mdh.getMuniOfficePropertyId(), cred);
+        try {
+            pc.getPropertyDataHeavy(mdh.getMuniOfficePropertyId(), cred);
+        } catch (SearchException ex) {
+            System.out.println(ex);
+        }
         
         return mdh;
         

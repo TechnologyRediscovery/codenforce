@@ -286,27 +286,6 @@ public class User implements Serializable{
     public void setCreatedTS(LocalDateTime createdTS) {
         this.createdTS = createdTS;
     }
-    /**
-     * @return the accessRecord
-     */
-    /**
-     * @param accessRecord the accessRecord to set
-     */
-    /**
-     * @param pswdLastUpdated the pswdLastUpdated to set
-     */
-    /**
-     * @return the forcePasswordResetTS
-     */
-    /**
-     * @param forcePasswordResetTS the forcePasswordResetTS to set
-     */
-    /**
-     * @return the accessRecord
-     */
-    /**
-     * @param accessRecord the accessRecord to set
-     */
-
+  
 
 }

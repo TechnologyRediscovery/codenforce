@@ -125,9 +125,9 @@ public class LogIntegrator extends BackingBeanUtils {
             boolean error, boolean reqview) throws IntegrationException{
         Connection con = getPostgresCon();
         String query = "INSERT INTO public.log(\n" +
-            "            logentryid, timeofentry, user_userid, sessionid, category, notes, \n" +
+            "            logentryid, timeofentry, user_userid, category, notes, \n" +
             "            error, reqview, viewed)\n" +
-            "    VALUES (DEFAULT, now(), ?, ?, ?, ?, \n" +
+            "    VALUES (DEFAULT, now(), ?, ?, ?, \n" +
             "            ?, ?, FALSE);";
 
         PreparedStatement stmt = null;

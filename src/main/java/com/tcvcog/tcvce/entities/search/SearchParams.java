@@ -32,13 +32,16 @@ public  class           SearchParams
     
     private String searchName;
     private String searchDescription;
+    
     private StringBuilder sql;
     
+    // filter common COM-1: Municipality
     private RoleType muni_rtMin;
     private boolean muni_ctl;
     private Municipality muni_val;
     protected List<Municipality> muniList_val;
     
+    // set #2: Date
     // subclasses will have a DateEnum member to specify which date field
     private RoleType date_rtMin;
     private boolean date_startEnd_ctl;
@@ -50,18 +53,24 @@ public  class           SearchParams
     private int date_relativeDates_start_val;
     private int date_realtiveDates_end_val;
     
-   private boolean user_ctl;
-   private IFace_userFieldHolder user_field;
-   private User user_val;
+    // set #3: User
+    private RoleType user_rtMin;
+    private boolean user_ctl;
+    private IFace_userFieldHolder user_field;
+    private User user_val;
     
+    // set #4: BOb ID
     private RoleType bobID_rtMin;
     private boolean bobID_ctl;
     private int bobID_val;
     
+    // set #5: Result count limit
     private RoleType limitResultCount_rtMin;
     private boolean limitResultCount_ctl;
     private int limitResultCount_val;
     
+    // set #6: Active
+    private RoleType active_rtMin;
     private boolean active_ctl;
     private boolean active_val;
     
@@ -580,6 +589,34 @@ public  class           SearchParams
      */
     public void setSql(StringBuilder sql) {
         this.sql = sql;
+    }
+
+    /**
+     * @return the user_rtMin
+     */
+    public RoleType getUser_rtMin() {
+        return user_rtMin;
+    }
+
+    /**
+     * @param user_rtMin the user_rtMin to set
+     */
+    public void setUser_rtMin(RoleType user_rtMin) {
+        this.user_rtMin = user_rtMin;
+    }
+
+    /**
+     * @return the active_rtMin
+     */
+    public RoleType getActive_rtMin() {
+        return active_rtMin;
+    }
+
+    /**
+     * @param active_rtMin the active_rtMin to set
+     */
+    public void setActive_rtMin(RoleType active_rtMin) {
+        this.active_rtMin = active_rtMin;
     }
 
    

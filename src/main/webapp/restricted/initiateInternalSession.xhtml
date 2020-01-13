@@ -98,13 +98,12 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="Actions" />
                                                 </f:facet>
-                                                <p:commandButton ajax="true"
-                                                                 id="usersettings-umaps-button-credentialize" 
-                                                                 value="credentialize" 
+                                                <p:commandButton ajax="false"
+                                                                 id="sessioninit-umaplist-button-credentialize" 
+                                                                 value="load session" 
                                                                  icon="fa fa-credit-card"
                                                                  styleClass="multiButtonLineButton" 
-                                                                 actionListener="#{userBB.credentializeUserMuniAuthPeriod(period)}"
-                                                                 update="usersettings-umaps-messages-form" />
+                                                                 action="#{sessionInitializer.credentializeUserMuniAuthPeriod(period)}"/>
                                             </p:column>
                                             <p:rowExpansion>
                                                 <div class="outlinedBox">
@@ -134,7 +133,6 @@
                                                         <f:facet name="footer">
 
                                                             <h4>Log entries associated with this authorization period</h4>
-
 
                                                             <p:scrollPanel id="usersettings-umaps-log-scrollpanel"
                                                                            style="height: 200px;">
@@ -184,12 +182,6 @@
                                                 </div>
                                             </p:rowExpansion>
                                         </p:dataTable>
-                            
-                            <p:commandButton ajax="false" 
-                                             value="Configure session" 
-                                             action="#{sessionInitializer.initiateInternalSession}" 
-                                             icon="fa fa-chevron-right"
-                                             update="init-session-messages"/>
                         </h:form>
                     </div>
                 </f:view>
