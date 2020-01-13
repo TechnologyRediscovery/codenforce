@@ -35,6 +35,7 @@ public class MoneyCECaseFeeAssigned extends FeeAssigned{
     
     public MoneyCECaseFeeAssigned(FeeAssigned fee) {
         
+        this.ceCaseAssignedFeeID = fee.assignedFeeID;
         this.assignedFeeID = fee.assignedFeeID;
         this.domain = EventDomainEnum.CODE_ENFORCEMENT;
         this.paymentList = fee.paymentList;

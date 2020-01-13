@@ -22,7 +22,7 @@ package com.tcvcog.tcvce.entities;
  */
 public class MoneyOccPeriodFeeAssigned extends FeeAssigned {
 
-    private int OccPerAssignedFeeID;
+    private int occPerAssignedFeeID;
     private int occPeriodID;
     private int occPeriodTypeID;
 
@@ -31,6 +31,7 @@ public class MoneyOccPeriodFeeAssigned extends FeeAssigned {
 
     public MoneyOccPeriodFeeAssigned(FeeAssigned fee) {
 
+        this.occPerAssignedFeeID = fee.assignedFeeID;
         this.assignedFeeID = fee.assignedFeeID;
         this.domain = EventDomainEnum.OCCUPANCY;
         this.paymentList = fee.paymentList;
@@ -63,11 +64,11 @@ public class MoneyOccPeriodFeeAssigned extends FeeAssigned {
     }
 
     public int getOccPerAssignedFeeID() {
-        return OccPerAssignedFeeID;
+        return occPerAssignedFeeID;
     }
 
-    public void setOccPerAssignedFeeID(int OccPerAssignedFeeID) {
-        this.OccPerAssignedFeeID = OccPerAssignedFeeID;
+    public void setOccPerAssignedFeeID(int occPerAssignedFeeID) {
+        this.occPerAssignedFeeID = occPerAssignedFeeID;
     }
 
 }

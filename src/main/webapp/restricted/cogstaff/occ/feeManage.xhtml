@@ -388,7 +388,7 @@
                                 <p:commandButton ajax="false" rendered="#{!feeManagementBB.editing}" 
                                                  value="Assign Fee" action="#{feeManagementBB.addAssignedFee()}" />
                                 <p:commandButton ajax="false" rendered="#{feeManagementBB.editing}" 
-                                                 actionListener="#{feeManagementBB.commitOccPeriodFeeUpdates(e)}"
+                                                 actionListener="#{feeManagementBB.commitAssignedFeeUpdates(e)}"
                                                  value="Commit Updates" tabindex="14"/>
                                 <p:commandButton    id="cancel-cb"
                                                     ajax="true"  tabindex="27"
@@ -400,9 +400,6 @@
 
                             </h:form>
                         </p:dialog>
-
-                        <!--******* OCC PERIOD FEE STUFF ********-->
-
 
                     </f:view>
                 </div>

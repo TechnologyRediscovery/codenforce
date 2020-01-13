@@ -142,12 +142,21 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     public String finishAndRedir() {
+        
+        //The following if statement is temporary. If you redirect to the fee Managment page from the fee permissions page, the case or occperiod does not load.
+        //until I create a better solution, this will remain here.
+        //TODO: Make a better redirection system that lasts longer than one redirection.
+        if(!getSessionBean().getFeeRedirTo().equalsIgnoreCase("editFees")){
         getSessionBean().setFeeRedirTo(null);
-
+        }
         return redirTo;
     }
 
     public String goToFeePermissions() {
+        
+        if(editingCECase() || editingOccPeriod()){   
+        getSessionBean().setFeeRedirTo("editFees");
+        }
         return "feePermissions";
     }
 
@@ -274,7 +283,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         } else {
 
             MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(firstSkeleton);
-            MoneyCECaseFeeAssigned caseFormFee = (MoneyCECaseFeeAssigned) assignedFormFee;
+            MoneyCECaseFeeAssigned caseFormFee = new MoneyCECaseFeeAssigned(assignedFormFee);
 
             secondSkeleton.setCeCaseAssignedFeeID(caseFormFee.getCeCaseAssignedFeeID());
             secondSkeleton.setCaseID(currentCase.getCaseID());
@@ -296,7 +305,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public String commitOccPeriodFeeUpdates(ActionEvent e) {
+    public String commitAssignedFeeUpdates(ActionEvent e) {
         FeeAssigned firstSkeleton = new FeeAssigned();
         PaymentIntegrator pi = getPaymentIntegrator();
 
@@ -746,14 +755,25 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         currentDomain = getSessionBean().getFeeManagementDomain();
 
-        if (currentDomain.equals(EventDomainEnum.OCCUPANCY)) {
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
 
             currentOccPeriod = getSessionBean().getFeeManagementOccPeriod();
 
             if (currentOccPeriod != null) {
 
                 try {
-                    feeAssignedList.addAll(pi.getFeeAssigned(currentOccPeriod));
+                    ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
+                    
+                    for (MoneyOccPeriodFeeAssigned fee : tempList){
+                        
+                        FeeAssigned skeleton = fee;
+                        
+                        skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
+                        skeleton.setDomain(currentDomain);
+                        feeAssignedList.add(skeleton);
+                        
+                    }
+                    
                     feeList = (ArrayList<Fee>) currentOccPeriod.getType().getPermittedFees();
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
@@ -763,14 +783,25 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             }
 
-        } else if (currentDomain.equals(EventDomainEnum.CODE_ENFORCEMENT)) {
+        } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
 
             currentCase = getSessionBean().getFeeManagementCeCase();
 
             if (currentCase != null) {
 
                 try {
-                    feeAssignedList.addAll(pi.getFeeAssigned(currentCase));
+                    
+                    ArrayList<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
+                    
+                    for (MoneyCECaseFeeAssigned fee : tempList){
+                        
+                        FeeAssigned skeleton = fee;
+                        
+                        skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
+                        skeleton.setDomain(currentDomain);
+                        feeAssignedList.add(skeleton);
+                        
+                    }
                     feeList = new ArrayList<>();
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
