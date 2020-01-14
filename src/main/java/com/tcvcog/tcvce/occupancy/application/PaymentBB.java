@@ -78,9 +78,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             
             refreshFeeAssignedList();
             
-           
-
-            
         }
 
         formPayment = new Payment();
@@ -108,7 +105,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             currentOccPeriod = getSessionBean().getSessionOccPeriod();
 
             if (getSessionBean().getSessionPayment() != null) {
-                paymentList = new ArrayList<>();
                 paymentList.add(getSessionBean().getSessionPayment());
                 paymentSet = true;
                 try {
@@ -156,7 +152,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             currentCase = getSessionBean().getFeeManagementCeCase();
 
             if (getSessionBean().getSessionPayment() != null) {
-                paymentList = new ArrayList<>();
                 paymentList.add(getSessionBean().getSessionPayment());
                 paymentSet = true;
                 try {
@@ -202,7 +197,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         }
         
-        if(paymentSet){
+        if(!paymentSet){
             try {
                 paymentList = pi.getPaymentList();
             } catch (IntegrationException ex) {

@@ -23,10 +23,10 @@
                         <h:form id="paymentDisplay">
                             <h2>Recorded payments 
                                 <p:outputLabel rendered="#{paymentBB.editingOccPeriod()}" value="for OccPeriod ##{paymentBB.currentOccPeriod.periodID} (#{paymentBB.currentAddress})"/>
-                                <p:outputLabel rendered="#{paymentBB.editingCECase}" value="for CECase ##{paymentBB.currentCase.caseID} (#{paymentBB.currentAddress})"/>
+                                <p:outputLabel rendered="#{paymentBB.editingCECase()}" value="for CECase ##{paymentBB.currentCase.caseID} (#{paymentBB.currentAddress})"/>
                             </h2>
                             <p:dataTable
-                                id="occInsFees"
+                                id="paymentTable"
                                 var="p"
                                 selectionMode="single"
                                 selection="#{paymentBB.selectedPayment}"
@@ -259,7 +259,7 @@
                                         id="occPeriodFeeTable"
                                         var="fee"
                                         value="#{paymentBB.assignedFeeList}"
-                                        rowKey="#{fee.occPerAssignedFeeID}"
+                                        rowKey="#{fee.assignedFeeID}"
                                         tableStyleClass="primeDataTable"
                                         rowExpandMode="single"
                                         expandedRow="false"
@@ -278,7 +278,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="ID" />
                                             </f:facet>
-                                            <h:outputText value="#{fee.occPerAssignedFeeID}"/>
+                                            <h:outputText value="#{fee.assignedFeeID}"/>
                                         </p:column>
 
 
@@ -315,7 +315,7 @@
                                         </p:column>
                                         <p:rowExpansion>
                                             <div class="outlinedBox">
-                                                <h2>Full fee listing for fee <h:outputText value="#{fee.occPerAssignedFeeID}"/> </h2>
+                                                <h2>Full fee listing for fee <h:outputText value="#{fee.assignedFeeID}"/> </h2>
                                                 <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd">
 

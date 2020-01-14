@@ -588,6 +588,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee.setCeCaseAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
             fee.setCaseID(rs.getInt("cecase_caseid"));
             fee.setCodeSetElement(rs.getInt("codesetelement_elementid"));
+            fee.setPaymentList(getPaymentList(fee));
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error generating CECaseFeeAssigned from ResultSet", ex);
@@ -816,6 +817,58 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             rs = stmt.executeQuery();
             while (rs.next()) {
                 paymentList.add(generatePayment(rs));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Payment List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return paymentList;
+    }
+    
+    public List<Payment> getPaymentList(MoneyCECaseFeeAssigned fee) throws IntegrationException {
+
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
+                + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
+                + "recordedby_userid, entrytimestamp\n"
+                + "FROM moneycecasefeepayment, public.moneypayment\n"
+                + "WHERE cecaseassignedfee_id = ? AND payment_paymentid = paymentid;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<Payment> paymentList = new ArrayList();
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getCeCaseAssignedFeeID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                Payment p = generatePayment(rs);
+                p.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
+                p.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
+                paymentList.add(p);
+
             }
 
         } catch (SQLException ex) {
