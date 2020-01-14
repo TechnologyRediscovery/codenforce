@@ -524,8 +524,8 @@ div.printer-friendly-report .ui-widget-content{
     flex-basis: 100%;
     flex-shrink: 1;
     
-    height: 75px;
-    background-color: #5a5754;
+    height: 100px;
+    background-color: #6C6D70;
     
 }
 
@@ -536,8 +536,7 @@ div.printer-friendly-report .ui-widget-content{
     flex-grow: 0;
     flex-basis: 200px;
     flex-shrink: 1;
-    
-    background-color: #04284A;
+    background-color: #CECECE;
     padding: 10px;
     
 }
@@ -1684,22 +1683,20 @@ tr.caseOpen{
 .navbar{
     height: 40px;
     position: relative;
-    background-color: #181F36;
+    background-color: #CECECE;
 }
 
-
 .nav_containner{
-    color:white;
+    color:#6C6D70;
     float:left;
     display: inline-block;
 
 }
 
 .nav_containner:hover {
-    color: black;
-    background-color: #eeeeee;
-    display: inline-block;
-
+    color:#E6E7E8;
+    background-color: #007AD9;
+    
 }
 
 .nav_content{
@@ -1716,9 +1713,11 @@ tr.caseOpen{
 }
 
 .nav_containner:hover .subnav_containner{
-    color: black;
-    background-color: #eeeeee;
+    color:#E6E7E8;
+    background-color: #007AD9;
     display: inline-block;
+    
+    
 }
 
 .subnav_containner{
@@ -1727,7 +1726,7 @@ tr.caseOpen{
     position: absolute;
     left: 0;
     font-family: inherit;
-    background-color: #2F6381;
+    background-color: #EEEEEE;
     color: white;
     width: 100%;
     z-index: 3;
@@ -1739,8 +1738,8 @@ tr.caseOpen{
     position: absolute;
     left: 0;
     font-family: inherit;
-    background-color: #eeeeee;
-    color: #2F6381;
+    color:#6C6D70;
+    background-color: #EEEEEE;
     width: 100%;
     z-index: 3;
 }
@@ -1762,7 +1761,8 @@ tr.caseOpen{
 }
 
 .subnav_content:hover{
-    border-bottom: 2px solid #2F6381;
+    color: #000000;
+    border-bottom: 2px solid #000000;
 }
 
 .nav_display{
@@ -1774,16 +1774,16 @@ tr.caseOpen{
 }
 
 .nav_active{
-    background-color: #2F6381;
+    color:#E6E7E8;
+    background-color: #6C6D70;
 }
 .navsub_active{
-    border-bottom: 2px solid #2F6381;
+    color:#000000;
+    border-bottom: 2px solid #6C6D70;
 
 }
 
-.subnav_containner_stable{
-    z-index: 0;
-}
+
 .currentinfo{
     float: left;
     font-size: 14px;
@@ -1817,7 +1817,7 @@ tr.caseOpen{
     width: 35px;
     position: absolute;
     left: 0;
-    background-color: #181F36;
+    background-color: #6C6D70;
     overflow-x: hidden;
     transition: 0s;
 }
@@ -1827,31 +1827,29 @@ tr.caseOpen{
     margin-left: 40px;
 }
 
-
-
-
 .toolSidebarCollapse{
     height: 40px;
-    color: #FFFFFF;
+    color: #E6E7E8;
     font-size: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     text-align: center;
-    border-bottom: 1px solid #FFFFFF;
+    border-bottom: 1px solid #E6E7E8;
 
 }
 
 .toolSidebarExpansion{
     height: 40px;
-    color: #FFFFFF;
+    color: #E6E7E8;
     font-size: 25px;
     display:none;
     flex-direction: column;
     justify-content: center;
-    border-bottom: 1px solid #FFFFFF;
+    border-bottom: 1px solid #E6E7E8;
     padding-right: 15px;
     align-items: flex-end;
+    
 }
 
 .toolSidebarTitle{
@@ -1865,7 +1863,7 @@ tr.caseOpen{
     cursor: pointer;
 }
 .toolSidebarCollapse i:hover,.toolSidebarExpansion i:hover{
-    color: #2F6381;
+    color: #00B4ED;
 }
 
 
@@ -1882,7 +1880,7 @@ tr.caseOpen{
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-bottom: 1px solid #2F6381;
+    border-bottom: 1px solid #E6E7E8;
 }
 
 .sidebar_firstmenu_item i{
@@ -1896,28 +1894,30 @@ tr.caseOpen{
     cursor: pointer;
 }
 .sidebar_firstmenu_item:hover{
-    border-bottom: 1px solid #FFFFFF;
+    border-bottom: 1px solid #007AD9;
 }
 
 
 .sidebar_firstmenu_font_active{
-    background-color: #2F6381;
+    background-color: #6C6D70;
 }
 
 .sidebar_secondmenu{
     display: none;
 }
 .sidebar_secondmenu_item{
+    color: #6C6D70;
     height: 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     border-bottom: 1px solid #2F6381;
-    background-color: #101423;
+    background-color: #CECECE;
 }
 
 .sidebar_secondmenu_item:hover{
-    border-bottom: 1px solid #FFFFFF;
+    background-color:#007AD9;
+    color:#000000;
 }
 .sidebar_secondmenu_item i{
     width: 25px;
@@ -1930,6 +1930,11 @@ tr.caseOpen{
     font-size: 16px;
     display: none;
     cursor: pointer;
+}
+
+body .ui-panel .ui-panel-titlebar{
+    background-color: #6C6D70;
+    border: 1px solid #6C6D70;
 }
 
 
