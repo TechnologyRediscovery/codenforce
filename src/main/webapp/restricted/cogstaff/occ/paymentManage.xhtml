@@ -21,7 +21,10 @@
                     <p>View, create, and manage payment records</p>
                     <f:view>
                         <h:form id="paymentDisplay">
-                            <h2>Recorded payments <p:outputLabel rendered="#{paymentBB.editingOccPeriod()}" value="for OccPeriod ##{paymentBB.currentOccPeriod.periodID} (#{paymentBB.occPeriodAddress})"/></h2>
+                            <h2>Recorded payments 
+                                <p:outputLabel rendered="#{paymentBB.editingOccPeriod()}" value="for OccPeriod ##{paymentBB.currentOccPeriod.periodID} (#{paymentBB.currentAddress})"/>
+                                <p:outputLabel rendered="#{paymentBB.editingCECase}" value="for CECase ##{paymentBB.currentCase.caseID} (#{paymentBB.currentAddress})"/>
+                            </h2>
                             <p:dataTable
                                 id="occInsFees"
                                 var="p"
@@ -255,13 +258,13 @@
                                     <p:dataTable
                                         id="occPeriodFeeTable"
                                         var="fee"
-                                        value="#{paymentBB.occPeriodFeeList}"
+                                        value="#{paymentBB.assignedFeeList}"
                                         rowKey="#{fee.occPerAssignedFeeID}"
                                         tableStyleClass="primeDataTable"
                                         rowExpandMode="single"
                                         expandedRow="false"
                                         selectionMode="single"
-                                        selection="#{paymentBB.selectedOccPeriodFee}"
+                                        selection="#{paymentBB.selectedAssignedFee}"
                                         filteredValue="#{paymentBB.occPeriodFilteredFeeList}"
                                         >
 
