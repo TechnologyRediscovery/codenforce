@@ -29,6 +29,15 @@ public  enum            QueryEventEnum
                                         RoleType.MuniReader, 
                                         true),
     
+    OCCPERIOD(                          "Events by occ period",
+                                        "All events by period",
+                                        RoleType.MuniReader,
+                                        false),
+    CECASE  (                          "Events by Code Enforcement case",
+                                        "All events by case",
+                                        RoleType.MuniReader,
+                                        false),
+    
     CUSTOM(                             "Custom", 
                                         "Custom", 
                                         RoleType.MuniReader,

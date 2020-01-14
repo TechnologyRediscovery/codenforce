@@ -15,9 +15,12 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class SearchParamsOccPeriod 
-        extends SearchParams implements Serializable {
+public class        SearchParamsOccPeriod 
+        extends     SearchParams {
     
+    
+    
+    public static final String MUNI_DBFIELD = "property.municipality_municode";
     
     // filter OCC-1
     private boolean property_ctl;

@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.entities.IFace_Openable;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
@@ -55,7 +56,8 @@ public  class       OccPeriodDataHeavy
     protected OccPeriodStatusEnum status;
 
     private List<OccPermitApplication> applicationList;
-    private List<PersonOccPeriod> personList;
+    private List<PersonOccPeriod> personListApplicants;
+    private List<Person> personList;
     
     private List<EventCnF> eventList;
     private List<Proposal> proposalList;
@@ -312,12 +314,6 @@ public  class       OccPeriodDataHeavy
         return applicationList;
     }
 
-    /**
-     * @return the personList
-     */
-    public List getPersonList() {
-        return personList;
-    }
 
     /**
      * @return the proposalList
@@ -355,10 +351,10 @@ public  class       OccPeriodDataHeavy
     }
 
     /**
-     * @param personList the personList to set
+     * @param personListApplicants the personListApplicants to set
      */
-    public void setPersonList(List<PersonOccPeriod> personList) {
-        this.personList = personList;
+    public void setPersonListApplicants(List<PersonOccPeriod> personListApplicants) {
+        this.personListApplicants = personListApplicants;
     }
 
     /**
@@ -444,6 +440,21 @@ public  class       OccPeriodDataHeavy
      */
     public void setStatus(OccPeriodStatusEnum status) {
         this.status = status;
+    }
+
+    /**
+     * @param personList the personList to set
+     */
+    public void setPersonList(List<Person> personList) {
+        this.personList = personList;
+    }
+    
+    public List<Person> getPersonList(){
+        return personList;
+    }
+    
+    public List<PersonOccPeriod> getPersonListApplicants(){
+        return personListApplicants;
     }
     
 }

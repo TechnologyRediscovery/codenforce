@@ -103,7 +103,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "       profile_profileid, enablecodeenforcement, enableoccupancy, enablepublicceactionreqsub, \n" +
                         "       enablepublicceactionreqinfo, enablepublicoccpermitapp, enablepublicoccinspectodo, \n" +
                         "       munimanager_userid, office_propertyid, notes, lastupdatedts, \n" +
-                        "       lastupdated_userid, primarystaffcontact_userid\n" +
+                        "       lastupdated_userid, primarystaffcontact_userid, defaultoccperiod    \n" +
                         "  FROM public.municipality"
                       + "  WHERE municode=?;";
         ResultSet rs = null;
@@ -173,6 +173,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
 
         mdh.setMuniManager(ui.getUser(rs.getInt("munimanager_userid")));
         mdh.setMuniOfficePropertyId(rs.getInt("office_propertyid"));
+        mdh.setDefaultOccPeriodID(rs.getInt("defaultoccperiod"));
         
         
         mdh.setNotes(rs.getString("notes"));
@@ -287,7 +288,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "       enablepublicceactionreqsub=?, enablepublicceactionreqinfo=?, \n" +
                         "       enablepublicoccpermitapp=?, enablepublicoccinspectodo=?, munimanager_userid=?, \n" +
                         "       office_propertyid=?, notes=?, lastupdatedts=now(), lastupdated_userid=?, \n" +
-                        "       primarystaffcontact_userid=?\n" +
+                        "       primarystaffcontact_userid=?, defaultoccperiod=?\n" +
                         " WHERE municode=?;";
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -327,6 +328,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setInt(23, muni.getPrimaryStaffContact().getUserID());
             
             stmt.setInt(24, muni.getMuniCode());
+            stmt.setInt(25, muni.getDefaultOccPeriodID());
+            
             stmt.executeUpdate();
             
         } catch (SQLException ex) {

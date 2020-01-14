@@ -17,29 +17,39 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
  * @author Ellen Bascomb
  */
 public class        SearchParamsCECase 
-        extends     SearchParams {
+        extends     SearchParams{
     
+    public static final String MUNI_DBFIELD = "property.municipality_municode";
+    
+    // filter CECASE-1
     private boolean caseOpen_ctl;
     private boolean caseOpen_val;
     
+    // filter CECASE-2
     private boolean property_ctl;
     private Property property_val;
     
+    // filter CECASE-3
     private boolean propertyUnit_ctl;
     private PropertyUnit propertyUnit_val;
     
+    // filter CECASE-4
     private boolean propInfoCase_ctl;
     private boolean propInfoCase_val;
     
+    // filter CECASE-5
     private boolean personInfoCase_ctl;
     private boolean personInfoCase_val;
     
+    // filter CECASE-6
     private boolean personInfoCaseID_ctl;
     private Person personInfoCaseID_val;
     
+    // filter CECASE-7
     private boolean source_ctl;
     private BOBSource source_val;
     
+    // filter CECASE-8
     private boolean pacc_ctl;
     private boolean pacc_val;
 
@@ -47,6 +57,7 @@ public class        SearchParamsCECase
     // ** JavaLand switches only!   **
     // *******************************
     
+    // filter CECASE-9
     private boolean casePhase_ctl;
     private CasePhaseEnum casePhase_val;
     

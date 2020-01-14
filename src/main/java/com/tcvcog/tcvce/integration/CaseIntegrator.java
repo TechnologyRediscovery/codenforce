@@ -64,8 +64,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         ResultSet rs = null;
         PreparedStatement stmt = null;
         
-        params.appendSQL("SELECT DISTINCT caseid ");
-        params.appendSQL("FROM public.cecase ");
+        params.appendSQL("SELECT DISTINCT caseid \n");
+        params.appendSQL("FROM public.cecase \n");
+        params.appendSQL("INNER JOIN public.property ON (cecase.property_propertyid = property.propertyid) \n");
         params.appendSQL("WHERE caseid IS NOT NULL ");
         
         // *******************************
@@ -76,10 +77,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             //*******************************
             // **   MUNI,DATES,USER,ACTIVE  **
             // *******************************
-            params = (SearchParamsCECase) sc.assembleBObSearchSQL_muniDatesUserActive(params);
+            params = (SearchParamsCECase) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsCECase.MUNI_DBFIELD);
             
             // *******************************
-            // **         OPEN/CLOSED       **
+            // **       1:OPEN/CLOSED       **
             // *******************************
             if (params.isCaseOpen_ctl()) {
                 if(params.isCaseOpen_val()){
@@ -90,7 +91,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             }
             
             // *******************************
-            // **        PROPERTY           **
+            // **      2:PROPERTY           **
             // *******************************
              if (params.isProperty_ctl()) {
                 if(params.getProperty_val()!= null){
@@ -102,7 +103,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             }
             
             // *******************************
-            // **       PROPERTY UNIT       **
+            // **     3:PROPERTY UNIT       **
             // *******************************
              if (params.isPropertyUnit_ctl()) {
                 if(params.getPropertyUnit_val()!= null){
@@ -114,7 +115,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             }
             
             // *******************************
-            // **      PROP INFO CASES      **
+            // **    4:PROP INFO CASES      **
             // *******************************
             if (params.isPropInfoCase_ctl()) {
                 if (params.isPropInfoCase_val()) {
@@ -124,9 +125,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 }
             }
             
-            // *******************************
-            // ** PERSONS INFO CASES BOOL   **
-            // *******************************
+            // **********************************
+            // ** 5. PERSONS INFO CASES BOOL   **
+            // **********************************
             if (params.isPersonInfoCase_ctl()) {
                 if (params.isPersonInfoCase_val()) {
                     params.appendSQL("AND personinfocase_personid IS NOT NULL ");
@@ -135,9 +136,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 }
             }
             
-            // *******************************
-            // ** PERSONS INFO CASES ID    **
-            // *******************************
+            // ********************************
+            // ** 6.PERSONS INFO CASES ID    **
+            // ********************************
             if (params.isPersonInfoCaseID_ctl()) {
                 if(params.getPersonInfoCaseID_val() != null){
                     params.appendSQL("AND personinfocase_personid=? ");
@@ -148,7 +149,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             }
             
             // *******************************
-            // **       BOb SOURCE          **
+            // **     7.BOb SOURCE          **
             // *******************************
              if (params.isSource_ctl()) {
                 if(params.getSource_val() != null){
@@ -160,7 +161,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             }
            
             // *******************************
-            // **           PACC            **
+            // **        9. PACC            **
             // *******************************
              if (params.isPacc_ctl()) {
                 if(params.isPacc_val()){
@@ -214,15 +215,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
             
-            System.out.println("CaseIntegrator.searchForCECases | metadata: " + stmt.getMetaData().toString());
-            System.out.println("CaseIntegrator.searchForCECases | params: " + stmt.getParameterMetaData().toString());
-
             rs = stmt.executeQuery();
 
             int counter = 0;
             int maxResults;
             if (params.isLimitResultCount_ctl()) {
-                maxResults = 100;
+                maxResults = params.getLimitResultCount_val();
             } else {
                 maxResults = Integer.MAX_VALUE;
             }

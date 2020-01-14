@@ -135,7 +135,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
            // *******************************
            // **   MUNI,DATES,USER,ACTIVE  **
            // *******************************
-            params = (SearchParamsOccPeriod) sc.assembleBObSearchSQL_muniDatesUserActive(params);
+            params = (SearchParamsOccPeriod) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsOccPeriod.MUNI_DBFIELD);
             
            // *******************************
             // **        PROPERTY           **
@@ -408,41 +408,38 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return op;
     }
     
-    public OccPeriodDataHeavy generateOccPeriodDataHeavy(OccPeriod opLight) throws IntegrationException{
-        OccPeriodDataHeavy op = new OccPeriodDataHeavy(opLight);
-        
-        OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
-        PersonIntegrator pi = getPersonIntegrator();
-        EventIntegrator ei = getEventIntegrator();
-        ChoiceIntegrator choiceInt = getChoiceIntegrator();
-        PaymentIntegrator pai = getPaymentIntegrator();
-        
-        // now get all the lists from their respective integrators
-        // this is the Java version of table joins in SQL; we're doing them interatively
-        // in our integrators for each BOB
-        op.setApplicationList(getOccPermitApplicationList(op));
-        op.setPersonList(pi.getPersonList(op));
+ public List<Integer> getOccPeriodHistoryList(int userID) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Integer> al = new ArrayList<>();
 
-        op.setEventList(ei.getEventList(op));
-        op.setProposalList(choiceInt.getProposalList(op));
-        op.setInspectionList(inspecInt.getOccInspectionList(op));
-//        op.setPaymentList(pai.getPaymentList(op));
-//        op.setFeeList(pai.getFeeAssigned(op));
+        try {
+            String s = "SELECT occperiod_periodid, entrytimestamp FROM loginobjecthistory "
+                    + "WHERE login_userid = ? "
+                    + "AND occperiod_periodid IS NOT NULL "
+                    + "ORDER BY entrytimestamp DESC;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, userID);
 
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                al.add(rs.getInt("occperiod_periodid"));
+            }
 
-        // call getPayments(op) here when ready
-        
-        op.setPermitList(getOccPermitList(op));
-        op.setBlobIDList(getBlobList(op));
-        
-        // TODO: Figure out this inheritance SNAFU
-//        op.setEventRuleList(ei.rules_getEventRuleOccPeriodList(op));
-        
-        return op;
-        
-    }
-    
-   
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        System.out.println("OccIntegrator Retrieved period of size: " + al.size());
+        return al;
+
+    }   
 
     public OccPermit getOccPermit(int permitID) throws IntegrationException {
         OccPermit op = null;

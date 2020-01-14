@@ -291,7 +291,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         setCurrOccPeriod(op);
         try {
             getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(getCurrOccPeriod(), getSessionBean().getSessionUser().getMyCredential()));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not load occupancy period with data" + ex.getMessage(), ""));
@@ -332,7 +332,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                                             "Please select a period type" , ""));
                 return "";
             }
-        } catch (EventException | AuthorizationException | BObStatusException | ViolationException | IntegrationException ex) {
+        } catch (EventException | AuthorizationException | ViolationException | IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,

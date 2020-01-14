@@ -28,11 +28,13 @@ public enum EventDomainEnum {
     CODE_ENFORCEMENT        (   "Code enforcement cases", 
                                 "cecase_caseid"             ),
     OCCUPANCY               (   "Code enforcement cases", 
-                                "cecase_caseid"             );
-    
-    private final String title;
-    private final String dbField;
-    
+                                "occperiod_periodid"             ),
+    UNIVERSAL               (   "All event subdomains", 
+                                "cecase_caseid"             );  // this field should never
+                                                                // be used since the Search Coor
+    private final String title;                                 // is interpreting UNIVERSAL to run
+    private final String dbField;                               // the other two independently
+                                                                // and combine the results
     private EventDomainEnum(String t, String db){
         title = t;
         dbField = db;

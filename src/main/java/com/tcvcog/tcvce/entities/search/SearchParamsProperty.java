@@ -16,8 +16,9 @@ import java.util.HashMap;
  * @author marosco and ellen bascomb
  */
 public  class       SearchParamsProperty 
-        extends     SearchParams 
-        implements  Serializable {
+        extends     SearchParams {
+    
+   public static final String MUNI_DBFIELD = "property.municipality_municode";
     
    // filter PROP-1
    private boolean zip_ctl;
@@ -549,5 +550,7 @@ public  class       SearchParamsProperty
     public void setLandbankprospect_intensityClass_val(IntensityClass landbankprospect_intensityClass_val) {
         this.landbankprospect_intensityClass_val = landbankprospect_intensityClass_val;
     }
+
+   
     
 }

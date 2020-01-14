@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Directive;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Proposal;
@@ -38,6 +39,8 @@ import java.time.LocalDateTime;
 import java.util.Iterator;
 import com.tcvcog.tcvce.entities.IFace_Openable;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -51,12 +54,29 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     public ChoiceCoordinator() {
     }
     
-    public CECaseDataHeavy configureProposals(CECaseDataHeavy cse, UserAuthorized u) throws EventException, AuthorizationException{
-        if(cse.getProposalList() != null && u != null){
+    /**
+     * Queries appropriate integrators and builds a list of Proposals for the given Case
+     * @param cse
+     * @param cred
+     * @return
+     * @throws EventException
+     * @throws AuthorizationException 
+     */
+    public CECaseDataHeavy configureProposals(CECaseDataHeavy cse, Credential cred) throws EventException, AuthorizationException{
+        ChoiceIntegrator ci = getChoiceIntegrator();
+        if(cse.getProposalList() == null){
+            try {
+                cse.setProposalList(ci.getProposalList(cse));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+        }
+        
+        if(cse.getProposalList() != null && cred != null){
             Iterator<Proposal> iter = cse.getProposalList().iterator();
             while(iter.hasNext()){
                 Proposal p = iter.next();
-                configureProposal(p, u);
+                configureProposal(p, cred);
     //            if(p.getDirective().getChoiceList().size() == 1
     //                    &&
     //                p.getDirective().isExecuteChoiceIfLoneWolf()){
@@ -68,25 +88,34 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Extracts the List&lt;Proposal&gt; from 
+     * Queries integrators and builds proposal list
      * @param oPeriod
-     * @param u
+     * @param cred
      * @return
      * @throws EventException
      * @throws AuthorizationException 
      */
-    public OccPeriodDataHeavy configureProposals(OccPeriodDataHeavy oPeriod, UserAuthorized u) throws EventException, AuthorizationException{
-        if(oPeriod != null && u != null){
-            if(oPeriod.getProposalList() != null){
-                Iterator<Proposal> iter = oPeriod.getProposalList().iterator();
-                while(iter.hasNext()){
-                    Proposal p = iter.next();
-                    configureProposal(p, u);
-        //            if(p.getDirective().getChoiceList().size() == 1
-        //                    &&
-        //                p.getDirective().isExecuteChoiceIfLoneWolf()){
-        //                    evaluateProposal(p, p.getDirective().getChoiceList().get(0), oPeriod, u);
-        //            }
+    public OccPeriodDataHeavy configureProposals(OccPeriodDataHeavy oPeriod, Credential cred) throws EventException, AuthorizationException{
+        ChoiceIntegrator ci = getChoiceIntegrator();
+        
+        if(oPeriod != null && oPeriod.getProposalList() == null){
+            try {
+                oPeriod.setProposalList(ci.getProposalList(oPeriod));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+            if(cred != null){
+                if(oPeriod.getProposalList() != null){
+                    Iterator<Proposal> iter = oPeriod.getProposalList().iterator();
+                    while(iter.hasNext()){
+                        Proposal p = iter.next();
+                        configureProposal(p, cred);
+            //            if(p.getDirective().getChoiceList().size() == 1
+            //                    &&
+            //                p.getDirective().isExecuteChoiceIfLoneWolf()){
+            //                    evaluateProposal(p, p.getDirective().getChoiceList().get(0), oPeriod, u);
+            //            }
+                    }
                 }
             }
         }
@@ -100,9 +129,9 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
      * @return 
      */
     private Proposal configureProposal( Proposal proposal, 
-                                        UserAuthorized u){
+                                        Credential cred){
         
-        if(proposal != null && u != null){
+        if(proposal != null && cred != null){
 
             // start by  setting the most restrictive rights and then relax them as authorization
             // status allows
@@ -120,32 +149,32 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
 
                 }
             }
-            if(u.getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToView()){
+            if(cred.getGoverningAuthPeriod().getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToView()){
                 proposal.setHidden(false);
-                if(u.getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToEvaluate()){
+                if(cred.getGoverningAuthPeriod().getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToEvaluate()){
                     proposal.setReadOnlyCurrentUser(false);
                 }
             }
-            configureChoiceList(proposal, u);
+            configureChoiceList(proposal, cred);
         }
         return proposal;
     }
     
-    public Proposal configureChoiceList(Proposal proposal, UserAuthorized u){
-        if(proposal != null && u != null){
+    public Proposal configureChoiceList(Proposal proposal, Credential cred){
+        if(proposal != null && cred != null){
             if(proposal.getDirective().getChoiceList() != null){
                 Iterator<IFace_Proposable> iter = proposal.getDirective().getChoiceList().iterator();
                 while(iter.hasNext()){
                     IFace_Proposable p = iter.next();
-                    configureChoice(p, u);
+                    configureChoice(p, cred);
                 }
             }
         }
         return proposal;
     }
     
-    private IFace_Proposable configureChoice(IFace_Proposable choice, UserAuthorized u){
-        if(choice != null && u != null){
+    private IFace_Proposable configureChoice(IFace_Proposable choice, Credential cred){
+        if(choice != null && cred != null){
             choice.setHidden(true);
             choice.setCanChoose(false);
 
@@ -153,9 +182,9 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
             if(!choice.isActive()){
                 return choice;
             }
-             if(u.getRole().getRank() >= choice.getMinimumRequiredUserRankToView()){
+             if(cred.getGoverningAuthPeriod().getRole().getRank() >= choice.getMinimumRequiredUserRankToView()){
                     choice.setHidden(false);
-                    if(u.getRole().getRank() >= choice.getMinimumRequiredUserRankToChoose()){
+                    if(cred.getGoverningAuthPeriod().getRole().getRank() >= choice.getMinimumRequiredUserRankToChoose()){
                         choice.setCanChoose(true);
                     }
             }

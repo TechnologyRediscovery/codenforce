@@ -9,39 +9,52 @@ import com.tcvcog.tcvce.entities.CEActionRequestIssueType;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.search.SearchParams;
-import java.io.Serializable;
+import com.tcvcog.tcvce.entities.Property;
 
 /**
  *
  * @author sylvia
  */
-public  class   SearchParamsCEActionRequests 
-        extends SearchParams {
+public  class       SearchParamsCEActionRequests 
+        extends     SearchParams {
     
+    public static final String DBFIELD = "property.municipality_municode";
+    
+    // filter CEAR-1
     private boolean requestStatus_ctl;
     private CEActionRequestStatus requestStatus_val;
     
+    // filter CEAR-2
     private boolean issueType_ctl;
     private CEActionRequestIssueType issueType_val;
     
+    // filter CEAR-3
     private boolean nonaddressable_ctl;
     private boolean nonaddressable_val;
     
+    // filter CEAR-4
     private boolean urgent_ctl;
     private boolean urgent_val;
     
+    // filter CEAR-5
     private boolean caseAttachment_ctl;
     private boolean caseAttachment_val;
     
+    // filter CEAR-6
     private boolean cecase_ctl;
     private CECase cecase_val;
     
+    // filter CEAR-7
     private boolean pacc_ctl;
     private boolean pacc_val;
     
+    // filter CEAR-8
     private boolean requestorPerson_ctl;
     private Person requestorPerson_val;
+    
+    // filter CEAR-9
+    private boolean property_ctl;
+    private Property property_val;
     
     
     /**
@@ -276,6 +289,34 @@ public  class   SearchParamsCEActionRequests
      */
     public void setCaseAttachment_val(boolean caseAttachment_val) {
         this.caseAttachment_val = caseAttachment_val;
+    }
+
+    /**
+     * @return the property_val
+     */
+    public Property getProperty_val() {
+        return property_val;
+    }
+
+    /**
+     * @param property_val the property_val to set
+     */
+    public void setProperty_val(Property property_val) {
+        this.property_val = property_val;
+    }
+
+    /**
+     * @return the property_ctl
+     */
+    public boolean isProperty_ctl() {
+        return property_ctl;
+    }
+
+    /**
+     * @param property_ctl the property_ctl to set
+     */
+    public void setProperty_ctl(boolean property_ctl) {
+        this.property_ctl = property_ctl;
     }
     
 }

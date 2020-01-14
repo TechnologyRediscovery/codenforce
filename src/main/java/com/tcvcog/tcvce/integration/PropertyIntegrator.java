@@ -730,7 +730,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             //******************************************************************
            // **   FILTERS COM-1, COM-2, COM-3, COM-6 MUNI,DATES,USER,ACTIVE  **
            // ******************************************************************
-             params = (SearchParamsProperty) sc.assembleBObSearchSQL_muniDatesUserActive(params);
+             params = (SearchParamsProperty) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsProperty.MUNI_DBFIELD);
 
             //**************************************
            // **   FILTER PROP-1   ZIP            **

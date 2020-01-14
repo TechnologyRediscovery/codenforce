@@ -9,7 +9,8 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUseType;
 import java.io.Serializable;
 
 /**
@@ -17,9 +18,9 @@ import java.io.Serializable;
  * @author Sylvia Garland
  */
 public class        SearchParamsEvent 
-        extends     SearchParams 
-        implements  Serializable{
+        extends     SearchParams {
     
+    public static final String MUNI_DBFIELD = "property.municipality_municode";
     
     // filter EVENT-1
     private boolean eventCat_ctl;
@@ -48,6 +49,18 @@ public class        SearchParamsEvent
     // filter EVENT-7
     private boolean discloseToPublic_ctl;
     private boolean discloseToPublic_val;
+    
+    // filter EVENT-8
+    private boolean property_ctl;
+    private Property property_val;
+    
+    // filter EVENT-9
+    private boolean propertyUseType_ctl;
+    private PropertyUseType propertyUseType_val;
+    
+    // filter EVENT-10
+    private boolean propertyLandBankHeld_ctl;
+    private boolean propertyLandBankHeld_val;
     
     
    public SearchParamsEvent(){
@@ -252,6 +265,90 @@ public class        SearchParamsEvent
      */
     public void setEventDomainPK_val(int eventDomainPK_val) {
         this.eventDomainPK_val = eventDomainPK_val;
+    }
+
+    /**
+     * @return the property_ctl
+     */
+    public boolean isProperty_ctl() {
+        return property_ctl;
+    }
+
+    /**
+     * @param property_ctl the property_ctl to set
+     */
+    public void setProperty_ctl(boolean property_ctl) {
+        this.property_ctl = property_ctl;
+    }
+
+    /**
+     * @return the propertyUseType_ctl
+     */
+    public boolean isPropertyUseType_ctl() {
+        return propertyUseType_ctl;
+    }
+
+    /**
+     * @param propertyUseType_ctl the propertyUseType_ctl to set
+     */
+    public void setPropertyUseType_ctl(boolean propertyUseType_ctl) {
+        this.propertyUseType_ctl = propertyUseType_ctl;
+    }
+
+    /**
+     * @return the propertyLandBankHeld_ctl
+     */
+    public boolean isPropertyLandBankHeld_ctl() {
+        return propertyLandBankHeld_ctl;
+    }
+
+    /**
+     * @param propertyLandBankHeld_ctl the propertyLandBankHeld_ctl to set
+     */
+    public void setPropertyLandBankHeld_ctl(boolean propertyLandBankHeld_ctl) {
+        this.propertyLandBankHeld_ctl = propertyLandBankHeld_ctl;
+    }
+
+    /**
+     * @return the propertyLandBankHeld_val
+     */
+    public boolean isPropertyLandBankHeld_val() {
+        return propertyLandBankHeld_val;
+    }
+
+    /**
+     * @param propertyLandBankHeld_val the propertyLandBankHeld_val to set
+     */
+    public void setPropertyLandBankHeld_val(boolean propertyLandBankHeld_val) {
+        this.propertyLandBankHeld_val = propertyLandBankHeld_val;
+    }
+
+    /**
+     * @return the propertyUseType_val
+     */
+    public PropertyUseType getPropertyUseType_val() {
+        return propertyUseType_val;
+    }
+
+    /**
+     * @param propertyUseType_val the propertyUseType_val to set
+     */
+    public void setPropertyUseType_val(PropertyUseType propertyUseType_val) {
+        this.propertyUseType_val = propertyUseType_val;
+    }
+
+    /**
+     * @return the property_val
+     */
+    public Property getProperty_val() {
+        return property_val;
+    }
+
+    /**
+     * @param property_val the property_val to set
+     */
+    public void setProperty_val(Property property_val) {
+        this.property_val = property_val;
     }
 
    

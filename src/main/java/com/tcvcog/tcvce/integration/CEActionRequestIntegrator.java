@@ -747,24 +747,24 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         SearchCoordinator sc = getSearchCoordinator();
         List<Integer> cearidlst = new ArrayList();
         
-        params.appendSQL("SELECT DISTINCT requestid FROM public.ceactionrequest ");
-        params.appendSQL("WHERE requestid IS NOT NULL "); // param 1
+        params.appendSQL("SELECT DISTINCT requestid FROM public.ceactionrequest \n");
+        params.appendSQL("LEFT OUTER JOIN public.property ON (ceactionrequest.property_propertyid = property.propertyid); \n");
+        params.appendSQL("WHERE requestid IS NOT NULL \n"); 
 
         // ****************************
         // **         OBJECT ID      **
         // ****************************
          if (!params.isBobID_ctl()) {
              
-             
             
             // ***********************************
             // **     MUNI,DATES,USER,ACTIVE    **
             // *********************************** 
            
-            params = (SearchParamsCEActionRequests) sc.assembleBObSearchSQL_muniDatesUserActive(params);
+            params = (SearchParamsCEActionRequests) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsCEActionRequests.DBFIELD);
             
             // ****************************
-            // **     REQUEST STATUS     **
+            // **   1.REQUEST STATUS     **
             // **************************** 
             if(params.isRequestStatus_ctl()){
                 if(params.getRequestStatus_val() != null){
@@ -776,7 +776,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             }
             
             // ****************************
-            // **     ISSUE TYPE         **
+            // **   2/ISSUE TYPE         **
             // **************************** 
             if(params.isIssueType_ctl()){
                 if(params.getIssueType_val() != null){
@@ -788,7 +788,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             }
             
             // ****************************
-            // **     ADDRESSABILITY     **
+            // **   3/ADDRESSABILITY     **
             // **************************** 
             if(params.isNonaddressable_ctl()){
                 if(params.isNonaddressable_val()){
@@ -799,7 +799,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             } 
             
             // ****************************
-            // **         URGENCY        **
+            // **       4.URGENCY        **
             // **************************** 
             if(params.isUrgent_ctl()){
                 if(params.isUrgent_val()){
@@ -810,7 +810,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             } 
 
             // ****************************
-            // **       CASE CNXN        **
+            // **     5/CASE CNXN        **
             // **************************** 
             if (params.isCaseAttachment_ctl()) {
                 if (params.isCaseAttachment_val()) {
@@ -819,6 +819,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND cecase_caseid IS NULL ");
                 }
             }
+            
+            // ****************************
+            // **    6/CECASE            **
+            // **************************** 
             
             if (params.isCecase_ctl()) {
                 if(params.getCecase_val() != null){
@@ -830,7 +834,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             }
             
             // ****************************
-            // **      PUBLIC ACCESS     **
+            // **    7/PUBLIC ACCESS     **
             // **************************** 
             if (params.isPacc_ctl()) {
                 if(params.isPacc_val()){
@@ -840,9 +844,9 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 }
             }
                 
-            // ****************************
-            // **   REQUESTING PERSON    **
-            // **************************** 
+            // *******************************
+            // **   8: REQUESTING PERSON    **
+            // ******************************* 
             
             if (params.isRequestorPerson_ctl()) {
                 if(params.getRequestorPerson_val() != null){
@@ -850,6 +854,19 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 } else {
                     params.setRequestorPerson_ctl(false);
                     params.logMessage("REQUESTING PERSON: no Person object found; person filter turned off; | ");
+                }
+            }
+                
+            // *******************************
+            // **   9: Property             **
+            // ******************************* 
+            
+            if (params.isProperty_ctl()) {
+                if(params.getProperty_val() != null){
+                    params.appendSQL("AND property.propertyid=? ");
+                } else {
+                    params.setRequestorPerson_ctl(false);
+                    params.logMessage("PROPERTY: no Property object found; filter turned off; | ");
                 }
             }
 
@@ -901,6 +918,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     stmt.setInt(++paramCounter, params.getRequestorPerson_val().getPersonID());
                 }
                 
+                if(params.isProperty_ctl()){
+                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                }
+                
 
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
@@ -911,9 +932,18 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             
             rs = stmt.executeQuery();
             
-            while (rs.next()) {
+            int counter = 0;
+            int maxResults;
+            if (params.isLimitResultCount_ctl()) {
+                maxResults = params.getLimitResultCount_val();
+            } else {
+                maxResults = Integer.MAX_VALUE;
+            }
+            while (rs.next() && counter < maxResults) {
                 cearidlst.add(rs.getInt("requestid"));
-            } 
+                counter++;
+            }
+
 
         } catch (SQLException ex) {
             System.out.println(ex);

@@ -66,6 +66,8 @@ public  class       MunicipalityDataHeavy
     private List<CourtEntity> courtEntities;
     private List<Integer> photoDocList;
     
+    private int defaultOccPeriodID;
+    
     private String credentialSignature;
     
     
@@ -636,6 +638,20 @@ public  class       MunicipalityDataHeavy
      */
     public void setMuniPropertyDH(PropertyDataHeavy muniPropertyDH) {
         this.muniPropertyDH = muniPropertyDH;
+    }
+
+    /**
+     * @return the defaultOccPeriodID
+     */
+    public int getDefaultOccPeriodID() {
+        return defaultOccPeriodID;
+    }
+
+    /**
+     * @param defaultOccPeriodID the defaultOccPeriodID to set
+     */
+    public void setDefaultOccPeriodID(int defaultOccPeriodID) {
+        this.defaultOccPeriodID = defaultOccPeriodID;
     }
 
 

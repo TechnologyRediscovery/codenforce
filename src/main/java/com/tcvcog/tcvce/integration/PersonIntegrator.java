@@ -1078,6 +1078,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
         params.appendSQL    ("SELECT DISTINC personid FROM public.person \n");
         params.appendSQL    ("LEFT OUTER JOIN public.propertyperson ON (person.personid = propertyperson.person_personid)\n");
+        params.appendSQL    ("LEFT OUTER JOIN public.property ON (property.propertyid = propertyperson.person_personid)\n");
         params.appendSQL    ("LEFT OUTER JOIN public.occperiodperson ON (person.personid = occperiodperson.person_personid)\n");
         params.appendSQL    ("LEFT OUTER JOIN public.eventperson ON (person.personid = eventperson.person_personid)\n");
         params.appendSQL    ("LEFT OUTER JOIN public.citationperson ON (person.personid = citationperson.person_personid)\n");
@@ -1095,7 +1096,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             //******************************************************************
            // **   FILTERS COM-1, COM-2, COM-3, COM-6 MUNI,DATES,USER,ACTIVE  **
            // ******************************************************************
-            params = (SearchParamsPerson) sc.assembleBObSearchSQL_muniDatesUserActive(params);
+            params = (SearchParamsPerson) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsPerson.MUNI_DBFIELD);
             
 
             // ***********************************

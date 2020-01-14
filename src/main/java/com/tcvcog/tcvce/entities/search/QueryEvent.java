@@ -41,7 +41,7 @@ public class QueryEvent
     }
 
     
-    public List getParamsList() {
+    public List<SearchParamsEvent> getParamsList() {
         return searchParamList;
     }
 

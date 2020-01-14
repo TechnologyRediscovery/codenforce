@@ -34,6 +34,11 @@ public  enum        QueryPersonEnum
                         RoleType.MuniStaff,
                         true),
     
+    OCCPERIOD_PERSONS(  "OccPeriod Persons",
+                        "All persons associated with a given Occupancy Period",
+                        RoleType.MuniStaff,
+                        false),   
+    
     CUSTOM(             "Custom", 
                         "Custom", 
                         RoleType.MuniReader,

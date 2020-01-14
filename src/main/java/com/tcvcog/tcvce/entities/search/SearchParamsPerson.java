@@ -24,9 +24,10 @@ import java.util.List;
  * 
  * @author Sylvia Garland
  */
-public  class   SearchParamsPerson 
-        extends SearchParams {
+public  class       SearchParamsPerson 
+        extends     SearchParams {
     
+    public static final String MUNI_DBFIELD = "property.municipality_municode";
     
     // filter PERS-1
     protected RoleType names_rtMin;

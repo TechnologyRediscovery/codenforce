@@ -204,10 +204,10 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         try {
             if(sessionPeriod != null){
                 if(!(sessionPeriod instanceof OccPeriodDataHeavy)){
-                    currentOccPeriod = oi.generateOccPeriodDataHeavy(sessionPeriod);
+                    currentOccPeriod = getSessionBean().getSessionOccPeriod();
                 }
                 if(currentOccPeriod.getConfiguredTS() == null){
-                    currentOccPeriod = oc.configureOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessionUser().getMyCredential());
+                    currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessionUser().getMyCredential());
                 }
                 currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
                 currentInspection = currentOccPeriod.getGoverningInspection();
@@ -234,10 +234,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 //                } 
 //            }
             propertyUnitCandidateList = pi.getPropertyUnitList(getSessionBean().getSessionProperty());
-        } catch (IntegrationException | EventException| AuthorizationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
-        } 
-        
+        }
         
         // general setting of drop-down box lists
         try {
@@ -502,7 +501,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Reloaded occ period ID " + currentOccPeriod.getPeriodID(), ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,

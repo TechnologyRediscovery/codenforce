@@ -88,7 +88,6 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
     
     public OccPeriod selectDefaultMuniOccPeriod(Credential cred) throws IntegrationException, AuthorizationException{
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        PropertyCoordinator pc = getPropertyCoordinator();
         MunicipalityDataHeavy mdh = null;
         if(cred != null){
             try {
@@ -96,19 +95,10 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
             } catch (BObStatusException | EventException ex) {
                 System.out.println(ex);
             }
-            if(mdh != null 
-                            && 
-                        mdh.getMuniPropertyDH().getUnitWithListsList() != null
-                            &&
-                        mdh.getMuniPropertyDH().getUnitWithListsList().get(0) != null){
-                
-                // TODO: this sequence needs to be tightened up
-                
-                return mdh.getMuniPropertyDH().getUnitWithListsList().get(0).getPeriodList().get(0);
-                
+            if(mdh != null && mdh.getDefaultOccPeriodID() != 0){
+                return oc.getOccPeriod(mdh.getDefaultOccPeriodID());
             }
         } 
-        
         return null;
     }
     

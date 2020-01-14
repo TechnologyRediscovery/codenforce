@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.SessionException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
@@ -86,7 +87,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.SysexMessage;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
+import com.tcvcog.tcvce.entities.search.QueryEventEnum;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.integration.ChoiceIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.SubSysEnum;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * King of all business logic implementation for the entire Occupancy object tree
@@ -137,14 +149,56 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @return
      * @throws IntegrationException 
      */
-    public OccPeriodDataHeavy assembleOccPeriodDataHeavy(OccPeriod per, Credential cred) throws IntegrationException{
+    public OccPeriodDataHeavy assembleOccPeriodDataHeavy(OccPeriod per, Credential cred) throws IntegrationException, BObStatusException{
+        if(per == null || cred == null){
+            throw new BObStatusException("Cannot assemble an OccPeriod data heavy without base period or Credential");
+        }
+        
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        OccPeriodDataHeavy opdh = null;
-        try{
-            opdh = configureOccPeriodDataHeavy(oi.generateOccPeriodDataHeavy(per), cred);
-        } catch (BObStatusException | AuthorizationException | EventException ex) {
+        OccPeriodDataHeavy opdh = new OccPeriodDataHeavy(per);
+        
+        OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
+        PersonIntegrator pi = getPersonIntegrator();
+        EventIntegrator ei = getEventIntegrator();
+        ChoiceCoordinator chc = getChoiceCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
+        
+        // now get all the lists from their respective integrators
+        // this is the Java version of table joins in SQL; we're doing them interatively
+        // in our integrators for each BOB
+        try {
+            opdh.setApplicationList(oi.getOccPermitApplicationList(opdh));
+
+            QueryPerson qp = sc.initQuery(QueryPersonEnum.OCCPERIOD_PERSONS, cred);
+            if(!qp.getParmsList().isEmpty()){
+                qp.getParmsList().get(0).setOccPeriod_val(per);
+            }
+            opdh.setPersonList(sc.runQuery(qp).getBOBResultList());
+
+            QueryEvent qe = sc.initQuery(QueryEventEnum.OCCPERIOD, cred);
+            if(!qe.getParmsList().isEmpty()){
+                qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
+            }
+            
+            opdh.setEventList(qe.getBOBResultList());
+
+            opdh = chc.configureProposals(opdh, cred);
+
+            opdh.setInspectionList(inspecInt.getOccInspectionList(opdh));
+
+    //        opdh.setPaymentList(pai.getPaymentList(opdh));
+    //        opdh.setFeeList(pai.getFeeAssigned(opdh));
+
+            opdh.setPermitList(oi.getOccPermitList(opdh));
+            opdh.setBlobIDList(oi.getBlobList(opdh));
+            opdh.setGoverningInspection(designateGoverningInspection(opdh));
+        
+        } catch (BObStatusException | EventException | AuthorizationException | SearchException ex) {
             System.out.println(ex);
         } 
+        // TODO: Figure out this inheritance SNAFU
+//        opdh.setEventRuleList(ei.rules_getEventRuleOccPeriodList(opdh));
+        
         
         return opdh;
         
@@ -169,62 +223,25 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     }
     
-    public OccPeriodDataHeavy configureOccPeriodDataHeavy(OccPeriodDataHeavy period, Credential cred) throws BObStatusException, IntegrationException, AuthorizationException, EventException{
-        ChoiceCoordinator cc = getChoiceCoordinator();
-        EventCoordinator ec = getEventCoordinator();
-        UserCoordinator uc = getUserCoordinator();
-        PropertyIntegrator pi = getPropertyIntegrator();
-        PropertyCoordinator pc = getPropertyCoordinator();
-        
-        UserAuthorized ua =  null;
-        
-        if(period != null && cred != null){
-            period.setGoverningInspection(designateGoverningInspection(period));
-            period = cc.configureProposals(period, ua);
-            // Removed during occbeta overhaul
-    //        if(period.determineGoverningOccInspection().isReadyForPassedCertification() 
-    //                && ec.rules_evaluateEventRules(period)){
-    //            period.setReadyForPeriodAuthorization(true);
-    //        }
-
-        }
-        return period;
-        
-    }
-    
     
     public List<OccPeriod> assembleOccPeriodHistoryList(Credential cred){
+        OccupancyIntegrator oi = getOccupancyIntegrator();
         
-        // TODO: write my guts
         
-        return new ArrayList<>();
+        List<OccPeriod> opList = new ArrayList<>();
+        try {
+            for(Integer i: oi.getOccPeriodHistoryList(cred.getGoverningAuthPeriod().getUserID())){
+                    opList.add(getOccPeriod(i));
+            }
+        } catch (IntegrationException ex) {            
+            System.out.println(ex);
+        }
         
+        
+        return opList;
         
     }
     
-    
-    public OccPeriod selectDefaultOccPeriod(MunicipalityDataHeavy mdh, Credential cred) throws SessionException{
-        if(mdh.getMuniPropertyDH() != null 
-                &&
-            mdh.getMuniPropertyDH().getUnitWithListsList() != null
-                &&
-            !mdh.getMuniPropertyDH().getUnitWithListsList().isEmpty()
-                &&
-            mdh.getMuniPropertyDH().getUnitWithListsList().get(0) != null
-                &&
-            mdh.getMuniPropertyDH().getUnitWithListsList().get(0).getPeriodList() != null
-                &&
-            !mdh.getMuniPropertyDH().getUnitWithListsList().get(0).getPeriodList().isEmpty()){
-            
-            return mdh.getMuniPropertyDH().getUnitWithListsList().get(0).getPeriodList().get(0);
-        }
-        
-        else {
-            throw new SessionException("Could not extract default occ period from muni", 
-                    SubSysEnum.VI_OCCPERIOD, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
-        }
-        
-    }
     
     
     /**
@@ -552,7 +569,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public int insertNewOccPeriod(OccPeriod op, UserAuthorized u) 
             throws  IntegrationException, 
                     InspectionException, 
-                    BObStatusException, 
                     EventException,
                     AuthorizationException,
                     ViolationException {
@@ -562,12 +578,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         int freshOccPeriodID = oi.insertOccPeriod(op); 
         
-        OccPeriodDataHeavy opdh = oi.generateOccPeriodDataHeavy(oi.getOccPeriod(freshOccPeriodID));
-        
-        if(op.getType().getBaseRuleSetID()!= 0){
-            EventRuleSet ers = ei.rules_getEventRuleSet(op.getType().getBaseRuleSetID());
-            ec.rules_attachRuleSet(ers, opdh, u);
-        }
+//        OccPeriodDataHeavy opdh = oi.generateOccPeriodDataHeavy(oi.getOccPeriod(freshOccPeriodID));
+//        
+//        if(op.getType().getBaseRuleSetID()!= 0){
+//            EventRuleSet ers = ei.rules_getEventRuleSet(op.getType().getBaseRuleSetID());
+//            ec.rules_attachRuleSet(ers, opdh, u);
+//        }
        System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);
 
         return freshOccPeriodID;

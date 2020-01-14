@@ -416,21 +416,41 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection con = getPostgresCon();
+
+        // we need an EventDomain for the BOBID, too, so set it arbitrarily if it's null
+        if(params.getEventDomain_val() == null){
+            params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+            params.logMessage("DOMAIN CONTROL: no object specified - Code Enforcement chosen as default; | ");
+        }
         
-        params.appendSQL("SELECT DISTINCT eventid, person_personid ");
-        params.appendSQL("FROM public.event INNER JOIN public.eventcategory ON category_catid = categoryid \n");
-        params.appendSQL("LEFT OUTER JOIN public.eventperson ON ceevent_eventid = eventid ");
-        params.appendSQL("WHERE eventid IS NOT NULL ");
+        params.appendSQL("SELECT DISTINCT eventid \n");
+        params.appendSQL("FROM public.event INNER JOIN public.eventcategory ON (category_catid = categoryid) \n");
+        params.appendSQL("LEFT OUTER JOIN public.eventperson ON (ceevent_eventid = event.eventid) \n");
+        // to get to property and hence municipality, we must traverse different key pathways
+        // through the database for CE versus Occ. This is all backflippy crazy shit because
+        // of the decision decision to maintain only one event tablef or both Occ events and CE events.
+        if(params.getEventDomain_val().equals(EventDomainEnum.CODE_ENFORCEMENT)){
+            params.appendSQL("LEFT OUTER JOIN public.cecase ON (cecase.caseid = event.cecase_caseid) \n");
+            params.appendSQL("LEFT OUTER JOIN public.property ON (cecase.property_propertyid = property_propertyid)  \n");
+            
+        } else {
+            // with only two enum values now, we either have Code enf or occ
+            params.appendSQL("LEFT OUTER JOIN public.occperiod ON (occperiod.periodid = event.occperiod_periodid) \n");
+            params.appendSQL("LEFT OUTER JOIN public.propertyunit ON (propertyunit.unitid = occperiod.propertyunit_unitid) \n");
+            params.appendSQL("LEFT OUTER JOIN public.property ON (property.propertyid = propertyunit.property_propertyid) \n");
+        }
+        params.appendSQL("WHERE eventid IS NOT NULL \n");
+        
         // as long as this isn't an ID only search, do the normal SQL building process
         if (!params.isBobID_ctl()) {
             
             //*******************************
            // **   MUNI,DATES,USER,ACTIVE  **
            // *******************************
-            params = (SearchParamsEvent) sc.assembleBObSearchSQL_muniDatesUserActive(params);
+            params = (SearchParamsEvent) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsEvent.MUNI_DBFIELD);
 
             //*******************************
-           // **      EVENT CATEGORY       **
+           // **      1.EVENT CATEGORY     **
            // *******************************
             if (params.isEventCat_ctl() ) {
                 if(params.getEventCat_val() != null){
@@ -442,7 +462,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             }
 
            // *******************************
-           // **      EVENT TYPE           **
+           // **      2.EVENT TYPE         **
            // *******************************
             if (params.isEventType_ctl() ) {
                 if(params.getEventType_val()!= null){
@@ -453,24 +473,19 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 }
             }
             
-            // we need an EventDomain for the BOBID, too, so set it arbitrarily if it's null
-            if(params.getEventDomain_val() == null){
-                params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
-                params.logMessage("DOMAIN CONTROL: no object specified - Code Enforcement chosen as default; | ");
-            }
             
            // *******************************
-           // **      EVENT DOMAIN         **
+           // **     3.EVENT DOMAIN        **
            // *******************************
             if(params.isEventDomain_ctl()){
                 params.appendSQL("AND ");
-                params.appendSQL(params.getEventDomain_val().getDbField());
+                params.appendSQL(params.getEventDomain_val().getDbField()); //Code enf or Occ
                 params.appendSQL(" ");
                 params.appendSQL("IS NOT NULL ");
             }
             
            // *******************************
-           // **   EVENT DOMAIN BOB ID     **
+           // **   4.EVENT DOMAIN BOB ID   **
            // *******************************
             if(params.isEventDomainPK_ctl()){
                 params.appendSQL("AND ");
@@ -479,11 +494,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             }
             
            // *******************************
-           // **   EVENT PERSONS           **
+           // **   5.EVENT PERSONS         **
            // *******************************
             if (params.isPerson_ctl()) {
                 if(params.getPerson_val() != null){
-                    params.appendSQL("AND person_personid=? ");
+                    params.appendSQL("AND eventperson.person_personid=? ");
                 } else {
                     params.setPerson_ctl(false);
                     params.logMessage("EVENT PERSONS: No Person object specified; person filter disabled; | ");
@@ -491,7 +506,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             }
 
            // *******************************
-           // **      DISCLOSE TO MUNI     **
+           // **    6.DISCLOSE TO MUNI     **
            // *******************************
             if (params.isDiscloseToMuni_ctl()) {
                 params.appendSQL("AND disclosetomunicipality=");
@@ -504,7 +519,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
 
            // *******************************
-           // **      DISCLOSE TO PUBLIC   **
+           // **    7.DISCLOSE TO PUBLIC   **
            // *******************************
             if (params.isDiscloseToPublic_ctl()) {
                 params.appendSQL("AND disclosetopublic=");
@@ -515,8 +530,44 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 }
             }
             
+           // *******************************
+           // **   8.PROPERTY              **
+           // *******************************
+            if (params.isProperty_ctl()) {
+                if(params.getProperty_val()!= null){
+                    params.appendSQL("AND property.propertyid=? ");
+                } else {
+                    params.setProperty_ctl(false);
+                    params.logMessage("PROPERTY: No PROPERTY object specified; filter disabled; | ");
+                }
+            }
+            
+           // *******************************
+           // **   9.PROP USE TYPE         **
+           // *******************************
+            if (params.isPropertyUseType_ctl()) {
+                if(params.getPropertyUseType_val()!= null){
+                    params.appendSQL("AND property.propertyid=? ");
+                } else {
+                    params.setPropertyUseType_ctl(false);
+                    params.logMessage("PROPERTY USE TYPE: No PROPERTY object specified; filter disabled; | ");
+                }
+            }
+            
+             // *******************************
+           // **   10. LAND BANK HELD        **
+           // *******************************
+            if (params.isDiscloseToPublic_ctl()) {
+                params.appendSQL("AND property.landbankheld=");
+                if (params.isDiscloseToPublic_val()) {
+                    params.appendSQL("TRUE ");
+                } else {
+                    params.appendSQL("FALSE ");
+                }
+            }
+            
         } else {
-            params.appendSQL("eventid=? "); // will be param 1 with ID search
+            params.appendSQL("AND eventid=? "); // will be param 1 with ID search
         }
         int paramCounter = 0;
         params.appendSQL(";");
@@ -555,6 +606,14 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     stmt.setInt(++paramCounter, params.getPerson_val().getPersonID());
                 }
                 
+                if (params.isProperty_ctl()) {
+                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                }
+                
+                if (params.isPropertyUseType_ctl()) {
+                    stmt.setInt(++paramCounter, params.getPropertyUseType_val().getTypeID());
+                }
+                
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
@@ -564,7 +623,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             int counter = 0;
             int maxResults;
             if (params.isLimitResultCount_ctl()) {
-                maxResults = 100;
+                maxResults = params.getLimitResultCount_val();
             } else {
                 maxResults = Integer.MAX_VALUE;
             }

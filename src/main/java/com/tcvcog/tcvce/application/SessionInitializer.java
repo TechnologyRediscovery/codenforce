@@ -39,6 +39,7 @@ import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
@@ -50,6 +51,8 @@ import com.tcvcog.tcvce.util.SubSysEnum;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -136,14 +139,11 @@ public  class       SessionInitializer
      * Processes the user's choice of their authorization period
      * and initiates the entire auth process to create a fully populted session
      * @param umap the chosen UMAP, which should be valid
+     * @return 
      */
-    public void credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
-        try {
-            configureSession(umap);
-        } catch (BObStatusException | IntegrationException ex) {
-            System.out.println("SessionInitializer.credentializeUserMuniAuthPeriod | error configuring session");
-            System.out.println(ex);
-        }
+    public String credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
+           return configureSession(umap);
+        
     }
     
     
@@ -158,7 +158,7 @@ public  class       SessionInitializer
      * @throws BObStatusException
      * @throws IntegrationException 
      */
-    public String configureSession(UserMuniAuthPeriod umap) throws BObStatusException, IntegrationException{
+    public String configureSession(UserMuniAuthPeriod umap) {
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
         System.out.println("SessionInitializer.configureSession()");
@@ -171,8 +171,10 @@ public  class       SessionInitializer
             // as long as we have an actual user, proceed with session config
             if(authUser != null){
                 initializeSubsystems(authUser);
+                System.out.println("Init subsystem success!");
                return "success";
             } else {
+                System.out.println("Init subsystem no auth!");
                 return "noAuth";
             }
         
@@ -536,22 +538,30 @@ public  class       SessionInitializer
     private void initSubsystem_VI_OccPeriod(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
         SearchCoordinator sc = getSearchCoordinator();
         OccupancyCoordinator occCord = getOccupancyCoordinator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
         
+        OccPeriod op = null;
             try {
             // Session object init
             sb.setSessionOccPeriodList(occCord.assembleOccPeriodHistoryList(cred));
             if(sb.getSessionOccPeriodList().isEmpty()){
-                sb.setSessionOccPeriod(occCord.assembleOccPeriodDataHeavy(occCord.selectDefaultOccPeriod(mdh, cred), cred));
+                op = occCord.getOccPeriod(sb.getSessionMuni().getDefaultOccPeriodID());
             } else {
-                sb.setSessionOccPeriod(occCord.assembleOccPeriodDataHeavy(sb.getSessionOccPeriodList().get(0), cred));
+                // if there's a history, convert the head item to a data heavy and put in session
+                op = sb.getSessionOccPeriodList().get(0);
             }
-
+            
+            sb.setSessionOccPeriod(occCord.assembleOccPeriodDataHeavy(op, cred));
+            if(op == null){
+                throw new SessionException("Unable to set a session occ period");
+            }
+            
             // Query set init
             sb.setQueryOccPeriodList(sc.buildQueryOccPeriodList(cred));
             if(!sb.getQueryOccPeriodList().isEmpty()){
                 sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
             }
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             throw new SessionException( "Occ period list or query assembly failure", 
                                         ex, 
