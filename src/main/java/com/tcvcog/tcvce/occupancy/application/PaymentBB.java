@@ -75,9 +75,9 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
         redirTo = getSessionBean().getPaymentRedirTo();
         if (redirTo != null) {
-            
+
             refreshFeeAssignedList();
-            
+
         }
 
         formPayment = new Payment();
@@ -91,12 +91,10 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         feeAssignedList = new ArrayList<>();
 
         paymentList = new ArrayList<>();
-        
-        boolean paymentSet = false;
-        
-        PaymentIntegrator pi = getPaymentIntegrator();
 
-        redirTo = getSessionBean().getFeeRedirTo();
+        boolean paymentSet = false;
+
+        PaymentIntegrator pi = getPaymentIntegrator();
 
         currentDomain = getSessionBean().getFeeManagementDomain();
 
@@ -109,15 +107,15 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                 paymentSet = true;
                 try {
                     ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-                    
-                    for (MoneyOccPeriodFeeAssigned fee : tempList){
-                        
+
+                    for (MoneyOccPeriodFeeAssigned fee : tempList) {
+
                         FeeAssigned skeleton = fee;
-                        
+
                         skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
                         skeleton.setDomain(currentDomain);
                         feeAssignedList.add(skeleton);
-                        
+
                     }
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
@@ -128,11 +126,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
                 try {
                     ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-                    
-                    for (MoneyOccPeriodFeeAssigned fee : tempList){
-                        
+
+                    for (MoneyOccPeriodFeeAssigned fee : tempList) {
+
                         FeeAssigned skeleton = fee;
-                        
+
                         skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
                         skeleton.setDomain(currentDomain);
                         feeAssignedList.add(skeleton);
@@ -156,15 +154,15 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                 paymentSet = true;
                 try {
                     ArrayList<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
-                    
-                    for (MoneyCECaseFeeAssigned fee : tempList){
-                        
+
+                    for (MoneyCECaseFeeAssigned fee : tempList) {
+
                         FeeAssigned skeleton = fee;
-                        
+
                         skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
                         skeleton.setDomain(currentDomain);
                         feeAssignedList.add(skeleton);
-                        
+
                     }
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
@@ -174,13 +172,13 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             } else if (currentCase != null) {
 
                 try {
-                    
+
                     ArrayList<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
-                    
-                    for (MoneyCECaseFeeAssigned fee : tempList){
-                        
+
+                    for (MoneyCECaseFeeAssigned fee : tempList) {
+
                         FeeAssigned skeleton = fee;
-                        
+
                         skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
                         skeleton.setDomain(currentDomain);
                         feeAssignedList.add(skeleton);
@@ -196,8 +194,8 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             }
 
         }
-        
-        if(!paymentSet){
+
+        if (!paymentSet) {
             try {
                 paymentList = pi.getPaymentList();
             } catch (IntegrationException ex) {
@@ -209,7 +207,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         }
 
     }
-    
+
     /**
      * @return the paymentList
      */
@@ -294,29 +292,28 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public boolean editingOccPeriod() {
-        return (redirTo != null && currentOccPeriod != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
+        return (redirTo != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
     }
-    
+
     public boolean editingCECase() {
-        return (redirTo != null && currentCase != null && currentDomain == EventDomainEnum.OCCUPANCY);
+        return (redirTo != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
     }
 
     public String getCurrentAddress() {
 
-        PropertyIntegrator pi = getPropertyIntegrator();
-
         String address = "";
-        PropertyUnit unit = new PropertyUnit();
-        Property prop;
+
         try {
-            
-            if(editingOccPeriod()){
-            unit = pi.getPropertyUnitByPropertyUnitID(currentOccPeriod.getPropertyUnitID());
-            } else if (editingCECase()){
-            unit = pi.getPropertyUnitByPropertyUnitID(currentCase.getPropertyUnit().getUnitID());
+
+            if (editingOccPeriod()) {
+                PropertyIntegrator pi = getPropertyIntegrator();
+                PropertyUnit unit = pi.getPropertyUnitByPropertyUnitID(currentOccPeriod.getPropertyUnitID());
+                Property prop = pi.getProperty(unit.getPropertyID());
+                address = prop.getAddress();
+            } else if (editingCECase()) {
+                address = currentCase.getProperty().getAddress();
             }
-            prop = pi.getProperty(unit.getPropertyID());
-            address = prop.getAddress();
+
         } catch (IntegrationException ex) {
             System.out.println("PaymentBB had problems getting the currentAddress");
         }
@@ -366,10 +363,14 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         try {
             paymentIntegrator.insertPayment(payment);
+            payment = paymentIntegrator.getMostRecentPayment(); //So that the join insert knows what payment to join to
+
             if (editingOccPeriod()) {
                 MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned(selectedAssignedFee);
-                payment = paymentIntegrator.getMostRecentPayment();
                 paymentIntegrator.insertPaymentPeriodJoin(payment, skeleton);
+            } else if (editingCECase()) {
+                MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned(selectedAssignedFee);
+                paymentIntegrator.insertPaymentCaseJoin(payment, skeleton);
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -788,6 +789,4 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         this.currentDomain = currentDomain;
     }
 
-    
-    
 }

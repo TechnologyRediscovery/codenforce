@@ -289,9 +289,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         List<Fee> feeList = new ArrayList<>();
 
-        String query = "SELECT moneyfee.feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes\n"
+        String query = "SELECT moneyfee.feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes, autoassign\n"
                 + "FROM moneyfee, moneycodesetelementfee\n"
-                + "WHERE moneyfee.feeid = moneycodesetelementfee.fee_feeid AND moneycodesetelementfee.codesetelement_elementid = ?;";
+                + "WHERE moneyfee.feeid = moneycodesetelementfee.fee_feeid AND moneycodesetelementfee.codesetelement_elementid = ? AND active = true;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1376,6 +1376,43 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+    public void insertPaymentCaseJoin(Payment payment, MoneyCECaseFeeAssigned fee) throws IntegrationException {
+        String query = "INSERT INTO public.moneycecasefeepayment(\n"
+                + "    payment_paymentid, cecaseassignedfee_id)\n"
+                + "    VALUES (?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, payment.getPaymentID());
+            stmt.setInt(2, fee.getCeCaseAssignedFeeID());
+            System.out.println("PaymentIntegrator.insertPaymentCaseJoin | sql: " + stmt.toString());
+            System.out.println("TRYING TO EXECUTE INSERT METHOD");
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert Payment-CE Case join", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+
+    }
+    
     public void deletePayment(Payment payment) throws IntegrationException {
         String query = "DELETE FROM public.moneypayment\n"
                 + " WHERE paymentid=?;";

@@ -23,11 +23,9 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
-import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,11 +34,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Connects the postgres database to java land in all directions.
@@ -713,7 +709,6 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         CodeIntegrator ci = getCodeIntegrator();
         CitationIntegrator citInt = getCitationIntegrator();
         UserIntegrator ui = getUserIntegrator();
-        PaymentIntegrator pai = getPaymentIntegrator();
         
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));

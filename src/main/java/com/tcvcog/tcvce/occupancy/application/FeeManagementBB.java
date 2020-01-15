@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeSet;
@@ -33,6 +34,7 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
@@ -41,7 +43,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
@@ -527,10 +530,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public void addFeeToPermittedFees() {
 
-        Iterator itr = workingFeeList.iterator();
         boolean duplicate = false;
-        while (itr.hasNext()) {
-            Fee test = (Fee) itr.next();
+        
+       for(Fee test : workingFeeList){
             duplicate = test.getOccupancyInspectionFeeID() == selectedFee.getOccupancyInspectionFeeID();
             if (duplicate) {
                 getFacesContext().addMessage(null,
@@ -819,7 +821,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         OccupancyIntegrator oi = getOccupancyIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
-
+        CaseIntegrator csi = getCaseIntegrator();
+        
         try {
             typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessionMuni().getProfile().getProfileID());
         } catch (IntegrationException ex) {
@@ -845,6 +848,16 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                             "Oops! We encountered a problem trying to fetch the CodeSetElement List!", ""));
         }
 
+        try {      
+            currentCase = csi.getCECase(currentCase.getCaseID());
+            
+        } catch (IntegrationException | CaseLifecycleException ex) {
+            System.out.println("FeeManagementBB.refreshTypesAndElements() | Error: " + ex.toString());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Oops! We encountered a problem trying to refresh the currentCase!", ""));
+        }
+        
     }
 
     public void violationSelected(ActionEvent e) {

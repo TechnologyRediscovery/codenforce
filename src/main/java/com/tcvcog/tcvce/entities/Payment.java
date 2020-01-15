@@ -154,7 +154,7 @@ public class Payment {
     }
 
     /**
-     * @return the paymentPayerID
+     * @return the payment Payer
      */
     public Person getPayer() {
         return payer;

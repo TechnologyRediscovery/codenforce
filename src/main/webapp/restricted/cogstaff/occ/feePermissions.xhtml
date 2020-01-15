@@ -203,7 +203,7 @@
                         </h:form>    
 
                         <h:form id="chooseCodeElementForm" rendered="#{feeManagementBB.editingCECase()}">
-                            <h2>Occupancy Period Types</h2>
+                            <h2>Code Set Elements</h2>
                             <p:dataTable
                                 id="codeElementTable"
                                 var="element"
@@ -239,28 +239,28 @@
                                     </f:facet>
                                     <h:outputText value="#{element.codeElement.ordSecTitle}"/>
                                 </p:column>
-                                
+
                                 <p:column width="5%" sortBy="#{element.codeElement.ordSubSecTitle}">
                                     <f:facet name="header">
                                         <h:outputText value="Subsection" />
                                     </f:facet>
                                     <h:outputText value="#{element.codeElement.ordSubSecTitle}"/>
                                 </p:column>
-                                
+
                                 <p:column width="5%" sortBy="#{element.codeElement.guideEntry.category}">
                                     <f:facet name="header">
                                         <h:outputText value="Category" />
                                     </f:facet>
                                     <h:outputText value="#{element.codeElement.guideEntry.category}"/>
                                 </p:column>
-                                
+
                                 <p:column width="5%" sortBy="#{element.codeElement.guideEntry.subCategory}">
                                     <f:facet name="header">
                                         <h:outputText value="SubCategory" />
                                     </f:facet>
                                     <h:outputText value="#{element.codeElement.guideEntry.subCategory}"/>
                                 </p:column>
-                                
+
                                 <p:rowExpansion>
                                     <div class="outlinedBox">
                                         <h3>Code element detail:</h3>
@@ -302,7 +302,7 @@
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.minPenalty}"/>
                                         </div>
-                                        
+
                                         <h:outputLabel styleClass="bold" value="Norm Penalty:"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.normPenalty}"/>
@@ -313,18 +313,18 @@
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.normDaysToComply}"/>
                                         </div>
-                                        
+
                                         <h:outputLabel styleClass="bold" value="Days To Comply notes:"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.daysToComplyNotes}"/>
                                         </div>
-                                        
+
                                         <h:outputLabel styleClass="bold" value="Date Created:"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.dateCreated}"/>
                                         </div>
                                         <p:spacer height="15px"/>
-                                        
+
                                         <h:outputLabel styleClass="bold" value="Chap"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.codeElement.ordchapterNo}"/>
@@ -335,7 +335,7 @@
                                             <h:outputText escape="false" value="#{element.codeElement.ordchapterTitle}"/>
                                         </div>
                                         <p:spacer height="15px"/>
-                                        
+
                                         <h:outputLabel styleClass="bold" value="Sec"/>
                                         <div class="rowExpansion">
                                             <h:outputText escape="false" value="#{element.codeElement.ordSecNum}"/>
@@ -566,13 +566,13 @@
 
                             </h:form>
                         </p:dialog>
-
+                        <p:spacer height="15px"/>
                         <p:commandButton    id="feePermissionFinishedButton"
                                             action="#{feeManagementBB.finishAndRedir()}"
-                                                rendered="#{feeManagementBB.redirTo != null}"
-                                                value="Finish editing permissions and return"
-                                                />
-                        
+                                            rendered="#{feeManagementBB.redirTo != null}"
+                                            value="Finish editing permissions and return"
+                                            />
+
                     </f:view>
                 </div>
             </ui:define>

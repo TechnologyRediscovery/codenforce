@@ -405,7 +405,7 @@
 
                                 </h:panelGrid>
                                 <p:spacer height="10px"/>
-                                <p:commandButton ajax="false" rendered="#{!paymentBB.editing}" value="Add Payment" action="#{paymentBB.addPayment}" />
+                                <p:commandButton ajax="false" rendered="#{!paymentBB.editing}" value="Add Payment" action="#{paymentBB.addPayment()}" />
                                 <p:commandButton ajax="false" rendered="#{paymentBB.editing}" actionListener="#{paymentBB.commitPaymentUpdates}"
                                                  value="Commit Updates" tabindex="14"/>
                                 <p:commandButton    id="cancel-cb"

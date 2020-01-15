@@ -22,7 +22,7 @@
                     <f:view>
                         <h:form id="occPeriodFeeDisplay">
                             <h2>Recorded 
-                                <p:outputLabel rendered="#{feeManagementBB.redirTo ne null}" value="At #{feeManagementBB.currentDomain}"/>
+                                <p:outputLabel rendered="#{feeManagementBB.redirTo ne null}" value="#{feeManagementBB.currentDomain}"/>
                                 Fees 
                                 <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/>
                                 <p:outputLabel rendered="#{feeManagementBB.editingCECase()}" value="At #{feeManagementBB.CECaseAddress}"/>
