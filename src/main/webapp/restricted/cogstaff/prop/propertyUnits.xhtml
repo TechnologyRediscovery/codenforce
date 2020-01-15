@@ -42,7 +42,7 @@
                                     collapsed="false"
                                     header="Property units">
                              
-                            <h:form id="form-propunits" >
+                            <h:form id="prop-units-list-form" >
                                 
                                 
                                 <p:commandButton       id="button-editunits"
@@ -86,7 +86,7 @@
                                         
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
                                                                ajax="true" 
-                                                               actionListener="#{propertyUnitsBB.initiateNewOccPeriodCreation(unit)}"
+                                                               actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
                                                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                                disabled="#{!propertyUnitsBB.currProp.active}"
                                                                oncomplete="PF('dialog-addoccperiod-var').show()"
@@ -143,6 +143,8 @@
                                         </p:dataScroller>
                                     </div>
                                 </p:dataScroller>
+                                
+                            </h:form>
 
                         </p:panel>
                         
@@ -314,9 +316,8 @@
                                              oncomplete="PF('dialog-widvar-unitedit').hide()"
                                              icon="fa fa-thumbs-o-up"
                                              update="
-                                             form-unitedit:messages-properties-editunit
-                                             form-propunits:datascroller-propunits
-                                             form-propertyobject-messages:messages-properties-object"
+                                             prop-units-messages-form
+                                             prop-units-list-form"
                                              value="Save unit list" 
                                              tabindex="3"/>
                         </h:form>
@@ -356,7 +357,7 @@
 
 
                             <p:commandButton ajax="true"
-                                             action="#{propertyProfileBB.addNewOccPeriod}"
+                                             action="#{propertyOccPeriodsBB.addNewOccPeriod}"
                                              icon="fa fa-thumbs-o-up"
                                              value="Create new period" 
                                              tabindex="3"/>

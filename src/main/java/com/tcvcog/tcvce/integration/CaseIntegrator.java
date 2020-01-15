@@ -249,6 +249,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param ceCaseID
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public CECase getCECase(int ceCaseID) throws IntegrationException, BObStatusException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
@@ -301,8 +302,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      private CECase generateCECase(ResultSet rs) throws SQLException, IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
-        SystemIntegrator si = getSystemIntegrator();
-        
         
         CECase cse = new CECase();
 

@@ -48,6 +48,16 @@ public class QueryCEAR
        searchParamsList.add(sp);
        
    }
+
+    @Override
+    public SearchParamsCEActionRequests getPrimaryParams() {
+        if(searchParamsList != null && !searchParamsList.isEmpty()){
+            return searchParamsList.get(0);
+        }
+        return null;
+    }
+   
+   
     
     public void addToResults(List<CEActionRequest> l){
         results.addAll(l);

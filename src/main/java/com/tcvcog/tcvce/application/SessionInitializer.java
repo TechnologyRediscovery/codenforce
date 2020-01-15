@@ -444,6 +444,7 @@ public  class       SessionInitializer
         try {
 
             sessBean.setSessionPropertyList(pc.assemblePropertyHistoryList(cred));
+            
             if(sessBean.getSessionPropertyList().isEmpty()){
                 sessBean.setSessionProperty(pc.selectDefaultProperty(cred));
             } else {
@@ -585,24 +586,18 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_VII_CECase(Credential cred, SubSysEnum ss) throws SessionException{
-        CaseCoordinator caseCoord = getCaseCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         
         try {
         
-            sb.setSessionCECaseList(caseCoord.assembleCaseHistory(cred));
+            sb.setSessionCECaseList(cc.assembleCaseHistory(cred));
             if(sb.getSessionCECaseList().isEmpty()){
-                caseCoord.selectDefaultCECase(cred);
+                sb.setSessionCECase(cc.assembleCECaseDataHeavy(cc.selectDefaultCECase(cred), cred));
             } else {
-                sb.setSessionCECase(sb.getSessionCECaseList().get(0));
+                sb.setSessionCECase(cc.assembleCECaseDataHeavy(sb.getSessionCECaseList().get(0), cred));
             }
-        
-            sb.setSessionCECaseList(caseCoord.assembleCaseHistory(cred));
-            if(sb.getSessionCECaseList().isEmpty()){
-                caseCoord.selectDefaultCECase(cred);
-            } else {
-                sb.setSessionCECase(sb.getSessionCECaseList().get(0));
-            }
+            
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             throw new SessionException("Error assembling session CECase list from history", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);

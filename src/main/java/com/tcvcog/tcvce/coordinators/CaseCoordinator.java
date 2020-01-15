@@ -30,6 +30,8 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
+import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.integration.*;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
@@ -69,42 +71,51 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Called at the very end of the CECaseDataHeavy creation process by the CaseIntegrator
- and simply checks for events that have a required eventcategory attached
- and places a copy of the event in the Case's member variable.
+     * and simply checks for events that have a required eventcategory attached
+     * and places a copy of the event in the Case's member variable.
      * 
      * This means that every time we refresh the case, the list is automatically
- updated.
- 
- DESIGN NOTE: A competing possible location for this method would be on the
- CECaseDataHeavy object itself--in its getEventListActionRequest method
+     * updated.
+     * DESIGN NOTE: A competing possible location for this method would be on the
+     * CECaseDataHeavy object itself--in its getEventListActionRequest method
      * 
-     * @param cse the CECaseDataHeavy with a populated set of Events
+     * @param c
+     * @param cred
      * @return the CECaseDataHeavy with the action request list ready to roll
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public CECaseDataHeavy assembleCECaseDataHeavy(CECase c, Credential cred) throws BObStatusException, IntegrationException{
-        ChoiceIntegrator choi = new ChoiceIntegrator();
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        CaseIntegrator caseInt = getCaseIntegrator();
-        EventIntegrator ei = getEventIntegrator();
-        CitationIntegrator citInt = getCitationIntegrator();
         SearchCoordinator sc = getSearchCoordinator();
+        ChoiceCoordinator chc = getChoiceCoordinator();
+        EventCoordinator ec = getEventCoordinator();
         
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
         CECaseDataHeavy cse = new CECaseDataHeavy(c);
 
-        // *** POPULATE LISTS OF EVENTS, NOTICES, CITATIONS, AND VIOLATIONS ***
-        cse.setCompleteEventList(ei.getEventList(cse));
-        
-        QueryCEAR qcear = sc.initQuery(QueryCEAREnum.ATTACHED_TO_CECASE, cred);
-        qcear.getParmsList().get(0).setCecase_val(c);
-        
         try {
+            // EVENT LIST
+            QueryEvent qe = sc.initQuery(QueryEventEnum.CECASE, cred);
+            qe.getPrimaryParams().setBobID_ctl(true);
+            qe.getPrimaryParams().setBobID_val(c.getCaseID());
+            cse.setCompleteEventList(sc.runQuery(qe).getBOBResultList());
+        
+            // PROPOSAL LIST
+            cse.setProposalList(chc.getProposalList(cse, cred));
+            
+            // EVENT RULE LIST
+            cse.setEventRuleList(ec.rules_getEventRuleImpList(cse, cred));
+            
+            // CEAR LIST
+            QueryCEAR qcear = sc.initQuery(QueryCEAREnum.ATTACHED_TO_CECASE, cred);
+            qcear.getPrimaryParams().setCecase_ctl(true);
+            qcear.getPrimaryParams().setCecase_val(c);
+            
             cse.setCeActionRequestList(sc.runQuery(qcear).getBOBResultList());
+            
         } catch (SearchException ex) {
             System.out.println(ex);
         }
+        
         
         //TODO NADGIT - integrate Fee functionality
 //        cse.setFeeList(new ArrayList<MoneyCECaseFeeAssigned>());
@@ -112,20 +123,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 //        
         cse.setShowHiddenEvents(false);
         cse.setShowInactiveEvents(false);
-        
-        if(cse.getCompleteEventList() == null){
-            cse.setCompleteEventList(new ArrayList<EventCnF>());
-        }
-        
-        if(cse.getProposalList() == null){
-            cse.setProposalList(new ArrayList<Proposal>());
-        }
-        
-        if(cse.assembleEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL) == null){
-            // this should not be null
-//            cse.setEventRuleList(new ArrayList<EventRuleAbstract>());
-        }
-        
         
         
         Collections.sort(cse.getVisibleEventList());
@@ -152,7 +149,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Primary pathway for retrieving the CECaseDataHeavy data-light 
- superclass CECase. Implements business logic.
+     * superclass CECase. Implements business logic.
      * @param caseID
      * @return
      * @throws IntegrationException 
@@ -257,9 +254,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             
             cse.setCasePhase(CasePhaseEnum.Closed);
         }
-        //now set the icon based on what phase we just assigned the case to
-        cse.setCasePhaseIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString(cse.getCasePhase().getCaseStage().getIconPropertyLookup()))));
+        
+        if(cse.getCasePhase() != null && cse.getCasePhase().getCaseStage() != null){
+            //now set the icon based on what phase we just assigned the case to
+            cse.setCasePhaseIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                    .getString(cse.getCasePhase().getCaseStage().getIconPropertyLookup()))));
+        }
         return cse;
     }
      
@@ -336,15 +336,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
   
     
-    public List<CECaseDataHeavy> assembleCaseHistory(Credential cred) throws IntegrationException, BObStatusException{
+    public List<CECase> assembleCaseHistory(Credential cred) throws IntegrationException, BObStatusException{
         CaseIntegrator caseInt = getCaseIntegrator();
-        List<CECaseDataHeavy> cl = new ArrayList<>();
+        List<CECase> cl = new ArrayList<>();
         List<Integer> cseidl = null;
         if(cred != null){
-            cseidl = caseInt.getCECaseHistoryList(0);
-//             while(!idList.isEmpty() && pl.size() <= Constants.MAX_BOB_HISTORY_SIZE){
-//                pl.add(pi.getPerson(idList.remove(0)));
-//            }
+            cseidl = caseInt.getCECaseHistoryList(cred.getGoverningAuthPeriod().getUserID());
+             if(!cseidl.isEmpty()){
+                for(Integer i: cseidl){
+                    cl.add(getCECase(i));
+                }
+            }
         }
         return cl;
     }

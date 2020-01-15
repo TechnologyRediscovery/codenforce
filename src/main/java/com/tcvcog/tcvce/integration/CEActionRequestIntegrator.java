@@ -26,21 +26,14 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestIssueType;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
-import com.tcvcog.tcvce.entities.search.QueryCEAR;
-import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -343,9 +336,9 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	cecase_caseid, coginternalnotes, \n"
                 + "	muniinternalnotes, publicexternalnotes,\n"
                 + "	actionRqstIssueType.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid \n"
-                + "	FROM public.ceactionrequest \n"
-                + "		INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid");
-        sb.append(" WHERE requestID = ?;");
+                + "FROM public.ceactionrequest \n"
+                + "     INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid ");
+        sb.append("WHERE requestID = ?;");
 
 //        
 //        
@@ -748,7 +741,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         List<Integer> cearidlst = new ArrayList();
         
         params.appendSQL("SELECT DISTINCT requestid FROM public.ceactionrequest \n");
-        params.appendSQL("LEFT OUTER JOIN public.property ON (ceactionrequest.property_propertyid = property.propertyid); \n");
+        params.appendSQL("LEFT OUTER JOIN public.property ON (ceactionrequest.property_propertyid = property.propertyid) \n");
         params.appendSQL("WHERE requestid IS NOT NULL \n"); 
 
         // ****************************

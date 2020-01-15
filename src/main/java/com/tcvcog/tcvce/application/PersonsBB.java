@@ -87,6 +87,14 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         }
         propertyCandidateList = getSessionBean().getSessionPropertyList();
         loadPersonHistory();
+        
+         System.out.println("PersonBB.getPersonList");
+        personList = getSessionBean().getSessionPersonList();
+
+        
+        
+        
+        
     }
     
     public String viewPersonAssociatedProperty(Property p){
@@ -205,35 +213,12 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void searchForPersons(ActionEvent event){
-        System.out.println("PersonBB.searchForPersons");
-        // clear past search results on bean and on the session
-        personList = null;
-        getSessionBean().setSessionPersonList(null);
-        // this will trigger database lookup logic inside
-        // getPersonList() when we tell the search result table to clear itself
-    }
-    
-    
-    public void searchForPersonsByNameOnly(ActionEvent event){
-        System.out.println("PersonBB.searchForPersonsByNameOnly");
-        PersonCoordinator pc = getPersonCoordinator();
-        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessionMuni());
-        // clear past search results on bean and on the session
-        personList = null;
-        getSessionBean().setSessionPersonList(null);
-        // this will trigger database lookup logic inside
-        // getPersonList() when we tell the search result table to clear itself
-    }
     
     
     public void selectPerson(Person p){
-        UserIntegrator ui = getUserIntegrator();
-        PropertyIntegrator pi = getPropertyIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         try {
             si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), p);
-            propertyPersonList = pi.getProperties(p);
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -271,44 +256,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
      */
     public List<Person> getPersonList() {
 
-        System.out.println("PersonBB.getPersonList");
-        PersonIntegrator integrator = getPersonIntegrator();
-        List<Person> sessionPersonList = getSessionBean().getSessionPersonList();
-
-        // first check if our view-scoped list is emtpy, if so, we need a list!
-        if (personList == null) {
-            System.out.println("PersonBB.getPersonList | found Null person List");
-            if (sessionPersonList != null) { // if we've got a session list, use that before going to DB
-                personList = sessionPersonList;
-                System.out.println("PersonBB.getPersonList | loaded list from session");
-            } else {
-                try {
-                    personList = integrator.getPersonList(searchParams); // go to Integrator with searchParams
-                    getSessionBean().setSessionPersonList(personList);
-                    if (personList.isEmpty()) {
-                        System.out.println("PersonBB.getPersonList | Emtpy list");
-                        getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_WARN,
-                                        "Database search returned 0 Persons",
-                                        "Please try again, perhaps by removing some letters from your name text"));
-
-                    } else {
-                        System.out.println("PersonBB.getPersonList | at least 1 in list");
-                        getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Database search returned " + personList.size() + " Persons", ""));
-                    }
-
-                } catch (IntegrationException ex) {
-                    System.out.println(ex);
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "System-related search error", "This issue requires administrator attention, sorry"));
-                }
-            }
-        }
-        
-        
+       
         
         return personList;
     }
@@ -455,14 +403,8 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
      * @return the propertyPersonList
      */
     public List<Property> getPropertyPersonList() {
-        PropertyIntegrator pi = getPropertyIntegrator();
-        if(propertyPersonList == null){
-            try {
-                propertyPersonList = pi.getProperties(selectedPerson);
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
-        }
+        
+       
         return propertyPersonList;
     }
     

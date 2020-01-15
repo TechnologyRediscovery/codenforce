@@ -746,6 +746,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case PROPERTY:
                 paramsList.add(getDefaultSearchParams_CasesByProp(params, cred));
                 break;
+            case PROPINFOCASES:
+                paramsList.add(genParams_cecase_propInfo(params, cred));
+                break;
+            case PACC:
+                paramsList.add(genParams_cecase_pacc(params, cred));
             case CUSTOM:
                 break;
             default:
@@ -1067,6 +1072,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setConstructionYear_ctl(false);
         params.setConstructionYear_min_val(FILTER_OFF_DEFVALUE_INT);
         params.setConstructionYear_max_val(FILTER_OFF_DEFVALUE_INT);
+        
+        // Param #PROP-15
+        params.setPerson_ctl(false);
+        params.setPerson_val(null);
         
         return params;
     }
@@ -1417,6 +1426,25 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //        params.setUseCaseManager(false);
         
         return params;
+    }
+    
+    public SearchParamsCECase genParams_cecase_pacc(SearchParamsCECase params, Credential cred){
+        
+        params.setPacc_ctl(true);
+        
+        return params;
+        
+    }
+    
+    public SearchParamsCECase genParams_cecase_propInfo(SearchParamsCECase params, Credential cred){
+        
+        params.setProperty_ctl(true);
+        // downstream must set Property object
+        params.setPropInfoCase_ctl(true);
+        params.setPersonInfoCase_val(true);
+        
+        return params;
+        
     }
     
     public SearchParamsCECase getDefaultSearchParams_CasesByProp(SearchParamsCECase params, Credential cred){

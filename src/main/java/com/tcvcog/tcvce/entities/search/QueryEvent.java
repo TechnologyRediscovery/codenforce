@@ -24,16 +24,16 @@ public class QueryEvent
     
     private QueryEventEnum queryName;
     
-    private List<SearchParamsEvent> searchParamList;
+    private List<SearchParamsEvent> searchParamsList;
     private List<EventCnF> results;
     
     public QueryEvent(QueryEventEnum qName, 
                             List<SearchParamsEvent> params,
                             Credential c) {
         super(c);
-        searchParamList = new ArrayList<>();
+        searchParamsList = new ArrayList<>();
         if(params != null){
-            searchParamList.addAll(params);
+            searchParamsList.addAll(params);
         }
         queryName = qName;
         results = new ArrayList<>();
@@ -42,7 +42,15 @@ public class QueryEvent
 
     
     public List<SearchParamsEvent> getParamsList() {
-        return searchParamList;
+        return searchParamsList;
+    }
+    
+    @Override
+    public SearchParamsEvent getPrimaryParams() {
+        if(searchParamsList != null && !searchParamsList.isEmpty()){
+            return searchParamsList.get(0);
+        }
+        return null;
     }
 
     @Override
@@ -61,7 +69,7 @@ public class QueryEvent
 
     @Override
     public List getParmsList() {
-        return searchParamList;
+        return searchParamsList;
     }
 
     @Override
@@ -97,14 +105,14 @@ public class QueryEvent
     @Override
     public int addParams(SearchParams params) {
          if(params instanceof SearchParamsEvent){
-            searchParamList.add((SearchParamsEvent) params);
+            searchParamsList.add((SearchParamsEvent) params);
         }
-        return searchParamList.size();
+        return searchParamsList.size();
     }
 
     @Override
     public int getParamsListSize() {
-        return searchParamList.size();
+        return searchParamsList.size();
     }
     
     

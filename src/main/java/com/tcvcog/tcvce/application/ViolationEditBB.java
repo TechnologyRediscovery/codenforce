@@ -63,7 +63,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         
          currentViolation = getSessionBean().getSessionCodeViolation();
-         currentCase = getSessionBean().getSessionCECaseList().get(0);
+         currentCase = getSessionBean().getSessionCECase();
          formDiscloseToMuni = true;
          formDiscloseToPublic = true;
     }

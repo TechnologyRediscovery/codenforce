@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -89,16 +90,13 @@ public class PropertyUnitsBB
    
 
     
-    
+    /**
+     * Logic container for steps needed to be taken before 
+     * a unit list is edited
+     * @param ev 
+     */
     public void beginPropertyUnitUpdates(ActionEvent ev){
-        PropertyIntegrator pi = getPropertyIntegrator();
-        currProp.setLastUpdatedBy(getSessionBean().getSessionUser());
-        System.out.println(currProp.getLastUpdatedBy().getUserID());
-        try{
-            pi.updateProperty(currProp);
-        } catch (IntegrationException ex) {
-            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        // do nothing as of beta 0.9
     }
     
      /**
@@ -149,6 +147,7 @@ public class PropertyUnitsBB
      */
     public void finalizeUnitList(ActionEvent ev) {
         PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
         boolean missingUnitNum = false;
         boolean duplicateUnitNum = false;
@@ -226,7 +225,21 @@ public class PropertyUnitsBB
                 }
             }
         }
-    }
+        
+        // mark parent property as updated now
+       
+        try{
+            pc.editProperty(currProp, getSessionBean().getSessionUser());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update associated property: ", ""));
+            
+        }
+        
+        
+    } // close method
     
     
     

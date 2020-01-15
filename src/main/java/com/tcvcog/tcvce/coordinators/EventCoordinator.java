@@ -184,7 +184,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //            imp.setCurrentUserCanEvaluateProposal(determineCanUserEvaluateProposal(ev, user, userAuthMuniList));
 //            ev.setEventProposalImplementation(imp);
 //        }
-//        ev.setPersonList(pi.getPersonList(ev));
+//        ev.setPersonList(pi.getPersonOccPeriodList(ev));
         
         return ev;
     }
@@ -647,44 +647,38 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     
      
-//    --------------------------------------------------------------------------
-//    ******************************** RULES and WORKFLOWS *********************
-//    --------------------------------------------------------------------------
+//    -----------------------------------------------------------
+//    ***************** RULES and WORKFLOWS *********************
+//    -----------------------------------------------------------
     
-   /**
-     * Utility method for setting view confirmation authorization 
-     * at the event level by user
-     * @deprecated following separation of Choice objects and their selections from events
-     * @param ev
-     * @param u the User viewing the list of CEEvents
-     * @param muniList
+    /**
+     * Calls appropriate Integration method given a CECase or OccPeriod
+     * and generates a configured event rule list.
+     * @param erg
+     * @param cred
      * @return 
      */
-    public boolean determineCanUserEvaluateProposal(EventCnF ev, UserAuthorized u, List<Municipality> muniList){
-        boolean canEvaluateProposal = false;
-        Directive evProp = ev.getCategory().getDirective();
+    public List<EventRuleImplementation> rules_getEventRuleImpList(IFace_EventRuleGoverned erg, Credential cred){
+        EventIntegrator ei = getEventIntegrator();
         
-        // direct event assignment allows view conf to cut across regular permissions
-        // checks
-        if(ev.getOwner().equals(u) || u.getMyCredential().isHasDeveloperPermissions()){
-            return true;
-            // check that the event is associated with the user's auth munis
-// TODO: Finish me occ beta
-//        } else if(isMunicodeInMuniList(ev.getMuniCode(), muniList)){
-        } else if(true){
-            // sys admins for a muni can confirm everything
-            if(u.getMyCredential().isHasSysAdminPermissions()){
-                return true;
-                // only code officers can enact timeline events
-            } else if(evProp.isDirectPropToDefaultMuniCEO() && u.getMyCredential().isHasEnfOfficialPermissions()){
-                return true;
-            } else if(evProp.isDirectPropToDefaultMuniStaffer() && u.getMyCredential().isHasMuniStaffPermissions()){
-                return true;
-            } 
+        List<EventRuleImplementation> erl = new ArrayList<>();
+        
+        try {
+            if(erg instanceof CECase){
+                   CECase cse = (CECase) erg;
+                   erl.addAll(ei.rules_getEventRuleImpCECaseList(cse));
+               } else if (erg instanceof OccPeriod){
+                   OccPeriod op = (OccPeriod) erg;
+                   erl.addAll(ei.rules_getEventRuleImpOccPeriodList(op))    ;
+               }
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
         }
-        return canEvaluateProposal;
+
+        return erl;
+
+        
     }
-    
     
     public EventRuleAbstract rules_getEventRuleAbstract(int eraid) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();

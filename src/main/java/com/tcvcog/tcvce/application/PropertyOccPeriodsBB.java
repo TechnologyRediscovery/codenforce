@@ -29,6 +29,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -59,7 +61,7 @@ public class PropertyOccPeriodsBB
     @PostConstruct
     public void initBean(){
         currProp = getSessionBean().getSessionProperty();
-          occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
+        occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
     }
     /**
      * Final step in creating a new occ period
@@ -97,6 +99,18 @@ public class PropertyOccPeriodsBB
     }
     
     
+   public String exploreOccPeriod(OccPeriod op){
+       OccupancyCoordinator oc = getOccupancyCoordinator();
+       if(op != null){
+           try {
+               getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessionUser().getMyCredential()));
+           } catch (IntegrationException | BObStatusException ex) {
+               System.out.println(ex);
+           }
+       }
+       
+       return "occPeriodWorkflow";
+   }
     
       /**
      * Called when the user initiates new occ period creation

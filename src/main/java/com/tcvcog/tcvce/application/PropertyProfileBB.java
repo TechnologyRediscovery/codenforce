@@ -18,6 +18,8 @@ import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -49,10 +51,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     private PropertyDataHeavy currProp;
     
-    
-    
-    private List<Person> filteredPersonList;
-    
     private Municipality selectedMuni;
     private List<PropertyUseType> putList;
     
@@ -65,9 +63,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        PropertyCoordinator pc = getPropertyCoordinator();
-        OccupancyIntegrator oi = getOccupancyIntegrator();
-        SearchCoordinator sc = getSearchCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         
         currProp = (getSessionBean().getSessionProperty());
@@ -81,18 +76,33 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             System.out.println(ex);
         }
     }
-
-     public String updateProperty(){
-        PropertyCoordinator pc = getPropertyCoordinator();
+    
+    /**
+     * Logic intermediary when property edits begin and dialog is displayed
+     * @param ev 
+     */
+    public void initiatePropertyEdit(ActionEvent ev){
+        // do nothing
         
-        getSessionBean().getSessionPropertyList().add(0, currProp);
-        getFacesContext().addMessage(null,
+    }
+
+     public void commitPropertyUpdates(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.editProperty(currProp, getSessionBean().getSessionUser());
+            getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Successfully updated property with ID " + getCurrProp().getPropertyID() 
                                 + ", which is now your 'active property'", ""));
-        return "propertyProfile";
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Could not update property, sorries!", ""));
+        }
+        refreshCurrPropWithLists();
+     
     }
-    
     
   
     
@@ -117,25 +127,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
  
     
-    public void certifyDataFieldOccPeriod(ActionEvent ev){
-        String fieldToCertify = null;
-        FacesContext fc = getFacesContext();
-        Map<String, String> params = fc.getExternalContext().getRequestParameterMap();
-        fieldToCertify = params.get("certify-fieldid");
-        System.out.println("PropertyProfileBB.certifyDateField | param value: " + fieldToCertify);
-        switch(fieldToCertify){
-            case "enddate":
-                break;
-            case "startdate":
-                break;
-            case "periodtype":
-                break;
-            case "authorization":
-                break;
-        }
-        
-    }
-   
     
     public String viewPersonProfile(Person p){
         getSessionBean().getSessionPersonList().add(0,p);
@@ -163,22 +154,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
    
    
-
-    /**
-     * @return the photoList
-     */
-    public List<Person> getFilteredPersonList() {
-        return filteredPersonList;
-    }
-
-    /**
-     * @param photoList the photoList to set
-     */
-    public void setFilteredPersonList(List<Person> filteredPersonList) {
-        this.filteredPersonList = filteredPersonList;
-    }
-
-
 
     /**
      * @return the selectedMuni

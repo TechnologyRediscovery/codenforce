@@ -45,9 +45,9 @@ public class    Property
     
     protected LocalDateTime vacantDateStop;
     protected User vacantBy;
-    protected int conditionIntensityClassID;
+    protected IntensityClass condition;
     
-    protected int landBankProspectIntensityClassID;
+    protected IntensityClass landBankProspect;
     protected boolean LandBankHeld;
     protected boolean active;
     protected boolean nonAddressable;
@@ -217,17 +217,25 @@ public class    Property
     }
 
     /**
-     * @return the conditionIntensityClassID
+     * @return the condition
      */
-    public int getConditionIntensityClassID() {
-        return conditionIntensityClassID;
+    public IntensityClass getCondition() {
+        return condition;
+    }
+    
+    /**
+     * sets the condition
+     * @param ic 
+     */
+    public void setCondition(IntensityClass ic){
+        condition = ic;
     }
 
     /**
-     * @return the landBankProspectIntensityClassID
+     * @return the landBankProspect
      */
-    public int getLandBankProspectIntensityClassID() {
-        return landBankProspectIntensityClassID;
+    public IntensityClass getLandBankProspect() {
+        return landBankProspect;
     }
 
     /**
@@ -331,17 +339,10 @@ public class    Property
     }
 
     /**
-     * @param conditionIntensityClassID the conditionIntensityClassID to set
+     * @param landBankProspectIntensityClassID the landBankProspect to set
      */
-    public void setConditionIntensityClassID(int conditionIntensityClassID) {
-        this.conditionIntensityClassID = conditionIntensityClassID;
-    }
-
-    /**
-     * @param landBankProspectIntensityClassID the landBankProspectIntensityClassID to set
-     */
-    public void setLandBankProspectIntensityClassID(int landBankProspectIntensityClassID) {
-        this.landBankProspectIntensityClassID = landBankProspectIntensityClassID;
+    public void setLandBankProspect(IntensityClass ic) {
+        this.landBankProspect = ic;
     }
 
     /**

@@ -53,6 +53,14 @@ public class    QueryOccPeriod
         }
         return searchParamsList.size();
     }
+    
+    @Override
+    public SearchParamsOccPeriod getPrimaryParams() {
+        if(searchParamsList != null && !searchParamsList.isEmpty()){
+            return searchParamsList.get(0);
+        }
+        return null;
+    }
 
     @Override
     public int getParamsListSize() {

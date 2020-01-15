@@ -28,58 +28,59 @@
                                     widgetVar="prop-periods-list-panel-var"
                                     collapsed="false"
                                     header="Occupancy periods">
-                               
+
                             <h:form id="prop-periods-form">
-                              <p:dataScroller
-                                            id="scroller-periodlist"
-                                            widgetVar="var-scroller-periodlist"
-                                            rowIndexVar="#{period.periodID}"
-                                            var="period"
-                                            value="#{propertyOccPeriodsBB.currProp.assembleOccPeriodList}"
-                                            >                                         
-                                            
-                                            
-                                            <div style="datum">
-                                                
-                                                
-                                                <h:outputText value="Start Date: " 
-                                                              styleClass="ui-label-inline" />
-                                                
-                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.startDate)}" 
-                                                              styleClass="data-text"/>
-                                            </div>
-                                                
-                                            <div style="datum">
-                                                <h:outputText value="End Date: " 
-                                                              styleClass="ui-label-inline" />
-                                                
-                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.endDate)}" 
-                                                              styleClass="data-text"/>
-                                            </div>
-                                            <div style="datum">
-                                                <h:outputText value="Type: " 
-                                                              styleClass="ui-label-inline" />
-                                                <h:outputText value="#{period.type.title}" 
-                                                              styleClass="data-text"/>
-                                            </div>
-                                            <div style="datum">
-                                                <h:outputText value="Authorization" 
-                                                              styleClass="ui-label-inline" />
-                                                <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : propertyProfileBB.getPrettyDate(period.authorizedTS)}" />
-                                            </div>
-                                                <p:commandButton       id="button-occperiodtable-editperiod"
-                                                                       ajax="false" 
-                                                                       action="#{propertyOccPeriodsBB.manageOccPeriod(period)}"
-                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                       value="manage occupancy period"  
-                                                                       icon="fa fa-edit"/>
-                                        </p:dataScroller>
+                                <p:dataScroller
+                                    id="scroller-periodlist"
+                                    widgetVar="var-scroller-periodlist"
+                                    rowIndexVar="#{period.periodID}"
+                                    var="period"
+                                    value="#{propertyOccPeriodsBB.currProp.completePeriodList}"
+                                    >                                         
+
+
+                                    <div style="datum">
+
+
+                                        <h:outputText value="Start Date: " 
+                                                      styleClass="ui-label-inline" />
+
+                                        <h:outputText value="#{propertyOccPeriodsBB.getPrettyDate(period.startDate)}" 
+                                                      styleClass="data-text"/>
+                                    </div>
+
+                                    <div style="datum">
+                                        <h:outputText value="End Date: " 
+                                                      styleClass="ui-label-inline" />
+
+                                        <h:outputText value="#{propertyOccPeriodsBB.getPrettyDate(period.endDate)}" 
+                                                      styleClass="data-text"/>
+                                    </div>
+                                    <div style="datum">
+                                        <h:outputText value="Type: " 
+                                                      styleClass="ui-label-inline" />
+                                        <h:outputText value="#{period.type.title}" 
+                                                      styleClass="data-text"/>
+                                    </div>
+                                    <div style="datum">
+                                        <h:outputText value="Authorization" 
+                                                      styleClass="ui-label-inline" />
+                                        <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : propertyProfileBB.getPrettyDate(period.authorizedTS)}" />
+                                    </div>
+                                    <p:commandButton       id="button-occperiodtable-editperiod"
+                                                           ajax="false" 
+                                                           action="#{propertyOccPeriodsBB.exploreOccPeriod(period)}"
+                                                           rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                           value="manage occupancy period"  
+                                                           icon="fa fa-edit"/>
+                                </p:dataScroller>
+                            </h:form>
 
                         </p:panel>
-                    <!--close main container-->
+                        <!--close main container-->
                     </div>
-                    
-                 
+
+
                 </f:view>
             </ui:define>
         </ui:composition>

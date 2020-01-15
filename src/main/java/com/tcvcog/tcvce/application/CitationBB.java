@@ -85,7 +85,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         if(c != null){
             currentCitation = c;
         } else {
-            CECaseDataHeavy ceCase = getSessionBean().getSessionCECaseList().get(0);
+            CECaseDataHeavy ceCase = getSessionBean().getSessionCECase();
             currentCitation = new Citation();
             currentCitation.setCeCaseNoLists(ceCase);
             currentCitation.setDateOfRecord(LocalDateTime.now());

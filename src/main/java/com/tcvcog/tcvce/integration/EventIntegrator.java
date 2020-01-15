@@ -24,8 +24,8 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleCECase;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -35,9 +35,7 @@ import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.MuniProfile;
-import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
@@ -46,7 +44,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -1156,12 +1153,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return s;
     }
     
-    public List<EventRuleCECase> rules_getEventRuleCECaseList(CECaseDataHeavy cse) throws IntegrationException{
+    public List<EventRuleCECase> rules_getEventRuleImpCECaseList(CECase cse) throws IntegrationException{
         EventRuleImplementation ruleImp = null;
         List<EventRuleCECase> ruleList = new ArrayList<>();
         String query =  "   SELECT cecase_caseid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
                         "       lastevaluatedts, passedrulets, passedrule_eventid, active \n" +
-                        "  FROM public.cecaseeventrule WHERE cecase_caseid=?;";
+                        "  FROM public.eventruleimpl WHERE cecase_caseid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1172,7 +1169,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             while (rs.next()) {
                 ruleImp = rules_generateEventRuleImplementation(rs);
-                ruleList.add(rules_generateCECaseEventRule(rs, ruleImp));
+                ruleList.add(rules_generateEventRuleCECase(rs, ruleImp));
                 
             }
         } catch (SQLException ex) {
@@ -1188,7 +1185,36 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private EventRuleCECase rules_generateCECaseEventRule(ResultSet rs, EventRuleImplementation imp) 
+      public List<EventRuleOccPeriod> rules_getEventRuleImpOccPeriodList(OccPeriod op) throws IntegrationException{
+        EventRuleImplementation ruleImp;
+        List<EventRuleOccPeriod> ruleList = new ArrayList<>();
+        String query = "SELECT occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
+                        "       lastevaluatedts, passedrulets, passedrule_eventid, active \n" +
+                        "  FROM public.occperiodeventrule WHERE occperiod_periodid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, op.getPeriodID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                ruleImp = rules_generateEventRuleImplementation(rs);
+                ruleList.add(rules_generateEventRuleOccPeriod(rs, ruleImp));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate list of event rules", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return ruleList;
+    }
+    
+    private EventRuleCECase rules_generateEventRuleCECase(ResultSet rs, EventRuleImplementation imp) 
             throws SQLException, IntegrationException{
         EventCoordinator ec = getEventCoordinator();
         EventRuleCECase evRule = new EventRuleCECase(imp);
@@ -1525,7 +1551,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     public void rules_insertEventRuleCECase(EventRuleCECase ercec) throws IntegrationException{
-          String query = "INSERT INTO public.cecaseeventrule(\n" +
+          String query = "INSERT INTO public.eventruleimp (\n" +
                         "            cecase_caseid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
                         "            lastevaluatedts, passedrulets, passedrule_eventid, active)\n" +
                         "    VALUES (?, ?, ?, ?, \n" +
@@ -1568,7 +1594,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     public void rules_UpdatetEventRuleCECase(EventRuleCECase ercec) throws IntegrationException{
-         String query = "UPDATE public.cecaseeventrule\n" +
+         String query = "UPDATE public.eventrule\n" +
                         "   SET cecase_caseid=?, eventrule_ruleid=?, attachedts=?, attachedby_userid=?, \n" +
                         "       lastevaluatedts=?, passedrulets=?, passedrule_eventid=?, active=?\n" +
                         " WHERE cecase_caseid=? AND eventrule_ruleid=?;";
@@ -1647,35 +1673,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ruleOccPer;
     }
     
-    public List<EventRuleOccPeriod> rules_getEventRuleOccPeriodList(OccPeriod op) throws IntegrationException{
-        EventRuleImplementation ruleImp;
-        List<EventRuleOccPeriod> ruleList = new ArrayList<>();
-        String query = "SELECT occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
-                        "       lastevaluatedts, passedrulets, passedrule_eventid, active \n" +
-                        "  FROM public.occperiodeventrule WHERE occperiod_periodid=?;";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, op.getPeriodID());
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                ruleImp = rules_generateEventRuleImplementation(rs);
-                ruleList.add(rules_generateEventRuleOccPeriod(rs, ruleImp));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot generate list of event rules", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return ruleList;
-    }
-    
-    
+  
        
 } // close class

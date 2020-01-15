@@ -194,7 +194,18 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return newPerson;
     } // close method
     
-    public List<PersonOccPeriod> getPersonList(OccPeriod period) throws IntegrationException{
+    /**
+     * We have a special type of Person which are those who have been attached to an Occ period
+     * through an application, which may suggest a certain person type in relation to a particular
+     * occupancy period
+     * 
+     * As of Beta launch Jan 2020, this functionality wasn't turned on yet.
+     * 
+     * @param period
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<PersonOccPeriod> getPersonOccPeriodList(OccPeriod period) throws IntegrationException{
         List<PersonOccPeriod> personList = new ArrayList<>();
         String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype\n" +
@@ -235,112 +246,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     }
     
 
-    /**
-     * Implements a basic person search by first and last name parts and returns
-     * a Person object based on those results. If more than one person is
-     * matched on the query, only the first one is returned since the cursor is
-     * only moved to the first row when passed to the
-     * createPersonFromResultSet() method
-     *
-     * @param params
-     * @return the new Person() object generated from the query
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public ArrayList<Person> getPersonList(SearchParamsPerson params) throws IntegrationException {
-        Connection con = getPostgresCon();
-        ArrayList<Person> personAL = new ArrayList<>();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append("SELECT personid FROM public.person ");   // < -- don't for get
-        
-        if(!params.isBobID_ctl()){
-            sb.append("WHERE muni_municode = ? ");              // < -- trailing spaces!
-            if(params.isName_first_ctl()){
-                sb.append("AND fname ILIKE ");
-                sb.append("'%");
-                sb.append(params.getName_first_val());
-                sb.append("%'");
-            }
-            if(params.isName_last_ctl()){
-                sb.append("AND lname ILIKE ");
-                sb.append("'%");
-                sb.append(params.getName_last_val());
-                sb.append("%'");
-            }
-            if(params.isEmail_ctl()){
-                sb.append("AND email ILIKE ");
-                sb.append("'%");
-                sb.append(params.getEmail_val());
-                sb.append("%'");
-            }
-            if(params.isAddress_streetNum_ctl()){
-                sb.append("AND address_street ILIKE ");
-                sb.append("'%");
-                sb.append(params.getAddress_streetNum_val());
-                sb.append("%'");
-            }
-            if(params.isActive_ctl()){
-                if(params.isActive_val()){
-                    sb.append("AND isactive = TRUE ");
-                } else {
-                    sb.append("AND isactive = FALSE ");
-                }
-            }
-            if(params.isVerified_val()){
-                if(params.isVerified_ctl()){
-                    sb.append("AND humanverifiedby IS NOT NULL");
-                } else {
-                    sb.append("AND humanverifiedby IS NULL");
-                }
-            }
-        } else { // if we're searching by personID, ignore all other criteria
-            sb.append("WHERE personid = ?;"); // param 2 with key search
-        }
-        
-        try {
-            stmt = con.prepareStatement(sb.toString());
-            
-            if(!params.isBobID_ctl()){
-                stmt.setInt(1, params.getMuni_val().getMuniCode());
-            } else {
-                stmt.setInt(1, params.getBobID_val()); // and this is the only param after muni!
-            }
-            
-            rs = stmt.executeQuery();
-            
-            int counter = 0;
-            int maxResults;
-            if(params.isLimitResultCount_ctl()){
-                 maxResults = Integer.parseInt(getResourceBundle(
-                        Constants.DB_FIXED_VALUE_BUNDLE).getString("defaultMaxQueryResults"));
-            } else {
-                maxResults = Integer.MAX_VALUE;
-            }
-            Person p;
-            int id;
-            
-            while (rs.next() && counter < maxResults ) {
-                id=rs.getInt("personid");
-                p = getPerson(id);
-                personAL.add(p);
-                counter++;
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot search for person", ex);
-
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return personAL;
-
-    } // close method
+   
 
     /**
      * Distributor method for handling requests to connect a person to a
@@ -693,7 +599,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             list.add(getPerson(personId));
         }
         return list;
-    } // close getPersonList()
+    } // close getPersonOccPeriodList()
 
     /**
      * Updates a given record for a person in the database. Will throw an error
@@ -828,6 +734,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
+    /**
+     * Dump-style retrieval for all Persons associated with a given event
+     * @param ev
+     * @return
+     * @throws IntegrationException 
+     */
     public List<Person> getPersonList(EventCnF ev) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -835,7 +747,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         List<Person> list = new ArrayList<>();
 
         try {
-            String s = "SELECT person_personid FROM public.ceeventperson WHERE ceevent_eventid = ?;";
+            String s = "SELECT person_personid FROM public.eventperson WHERE ceevent_eventid = ?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, ev.getEventID());
 
@@ -1076,7 +988,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        params.appendSQL    ("SELECT DISTINC personid FROM public.person \n");
+        params.appendSQL    ("SELECT DISTINCT personid FROM public.person \n");
         params.appendSQL    ("LEFT OUTER JOIN public.propertyperson ON (person.personid = propertyperson.person_personid)\n");
         params.appendSQL    ("LEFT OUTER JOIN public.property ON (property.propertyid = propertyperson.person_personid)\n");
         params.appendSQL    ("LEFT OUTER JOIN public.occperiodperson ON (person.personid = occperiodperson.person_personid)\n");
@@ -1199,7 +1111,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             // *******************************************
              if (params.isProperty_ctl()) {
                 if(params.getProperty_val()!= null){
-                    params.appendSQL("AND property_propertyid=? ");
+                    params.appendSQL("AND propertyperson.property_propertyid=? ");
                 } else {
                     params.setProperty_ctl(false);
                     params.logMessage("PROPERTY: no Property object; prop filter disabled");
@@ -1267,14 +1179,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             // ***********************************
             // **    FILTER PERS-18             **
             // ***********************************
-            if(params.isMergeTarget_ctl()){
-                if(params.getMergeTarget_val() != null){
-                    params.appendSQL("AND personmunilink.person_personid=? ");
-                } else {
-                    params.setMergeTarget_ctl(false);
-                    params.logMessage("MUNICIPALITY: no MUNI object; muni filter disabled");
-                }
-            }
+//            if(params.isMergeTarget_ctl()){
+//                if(params.getMergeTarget_val() != null){
+//                    params.appendSQL("AND personmunilink.person_personid=? ");
+//                } else {
+//                    params.setMergeTarget_ctl(false);
+//                    params.logMessage("MUNICIPALITY: no MUNI object; muni filter disabled");
+//                }
+//            }
             
         } else {
             params.appendSQL("AND caseid=? ");
@@ -1397,10 +1309,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 if (params.isMergeTarget_ctl()) {
                      stmt.setInt(++paramCounter, params.getMergeTarget_val().getPersonID());
                 }
-                // filter PERS-18
-                if (params.isMuni_ctl()) {
-                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
-                }
+//                // filter PERS-18
+//                if (params.isMuni_ctl()) {
+//                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
+//                }
                 
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());

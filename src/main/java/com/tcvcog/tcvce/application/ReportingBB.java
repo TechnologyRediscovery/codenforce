@@ -7,9 +7,9 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
@@ -20,12 +20,9 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
 import java.io.Serializable;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
@@ -71,7 +68,12 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        caseList = getSessionBean().getSessionCECaseList();
+        CaseCoordinator cc = getCaseCoordinator();
+        List<CECase> csel =  getSessionBean().getSessionCECaseList();
+        if(csel != null && !csel.isEmpty()){
+            caseList = cc.getCECaseHeavyList(csel, getSessionBean().getSessionUser().getMyCredential());
+        }
+        
         DataCoordinator dc = getDataCoordinator();
         
         if(caseList != null && !caseList.isEmpty()){

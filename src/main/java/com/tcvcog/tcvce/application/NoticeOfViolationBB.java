@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -74,21 +75,18 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     @PostConstruct
     public void initBean(){
-        PersonIntegrator pi = getPersonIntegrator();
         currentNotice = getSessionBean().getSessionNotice();
         currentCase = getSessionBean().getSessionCECase();
         blockListBeforeViolations = new ArrayList<>();
         blockListAfterViolations = new ArrayList<>();
-        try {
-            personCandidateList = pi.getPersonList(currentCase.getProperty());
-            if(personCandidateList != null){
-                System.out.println("NoticeOfViolationBuilderBB.initbean "
-                        + "| person candidate list size: " + personCandidateList.size());
-            }
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
+        PropertyDataHeavy pdh = getSessionBean().getSessionProperty();
+        
+        personCandidateList = pdh.getPersonList();
+        if(personCandidateList != null){
+            System.out.println("NoticeOfViolationBuilderBB.initbean "
+                    + "| person candidate list size: " + personCandidateList.size());
         }
+            
         manualRetrievedPersonList = new ArrayList<>();
         showTextBlocksAllMuni = false;
         

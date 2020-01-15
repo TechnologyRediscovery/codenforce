@@ -127,7 +127,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //            TODO: occbeta
             
 //            try {
-//                personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonList();
+//                personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonOccPeriodList();
 //            } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
 //                System.out.println(ex);
 //            }

@@ -19,7 +19,10 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
+import java.util.Map;
 import javax.annotation.PostConstruct;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -37,6 +40,25 @@ public  class   OccPeriodWorkflowBB
        
     }
     
+    public void certifyDataFieldOccPeriod(ActionEvent ev){
+        String fieldToCertify = null;
+        FacesContext fc = getFacesContext();
+        Map<String, String> params = fc.getExternalContext().getRequestParameterMap();
+        fieldToCertify = params.get("certify-fieldid");
+        System.out.println("PropertyProfileBB.certifyDateField | param value: " + fieldToCertify);
+        switch(fieldToCertify){
+            case "enddate":
+                break;
+            case "startdate":
+                break;
+            case "periodtype":
+                break;
+            case "authorization":
+                break;
+        }
+        
+    }
+   
     /**
      * Creates a new instance of OccPeriodWorkflowBB
      */

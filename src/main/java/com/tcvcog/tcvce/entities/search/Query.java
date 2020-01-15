@@ -89,6 +89,13 @@ public abstract class   Query<E extends BOb>
     public abstract <P extends SearchParams> List<P> getParmsList();
     
     /**
+     * Convenience method for retrieving the parameter at the head of the list
+     * @param <P>
+     * @return 
+     */
+    public abstract <P extends SearchParams> P getPrimaryParams();
+    
+    /**
      * Used to include a given SaerchParams subclass in the Query
      * @param params adds the given SearchParams subclass to the subclass's
      * internal parameter list

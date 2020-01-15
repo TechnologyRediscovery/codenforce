@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.IntensityClass;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -77,6 +78,10 @@ public  class       SearchParamsProperty
    private boolean constructionYear_ctl;
    private int constructionYear_min_val;
    private int constructionYear_max_val;
+   
+   // filter #PROP-15 person
+   private boolean person_ctl;
+   private Person person_val;
    
    
    public SearchParamsPropertyDateFieldsEnum[] getDateFieldList(){
@@ -549,6 +554,34 @@ public  class       SearchParamsProperty
      */
     public void setLandbankprospect_intensityClass_val(IntensityClass landbankprospect_intensityClass_val) {
         this.landbankprospect_intensityClass_val = landbankprospect_intensityClass_val;
+    }
+
+    /**
+     * @return the person_val
+     */
+    public Person getPerson_val() {
+        return person_val;
+    }
+
+    /**
+     * @param person_val the person_val to set
+     */
+    public void setPerson_val(Person person_val) {
+        this.person_val = person_val;
+    }
+
+    /**
+     * @return the person_ctl
+     */
+    public boolean isPerson_ctl() {
+        return person_ctl;
+    }
+
+    /**
+     * @param person_ctl the person_ctl to set
+     */
+    public void setPerson_ctl(boolean person_ctl) {
+        this.person_ctl = person_ctl;
     }
 
    

@@ -102,7 +102,7 @@
                                 </h:panelGrid>
 
                                 <p:commandButton ajax="true" value="Update Selected Property Info" 
-                                                 action="#{propertyProfileBB.updateProperty}" 
+                                                 actionListener="#{propertyProfileBB.initiatePropertyEdit}" 
                                                  oncomplete="PF('dialog-widvar-propinfoedit').show()"
                                                  rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                  icon="fa fa-edit"
@@ -183,8 +183,21 @@
                                 
                             </h:panelGrid>
                             <p:spacer height="10px"/>
-                           
+                             <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" immediate="true"
+                                             onclick="PF('dialog-widvar-propinfoedit').hide()"/>
+                             
+                               <p:commandButton ajax="true" value="Commit edits" 
+                                                action="#{propertyProfileBB.commitPropertyUpdates}" 
+                                                 oncomplete="PF('dialog-widvar-propinfoedit').hide()"
+                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                 icon="fa fa-edit"
+                                                 disabled="false"
+                                                 update="property-info-form
+                                                 prop-info-messages-form"/>
+                          
                         </h:form>
+                           
                         <script type="text/javascript">
                                 $(function () {
                                     $.extend(PF("datatable"), {

@@ -15,6 +15,8 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
@@ -45,6 +47,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         
         CaseIntegrator caseInt = getCaseIntegrator();
         List<CEActionRequest> requestList;
+        SearchCoordinator sc = getSearchCoordinator();
         
         // this list will store bundles from all sources polled in this method
         // go polymorphism!!
@@ -73,14 +76,16 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         // now go and get CECaseDataHeavy bundles and add them to the list
         
-        List<CECase> caseList = caseInt.getCECasesByPACC(pacc);
-        System.out.println("PublicInfoCoordinator.getPublicInfoBundles | num CE cases found: " + caseList.size());
+//        QueryCECase qc = sc.initQuery(QueryCECaseEnum.PACC, cred);
         
-        for(CECase c: caseList){
-            // let the extraction method deal with all the assembly logic
-            // and access control issues
-            infoBundleList.add(extractPublicInfo(c));
-        }
+//        List<CECase> caseList = 
+//        System.out.println("PublicInfoCoordinator.getPublicInfoBundles | num CE cases found: " + caseList.size());;
+        
+//        for(CECase c: caseList){
+//            // let the extraction method deal with all the assembly logic
+//            // and access control issues
+//            infoBundleList.add(extractPublicInfo(c));
+//        }
           
         
         return infoBundleList;

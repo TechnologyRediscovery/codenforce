@@ -59,6 +59,18 @@ public  enum QueryCECaseEnum
                             RoleType.MuniReader, 
                             true),
     
+    
+    PROPINFOCASES(          "Cases associated with a single property's info",
+                            "Not normal CE cases", 
+                            RoleType.MuniStaff, 
+                            true),
+    
+    
+    PACC(                   "CE cases by public access control code",
+                            "All cases by PACC", 
+                            RoleType.MuniStaff, 
+                            true),
+    
     CUSTOM(                 "Custom case query", 
                             "Customized search parameters", 
                             RoleType.MuniReader, 

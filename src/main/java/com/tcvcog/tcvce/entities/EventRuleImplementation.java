@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -32,8 +31,7 @@ import java.time.LocalDateTime;
  * @author Ellen Bascomb
  */
 public  class       EventRuleImplementation 
-        extends     EventRuleAbstract 
-        implements  Serializable{
+        extends     EventRuleAbstract {
     
     protected LocalDateTime attachedTS;
     protected User attachedBy;

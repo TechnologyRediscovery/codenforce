@@ -16,7 +16,8 @@ import java.io.Serializable;
  * 
  * @author ellen bascomb
  */
-public class EventRuleAbstract  implements Serializable {
+public class        EventRuleAbstract  
+        implements  Serializable {
     
     protected int ruleid;
     protected String title;

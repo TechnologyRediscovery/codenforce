@@ -47,6 +47,13 @@ public class QueryProperty
         return query.getTitle();
     }
     
+    @Override
+    public SearchParamsProperty getPrimaryParams() {
+        if(searchParamsList != null && !searchParamsList.isEmpty()){
+            return searchParamsList.get(0);
+        }
+        return null;
+    }
 
     
     public void addToResults(List<Property> l){

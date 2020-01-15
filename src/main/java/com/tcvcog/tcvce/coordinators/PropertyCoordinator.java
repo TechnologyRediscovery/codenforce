@@ -38,12 +38,17 @@ import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -65,36 +70,46 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public PropertyDataHeavy assemblePropertyDataHeavy(Property pr, Credential cred) throws IntegrationException, BObStatusException, SearchException{
         
-        PropertyIntegrator pi = getPropertyIntegrator();
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
         
-        PropertyDataHeavy propWL = new PropertyDataHeavy(pr);
+        PropertyDataHeavy pdh = new PropertyDataHeavy(pr);
         
-            QueryCECase qp = sc.initQuery(QueryCECaseEnum.PROPERTY, cred);
-            qp.getSearchParamsList().get(0).setProperty_val(pr);
-            propWL.setCeCaseList(cc.getCECaseHeavyList(sc.runQuery(qp).getResults(), cred));
-        if (propWL.getUnitWithListsList() == null) {
-            propWL.setUnitWithListsList(new ArrayList<PropertyUnitDataHeavy>());
-            // since it was empty
-        }
-        
-        if (propWL.getPersonList() == null) {
-            propWL.setPersonList(new ArrayList<Person>());
-        }
-        if (propWL.getInfoCaseList() == null) {
-            propWL.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
-        }
-        if (propWL.getChangeList() == null) {
-            propWL.setChangeList(new ArrayList<PropertyUnitChangeOrder>());
-        }
-        if (propWL.getBlobList() == null) {
-            propWL.setBlobList(new ArrayList<Integer>());
-        }
+        try {
+            // CECase list
+            QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PROPERTY, cred);
+            qcse.getPrimaryParams().setProperty_val(pr);
+            pdh.setCeCaseList(cc.getCECaseHeavyList(sc.runQuery(qcse).getResults(), cred));
 
-        // add a unit number -1 to any PropertyWithoutAnyUnits
-        System.out.println("PropertyCoordinator.assemblePropertyDataheavy()");
-        return propWL;
+            
+            // Property info cases
+            qcse = sc.initQuery(QueryCECaseEnum.PROPINFOCASES, cred);
+            qcse.getPrimaryParams().setProperty_val(pr);
+            pdh.setPropInfoCaseList(cc.getCECaseHeavyList(sc.runQuery(qcse).getBOBResultList(), cred));
+            
+            // UnitDataHeavy list
+            // remember that units data heavy contain all our occ periods and inspections
+            if(pdh.getUnitList() != null && !pdh.getUnitList().isEmpty()){
+                pdh.setUnitWithListsList(pi.getPropertyUnitWithListsList(pdh.getUnitList()));
+            }
+            
+            // Person list
+            QueryPerson qp = sc.initQuery(QueryPersonEnum.PROPERTY_PERSONS, cred);
+            qp.getPrimaryParams().setProperty_val(pr);
+            pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
+            
+            // change order list
+            //delay this
+//            pdh.setChangeList(pi.getPropertyUnitChangeListAll(pr));
+            
+            // wait on blobs
+            //pdh.setBlobList(new ArrayList<Integer>());
+            
+        } catch (EventException | AuthorizationException ex) {
+            System.out.println(ex);
+        } 
+        return pdh;
     }
     
     /**
@@ -159,6 +174,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
     public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
+        prop.setLastUpdatedBy(getSessionBean().getSessionUser());
+        prop.setLastUpdatedTS(LocalDateTime.now());
         pi.updateProperty(prop);
         
         

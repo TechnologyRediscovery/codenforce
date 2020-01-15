@@ -52,6 +52,14 @@ public class    QueryPerson
     public int getParamsListSize() {
         return searchParamsList.size();
     }
+    
+    @Override
+    public SearchParamsPerson getPrimaryParams() {
+        if(searchParamsList != null && !searchParamsList.isEmpty()){
+            return searchParamsList.get(0);
+        }
+        return null;
+    }
 
     @Override
     public String getQueryTitle(){

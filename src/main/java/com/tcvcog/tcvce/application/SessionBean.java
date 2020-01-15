@@ -136,7 +136,7 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     private CECaseDataHeavy sessionCECase;
-    private List<CECaseDataHeavy> sessionCECaseList;
+    private List<CECase> sessionCECaseList;
     
     private CodeViolation sessionCodeViolation;
     private List<CodeViolation> sessionViolationList;
@@ -485,7 +485,7 @@ public class    SessionBean
     /**
      * @return the sessionCECaseList
      */
-    public List<CECaseDataHeavy> getSessionCECaseList() {
+    public List<CECase> getSessionCECaseList() {
         return sessionCECaseList;
     }
 
@@ -504,7 +504,7 @@ public class    SessionBean
     /**
      * @param sessionCECaseList the sessionCECaseList to set
      */
-    public void setSessionCECaseList(List<CECaseDataHeavy> sessionCECaseList) {
+    public void setSessionCECaseList(List<CECase> sessionCECaseList) {
         this.sessionCECaseList = sessionCECaseList;
     }
 

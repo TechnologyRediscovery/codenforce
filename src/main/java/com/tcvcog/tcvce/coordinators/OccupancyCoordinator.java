@@ -18,47 +18,10 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.EventException;
-import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
-import com.tcvcog.tcvce.domain.InspectionException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.domain.SessionException;
-import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.Choice;
-import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventRuleAbstract;
-import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
-import com.tcvcog.tcvce.entities.EventRuleSet;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Icon;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonType;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.RoleType;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectableStatus;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectionStatusEnum;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
-import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
-import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
-import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
+import com.tcvcog.tcvce.domain.*;
+import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.occupancy.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
@@ -75,30 +38,18 @@ import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sound.midi.SysexMessage;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
-import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
-import com.tcvcog.tcvce.util.SubSysEnum;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * King of all business logic implementation for the entire Occupancy object tree
@@ -155,53 +106,79 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
         
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        OccPeriodDataHeavy opdh = new OccPeriodDataHeavy(per);
-        
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
-        PersonIntegrator pi = getPersonIntegrator();
-        EventIntegrator ei = getEventIntegrator();
         ChoiceCoordinator chc = getChoiceCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        
+        OccPeriodDataHeavy opdh = new OccPeriodDataHeavy(per);
         
         // now get all the lists from their respective integrators
         // this is the Java version of table joins in SQL; we're doing them interatively
         // in our integrators for each BOB
         try {
+            // APPLICATION LIST
             opdh.setApplicationList(oi.getOccPermitApplicationList(opdh));
 
+            // PERSON LIST
             QueryPerson qp = sc.initQuery(QueryPersonEnum.OCCPERIOD_PERSONS, cred);
             if(!qp.getParmsList().isEmpty()){
                 qp.getParmsList().get(0).setOccPeriod_val(per);
             }
             opdh.setPersonList(sc.runQuery(qp).getBOBResultList());
 
+            // EVENT LIST
             QueryEvent qe = sc.initQuery(QueryEventEnum.OCCPERIOD, cred);
             if(!qe.getParmsList().isEmpty()){
                 qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
             }
-            
             opdh.setEventList(qe.getBOBResultList());
 
-            opdh = chc.configureProposals(opdh, cred);
-
+            // PROPOSAL LIST
+            opdh.setProposalList(chc.getProposalList(opdh, cred));
+            
+            // EVENT RULE LIST
+            opdh.setEventRuleList(ec.rules_getEventRuleImpList(opdh, cred));
+            
+            // INSPECTION LIST
             opdh.setInspectionList(inspecInt.getOccInspectionList(opdh));
 
+            // FEE AND PAYMENT LIST
     //        opdh.setPaymentList(pai.getPaymentList(opdh));
     //        opdh.setFeeList(pai.getFeeAssigned(opdh));
 
+            // PERMIT LIST
             opdh.setPermitList(oi.getOccPermitList(opdh));
+            // BLOB LIST
             opdh.setBlobIDList(oi.getBlobList(opdh));
+            
             opdh.setGoverningInspection(designateGoverningInspection(opdh));
         
-        } catch (BObStatusException | EventException | AuthorizationException | SearchException ex) {
+        } catch (BObStatusException | SearchException ex) {
             System.out.println(ex);
         } 
-        // TODO: Figure out this inheritance SNAFU
-//        opdh.setEventRuleList(ei.rules_getEventRuleOccPeriodList(opdh));
-        
         
         return opdh;
         
+    }
+    
+    /**
+     * Logic container for determining occ period status based on a OPDH
+     * 
+     * As of Beta 0.9, we're just arbitrarily setting the status to unknown
+     * 
+     * @param opdh
+     * @param cred
+     * @return 
+     */
+    private OccPeriodDataHeavy configureOccPeriodDataHeavy(OccPeriodDataHeavy opdh, Credential cred){
+        if(opdh == null){
+            return opdh;
+        }
+        
+        opdh.setStatus(OccPeriodStatusEnum.UNKNOWN);
+        
+        return opdh;
     }
     
     

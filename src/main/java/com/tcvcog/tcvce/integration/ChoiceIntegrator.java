@@ -16,12 +16,13 @@
  */
 package com.tcvcog.tcvce.integration;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.Constants;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.ChoiceEventCat;
 import com.tcvcog.tcvce.entities.Directive;
@@ -31,14 +32,12 @@ import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
-import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
@@ -199,7 +198,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public List<Proposal> getProposalList(CECaseDataHeavy cse) throws IntegrationException{
+    public List<Proposal> getProposalList(CECase cse) throws IntegrationException{
         List<Proposal> proposalList = new ArrayList<>();
   
         StringBuilder sb = new StringBuilder();
@@ -273,25 +272,25 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
      */
      private Proposal generateProposal(ResultSet rs) throws SQLException, IntegrationException{
         Proposal prop = new Proposal();
-        UserIntegrator ui = getUserIntegrator();
-        EventIntegrator ei = getEventIntegrator();
+        UserCoordinator uc = getUserCoordinator();
+        EventCoordinator ec = getEventCoordinator();
         
         prop.setProposalID(rs.getInt("proposalid"));
         
         prop.setDirective(getDirective(rs.getInt("directive_directiveid")));
         if(rs.getInt("generatingevent_eventid") != 0){
-            prop.setGeneratingEvent(ei.getEvent(rs.getInt("generatingevent_eventid")));
+            prop.setGeneratingEvent(ec.getEvent(rs.getInt("generatingevent_eventid")));
         }
         if(rs.getInt("generatingevent_eventid") != 0){
-            prop.setGeneratingEvent(ei.getEvent(rs.getInt("generatingevent_eventid")));
+            prop.setGeneratingEvent(ec.getEvent(rs.getInt("generatingevent_eventid")));
         }
         if(rs.getInt("responseevent_eventid") != 0){
-            prop.setResponseEvent(ei.getEvent(rs.getInt("responseevent_eventid")));
+            prop.setResponseEvent(ec.getEvent(rs.getInt("responseevent_eventid")));
         }
                
-        prop.setInitiator(ui.getUser(rs.getInt("initiator_userid")));
+        prop.setInitiator(uc.getUser(rs.getInt("initiator_userid")));
         
-        prop.setResponderIntended(ui.getUser(rs.getInt("responderintended_userid")));
+        prop.setResponderIntended(uc.getUser(rs.getInt("responderintended_userid")));
         if(rs.getTimestamp("activateson") != null){
             prop.setActivatesOn(rs.getTimestamp("activateson").toLocalDateTime());
         }
@@ -299,7 +298,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             prop.setExpiresOn(rs.getTimestamp("expireson").toLocalDateTime());
         }
         
-        prop.setResponderActual(ui.getUser(rs.getInt("responderactual_userid")));
+        prop.setResponderActual(uc.getUser(rs.getInt("responderactual_userid")));
         prop.setProposalRejected(rs.getBoolean("rejectproposal"));
         if(rs.getTimestamp("responsetimestamp") != null){
             prop.setResponseTS(rs.getTimestamp("responsetimestamp").toLocalDateTime());

@@ -47,6 +47,14 @@ public class QueryCECase
         return searchParamsList.size();
     }
     
+      @Override
+    public SearchParamsCECase getPrimaryParams() {
+        if(searchParamsList != null && !searchParamsList.isEmpty()){
+            return searchParamsList.get(0);
+        }
+        return null;
+    }
+    
 
     @Override
     public List getBOBResultList() {

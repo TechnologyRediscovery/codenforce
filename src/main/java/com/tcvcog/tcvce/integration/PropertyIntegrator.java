@@ -62,6 +62,47 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public PropertyIntegrator() {
 
     }
+    
+    
+    public Property getProperty(int propertyID) throws IntegrationException {
+        Property p = new Property();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        String query = "SELECT propertyid, municipality_municode, parid, lotandblock, address, \n" +
+                        "       usegroup, constructiontype, countycode, notes, addr_city, addr_state, \n" +
+                        "       addr_zip, ownercode, propclass, lastupdated, lastupdatedby, locationdescription, \n" +
+                        "       bobsource_sourceid, unfitdatestart, unfitdatestop, unfitby_userid, \n" +
+                        "       abandoneddatestart, abandoneddatestop, abandonedby_userid, vacantdatestart, \n" +
+                        "       vacantdatestop, vacantby_userid, condition_intensityclassid, \n" +
+                        "       landbankprospect_intensityclassid, landbankheld, active, nonaddressable, \n" +
+                        "       usetype_typeid, creationts \n" +
+                        "  FROM public.property WHERE propertyid=?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, propertyID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                p = generateProperty(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return pc.configureProperty(p);
+
+    } // close getProperty()
+  
+    
+    
 
     /**
      * Utility method for property search methods whose individual SQL
@@ -80,6 +121,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         UserIntegrator ui = getUserIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
         
+        
 
         Property p = new Property();
 
@@ -87,6 +129,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             p.setPropertyID(rs.getInt("propertyid"));
             p.setMuni(mi.getMuni(rs.getInt("municipality_muniCode")));
             p.setMuniCode(rs.getInt("municipality_muniCode")); // for legacy compat
+            
             p.setParID(rs.getString("parid"));
             p.setLotAndBlock(rs.getString("lotandblock"));
             p.setAddress(rs.getString("address"));
@@ -106,45 +149,69 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 p.setLastUpdatedTS(rs.getTimestamp("lastupdated").toLocalDateTime());
             }
             
-            p.setLocationDescriptor(ci.getLocationDescriptor(rs.getInt("locationdescription")));
+            if(rs.getInt("locationdescription") != 0){
+                p.setLocationDescriptor(ci.getLocationDescriptor(rs.getInt("locationdescription")));
+            }
             
-            p.setBobSource(si.getBOBSource(rs.getInt("bobsource_sourceid")));
+            if(rs.getInt("bobsource_sourceid") != 0){
+                p.setBobSource(si.getBOBSource(rs.getInt("bobsource_sourceid")));
+            }
             
             if(rs.getTimestamp("unfitdatestart") != null){
                 p.setUnfitDateStart(rs.getTimestamp("unfitdatestart").toLocalDateTime());
             }
+            
             if(rs.getTimestamp("unfitdatestop") != null){
                 p.setUnfitDateStop(rs.getTimestamp("unfitdatestop").toLocalDateTime());
             }
             
-            p.setUnfitBy(ui.getUser(rs.getInt("unfitby_userid")));
+            if(rs.getInt("unfitby_userid") != 0){
+                p.setUnfitBy(ui.getUser(rs.getInt("unfitby_userid")));
+            }
                 
             if(rs.getTimestamp("abandoneddatestart") != null){
                 p.setAbandonedDateStart(rs.getTimestamp("abandoneddatestart").toLocalDateTime());
             }
+            
             if(rs.getTimestamp("abandoneddatestop") != null){
                 p.setAbandonedDateStop(rs.getTimestamp("abandoneddatestop").toLocalDateTime());
             }
-            p.setAbandonedBy(ui.getUser(rs.getInt("abandonedby_userid")));
+            
+            if(rs.getInt("abandonedby_userid") != 0){
+                p.setAbandonedBy(ui.getUser(rs.getInt("abandonedby_userid")));
+            }
             
             if(rs.getTimestamp("vacantdatestart") != null){
                 p.setVacantDateStart(rs.getTimestamp("vacantdatestart").toLocalDateTime());
             }
+            
             if(rs.getTimestamp("vacantdatestop") != null){
                 p.setVacantDateStop(rs.getTimestamp("vacantdatestop").toLocalDateTime());
             }
+            
             if(rs.getTimestamp("creationts") != null){
                 p.setCreationTS(rs.getTimestamp("creationts").toLocalDateTime());
             }
-            p.setVacantBy(ui.getUser(rs.getInt("vacantby_userid")));
-            p.setConditionIntensityClassID(rs.getInt("condition_intensityclassid"));
             
-            p.setLandBankProspectIntensityClassID(rs.getInt("landbankprospect_intensityclassid"));
+            if(rs.getInt("vacantby_userid") != 0){
+                p.setVacantBy(ui.getUser(rs.getInt("vacantby_userid")));
+            }
+            
+            if(rs.getInt("condition_intensityclassid") != 0){
+                p.setCondition(si.getIntensityClass(rs.getInt("condition_intensityclassid")));
+            }
+            
+            if(rs.getInt("landbankprospect_intensityclassid") != 0){
+                p.setLandBankProspect(si.getIntensityClass(rs.getInt("landbankprospect_intensityclassid")));
+            }
+            
             p.setLandBankHeld(rs.getBoolean("landbankheld"));
             p.setActive(rs.getBoolean("active"));
             p.setNonAddressable(rs.getBoolean("nonaddressable"));
             
-            p.setUseType(getPropertyUseType(rs.getInt("usetype_typeid")));
+            if(rs.getInt("usetype_typeid") != 0){
+                p.setUseType(getPropertyUseType(rs.getInt("usetype_typeid")));
+            }
             
             p.setUnitList(getPropertyUnitList(p));
             
@@ -162,182 +229,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return p;
     }
     
-    /**
-     * Builds a PropertyUseType object given a PK from the propertyusetype table
-     * @param useTypeID
-     * @return
-     * @throws IntegrationException 
-     */
-    public PropertyUseType getPropertyUseType(int useTypeID) throws IntegrationException{
-        String query = "SELECT propertyusetypeid, name, description, icon_iconid, zoneclass\n" +
-                        "  FROM public.propertyusetype WHERE propertyusetypeid=?;";
-
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        PropertyUseType put = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, useTypeID);
-            rs = stmt.executeQuery();
-            
-            while (rs.next()) {
-                put = generatePropertyUseType(rs);
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Error searching for properties", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return put;
-    }
-    
-    
-    public void updatePropertyUseType(PropertyUseType put) throws IntegrationException{
-        String query =  "UPDATE public.propertyusetype\n" +
-                        "   SET name=?, description=?, icon_iconid=?, zoneclass=?\n" +
-                        " WHERE propertyusetypeid=?;";
-
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, put.getName());
-            stmt.setString(2, put.getDescription());
-            if(put.getIcon() != null){
-                stmt.setInt(3, put.getIcon().getIconid());
-            } else {
-                stmt.setNull(3, java.sql.Types.NULL);
-            }
-            stmt.setString(4, put.getZoneClass());
-            
-
-            stmt.executeUpdate();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to update property use type", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
-    
-    
-    public void insertPropertyUseType(PropertyUseType put) throws IntegrationException{
-        String query =  "INSERT INTO public.propertyusetype(\n" +
-"            propertyusetypeid, name, description, icon_iconid, zoneclass)\n" +
-"    VALUES (DEFAULT, ?, ?, ?, ?);";
-
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, put.getName());
-            stmt.setString(2, put.getDescription());
-            if(put.getIcon() != null){
-                stmt.setInt(3, put.getIcon().getIconid());
-            } else {
-                stmt.setNull(3, java.sql.Types.NULL);
-            }
-            stmt.setString(4, put.getZoneClass());
-            
-            stmt.execute();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to insert new prop use type", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
-    
-    /**
-     * Returns a full table dump of PropertyUseType entries
-     * @return 
-     * @throws com.tcvcog.tcvce.domain.IntegrationException 
-     */
-    public List<PropertyUseType> getPropertyUseTypeList() throws IntegrationException{
-        String query = "SELECT propertyusetypeid, name, description, icon_iconid, zoneclass\n" +
-                        "  FROM public.propertyusetype;";
-
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        List<PropertyUseType> putList = new ArrayList<>();
-        
-        try {
-            stmt = con.prepareStatement(query);
-            rs = stmt.executeQuery();
-            
-            while (rs.next()) {
-                putList.add(generatePropertyUseType(rs));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Error searching for properties", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return putList;
-        
-    }
-    
-
-    /**
-     * Internal generator method which extracts column values from a ResultSet
-     * populated from the propertyusetype table.
-     * @param rs
-     * @return
-     * @throws SQLException
-     * @throws IntegrationException 
-     */
-    private PropertyUseType generatePropertyUseType(ResultSet rs) throws SQLException, IntegrationException{
-        SystemIntegrator si = getSystemIntegrator();
-        PropertyUseType put = new PropertyUseType();
-
-        put.setTypeID(rs.getInt("propertyusetypeid"));
-        put.setName(rs.getString("name"));
-        put.setDescription(rs.getString("description"));
-        put.setIcon(si.getIcon(rs.getInt("icon_iconid")));
-        put.setZoneClass(rs.getString("zoneclass"));
-
-        return put;
-    }
-
-    /**
-     * Utility method for property search methods whose individual SQL
-     * statements implement various search features. These methods can send
-     * properly configured (i.e. cursor positioned) ResultSet objects to this
-     * method and get back a populated Property object
-     *
-     * @param rs
-     * @return the fully baked Property with all fields set from DB data
-     */
-    private PropertyDataHeavy generatePropertyWithLists(ResultSet rs) throws IntegrationException {
-
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-
-        PropertyDataHeavy p = new PropertyDataHeavy(generateProperty(rs));
-
-        // finish me
-        return p;
-    }
-
-   
 
     
     public List<Property> searchForChangedProperties(String houseNum, String street, int muniID) throws IntegrationException {
@@ -384,45 +275,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     }
 
-    public List<Property> searchForChangedPropertiesAll(String houseNum, String street, int muniID) throws IntegrationException {
-        String query = "SELECT DISTINCT\n"
-                + "	   propertyid FROM \n"
-                + "	property,\n"
-                + "	propertyunitchange\n"
-                + "	\n"
-                + "WHERE \n"
-                + "	address ILIKE ? AND municipality_muniCode=?  AND propertyid = property_propertyid;";
-
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        List<Property> propList = new ArrayList<>();
-
-        try {
-            System.out.println("PropertyIntegrator.searchForProperties - with muni | sql: ");
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + houseNum + "%" + street + "%");
-            stmt.setInt(2, muniID);
-            rs = stmt.executeQuery();
-            int counter = 0;
-            while (rs.next() && counter <= MAX_RESULTS) {
-                propList.add(getProperty(rs.getInt("propertyid")));
-                counter++;
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Error searching for properties", ex);
-
-        } finally {
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return propList;
-
-    }
 
     public int insertProperty(Property prop) throws IntegrationException {
         String query = "INSERT INTO public.property(\n" +
@@ -465,28 +317,61 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(11, prop.getAddress_zip());
             stmt.setString(12, prop.getOwnerCode());
             stmt.setString(13, prop.getPropclass());
-             if(prop.getLastUpdatedTS() != null){
-                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(prop.getLastUpdatedTS()));
-            }
-            stmt.setInt(15, prop.getLastUpdatedBy().getUserID());
             
-            stmt.setInt(16, prop.getLocationDescriptor().getLocationID());
-            stmt.setInt(17, prop.getBobSource().getSourceid());
+            if(prop.getLastUpdatedTS() != null){
+                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(prop.getLastUpdatedTS()));
+            } else {
+                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            }
+            
+            if(prop.getLastUpdatedBy() != null){
+                stmt.setInt(15, prop.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+            
+            if(prop.getLocationDescriptor() != null){
+                stmt.setInt(16, prop.getLocationDescriptor().getLocationID());
+            } else {
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
+            
+            if(prop.getBobSource()!= null){
+                stmt.setInt(17, prop.getBobSource().getSourceid());
+            } else {
+                stmt.setNull(17, java.sql.Types.NULL);
+            }
+            
             if(prop.getUnfitDateStart() != null){
                 stmt.setTimestamp(18, java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
-            }
-            if(prop.getUnfitDateStop() != null){
-                stmt.setTimestamp(19, java.sql.Timestamp.valueOf(prop.getUnfitDateStop()));
+            } else {
+                stmt.setNull(18, java.sql.Types.NULL);
             }
             
-            stmt.setInt(20, prop.getUnfitBy().getUserID());
+            if(prop.getUnfitDateStop() != null){
+                stmt.setTimestamp(19, java.sql.Timestamp.valueOf(prop.getUnfitDateStop()));
+            } else {
+                stmt.setNull(19, java.sql.Types.NULL);
+            }
+            
+            if(prop.getUnfitBy() != null){
+                stmt.setInt(20, prop.getUnfitBy().getUserID());
+            } else {
+                stmt.setNull(20, java.sql.Types.NULL);
+            }
+            
             if(prop.getAbandonedDateStart()!= null){
                 stmt.setTimestamp(21, java.sql.Timestamp.valueOf(prop.getAbandonedDateStart()));
             }
             if(prop.getAbandonedDateStop()!= null){
                 stmt.setTimestamp(22, java.sql.Timestamp.valueOf(prop.getAbandonedDateStop()));
             }
-            stmt.setInt(23, prop.getAbandonedBy().getUserID());
+            
+            if(prop.getAbandonedBy()!= null){
+                stmt.setInt(23, prop.getAbandonedBy().getUserID());
+            } else {
+                stmt.setNull(23, java.sql.Types.NULL);
+            }
             
             if(prop.getVacantDateStart()!= null){
                 stmt.setTimestamp(24, java.sql.Timestamp.valueOf(prop.getVacantDateStart()));
@@ -494,10 +379,26 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if(prop.getVacantDateStop()!= null){
                 stmt.setTimestamp(25, java.sql.Timestamp.valueOf(prop.getVacantDateStop()));
             }
-            stmt.setInt(26, prop.getVacantBy().getUserID());
-            stmt.setInt(27, prop.getConditionIntensityClassID());
             
-            stmt.setInt(28, prop.getLandBankProspectIntensityClassID());
+            if(prop.getVacantBy()!= null){
+                stmt.setInt(26, prop.getVacantBy().getUserID());
+            } else {
+                stmt.setNull(26, java.sql.Types.NULL);
+            }
+
+            if(prop.getCondition()!= null){
+                stmt.setInt(27, prop.getCondition().getClassID());
+            } else {
+                stmt.setNull(27, java.sql.Types.NULL);
+            }
+            
+
+            if(prop.getLandBankProspect()!= null){
+                stmt.setInt(28, prop.getLandBankProspect().getClassID());
+            } else {
+                stmt.setNull(28, java.sql.Types.NULL);
+            }
+            
             stmt.setBoolean(29, prop.isLandBankHeld());
             stmt.setBoolean(30, prop.isActive());
             stmt.setBoolean(31, prop.isNonAddressable());
@@ -530,46 +431,20 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     }
 
-    public List<Property> getProperties(Person p) throws IntegrationException {
-        String query = "SELECT property_propertyid FROM propertyperson WHERE person_personid = ?;";
-
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        List<Property> pList = new ArrayList<>();
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, p.getPersonID());
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                pList.add(getProperty(rs.getInt("property_propertyid")));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return pList;
-
-    }
 
     public String updateProperty(Property prop) throws IntegrationException {
         String query =  "UPDATE public.property\n" +
-                        "   SET municipality_municode=?, parid=?, lotandblock=?, \n" +
-                        "       address=?, usegroup=?, constructiontype=?, countycode=?, notes=?, \n" +
-                        "       addr_city=?, addr_state=?, addr_zip=?, ownercode=?, propclass=?, \n" +
-                        "       lastupdated=?, lastupdatedby=? WHERE propertyid=?;";
-//                        "       locationdescription=?, bobsource_sourceid=?, unfitdatestart=?, unfitdatestop=?, unfitby_userid=?, abandoneddatestart=?, \n" +
-//                        "       abandoneddatestop=?, abandonedby_userid=?, vacantdatestart=?, \n" +
-//                        "       vacantdatestop=?, vacantby_userid=?, condition_intensityclassid=?, \n" +
-//                        "       landbankprospect_intensityclassid=?, landbankheld=?, active=?, \n" +
-//                        "       nonaddressable=?, usetype_typeid=?\n" +
-//                        " WHERE propertyid=?;";
+                        "   SET municipality_municode=?, parid=?, lotandblock=?, \n" +  // 1-3
+                        "       address=?, usegroup=?, constructiontype=?, countycode=?, notes=?, \n" + // 4-8
+                        "       addr_city=?, addr_state=?, addr_zip=?, ownercode=?, propclass=?, \n" + // 9-13
+                        "       lastupdated=?, lastupdatedby=?, " + // 14-15
+                        "       locationdescription=?, bobsource_sourceid=?, unfitdatestart=?, " + // 16-18
+                        "       unfitdatestop=?, unfitby_userid=?, abandoneddatestart=?, \n" + // 19-21
+                        "       abandoneddatestop=?, abandonedby_userid=?, vacantdatestart=?, \n" + // 22-24
+                        "       vacantdatestop=?, vacantby_userid=?, condition_intensityclassid=?, \n" + // 25-27
+                        "       landbankprospect_intensityclassid=?, landbankheld=?, active=?, \n" + // 28-30
+                        "       nonaddressable=?, usetype_typeid=? \n" + // 31 -33
+                        " WHERE propertyid=?;"; // 34
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -579,93 +454,135 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(1, prop.getMuniCode());
             stmt.setString(2, prop.getParID());
             stmt.setString(3, prop.getLotAndBlock());
-            stmt.setString(4, prop.getAddress());
             
+            // new SQL line
+            stmt.setString(4, prop.getAddress());
             stmt.setString(5, prop.getUseGroup());
             stmt.setString(6, prop.getConstructionType());
             stmt.setString(7, prop.getCountyCode());
             stmt.setString(8, prop.getNotes());
-            stmt.setString(9, prop.getAddress_city());
             
+            // new SQL line
+            stmt.setString(9, prop.getAddress_city());
             stmt.setString(10, prop.getAddress_state());
             stmt.setString(11, prop.getAddress_zip());
             stmt.setString(12, prop.getOwnerCode());
             stmt.setString(13, prop.getPropclass());
+            
+            // new SQL line
             if(prop.getLastUpdatedTS() != null){
                 stmt.setTimestamp(14, java.sql.Timestamp.valueOf(prop.getLastUpdatedTS()));
+            } else {
+                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(LocalDateTime.now()));
             }
-            stmt.setInt(15, prop.getLastUpdatedBy().getUserID());
             
-//            stmt.setInt(16, prop.getLocationDescriptor().getLocationID());
-//            stmt.setInt(17, prop.getBobSource().getSourceid());
-//            if(prop.getUnfitDateStart() != null){
-//                stmt.setTimestamp(18, java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
-//            }
-//            if(prop.getUnfitDateStop() != null){
-//                stmt.setTimestamp(19, java.sql.Timestamp.valueOf(prop.getUnfitDateStop()));
-//            }
-//            
-//            stmt.setInt(20, prop.getUnfitBy().getUserID());
-//            if(prop.getAbandonedDateStart()!= null){
-//                stmt.setTimestamp(21, java.sql.Timestamp.valueOf(prop.getAbandonedDateStart()));
-//            }
-//            if(prop.getAbandonedDateStop()!= null){
-//                stmt.setTimestamp(22, java.sql.Timestamp.valueOf(prop.getAbandonedDateStop()));
-//            }
-//            stmt.setInt(23, prop.getAbandonedBy().getUserID());
-//            
-//            if(prop.getVacantDateStart()!= null){
-//                stmt.setTimestamp(24, java.sql.Timestamp.valueOf(prop.getVacantDateStart()));
-//            }
-//            if(prop.getVacantDateStop()!= null){
-//                stmt.setTimestamp(25, java.sql.Timestamp.valueOf(prop.getVacantDateStop()));
-//            }
-//            stmt.setInt(26, prop.getVacantBy().getUserID());
-//            stmt.setInt(27, prop.getConditionIntensityClassID());
-//            
-//            stmt.setInt(28, prop.getLandBankProspectIntensityClassID());
-//            stmt.setBoolean(29, prop.isLandBankHeld());
-//            stmt.setBoolean(30, prop.isActive());
-//            stmt.setBoolean(31, prop.isNonAddressable());
-//            
-//            stmt.setInt(32, prop.getUseTypeID());
-            stmt.setInt(16, prop.getPropertyID());
-            stmt.setInt(16, prop.getLocationDescriptor().getLocationID());
-            stmt.setInt(17, prop.getBobSource().getSourceid());
+            stmt.setInt(15, prop.getLastUpdatedBy().getUserID());
+             if(prop.getLastUpdatedBy() != null){
+                stmt.setInt(15, prop.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+            
+            // new SQL line
+            if(prop.getLocationDescriptor() != null){
+                stmt.setInt(16, prop.getLocationDescriptor().getLocationID());
+            } else {
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
+            
+            if(prop.getBobSource()!= null){
+                stmt.setInt(17, prop.getBobSource().getSourceid());
+            } else {
+                stmt.setNull(17, java.sql.Types.NULL);
+            }
+            
             if(prop.getUnfitDateStart() != null){
                 stmt.setTimestamp(18, java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
-            }
-            if(prop.getUnfitDateStop() != null){
-                stmt.setTimestamp(19, java.sql.Timestamp.valueOf(prop.getUnfitDateStop()));
+            } else {
+                stmt.setNull(18, java.sql.Types.NULL);
             }
             
-            stmt.setInt(20, prop.getUnfitBy().getUserID());
+            // new SQL line
+            if(prop.getUnfitDateStop() != null){
+                stmt.setTimestamp(19, java.sql.Timestamp.valueOf(prop.getUnfitDateStop()));
+            } else {
+                stmt.setNull(19, java.sql.Types.NULL);
+            }
+            
+            if(prop.getUnfitBy() != null){
+                stmt.setInt(20, prop.getUnfitBy().getUserID());
+            } else {
+                stmt.setNull(20, java.sql.Types.NULL);
+            } 
+            
             if(prop.getAbandonedDateStart()!= null){
                 stmt.setTimestamp(21, java.sql.Timestamp.valueOf(prop.getAbandonedDateStart()));
-            }
+            } else {
+                stmt.setNull(21, java.sql.Types.NULL);
+            } 
+            
+            // new SQL line
+            
             if(prop.getAbandonedDateStop()!= null){
                 stmt.setTimestamp(22, java.sql.Timestamp.valueOf(prop.getAbandonedDateStop()));
+            } else {
+                stmt.setNull(22, java.sql.Types.NULL);
+            } 
+            
+            if(prop.getAbandonedBy()!= null){
+                stmt.setInt(23, prop.getAbandonedBy().getUserID());
+            } else {
+                stmt.setNull(23, java.sql.Types.NULL);
             }
-            stmt.setInt(23, prop.getAbandonedBy().getUserID());
             
             if(prop.getVacantDateStart()!= null){
                 stmt.setTimestamp(24, java.sql.Timestamp.valueOf(prop.getVacantDateStart()));
-            }
+            } else {
+                stmt.setNull(24, java.sql.Types.NULL);
+            } 
+            
+            
+            // new SQL line
             if(prop.getVacantDateStop()!= null){
                 stmt.setTimestamp(25, java.sql.Timestamp.valueOf(prop.getVacantDateStop()));
-            }
-            stmt.setInt(26, prop.getVacantBy().getUserID());
-            stmt.setInt(27, prop.getConditionIntensityClassID());
+            } else {
+                stmt.setNull(25, java.sql.Types.NULL);
+            } 
             
-            stmt.setInt(28, prop.getLandBankProspectIntensityClassID());
+            if(prop.getVacantBy()!= null){
+                stmt.setInt(26, prop.getVacantBy().getUserID());
+            } else {
+                stmt.setNull(26, java.sql.Types.NULL);
+            }
+
+            if(prop.getCondition()!= null){
+                stmt.setInt(27, prop.getCondition().getClassID());
+            } else {
+                stmt.setNull(27, java.sql.Types.NULL);
+            }
+            
+
+            // new SQL line
+            if(prop.getLandBankProspect()!= null){
+                stmt.setInt(28, prop.getLandBankProspect().getClassID());
+            } else {
+                stmt.setNull(28, java.sql.Types.NULL);
+            }
+            
             stmt.setBoolean(29, prop.isLandBankHeld());
             stmt.setBoolean(30, prop.isActive());
+            
+            // new SQL line
             stmt.setBoolean(31, prop.isNonAddressable());
             
             if(prop.getUseType() != null){
                 stmt.setInt(32, prop.getUseType().getTypeID());
+            } else {
+                stmt.setNull(32, java.sql.Types.NULL);
             }
-
+            
+            stmt.setInt(33, prop.getPropertyID());
+            
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
@@ -721,6 +638,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         params.appendSQL("SELECT DISTINCT propertyid ");
         params.appendSQL("FROM property LEFT OUTER JOIN propertyexternaldata ON (property.propertyid = propertyexternaldata.property_propertyid) \n");
+        params.appendSQL("LEFT OUTER JOIN propertyperson ON (property.propertyid = propertyperson.property_propertyid) \n");
         params.appendSQL("WHERE propertyid IS NOT NULL ");
         
         // **********************************
@@ -862,6 +780,18 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 params.appendSQL("AND propertyexternaldata.yearbuilt>? ");
                 params.appendSQL("AND propertyexternaldata.yearbuilt<? ");
             }
+
+           // ****************************
+           // **   15:PERSON            **
+           // ****************************
+            if (params.isPerson_ctl()) {
+                if(params.getPerson_val() != null){
+                    params.appendSQL("AND propertyperson.person_personid=? ");
+                } else {
+                    params.setPerson_ctl(false);
+                    params.logMessage("PERSON: No object found; filter disabled; | " );
+                }
+            }
            
         // ****************************
         // ** COM-4  OBJECT ID       **
@@ -952,6 +882,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
                     stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
                 }
+                if (params.isPerson_ctl()){
+                    stmt.setInt(++paramCounter, params.getPerson_val().getPersonID());
+                }
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
@@ -983,45 +916,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
 
 
-    public Property getProperty(int propertyID) throws IntegrationException {
-        Property p = new Property();
-        PropertyCoordinator pc = getPropertyCoordinator();
-        String query = "SELECT propertyid, municipality_municode, parid, lotandblock, address, \n" +
-                        "       usegroup, constructiontype, countycode, notes, addr_city, addr_state, \n" +
-                        "       addr_zip, ownercode, propclass, lastupdated, lastupdatedby, locationdescription, \n" +
-                        "       bobsource_sourceid, unfitdatestart, unfitdatestop, unfitby_userid, \n" +
-                        "       abandoneddatestart, abandoneddatestop, abandonedby_userid, vacantdatestart, \n" +
-                        "       vacantdatestop, vacantby_userid, condition_intensityclassid, \n" +
-                        "       landbankprospect_intensityclassid, landbankheld, active, nonaddressable, \n" +
-                        "       usetype_typeid, creationts \n" +
-                        "  FROM public.property WHERE propertyid=?;";
-
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, propertyID);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                p = generateProperty(rs);
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
-        } finally {
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return pc.configureProperty(p);
-
-    } // close getProperty()
-  
-    
-    
    
 
     /**
@@ -1064,6 +958,13 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return propList;
     }
     
+    
+    
+    // *************************************************************************
+    // **               PROPERTY UNIT STUFF                                   **
+    // *************************************************************************
+    
+    
      public PropertyUnit getPropertyUnit(int propUnitID) throws IntegrationException {
         PropertyUnit pu = null;
         String query =  "SELECT unitid, unitnumber, property_propertyid, otherknownaddress, notes, \n" +
@@ -1094,6 +995,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return pu;
     }
 
+     
+     
 
       private PropertyUnit generatePropertyUnit(ResultSet rs) throws SQLException, IntegrationException {
         PropertyUnit pu = new PropertyUnit();
@@ -1594,6 +1497,167 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return ucl;
     }
 
+ // *************************************************************************
+    // **               PROPERTY USE TYPE STUFF                               **
+    // *************************************************************************
+    
+    /**
+     * Builds a PropertyUseType object given a PK from the propertyusetype table
+     * @param useTypeID
+     * @return
+     * @throws IntegrationException 
+     */
+    public PropertyUseType getPropertyUseType(int useTypeID) throws IntegrationException{
+        String query = "SELECT propertyusetypeid, name, description, icon_iconid, zoneclass\n" +
+                        "  FROM public.propertyusetype WHERE propertyusetypeid=?;";
 
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        PropertyUseType put = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, useTypeID);
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                put = generatePropertyUseType(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Error searching for properties", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return put;
+    }
+    
+    
+    public void updatePropertyUseType(PropertyUseType put) throws IntegrationException{
+        String query =  "UPDATE public.propertyusetype\n" +
+                        "   SET name=?, description=?, icon_iconid=?, zoneclass=?\n" +
+                        " WHERE propertyusetypeid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, put.getName());
+            stmt.setString(2, put.getDescription());
+            if(put.getIcon() != null){
+                stmt.setInt(3, put.getIcon().getIconid());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            stmt.setString(4, put.getZoneClass());
+            
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update property use type", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    
+    public void insertPropertyUseType(PropertyUseType put) throws IntegrationException{
+        String query =  "INSERT INTO public.propertyusetype(\n" +
+"            propertyusetypeid, name, description, icon_iconid, zoneclass)\n" +
+"    VALUES (DEFAULT, ?, ?, ?, ?);";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, put.getName());
+            stmt.setString(2, put.getDescription());
+            if(put.getIcon() != null){
+                stmt.setInt(3, put.getIcon().getIconid());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            stmt.setString(4, put.getZoneClass());
+            
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to insert new prop use type", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    /**
+     * Returns a full table dump of PropertyUseType entries
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public List<PropertyUseType> getPropertyUseTypeList() throws IntegrationException{
+        String query = "SELECT propertyusetypeid, name, description, icon_iconid, zoneclass\n" +
+                        "  FROM public.propertyusetype;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        List<PropertyUseType> putList = new ArrayList<>();
+        
+        try {
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                putList.add(generatePropertyUseType(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Error searching for properties", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return putList;
+        
+    }
+    
+
+    /**
+     * Internal generator method which extracts column values from a ResultSet
+     * populated from the propertyusetype table.
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private PropertyUseType generatePropertyUseType(ResultSet rs) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        PropertyUseType put = new PropertyUseType();
+
+        put.setTypeID(rs.getInt("propertyusetypeid"));
+        put.setName(rs.getString("name"));
+        put.setDescription(rs.getString("description"));
+        put.setIcon(si.getIcon(rs.getInt("icon_iconid")));
+        put.setZoneClass(rs.getString("zoneclass"));
+
+        return put;
+    }
+
+   
+   
 
 } // close class
