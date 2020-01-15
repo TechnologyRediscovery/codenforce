@@ -39,3 +39,8 @@ CREATE TABLE public.occperiodeventrule
       REFERENCES public.login (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+
+--IF datepublished IS NULL the patch is still open and receiving changes
+INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
+    VALUES (25, 'database/patches/dbpatch_beta25.sql', NULL, 'ecd', 'various changes');

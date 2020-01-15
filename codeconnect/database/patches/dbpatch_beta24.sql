@@ -60,3 +60,6 @@ ALTER TABLE property ADD COLUMN creationts TIMESTAMP WITH TIME ZONE;
 
 
 
+--IF datepublished IS NULL the patch is still open and receiving changes
+INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
+    VALUES (24, 'database/patches/dbpatch_beta24.sql', NULL, 'ecd', 'various changes');
