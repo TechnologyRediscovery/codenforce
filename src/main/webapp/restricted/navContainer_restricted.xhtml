@@ -19,22 +19,12 @@
         <div class="flex-box-container">
             <ui:insert name="top">
                 <div class="flexing-box-topbar">
-                    <f:view id="navview">
-                        <div class="logoBox">
-                            <div class="logo-image-wrapper">
-                                <h:graphicImage value="/images/tcvcog_logo_inverted_new.jpg" height="50"/>
-                            </div>
-                            <div class="logo-title-wrapper">
-                                <div class="sys-title" style="font-weight: bold;">codeNforce</div>
-                                <div class="sys-title-sub">municipal code enforcement workflow management system</div>
-                            </div>
-                        </div>
-                    </f:view>
+                    <div class="logo-image-wrapper">
+                        <h:graphicImage value="/images/Logo-N.png" height="100px"/>
+                    </div>
                 </div>
             </ui:insert>
         </div>
-
-        <p:spacer height="5px"/>
 
         <div class="flex-box-container">
             <div class="flexing-box-interior">
@@ -181,12 +171,13 @@
 
                                     </ui:repeat>
 
+                                    
 
 
                                     <div class="navItem_logout">
                                         <p:commandButton    id="navcontres-button-logout"
                                                             action="#{systemServicesBB.logout}" 
-                                                            value="Logout #{systemServicesBB.bbSessionUser.person.firstName}"
+                                                            value="Logout"
                                                             icon="fa fa-sign-out"
                                                             ajax="false"/>
                                     </div>
@@ -198,9 +189,13 @@
                                                                 rendered="true"
                                                                 disabled="false"
                                                                 oncomplete="PF('navcontainer-dialog-usersettings').show()"
-                                                                value="settings" 
+                                                                value="Settings" 
                                                                 update="usersettings-form"
                                                                 icon="fa fa-gear"/>
+                                    </div>
+                                    
+                                    <div class="navItem_user">
+                                        <h:outputText value="Hi, #{systemServicesBB.bbSessionUser.person.firstName}" />
                                     </div>
 
                                 </div>
