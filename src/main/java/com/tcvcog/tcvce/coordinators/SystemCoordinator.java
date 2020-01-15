@@ -18,17 +18,10 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.CasePhaseEnum;
-import com.tcvcog.tcvce.entities.CaseStageEnum;
-import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
-import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.LogIntegrator;
@@ -41,14 +34,9 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.faces.context.FacesContext;
 
 /**
  *
@@ -209,8 +197,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem propertyUnits = getNavSubItem("Units", "/restricted/cogstaff/prop/propertyUnits.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyEvents = getNavSubItem("Events", "/restricted/cogstaff/prop/propertyEvents.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyPersons = getNavSubItem("Persons", "/restricted/cogstaff/prop/propertyPersons.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyCases = getNavSubItem("Cases", "/restricted/cogstaff/prop/propertyCECases.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "/restricted/cogstaff/prop/propertyPeriods.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyCases = getNavSubItem("Cases", "/restricted/cogstaff/prop/propertyCases.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "/restricted/cogstaff/prop/propertyOccPeriods.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyDocuments = getNavSubItem("Files", "/restricted/cogstaff/prop/propertyFiles.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Property
@@ -322,10 +310,10 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             NavigationItem codeItem = getNavItem("/restricted/cogstaff/code/codeSourceManage.xhtml", "Code", "fa fa-book", getCodeNavList());
 
             navList.add(dashboardItem);
-            navList.add(personItem);
             navList.add(propertyItem);
-            navList.add(CEItem);
+            navList.add(personItem);
             navList.add(occItem);
+            navList.add(CEItem);
             navList.add(codeItem);
         } catch (Exception e) {
 

@@ -229,11 +229,7 @@
     </managed-bean>
         
     
-    <managed-bean>
-        <managed-bean-name>propertyProfileBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PropertyProfileBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+  
         
     <managed-bean>
         <managed-bean-name>unitChangesBB</managed-bean-name>
@@ -342,14 +338,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    
-    <managed-bean>
-        <managed-bean-name>propertyUpdateBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PropertyUpdateBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    
+  
    
     <managed-bean>
         <managed-bean-name>violationAddBB</managed-bean-name>
@@ -508,11 +497,7 @@
         <managed-bean-class>com.tcvcog.tcvce.application.CEEventsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    <managed-bean>
-        <managed-bean-name>propertyAddBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PropertyAddBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>iconBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.IconBB</managed-bean-class>
@@ -1044,15 +1029,7 @@
     <!--Properties-->
     
     
-    <navigation-rule>
-        <from-view-id>/restricted/cogstaff/propertyUpdate.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>propertyProfile</from-outcome>
-            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
-    
+ 
   
     
     <navigation-rule>
@@ -1098,21 +1075,7 @@
         </navigation-case>
     </navigation-rule>
     
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
-        
-        <navigation-case>
-            <from-outcome>propertyUpdate</from-outcome>
-            <to-view-id>/restricted/cogstaff/gen/propertyUpdate.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>propertyAdd</from-outcome>
-            <to-view-id>/restricted/cogstaff/gen/propertyAdd.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>    
+  
         
     <!--Persons-->
     <navigation-rule>
@@ -1696,11 +1659,50 @@
     <managed-bean>
         <managed-bean-name>propertySearchBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertySearchBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>propertyProfileBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyProfileBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>propertyCreateBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyCreateBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>propertyUnitsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyUnitsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>propertyCasesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyCasesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>propertyEventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyEventsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>propertyFilesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyFilesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>propertyOccPeriodsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyPeriodsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>propertyPersonsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyPersonsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
 </faces-config>

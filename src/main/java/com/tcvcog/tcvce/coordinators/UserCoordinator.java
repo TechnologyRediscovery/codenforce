@@ -20,18 +20,14 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.Credential;
 import java.io.Serializable;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Named;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.UserConfigReady;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -44,12 +40,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -188,12 +181,25 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * so the user can search by Users who have some past connection to any of the 
      * given Municipality objects passed into the method.
      * 
-     * TODO: Finish my guts!
-     * @param muniList The set of Municipalities for which the user may Search
+     * TODO: Customize list based on muni connections
+     * 
      * @return An assembled list of users for authorization
      */
-    public List<User> assembleUserListForSearchCriteria(List<Municipality> muniList){
-        return new ArrayList<>();
+    public List<User> assembleUserListForSearchCriteria(){
+        // we do nothing with muniList
+        UserIntegrator ui = getUserIntegrator();
+        
+        List<User> ulst = new ArrayList<>();
+        
+        try {
+            for(Integer i: ui.getSystemUserIDList()){
+                ulst.add(getUser(i));
+            }
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return ulst;
+        
     }
     
     /**
@@ -611,7 +617,6 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return usersForConfig;
     }
     
-  
     
     
     /**

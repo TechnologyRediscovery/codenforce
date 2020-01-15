@@ -29,7 +29,7 @@
                                     toggleable="true"
                                     widgetVar="prop-pers-list-panel-var"
                                     collapsed="false"
-                                    header="Persons connected to #{propertyProfileBB.currProp.address} (#{propertyProfileBB.currProp.muni.muniName})">
+                                    header="Persons connected to #{propertyPersonsBB.currProp.address} (#{propertyProfileBB.currProp.muni.muniName})">
                                
                             <h:form id="prop-pers-list-form">
                                 
@@ -38,12 +38,12 @@
                                 <p:dataTable
                                     id="prop-persons-table"
                                     var="person"
-                                    value="#{propertyProfileBB.currProp.personList}"
+                                    value="#{propertyPersonsBB.currProp.personList}"
                                     rowKey="#{person.personID}"
                                     tableStyleClass="primeDataTable"
                                     rowExpandMode="single"
                                     expandedRow="false"
-                                    filteredValue="#{propertyProfileBB.filteredPersonList}"
+                                    filteredValue="#{propertyPersonBB.filteredPersonList}"
                                     >
 
                                     <p:column width="3%">
@@ -235,121 +235,6 @@
 
                             </h:form>
                         </p:panel>
-                        
-                        
-                        
-                        <p:tabView id="_________NAMEME_________">
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                        </p:tabView>
-                        
-                          <p:dataScroller
-                                                id="_________NAMEME_________"
-                                                widgetVar="_________NAMEME_________"
-                                                var="inelement"
-                                                value="#{inspace.inspectedElementListVisible}"
-                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
-                          
-                          
-                          
-                          </p:dataScroller>
-                        
-                          <p:dataTable
-                                            id="_________NAMEME_________"
-                                            var="_________NAMEME_________"
-                                            rowKey="#{permit.permitID}"
-                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
-                                            tableStyleClass="primeDataTable"
-                                            draggableColumns="true"
-                                            resizableColumns="true"
-                                            filteredValue="#{occInspectionBB.filteredEventList}"
-                                            widgetVar="caseEventTable">
-
-                                            <p:column width="3%" exportable="false">
-                                                <p:rowToggler/>
-                                            </p:column>
-                                            
-                                            <p:column width="10%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Print" />
-                                                </f:facet>
-                                                <p:commandButton ajax="false" 
-                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
-                                                                 value="print"
-                                                                 icon="fa fa-print"
-                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
-                                            </p:column>
-                          </p:dataTable>
-
-                        <p:commandButton   id="_________NAMEME_________" 
-                                           value="run selected query" 
-                                           ajax="true" 
-                                           actionListener="_________NAMEME_________"
-                                           icon="fa fa-print" 
-                                           styleClass="button"
-                                           update=""/>
-
-
-
-                        <p:commandButton    id="_________NAMEME_________"
-                                            value="help on this page" 
-                                            onclick="PF('_________NAMEME_________').show()" 
-                                            styleClass="noFill" 
-                                            icon="fa fa-question-circle"/>
-                        <p:spacer height="10px"/>
-
-
-
-
-                    <!--close main container-->
-                    </div>
-                    
-                    
-                    <p:dialog   id="_________NAMEME_________"
-                                header="_________NAMEME_________" 
-                                widgetVar="_________NAMEME_________" 
-                                responsive="true" 
-                                width="400"
-                                modal="false"
-                                height="600">
-                        
-                          <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                        </h:form>
-                        
-                        <h:form id="_________NAMEME_________">
-                            
-
-                            <h2>_________NAMEME_________</h2>
-
-                            
-                            
-                            <p:commandButton    id="_________NAMEME_________"
-                                                value="_________NAMEME_________" 
-                                                ajax="true" 
-                                                icon="fa fa-edit"
-                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
-                                                disabled="false"
-                                                rendered="true"
-                                                oncomplete="PF('_________NAMEME_________').hide()"
-                                                update=""/>
-
-                            <p:commandLink  value="close" 
-                                            onclick="PF('_________NAMEME_________').hide()" 
-                                            styleClass="noFill"/>
-
-                        </h:form>
-
-                    </p:dialog>
-
-
                 </f:view>
             </ui:define>
         </ui:composition>

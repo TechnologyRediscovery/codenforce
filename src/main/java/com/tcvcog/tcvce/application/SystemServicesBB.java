@@ -18,12 +18,15 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
@@ -33,6 +36,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -55,10 +59,16 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     
     private UserAuthorized bbSessionUser;
     private MunicipalityDataHeavy bbSessionMuni;
-    
-    private Property bbSessionProperty;
+    private PropertyDataHeavy bbSessionProperty;
     private Person bbSessionPerson;
     
+    
+    
+    // *************************************************************************
+    // **               search support 
+    // *************************************************************************
+    
+    private List<User> userListForSearch;
     
     
     // *************************************************************************
@@ -86,10 +96,15 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
+        System.out.println("SystemServicesBB.initBean");
+        UserCoordinator uc = getUserCoordinator();
         
         bbSessionUser = getSessionBean().getSessionUser();
         bbSessionMuni = getSessionBean().getSessionMuni();
-        System.out.println("SystemServicesBB.initBean");
+        bbSessionProperty = getSessionBean().getSessionProperty();
+        bbSessionPerson = getSessionBean().getSessionPerson();
+        
+        userListForSearch = uc.assembleUserListForSearchCriteria();
         
     }
     
@@ -361,32 +376,12 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param bbSessionUser the bbSessionUser to set
-     */
-    public void setBbSessionUser(UserAuthorized bbSessionUser) {
-        this.bbSessionUser = bbSessionUser;
-    }
-
-    /**
      * @return the bbSessionMuni
      */
     public MunicipalityDataHeavy getBbSessionMuni() {
         return bbSessionMuni;
     }
 
-    /**
-     * @param bbSessionMuni the bbSessionMuni to set
-     */
-    public void setBbSessionMuni(MunicipalityDataHeavy bbSessionMuni) {
-        this.bbSessionMuni = bbSessionMuni;
-    }
-
-    /**
-     * @return the bbSessionProperty
-     */
-    public Property getBbSessionProperty() {
-        return bbSessionProperty;
-    }
 
     /**
      * @return the bbSessionPerson
@@ -395,20 +390,21 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         return bbSessionPerson;
     }
 
+   
     /**
-     * @param bbSessionProperty the bbSessionProperty to set
+     * @return the bbSessionProperty
      */
-    public void setBbSessionProperty(Property bbSessionProperty) {
-        this.bbSessionProperty = bbSessionProperty;
+    public PropertyDataHeavy getBbSessionProperty() {
+        return bbSessionProperty;
     }
 
+
     /**
-     * @param bbSessionPerson the bbSessionPerson to set
+     * @return the userListForSearch
      */
-    public void setBbSessionPerson(Person bbSessionPerson) {
-        this.bbSessionPerson = bbSessionPerson;
+    public List<User> getUserListForSearch() {
+        return userListForSearch;
     }
-    
-    
+
     
 }

@@ -37,7 +37,6 @@ public class SearchParamsConverterBOBQuery extends EntityConverter implements Co
             return null; 
         }
         Query o = (Query) this.getViewMap(fc).get(titleS);
-        System.out.println("SearchParamsConverterBOB.getAsObject | object " + o.getQueryTitle());
         return o;
     }
 

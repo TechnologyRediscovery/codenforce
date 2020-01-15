@@ -24,131 +24,169 @@
                         </h:form>
 
 
-                        <p:panel    id="prop-events-list-panel"
-                                    toggleable="true"
-                                    widgetVar="prop-events-list-panel-var"
-                                    collapsed="false"
-                                    header="Property events">
-                               
-                            <h:form id="prop-events-list-form">
-                                      
+                            <p:panel    id="property-events-panel"
+                                        toggleable="true"
+                                        widgetVar="property-events-panel-var"
+                                        collapsed="false"
+                                        header="Property events">
 
 
-                        </p:panel>
-                        
-                        <p:tabView id="_________NAMEME_________">
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                        </p:tabView>
-                        
-                          <p:dataScroller
-                                                id="_________NAMEME_________"
-                                                widgetVar="_________NAMEME_________"
-                                                var="inelement"
-                                                value="#{inspace.inspectedElementListVisible}"
-                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
-                          
-                          
-                          
-                          </p:dataScroller>
-                        
-                          <p:dataTable
-                                            id="_________NAMEME_________"
-                                            var="_________NAMEME_________"
-                                            rowKey="#{permit.permitID}"
-                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
-                                            tableStyleClass="primeDataTable"
-                                            draggableColumns="true"
-                                            resizableColumns="true"
-                                            filteredValue="#{occInspectionBB.filteredEventList}"
-                                            widgetVar="caseEventTable">
+                                <h:form id="event-messages-form">
+                                    <h:messages id="propertys-events-messages"
+                                                globalOnly="true" showDetail="true" showSummary="true"
+                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                    </h:messages>
+                                </h:form>
 
-                                            <p:column width="3%" exportable="false">
-                                                <p:rowToggler/>
-                                            </p:column>
-                                            
-                                            <p:column width="10%">
+
+
+                                <h:form id="event-dt-form">
+
+
+                                    <p:dataTable
+                                        id="propertyEventTable"
+                                        var="e"
+                                        rowKey="#{e.eventID}"
+                                        value="#{propertyEventsBB.currProp.assemblePropertyEventList}"
+                                        tableStyleClass="primeDataTable"
+                                        resizableColumns="true"
+                                        rowExpandMode="multiple"
+                                        expandedRow="false"
+                                        scrollHeight="400"
+                                        filteredValue="#{propertyEventsBB.eventListFiltered}"
+                                        widgetVar="propertyEventTable"
+                                        >
+                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                        <p:column width="3%" exportable="false">
+                                            <p:rowToggler/>
+                                        </p:column>
+
+                                        <p:column width="4%">
+                                            <i class="material-icons"><h:outputText value="#{e.category.icon.materialIcon}"/></i>
+                                        </p:column>
+
+                                        <p:column width="9%" sortBy="#{e.timeStart}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Start" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{e.timeStartPretty}"/>
+                                            </div>
+                                        </p:column>
+                                        
+                                        <p:column width="9%" sortBy="#{e.timeEnd}">
+                                            <f:facet name="header">
+                                                <h:outputText value="End" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{e.timeEndPretty}"/>
+                                            </div>
+                                        </p:column>
+
+                                        <p:column width="4%" sortBy="#{e.eventID}">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{e.eventID}"/>
+                                        </p:column>
+                                        <ui:remove>
+                                            <p:column width="8%" sortBy="#{e.category.eventType.label}"
+                                                      filterBy="#{e.category.eventType.label}">
                                                 <f:facet name="header">
-                                                    <h:outputText value="Print" />
+                                                    <h:outputText value="Type" />
                                                 </f:facet>
-                                                <p:commandButton ajax="false" 
-                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
-                                                                 value="print"
-                                                                 icon="fa fa-print"
-                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                                                <h:outputText value="#{e.category.eventType.label}"/>
                                             </p:column>
-                          </p:dataTable>
+                                        </ui:remove>
 
-                        <p:commandButton   id="_________NAMEME_________" 
-                                           value="run selected query" 
-                                           ajax="true" 
-                                           actionListener="_________NAMEME_________"
-                                           icon="fa fa-print" 
-                                           styleClass="button"
-                                           update=""/>
+                                        <p:column width="12%" sortBy="#{e.category.eventCategoryTitle}"
+                                                  filterBy="#{e.category.eventCategoryTitle}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Category" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                            </div>
+                                        </p:column>
+                                        <p:column width="5%" filterBy="#{e.owner.person.lastName}"
+                                                  sortBy="#{e.owner.person.lastName}">
 
+                                            <f:facet name="header">
+                                                <h:outputText value="Owner" />
+                                            </f:facet>
+                                            <h:outputText value="#{e.owner.person.lastName}"/>
+                                        </p:column>
+                                        <p:column width="20%" style="word-wrap: normal;">
+                                            <f:facet name="header">
+                                                <h:outputText value="Description" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{e.description}"/>
+                                            </div>
+                                        </p:column>
 
+                                       
+                                        <p:rowExpansion>
 
-                        <p:commandButton    id="_________NAMEME_________"
-                                            value="help on this page" 
-                                            onclick="PF('_________NAMEME_________').show()" 
-                                            styleClass="noFill" 
-                                            icon="fa fa-question-circle"/>
-                        <p:spacer height="10px"/>
+                                            <div class="outlinedBox">
+                                                <h2><h:outputText value="#{e.category.eventType.label}:#{e.category.eventCategoryTitle}"/>
+                                                    ; Event ID: <h:outputText value="#{e.eventID}"/> </h2>
+                                                <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
 
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Description" />
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.description}"/>
+                                                        </div>
+                                                    </h:panelGroup>
 
-                        </h:form>
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Disclose to Municipality Staff?" />
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.discloseToMunicipality}"/>
+                                                        </div>
+                                                    </h:panelGroup>
 
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Disclose to Public?" />
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.discloseToPublic}"/>
+                                                        </div>
+                                                    </h:panelGroup>
 
-                    <!--close main container-->
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Creation time stamp"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.timestampPretty}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Active Event?"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.active}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                
+                                                    <f:facet name="footer" class="leftalign">
+                                                        <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion" style="text-align: left">
+                                                            <h:outputText escape="false" value="#{e.notes}"/>
+                                                        </div>
+                                                    </f:facet>
+
+                                                </h:panelGrid>
+                                            </div>
+                                        </p:rowExpansion>
+
+                                    </p:dataTable>
+                                </h:form>
+                        </p:panel>
                     </div>
-                    
-                    
-                    <p:dialog   id="_________NAMEME_________"
-                                header="_________NAMEME_________" 
-                                widgetVar="_________NAMEME_________" 
-                                responsive="true" 
-                                width="400"
-                                modal="false"
-                                height="600">
-                        
-                          <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                        </h:form>
-                        
-                        <h:form id="_________NAMEME_________">
-                            
-
-                            <h2>_________NAMEME_________</h2>
-
-                            
-                            
-                            <p:commandButton    id="_________NAMEME_________"
-                                                value="_________NAMEME_________" 
-                                                ajax="true" 
-                                                icon="fa fa-edit"
-                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
-                                                disabled="false"
-                                                rendered="true"
-                                                oncomplete="PF('_________NAMEME_________').hide()"
-                                                update=""/>
-
-                            <p:commandLink  value="close" 
-                                            onclick="PF('_________NAMEME_________').hide()" 
-                                            styleClass="noFill"/>
-
-                        </h:form>
-
-                    </p:dialog>
-
-
                 </f:view>
             </ui:define>
         </ui:composition>

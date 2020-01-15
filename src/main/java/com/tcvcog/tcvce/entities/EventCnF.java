@@ -374,7 +374,16 @@ public  class       EventCnF
         }
         return null;
     }
+    
+    public String getTimeStartPretty(){
+        return EntityUtils.getPrettyDate(timeStart);
+        
+    }
 
+    public String getTimeEndPretty(){
+        return EntityUtils.getPrettyDate(timeEnd);
+    }
+    
     /**
      * @param timeStart the timeStart to set
      */

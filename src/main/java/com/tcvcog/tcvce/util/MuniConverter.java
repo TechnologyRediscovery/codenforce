@@ -34,7 +34,6 @@ public class MuniConverter extends EntityConverter implements Converter {
     
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
-        System.out.println("Muni was gotten" + titleS);
         if(titleS.isEmpty()) {
             return null; 
         }

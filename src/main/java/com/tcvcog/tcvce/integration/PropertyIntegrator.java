@@ -721,6 +721,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         params.appendSQL("SELECT DISTINCT propertyid ");
         params.appendSQL("FROM property LEFT OUTER JOIN propertyexternaldata ON (property.propertyid = propertyexternaldata.property_propertyid) \n");
+        params.appendSQL("WHERE propertyid IS NOT NULL ");
         
         // **********************************
         // **    FILTER COM-4 OBJECT ID     **
@@ -970,7 +971,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 propIDList.add(rs.getInt("propertyid"));
                 counter++;
             }
-            System.out.println(String.format("number of returned props = %d", counter));
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot search for properties, sorry!", ex);

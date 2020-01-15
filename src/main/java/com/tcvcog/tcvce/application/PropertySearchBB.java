@@ -103,6 +103,7 @@ public class PropertySearchBB extends BackingBeanUtils{
     
     
     public void executeQuery(ActionEvent event){
+        
         SearchCoordinator sc = getSearchCoordinator();
         List<Property> pl = null;
         try {

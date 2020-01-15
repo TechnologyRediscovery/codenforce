@@ -35,7 +35,7 @@
                                             widgetVar="var-scroller-periodlist"
                                             rowIndexVar="#{period.periodID}"
                                             var="period"
-                                            value="#{propertyProfileBB.currProp.assembleOccPeriodList}"
+                                            value="#{propertyOccPeriodsBB.currProp.assembleOccPeriodList}"
                                             >                                         
                                             
                                             
@@ -69,7 +69,7 @@
                                             </div>
                                                 <p:commandButton       id="button-occperiodtable-editperiod"
                                                                        ajax="false" 
-                                                                       action="#{propertyProfileBB.manageOccPeriod(period)}"
+                                                                       action="#{propertyOccPeriodsBB.manageOccPeriod(period)}"
                                                                        rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                                        value="manage occupancy period"  
                                                                        icon="fa fa-edit"/>
@@ -79,50 +79,7 @@
                     <!--close main container-->
                     </div>
                     
-                    <p:dialog    id="dialog-addoccperiod"
-                                 height="400" width="600"
-                                 widgetVar="dialog-addoccperiod-var"
-                                 closable="true" >
-                        
-                        <h2>Create new occupancy period</h2>
-
-                        <h:form id="dialog-addoccperiod-form">
-                            <h:messages id="messages-properties-editunit"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                            
-                            
-                            <h:outputLabel styleClass="ui-label" for="som-occperiodtype" value="Occupancy type" />
-                            
-                                <p:selectOneMenu
-                                    id="som-occperiodtype" tabindex="1" required="true"
-                                        value="#{propertyProfileBB.selectedOccPeriodType}">
-                                            <f:converter converterId="occPeriodTypeConverter"/>
-                                            <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
-                                            <f:selectItems id="si-typelist" 
-                                                           value="#{propertyProfileBB.occPeriodTypeList}" 
-                                                           var ="opt" 
-                                                           itemValue="#{opt}" 
-                                                           itemLabel="#{opt.title}" />
-                                </p:selectOneMenu>
-                             <p:commandButton ajax="true" 
-                                             value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('dialog-addoccperiod-var').hide()"
-                                             tabindex="4"/>
-
-
-                            <p:commandButton ajax="true"
-                                             action="#{propertyProfileBB.addNewOccPeriod}"
-                                             icon="fa fa-thumbs-o-up"
-                                             value="Create new period" 
-                                             tabindex="3"/>
-                            
-                                
-                            
-                            
-                        </h:form>
-                    </p:dialog>
+                 
                 </f:view>
             </ui:define>
         </ui:composition>

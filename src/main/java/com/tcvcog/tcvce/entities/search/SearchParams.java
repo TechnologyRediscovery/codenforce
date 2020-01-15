@@ -39,7 +39,6 @@ public  class           SearchParams
     private RoleType muni_rtMin;
     private boolean muni_ctl;
     private Municipality muni_val;
-    protected List<Municipality> muniList_val;
     
     // set #2: Date
     // subclasses will have a DateEnum member to specify which date field
@@ -77,7 +76,6 @@ public  class           SearchParams
     private StringBuilder log;
     
    public SearchParams(){
-       muniList_val = new ArrayList<>();
        sql = new StringBuilder();
        log = new StringBuilder();
    }
@@ -95,6 +93,10 @@ public  class           SearchParams
        if(str != null){
             sql.append(str);
        }
+   }
+   
+   public void clearSQL(){
+       sql = new StringBuilder();
    }
    
    
@@ -130,34 +132,6 @@ public  class           SearchParams
     }
    
    
-    /**
-     * Adds a given municipality to the Query's internal list of Municipalities
-     * to query
-     * @param muni a muni_val to search using the Query Object's parameter list
-     * @return the size of the list after the inputed Muni is added
-     */
-    public int addMuni(Municipality muni){
-        muniList_val.add(muni);
-        return muniList_val.size();
-        
-    }
-    
-    /**
-     * Utility method for calling clear() on the internal munilist
-     */
-    public void clearMuniList(){
-        muniList_val.clear();
-    }
-    
-    /**
-     * Retrieves the internal list of Municipality objects held by this Query subclass
-     * @return a reference to the internal muniList_val
-     */
-    public List<Municipality> getMuniList_val(){
-        return muniList_val;
-    }
-  
-    
     
     /**
      * @return the muni_val

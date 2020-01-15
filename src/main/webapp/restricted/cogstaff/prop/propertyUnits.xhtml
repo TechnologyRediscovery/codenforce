@@ -7,48 +7,47 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>_________NAMEME_________</title>
+        <title>Property units</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="_________NAMEME_________">
+                <f:view id="prop-units-view">
 
                     <div class="mainContainer">
 
-                        <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
+                        <h:form id="prop-units-messages-form">
+                            <h:messages id="prop-units-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
 
                             
-                        <h1>_________NAMEME_________</h1>
-
+                        <h1>Property units</h1>
 
                          <h:form id="gotounitchanges">
                                         <p:commandButton id="goToUnitChangesButton"
                                                          value="Go to unit changes"
-                                                         action="#{propertySearchBB.goToChanges()}"
+                                                         action="#{propertyUnitsBB.goToChanges()}"
                                                          />
 
                                         <h1 class="property-blue">Properties</h1>
                                     </h:form>
                         
                         
-                        <p:panel    id="_________NAMEME_________"
+                        <p:panel    id="prop-units-list-panel"
                                     toggleable="true"
-                                    widgetVar="_________NAMEME_________-var"
+                                    widgetVar="prop-units-list-panel-var"
                                     collapsed="false"
-                                    header="Occupancy period settings">
+                                    header="Property units">
                              
                             <h:form id="form-propunits" >
                                 
                                 
                                 <p:commandButton       id="button-editunits"
                                                        ajax="true" 
-                                                       actionListener="#{propertyProfileBB.beginPropertyUnitUpdates}"
+                                                       actionListener="#{propertyUnitsBB.beginPropertyUnitUpdates}"
                                                        oncomplete="PF('dialog-widvar-unitedit').show()"
                                                        rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                        value="Edit unit list"  
@@ -61,7 +60,7 @@
                                     id="datascroller-propunits"
                                     var="unit"
                                     rowIndexVar="#{unit.unitID}"
-                                    value="#{propertyProfileBB.currProp.unitWithListsList}"
+                                    value="#{propertyUnitsBB.currProp.unitWithListsList}"
                                     widgetVar="events-requiredactions-ds"
                                     >
 
@@ -87,9 +86,9 @@
                                         
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
                                                                ajax="true" 
-                                                               actionListener="#{propertyProfileBB.initiateNewOccPeriodCreation(unit)}"
+                                                               actionListener="#{propertyUnitsBB.initiateNewOccPeriodCreation(unit)}"
                                                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                               disabled="#{!propertyProfileBB.currProp.active}"
+                                                               disabled="#{!propertyUnitsBB.currProp.active}"
                                                                oncomplete="PF('dialog-addoccperiod-var').show()"
                                                                value="Add new occupancy period" 
                                                                update="dialog-addoccperiod-form"
@@ -113,7 +112,7 @@
                                                 <h:outputText value="Start Date: " 
                                                               styleClass="ui-label-inline" />
                                                 
-                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.startDate)}" 
+                                                <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.startDate)}" 
                                                               styleClass="data-text"/>
                                             </div>
                                                 
@@ -121,7 +120,7 @@
                                                 <h:outputText value="End Date: " 
                                                               styleClass="ui-label-inline" />
                                                 
-                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.endDate)}" 
+                                                <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.endDate)}" 
                                                               styleClass="data-text"/>
                                             </div>
                                             <div style="datum">
@@ -133,11 +132,11 @@
                                             <div style="datum">
                                                 <h:outputText value="Authorization" 
                                                               styleClass="ui-label-inline" />
-                                                <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : propertyProfileBB.getPrettyDate(period.authorizedTS)}" />
+                                                <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : PropertyUnitsBB.getPrettyDate(period.authorizedTS)}" />
                                             </div>
                                                 <p:commandButton       id="button-occperiodtable-editperiod"
                                                                        ajax="false" 
-                                                                       action="#{propertyProfileBB.manageOccPeriod(period)}"
+                                                                       action="#{PropertyUnitsBB.manageOccPeriod(period)}"
                                                                        rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                                        value="manage occupancy period"  
                                                                        icon="fa fa-edit"/>
@@ -147,74 +146,7 @@
 
                         </p:panel>
                         
-                        <p:tabView id="_________NAMEME_________">
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                            <p:tab title="_________NAMEME_________">
-                                
-                            </p:tab>
-                        </p:tabView>
-                        
-                          <p:dataScroller
-                                                id="_________NAMEME_________"
-                                                widgetVar="_________NAMEME_________"
-                                                var="inelement"
-                                                value="#{inspace.inspectedElementListVisible}"
-                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
-                          
-                          
-                          
-                          </p:dataScroller>
-                        
-                          <p:dataTable
-                                            id="_________NAMEME_________"
-                                            var="_________NAMEME_________"
-                                            rowKey="#{permit.permitID}"
-                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
-                                            tableStyleClass="primeDataTable"
-                                            draggableColumns="true"
-                                            resizableColumns="true"
-                                            filteredValue="#{occInspectionBB.filteredEventList}"
-                                            widgetVar="caseEventTable">
-
-                                            <p:column width="3%" exportable="false">
-                                                <p:rowToggler/>
-                                            </p:column>
-                                            
-                                            <p:column width="10%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Print" />
-                                                </f:facet>
-                                                <p:commandButton ajax="false" 
-                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
-                                                                 value="print"
-                                                                 icon="fa fa-print"
-                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
-                                            </p:column>
-                          </p:dataTable>
-
-                        <p:commandButton   id="_________NAMEME_________" 
-                                           value="run selected query" 
-                                           ajax="true" 
-                                           actionListener="_________NAMEME_________"
-                                           icon="fa fa-print" 
-                                           styleClass="button"
-                                           update=""/>
-
-
-
-                        <p:commandButton    id="_________NAMEME_________"
-                                            value="help on this page" 
-                                            onclick="PF('_________NAMEME_________').show()" 
-                                            styleClass="noFill" 
-                                            icon="fa fa-question-circle"/>
-                        <p:spacer height="10px"/>
-
-
-                        </h:form>
-
-
+                   
                     <!--close main container-->
                     </div>
                     
@@ -232,7 +164,7 @@
                             </h:messages>
 
                             <p:commandButton ajax="true"                                                   
-                                             actionListener="#{propertyProfileBB.addUnitToNewPropUnits}" 
+                                             actionListener="#{propertyUnitsBB.addUnitToNewPropUnits}" 
                                              update="table-unitedit"
                                              icon="fa fa-plus"
                                              tabindex="1"
@@ -245,7 +177,7 @@
                                 widgetVar="datatable"
                                 rowIndexVar="rowIndex"
                                 var="unit"
-                                value="#{propertyProfileBB.currProp.unitList}"
+                                value="#{propertyUnitsBB.currProp.unitList}"
                                 tabindex="2"
                                 rowKey="#{unit.unitID}"
                                 editable="true">                                         
@@ -314,7 +246,7 @@
                                                         ajax="true" 
                                                         value="Remove" 
                                                         disabled="#{!(unit.unitID==0)}"
-                                                        action="#{propertyProfileBB.removePropertyUnitFromEditTable(unit)}"
+                                                        action="#{propertyUnitsBB.removePropertyUnitFromEditTable(unit)}"
                                                         update="#{p:component('table-unitedit')}
                                                         form-unitedit:messages-properties-editunit"/>                                      
 
@@ -322,7 +254,7 @@
                                                         ajax="true" 
                                                         value="Deactivate" 
                                                         disabled="#{unit.unitID==0}"
-                                                        action="#{propertyProfileBB.deactivatePropertyUnit(unit)}"
+                                                        action="#{propertyUnitsBB.deactivatePropertyUnit(unit)}"
                                                         update="#{p:component('table-unitedit')}
                                                         form-unitedit:messages-properties-editunit"/>                                      
                                 </p:column>
@@ -378,7 +310,7 @@
 
 
                             <p:commandButton ajax="true"
-                                             actionListener="#{propertyProfileBB.finalizeUnitList}"
+                                             actionListener="#{propertyUnitsBB.finalizeUnitList}"
                                              oncomplete="PF('dialog-widvar-unitedit').hide()"
                                              icon="fa fa-thumbs-o-up"
                                              update="
@@ -387,6 +319,51 @@
                                              form-propertyobject-messages:messages-properties-object"
                                              value="Save unit list" 
                                              tabindex="3"/>
+                        </h:form>
+                    </p:dialog>
+                    
+                       <p:dialog    id="dialog-addoccperiod"
+                                 height="400" width="600"
+                                 widgetVar="dialog-addoccperiod-var"
+                                 closable="true" >
+                        
+                        <h2>Create new occupancy period</h2>
+
+                        <h:form id="dialog-addoccperiod-form">
+                            <h:messages id="messages-properties-editunit"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                            
+                            
+                            <h:outputLabel styleClass="ui-label" for="som-occperiodtype" value="Occupancy type" />
+                            
+                                <p:selectOneMenu
+                                    id="som-occperiodtype" tabindex="1" required="true"
+                                    value="#{propertyOccPeriodsBB.selectedOccPeriodType}">
+                                            <f:converter converterId="occPeriodTypeConverter"/>
+                                            <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
+                                            <f:selectItems id="si-typelist" 
+                                                           value="#{propertyOccPeriodsBB.occPeriodTypeList}" 
+                                                           var ="opt" 
+                                                           itemValue="#{opt}" 
+                                                           itemLabel="#{opt.title}" />
+                                </p:selectOneMenu>
+                             <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('dialog-addoccperiod-var').hide()"
+                                             tabindex="4"/>
+
+
+                            <p:commandButton ajax="true"
+                                             action="#{propertyProfileBB.addNewOccPeriod}"
+                                             icon="fa fa-thumbs-o-up"
+                                             value="Create new period" 
+                                             tabindex="3"/>
+                            
+                                
+                            
+                            
                         </h:form>
                     </p:dialog>
 

@@ -62,9 +62,6 @@ public class CECaseSearchBB
     
     private ArrayList<CECaseDataHeavy> filteredCaseHistoryList;
     
-    private List<User> usersForSearchConfig;
-
-    
     private ReportConfigCECaseList reportCECaseList;
     
     /**
@@ -82,8 +79,6 @@ public class CECaseSearchBB
         
         SessionBean sb = getSessionBean();
         setCurrentCase(sb.getSessionCECase());
-        
-        setUsersForSearchConfig(uc.assembleUserListForSearchCriteria(null));
         
         setQueryList(sc.buildQueryCECaseList(getSessionBean().getSessionUser().getMyCredential()));
         setSelectedCECaseQuery(getSessionBean().getQueryCECase());
@@ -263,12 +258,6 @@ public class CECaseSearchBB
         return filteredCaseHistoryList;
     }
 
-    /**
-     * @return the usersForSearchConfig
-     */
-    public List<User> getUsersForSearchConfig() {
-        return usersForSearchConfig;
-    }
 
     /**
      * @return the reportCECaseList
@@ -331,13 +320,6 @@ public class CECaseSearchBB
      */
     public void setFilteredCaseHistoryList(ArrayList<CECaseDataHeavy> filteredCaseHistoryList) {
         this.filteredCaseHistoryList = filteredCaseHistoryList;
-    }
-
-    /**
-     * @param usersForSearchConfig the usersForSearchConfig to set
-     */
-    public void setUsersForSearchConfig(List<User> usersForSearchConfig) {
-        this.usersForSearchConfig = usersForSearchConfig;
     }
 
     /**

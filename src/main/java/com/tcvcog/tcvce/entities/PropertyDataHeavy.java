@@ -181,6 +181,20 @@ public  class       PropertyDataHeavy
         
     }
     
+    public List<EventCnF> assemblePropertyEventList(){
+        List<EventCnF> evList = new ArrayList<>();
+        
+        if(propInfoCaseList != null && !propInfoCaseList.isEmpty()){
+            for(CECaseDataHeavy cdh: propInfoCaseList){
+                if(cdh.getActiveEventList() !=  null && !cdh.getActiveEventList().isEmpty()){
+                    evList.addAll(cdh.getActiveEventList());
+                }
+            }
+        }
+        return evList;
+    }
+    
+    
     /**
      * @return the ceCaseList
      */

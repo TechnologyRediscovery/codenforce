@@ -237,7 +237,7 @@
                                                                      value="#{ceCaseSearchBB.searchParams.caseManagerUser}"
                                                                      disabled="#{!ceCaseSearchBB.searchParams.useCaseManager}">
                                                         <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
-                                                        <f:selectItems value="#{ceCaseSearchBB.usersForSearchConfig}"  var="u" itemValue="#{u}" 
+                                                        <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}" 
                                                                        itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
                                                         <f:converter converterId="userConverter"/>
                                                     </p:selectOneMenu>
@@ -262,7 +262,7 @@
 
                                                         <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
                                                         <f:selectItems value="#{sessionBean.sessionPropertyList}"  var="p" itemValue="#{p}" 
-                                                                       itemLabel="#{p.address} (#{p.muni.managerName})"/>
+                                                                       itemLabel="#{p.address} (#{p.muni.muniName})"/>
                                                         <f:converter converterId="propertyConverter"/>
 
                                                     </p:selectOneMenu>

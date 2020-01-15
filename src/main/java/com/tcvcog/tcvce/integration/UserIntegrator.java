@@ -801,6 +801,36 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return userID;
     }
     
+    public List<Integer> getSystemUserIDList() throws IntegrationException{
+
+        List<Integer> idlst = new ArrayList<>();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        int userID = 0;
+        String query = "SELECT userid FROM login WHERE deactivatedts IS NULL ;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                idlst.add(rs.getInt("userid"));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Userintegrator.getSystemUserIDList", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idlst;
+    }
+    
     
     /** 
      * Inserts user-municipality mappings into the loginmuni table. This effectively gives the user

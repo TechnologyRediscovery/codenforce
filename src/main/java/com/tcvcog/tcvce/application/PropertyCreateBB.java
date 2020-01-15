@@ -22,12 +22,11 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -39,8 +38,9 @@ import javax.faces.event.ActionEvent;
 public class PropertyCreateBB 
         extends BackingBeanUtils{
 
-     private Property prop;
-     private List<PropertyUseType> putList;
+    private PropertyDataHeavy currProp;
+    private Property prop;
+    private List<PropertyUseType> putList;
     
     /**
      * Creates a new instance of PropertyCreateBB
@@ -54,6 +54,7 @@ public class PropertyCreateBB
     @PostConstruct
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
+        currProp = getSessionBean().getSessionProperty();
          try {
              setPutList(pi.getPropertyUseTypeList());
          } catch (IntegrationException ex) {
@@ -121,6 +122,20 @@ public class PropertyCreateBB
      */
     public void setPutList(List<PropertyUseType> putList) {
         this.putList = putList;
+    }
+
+    /**
+     * @return the currProp
+     */
+    public PropertyDataHeavy getCurrProp() {
+        return currProp;
+    }
+
+    /**
+     * @param currProp the currProp to set
+     */
+    public void setCurrProp(PropertyDataHeavy currProp) {
+        this.currProp = currProp;
     }
     
     
