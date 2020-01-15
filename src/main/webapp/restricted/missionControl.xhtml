@@ -82,9 +82,9 @@
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     <p:commandButton    id="dash-switchuser-button-switch"
                                                         disabled="#{empty missionControlBB.selectedUser}"
-                                                        value="become #{missionControlBB.selectedUser.username}" 
+                                                        value="Switch to #{missionControlBB.selectedUser.username}" 
                                                         styleClass="button" 
-                                                        action="#{sessionInitializer.configureSession(missionControlBB.selectedUser, null, null)}" 
+                                                        action="#{missionControlBB.switchToUser}" 
                                                         icon="fa fa-universal-access" />
                                 </p:panel>
                                 

@@ -17,47 +17,25 @@ Council of Governments, PA
  */
 
 package com.tcvcog.tcvce.application;
-
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
-
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
-import javax.servlet.http.HttpSession;
-
-//import com.itextpdf.kernel.pdf.PdfDocument;
-//import com.itextpdf.kernel.pdf.PdfWriter;
-//import com.itextpdf.layout.Document;
-//import com.itextpdf.layout.element.Paragraph;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.entities.EventCaseHeavy;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
-import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
-import com.tcvcog.tcvce.entities.RoleType;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
- 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
-
 import org.primefaces.model.DashboardModel;
-import org.primefaces.component.dashboard.Dashboard;
 import org.primefaces.model.DashboardColumn;
 import org.primefaces.model.DefaultDashboardColumn;
 import org.primefaces.model.DefaultDashboardModel;
@@ -72,7 +50,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private Municipality currentMuni;
     private Municipality selectedMuni;
     
-    private List<UserAuthorized> userList;
+    private List<User> userList;
     private User selectedUser;
     
     private DashboardModel mainDash;
@@ -91,7 +69,10 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean() {
+        UserCoordinator uc = getUserCoordinator();
         currentUser = getSessionBean().getSessionUser();
+        userList = uc.assembleUserListForSearchCriteria();
+        
         generateMainDash();
     }
     
@@ -111,9 +92,6 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         
         column3.addWidget("dashpanel-sys-events");
         column3.addWidget("dashpanel-sys-switchmuni");
-//        if(     currentUser != null 
-//            &&  currentUser.getMyCredential() != null
-//            && currentUser.getMyCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
         column3.addWidget("dashpanel-sys-switchuser");
         
 
@@ -122,40 +100,6 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         mainDash.addColumn(column3);
         
     }
-//    
-//    
-//    
-//    public void testPDF(ActionEvent ev){
-//        String DEST = "/home/sylvia/GlassFish_Server/glassfish/domains/domain1/applications/helloPDF.pdf";
-//        File file = new File(DEST);
-//        System.out.println("MissionControlBB.testPDF | can write to loc: " + file.canWrite());
-//        file.getParentFile().mkdirs();
-//        //Initialize PDF writer
-//        Document document;
-//        PdfWriter writer;
-//        try {
-//            writer = new PdfWriter(file);
-//        //Initialize PDF document
-//        PdfDocument pdf = new PdfDocument(writer);
-// 
-//        // Initialize document
-//        document = new Document(pdf);
-// 
-//        //Add paragraph to the document
-//        document.add(new Paragraph("Hello World!"));
-// 
-//        //Close document
-//        document.close();
-//            System.out.println("wrote pdf!");
-//        
-//        } catch (FileNotFoundException ex) {
-//            System.out.println("MissionControlBB.testPDF");
-//            System.out.println(ex);
-//        }
-//    }
-//    
-//   
-//    
     
     /**
      * TODO: Push this logic into the coordinators and session folks!!
@@ -190,15 +134,21 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         return "publicPortal";
     }
     
+    public String switchToUser(){
+        if(selectedUser != null){
+            getSessionBean().setUserForReInit(selectedUser);
+            return "startInitiationProcess";
+        } else {
+            return "";
+        }
+    }
+    
    
     /**
      * @return the user
      */
     public User getCurrentUser() {
-        currentUser = getSessionBean().getSessionUser();
-        if(currentUser != null){
-            System.out.println("MissionControlBB.getUser | facesUser: " + currentUser.getPerson().getFirstName());
-        }
+        
         return currentUser;
     }
 
@@ -317,7 +267,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the userList
      */
-    public List<UserAuthorized> getUserList() {
+    public List<User> getUserList() {
         return userList;
     }
 
@@ -331,7 +281,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     /**
      * @param userList the userList to set
      */
-    public void setUserList(List<UserAuthorized> userList) {
+    public void setUserList(List<User> userList) {
         this.userList = userList;
     }
 

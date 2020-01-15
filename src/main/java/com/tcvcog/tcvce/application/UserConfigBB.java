@@ -138,7 +138,7 @@ public class UserConfigBB extends BackingBeanUtils{
         if(uc.verifyReInitSessionRequest(getSessionBean().getSessionUser(), umap)){
             try {
                 getSessionBean().setSessionMuni(mc.assembleMuniDataHeavy(mc.getMuni(umap.getMuni().getMuniCode()), cred));
-                getSessionBean().setSessionUserForReInitSession(uc.getUser(umap.getUserID()));
+                getSessionBean().setUserForReInit(uc.getUser(umap.getUserID()));
             } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,

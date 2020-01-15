@@ -47,7 +47,7 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     private UserAuthorized sessionUser;
-    private User sessionUserForReInitSession;
+    private User userForReInit;
     
     private UserMuniAuthPeriod umapRequestedForReInit;
     private List<UserMuniAuthPeriod> sessionUMAPListValidOnly;
@@ -934,17 +934,17 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessionUserForReInitSession
+     * @return the userForReInit
      */
-    public User getSessionUserForReInitSession() {
-        return sessionUserForReInitSession;
+    public User getUserForReInit() {
+        return userForReInit;
     }
 
     /**
-     * @param sessionUserForReInitSession the sessionUserForReInitSession to set
+     * @param userForReInit the userForReInit to set
      */
-    public void setSessionUserForReInitSession(User sessionUserForReInitSession) {
-        this.sessionUserForReInitSession = sessionUserForReInitSession;
+    public void setUserForReInit(User userForReInit) {
+        this.userForReInit = userForReInit;
     }
 
     /**

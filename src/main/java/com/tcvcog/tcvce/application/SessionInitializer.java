@@ -87,19 +87,17 @@ public  class       SessionInitializer
         UserCoordinator uc = getUserCoordinator();
         // check to see if we have an internal session created already
         // to determine which user we authenticate with
-//        muniQueuedForSession = sb.getSessionMuni();
-//        userQueuedForSession = sb.getSessionUserForReInitSession();
-//        umapQueuedForSession = sb.getUmapRequestedForReInit();
         
-        
-            if( userQueuedForSession == null){
-                try {
-                    // we have a first init! Ask the container for its user
-                    userQueuedForSession = getContainerAuthenticatedUser();
-                } catch (IntegrationException ex) {
-                    System.out.println(ex);
-                }
-            } 
+        if(sb.getUserForReInit() != null){
+            userQueuedForSession = sb.getUserForReInit().getUsername();
+        } else if(userQueuedForSession == null){
+            try {
+                // we have a first init! Ask the container for its user
+                userQueuedForSession = getContainerAuthenticatedUser();
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+        } 
             
             
             umapListValidForUserSelect = uc.assembleValidAuthPeriods(userQueuedForSession);
