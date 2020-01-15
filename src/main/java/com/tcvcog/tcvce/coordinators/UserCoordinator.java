@@ -120,6 +120,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         if(safeList != null && !safeList.isEmpty()){
             Collections.sort(safeList);
             
+            Map<Municipality, List<UserMuniAuthPeriod>> tempMap = new HashMap<>();
             usrAuth = ui.getUserAuthorizedNoAuthPeriods(getUser(umapReq.getUserID()));
             List<UserMuniAuthPeriod> tempUMAPList;
             
@@ -129,12 +130,12 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                     tempUMAPList = umapMasterMap.get(mu); // pull out our authorized peridos
                     tempUMAPList.add(umap); // add our new one
                     Collections.sort(tempUMAPList); // sort based first on role rank, then assignment order ACROSS munis
-                    umapMasterMap.put(umap.getMuni(), tempUMAPList); // and overwrite the previous val (i.e. keep the same reference)
+                    tempMap.put(umap.getMuni(), tempUMAPList); // and overwrite the previous val (i.e. keep the same reference)
                 } else {
                     // no existing record for that muni, so make a list, inject, and put
                     tempUMAPList = new ArrayList<>();
                     tempUMAPList.add(umap);
-                    umapMasterMap.put(umap.getMuni(), safeList);
+                    tempMap.put(umap.getMuni(), safeList);
                 }
             } // close for over periods
 
@@ -145,7 +146,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             usrAuth.setMyCredential(cr);
 
             // finally, inject the muniPeriodMap into the UA whose credential is set
-            usrAuth.setMuniAuthPeriodsMap(umapMasterMap);
+            usrAuth.setMuniAuthPeriodsMap(tempMap);
         } 
         return usrAuth;
     }
