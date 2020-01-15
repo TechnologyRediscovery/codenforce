@@ -23,7 +23,10 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public abstract class Choice implements IFace_Proposable, Serializable, Comparable<Choice> {
+public  abstract class  Choice 
+        implements      IFace_Proposable, 
+                        Serializable, 
+                        Comparable<Choice> {
 
     protected boolean hidden;
     protected boolean active;

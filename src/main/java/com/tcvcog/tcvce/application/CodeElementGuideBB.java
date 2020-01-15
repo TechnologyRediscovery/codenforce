@@ -30,9 +30,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 
-/**
- *
- * @author Eric C. Darsow
+/** 
+*
+ * @author ellen bascomb of apt 31y
  */
 public class CodeElementGuideBB extends BackingBeanUtils implements Serializable {
       

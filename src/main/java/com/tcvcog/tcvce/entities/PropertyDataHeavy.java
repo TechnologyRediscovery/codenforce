@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,29 +25,39 @@ import java.util.List;
 
 /**
  * 
- * @author Eric C. Darsow
+ * @author ellen bascomb
  */
 public  class       PropertyDataHeavy 
         extends     Property 
         implements  IFace_CredentialSigned{
     
-    // cases store code enforcement data
-    private List<CECase> ceCaseList;
-    // property units store occupancy data
+    
+    private List<CECaseDataHeavy> ceCaseList;
+    
     private List<PropertyUnitDataHeavy> unitWithListsList;
-    // both are connected to Person objects all over the place
+    
     private List<Person> personList;
-    private List<CECase> infoCaseList;
-    private List<PropertyUnitChange> changeList;
+    
+    private List<CECaseDataHeavy> propInfoCaseList;
+    
+    private List<PropertyUnitChangeOrder> changeList;
+    
     private List<Integer> blobList;
     
     private String credentialSignature;
+    
     
     public PropertyDataHeavy(){
         
     }
     
-       public PropertyDataHeavy(Property prop, Credential cred){
+    /**
+     * Theoretically we store the credential signature of the user who
+     * retrieves any data heavy bob, but for now, this is in holding
+     * @param prop
+     * @param cred 
+     */
+    public PropertyDataHeavy(Property prop, Credential cred){
         
         this.credentialSignature = cred.getSignature();
            
@@ -57,7 +68,7 @@ public  class       PropertyDataHeavy
         this.lotAndBlock = prop.getLotAndBlock();
         this.address = prop.getAddress();
 
-        this.useTypeString = prop.getUseTypeString();
+        this.useType = prop.getUseType();      
         this.useGroup = prop.getUseGroup();
         this.constructionType = prop.getConstructionType();
         this.countyCode = prop.getCountyCode();
@@ -86,16 +97,14 @@ public  class       PropertyDataHeavy
 
         this.vacantDateStop = prop.getVacantDateStop();
         this.vacantBy = prop.getVacantBy();
-        this.conditionIntensityClassID = prop.getConditionIntensityClassID();
+        this.condition = prop.getCondition();
 
-        this.landBankProspectIntensityClassID = prop.getLandBankProspectIntensityClassID();
+        this.landBankProspect = prop.getLandBankProspect();
         this.LandBankHeld = prop.isLandBankHeld();
         this.active = prop.isActive();
         this.nonAddressable = prop.isNonAddressable();
         
-        this.useTypeID = prop.getUseTypeID();
-        this.useTypeString = prop.getUseTypeString();
-        this.unitList = prop.getUnitList();
+        
         
         
     }
@@ -109,7 +118,7 @@ public  class       PropertyDataHeavy
         this.lotAndBlock = prop.getLotAndBlock();
         this.address = prop.getAddress();
 
-        this.useTypeString = prop.getUseTypeString();
+        this.useType = prop.getUseType();
         this.useGroup = prop.getUseGroup();
         this.constructionType = prop.getConstructionType();
         this.countyCode = prop.getCountyCode();
@@ -138,15 +147,13 @@ public  class       PropertyDataHeavy
 
         this.vacantDateStop = prop.getVacantDateStop();
         this.vacantBy = prop.getVacantBy();
-        this.conditionIntensityClassID = prop.getConditionIntensityClassID();
+        this.condition = prop.getCondition();
 
-        this.landBankProspectIntensityClassID = prop.getLandBankProspectIntensityClassID();
+        this.landBankProspect = prop.getLandBankProspect();
         this.LandBankHeld = prop.isLandBankHeld();
         this.active = prop.isActive();
         this.nonAddressable = prop.isNonAddressable();
         
-        this.useTypeID = prop.getUseTypeID();
-        this.useTypeString = prop.getUseTypeString();
         this.unitList = prop.getUnitList();
         
         
@@ -160,11 +167,38 @@ public  class       PropertyDataHeavy
         return credentialSignature;
     }
 
+    public List<OccPeriod> getCompletePeriodList(){
+        List<OccPeriod> perList = new ArrayList<>();
+        if(unitWithListsList != null && !unitWithListsList.isEmpty()){
+            for(PropertyUnitDataHeavy pudh: unitWithListsList){
+                if(pudh.getPeriodList() != null && !pudh.getPeriodList().isEmpty()){
+                    perList.addAll(pudh.getPeriodList());
+                }
+            }
+        }
+        
+        return perList;
+        
+    }
+    
+    public List<EventCnF> getCompleteEventList(){
+        List<EventCnF> evList = new ArrayList<>();
+        
+        if(propInfoCaseList != null && !propInfoCaseList.isEmpty()){
+            for(CECaseDataHeavy cdh: propInfoCaseList){
+                if(cdh.getActiveEventList() !=  null && !cdh.getActiveEventList().isEmpty()){
+                    evList.addAll(cdh.getActiveEventList());
+                }
+            }
+        }
+        return evList;
+    }
+    
     
     /**
      * @return the ceCaseList
      */
-    public List<CECase> getCeCaseList() {
+    public List<CECaseDataHeavy> getCeCaseList() {
         return ceCaseList;
     }
 
@@ -179,7 +213,7 @@ public  class       PropertyDataHeavy
     /**
      * @param ceCaseList the ceCaseList to set
      */
-    public void setCeCaseList(List<CECase> ceCaseList) {
+    public void setCeCaseList(List<CECaseDataHeavy> ceCaseList) {
         this.ceCaseList = ceCaseList;
     }
 
@@ -191,18 +225,12 @@ public  class       PropertyDataHeavy
         this.personList = personList;
     }
 
-    /**
-     * @return the infoCaseList
-     */
-    public List getInfoCaseList() {
-        return infoCaseList;
-    }
 
     /**
-     * @param infoCaseList the infoCaseList to set
+     * @param propInfoCaseList the propInfoCaseList to set
      */
-    public void setInfoCaseList(List<CECase> infoCaseList) {
-        this.infoCaseList = infoCaseList;
+    public void setPropInfoCaseList(List<CECaseDataHeavy> propInfoCaseList) {
+        this.propInfoCaseList = propInfoCaseList;
     }
 
     /**
@@ -215,7 +243,7 @@ public  class       PropertyDataHeavy
     /**
      * @param changeList the changeList to set
      */
-    public void setChangeList(List<PropertyUnitChange> changeList) {
+    public void setChangeList(List<PropertyUnitChangeOrder> changeList) {
         this.changeList = changeList;
     }
 
@@ -245,6 +273,13 @@ public  class       PropertyDataHeavy
      */
     public void setUnitWithListsList(List<PropertyUnitDataHeavy> unitWithListsList) {
         this.unitWithListsList = unitWithListsList;
+    }
+
+    /**
+     * @return the propInfoCaseList
+     */
+    public List<CECaseDataHeavy> getPropInfoCaseList() {
+        return propInfoCaseList;
     }
 
 

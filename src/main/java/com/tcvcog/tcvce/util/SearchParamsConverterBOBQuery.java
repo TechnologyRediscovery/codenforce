@@ -26,7 +26,7 @@ import javax.faces.convert.FacesConverter;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 @FacesConverter(value="bOBQueryConverter")
 public class SearchParamsConverterBOBQuery extends EntityConverter implements Converter{
@@ -37,7 +37,6 @@ public class SearchParamsConverterBOBQuery extends EntityConverter implements Co
             return null; 
         }
         Query o = (Query) this.getViewMap(fc).get(titleS);
-        System.out.println("SearchParamsConverterBOB.getAsObject | object " + o.getQueryTitle());
         return o;
     }
 
@@ -47,8 +46,8 @@ public class SearchParamsConverterBOBQuery extends EntityConverter implements Co
             return "";
         }
         
-        Query sp = (Query) o;
-        String title = sp.getQueryTitle();  
+        Query q = (Query) o;
+        String title = q.getQueryTitle();  
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;

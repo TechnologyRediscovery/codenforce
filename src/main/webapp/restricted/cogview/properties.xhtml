@@ -74,7 +74,7 @@
                                             </p:outputLabel>
                                             <p:spacer height="5px"/>
                                             <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuni}">
-                                                <f:selectItems value="#{sessionBeasessionUserer.authMunis}"/>
+                                                <f:selectItems value="#{sessionBean.sessionUser.authMunis}"/>
                                             </p:selectOneMenu>
                                             <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -162,7 +162,7 @@
                                                 
                                                 <h:panelGroup>
                                                     <p:outputLabel id="prop-id-search-ol" for="prop-id-search" value="filter by prop ID:"/>
-                                                    <p:selectBooleanCheckbox id="prop-id-search" value="#{propertyProfileBB.searchParams.objectID_filterBy}"
+                                                    <p:selectBooleanCheckbox id="prop-id-search" value="#{propertyProfileBB.searchParams.filterByObjectID}"
                                                                              disabled="false">
                                                         <p:ajax update="prop-id-input" />
                                                     </p:selectBooleanCheckbox>
@@ -172,7 +172,7 @@
                                 <p:spacer height="5px"/>
                                                     <p:inputText id="prop-id-input"
                                                                  value="#{propertyProfileBB.searchParams.objectID}"
-                                                                 disabled="#{!propertyProfileBB.searchParams.objectID_filterBy}"/>
+                                                                 disabled="#{!propertyProfileBB.searchParams.filterByObjectID}"/>
                                                     <h:message for="prop-id-input" showDetail="false" showSummary="true"
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                 </h:panelGroup>
@@ -447,9 +447,13 @@
                                     </h:panelGroup>
                                 </h:panelGrid>
 
-                                <p:commandButton ajax="false" value="Update Selected Property Info" 
-                                                 action="#{propertyProfileBB.updateProperty}" icon="fa fa-edit"
-                                                 disabled="false"/>
+                                <p:commandButton ajax="true" value="Update Selected Property Info" 
+                                                 action="#{propertyProfileBB.updateProperty}" 
+                                                 oncomplete="PF('dialog-widvar-propinfoedit').show()"
+                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                 icon="fa fa-edit"
+                                                 disabled="false"
+                                                 update="form-propinfoedit"/>
                             </h:form>
 
                             <h:form id="form-propunits-editunits">
@@ -909,7 +913,123 @@
                         </h:form>
                     </p:dialog>
                             
+                    <p:dialog id="dialog-propinfoedit"
+                              height="650" width="900"
+                              widgetVar="dialog-widvar-propinfoedit"
+                              closable="true">
+                        <h2>Edit Property Info</h2>
+                        <h:form id="form-propinfoedit">
+                            <h:messages id="messages-properties-editpropinfo"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                            <h:panelGrid id="panelgrid-propinfoedit" columns="2" cellpadding="10" cellspacing="30">
+                                <h:panelGroup>
+                                    <p:outputLabel value="Street Address"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                             
+                                <h:panelGroup>
+                                    <p:outputLabel value="City"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address_city}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+
+                                    <p:outputLabel value="Zip Code"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address_zip}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel value="State"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.address_state}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel value="Lot and Block"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.lotAndBlock}"
+                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                 onkeyup="PF('datatable').onKeyUp(event)"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel value="ParcelID"/>
+                                    <p:spacer width="5px"/>
+                                    <p:inputText value="#{propertyProfileBB.currProp.parID}"
+                                                  onkeydown="PF('datatable').onKeyDown(event)"
+                                                  onkeyup="PF('datatable').onKeyUp(event)"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel value="Municipality"/>
+                                    <p:spacer width="5px"/>
+                                    <h:selectOneMenu id="propinfoedit-muni-som"
+                                                     value="#{propertyProfileBB.currProp.muni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="propinfoedit-muninamelist" 
+                                                       value="#{sessionBean.sessionUser.authMuniList}"
+                                                       var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+
+                                    </h:selectOneMenu>
+                                </h:panelGroup>
+                                
+                            </h:panelGrid>
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="true"
+                                                 actionListener="#{propertyProfileBB.beginPropertyUnitUpdates}"
+                                                 update="dialog-propinfoedit
+                                                 :property-info-form"
+                                                 icon="fa fa-plus"
+                                                 tabindex="1"
+                                                 value="Save Property Info"/>
                             
+                            
+                            
+                        </h:form>
+                        <script type="text/javascript">
+
+                                $(function () {
+                                    $.extend(PF("datatable"), {
+                                        onKeyDown: function (e) {
+                                            var key = e.which,
+                                                    keyCode = $.ui.keyCode;
+
+                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                e.preventDefault();
+                                            }
+                                        },
+
+                                        onKeyUp: function (e, rowIndex) {
+                                            var key = e.which,
+                                                    keyCode = $.ui.keyCode;
+                                            //.ui-row-editor-check .ui-icon-check .ui-c
+                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                this.tbody
+                                                        .find('.ui-row-editor .ui-icon-check')
+                                                        .eq(rowIndex)
+                                                        .click();
+                                            }
+
+                                            if (key === keyCode.ESCAPE) {
+                                                this.tbody
+                                                        .find('.ui-row-editor .ui-icon-close')
+                                                        .eq(rowIndex)
+                                                        .click();
+                                            }
+                                        }
+                                    });
+                                });
+
+                            </script>
+                    </p:dialog>
                             
                             
                     <p:dialog    id="dialog-unitedit"

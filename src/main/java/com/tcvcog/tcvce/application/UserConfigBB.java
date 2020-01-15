@@ -21,7 +21,11 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
@@ -90,12 +94,12 @@ public class UserConfigBB extends BackingBeanUtils{
         
          // user our fancy specialized query to get all Persons who are delcared to 
         // be user types
-        QueryPerson qp = searchCoord.assembleQueryPerson(QueryPersonEnum.USER_PERSONS, getSessionBean().getSessionUser(), null, null );
+        QueryPerson qp = searchCoord.initQuery(QueryPersonEnum.USER_PERSONS, getSessionBean().getSessionUser().getMyCredential());
         try {
             qp = searchCoord.runQuery(qp);
             userPersonList = qp.getResults();
-        } catch (AuthorizationException | IntegrationException ex) {
-            System.out.println(ex);
+        } catch (SearchException ex) {
+            Logger.getLogger(UserConfigBB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -127,19 +131,20 @@ public class UserConfigBB extends BackingBeanUtils{
         System.out.println("UserConfigBB.createNewUser");
     }
     
-    public String reInitSession(UserMuniAuthPeriod umap){
+    public String reInitSession(UserMuniAuthPeriod umap, Credential cred){
         UserCoordinator uc = getUserCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();
         
         if(uc.verifyReInitSessionRequest(getSessionBean().getSessionUser(), umap)){
             try {
-                getSessionBean().setSessionMuni(mc.getMuniDataHeavy(umap.getMuni().getMuniCode()));
-                getSessionBean().setSessionUserForReInitSession(uc.getUser(umap.getUserID()));
-            } catch (IntegrationException | AuthorizationException ex) {
+                getSessionBean().setSessionMuni(mc.assembleMuniDataHeavy(mc.getMuni(umap.getMuni().getMuniCode()), cred));
+                getSessionBean().setUserForReInit(uc.getUser(umap.getUserID()));
+            } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
+                System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Could not set your new session's municipality correctly, sorry!", ""));
-            }
+            } 
             return "startInitiationProcess";
         } else {
             getFacesContext().addMessage(null,

@@ -44,9 +44,7 @@ public class    PropertyPublic
     protected String address_zip;
     protected String ownerCode;
     protected String propclass;
-    // until we have an object
-    protected int useTypeID;
-    protected String useTypeString;
+    protected PropertyUseType useType;
 
     public PropertyPublic() {
     }
@@ -115,10 +113,14 @@ public class    PropertyPublic
     }
 
     /**
-     * @return the useTypeString
+     * @return the useType
      */
-    public String getUseTypeString() {
-        return useTypeString;
+    public PropertyUseType getUseType() {
+        return useType;
+    }
+    
+    public void setUseType(PropertyUseType put){
+        useType = put;
     }
 
     /**
@@ -210,11 +212,5 @@ public class    PropertyPublic
         this.propclass = propclass;
     }
 
-    /**
-     * @return the useTypeID
-     */
-    public int getUseTypeID() {
-        return useTypeID;
-    }
-    
+
 }

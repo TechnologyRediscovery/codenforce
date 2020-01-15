@@ -31,7 +31,7 @@ import javax.faces.application.FacesMessage;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class ViolationSelectElementBB extends BackingBeanUtils implements Serializable {
 

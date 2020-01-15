@@ -1,0 +1,193 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Property Code Enf Cases</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="prop-cecases-view">
+
+                    <div class="mainContainer">
+
+                        <h:form id="prop-cecases-messages-form">
+                            <h:messages id="prop-cecases-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                            
+                        <h1>Code enforcement cases</h1>
+
+
+                        <p:panel    id="prop-cecases-list-panel"
+                                    toggleable="true"
+                                    widgetVar="prop-cecases-list-panel-var"
+                                    collapsed="false"
+                                    header="Existing code enforcemetn cases">
+
+                            <h:form id="caseViewForm">
+                                <p:commandButton ajax="false"  value="Open a new code enforcement case" action="#{propertyCasesBB.openCECase(systemServicesBB.bbSessionProperty)}"/>
+                                <p:spacer height="10px"/>
+                                <p:dataTable
+                                    id="caseTable"
+                                    var="c"
+                                    rowKey="#{c.caseID}"
+                                    widgetVar="propProfileCaseTable"
+                                    rowExpandMode="multiple"
+                                    value="#{propertyCasesBB.currProp.ceCaseList}"
+                                    tableStyleClass="primeDataTable">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="3%">
+                                        <p:rowToggler />
+                                    </p:column>
+                                    <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Case ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseID}"/>
+                                    </p:column>
+                                     <p:column width="8%" exportable="false">
+                                            <f:facet name="header">
+                                                <h:outputText value="view" />
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-clipboard"
+                                                             action="#{propertyCasesBB.exploreCECase(c)}" 
+                                                             ajax="false"/>
+                                        </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Property" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.property.address}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Name" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseName}"/>
+                                    </p:column>
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Phase" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.casePhase}"/>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Date Opened" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.originiationDatePretty}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Manager" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseManager.person.lastName}"/>
+                                    </p:column>
+
+                                    <p:rowExpansion>
+                                        <div class="outlinedBox">
+                                            
+                                        <h:panelGrid
+                                            columns="3" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd"
+                                             footerClass="gridFooter" style="vertical-align: top;">
+                                            <h:panelGroup>
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                        <h:outputText value="Public access control Code: #{c.publicControlCode}"/>
+                                        </div>
+                                    </p:rowExpansion>
+                                </p:dataTable>
+
+                            </h:form>
+                                  <h:form id="property-lists-form">
+
+                                <p:commandButton ajax="false"  icon="fa fa-plus"
+                                                 value="Open a new code enforcement case" 
+                                                 action="#{propertyCasesBB.exploreCECase(c)}"
+                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                <p:spacer height="10px"/>
+                                <p:dataTable
+                                    id="prop-cases-datatable"
+                                    var="c"
+                                    rowKey="#{c.caseID}"
+                                    widgetVar="propProfileCaseTable"
+                                    rowExpandMode="multiple"
+                                    value="#{propertyProfileBB.currProp.ceCaseList}"
+                                    tableStyleClass="primeDataTable">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseID}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Property" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.property.address}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Name" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseName}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Phase" />
+                                        </f:facet>
+                                        <div class="wrapText">
+
+                                            <h:outputText value="#{c.casePhase}"/>
+                                        </div>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Date Opened" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.originiationDatePretty}"/>
+                                    </p:column>
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Manager" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseManager.person.lastName}"/>
+                                    </p:column>
+                                    <p:column width="5%" exportable="false">
+                                        <f:facet name="header">
+                                            <h:outputText value="view" />
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-clipboard"
+                                                         action="#{propertyCasesBB.exploreCECase(c)}" 
+                                                         ajax="false"/>
+                                    </p:column>
+
+
+                                </p:dataTable>
+
+                            </h:form>
+
+                              
+
+                        </p:panel>
+                        
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

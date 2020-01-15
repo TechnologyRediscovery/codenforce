@@ -18,37 +18,29 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.application.SessionBean;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseStage;
-import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
-import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.LogEntry;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.faces.context.FacesContext;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class SystemCoordinator extends BackingBeanUtils implements Serializable {
 
@@ -64,7 +56,25 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     public void initBean() {
 
     }
+    
+     public void logObjectView(User u, IFace_Loggable ob) throws IntegrationException {
+         SystemIntegrator si = getSystemIntegrator();
+         si.logObjectView(u, ob);
+         
+     }
 
+     /**
+      * Central access point for writing all LogEntry objects to the DB
+      * @param entry
+      * @return 
+      */
+     public int makeLogEntry(LogEntry entry){
+         LogIntegrator li = getLogIntegrator();
+         return li.writeLogEntry(entry);
+     }
+     
+    
+    
     /**
      * Skeleton of a system that may be needed to generate and release carefully
      * some level of "internal guest" level access Credential
@@ -183,44 +193,52 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      */
     //Nav Bar
     //Sub NavItem: Property
-    private final NavigationSubItem propertyUnits = getNavSubItem("Units", "", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyEvents = getNavSubItem("Events", "", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyPersons = getNavSubItem("Persons", "", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyCases = getNavSubItem("Cases", "", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyDocuments = getNavSubItem("Documents", "", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyInfo = getNavSubItem("Info", "/restricted/cogstaff/prop/propertyInfo.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyUnits = getNavSubItem("Units", "/restricted/cogstaff/prop/propertyUnits.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyEvents = getNavSubItem("Events", "/restricted/cogstaff/prop/propertyEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyPersons = getNavSubItem("Persons", "/restricted/cogstaff/prop/propertyPersons.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyCases = getNavSubItem("Cases", "/restricted/cogstaff/prop/propertyCases.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "/restricted/cogstaff/prop/propertyOccPeriods.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyDocuments = getNavSubItem("Files", "/restricted/cogstaff/prop/propertyFiles.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Property
     public List<NavigationSubItem> getPropertyNavList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
+        navList.add(propertyInfo);
         navList.add(propertyUnits);
-        navList.add(propertyEvents);
-        navList.add(propertyPersons);
         navList.add(propertyCases);
         navList.add(propertyPeriods);
+        navList.add(propertyPersons);
+        navList.add(propertyEvents);
         navList.add(propertyDocuments);
         return navList;
     }
 
     //Sub NavItem: Code Enf
-    private final NavigationSubItem CEViolations = getNavSubItem("Violations", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CEEvents = getNavSubItem("Events", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CECitations = getNavSubItem("Citations", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CENotices = getNavSubItem("Notices", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CERequests = getNavSubItem("Requests", "", "fa fa-sign-in", false);
-    private final NavigationSubItem CEPayments = getNavSubItem("Payments", "", "fa fa-sign-in", false);
+    private final NavigationSubItem CEWorkflow = getNavSubItem("Workflow", "/restricted/cogstaff/ce/ceCaseWorkflow.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEViolations = getNavSubItem("Violations", "/restricted/cogstaff/ce/ceCaseViolations.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CENotices = getNavSubItem("Notices", "/restricted/cogstaff/ce/ceCaseNotices.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CECitations = getNavSubItem("Citations", "/restricted/cogstaff/ce/ceCaseCitations.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEEvents = getNavSubItem("Events", "/restricted/cogstaff/ce/ceCaseEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEPayments = getNavSubItem("Payments", "/restricted/cogstaff/ce/ceCasePayments.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CERequests = getNavSubItem("Requests", "/restricted/cogstaff/ce/ceCaseRequests.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEFiles = getNavSubItem("Files", "/restricted/cogstaff/ce/ceCaseFiles.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEPublic = getNavSubItem("Public", "/restricted/cogstaff/ce/ceCasePublic.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Code Enf
     public List<NavigationSubItem> getCENavList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
+        navList.add(CEWorkflow);
         navList.add(CEViolations);
-        navList.add(CEEvents);
-        navList.add(CECitations);
         navList.add(CENotices);
-        navList.add(CERequests);
+        navList.add(CECitations);
+        navList.add(CEEvents);
         navList.add(CEPayments);
+        navList.add(CERequests);
+        navList.add(CEFiles);
+        navList.add(CEPublic);
         return navList;
     }
 
@@ -281,21 +299,21 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             //NavItem: Dashboard
             NavigationItem dashboardItem = getNavItem("/restricted/missionControl.xhtml", "Dashboard", "fa fa-dashboard", getDashboardNavList());
             //NavItem: Property
-            NavigationItem propertyItem = getNavItem("/restricted/cogview/properties.xhtml", "Property", "fa fa-home", getPropertyNavList());
+            NavigationItem propertyItem = getNavItem("/restricted/cogstaff/prop/propertySearch.xhtml", "Property", "fa fa-home", getPropertyNavList());
             //NavItem: Code Enf
-            NavigationItem CEItem = getNavItem("/restricted/cogview/cECases.xhtml", "Code Enforcement", "fa fa-balance-scale", getCENavList());
+            NavigationItem CEItem = getNavItem("/restricted/cogstaff/ce/ceCaseSearch.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
             //NavItem: Occupancy
-            NavigationItem occItem = getNavItem("/restricted/cogstaff/occ/occPeriodStatus.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
+            NavigationItem occItem = getNavItem("/restricted/cogstaff/occ/occPeriodsearch.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
             //NavItem: Persons
-            NavigationItem personItem = getNavItem("/restricted/cogview/persons.xhtml", "Person", "fa fa-female", getPersonNavList());
+            NavigationItem personItem = getNavItem("/restricted/cogstaff/person/personSearch.xhtml", "Person", "fa fa-female", getPersonNavList());
             //NavItem: Code
             NavigationItem codeItem = getNavItem("/restricted/cogstaff/code/codeSourceManage.xhtml", "Code", "fa fa-book", getCodeNavList());
 
             navList.add(dashboardItem);
-            navList.add(personItem);
             navList.add(propertyItem);
-            navList.add(CEItem);
+            navList.add(personItem);
             navList.add(occItem);
+            navList.add(CEItem);
             navList.add(codeItem);
         } catch (Exception e) {
 

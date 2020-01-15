@@ -18,7 +18,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.FeeAssignedType;
@@ -94,7 +94,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return assignedFees;
     }
 
-    public List<MoneyCECaseFeeAssigned> getFeeAssigned(CECase cse) throws IntegrationException {
+    public List<MoneyCECaseFeeAssigned> getFeeAssigned(CECaseDataHeavy cse) throws IntegrationException {
 
         List<MoneyCECaseFeeAssigned> assignedFees = new ArrayList<>();
 

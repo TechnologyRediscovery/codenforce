@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Eric C. Darsow
+ * Copyright (C) 2017 ellen bascomb of apt 31y
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,9 +64,8 @@ public class CEActionRequest implements Serializable{
     private Person requestor;
 
     private Property requestProperty;
-   
-    private int issueType_issueTypeID;
-    private String issueTypeString; //populated from linked table
+    
+    private CEActionRequestIssueType issue;
     
     private int muniCode;
     
@@ -123,34 +122,6 @@ public class CEActionRequest implements Serializable{
      */
     public void setRequestID(int requestID) {
         this.requestID = requestID;
-    }
-
-    /**
-     * @return the issueType_issueTypeID
-     */
-    public int getIssueType_issueTypeID() {
-        return issueType_issueTypeID;
-    }
-
-    /**
-     * @param issueType_issueTypeID the issueType_issueTypeID to set
-     */
-    public void setIssueType_issueTypeID(int issueType_issueTypeID) {
-        this.issueType_issueTypeID = issueType_issueTypeID;
-    }
-
-    /**
-     * @return the issueTypeString
-     */
-    public String getIssueTypeString() {
-        return issueTypeString;
-    }
-
-    /**
-     * @param issueTypeString the issueTypeString to set
-     */
-    public void setIssueTypeString(String issueTypeString) {
-        this.issueTypeString = issueTypeString;
     }
 
 
@@ -463,8 +434,6 @@ public class CEActionRequest implements Serializable{
         hash = 73 * hash + Objects.hashCode(this.muni);
         hash = 73 * hash + Objects.hashCode(this.requestor);
         hash = 73 * hash + Objects.hashCode(this.requestProperty);
-        hash = 73 * hash + this.issueType_issueTypeID;
-        hash = 73 * hash + Objects.hashCode(this.issueTypeString);
         hash = 73 * hash + this.muniCode;
         hash = 73 * hash + this.caseID;
         hash = 73 * hash + Objects.hashCode(this.submittedTimeStamp);
@@ -501,9 +470,6 @@ public class CEActionRequest implements Serializable{
         if (this.requestPublicCC != other.requestPublicCC) {
             return false;
         }
-        if (this.issueType_issueTypeID != other.issueType_issueTypeID) {
-            return false;
-        }
         if (this.muniCode != other.muniCode) {
             return false;
         }
@@ -520,9 +486,6 @@ public class CEActionRequest implements Serializable{
             return false;
         }
         if (this.anonymitiyRequested != other.anonymitiyRequested) {
-            return false;
-        }
-        if (!Objects.equals(this.issueTypeString, other.issueTypeString)) {
             return false;
         }
         if (!Objects.equals(this.formattedSubmittedTimeStamp, other.formattedSubmittedTimeStamp)) {
@@ -621,6 +584,20 @@ public class CEActionRequest implements Serializable{
      */
     public void setInsertPageBreakBefore(boolean insertPageBreakBefore) {
         this.insertPageBreakBefore = insertPageBreakBefore;
+    }
+
+    /**
+     * @return the issue
+     */
+    public CEActionRequestIssueType getIssue() {
+        return issue;
+    }
+
+    /**
+     * @param issue the issue to set
+     */
+    public void setIssue(CEActionRequestIssueType issue) {
+        this.issue = issue;
     }
 
 }

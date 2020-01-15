@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
@@ -43,7 +43,7 @@ import java.util.List;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class UserIntegrator extends BackingBeanUtils implements Serializable {
 
@@ -99,11 +99,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     /**
      *
-     * @param u
+     * Creates sekeletonized UserAuthorized
+     * 
+     * @param usr
      * @return
      * @throws IntegrationException 
      */
-    public UserAuthorized getUserAuthorizedNoAuthPeriods(User u) throws IntegrationException{
+    public UserAuthorized getUserAuthorizedNoAuthPeriods(User usr) throws IntegrationException{
         
         
         Connection con = getPostgresCon();
@@ -117,17 +119,16 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, u.getUserID());
+            stmt.setInt(1, usr.getUserID());
             rs = stmt.executeQuery();
             while(rs.next()){
-                ua = new UserAuthorized(u);
+                ua = new UserAuthorized(usr);
                 if(rs.getTimestamp("pswdlastupdated") != null){
                     ua.setPswdLastUpdated(rs.getTimestamp("pswdlastupdated").toLocalDateTime());
                 }
                 if(rs.getTimestamp("forcepasswordreset") != null){
                     ua.setForcePasswordResetTS(rs.getTimestamp("forcepasswordreset").toLocalDateTime());
                 }
-                System.out.println("UserIntegrator.getAuthorizedUser | uaid: " + ua.getUserID());
                 ua.setCreatedByUserId(rs.getInt("createdby"));
                 if(rs.getTimestamp("createdts") != null){
                     ua.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
@@ -163,6 +164,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setUsername(rs.getString("username"));
             user.setNotes(rs.getString("notes"));
             user.setActive(rs.getBoolean("active"));
+            user.setPersonID(rs.getInt("personlink"));
             user.setPerson(pi.getPerson(rs.getInt("personlink")));
             user.setNoLoginVirtualUser(rs.getBoolean("nologinvirtualonly"));
             
@@ -179,11 +181,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * Provides a complete list of records by User in the table loginmuniauthperiod.
      * Client is responsible for validating the UMAP object by the UserCoordinator
-     * @param u
+     * @param userID
      * @return
      * @throws IntegrationException 
      */
-    public List<UserMuniAuthPeriod> getUserMuniAuthPeriodsRaw(User u) throws IntegrationException{
+    public List<UserMuniAuthPeriod> getUserMuniAuthPeriodsRaw(int userID) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         List<UserMuniAuthPeriod> perList = null;
@@ -191,11 +193,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query = "SELECT muniauthperiodid FROM public.loginmuniauthperiod WHERE authuser_userid=?;";
         
         PreparedStatement stmt = null;
-        if(u != null){
+        if(userID != 0){
             perList = new ArrayList<>();
             try {
                 stmt = con.prepareStatement(query);
-                stmt.setInt(1, u.getUserID());
+                stmt.setInt(1, userID);
                 rs = stmt.executeQuery();
                 while(rs.next()){
                     perList.add(getUserMuniAuthPeriod(rs.getInt("muniauthperiodid")));
@@ -797,6 +799,36 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         
         return userID;
+    }
+    
+    public List<Integer> getSystemUserIDList() throws IntegrationException{
+
+        List<Integer> idlst = new ArrayList<>();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        int userID = 0;
+        String query = "SELECT userid FROM login WHERE deactivatedts IS NULL ;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                idlst.add(rs.getInt("userid"));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Userintegrator.getSystemUserIDList", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idlst;
     }
     
     

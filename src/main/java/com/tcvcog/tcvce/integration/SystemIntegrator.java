@@ -18,13 +18,14 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
-import com.tcvcog.tcvce.entities.Intensity;
+import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Person;
@@ -46,7 +47,7 @@ import java.util.Map;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
@@ -217,7 +218,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      */
-    public Icon getIcon(CasePhase casephase) throws IntegrationException {
+    public Icon getIcon(CasePhaseEnum casephase) throws IntegrationException {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -373,7 +374,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return rs;
     }
 
-    public ImprovementSuggestion generateImprovementSuggestion(ResultSet rs) throws SQLException, IntegrationException {
+    private ImprovementSuggestion generateImprovementSuggestion(ResultSet rs) throws SQLException, IntegrationException {
         UserIntegrator ui = getUserIntegrator();
         ImprovementSuggestion is = new ImprovementSuggestion();
         is.setSuggestionID(rs.getInt("improvementid"));
@@ -454,63 +455,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return hm;
     }
 
-    /**
-     * First generation data querying method: still raw SQL! Replaced by the
-     * SearchParams* family
-     *
-     * @deprecated
-     * @param muniCode
-     * @return
-     * @throws IntegrationException
-     */
-    public Map<String, Integer> getCaseCountsByPhase(int muniCode) throws IntegrationException {
-
-        CasePhase[] phaseValuesArray = new CasePhase[8];
-        phaseValuesArray[0] = CasePhase.PrelimInvestigationPending;
-        phaseValuesArray[1] = CasePhase.NoticeDelivery;
-        phaseValuesArray[2] = CasePhase.InitialComplianceTimeframe;
-        phaseValuesArray[3] = CasePhase.SecondaryComplianceTimeframe;
-        phaseValuesArray[4] = CasePhase.AwaitingHearingDate;
-        phaseValuesArray[5] = CasePhase.HearingPreparation;
-        phaseValuesArray[6] = CasePhase.InitialPostHearingComplianceTimeframe;
-        phaseValuesArray[7] = CasePhase.SecondaryPostHearingComplianceTimeframe;
-        //CasePhase[] phaseValuesArray = CasePhase.values();
-
-        Map<String, Integer> caseCountMap = new LinkedHashMap<>();
-        PreparedStatement stmt = null;
-        Connection con = null;
-        String query = "SELECT count(caseid) FROM cecase join property "
-                + "ON property.propertyid = cecase.property_propertyid "
-                + "WHERE property.municipality_municode = ? "
-                + "AND casephase = CAST(? AS casephase) ;";
-        ResultSet rs = null;
-
-        try {
-            con = getPostgresCon();
-            for (CasePhase c : phaseValuesArray) {
-                stmt = con.prepareStatement(query);
-                stmt.setInt(1, muniCode);
-                String phaseString = c.toString();
-                stmt.setString(2, phaseString);
-                rs = stmt.executeQuery();
-                while (rs.next()) {
-                    caseCountMap.put(phaseString, rs.getInt(1));
-                }
-
-            }
-
-        } catch (SQLException ex) {
-            System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
-            throw new IntegrationException("Exception in MunicipalityIntegrator.getCaseCountsByPhase", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return caseCountMap;
-
-    }
+   
      
       
       public BOBSource getBOBSource(int sourceID) throws IntegrationException{
@@ -548,13 +493,12 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
     }
 
     private BOBSource generateBOBSource(ResultSet rs) throws SQLException, IntegrationException {
-        UserIntegrator ui = getUserIntegrator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         BOBSource bs = new BOBSource();
         bs.setSourceid(rs.getInt("sourceid"));
         bs.setTitle(rs.getString("title"));;
         bs.setDescription(rs.getString("description"));
-        bs.setCreator(ui.getUser(rs.getInt("creator")));
+        bs.setCreatorUserID(rs.getInt("creator"));
         bs.setMuni(mi.getMuni(rs.getInt("muni_municode")));;
         bs.setActive(rs.getBoolean("active"));;
         bs.setNotes(rs.getString("notes"));
@@ -562,9 +506,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
-    public Intensity generateIntensityClass(ResultSet rs) throws IntegrationException {
+    private IntensityClass generateIntensityClass(ResultSet rs) throws IntegrationException {
 
-        Intensity intsty = new Intensity();
+        IntensityClass intsty = new IntensityClass();
         MunicipalityIntegrator mi = new MunicipalityIntegrator();
 
         try {
@@ -583,12 +527,45 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return intsty;
 
     }
+    
+    
+    public IntensityClass getIntensityClass(int intensityClassID) throws IntegrationException{
+        
+        IntensityClass in = null;
 
-    public List<Intensity> getIntensityClassList(IntensitySchema cat) throws IntegrationException {
+        String query =  "SELECT classid, title, muni_municode, numericrating, schemaname, active, \n" +
+                        "       icon_iconid\n" +
+                        "  FROM public.intensityclass WHERE classid=?;";
 
-        List<Intensity> inList = new ArrayList<>();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
 
-        String query = "SELECT * FROM intensityclass WHERE schemaname LIKE ?;";
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, intensityClassID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                in = generateIntensityClass(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("SystemIntegrator.getIntensityClassList | Unable to get Intensity List", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return in;
+    }
+    
+
+    public List<IntensityClass> getIntensityClassList(IntensitySchema cat) throws IntegrationException {
+
+        List<IntensityClass> inList = new ArrayList<>();
+
+        String query = "SELECT classid, title, muni_municode, numericrating, schemaname, active, icon_iconid FROM intensityclass WHERE schemaname LIKE ?;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -605,16 +582,16 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("SystemIntegrator.getIntensityClassList | Unable to get Intensity List", ex);
         } finally {
-          if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return inList;
 
     }
 
-    public void updateIntensityClass(Intensity intsty) throws IntegrationException {
+    public void updateIntensityClass(IntensityClass intsty) throws IntegrationException {
 
         String query = "UPDATE public.intensityclass\n"
                 + "SET title=?, muni_municode=?, numericrating=?,\n"
@@ -645,7 +622,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
-    public void insertIntensityClass(Intensity intsty) throws IntegrationException {
+    public void insertIntensityClass(IntensityClass intsty) throws IntegrationException {
         String query = "INSERT INTO public.intensityclass(classid, title, \n"
                 + "muni_municode, numericrating, schemaname, \n"
                 + "active, icon_iconid)\n"
@@ -673,7 +650,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
-    public void deleteIntensityClass(Intensity intsty) throws IntegrationException {
+    public void deleteIntensityClass(IntensityClass intsty) throws IntegrationException {
         String query = "DELETE FROM public.intensityclass\n"
                 + "WHERE classid=?;";
         Connection con = getPostgresCon();
@@ -750,7 +727,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * @param ob any Object that's displayed in a data table or list in the system
      * @throws IntegrationException
      */
-    public void logObjectView(User u, Object ob) throws IntegrationException {
+    public void logObjectView(User u, IFace_Loggable ob) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -782,8 +759,8 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.execute();
 
                 System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
-            } else if (ob instanceof CECase) {
-                CECase c = (CECase) ob;
+            } else if (ob instanceof CECaseDataHeavy) {
+                CECaseDataHeavy c = (CECaseDataHeavy) ob;
                 
                 insertSB.append("(login_userid, cecase_caseid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
                 stmt = con.prepareStatement(insertSB.toString());
@@ -907,8 +884,8 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setInt(2, p.getPropertyID());
                 stmt.execute();
                 System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
-            } else if (ob instanceof CECase) {
-                CECase c = (CECase) ob;
+            } else if (ob instanceof CECaseDataHeavy) {
+                CECaseDataHeavy c = (CECaseDataHeavy) ob;
                 // prepare SELECT statement
                 selectSB.append("AND cecase_caseid = ? ");
                 stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);

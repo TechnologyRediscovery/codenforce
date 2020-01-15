@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Eric C. Darsow
+ * Copyright (C) 2017 ellen bascomb of apt 31y
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,27 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CEActionRequestIssueType;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
-import com.tcvcog.tcvce.entities.search.QueryCEAR;
-import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CEActionRequestIntegrator extends BackingBeanUtils implements Serializable {
 
@@ -193,7 +192,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 stmt.setNull(3, java.sql.Types.NULL);
             }
 
-            stmt.setInt(4, actionRequest.getIssueType_issueTypeID());
+            stmt.setInt(4, actionRequest.getIssue().getIssueTypeID());
             stmt.setInt(5, actionRequest.getRequestor().getPersonID());
             // case ID is null since the request hasn't been assigned to a case yet
             stmt.setNull(6, java.sql.Types.NULL); // 0 is the int version of null
@@ -257,8 +256,6 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setRequestProperty(propI.getProperty(rs.getInt("property_propertyID")));
         actionRequest.setRequestor(pi.getPerson(rs.getInt("actrequestor_requestorid")));
 
-        actionRequest.setIssueType_issueTypeID(rs.getInt("issuetype_issuetypeid"));
-        actionRequest.setIssueTypeString(rs.getString("typename")); // field from joined table
         actionRequest.setSubmittedTimeStamp(rs.getTimestamp("submittedtimestamp").toLocalDateTime());
         actionRequest.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
         actionRequest.setFormattedSubmittedTimeStamp(getPrettyDate(actionRequest.getDateOfRecord()));
@@ -287,17 +284,18 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     }
 
     public void connectActionRequestToCECase(int actionRequestID, int cecaseID, int userid)
-            throws CaseLifecycleException, IntegrationException {
+            throws BObStatusException, IntegrationException {
+        CaseCoordinator cc = getCaseCoordinator();
         CECase cecase = null;
-
-        CaseIntegrator ci = getCaseIntegrator();
+        
+        
         try {
-            cecase = ci.getCECase(cecaseID);
+            cecase = cc.getCECase(cecaseID);
         } catch (IntegrationException ex) {
-            throw new CaseLifecycleException("Cannot find a CECase to which the action request can be connected");
+            throw new BObStatusException("Cannot find a CECase to which the action request can be connected");
         }
         if (cecase == null) {
-            throw new CaseLifecycleException("Case returned has ID of zero");
+            throw new BObStatusException("Case returned has ID of zero");
         }
 
         String q = "UPDATE ceactionrequest SET cecase_caseid =?, "
@@ -338,9 +336,9 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	cecase_caseid, coginternalnotes, \n"
                 + "	muniinternalnotes, publicexternalnotes,\n"
                 + "	actionRqstIssueType.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid \n"
-                + "	FROM public.ceactionrequest \n"
-                + "		INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid");
-        sb.append(" WHERE requestID = ?;");
+                + "FROM public.ceactionrequest \n"
+                + "     INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid ");
+        sb.append("WHERE requestID = ?;");
 
 //        
 //        
@@ -388,6 +386,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         return newActionRequest;
     } // close getActionRequest
 
+    
+    
     private CEActionRequest populatePhotodocIDs(CEActionRequest cear) throws IntegrationException{
         StringBuilder sb = new StringBuilder();
 
@@ -537,6 +537,36 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
     }
 
+    public CEActionRequestStatus getRequestStatus(int statusID) throws IntegrationException {
+
+        CEActionRequestStatus status = null;
+        String query = "SELECT statusid, title, description\n"
+                + "  FROM public.ceactionrequeststatus WHERE statusid = ?;";
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1,statusID);
+            rs = stmt.executeQuery();
+
+            // loop through the result set and reat an action request from each
+            while (rs.next()) {
+                status = generateCEActionRequestStatus(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequestByControlCode | Integration Error: Unable to retrieve action request", ex);
+        } finally {
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return status;
+    }
+
     public CEActionRequestStatus generateCEActionRequestStatus(ResultSet rs) throws IntegrationException {
         CEActionRequestStatus arqs = new CEActionRequestStatus();
         try {
@@ -581,24 +611,27 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         } // close finally
         return statusList;
     }
+    
+    
+    
+    public CEActionRequestIssueType getRequestIssueType(int issueID) throws IntegrationException {
 
-    public CEActionRequestStatus getRequestStatus(int statusID) throws IntegrationException {
-
-        CEActionRequestStatus status = null;
-        String query = "SELECT statusid, title, description\n"
-                + "  FROM public.ceactionrequeststatus WHERE statusid = ?;";
+        CEActionRequestIssueType tpe = null;
+        String query = "SELECT issuetypeid, typename, typedescription, muni_municode, notes, \n" +
+                        "       intensity_classid\n" +
+                        "  FROM public.ceactionrequestissuetype;";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1,statusID);
+            stmt.setInt(1, issueID);
             rs = stmt.executeQuery();
 
             // loop through the result set and reat an action request from each
             while (rs.next()) {
-                status = generateCEActionRequestStatus(rs);
+                tpe = generateCEActionRequestIssueType(rs);
             }
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -609,34 +642,88 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return status;
+        return tpe;
+    }
+
+    public CEActionRequestIssueType generateCEActionRequestIssueType(ResultSet rs) throws IntegrationException {
+        CEActionRequestIssueType tpe = new CEActionRequestIssueType();
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
+        
+        try {
+            tpe.setIssueTypeID(rs.getInt("issuetypeid"));
+            tpe.setName(rs.getString("typename"));
+            tpe.setDescription((rs.getString("typedescription")));
+            tpe.setMuni(mc.getMuni(rs.getInt("muni_municode")));
+            tpe.setNotes(rs.getString("notes"));
+            tpe.setIntensityClass(si.getIntensityClass(rs.getInt("intensityclass_classid")));
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Cannot Generate CEActionRequestStatus object", ex);
+        }
+        return tpe;
     }
     
     
     /**
-     * Unpacks a Query object and asks selectWithSearchParams for a set of CEARs
- for each of SearchParams object in the given Query
-     * @param q a fully-baked Query, meaning it has its own Params
-     * @return The set of returned CEARs from each SearchParams inside this Query
+     * Generates a list of CEActionRequestIssueType objects
+     * @param muni restrict results to given muni; when null, all issue types are returned
+     * @return the list of sub-BObs
      * @throws IntegrationException 
      */
-    public QueryCEAR runQueryCEAR(QueryCEAR q) throws IntegrationException{
-        List<SearchParamsCEActionRequests> pList = q.getParmsList();
+    public List<CEActionRequestIssueType> getRequestIssueTypeList(Municipality muni) throws IntegrationException {
+
+        List<CEActionRequestIssueType> typeList = new ArrayList();
         
-        for(SearchParamsCEActionRequests sp: pList){
-            q.addToResults(getCEARs(sp));
+        CEActionRequestIssueType tpe = null;
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append( "SELECT issuetypeid, typename, typedescription, muni_municode, notes, intensity_classid \n");
+        sb.append(" FROM public.ceactionrequestissuetype ");
+        if(muni != null){
+            sb.append(" WHERE muni_municode = ?;");
+        } else {
+            sb.append(";");
         }
-        q.setExecutionTimestamp(LocalDateTime.now());
-        System.out.println("CEActionRequestIntegrator.QueryCEARs | returning list of size: " + q.getBOBResultList().size());
-        q.setExecutedByIntegrator(true);
-        return q;
         
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(sb.toString());
+            if(muni != null){
+                stmt.setInt(1, muni.getMuniCode());
+            } 
+
+            rs = stmt.executeQuery();
+
+            // loop through the result set and reat an action request from each
+            while (rs.next()) {
+                tpe = generateCEActionRequestIssueType(rs);
+                typeList.add(tpe);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequestByControlCode | Integration Error: Unable to retrieve action request", ex);
+        } finally {
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return typeList;
     }
     
+    
+    
+    
+    
+    
     /**
-     * Called by runQueryCECase() only!
- 
- Internal retrieval method for Code Enforcement Action Requests. Implements
+     * Called by the SearchCoordinator's queryCEAR method
+     * implements
      * a multi-stage SQL statement building process based on the settings on the
      * SearchParams object passed into this method.
      *
@@ -649,78 +736,207 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
      * 
      * @throws IntegrationException
      */
-    private List<CEActionRequest> getCEARs(SearchParamsCEActionRequests params) throws IntegrationException {
-        List<CEActionRequest> list = new ArrayList();
-        StringBuilder sb = new StringBuilder();
+    public List<Integer> searchForCEActionRequests(SearchParamsCEActionRequests params) throws IntegrationException {
+        SearchCoordinator sc = getSearchCoordinator();
+        List<Integer> cearidlst = new ArrayList();
+        
+        params.appendSQL("SELECT DISTINCT requestid FROM public.ceactionrequest \n");
+        params.appendSQL("LEFT OUTER JOIN public.property ON (ceactionrequest.property_propertyid = property.propertyid) \n");
+        params.appendSQL("WHERE requestid IS NOT NULL \n"); 
 
-        sb.append("SELECT requestid FROM public.ceactionrequest ");
-        sb.append("WHERE muni_municode = ? "); // param 1
-
-        // as long as this isn't an ID only search, do the normal SQL building process
-         if (!params.isUseRequestID()) {
-            sb.append("AND submittedtimestamp BETWEEN ? AND ? "); // parm 2 and 3 without ID
+        // ****************************
+        // **         OBJECT ID      **
+        // ****************************
+         if (!params.isBobID_ctl()) {
+             
             
-            if(params.isUseRequestStatus()){
-                sb.append("AND status_id = ? "); // param 4 without ID search
-            } // close request status
+            // ***********************************
+            // **     MUNI,DATES,USER,ACTIVE    **
+            // *********************************** 
+           
+            params = (SearchParamsCEActionRequests) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsCEActionRequests.DBFIELD);
             
-            if(params.isUseNotAtAddress()){
-                if(params.isNotAtAnAddress()){
-                    sb.append("AND notataddress = TRUE ");
+            // ****************************
+            // **   1.REQUEST STATUS     **
+            // **************************** 
+            if(params.isRequestStatus_ctl()){
+                if(params.getRequestStatus_val() != null){
+                    params.appendSQL("AND status_id = ? "); // param 4 without ID search
                 } else {
-                    sb.append("AND notataddress = FALSE ");
+                    params.setRequestStatus_ctl(false);
+                    params.logMessage("REQUEST STATUS: found null CEActionRequestStatus; status filter turned off; | ");
                 }
-            } // close not at address
+            }
             
-            if(params.isUseMarkedUrgent()){
-                if(params.isMarkedUrgent()){
-                    sb.append("AND isurgent = TRUE ");
+            // ****************************
+            // **   2/ISSUE TYPE         **
+            // **************************** 
+            if(params.isIssueType_ctl()){
+                if(params.getIssueType_val() != null){
+                    params.appendSQL("AND issuetype_issuetypeid=? "); // param 4 without ID search
                 } else {
-                    sb.append("AND isurgent = FALSE ");
+                    params.setIssueType_ctl(false);
+                    params.logMessage("ISSUE TYPE: found null CEActionRequestIssueType; issue type filter turned off; | ");
                 }
-            } // close urgent
-
-            if (params.isUseAttachedToCase()) {
-                if (params.isAttachedToCase()) {
-                    sb.append("AND cecase_caseid IS NOT NULL ");
+            }
+            
+            // ****************************
+            // **   3/ADDRESSABILITY     **
+            // **************************** 
+            if(params.isNonaddressable_ctl()){
+                if(params.isNonaddressable_val()){
+                    params.appendSQL("AND notataddress = TRUE ");
                 } else {
-                    sb.append("AND cecase_caseid IS NULL ");
+                    params.appendSQL("AND notataddress = FALSE ");
                 }
-            } // close attached to case
+            } 
+            
+            // ****************************
+            // **       4.URGENCY        **
+            // **************************** 
+            if(params.isUrgent_ctl()){
+                if(params.isUrgent_val()){
+                    params.appendSQL("AND isurgent = TRUE ");
+                } else {
+                    params.appendSQL("AND isurgent = FALSE ");
+                }
+            } 
 
+            // ****************************
+            // **     5/CASE CNXN        **
+            // **************************** 
+            if (params.isCaseAttachment_ctl()) {
+                if (params.isCaseAttachment_val()) {
+                    params.appendSQL("AND cecase_caseid IS NOT NULL ");
+                } else {
+                    params.appendSQL("AND cecase_caseid IS NULL ");
+                }
+            }
+            
+            // ****************************
+            // **    6/CECASE            **
+            // **************************** 
+            
+            if (params.isCecase_ctl()) {
+                if(params.getCecase_val() != null){
+                    params.appendSQL("AND cecase_caseid=? ");
+                } else {
+                    params.setCecase_ctl(false);
+                    params.logMessage("CECASE ID: no CECase found; case id filter turned off; | ");
+                }
+            }
+            
+            // ****************************
+            // **    7/PUBLIC ACCESS     **
+            // **************************** 
+            if (params.isPacc_ctl()) {
+                if(params.isPacc_val()){
+                    params.appendSQL("AND paccenabled = TRUE ");
+                } else {
+                    params.appendSQL("AND paccenabled = FALSE");
+                }
+            }
+                
+            // *******************************
+            // **   8: REQUESTING PERSON    **
+            // ******************************* 
+            
+            if (params.isRequestorPerson_ctl()) {
+                if(params.getRequestorPerson_val() != null){
+                    params.appendSQL("AND actrequestor_requestorid=? ");
+                } else {
+                    params.setRequestorPerson_ctl(false);
+                    params.logMessage("REQUESTING PERSON: no Person object found; person filter turned off; | ");
+                }
+            }
+                
+            // *******************************
+            // **   9: Property             **
+            // ******************************* 
+            
+            if (params.isProperty_ctl()) {
+                if(params.getProperty_val() != null){
+                    params.appendSQL("AND property.propertyid=? ");
+                } else {
+                    params.setRequestorPerson_ctl(false);
+                    params.logMessage("PROPERTY: no Property object found; filter turned off; | ");
+                }
+            }
+
+        // ****************************
+        // **      OBJECT ID         **
+        // **************************** 
         } else {
-            sb.append("AND requestid = ? "); // will be param 2 with ID search
+            params.appendSQL("AND requestid=? "); // will be param 2 with ID search
         }
-        sb.append(";");
+        params.appendSQL(";");
 
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection con = getPostgresCon();
-        CEActionRequest cear;
         int paramCounter = 0;
 
         try {
-            stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+            stmt = con.prepareStatement(params.extractRawSQL());
+            
+            
             // as long as we're not searching by ID only
-            if (!params.isUseRequestID()) {
-                stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
-                stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
+            if (!params.isBobID_ctl()) {
+                 if(params.isMuni_ctl()){
+                    stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
+                 }
                 
-                if(params.isUseRequestStatus()){
-                    stmt.setInt(++paramCounter, params.getRequestStatus().getStatusID());
+                 if(params.isDate_startEnd_ctl()){
+                    stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
+                    stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
+                 }
+                 
+                if (params.isUser_ctl()) {
+                    stmt.setInt(++paramCounter, params.getUser_val().getUserID());
                 }
+                
+                if(params.isRequestStatus_ctl()){
+                    stmt.setInt(++paramCounter, params.getRequestStatus_val().getStatusID());
+                }
+                
+                if(params.isIssueType_ctl()){
+                    stmt.setInt(++paramCounter, params.getIssueType_val().getIssueTypeID());
+                }
+                
+                if(params.isCecase_ctl()){
+                    stmt.setInt(++paramCounter, params.getCecase_val().getCaseID());
+                }
+                
+                if(params.isRequestorPerson_ctl()){
+                    stmt.setInt(++paramCounter, params.getRequestorPerson_val().getPersonID());
+                }
+                
+                if(params.isProperty_ctl()){
+                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                }
+                
 
             } else {
-                stmt.setInt(++paramCounter, params.getRequestID());
+                stmt.setInt(++paramCounter, params.getBobID_val());
             }
 
-            System.out.println("CEActionRequestIntegrator.getCEActionRequestList | stmt: " + stmt.toString());
+            params.logMessage("CEActionRequestIntegrator SQL before execution: ");
+            params.logMessage(stmt.toString());
+            
             rs = stmt.executeQuery();
-            while (rs.next()) {
-                cear = getActionRequestByRequestID(rs.getInt(1));
-                list.add(cear);
-            } // close while
+            
+            int counter = 0;
+            int maxResults;
+            if (params.isLimitResultCount_ctl()) {
+                maxResults = params.getLimitResultCount_val();
+            } else {
+                maxResults = Integer.MAX_VALUE;
+            }
+            while (rs.next() && counter < maxResults) {
+                cearidlst.add(rs.getInt("requestid"));
+                counter++;
+            }
+
 
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -733,68 +949,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         }// close try/catch
 
-        return list;
+        return cearidlst;
     } // close method
 
-    public List getCEActionRequestListByCase(int ceCaseID) throws IntegrationException {
-        ArrayList<CEActionRequest> requestList = new ArrayList();
-        int requestID;
-        String query = "SELECT requestid FROM public.ceactionrequest "
-                + "WHERE cecase_caseid = ?;";
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection con = getPostgresCon();
-        CEActionRequest cear;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, ceCaseID);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                requestID = rs.getInt("requestid");
-                cear = getActionRequestByRequestID(requestID);
-                requestList.add(cear);
-            } // close while
-
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Integration Error: Problem retrieving and generating action request list", ex);
-        } finally {
-            
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-
-        }// close try/catch
-
-        return requestList;
-    } // close method
-    
-    
-    /**
-     * @return the violationMap
-     */
-    public HashMap<String, Integer> getViolationMap() {
-        
-        
-       HashMap<String, Integer> violationMap = new HashMap<>();
-        
-        Connection con = getPostgresCon();
-        String query = "SELECT issueTypeID, typeName FROM public.actionRqstIssueType;";
-        ResultSet rs;
- 
-        try {
-            Statement stmt = con.createStatement();
-            rs = stmt.executeQuery(query);
-            while(rs.next()){
-                violationMap.put(rs.getString("typeName"), rs.getInt("issueTypeID"));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-        } // end try/catch
-        return violationMap;
-    }
-
-    
 
 } // close class

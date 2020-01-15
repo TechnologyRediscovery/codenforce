@@ -1,0 +1,519 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Occ period search</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="occperiod-search-view">
+
+                    <div class="mainContainer">
+
+                        <h:form id="occperiod-search-messages-form">
+                            <h:messages id="occperiod-search-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                        <p:panel    id="occperiod-search-prebuiltq-panel"
+                                    toggleable="true"
+                                    widgetVar="occperiod-search-prebuiltq-panel-var"
+                                    collapsed="false"
+                                    header="Run preset query">
+                               
+                               <h:form id="occperiod-search-form">
+
+                                <p:selectOneMenu id="occperiod-query-som" tabindex="1" value="#{occPeriodSearchBB.selectedBOBQuery}">
+                                    <f:converter converterId="bOBQueryConverter"/>
+                                    <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                    <f:selectItems id="querylist-si" value="#{occPeriodSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                    <p:ajax update="cease-query-desc-ot" />
+                                </p:selectOneMenu>
+
+                                <p:commandButton   id="cecases-executequery-cb" 
+                                                   ajax="true" 
+                                                   actionListener="#{occPeriodSearchBB.executeQuery}"
+                                                   icon="fa fa-print" 
+                                                   styleClass="button"
+                                                   value="run selected query" 
+                                                   update="cecase-search-form
+                                                   cecase-results-form
+                                                   cecases-messages-form"/>
+
+                                <p:spacer height="5px" />
+
+
+
+
+                                <h:outputLabel styleClass="bold" value="Query description: " for="cears-query-desc-ot" />
+                                <h:outputText id="cease-query-desc-ot" value="#{occPeriodSearchBB.selectedCECaseQuery.queryName.desc}" />
+                                <h:outputText id="cease-query-ts-ot" value="; timestamp: #{occPeriodSearchBB.selectedCECaseQuery.executionTimestampPretty}" />
+                                <p:spacer height="5px" />
+                            </h:form>
+
+                            <h:form id="cecases-search-form">
+                                <p:fieldset legend="search options" 
+                                            toggleable="true" collapsed="true" style="background-color: white;">
+                                    <h:panelGrid columns="1" cellpadding="10" columnClasses="gridTd-solid-back"
+                                                 footerClass="gridFooter">
+                                        <h:panelGroup>
+                                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-muni-ol" for="seev-filter-muni-chkbx" value="filter by municipality? "/>
+                                                    <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{occPeriodSearchBB.searchParams.filterByMuni}" >
+                                                        <p:ajax update="cecases-search-muni-som"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:selectOneMenu id="cecases-search-muni-som" tabindex="1" value="#{occPeriodSearchBB.searchParams.muni}"
+                                                                     disabled="#{!occPeriodSearchBB.searchParams.filterByMuni}">
+                                                        <f:converter converterId="muniConverter"/>
+                                                        <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                                        <f:selectItems id="muniNameList" value="#{sessionBean.sessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                    </p:selectOneMenu>
+                                                    <h:message for="cecases-search-muni-som" showDetail="true" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-search-startend-chkbx-ol" for="cecases-search-startend-chkbx" value="filter by date range? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-search-startend-chkbx" value="#{occPeriodSearchBB.searchParams.filterByStartEndDate}" >
+                                                        <p:ajax update="datetosearch-sor
+                                                                eventDateCalStart
+                                                                eventDateCalEnd
+                                                                cecases-search-relative-dates-cb" />
+                                                    </p:selectBooleanCheckbox>
+
+                                                    <h4 style="margin-bottom: 2px;">case date search options:</h4>
+
+                                                    <p:selectOneRadio id="datetosearch-sor" layout="pageDirection" value="#{occPeriodSearchBB.searchParams.dateToSearchCECases}"
+                                                                      disabled="#{(!occPeriodSearchBB.searchParams.filterByStartEndDate)}">
+                                                        <f:selectItems value="#{occPeriodSearchBB.searchParams.dateSearchOptions}"/>
+                                                    </p:selectOneRadio>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup id="datepickers-pg">
+                                                    <p:spacer height="5px" />
+                                                    <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="query start date: "/>
+                                                    <p:spacer height="1px"/>
+                                                    <p:calendar id="eventDateCalStart" value="#{occPeriodSearchBB.searchParams.startDateUtilDate}" 
+                                                                mode="popup" disabled="#{(!occPeriodSearchBB.searchParams.filterByStartEndDate) or occPeriodSearchBB.searchParams.useRelativeDates}"
+                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                                showButtonPanel="true" showTodayButton="true"
+                                                                required="false"/>
+                                                    <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                    <p:spacer height="5px"/>
+
+                                                    <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="query end date: "/>
+                                                    <p:spacer height="1px"/>
+                                                    <p:calendar id="eventDateCalEnd" value="#{occPeriodSearchBB.searchParams.endDateUtilDate}" 
+                                                                mode="popup" disabled="#{(!occPeriodSearchBB.searchParams.filterByStartEndDate) or occPeriodSearchBB.searchParams.useRelativeDates}"
+                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                                showButtonPanel="true" showTodayButton="true"
+                                                                required="false" />
+                                                    <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+
+                                                    <p:outputLabel id="cecases-search-relative-dates-ol" for="cecases-search-relative-dates-cb" value="use relative dates? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-search-relative-dates-cb" 
+                                                                             value="#{occPeriodSearchBB.searchParams.useRelativeDates}" 
+                                                                             disabled="#{!occPeriodSearchBB.searchParams.filterByStartEndDate}">
+                                                        <p:ajax update="eventDateCalStart
+                                                                eventDateCalEnd
+                                                                cecases-search-relative-dates-start-it
+                                                                cecases-search-relative-dates-end-it" />
+                                                    </p:selectBooleanCheckbox>
+
+
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-search-relative-dates-start-ol" for="cecases-search-relative-dates-start-it" value="start date in days (relative to today)"/>
+                                                    <p:spacer height="1px"/>
+                                                    <p:inputText id="cecases-search-relative-dates-start-it" 
+                                                                 value="#{occPeriodSearchBB.searchParams.startDateRelativeDays}" 
+                                                                 disabled="#{!(occPeriodSearchBB.searchParams.filterByStartEndDate and occPeriodSearchBB.searchParams.useRelativeDates)}" />
+                                                    <h:message for="cecases-search-relative-dates-start-it" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                    <p:spacer height="5px"/>
+                                                    <p:outputLabel id="cecases-search-relative-dates-end-ol" for="cecases-search-relative-dates-end-it" value="end date in days (relative to today)"/>
+                                                    <p:spacer height="1px"/>
+                                                    <p:inputText id="cecases-search-relative-dates-end-it" 
+                                                                 value="#{occPeriodSearchBB.searchParams.endDateRelativeDays}" 
+                                                                 disabled="#{!(occPeriodSearchBB.searchParams.filterByStartEndDate and occPeriodSearchBB.searchParams.useRelativeDates)}" />
+                                                    <h:message for="cecases-search-relative-dates-end-it" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-phase-ol" for="cecases-filter-phase" value="filter by case phase? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-phase" value="#{occPeriodSearchBB.searchParams.useCasePhase}" >
+                                                        <p:ajax update="casePhaseSOM" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-critera-phase" for="casePhaseSOM" value="case phases? "/>
+                                                    <p:selectOneMenu value="#{occPeriodSearchBB.searchParams.casePhase}"
+                                                                     id="casePhaseSOM">
+
+                                                        <f:selectItems value="#{occPeriodSearchBB.casePhaseList}"
+                                                                       var="cp"
+                                                                       itemValue="#{cp}"
+                                                                       itemLabel="#{cp.label}"/>
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-stage-ol" for="cecases-filter-stage" value="filter by case stage? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-stage" value="#{occPeriodSearchBB.searchParams.useCaseStage}" >
+                                                        <p:ajax update="cecases-criteria-user" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-criteria-stage-ol" for="case-stage-som" value="case stages:"/>
+                                                    <p:selectOneMenu value="#{occPeriodSearchBB.searchParams.caseStage}"
+                                                                     id="case-stage-som">
+
+                                                        <f:selectItems value="#{occPeriodSearchBB.caseStageArray}"
+                                                                       var="cs"
+                                                                       itemValue="#{cs}"
+                                                                       itemLabel="#{cs.label}"/>
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-id-ol" for="cecases-filter-id" value="filter by ce case ID? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-id" value="#{occPeriodSearchBB.searchParams.objectID_filterBy}" 
+                                                                             disabled="false" >
+                                                        <p:ajax update="cecases-criteria-caseid" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-criteria-caseid-ol" for="cecases-criteria-caseid" value="ce case ID:"/>
+                                                    <p:spacer height="5px"/>
+                                                    <p:inputText id="cecases-criteria-caseid" 
+                                                                 value="#{occPeriodSearchBB.searchParams.objectID}" 
+                                                                 disabled="#{!occPeriodSearchBB.searchParams.objectID_filterBy}"/>
+                                                    <h:message for="cecases-criteria-caseid" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-manager-ol" for="cecases-filter-manager" value="filter by case manager? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-manager" 
+                                                                             disabled="false"
+                                                                             value="#{occPeriodSearchBB.searchParams.useCaseManager}" >
+                                                        <p:ajax update="cecases-criteria-user" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel for="cecases-criteria-user" id="cecases-criteria-user-ol">
+                                                        <h:outputText value="system user list:"/>
+                                                    </h:outputLabel>
+                                                    <p:spacer height="5px"/>
+
+                                                    <p:selectOneMenu id="cecases-criteria-user" required="false" 
+                                                                     value="#{occPeriodSearchBB.searchParams.caseManagerUser}"
+                                                                     disabled="#{!occPeriodSearchBB.searchParams.useCaseManager}">
+                                                        <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
+                                                        <f:selectItems value="#{occPeriodSearchBB.usersForSearchConfig}"  var="u" itemValue="#{u}" 
+                                                                       itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
+                                                        <f:converter converterId="userConverter"/>
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-property-ol" for="cecases-filter-property" value="filter by property? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-property" value="#{occPeriodSearchBB.searchParams.useProperty}" >
+                                                        <p:ajax update="cecases-criteria-property-som" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel for="cecases-criteria-property-som" id="cecases-criteria-property-ol">
+                                                        <h:outputText value="property list:"/>
+                                                    </h:outputLabel>
+                                                    <p:spacer height="5px"/>
+
+                                                    <p:selectOneMenu id="cecases-criteria-property-som" required="false" 
+                                                                     value="#{occPeriodSearchBB.searchParams.property}"
+                                                                     disabled="#{!occPeriodSearchBB.searchParams.useProperty}">
+
+                                                        <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
+                                                        <f:selectItems value="#{sessionBean.sessionPropertyList}"  var="p" itemValue="#{p}" 
+                                                                       itemLabel="#{p.address} (#{p.muni.managerName})"/>
+                                                        <f:converter converterId="propertyConverter"/>
+
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-open-ol" for="cecases-filter-open" value="filter by open case? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-open" value="#{occPeriodSearchBB.searchParams.useIsOpen}" >
+                                                        <p:ajax update="cecases-criteria-open" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:selectBooleanCheckbox id="cecases-criteria-open" 
+                                                                             value="#{occPeriodSearchBB.searchParams.isOpen}" 
+                                                                             disabled="#{!occPeriodSearchBB.searchParams.useIsOpen}" />
+                                                    <p:outputLabel id="cecases-criteria-open-ol" for="cecases-criteria-open" 
+                                                                   value="(checked = only open cases)" styleClass="italic"/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-filter-propinfo-ol" for="cecases-filter-propinfo" value="filter by property info flag? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-propinfo" value="#{occPeriodSearchBB.searchParams.usePropertyInfoCase}" >
+                                                        <p:ajax update="cecases-criteria-propinfo" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:selectBooleanCheckbox id="cecases-criteria-propinfo" 
+                                                                             value="#{occPeriodSearchBB.searchParams.propertyInfoCase}" 
+                                                                             disabled="#{!occPeriodSearchBB.searchParams.usePropertyInfoCase}" />
+                                                    <p:outputLabel id="cecases-criteria-propinfo-ol" for="cecases-criteria-propinfo" 
+                                                                   value="(checked = only cases that store property info)" styleClass="italic"/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="cecases-query-limit-ol" for="cecases-query-limit" value="limit results to 100? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-query-limit" value="#{occPeriodSearchBB.searchParams.limitResultCountTo100}" />
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+
+                                                </h:panelGroup>
+                                            </h:panelGrid>                                        
+                                        </h:panelGroup>
+                                    </h:panelGrid>                               
+                                    <p:commandButton    id="queryButton"
+                                                        ajax="true" value="Run query" actionListener="#{occPeriodSearchBB.executeQuery}"
+                                                        process="@form"
+                                                        disabled="false"
+                                                        update="cecase-results-form
+                                                        cecases-messages-form"
+                                                        />
+                                </p:fieldset>
+                            </h:form>
+
+                            <p:spacer height="5px" />
+                            <h:form id="cecase-results-form" >
+
+                                <p:dataTable
+                                    id="caseTable"
+                                    var="c"
+                                    filteredValue="#{occPeriodSearchBB.filteredCaseList}"
+                                    rowKey="#{c.caseID}"
+                                    rowExpandMode="multiple"
+                                    widgetVar="ceViewTable"
+                                    value="#{occPeriodSearchBB.caseList}"
+                                    tableStyleClass="primeDataTable">
+
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseID}"/>
+                                    </p:column>
+                                    <p:column width="15%" sortBy="#{c.property.address}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Property" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.property.address} (#{c.property.muni.muniName})"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Name" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseName}"/>
+                                    </p:column>
+                                    <p:column width="8%" sortBy="#{c.caseStage}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Stage" />
+                                        </f:facet>
+                                        <div class="#{c.casePhaseIcon.styleClass}">
+                                            <i class="material-icons status-display-icon-i"><h:outputText value="#{c.casePhaseIcon.materialIcon}"/></i>
+                                        </div>
+                                    </p:column>
+                                    <p:column width="5%" sortBy="#{c.caseAge}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Age" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseAge}"/>
+                                    </p:column>
+                                    <p:column width="12%">
+                                        <f:facet name="header">
+                                            <h:outputText value="view" />
+                                        </f:facet>
+                                        <p:commandButton    id="cecases-viewcase-cb"
+                                                            icon="fa fa-hand-o-right" 
+                                                            value="view"
+                                                            actionListener="#{occPeriodSearchBB.manageCECase(c)}"
+                                                            ajax="true"
+                                                            update="
+                                                            case-details-form
+                                                            event-dt-form
+                                                            violation-form
+                                                            sessionInfoForm
+                                                            notices-form:notices-ds
+                                                            action-requests-form
+                                                            events-datascroller-form" />
+                                    </p:column>
+                                </p:dataTable>
+
+
+                                <p:spacer height="10px"/>
+
+                                <p:commandButton   id="print-case-list-cb" 
+                                                   ajax="true" actionListener="#{occPeriodSearchBB.prepareReportCECaseList}"
+                                                   icon="fa fa-print" styleClass="button"
+                                                   oncomplete="PF('report-caselist-profile-diaglog-var').show()"
+                                                   value="generate case list report" 
+                                                   update="report-caselist-profile-form"/>
+                                
+                                
+
+
+                        </p:panel>
+                        
+                        <p:tabView id="_________NAMEME_________">
+                            <p:tab title="_________NAMEME_________">
+                                
+                            </p:tab>
+                            <p:tab title="_________NAMEME_________">
+                                
+                            </p:tab>
+                        </p:tabView>
+                        
+                          <p:dataScroller
+                                                id="_________NAMEME_________"
+                                                widgetVar="_________NAMEME_________"
+                                                var="inelement"
+                                                value="#{inspace.inspectedElementListVisible}"
+                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
+                          
+                          
+                          
+                          </p:dataScroller>
+                        
+                          <p:dataTable
+                                            id="_________NAMEME_________"
+                                            var="_________NAMEME_________"
+                                            rowKey="#{permit.permitID}"
+                                            value="#{occInspectionBB.currentOccPeriod.permitList}"
+                                            tableStyleClass="primeDataTable"
+                                            draggableColumns="true"
+                                            resizableColumns="true"
+                                            filteredValue="#{occInspectionBB.filteredEventList}"
+                                            widgetVar="caseEventTable">
+
+                                            <p:column width="3%" exportable="false">
+                                                <p:rowToggler/>
+                                            </p:column>
+                                            
+                                            <p:column width="10%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Print" />
+                                                </f:facet>
+                                                <p:commandButton ajax="false" 
+                                                                 action="#{occInspectionBB.initializeOccPermitReport(permit)}"
+                                                                 value="print"
+                                                                 icon="fa fa-print"
+                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                                            </p:column>
+                          </p:dataTable>
+
+                        <p:commandButton   id="_________NAMEME_________" 
+                                           value="run selected query" 
+                                           ajax="true" 
+                                           actionListener="_________NAMEME_________"
+                                           icon="fa fa-print" 
+                                           styleClass="button"
+                                           update=""/>
+
+
+
+                        <p:commandButton    id="_________NAMEME_________"
+                                            value="help on this page" 
+                                            onclick="PF('_________NAMEME_________').show()" 
+                                            styleClass="noFill" 
+                                            icon="fa fa-question-circle"/>
+                        <p:spacer height="10px"/>
+
+
+                        </h:form>
+
+
+                    <!--close main container-->
+                    </div>
+                    
+                    
+                    <p:dialog   id="_________NAMEME_________"
+                                header="_________NAMEME_________" 
+                                widgetVar="_________NAMEME_________" 
+                                responsive="true" 
+                                width="400"
+                                modal="false"
+                                height="600">
+                        
+                          <h:form id="_________NAMEME_________">
+                            <h:messages id="_________NAMEME_________"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+                        
+                        <h:form id="_________NAMEME_________">
+                            
+
+                            <h2>_________NAMEME_________</h2>
+
+                            
+                            
+                            <p:commandButton    id="_________NAMEME_________"
+                                                value="_________NAMEME_________" 
+                                                ajax="true" 
+                                                icon="fa fa-edit"
+                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
+                                                disabled="false"
+                                                rendered="true"
+                                                oncomplete="PF('_________NAMEME_________').hide()"
+                                                update=""/>
+
+                            <p:commandLink  value="close" 
+                                            onclick="PF('_________NAMEME_________').hide()" 
+                                            styleClass="noFill"/>
+
+                        </h:form>
+
+                    </p:dialog>
+
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

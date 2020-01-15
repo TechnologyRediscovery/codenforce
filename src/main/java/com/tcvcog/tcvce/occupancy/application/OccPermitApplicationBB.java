@@ -9,7 +9,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -17,7 +17,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitChange;
+import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -167,7 +167,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     } // end postConstruct
     
     
-    public String beginInternalOccApp(PropertyUnit pu) throws IntegrationException, CaseLifecycleException{
+    public String beginInternalOccApp(PropertyUnit pu) throws IntegrationException, BObStatusException{
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         
@@ -216,8 +216,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         PropertyIntegrator pi = getPropertyIntegrator();
         Municipality activeMuni = getSessionBean().getSessionMuni();
 
-        try {
-            propList = pi.searchForProperties(houseNum, streetName, activeMuni.getMuniCode());
+        // TODO: occ beta adapt to new search params
+//        try {
+//            propList = pi.searchForProperties(houseNum, streetName, activeMuni.getMuniCode());
 
             if (propList.size() > 50) {
                 propList.subList(50, propList.size()).clear(); //Limits the search to 50 results.  
@@ -225,12 +226,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Your search completed with " + getPropList().size() + " result(s)", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to complete a property search! Sorry!", ""));
-        }
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            "Unable to complete a property search! Sorry!", ""));
+//        }
     }
 
     /**
@@ -243,20 +244,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void onPropertySelection() {
         PropertyCoordinator pc = getPropertyCoordinator();
-// todo: occbeta
-//        if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
-//            try {
-//                propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
-//            } catch (CaseLifecycleException ex) {
-//                System.out.println(ex);
-//            }
-//        } else {
-//            try {
-//                propWithLists = pc.getPropertyUnits(selectedProperty);
-//            } catch (CaseLifecycleException ex) {
-//                System.out.println(ex);
-//            }
-//        }
 
         getSessionBean().setOccPermitAppActiveProp(prop);
 
@@ -273,7 +260,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void addUnitToNewPropUnits() {
         PropertyCoordinator pc = getPropertyCoordinator();
-        unitToAdd = pc.getNewPropertyUnit();
+        unitToAdd = pc.initPropertyUnit(selectedProperty);
         unitToAdd.setUnitNumber("");
 //        unitToAdd.setRental(false);
         unitToAdd.setNotes("");
@@ -321,13 +308,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //            if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
 //                try {
 //                    propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
-//                } catch (CaseLifecycleException ex) {
+//                } catch (BObStatusException ex) {
 //                    System.out.println(ex);
 //                }
 //            } else {
 //                try {
-//                    propWithLists = pc.getPropertyUnits(selectedProperty);
-//                } catch (CaseLifecycleException ex) {
+//                    propWithLists = pc.getPropertyDataHeavy(selectedProperty);
+//                } catch (BObStatusException ex) {
 //                    System.out.println(ex);
 //                }
 //            }
@@ -770,24 +757,26 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public void submitUnitChangeList() {
 
-        List<PropertyUnitChange> changeList = new ArrayList<>();
+        List<PropertyUnitChangeOrder> changeList = new ArrayList<>();
 
         PropertyIntegrator pri = getPropertyIntegrator();
 
         PropertyDataHeavy existingProp = new PropertyDataHeavy();
         
         Person changedby = getSessionBean().getSessionOccPermitApplication().getApplicantPerson();
-        
-        try {
-            existingProp = pri.getPropertyDataHeavy(prop.getPropertyID());
-                    
-        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
-            System.out.println(ex);
-        }
+
+        // TODO: Occbeta
+
+//        try {
+//            existingProp = pri.getPropertyDataHeavy(prop.getPropertyID());
+//                    
+//        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
+//            System.out.println(ex);
+//        }
         
         for (PropertyUnit workingUnit : workingPropUnits) {
 
-            PropertyUnitChange skeleton = new PropertyUnitChange();
+            PropertyUnitChangeOrder skeleton = new PropertyUnitChangeOrder();
 
             boolean added = true;
 
@@ -877,7 +866,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         for (PropertyUnit activeUnit : existingProp.getUnitList()) {
 
-            PropertyUnitChange skeleton = new PropertyUnitChange();
+            PropertyUnitChangeOrder skeleton = new PropertyUnitChangeOrder();
 
             skeleton.setPropertyID(getSessionBean().getSessionOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
             
@@ -937,7 +926,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
-        for (PropertyUnitChange order : changeList) {
+        for (PropertyUnitChangeOrder order : changeList) {
 
             try {
                 pri.insertPropertyUnitChange(order);

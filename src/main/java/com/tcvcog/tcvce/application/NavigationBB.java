@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
@@ -35,7 +35,7 @@ import javax.faces.context.FacesContext;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class NavigationBB extends BackingBeanUtils implements Serializable {
 
@@ -228,7 +228,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveCase
      */
     public boolean isNoActiveCase() {
-        CECase c = getSessionBean().getSessionCECase();
+        CECaseDataHeavy c = getSessionBean().getSessionCECase();
         noActiveCase = (c == null);
         return noActiveCase;
     }

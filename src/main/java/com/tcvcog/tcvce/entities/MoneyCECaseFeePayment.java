@@ -20,7 +20,8 @@ package com.tcvcog.tcvce.entities;
  *
  * @author Nathan Dietz
  */
-public class MoneyCECaseFeePayment {
+public class MoneyCECaseFeePayment 
+        extends Payment{
 
     private int moneyPaymentID;
     private int CECaseAssignedFeeID;

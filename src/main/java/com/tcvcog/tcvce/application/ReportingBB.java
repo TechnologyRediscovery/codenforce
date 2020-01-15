@@ -7,12 +7,12 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseStage;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CasePhaseEnum;
+import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.reports.Report;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
@@ -20,12 +20,9 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
 import java.io.Serializable;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
@@ -58,8 +55,8 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     private DonutChartModel violationDonut;
     
     
-    private List<CECase> caseList;
-    private Map<CasePhase, Integer> cPhaseMap;
+    private List<CECaseDataHeavy> caseList;
+    private Map<CasePhaseEnum, Integer> cPhaseMap;
      
 
     /**
@@ -71,7 +68,12 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        caseList = getSessionBean().getSessionCECaseList();
+        CaseCoordinator cc = getCaseCoordinator();
+        List<CECase> csel =  getSessionBean().getSessionCECaseList();
+        if(csel != null && !csel.isEmpty()){
+            caseList = cc.getCECaseHeavyList(csel, getSessionBean().getSessionUser().getMyCredential());
+        }
+        
         DataCoordinator dc = getDataCoordinator();
         
         if(caseList != null && !caseList.isEmpty()){
@@ -105,9 +107,9 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         
         ChartSeries caseCountSeries = new ChartSeries();
         caseCountSeries.setLabel("Count of CE cases");
-        Set<CasePhase> phaseSet = cPhaseMap.keySet();
+        Set<CasePhaseEnum> phaseSet = cPhaseMap.keySet();
         Integer max = 0;
-        for(CasePhase p : phaseSet) {
+        for(CasePhaseEnum p : phaseSet) {
             Integer cnt = cPhaseMap.get(p);
             if(cnt > max){
                 max = cnt;
@@ -136,17 +138,17 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
          DataCoordinator dc = getDataCoordinator();
         ChartSeries caseCountSeries = new ChartSeries();
         caseCountSeries.setLabel("Count of CE cases");
-        Map<CaseStage, Integer> stageMap = null;
+        Map<CaseStageEnum, Integer> stageMap = null;
         try {
              stageMap = dc.getCaseCountsByStage(caseList);
-        } catch (IntegrationException | CaseLifecycleException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
         Integer max = 0;
         if(stageMap != null && stageMap.keySet() != null){
             
-            Set<CaseStage> stageSet = stageMap.keySet();
-            for(CaseStage s : stageSet) {
+            Set<CaseStageEnum> stageSet = stageMap.keySet();
+            for(CaseStageEnum s : stageSet) {
                 Integer cnt = stageMap.get(s);
                 if(cnt > max){
                     max = cnt;
@@ -262,28 +264,28 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the caseList
      */
-    public List<CECase> getCaseList() {
+    public List<CECaseDataHeavy> getCaseList() {
         return caseList;
     }
 
     /**
      * @param caseList the caseList to set
      */
-    public void setCaseList(List<CECase> caseList) {
+    public void setCaseList(List<CECaseDataHeavy> caseList) {
         this.caseList = caseList;
     }
 
     /**
      * @return the cPhaseMap
      */
-    public Map<CasePhase, Integer> getcPhaseMap() {
+    public Map<CasePhaseEnum, Integer> getcPhaseMap() {
         return cPhaseMap;
     }
 
     /**
      * @param cPhaseMap the cPhaseMap to set
      */
-    public void setcPhaseMap(Map<CasePhase, Integer> cPhaseMap) {
+    public void setcPhaseMap(Map<CasePhaseEnum, Integer> cPhaseMap) {
         this.cPhaseMap = cPhaseMap;
     }
 

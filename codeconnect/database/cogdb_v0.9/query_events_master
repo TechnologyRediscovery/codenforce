@@ -1,0 +1,13 @@
+﻿
+
+SELECT DISTINCT eventid
+FROM public.event INNER JOIN public.eventcategory ON (category_catid = categoryid)
+LEFT OUTER JOIN public.eventperson ON (ceevent_eventid = event.eventid)
+--LEFT OUTER JOIN public.occperiod ON (occperiod.periodid = event.occperiod_periodid)
+--LEFT OUTER JOIN public.propertyunit ON (propertyunit.unitid = occperiod.propertyunit_unitid)
+--LEFT OUTER JOIN public.property ON (property.propertyid = propertyunit.property_propertyid)
+LEFT OUTER JOIN public.cecase ON (cecase.caseid = event.cecase_caseid)
+LEFT OUTER JOIN public.property ON (cecase.property_propertyid = property_propertyid) 
+WHERE eventid IS NOT NULL AND;
+
+

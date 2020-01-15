@@ -23,12 +23,12 @@ package com.tcvcog.tcvce.entities;
  * - Assigning a case phase
  * - Assigning a case's stage
  * 
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public enum ViolationStatusEnum {
 
     RESOLVED(                               "Resolved", 
-                                            "",
+                                            "Issue no longer remains on property",
                                             "codeviolation_resolved_iconid",
                                             0),
     

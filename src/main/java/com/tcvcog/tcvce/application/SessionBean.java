@@ -17,44 +17,10 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
-import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.*;
-import com.tcvcog.tcvce.entities.reports.Report;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
-import com.tcvcog.tcvce.entities.CodeSet;
-import com.tcvcog.tcvce.entities.CodeSource;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PublicInfoBundle;
-import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.QueryCEAR;
-import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.QueryEventCECase;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPermit;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
-import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
-import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
-import com.tcvcog.tcvce.entities.search.QueryPerson;
-import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.reports.*;
+import com.tcvcog.tcvce.entities.search.*;
+import com.tcvcog.tcvce.entities.occupancy.*;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -71,84 +37,164 @@ import javax.annotation.PostConstruct;
  * object on one of these session shelves for others to work with and to maintain
  * user state across page changes.
  * 
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
-public class SessionBean extends BackingBeanUtils implements Serializable{
+public class    SessionBean 
+        extends BackingBeanUtils {
     
-    // CORE BUSINESS OBJECT SESSION SHELVES
-    private MunicipalityDataHeavy sessionMuni;
-
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                      N User                                    <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
     private UserAuthorized sessionUser;
+    private User userForReInit;
+    
+    private UserMuniAuthPeriod umapRequestedForReInit;
+    private List<UserMuniAuthPeriod> sessionUMAPListValidOnly;
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                    I Municipality                              <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private MunicipalityDataHeavy sessionMuni;
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                   III CodeBook                                 <<< */
+    /* >>> -------------------------------------------------------------- <<< */
     
     private CodeSet sessionCodeSet;
-    
-    private Property sessionProperty;
-    private List<Property> sessionPropertyList;
-    
-    private Person sessionPerson;
-    private List<Person> sessionPersonList;
-    
-    private CECase sessionCECase;
-    private List<CECase> sessionCECaseList;
-    
-    private OccPeriod sessionOccPeriod;
-    private List<OccPeriod> sessionOccPeriodList;
-    
-    // Session Entity Lists
-    private List<CEActionRequest> sessionCEARList;
-    private List<EventCECaseCasePropBundle> sessionEventWithCasePropList;
-    
-    private CodeViolation sessionCodeViolation;
-    private List<CodeViolation> sessionViolationList;
-    
-    private Blob sessionBlob;
-    private List<Blob> blobList;
-    
-    private User sessionUserForReInitSession;
-    private UserMuniAuthPeriod umapRequestedForReInit;
-    
-    // BOB individual object session shelves - NOT ALWAYS POPULATED
-    private CEActionRequest sessionCEAR;
-    private PropertyUnit sessionPropertyUnit;
-    private OccInspection sessionOccInspection;
-    private OccPermit sessionOccPermit;
-    
-    // CECase-specific objects
-    private NoticeOfViolation sessionNotice;
-    private Citation sessionCitation;
-    
-    // BOB queries
-    private QueryProperty queryProperty;
-    private QueryPerson queryPerson;
-    private QueryCEAR queryCEAR;
-    private QueryCECase queryCECase;
-    private QueryEventCECase queryEventCECase;
-    private QueryOccPeriod queryOccPeriod;
-    
-    /* *** Municipal Code Session Shelves ***  */
     private CodeSource activeCodeSource;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
     private EnforcableCodeElement selectedEnfCodeElement;
     private CodeElement activeCodeElement;
     
-    /* *** Occupancy Permit Application Session Shelves *** */
-    private OccPermitApplication sessionOccPermitApplication;
-    private Property occPermitAppActiveProp;
-    private Property occPermitAppWorkingProp;
-    private PropertyUnit occPermitAppActivePropUnit;
-    private PersonType occPermitAppActivePersonType;
     
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                   III Property                                 <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    
+    private PropertyDataHeavy sessionProperty;
+    private List<Property> sessionPropertyList;
+    
+    private PropertyUnit sessionPropertyUnit;
+    
+    /* >>> QUERY PROPERTY <<< */
+    private QueryProperty queryProperty;
+    private List<QueryProperty> queryPropertyList;
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                     IV Person                                  <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    
+    private Person sessionPerson;
+    private List<Person> sessionPersonList;
+    
+    
+    /* >>> QUERY PERSON <<< */
+    private QueryPerson queryPerson;
+    private List<QueryPerson> queryPersonList;
+    
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                   V Event                                      <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    
+    private List<EventCaseHeavy> sessionEventWithCasePropList;
+    private List<EventCnF> sessionEventList;
+    
+    /* >>> QUERY EVENT <<< */
+    private QueryEvent queryEvent;
+    private List<QueryEvent> queryEventList;
+    
+    
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                  VI OccPeriod                                  <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private OccPeriodDataHeavy sessionOccPeriod;
+    private List<OccPeriod> sessionOccPeriodList;
+    
+    private OccPermit sessionOccPermit;
+    private OccInspection sessionOccInspection;
+    
+    /* >>> QUERY OCCPERIOD <<< */
+    private QueryOccPeriod queryOccPeriod;
+    private List<QueryOccPeriod> queryOccPeriodList;
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                  VII CECaseDataHeavy                                    <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private CECaseDataHeavy sessionCECase;
+    private List<CECase> sessionCECaseList;
+    
+    private CodeViolation sessionCodeViolation;
+    private List<CodeViolation> sessionViolationList;
+    
+    private NoticeOfViolation sessionNotice;
+    private Citation sessionCitation;
+    
+    
+    /* >>> QUERY CECASE <<< */
+    private QueryCECase queryCECase;
+    private List<QueryCECase> queryCECaseList;
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>              VIII CEActionRequest                              <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private List<CEActionRequest> sessionCEARList;
+    
+    private CEActionRequest sessionCEAR;
     /* *** Code Enf Action Request Session Shelves ***  */
     private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
     
     
-    /* *** Public Data Session Shelves ***  */
-    private List<PublicInfoBundle> infoBundleList;
-    private PublicInfoBundleCECase pibCECase;
+    // --- QUERY CEAR ---
+    private QueryCEAR queryCEAR;
+    private List<QueryCEAR> queryCEARList;
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                     VIV OccApp                                 <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private OccPermitApplication sessionOccPermitApplication;
+    
+    private Property occPermitAppActiveProp;
+    private Property occPermitAppWorkingProp;
+    private PropertyUnit occPermitAppActivePropUnit;
+    private PersonType occPermitAppActivePersonType;
+    
+    private OccPermitApplicationReason occPermitApplicationReason;
 
-    /* *** Reporting *** */
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                        X Payment                               <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+
+    private Payment sessionPayment;
+    private String paymentRedirTo;
+    
+    private OccPeriod feeManagementOccPeriod;
+    private String feeRedirTo;
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                         XI Report                              <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+
     private Report sessionReport;
     
     private ReportConfigCECase reportConfigCECase;
@@ -158,22 +204,27 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private ReportConfigOccInspection reportConfigInspection;
     private ReportConfigOccPermit reportConfigOccPermit;
     
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                         XII Blob                                <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private Blob sessionBlob;
+    private List<Blob> blobList;
+    
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                  XIII PublicInfoBundle                          <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    private List<PublicInfoBundle> infoBundleList;
+    private PublicInfoBundleCECase pibCECase;
+    
     /* *** Public Person Search/Edit Session Shelves *** */
     private Person activeAnonPerson;
-    private OccPermitApplicationReason occPermitApplicationReason;
-
-    /* *** Payment and Fee Management Shelves *** */
-    private Payment sessionPayment;
-    private String paymentRedirTo;
-    
-    private OccPeriod feeManagementOccPeriod;
-    private String feeRedirTo;
     
     
-    /* *** Blob Upload Session Shelves *** */
-    //linking
-
-
     /**
      * Creates a new instance of getSessionBean()
      */
@@ -190,14 +241,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the sessionProperty
      */
-    public Property getSessionProperty() {
+    public PropertyDataHeavy getSessionProperty() {
         return sessionProperty;
     }
 
     /**
      * @return the sessionCECase
      */
-    public CECase getSessionCECase() {
+    public CECaseDataHeavy getSessionCECase() {
         return sessionCECase;
         
     }
@@ -273,14 +324,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @param sessionProperty the sessionProperty to set
      */
-    public void setSessionProperty(Property sessionProperty) {
+    public void setSessionProperty(PropertyDataHeavy sessionProperty) {
         this.sessionProperty = sessionProperty;
     }
 
     /**
      * @param sessionCECase the sessionCECase to set
      */
-    public void setSessionCECase(CECase sessionCECase) {
+    public void setSessionCECase(CECaseDataHeavy sessionCECase) {
         this.sessionCECase = sessionCECase;
     }
 
@@ -555,14 +606,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /*
      * @return the sessionEventWithCasePropList
      */
-    public List<EventCECaseCasePropBundle> getSessionEventWithCasePropList() {
+    public List<EventCaseHeavy> getSessopmEvemtCaseHeavyList() {
         return sessionEventWithCasePropList;
     }
 
     /**
      * @param sessionEventWithCasePropList the sessionEventWithCasePropList to set
      */
-    public void setSessionEventWithCasePropList(List<EventCECaseCasePropBundle> sessionEventWithCasePropList) {
+    public void setSessionEventWithCasePropList(List<EventCaseHeavy> sessionEventWithCasePropList) {
         this.sessionEventWithCasePropList = sessionEventWithCasePropList;
     }
 
@@ -697,13 +748,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.occPermitApplicationReason = occPermitApplicationReason;
     }
 
-    /**
-     * @return the sessionOccPeriod
-     */
-    public OccPeriod getSessionOccPeriod() {
-        return sessionOccPeriod;
-    }
-
+  
     /**
      * @return the queryOccPeriod
      */
@@ -732,12 +777,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         return sessionOccPermit;
     }
 
-    /**
-     * @param sessionOccPeriod the sessionOccPeriod to set
-     */
-    public void setSessionOccPeriod(OccPeriod sessionOccPeriod) {
-        this.sessionOccPeriod = sessionOccPeriod;
-    }
+  
 
     /**
      * @param queryOccPeriod the queryOccPeriod to set
@@ -782,10 +822,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the queryEventCECase
+     * @return the queryEvent
      */
-    public QueryEventCECase getQueryEventCECase() {
-        return queryEventCECase;
+    public QueryEvent getQueryEvent() {
+        return queryEvent;
     }
 
     /**
@@ -803,10 +843,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param queryEventCECase the queryEventCECase to set
+     * @param queryEvent the queryEvent to set
      */
-    public void setQueryEventCECase(QueryEventCECase queryEventCECase) {
-        this.queryEventCECase = queryEventCECase;
+    public void setQueryEvent(QueryEvent queryEvent) {
+        this.queryEvent = queryEvent;
     }
 
     /**
@@ -894,17 +934,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the sessionUserForReInitSession
+     * @return the userForReInit
      */
-    public User getSessionUserForReInitSession() {
-        return sessionUserForReInitSession;
+    public User getUserForReInit() {
+        return userForReInit;
     }
 
     /**
-     * @param sessionUserForReInitSession the sessionUserForReInitSession to set
+     * @param userForReInit the userForReInit to set
      */
-    public void setSessionUserForReInitSession(User sessionUserForReInitSession) {
-        this.sessionUserForReInitSession = sessionUserForReInitSession;
+    public void setUserForReInit(User userForReInit) {
+        this.userForReInit = userForReInit;
     }
 
     /**
@@ -1003,6 +1043,132 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setSessionBlob(Blob sessionBlob) {
         this.sessionBlob = sessionBlob;
+    }
+
+    /**
+     * @return the sessionOccPeriod
+     */
+    public OccPeriodDataHeavy getSessionOccPeriod() {
+        return sessionOccPeriod;
+    }
+
+    /**
+     * @param sessionOccPeriod the sessionOccPeriod to set
+     */
+    public void setSessionOccPeriod(OccPeriodDataHeavy sessionOccPeriod) {
+        this.sessionOccPeriod = sessionOccPeriod;
+    }
+
+    /**
+     * @return the queryPropertyList
+     */
+    public List<QueryProperty> getQueryPropertyList() {
+        return queryPropertyList;
+    }
+
+    /**
+     * @param queryPropertyList the queryPropertyList to set
+     */
+    public void setQueryPropertyList(List<QueryProperty> queryPropertyList) {
+        this.queryPropertyList = queryPropertyList;
+    }
+
+    /**
+     * @return the queryPersonList
+     */
+    public List<QueryPerson> getQueryPersonList() {
+        return queryPersonList;
+    }
+
+    /**
+     * @param queryPersonList the queryPersonList to set
+     */
+    public void setQueryPersonList(List<QueryPerson> queryPersonList) {
+        this.queryPersonList = queryPersonList;
+    }
+
+    /**
+     * @return the queryOccPeriodList
+     */
+    public List<QueryOccPeriod> getQueryOccPeriodList() {
+        return queryOccPeriodList;
+    }
+
+    /**
+     * @param queryOccPeriodList the queryOccPeriodList to set
+     */
+    public void setQueryOccPeriodList(List<QueryOccPeriod> queryOccPeriodList) {
+        this.queryOccPeriodList = queryOccPeriodList;
+    }
+
+    /**
+     * @return the queryCECaseList
+     */
+    public List<QueryCECase> getQueryCECaseList() {
+        return queryCECaseList;
+    }
+
+    /**
+     * @param queryCECaseList the queryCECaseList to set
+     */
+    public void setQueryCECaseList(List<QueryCECase> queryCECaseList) {
+        this.queryCECaseList = queryCECaseList;
+    }
+
+    /**
+     * @return the queryCEARList
+     */
+    public List<QueryCEAR> getQueryCEARList() {
+        return queryCEARList;
+    }
+
+    /**
+     * @param queryCEARList the queryCEARList to set
+     */
+    public void setQueryCEARList(List<QueryCEAR> queryCEARList) {
+        this.queryCEARList = queryCEARList;
+    }
+
+    /**
+     * @return the queryEventList
+     */
+    public List<QueryEvent> getQueryEventList() {
+        return queryEventList;
+    }
+
+    /**
+     * @param queryEventList the queryEventList to set
+     */
+    public void setQueryEventList(List<QueryEvent> queryEventList) {
+        this.queryEventList = queryEventList;
+    }
+
+    /**
+     * @return the sessionEventList
+     */
+    public List<EventCnF> getSessionEventList() {
+        return sessionEventList;
+    }
+
+    /**
+     * @param sessionEventList the sessionEventList to set
+     */
+    public void setSessionEventList(List<EventCnF> sessionEventList) {
+        this.sessionEventList = sessionEventList;
+    }
+
+    /**
+     * @return the sessionUMAPListValidOnly
+     */
+    public List<UserMuniAuthPeriod> getSessionUMAPListValidOnly() {
+        return sessionUMAPListValidOnly;
+    }
+
+    /**
+     * @param sessionUMAPListValidOnly the sessionUMAPListValidOnly to set
+     */
+    public void setSessionUMAPListValidOnly(List<UserMuniAuthPeriod> sessionUMAPListValidOnly) {
+        this.sessionUMAPListValidOnly = sessionUMAPListValidOnly;
     }
     
     

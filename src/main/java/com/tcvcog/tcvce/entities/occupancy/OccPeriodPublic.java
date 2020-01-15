@@ -24,7 +24,6 @@ import com.tcvcog.tcvce.entities.IFace_Openable;
  * @author sylvia
  */
 public abstract class OccPeriodPublic
-                extends BOb
-                implements IFace_Openable {
+                extends BOb {
     
 }

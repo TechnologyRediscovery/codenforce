@@ -21,7 +21,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CodeSource implements Serializable{
     

@@ -1,0 +1,274 @@
+N_USER(),
+I_MUNICIPALITY(),
+II_CODEBOOK(),
+III_PROPERTY(),
+IV_PERSON(),
+V_EVENT(),
+VI_OCCPERIOD(),
+VII_CECASE(),
+VIII_CEACTIONREQUEST(),
+VIV_OCCAPP(),
+X_PAYMENT(),
+XI_REPORT(),
+XII_BLOB(),
+XIII_PUBLICINFOBUNDLE();
+
+
+
+     
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   *                                 <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   N User                                       <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   I Municipality                               <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   II Codebook                                  <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   III Property                                 <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */  
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   IV Person                                    <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   V Event                                     <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   VI Occperiod                                 <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   VII Cecase                                   <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   VIII CEActionrequest                         <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   VIV Occapp                                   <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   X Payment                                    <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   XI Report                                    <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   XII Blob                                     <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+
+
+     /**
+     * Subsystem initialization controller
+     *
+     * >>> -------------------------------------------------------------- <<<
+     * >>>                   XIII PublicInfo                              <<<
+     * >>> -------------------------------------------------------------- <<<
+     * 
+     * Populates relevant SessionBean members through calls to the governing
+     * Coordinator classes. Also initializes query lists for query-able BObs
+     * 
+     * @param cred of the requesting User
+     * @param ss under current configuration
+     * @throws SessionException for all initialization issues
+     */
+
+

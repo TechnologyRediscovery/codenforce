@@ -5,32 +5,91 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.RoleType;
+
 /**
  *
  * @author sylvia
  */
-public enum QueryCECaseEnum {
+public  enum QueryCECaseEnum 
+        implements IFace_RankLowerBounded{
     
-    OPENCASES("All open cases", "Code enforcement case containing any unresolved violations", 2, false),
-    EXPIRED_TIMEFRAMES("Overdue cases", "Cases with one or more violations with expired compliance timeframes", 2, false),
-    CURRENT_TIMEFRAMES("Within compliance timeframe", "Cases whose violations are all insdie compliance timeframes", 2, false),
-    OPENED_30DAYS("Opened past 30 days", "Cases opene in the past 30 days", 2, false),
-    CLOSED_30DAYS("Closed in the past 30 days", "Any case closed in the past 30 days", 2, false),
-    UNRESOLVED_CITATIONS("Outstanding citations", "Cases with filed citations and are in court system with unpaid citations", 2, false),
-    ANY_ACTIVITY_7Days("Any case activity in past week","Cases with any new events in the past 7 days", 2, false),
-    ANY_ACTIVITY_30Days("Any case activyt in past month","Cases with any new events in the past 30 days", 2, false),
-    CUSTOM("Custom case query", "Customized search parameters", 2, false);
+    OPENCASES(              "All open cases", 
+                            "Code enforcement case containing any unresolved violations", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    EXPIRED_TIMEFRAMES(     "Overdue cases", 
+                            "Cases with one or more violations with expired compliance timeframes", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    CURRENT_TIMEFRAMES(     "Within compliance timeframe", 
+                            "Cases whose violations are all insdie compliance timeframes", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    OPENED_30DAYS(          "Opened past 30 days", 
+                            "Cases opene in the past 30 days", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    CLOSED_30DAYS(          "Closed in the past 30 days", 
+                            "Any case closed in the past 30 days", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    UNRESOLVED_CITATIONS(   "Outstanding citations", 
+                            "Cases with filed citations and are in court system with unpaid citations", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    ANY_ACTIVITY_7Days(     "Any case activity in past week",
+                            "Cases with any new events in the past 7 days", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    ANY_ACTIVITY_30Days(    "Any case activyt in past month",
+                            "Cases with any new events in the past 30 days", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    PROPERTY(               "CE cases by property",
+                            "CE Cases attached to a single specified property", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    
+    PROPINFOCASES(          "Cases associated with a single property's info",
+                            "Not normal CE cases", 
+                            RoleType.MuniStaff, 
+                            true),
+    
+    
+    PACC(                   "CE cases by public access control code",
+                            "All cases by PACC", 
+                            RoleType.MuniStaff, 
+                            true),
+    
+    CUSTOM(                 "Custom case query", 
+                            "Customized search parameters", 
+                            RoleType.MuniReader, 
+                            true);
     
     private final String title;
     private final String desc;
-    private final int userRankMinimum;
+    private final RoleType requiredRoleMin;
     private final boolean log;
     
-    private QueryCECaseEnum(String t, String l, int rnkMin, boolean lg){
+    private QueryCECaseEnum(String t, String l, RoleType minRoleType, boolean lg){
         this.desc = l;
         this.title = t;
-        this.userRankMinimum = rnkMin;
         this.log = lg;
+        if(minRoleType != null){
+            this.requiredRoleMin = minRoleType;
+        } else {
+            this.requiredRoleMin = RoleType.MuniStaff;
+        }
     }
     
     public String getDesc(){
@@ -41,16 +100,14 @@ public enum QueryCECaseEnum {
         return title;
     }
 
-    /**
-     * @return the userRankMinimum
-     */
-    public int getUserRankMinimum() {
-        return userRankMinimum;
-    }
-    
     
     public boolean logQueryRun(){
         return log;
+    }
+
+    @Override
+    public RoleType getRequiredRoleMin() {
+        return requiredRoleMin;
     }
     
     

@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -77,10 +77,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private String houseNum;
     private String streetName;
     
-    private Map<String, Integer> violationTypeMap;
-    private int violationTypeID;
-    private String violationTypeName;
-    
     private Municipality selectedMuni;
     
     private Property selectedProperty;
@@ -128,11 +124,13 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             req != null 
                 && 
             currentRequest.getRequestProperty() != null){
-            try {
-                personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonList();
-            } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
-                System.out.println(ex);
-            }
+//            TODO: occbeta
+            
+//            try {
+//                personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonOccPeriodList();
+//            } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
+//                System.out.println(ex);
+//            }
         } else if (usr != null && req != null ) {
             personCandidateList = getSessionBean().getSessionPersonList();
         }
@@ -258,7 +256,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         Municipality m = currentRequest.getMuni();
-        Person skel = pc.getNewPersonSkeleton(m);
+        Person skel = pc.initPerson(m);
         try {
             skel.setCreatorUserID(uc.getUserRobot().getUserID());
         } catch (IntegrationException ex) {
@@ -424,20 +422,20 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
       
     public void searchForPropertiesSingleMuni(ActionEvent ev){
         PropertyIntegrator pi = getPropertyIntegrator();
-        
-        try {
-            propList = (ArrayList<Property>) pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Your search completed with " + getPropList().size() + " results", ""));
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to complete a property search! Sorry!", ""));
-            
-        }
+//        
+//        try {
+//            propList = (ArrayList<Property>) pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
+//            getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+//                        "Your search completed with " + getPropList().size() + " results", ""));
+//            
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+//                        "Unable to complete a property search! Sorry!", ""));
+//            
+//        }
     }
     
     
@@ -530,34 +528,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
    
 
-    /**
-     * @return the violationTypeID
-     */
-    public int getViolationTypeID() {
-        return violationTypeID;
-    }
-
-    /**
-     * @param violationTypeID the violationTypeID to set
-     */
-    public void setViolationTypeID(int violationTypeID) {
-        this.violationTypeID = violationTypeID;
-    }
-
-    /**
-     * @return the violationTypeName
-     */
-    public String getViolationTypeName() {
-        return violationTypeName;
-    }
-
-    /**
-     * @param violationTypeName the violationTypeName to set
-     */
-    public void setViolationTypeName(String violationTypeName) {
-        this.violationTypeName = violationTypeName;
-    }
-
+    
     
 
     /**
@@ -691,21 +662,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     
 
    
-    /**
-     * @return the violationTypeMap
-     */
-    public Map<String, Integer> getViolationTypeMap() {
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        violationTypeMap = ceari.getViolationMap();
-        return violationTypeMap;
-    }
-
-    /**
-     * @param violationTypeMap the violationTypeMap to set
-     */
-    public void setViolationTypeMap(Map<String, Integer> violationTypeMap) {
-        this.violationTypeMap = violationTypeMap;
-    }
 
     /**
      * @return the currentDate

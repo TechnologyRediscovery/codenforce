@@ -21,8 +21,8 @@ package com.tcvcog.tcvce.entities;
  * @author Nathan Dietz
  */
 public enum FeeAssignedType {
-    OccPeriod("OccPeriod"),
-    CEEvent("CEEvent");
+    OccPeriod("Occupancy Period"),
+    CECase("CE Case");
     
     private final String label;
 

@@ -21,7 +21,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     private int caseID;
     private boolean paccEnabled;
 
-    private CasePhase casePhase;
+    private CasePhaseEnum casePhase;
     // extract only the publicly released events from the CECase's list
     
     
@@ -34,7 +34,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     
     private String closingDatePretty;
     
-    private List<CECaseEvent> publicEventList;
+    private List<EventCnF> publicEventList;
     
     private LocalDateTime mostRecentLoggedEvent;
     
@@ -231,7 +231,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @return the casePhase
      */
-    public CasePhase getCasePhase() {
+    public CasePhaseEnum getCasePhase() {
         return casePhase;
     }
 
@@ -266,7 +266,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @return the publicEventList
      */
-    public List<CECaseEvent> getPublicEventList() {
+    public List<EventCnF> getPublicEventList() {
         return publicEventList;
     }
 
@@ -289,7 +289,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @param casePhase the casePhase to set
      */
-    public void setCasePhase(CasePhase casePhase) {
+    public void setCasePhase(CasePhaseEnum casePhase) {
         this.casePhase = casePhase;
     }
 
@@ -324,7 +324,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @param publicEventList the publicEventList to set
      */
-    public void setPublicEventList(List<CECaseEvent> publicEventList) {
+    public void setPublicEventList(List<EventCnF> publicEventList) {
         this.publicEventList = publicEventList;
     }
     

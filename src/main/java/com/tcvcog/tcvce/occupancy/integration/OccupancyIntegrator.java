@@ -18,8 +18,9 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -39,9 +40,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
-import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriodDateFields;
 import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
@@ -50,7 +49,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +59,7 @@ import java.util.List;
  * High-level object families produced here include: OccPeriod OccPeriodType
  * OccPermit OccPermitApplication
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class OccupancyIntegrator extends BackingBeanUtils implements Serializable {
 
@@ -76,12 +74,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             throws  IntegrationException, 
                     AuthorizationException, 
                     EventException, 
-                    CaseLifecycleException, 
+                    BObStatusException, 
                     ViolationException {
         return getOccPeriodList(pu.getUnitID());
     }
     
-    public List<OccPeriod> getOccPeriodList(int unitID) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
+    public List<OccPeriod> getOccPeriodList(int unitID) throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException {
         List<OccPeriod> opList = new ArrayList<>();
         String query = "SELECT periodid FROM public.occperiod WHERE propertyunit_unitid=?;";
 
@@ -107,19 +105,17 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return opList;
     }
 
-    public QueryOccPeriod runQueryOccPeriod(QueryOccPeriod query, UserAuthorized u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
-        List<SearchParamsOccPeriod> pList = query.getParmsList();
-        
-        for(SearchParamsOccPeriod sp: pList){
-            query.addToResults(searchForOccPeriods(sp));
-        }
-        query.setExecutionTimestamp(LocalDateTime.now());
-        query.setExecutedByIntegrator(true);
-        return query;
-    }
+  
 
-    public List<OccPeriod> searchForOccPeriods(SearchParamsOccPeriod params) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
-        List<OccPeriod> periodList = new ArrayList<>();
+    /**
+     * Single point of entry for queries against the OccPeriod table
+     * @param params
+     * @return 
+     */
+    public List<Integer> searchForOccPeriods(SearchParamsOccPeriod params) {
+        SearchCoordinator sc = getSearchCoordinator();
+        
+        List<Integer> periodList = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -129,177 +125,185 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         sb.append("FROM occperiod INNER JOIN occperiodtype ON (type_typeid = typeid) \n");
         sb.append("INNER JOIN propertyunit ON (occperiod.propertyunit_unitid = unitid) \n");
         sb.append("INNER JOIN property ON (propertyunit.property_propertyid = property.propertyid) \n ");
-        sb.append("RIGHT OUTER JOIN occinspection ON (occinspection.occperiod_periodid = periodid) \n");
-        sb.append("RIGHT OUTER JOIN occpermit ON (occpermit.occperiod_periodid = periodid) \n ");
-        sb.append("WHERE occperiodid iS NOT NULL AND ");
+        sb.append("LEFT OUTER JOIN occinspection ON (occinspection.occperiod_periodid = periodid) \n");
+        sb.append("LEFT OUTER JOIN occpermit ON (occpermit.occperiod_periodid = periodid) \n ");
+        sb.append("LEFT OUTER JOIN occperiodperson ON (occperiod.periodid = occperiodperson.person_personid) \n");
+        sb.append("WHERE occperiodid IS NOT NULL AND ");
 
-        if (!params.isObjectID_filterBy()) {
-            if (params.isFilterByMuni()) {
-                sb.append("AND ");
-                sb.append("municipality_municode = ? "); // param 1
-            }
-
-            if (params.isProperty_filterBy()) {
-                sb.append("AND ");
-                sb.append("property.propertyid=? ");
-            }
-
-            if (params.isPropertyUnit_filterBy()) {
-                sb.append("AND ");
-                sb.append("propertyunit.propertyunit_unitid=? ");
-            }
-
-            if (params.isFilterByStartEndDate()) {
-                sb.append("AND ");
-                sb.append(getDBDateField(params.getDateField()));
-                sb.append(" ");
-                sb.append("BETWEEN ? AND ? "); // parm 2 and 3 without ID
-            }
-
-            if (params.isNullDateField_filterBy()) {
-                sb.append("AND ");
-                sb.append(getDBDateField(params.getNullDateField_EnumValue()));
-                sb.append("IS NULL ");
-            }
-
-            if (params.isOccPeriodType_filterBy()) {
-                sb.append("AND ");
-                sb.append("occperiod.typeid=? ");
-            }
-
-            if (params.isUserField_filter()) {
-                sb.append("AND ");
-                sb.append(getDBUserField(params));
-            }
-
-            if (params.isOverrideTypeConfig_filterBy()) {
-                sb.append("AND ");
-                if (params.isOverrideTypeConfig_switch_overridesTypeConfig()) {
-                    sb.append("overrideperiodtypeconfig=TRUE ");
+        
+        if (!params.isBobID_ctl()) {
+           // *******************************
+           // **   MUNI,DATES,USER,ACTIVE  **
+           // *******************************
+            params = (SearchParamsOccPeriod) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsOccPeriod.MUNI_DBFIELD);
+            
+           // *******************************
+            // **        PROPERTY           **
+            // *******************************
+             if (params.isProperty_ctl()) {
+                if(params.getProperty_val()!= null){
+                    params.appendSQL("AND property_propertyid=? ");
                 } else {
-                    sb.append("overrideperiodtypeconfig=FALSE");
+                    params.setProperty_ctl(false);
+                    params.logMessage("PROPERTY: no Property object; prop filter disabled");
+                }
+            }
+            
+            // *******************************
+            // **       PROPERTY UNIT       **
+            // *******************************
+             if (params.isPropertyUnit_ctl()) {
+                if(params.getPropertyUnit_val()!= null){
+                    params.appendSQL("AND propertyunit_unitid=? ");
+                } else {
+                    params.setPropertyUnit_ctl(false);
+                    params.logMessage("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
+                }
+            }
+             
+            // *******************************
+            // **       PERIOD TYPE         **
+            // *******************************
+            if (params.isPeriodType_ctl()) {
+                if(params.getPeriodType_val() != null){
+                    params.appendSQL("AND type_typeid=? ");
+                } else {
+                    params.setPeriodType_ctl(false);
+                    params.logMessage("PERIOD TYPE: no type object found; type filter disabled");
                 }
             }
 
-            if (params.isPermitIssuance_filterBy()) {
-                sb.append("AND ");
-                if (params.isPermitIssuance_switch_permitIssued()) {
-                    sb.append("occpermit.dateissued IS NOT NULL ");
+            
+            // *******************************
+            // **       PERMITS             **
+            // *******************************
+            if (params.isPermitIssuance_ctl()) {
+                if (params.isPermitIssuance_val()) {
+                    params.appendSQL("occpermit.dateissued IS NOT NULL ");
                 } else {
-                    sb.append("occpermit.dateissued IS NULL ");
+                    params.appendSQL("occpermit.dateissued IS NULL ");
                 }
             }
 
-            if (params.isInspectionPassed_filterBy()) {
-                sb.append("AND ");
-                if (params.isInspectionPassed_switch_passedInspection()) {
-                    sb.append("occinspection.passedinspectionts IS NOT NULL ");
+            
+            // *******************************
+            // **    PASSED INSPECTIONS     **
+            // *******************************
+            if (params.isInspectionPassed_ctl()) {
+                params.appendSQL("AND occinspection.passedinspectionts ");
+                if (params.isInspectionPassed_val()) {
+                    params.appendSQL("IS NOT NULL ");
                 } else {
-                    sb.append("occinspection.passedinspectionts IS NULL ");
+                    params.appendSQL("IS NULL ");
                 }
             }
 
-            if (params.isThirdPartyInspector_filterBy()) {
-                sb.append("AND ");
-                if (params.isThirdPartyInspector_switch_thirdPartyRegistered()) {
-                    sb.append("occinspection.thirdpartyinspector_personid IS NOT NULL ");
+            // *******************************
+            // **    THIRD PARTY            **
+            // *******************************
+            if (params.isThirdPartyInspector_ctl()) {
+                params.appendSQL("AND occinspection.thirdpartyinspector_personid ");
+                if (params.isThirdPartyInspector_registered_val()) {
+                    params.appendSQL("IS NOT NULL ");
                 } else {
-                    sb.append("occinspection.thirdpartyinspector_personid IS NULL ");
+                    params.appendSQL("IS NULL ");
                 }
 
-                sb.append("AND ");
-
-                if (params.isThirdPartyInspector_switch_thirdPartyApproval()) {
-                    sb.append("occinspection.thirdpartyinspectorapprovalby IS NOT NULL ");
+                params.appendSQL("AND occinspection.thirdpartyinspector_personid ");
+                if (params.isThirdPartyInspector_approved_val()) {
+                    params.appendSQL("IS NOT NULL ");
                 } else {
-                    sb.append("occinspection.thirdpartyinspectorapprovalby IS NULL ");
-                }
-            }
-
-            if (params.isPaccEnabled_filterBy()) {
-                sb.append("AND ");
-                if (params.isPaccEnabled_switch_paccIsEnabled()) {
-                    sb.append("occinspection.enablepacc=TRUE");
-                } else {
-                    sb.append("occinspection.enablepacc=FALSE");
+                    params.appendSQL("IS NULL ");
                 }
             }
 
-            if (params.isChecklistImplemented_filterBy()) {
-                sb.append("AND ");
-                sb.append("occchecklist_checklistlistid=?");
-            }
-
-            if (params.isActive_filterBy()) {
-                sb.append("AND ");
-                if (params.isActive()) {
-                    sb.append("active=TRUE ");
+           // *******************************
+            // **          7:PACC          **
+            // *******************************
+             if (params.isPacc_ctl()) {
+                if(params.isPacc_val()){
+                    params.appendSQL("AND paccenabled = TRUE ");
                 } else {
-                    sb.append("active=FALSE ");
+                    params.appendSQL("AND paccenabled = TRUE ");
                 }
             }
+             
+            // *******************************
+            // **       8:PERSON            **
+            // *******************************
+             if (params.isPerson_ctl()) {
+                if(params.getPerson_val()!= null){
+                    params.appendSQL("AND occperiodperson.person_personid=? ");
+                } else {
+                    params.setPropertyUnit_ctl(false);
+                    params.logMessage("PERSON: no Person object found; person filter disabled");
+                }
+            }
+
 
         } else {
-            sb.append("AND ");
-            sb.append("periodid=? "); // will be param 1 with ID search
+            sb.append("AND periodid=? "); // will be param 1 with ID search
         }
+        
+        params.appendSQL(";");
 
         int paramCounter = 0;
 
         try {
             stmt = con.prepareStatement(sb.toString());
 
-            if (!params.isObjectID_filterBy()) {
-                if (params.isFilterByMuni()) {
-                    stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+            if (!params.isBobID_ctl()) {
+                if (params.isMuni_ctl()) {
+                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
+                }
+                
+                if(params.isDate_startEnd_ctl()){
+                    stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
+                    stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
+                 }
+                
+                if (params.isUser_ctl()) {
+                   stmt.setInt(++paramCounter, params.getUser_val().getUserID());
+                }
+                
+                if (params.isProperty_ctl()) {
+                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
                 }
 
-                if (params.isProperty_filterBy()) {
-                    stmt.setInt(++paramCounter, params.getProperty_propertyid());
+                if (params.isPropertyUnit_ctl()) {
+                    stmt.setInt(++paramCounter, params.getPropertyUnit_val().getUnitID());
                 }
 
-                if (params.isPropertyUnit_filterBy()) {
-                    stmt.setInt(++paramCounter, params.getPropertyUnit_unitID());
+                if (params.isPeriodType_ctl()) {
+                    stmt.setInt(++paramCounter, params.getPeriodType_val().getTypeID());
                 }
 
-                if (params.isFilterByStartEndDate()) {
-                    stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(params.getStartDate()));
-                    stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(params.getEndDate()));
-                }
-
-                if (params.isOccPeriodType_filterBy()) {
-                    stmt.setInt(++paramCounter, params.getOccPeriodType_type().getTypeID());
-                }
-
-                if (params.isUserField_filter()) {
-                    stmt.setInt(++paramCounter, params.getUserFieldUser().getUserID());
-                }
-
-                if (params.isChecklistImplemented_filterBy()) {
-                    stmt.setInt(++paramCounter, params.getChecklistImplemented_checklistID());
+                // filter OCC-8
+                if (params.isPerson_ctl()) {
+                    stmt.setInt(++paramCounter, params.getPerson_val().getPersonID());
                 }
 
             } else {
-                stmt.setInt(++paramCounter, params.getObjectID());
+                stmt.setInt(++paramCounter, params.getBobID_val());
             }
 
             rs = stmt.executeQuery();
 
             int counter = 0;
             int maxResults;
-            if (params.isLimitResultCountTo100()) {
-                maxResults = 100;
+            if (params.isLimitResultCount_ctl()) {
+                maxResults = params.getLimitResultCount_val();
             } else {
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                periodList.add(getOccPeriod(rs.getInt("periodid")));
+                periodList.add(rs.getInt("periodid"));
                 counter++;
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot search for occupancy periods, sorry!", ex);
+            
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -311,76 +315,11 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     }
 
-    private String getDBDateField(SearchParamsOccPeriodDateFields enumVal) {
-
-        switch (enumVal) {
-            case CREATED_TS:
-                return "occperiod.createdts";
-
-            case TYPE_CERTIFIED_TS:
-                return "occperiod.typecertifiedby_userid";
-
-            case PERIOD_START_DATE:
-                return "occperiod.startdate";
-
-            case PERIOD_END_DATE:
-                return "occperiod.enddate";
-
-            case START_DATE_CERTIFIED_TS:
-                return "occperiod.startdatecertifiedts";
-
-            case END_DATE_CERTIFIED_TS:
-                return "occperiod.enddatecertifiedts";
-
-            case AUTHORIZATION_TS:
-                return "occperiod.authorizationts";
-
-            case INSPECTION_EFFECTIVEDATE:
-                return "occinspection.effectivedate";
-
-            case PASSEDINSPECTION_TS:
-                return "occinspection.passedinspectionts";
-
-            case THIRDPARTY_INSPECTOR_APPROVAL_TS:
-                return "occinspection.thirdpartyinspectorapprovalts";
-
-            case PERMIT_ISSUANCE_DATE:
-                return "occpermit.dateissued";
-
-            default:
-                return "occperiod.startdate";
-        }
-    }
-
-    private String getDBUserField(SearchParamsOccPeriod params) {
-        switch (params.getUserField_enumValue()) {
-            case AUTHORIZIING_USER:
-                return "occperiod.authorizedby_userid";
-            case CREATED_USER:
-                return "occperiod.createdby_userid";
-            case END_DATE_CERTIFYING_USER:
-                return "occperiod.enddatecertifiedby_userid";
-            case INSPECTOR_USER:
-                return "occinspection.inspector_userid";
-            case MANAGER_USER:
-                return "occperiod.manager_userid";
-            case PASSEDINSPETION_AUTH_USER:
-                return "occinspection.passedinspection_userid";
-            case PERMIT_ISSUEDBY_USER:
-                return "issuedby_userid";
-            case START_DATE_CERTIFYING_USER:
-                return "startdatecertifiedby_userid";
-            case TYPE_CERTIFYING_USER:
-                return "typecertifiedby_userid";
-            default:
-                return "occinspection.inspector_userid";
-        }
-    }
 
     public OccPeriod getOccPeriod(int periodid) throws IntegrationException, 
                                                                 EventException, 
                                                                 AuthorizationException, 
-                                                                CaseLifecycleException, 
+                                                                BObStatusException, 
                                                                 ViolationException {
         OccPeriod op = null;
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -469,42 +408,38 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return op;
     }
     
-    public OccPeriodDataHeavy generateOccPeriodDataHeavy(OccPeriod opLight) throws IntegrationException{
-        OccPeriodDataHeavy op = new OccPeriodDataHeavy(opLight);
-        
-        OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
-        PersonIntegrator pi = getPersonIntegrator();
-        EventIntegrator ei = getEventIntegrator();
-        ChoiceIntegrator choiceInt = getChoiceIntegrator();
-        PaymentIntegrator pai = getPaymentIntegrator();
-        
-        // now get all the lists from their respective integrators
-        // this is the Java version of table joins in SQL; we're doing them interatively
-        // in our integrators for each BOB
-        op.setApplicationList(getOccPermitApplicationList(op));
-        op.setPersonList(pi.getPersonList(op));
+ public List<Integer> getOccPeriodHistoryList(int userID) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Integer> al = new ArrayList<>();
 
-        op.setEventList(ei.getEventList(op));
-        op.setProposalList(choiceInt.getProposalList(op));
-        op.setInspectionList(inspecInt.getOccInspectionList(op));
-//        op.setPaymentList(pai.getPaymentList(op));
-//        op.setFeeList(pai.getFeeAssigned(op));
+        try {
+            String s = "SELECT occperiod_periodid, entrytimestamp FROM loginobjecthistory "
+                    + "WHERE login_userid = ? "
+                    + "AND occperiod_periodid IS NOT NULL "
+                    + "ORDER BY entrytimestamp DESC;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, userID);
 
-        // TODO: Figure out this inheritance SNAFU
-        
-//        op.setEventRuleList(ei.rules_getEventRuleOccPeriodList(op));
-        
-        // call getPayments(op) here when ready
-        
-        op.setPermitList(getOccPermitList(op));
-        op.setBlobIDList(getBlobList(op));
-        
-        
-        return op;
-        
-    }
-    
-   
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                al.add(rs.getInt("occperiod_periodid"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        System.out.println("OccIntegrator Retrieved period of size: " + al.size());
+        return al;
+
+    }   
 
     public OccPermit getOccPermit(int permitID) throws IntegrationException {
         OccPermit op = null;
@@ -1226,7 +1161,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             occpermitapp.setSubmissionDate(rs.getTimestamp("submissiontimestamp").toLocalDateTime());
             occpermitapp.setSubmissionNotes(rs.getString("submitternotes"));
             occpermitapp.setInternalNotes(rs.getString("internalNotes"));
-            occpermitapp.setApplicationPropertyUnit(propint.getPropertyUnitByPropertyUnitID(rs.getInt("propertyunitid")));
+            occpermitapp.setApplicationPropertyUnit(propint.getPropertyUnit(rs.getInt("propertyunitid")));
 
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyInspectionIntegrator.generateOccPermitApplication | "

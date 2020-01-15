@@ -5,12 +5,8 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.BOb;
-import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.Credential;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,19 +23,38 @@ public class QueryCECase
     private List<CECase> results;
     
     public QueryCECase( QueryCECaseEnum qName, 
-                        Municipality muni, 
                         List<SearchParamsCECase> params,
-                        UserAuthorized u) {
-        super(muni, u);
+                        Credential c) {
+        super(c);
         queryName = qName;
         searchParamsList = new ArrayList<>();
-        searchParamsList.addAll(params);
+        if(params != null){
+            searchParamsList.addAll(params);
+        }
         results = new ArrayList<>();
     }
     
     public void addToResults(List<CECase> list){
         results.addAll(list);
     }
+    
+    
+    @Override
+    public int addParams(SearchParams params) {
+        if(params != null && params instanceof SearchParamsCECase){
+            searchParamsList.add((SearchParamsCECase) params);
+        }
+        return searchParamsList.size();
+    }
+    
+      @Override
+    public SearchParamsCECase getPrimaryParams() {
+        if(searchParamsList != null && !searchParamsList.isEmpty()){
+            return searchParamsList.get(0);
+        }
+        return null;
+    }
+    
 
     @Override
     public List getBOBResultList() {
@@ -47,7 +62,7 @@ public class QueryCECase
     }
 
     @Override
-    public void setBOBResultList(List l) {
+    public void addBObListToResults(List l) {
         results = l;
     }
 
@@ -144,7 +159,12 @@ public class QueryCECase
     public QueryCECaseEnum getQueryName() {
         return queryName;
     }
-    
+
+    @Override
+    public int getParamsListSize() {
+        return searchParamsList.size();
+    }
+
     
     
     

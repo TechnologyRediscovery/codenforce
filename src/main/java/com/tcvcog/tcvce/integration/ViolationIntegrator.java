@@ -21,9 +21,10 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
-import com.tcvcog.tcvce.entities.CECaseEvent;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -110,12 +111,12 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
     
     /**
      * Writes a new Notice of Violation to the DB
-     * @param c associated CECase
+     * @param c associated CECaseDataHeavy
      * @param notice the Notice to write
      * @return the id assigned the new notice by the database
      * @throws IntegrationException 
      */
-    public int novInsert(CECase c, NoticeOfViolation notice) throws IntegrationException {
+    public int novInsert(CECaseDataHeavy c, NoticeOfViolation notice) throws IntegrationException {
 
         String query =  "INSERT INTO public.noticeofviolation(\n" +
                         "            noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
@@ -381,7 +382,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     
-    public void novUpdate(NoticeOfViolation notice) throws IntegrationException {
+    public void novUpdateNotice(NoticeOfViolation notice) throws IntegrationException {
         String query = "UPDATE public.noticeofviolation\n"
                 + "   SET lettertextbeforeviolations=?, \n" +
                 "       dateofrecord=?, personid_recipient=?, \n" +
@@ -822,7 +823,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
     }
     
 
-    public List<CodeViolation> getCodeViolations(CECase c) throws IntegrationException {
+    public List<CodeViolation> getCodeViolations(CECaseDataHeavy c) throws IntegrationException {
         return getCodeViolations(c.getCaseID());
     }
     

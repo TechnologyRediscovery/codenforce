@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
@@ -19,8 +20,10 @@ import java.util.Objects;
  * Query subclass for retrieving Code Enforcement Action Requests
  * @author Loretta
  */
-public class QueryOccPeriod 
+public class    QueryOccPeriod 
         extends Query{
+
+  
 
     /**
      * Holds this Query's identity Enum which includes the Query's
@@ -31,15 +34,39 @@ public class QueryOccPeriod
     private List<OccPeriod> results;
 
     public QueryOccPeriod(QueryOccPeriodEnum name,
-                        Municipality m, 
                         List<SearchParamsOccPeriod> params,
-                        UserAuthorized u){
-        super(m, u);
+                        Credential c){
+        super(c);
         queryName = name;
         searchParamsList = new ArrayList<>();
-        searchParamsList.addAll(params);
+        if(params != null){
+            searchParamsList.addAll(params);
+        }
         results = new ArrayList<>();
     }
+    
+    
+    @Override
+    public int addParams(SearchParams params) {
+         if(params instanceof SearchParamsOccPeriod){
+            searchParamsList.add((SearchParamsOccPeriod) params);
+        }
+        return searchParamsList.size();
+    }
+    
+    @Override
+    public SearchParamsOccPeriod getPrimaryParams() {
+        if(searchParamsList != null && !searchParamsList.isEmpty()){
+            return searchParamsList.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public int getParamsListSize() {
+        return searchParamsList.size();
+    }
+
 
     @Override
     public String getQueryTitle(){
@@ -75,7 +102,7 @@ public class QueryOccPeriod
     }
 
     @Override
-    public void setBOBResultList(List l) {
+    public void addBObListToResults(List l) {
         results = l;
     }
 
@@ -146,6 +173,6 @@ public class QueryOccPeriod
     public void setQueryName(QueryOccPeriodEnum queryName) {
         this.queryName = queryName;
     }
-    
+
     
 }

@@ -29,7 +29,7 @@ import javax.faces.application.FacesMessage;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CodeSourceBB extends BackingBeanUtils implements Serializable {
 

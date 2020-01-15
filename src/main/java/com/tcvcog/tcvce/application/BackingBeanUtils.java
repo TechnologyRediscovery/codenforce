@@ -87,7 +87,8 @@ import javax.sql.DataSource;
  * @author Xander Darsow
  */
 
-public class BackingBeanUtils implements Serializable{
+public class        BackingBeanUtils 
+        implements  Serializable{
     
 //    @ManagedProperty(value="sessionBean")
     private SessionBean sessionBean;

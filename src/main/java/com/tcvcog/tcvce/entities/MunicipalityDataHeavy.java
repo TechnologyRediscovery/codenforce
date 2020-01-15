@@ -42,8 +42,11 @@ public  class       MunicipalityDataHeavy
     private CodeSet codeSet;
     private CodeSource issuingCodeSource;
     private int defaultNOVStyleID;
+    
+    private PropertyDataHeavy muniPropertyDH;
 
     private MuniProfile profile;
+    
     private boolean enableCodeEnforcement;
     private boolean enableOccupancy;
     private boolean enablePublicCEActionRequestSubmissions;
@@ -62,6 +65,8 @@ public  class       MunicipalityDataHeavy
     private List<User> userList;
     private List<CourtEntity> courtEntities;
     private List<Integer> photoDocList;
+    
+    private int defaultOccPeriodID;
     
     private String credentialSignature;
     
@@ -619,6 +624,34 @@ public  class       MunicipalityDataHeavy
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the muniPropertyDH
+     */
+    public PropertyDataHeavy getMuniPropertyDH() {
+        return muniPropertyDH;
+    }
+
+    /**
+     * @param muniPropertyDH the muniPropertyDH to set
+     */
+    public void setMuniPropertyDH(PropertyDataHeavy muniPropertyDH) {
+        this.muniPropertyDH = muniPropertyDH;
+    }
+
+    /**
+     * @return the defaultOccPeriodID
+     */
+    public int getDefaultOccPeriodID() {
+        return defaultOccPeriodID;
+    }
+
+    /**
+     * @param defaultOccPeriodID the defaultOccPeriodID to set
+     */
+    public void setDefaultOccPeriodID(int defaultOccPeriodID) {
+        this.defaultOccPeriodID = defaultOccPeriodID;
     }
 
 

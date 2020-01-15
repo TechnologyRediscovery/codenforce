@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
@@ -18,7 +19,8 @@ import java.util.List;
  */
 
 public class    Property 
-        extends PropertyPublic{
+        extends PropertyPublic 
+        implements IFace_Loggable{
     
     protected List<PropertyUnit> unitList;
     
@@ -26,6 +28,7 @@ public class    Property
     
     protected String notes;
   
+    private LocalDateTime creationTS;
     protected LocalDateTime lastUpdatedTS;
     protected User lastUpdatedBy;
     protected OccLocationDescriptor  locationDescriptor;
@@ -42,9 +45,9 @@ public class    Property
     
     protected LocalDateTime vacantDateStop;
     protected User vacantBy;
-    protected int conditionIntensityClassID;
+    protected IntensityClass condition;
     
-    protected int landBankProspectIntensityClassID;
+    protected IntensityClass landBankProspect;
     protected boolean LandBankHeld;
     protected boolean active;
     protected boolean nonAddressable;
@@ -62,14 +65,6 @@ public class    Property
      */
     public void setAddress(String address) {
         this.address = address;
-    }
-
-
-    /**
-     * @param useTypeString the useTypeString to set
-     */
-    public void setUseTypeString(String useTypeString) {
-        this.useTypeString = useTypeString;
     }
 
 
@@ -222,17 +217,25 @@ public class    Property
     }
 
     /**
-     * @return the conditionIntensityClassID
+     * @return the condition
      */
-    public int getConditionIntensityClassID() {
-        return conditionIntensityClassID;
+    public IntensityClass getCondition() {
+        return condition;
+    }
+    
+    /**
+     * sets the condition
+     * @param ic 
+     */
+    public void setCondition(IntensityClass ic){
+        condition = ic;
     }
 
     /**
-     * @return the landBankProspectIntensityClassID
+     * @return the landBankProspect
      */
-    public int getLandBankProspectIntensityClassID() {
-        return landBankProspectIntensityClassID;
+    public IntensityClass getLandBankProspect() {
+        return landBankProspect;
     }
 
     /**
@@ -336,17 +339,10 @@ public class    Property
     }
 
     /**
-     * @param conditionIntensityClassID the conditionIntensityClassID to set
+     * @param landBankProspectIntensityClassID the landBankProspect to set
      */
-    public void setConditionIntensityClassID(int conditionIntensityClassID) {
-        this.conditionIntensityClassID = conditionIntensityClassID;
-    }
-
-    /**
-     * @param landBankProspectIntensityClassID the landBankProspectIntensityClassID to set
-     */
-    public void setLandBankProspectIntensityClassID(int landBankProspectIntensityClassID) {
-        this.landBankProspectIntensityClassID = landBankProspectIntensityClassID;
+    public void setLandBankProspect(IntensityClass ic) {
+        this.landBankProspect = ic;
     }
 
     /**
@@ -406,12 +402,6 @@ public class    Property
     }
 
 
-    /**
-     * @param useTypeID the useTypeID to set
-     */
-    public void setUseTypeID(int useTypeID) {
-        this.useTypeID = useTypeID;
-    }
 
     /**
      * @return the unitList
@@ -425,6 +415,20 @@ public class    Property
      */
     public void setUnitList(List<PropertyUnit> unitList) {
         this.unitList = unitList;
+    }
+
+    /**
+     * @return the creationTS
+     */
+    public LocalDateTime getCreationTS() {
+        return creationTS;
+    }
+
+    /**
+     * @param creationTS the creationTS to set
+     */
+    public void setCreationTS(LocalDateTime creationTS) {
+        this.creationTS = creationTS;
     }
 
   

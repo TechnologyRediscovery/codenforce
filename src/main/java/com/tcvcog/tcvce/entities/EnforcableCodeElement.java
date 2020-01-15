@@ -21,7 +21,7 @@ import java.io.Serializable;
 
 /**
  *  Represents a codesetelement stated with fidelity to the ERD
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class EnforcableCodeElement extends CodeElement implements Serializable{
     

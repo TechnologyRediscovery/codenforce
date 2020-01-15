@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.CodeViolation;
@@ -38,7 +39,7 @@ import javax.faces.application.FacesMessage;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CitationIntegrator extends BackingBeanUtils implements Serializable{
     
@@ -208,7 +209,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<Citation> citationList = new ArrayList();
+        List<Citation> citationList = new ArrayList();
         
         try {
             stmt = con.prepareStatement(query);

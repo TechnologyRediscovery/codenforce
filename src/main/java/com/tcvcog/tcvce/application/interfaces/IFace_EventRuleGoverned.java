@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.application.interfaces;
 
-import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
@@ -28,8 +28,8 @@ import java.util.List;
  * @author sylvia
  */
 public interface IFace_EventRuleGoverned {
-    public void setEventList(List<Event> lst);
-    public List<Event> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle);
+    public void setEventList(List<EventCnF> lst);
+    public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle);
     
     public void setEventRuleList(List<EventRuleImplementation> lst);
     public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere);

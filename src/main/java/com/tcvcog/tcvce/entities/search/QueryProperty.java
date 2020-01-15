@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
@@ -30,13 +31,14 @@ public class QueryProperty
     private List<Property> results;
 
     public QueryProperty(QueryPropertyEnum name,
-                        Municipality m, 
                         List<SearchParamsProperty> params,
-                        UserAuthorized u){
-        super(m, u);
+                        Credential c){
+        super(c);
         query = name;
         searchParamsList = new ArrayList<>();
-        searchParamsList.addAll(params);
+        if(params != null){
+            searchParamsList.addAll(params);
+        }
         results = new ArrayList<>();
     }
 
@@ -45,14 +47,31 @@ public class QueryProperty
         return query.getTitle();
     }
     
+    @Override
+    public SearchParamsProperty getPrimaryParams() {
+        if(searchParamsList != null && !searchParamsList.isEmpty()){
+            return searchParamsList.get(0);
+        }
+        return null;
+    }
 
-   public void addSearchParams(SearchParamsProperty sp){
-       searchParamsList.add(sp);
-       
-   }
     
     public void addToResults(List<Property> l){
         results.addAll(l);
+    }
+    
+    
+    @Override
+    public int addParams(SearchParams params) {
+      if(params instanceof SearchParamsProperty){
+            searchParamsList.add((SearchParamsProperty) params);
+        }
+        return searchParamsList.size();
+    }
+
+    @Override
+    public int getParamsListSize() {
+        return searchParamsList.size();
     }
     
     
@@ -74,7 +93,7 @@ public class QueryProperty
     }
 
     @Override
-    public void setBOBResultList(List l) {
+    public void addBObListToResults(List l) {
         results = l;
     }
 
@@ -127,6 +146,6 @@ public class QueryProperty
         }
         return true;
     }
-    
+
     
 }

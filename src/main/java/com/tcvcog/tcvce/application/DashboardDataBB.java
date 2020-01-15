@@ -72,10 +72,18 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
         return model1;
     }
      
+    /**
+     * First gen testing methods for charts
+     * @deprecated 
+     */
     private void createBarModels() {
-        createBarModel();
+//        createBarModel();
     }
      
+    /**
+     * First gen testing methods for charts
+     * @deprecated 
+     */
     private void createBarModel() {
         
          caseCountByPhase = new BarChartModel();
@@ -112,17 +120,22 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * First gen testing method for charts
+     * @deprecated 
+     * @return 
+     */
     private Map<String, Integer> getCaseCountMap(){
         Map<String, Integer> caseCountMap = null;
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         SystemCoordinator ssc = getSystemCoordinator();
         SystemIntegrator si = getSystemIntegrator();
-        try {
-             caseCountMap = si.getCaseCountsByPhase(getSessionBean().getSessionMuni().getMuniCode());
-        } catch (IntegrationException ex) {
-            Logger.getLogger(DashboardDataBB.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("DashboardDataBB.getCaseCountMap");
-        }
+//        try {
+//             caseCountMap = si.getCaseCountsByPhase(getSessionBean().getSessionMuni().getMuniCode());
+//        } catch (IntegrationException ex) {
+//            Logger.getLogger(DashboardDataBB.class.getName()).log(Level.SEVERE, null, ex);
+//            System.out.println("DashboardDataBB.getCaseCountMap");
+//        }
         return caseCountMap;
     }
 

@@ -16,14 +16,22 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- *
- * @author sylvia
+ * Represents an EventRuleAbstract that has been attached to a specific 
+ * business object, which in Dec 2019 were CECase and OccPeriod objects
+ * 
+ * The original creation of this object tree involved subtypes for OccPeriod
+ * and CECase objects, since they had Event objects subtyped to them at that time.
+ * 
+ * During the Grand Event Reunification GER, this class's subclasses were deprecated
+ * in favor of employing the same EventDomain enum flag.
+ * 
+ * @author Ellen Bascomb
  */
-public class EventRuleImplementation extends EventRuleAbstract implements Serializable{
+public  class       EventRuleImplementation 
+        extends     EventRuleAbstract {
     
     protected LocalDateTime attachedTS;
     protected User attachedBy;

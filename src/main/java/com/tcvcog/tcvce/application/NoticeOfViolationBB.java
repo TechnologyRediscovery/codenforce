@@ -20,12 +20,13 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -39,11 +40,11 @@ import javax.faces.event.ActionEvent;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class NoticeOfViolationBB extends BackingBeanUtils implements Serializable {
     
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
 
     private NoticeOfViolation currentNotice;
     private List<CodeViolation> activeVList;
@@ -74,21 +75,18 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     @PostConstruct
     public void initBean(){
-        PersonIntegrator pi = getPersonIntegrator();
         currentNotice = getSessionBean().getSessionNotice();
         currentCase = getSessionBean().getSessionCECase();
         blockListBeforeViolations = new ArrayList<>();
         blockListAfterViolations = new ArrayList<>();
-        try {
-            personCandidateList = pi.getPersonList(currentCase.getProperty());
-            if(personCandidateList != null){
-                System.out.println("NoticeOfViolationBuilderBB.initbean "
-                        + "| person candidate list size: " + personCandidateList.size());
-            }
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
+        PropertyDataHeavy pdh = getSessionBean().getSessionProperty();
+        
+        personCandidateList = pdh.getPersonList();
+        if(personCandidateList != null){
+            System.out.println("NoticeOfViolationBuilderBB.initbean "
+                    + "| person candidate list size: " + personCandidateList.size());
         }
+            
         manualRetrievedPersonList = new ArrayList<>();
         showTextBlocksAllMuni = false;
         
@@ -332,14 +330,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 

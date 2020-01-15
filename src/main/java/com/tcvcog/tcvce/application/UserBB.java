@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
@@ -47,7 +48,7 @@ import javax.faces.event.ActionEvent;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 
 public class UserBB extends BackingBeanUtils implements Serializable {
@@ -87,11 +88,11 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         SearchCoordinator sc = getSearchCoordinator();
         // user our fancy specialized query to get all Persons who are delcared to 
         // be user types
-        QueryPerson qp = sc.assembleQueryPerson(QueryPersonEnum.USER_PERSONS, currentUser, null, null );
+        QueryPerson qp = sc.initQuery(QueryPersonEnum.USER_PERSONS, currentUser.getMyCredential());
         try {
             qp = sc.runQuery(qp);
             userPersonList = qp.getResults();
-        } catch (IntegrationException | AuthorizationException ex) {
+        } catch (SearchException ex) {
             System.out.println(ex);
         }
     }
@@ -115,23 +116,23 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     }
 
     
-    public void credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
-        // TODO: finish me!
-        
-        
-    }
     
+    
+    /**
+     * We must do a full re-init of the session!
+     * @deprecated  
+     */
     public void refreshCurrentUser(){
         System.out.println("UserBB.refreshCurrentUser");
         UserCoordinator uc = getUserCoordinator();
-        try {
-            currentUser = uc.authorizeUser(currentUser, getSessionBean().getSessionMuni(), null);
-            
-        } catch (IntegrationException ex) {
-            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (AuthorizationException ex) {
-            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            currentUser = uc.authorizeUser(currentUser, getSessionBean().getSessionMuni(), null);
+//            
+//        } catch (IntegrationException ex) {
+//            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (AuthorizationException ex) {
+//            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         
         
     }

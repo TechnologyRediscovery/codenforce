@@ -70,9 +70,9 @@ public class Credential implements Serializable{
         sb.append("UMAPISVALTS:");
         sb.append(governingAuthPeriod.getValidatedTS());
         sb.append("|");
-        sb.append("UMAPLOGID:");
-        sb.append(governingAuthPeriod.getPeriodActivityLogBook().get(0));
-        sb.append("|");
+//        sb.append("UMAPLOGID:");
+//        sb.append(governingAuthPeriod.getPeriodActivityLogBook().get(0));
+//        sb.append("|");
         sb.append("POSTCON:");
         sb.append("|");
         signature = sb.toString();

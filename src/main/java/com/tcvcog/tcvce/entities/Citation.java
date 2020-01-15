@@ -25,7 +25,7 @@ import java.util.Objects;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class Citation implements Serializable {
     private int citationID;
@@ -33,9 +33,9 @@ public class Citation implements Serializable {
     private CitationStatus status;
     private CourtEntity origin_courtentity;
     
-    private List<CECaseEvent> eventList;
+    private List<EventCnF> eventList;
     
-    private CECaseBase ceCaseNoLists;
+    private CECase ceCaseNoLists;
     private User userOwner;
     
     private LocalDateTime dateOfRecord;
@@ -261,14 +261,14 @@ public class Citation implements Serializable {
     /**
      * @return the ceCaseNoLists
      */
-    public CECaseBase getCeCaseNoLists() {
+    public CECase getCeCaseNoLists() {
         return ceCaseNoLists;
     }
 
     /**
      * @param ceCaseNoLists the ceCaseNoLists to set
      */
-    public void setCeCaseNoLists(CECaseBase ceCaseNoLists) {
+    public void setCeCaseNoLists(CECase ceCaseNoLists) {
         this.ceCaseNoLists = ceCaseNoLists;
     }
 
@@ -311,14 +311,14 @@ public class Citation implements Serializable {
     /**
      * @return the eventList
      */
-    public List<CECaseEvent> getEventList() {
+    public List<EventCnF> getEventList() {
         return eventList;
     }
 
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<CECaseEvent> eventList) {
+    public void setEventList(List<EventCnF> eventList) {
         this.eventList = eventList;
     }
     

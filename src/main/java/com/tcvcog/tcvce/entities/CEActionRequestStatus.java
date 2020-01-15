@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Eric C. Darsow
+ * Copyright (C) 2017 ellen bascomb of apt 31y
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ import java.io.Serializable;
 
 /**
  * 
- * @author Eric C. Darsow
+ * @author ellen bascomb of apt 31y
  */
 public class CEActionRequestStatus extends Status implements Serializable{
     

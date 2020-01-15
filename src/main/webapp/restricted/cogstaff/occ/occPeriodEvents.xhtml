@@ -205,7 +205,7 @@
                                                                     icon="fa fa-moon-o"
                                                                     ajax="true"
                                                                     disabled="#{e.hidden}"
-                                                                    rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                     actionListener="#{occInspectionBB.hideEvent(e)}" 
                                                                     update="occperiod-events-datatable
                                                                     occperiod-messages-messages-rightcolheader"
@@ -215,7 +215,7 @@
                                                                  ajax="true"
                                                                  disabled="#{!e.hidden}"
                                                                  actionListener="#{occInspectionBB.unHideEvent(e)}" 
-                                                                 rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                  update="occperiod-events-datatable
                                                                  occperiod-messages-messages-rightcolheader"
                                                                  />

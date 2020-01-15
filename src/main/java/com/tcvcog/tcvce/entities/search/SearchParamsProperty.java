@@ -5,564 +5,444 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.CEActionRequestStatus;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.SearchParams;
+import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.IntensityClass;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PropertyUseType;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
- * @author sylvia
+ * @author marosco and ellen bascomb
  */
-public class SearchParamsProperty extends SearchParams implements Serializable {
+public  class       SearchParamsProperty 
+        extends     SearchParams {
     
-   
-    // The filter by date switch is on the superclass SearchParams
-    // if that's swich is on, the integrator will look at this Enum value
-    // to decide which field to use in the query against the db
-    private SearchParamsPropertyDateFields dateField;
+   public static final String MUNI_DBFIELD = "property.municipality_municode";
     
-   private boolean filterByNullDateField;
-   private SearchParamsPropertyDateFields nullDateField;
+   // filter PROP-1
+   private boolean zip_ctl;
+   private String zip_val;
     
-   private boolean filterByUserField;
-   private SearchParamsPropertyUserFields userField;
-   private User userFieldUser;
+   // filter #PROP-2
+   private boolean lotblock_ctl;
+   private String lotblock_val;
    
-   private boolean filterByZip;
-   private String zipCode;
+   // filter #PROP-3
+   private boolean bobSource_ctl;
+   private BOBSource bobSource_val;
+   
+   // filter #PROP-4
+   private boolean parcelid_ctl;
+   private String parcelid_val;
+   
+   // filter #PROP-5
+   private boolean address_ctl; 
+   private String address_val;
+   
+   // filter #PROP-6
+   private boolean condition_ctl;
+   private IntensityClass condition_intensityClass_val;
+   
+   // filter #PROP-7
+   private boolean landbankprospect_ctl;
+   private IntensityClass landbankprospect_intensityClass_val;
+   
+   // filter #PROP-8
+   private boolean landbankheld_ctl;
+   private boolean landbankheld_val;
+
+   // filter #PROP-9
+   private boolean nonaddressable_ctl;
+   private boolean nonaddressable_val;
+   
+   // filter #PROP-10
+   private boolean useType_ctl;
+   private PropertyUseType useType_val;
+   
+   // filter #PROP-11
+   private boolean zoneClass_ctl;
+   private String zoneClass_val;
+   
+   // filter #PROP-12
+   private boolean taxStatus_ctl;
+   private String taxStatus_val;
+   
+   // filter #PROP-13
+   private boolean propValue_ctl;
+   private int propValue_min_val;
+   private int propValue_max_val;
+   
+   // filter #PROP-14
+   private boolean constructionYear_ctl;
+   private int constructionYear_min_val;
+   private int constructionYear_max_val;
+   
+   // filter #PROP-15 person
+   private boolean person_ctl;
+   private Person person_val;
+   
+   
+   public SearchParamsPropertyDateFieldsEnum[] getDateFieldList(){
+       SearchParamsPropertyDateFieldsEnum[] fields = SearchParamsPropertyDateFieldsEnum.values();
+       return fields;
+   }
+   
+   public SearchParamsPropertyUserFieldsEnum[] getUserFieldList(){
+       SearchParamsPropertyUserFieldsEnum[] fields = SearchParamsPropertyUserFieldsEnum.values();
+       return fields;
+   }
+   
+    /**
+     * @return the lotblock_ctl
+     */
+    public boolean isLotblock_ctl() {
+        return lotblock_ctl;
+    }
+
+    /**
+     * @return the lotblock_val
+     */
+    public String getLotblock_val() {
+        return lotblock_val;
+    }
+
+    /**
+     * @return the parcelid_ctl
+     */
+    public boolean isParcelid_ctl() {
+        return parcelid_ctl;
+    }
+
+    /**
+     * @return the parcelid_val
+     */
+    public String getParcelid_val() {
+        return parcelid_val;
+    }
+
+    /**
+     * @return the address_ctl
+     */
+    public boolean isAddress_ctl() {
+        return address_ctl;
+    }
+
+    /**
+     * @return the address_val
+     */
+    public String getAddress_val() {
+        return address_val;
+    }
+
+
     
-   private boolean filterByLotAndBlock;
-   private String logAndBlock;
-   
-   private boolean filterByBOBSource;
-   private int bobSourceID;
-   
-   private boolean filterByParcelID;
-   private String parcelID;
-   
-   private boolean filterByAddressPart; 
-   private String addressPart;
-   
-   private boolean filterByCondition;
-   private int conditionIntensityClassID;
-   
-   private boolean filterByLandBankPropspect;
-   private int landBankPropsectIntensityClassID;
-   
-   private boolean filterByLandBankHeld;
-   private boolean landBankHeld;
-
-   private boolean filterByNonAddressable;
-   private boolean nonAddressable;
-   
-   private boolean filterByUseType;
-   private int useTypeID;
-   
-   private boolean filterByZoneClass;
-   private String zoneClass;
-   
-   private boolean filterByAssessedValue;
-   private int assessedValueMin;
-   private int assessedValueMax;
-   
-   private boolean filterByYearBuilt;
-   private int yearBuiltMin;
-   private int yearBuiltMax;
-   
-   private HashMap allParams;
-   
-   private List<Enum> dateSearchOptions;
-   private String dateToSearchProps;
-   
-   
     /**
-     * @return the filterByLotAndBlock
+     * @param lotblock_ctl the lotblock_ctl to set
      */
-    public boolean isFilterByLotAndBlock() {
-        return filterByLotAndBlock;
+    public void setLotblock_ctl(boolean lotblock_ctl) {
+        this.lotblock_ctl = lotblock_ctl;
     }
 
     /**
-     * @return the logAndBlock
+     * @param lotblock_val the lotblock_val to set
      */
-    public String getLogAndBlock() {
-        return logAndBlock;
+    public void setLotblock_val(String lotblock_val) {
+        this.lotblock_val = lotblock_val;
     }
 
     /**
-     * @return the filterByParcelID
+     * @param parcelid_ctl the parcelid_ctl to set
      */
-    public boolean isFilterByParcelID() {
-        return filterByParcelID;
+    public void setParcelid_ctl(boolean parcelid_ctl) {
+        this.parcelid_ctl = parcelid_ctl;
     }
 
     /**
-     * @return the parcelID
+     * @param parcelid_val the parcelid_val to set
      */
-    public String getParcelID() {
-        return parcelID;
+    public void setParcelid_val(String parcelid_val) {
+        this.parcelid_val = parcelid_val;
     }
 
     /**
-     * @return the filterByAddressPart
+     * @param address_ctl the address_ctl to set
      */
-    public boolean isFilterByAddressPart() {
-        return filterByAddressPart;
+    public void setAddress_ctl(boolean address_ctl) {
+        this.address_ctl = address_ctl;
     }
 
     /**
-     * @return the addressPart
+     * @param address_val the address_val to set
      */
-    public String getAddressPart() {
-        return addressPart;
+    public void setAddress_val(String address_val) {
+        this.address_val = address_val;
     }
 
 
-    
     /**
-     * @param filterByLotAndBlock the filterByLotAndBlock to set
+     * @return the zip_ctl
      */
-    public void setFilterByLotAndBlock(boolean filterByLotAndBlock) {
-        this.filterByLotAndBlock = filterByLotAndBlock;
+    public boolean isZip_ctl() {
+        return zip_ctl;
     }
 
     /**
-     * @param logAndBlock the logAndBlock to set
+     * @return the zip_val
      */
-    public void setLogAndBlock(String logAndBlock) {
-        this.logAndBlock = logAndBlock;
+    public String getZip_val() {
+        return zip_val;
     }
 
     /**
-     * @param filterByParcelID the filterByParcelID to set
+     * @return the bobSource_ctl
      */
-    public void setFilterByParcelID(boolean filterByParcelID) {
-        this.filterByParcelID = filterByParcelID;
-    }
-
-    /**
-     * @param parcelID the parcelID to set
-     */
-    public void setParcelID(String parcelID) {
-        this.parcelID = parcelID;
-    }
-
-    /**
-     * @param filterByAddressPart the filterByAddressPart to set
-     */
-    public void setFilterByAddressPart(boolean filterByAddressPart) {
-        this.filterByAddressPart = filterByAddressPart;
-    }
-
-    /**
-     * @param addressPart the addressPart to set
-     */
-    public void setAddressPart(String addressPart) {
-        this.addressPart = addressPart;
+    public boolean isBobSource_ctl() {
+        return bobSource_ctl;
     }
 
 
- 
+    /**
+     * @return the condition_ctl
+     */
+    public boolean isCondition_ctl() {
+        return condition_ctl;
+    }
+
 
     /**
-     * @return the dateField
+     * @return the landbankprospect_ctl
      */
-    public SearchParamsPropertyDateFields getDateField() {
-        return dateField;
+    public boolean isLandbankprospect_ctl() {
+        return landbankprospect_ctl;
+    }
+
+
+    /**
+     * @return the landbankheld_ctl
+     */
+    public boolean isLandbankheld_ctl() {
+        return landbankheld_ctl;
     }
 
     /**
-     * @return the filterByNullDateField
+     * @return the landbankheld_val
      */
-    public boolean isFilterByNullDateField() {
-        return filterByNullDateField;
+    public boolean isLandbankheld_val() {
+        return landbankheld_val;
     }
 
     /**
-     * @return the nullDateField
+     * @return the nonaddressable_ctl
      */
-    public SearchParamsPropertyDateFields getNullDateField() {
-        return nullDateField;
+    public boolean isNonaddressable_ctl() {
+        return nonaddressable_ctl;
     }
 
     /**
-     * @return the filterByUserField
+     * @return the nonaddressable_val
      */
-    public boolean isFilterByUserField() {
-        return filterByUserField;
-    }
-
-    /**
-     * @return the userField
-     */
-    public SearchParamsPropertyUserFields getUserField() {
-        return userField;
-    }
-
-    /**
-     * @return the filterByZip
-     */
-    public boolean isFilterByZip() {
-        return filterByZip;
-    }
-
-    /**
-     * @return the zipCode
-     */
-    public String getZipCode() {
-        return zipCode;
-    }
-
-    /**
-     * @return the filterByBOBSource
-     */
-    public boolean isFilterByBOBSource() {
-        return filterByBOBSource;
-    }
-
-    /**
-     * @return the bobSourceID
-     */
-    public int getBobSourceID() {
-        return bobSourceID;
-    }
-
-    /**
-     * @return the filterByCondition
-     */
-    public boolean isFilterByCondition() {
-        return filterByCondition;
-    }
-
-    /**
-     * @return the conditionIntensityClassID
-     */
-    public int getConditionIntensityClassID() {
-        return conditionIntensityClassID;
-    }
-
-    /**
-     * @return the filterByLandBankPropspect
-     */
-    public boolean isFilterByLandBankPropspect() {
-        return filterByLandBankPropspect;
-    }
-
-    /**
-     * @return the landBankPropsectIntensityClassID
-     */
-    public int getLandBankPropsectIntensityClassID() {
-        return landBankPropsectIntensityClassID;
-    }
-
-    /**
-     * @return the filterByLandBankHeld
-     */
-    public boolean isFilterByLandBankHeld() {
-        return filterByLandBankHeld;
-    }
-
-    /**
-     * @return the landBankHeld
-     */
-    public boolean isLandBankHeld() {
-        return landBankHeld;
-    }
-
-    /**
-     * @return the filterByNonAddressable
-     */
-    public boolean isFilterByNonAddressable() {
-        return filterByNonAddressable;
-    }
-
-    /**
-     * @return the nonAddressable
-     */
-    public boolean isNonAddressable() {
-        return nonAddressable;
+    public boolean isNonaddressable_val() {
+        return nonaddressable_val;
     }
 
     
     /**
-     * @return the filterByUseType
+     * @return the useType_ctl
      */
-    public boolean isFilterByUseType() {
-        return filterByUseType;
+    public boolean isUseType_ctl() {
+        return useType_ctl;
+    }
+
+
+    /**
+     * @return the zoneClass_ctl
+     */
+    public boolean isZoneClass_ctl() {
+        return zoneClass_ctl;
     }
 
     /**
-     * @return the useTypeID
+     * @return the zoneClass_val
      */
-    public int getUseTypeID() {
-        return useTypeID;
+    public String getZoneClass_val() {
+        return zoneClass_val;
     }
 
     /**
-     * @return the filterByZoneClass
+     * @return the propValue_ctl
      */
-    public boolean isFilterByZoneClass() {
-        return filterByZoneClass;
+    public boolean isPropValue_ctl() {
+        return propValue_ctl;
     }
 
     /**
-     * @return the zoneClass
+     * @return the propValue_min_val
      */
-    public String getZoneClass() {
-        return zoneClass;
+    public int getPropValue_min_val() {
+        return propValue_min_val;
     }
 
     /**
-     * @return the filterByAssessedValue
+     * @return the constructionYear_ctl
      */
-    public boolean isFilterByAssessedValue() {
-        return filterByAssessedValue;
+    public boolean isConstructionYear_ctl() {
+        return constructionYear_ctl;
     }
 
     /**
-     * @return the assessedValueMin
+     * @return the constructionYear_min_val
      */
-    public int getAssessedValueMin() {
-        return assessedValueMin;
+    public int getConstructionYear_min_val() {
+        return constructionYear_min_val;
     }
 
     /**
-     * @return the filterByYearBuilt
+     * @param zip_ctl the zip_ctl to set
      */
-    public boolean isFilterByYearBuilt() {
-        return filterByYearBuilt;
+    public void setZip_ctl(boolean zip_ctl) {
+        this.zip_ctl = zip_ctl;
     }
 
     /**
-     * @return the yearBuiltMin
+     * @param zip_val the zip_val to set
      */
-    public int getYearBuiltMin() {
-        return yearBuiltMin;
+    public void setZip_val(String zip_val) {
+        this.zip_val = zip_val;
     }
 
     /**
-     * @param dateField the dateField to set
+     * @param bobSource_ctl the bobSource_ctl to set
      */
-    public void setDateField(SearchParamsPropertyDateFields dateField) {
-        this.dateField = dateField;
+    public void setBobSource_ctl(boolean bobSource_ctl) {
+        this.bobSource_ctl = bobSource_ctl;
+    }
+
+
+    /**
+     * @param condition_ctl the condition_ctl to set
+     */
+    public void setCondition_ctl(boolean condition_ctl) {
+        this.condition_ctl = condition_ctl;
+    }
+
+
+    /**
+     * @param landbankprospect_ctl the landbankprospect_ctl to set
+     */
+    public void setLandbankprospect_ctl(boolean landbankprospect_ctl) {
+        this.landbankprospect_ctl = landbankprospect_ctl;
+    }
+
+
+    /**
+     * @param landbankheld_ctl the landbankheld_ctl to set
+     */
+    public void setLandbankheld_ctl(boolean landbankheld_ctl) {
+        this.landbankheld_ctl = landbankheld_ctl;
     }
 
     /**
-     * @param filterByNullDateField the filterByNullDateField to set
+     * @param landbankheld_val the landbankheld_val to set
      */
-    public void setFilterByNullDateField(boolean filterByNullDateField) {
-        this.filterByNullDateField = filterByNullDateField;
+    public void setLandbankheld_val(boolean landbankheld_val) {
+        this.landbankheld_val = landbankheld_val;
     }
 
     /**
-     * @param nullDateField the nullDateField to set
+     * @param nonaddressable_ctl the nonaddressable_ctl to set
      */
-    public void setNullDateField(SearchParamsPropertyDateFields nullDateField) {
-        this.nullDateField = nullDateField;
+    public void setNonaddressable_ctl(boolean nonaddressable_ctl) {
+        this.nonaddressable_ctl = nonaddressable_ctl;
     }
 
     /**
-     * @param filterByUserField the filterByUserField to set
+     * @param nonaddressable_val the nonaddressable_val to set
      */
-    public void setFilterByUserField(boolean filterByUserField) {
-        this.filterByUserField = filterByUserField;
-    }
-
-    /**
-     * @param userField the userField to set
-     */
-    public void setUserField(SearchParamsPropertyUserFields userField) {
-        this.userField = userField;
-    }
-
-    /**
-     * @param filterByZip the filterByZip to set
-     */
-    public void setFilterByZip(boolean filterByZip) {
-        this.filterByZip = filterByZip;
-    }
-
-    /**
-     * @param zipCode the zipCode to set
-     */
-    public void setZipCode(String zipCode) {
-        this.zipCode = zipCode;
-    }
-
-    /**
-     * @param filterByBOBSource the filterByBOBSource to set
-     */
-    public void setFilterByBOBSource(boolean filterByBOBSource) {
-        this.filterByBOBSource = filterByBOBSource;
-    }
-
-    /**
-     * @param bobSourceID the bobSourceID to set
-     */
-    public void setBobSourceID(int bobSourceID) {
-        this.bobSourceID = bobSourceID;
-    }
-
-    /**
-     * @param filterByCondition the filterByCondition to set
-     */
-    public void setFilterByCondition(boolean filterByCondition) {
-        this.filterByCondition = filterByCondition;
-    }
-
-    /**
-     * @param conditionIntensityClassID the conditionIntensityClassID to set
-     */
-    public void setConditionIntensityClassID(int conditionIntensityClassID) {
-        this.conditionIntensityClassID = conditionIntensityClassID;
-    }
-
-    /**
-     * @param filterByLandBankPropspect the filterByLandBankPropspect to set
-     */
-    public void setFilterByLandBankPropspect(boolean filterByLandBankPropspect) {
-        this.filterByLandBankPropspect = filterByLandBankPropspect;
-    }
-
-    /**
-     * @param landBankPropsectIntensityClassID the landBankPropsectIntensityClassID to set
-     */
-    public void setLandBankPropsectIntensityClassID(int landBankPropsectIntensityClassID) {
-        this.landBankPropsectIntensityClassID = landBankPropsectIntensityClassID;
-    }
-
-    /**
-     * @param filterByLandBankHeld the filterByLandBankHeld to set
-     */
-    public void setFilterByLandBankHeld(boolean filterByLandBankHeld) {
-        this.filterByLandBankHeld = filterByLandBankHeld;
-    }
-
-    /**
-     * @param landBankHeld the landBankHeld to set
-     */
-    public void setLandBankHeld(boolean landBankHeld) {
-        this.landBankHeld = landBankHeld;
-    }
-
-    /**
-     * @param filterByNonAddressable the filterByNonAddressable to set
-     */
-    public void setFilterByNonAddressable(boolean filterByNonAddressable) {
-        this.filterByNonAddressable = filterByNonAddressable;
-    }
-
-    /**
-     * @param nonAddressable the nonAddressable to set
-     */
-    public void setNonAddressable(boolean nonAddressable) {
-        this.nonAddressable = nonAddressable;
+    public void setNonaddressable_val(boolean nonaddressable_val) {
+        this.nonaddressable_val = nonaddressable_val;
     }
 
    
     /**
-     * @param filterByUseType the filterByUseType to set
+     * @param useType_ctl the useType_ctl to set
      */
-    public void setFilterByUseType(boolean filterByUseType) {
-        this.filterByUseType = filterByUseType;
+    public void setUseType_ctl(boolean useType_ctl) {
+        this.useType_ctl = useType_ctl;
+    }
+
+
+    /**
+     * @param zoneClass_ctl the zoneClass_ctl to set
+     */
+    public void setZoneClass_ctl(boolean zoneClass_ctl) {
+        this.zoneClass_ctl = zoneClass_ctl;
     }
 
     /**
-     * @param useTypeID the useTypeID to set
+     * @param zoneClass_val the zoneClass_val to set
      */
-    public void setUseTypeID(int useTypeID) {
-        this.useTypeID = useTypeID;
+    public void setZoneClass_val(String zoneClass_val) {
+        this.zoneClass_val = zoneClass_val;
     }
 
     /**
-     * @param filterByZoneClass the filterByZoneClass to set
+     * @param propValue_ctl the propValue_ctl to set
      */
-    public void setFilterByZoneClass(boolean filterByZoneClass) {
-        this.filterByZoneClass = filterByZoneClass;
+    public void setPropValue_ctl(boolean propValue_ctl) {
+        this.propValue_ctl = propValue_ctl;
     }
 
     /**
-     * @param zoneClass the zoneClass to set
+     * @param propValue_min_val the propValue_min_val to set
      */
-    public void setZoneClass(String zoneClass) {
-        this.zoneClass = zoneClass;
+    public void setPropValue_min_val(int propValue_min_val) {
+        this.propValue_min_val = propValue_min_val;
     }
 
     /**
-     * @param filterByAssessedValue the filterByAssessedValue to set
+     * @param constructionYear_ctl the constructionYear_ctl to set
      */
-    public void setFilterByAssessedValue(boolean filterByAssessedValue) {
-        this.filterByAssessedValue = filterByAssessedValue;
+    public void setConstructionYear_ctl(boolean constructionYear_ctl) {
+        this.constructionYear_ctl = constructionYear_ctl;
     }
 
     /**
-     * @param assessedValueMin the assessedValueMin to set
+     * @param constructionYear_min_val the constructionYear_min_val to set
      */
-    public void setAssessedValueMin(int assessedValueMin) {
-        this.assessedValueMin = assessedValueMin;
+    public void setConstructionYear_min_val(int constructionYear_min_val) {
+        this.constructionYear_min_val = constructionYear_min_val;
     }
 
     /**
-     * @param filterByYearBuilt the filterByYearBuilt to set
+     * @return the propValue_max_val
      */
-    public void setFilterByYearBuilt(boolean filterByYearBuilt) {
-        this.filterByYearBuilt = filterByYearBuilt;
+    public int getPropValue_max_val() {
+        return propValue_max_val;
     }
 
     /**
-     * @param yearBuiltMin the yearBuiltMin to set
+     * @param propValue_max_val the propValue_max_val to set
      */
-    public void setYearBuiltMin(int yearBuiltMin) {
-        this.yearBuiltMin = yearBuiltMin;
+    public void setPropValue_max_val(int propValue_max_val) {
+        this.propValue_max_val = propValue_max_val;
     }
 
     /**
-     * @return the assessedValueMax
+     * @return the constructionYear_max_val
      */
-    public int getAssessedValueMax() {
-        return assessedValueMax;
+    public int getConstructionYear_max_val() {
+        return constructionYear_max_val;
     }
 
     /**
-     * @param assessedValueMax the assessedValueMax to set
+     * @param constructionYear_max_val the constructionYear_max_val to set
      */
-    public void setAssessedValueMax(int assessedValueMax) {
-        this.assessedValueMax = assessedValueMax;
+    public void setConstructionYear_max_val(int constructionYear_max_val) {
+        this.constructionYear_max_val = constructionYear_max_val;
     }
 
-    /**
-     * @return the yearBuiltMax
-     */
-    public int getYearBuiltMax() {
-        return yearBuiltMax;
-    }
-
-    /**
-     * @param yearBuiltMax the yearBuiltMax to set
-     */
-    public void setYearBuiltMax(int yearBuiltMax) {
-        this.yearBuiltMax = yearBuiltMax;
-    }
-
-    /**
-     * @return the userFieldUser
-     */
-    public User getUserFieldUser() {
-        return userFieldUser;
-    }
-
-    /**
-     * @param userFieldUser the userFieldUser to set
-     */
-    public void setUserFieldUser(User userFieldUser) {
-        this.userFieldUser = userFieldUser;
-    }
    
     /**
      *
@@ -570,70 +450,140 @@ public class SearchParamsProperty extends SearchParams implements Serializable {
      */
     public HashMap getParams(){
         HashMap m = new HashMap();
-        m.put("Fil by Address Part:", this.isFilterByAddressPart());
-        m.put("Fil by Assessed Value:", this.isFilterByAssessedValue());
-        m.put("Fil by Bob Source:", this.isFilterByBOBSource());
-        m.put("Fil by Condition:", this.isFilterByCondition());
-        m.put("Fil by Land Bank Held:", this.isFilterByLandBankHeld());
-        m.put("Fil by Land Bank Proipect:", this.isFilterByLandBankPropspect());
-        m.put("Fil by Lot and block:", this.isFilterByLotAndBlock());
-        m.put("Fil by Muni:", this.isFilterByMuni());
-        m.put("Fil by Nonaddressable:", this.isFilterByNonAddressable());
-        m.put("Fil by Null date field:", this.isFilterByNullDateField());
-        m.put("Fil by Object ID:", this.isObjectID_filterBy());
-        m.put("Fil by Parcel ID:", this.isFilterByParcelID());
-        m.put("Fil by Start End Date:", this.isFilterByStartEndDate());
-        m.put("Fil by Use Type:", this.isFilterByUseType());
-        m.put("Fil by User Field:", this.isFilterByUserField());
-        m.put("Fil by Year Built:", this.isFilterByYearBuilt());
-        m.put("Fil by Zip:", this.isFilterByZip());
-        m.put("Fil by Zone Class:", this.isFilterByZoneClass());
+        m.put("Fil by Address Part:", this.isAddress_ctl());
+        m.put("Fil by Assessed Value:", this.isPropValue_ctl());
+        m.put("Fil by Bob Source:", this.isBobSource_ctl());
+        m.put("Fil by Condition:", this.isCondition_ctl());
+        m.put("Fil by Land Bank Held:", this.isLandbankheld_ctl());
+        m.put("Fil by Land Bank Proipect:", this.isLandbankprospect_ctl());
+        m.put("Fil by Lot and block:", this.isLotblock_ctl());
+        m.put("Fil by Muni:", this.isMuni_ctl());
+        m.put("Fil by Nonaddressable:", this.isNonaddressable_ctl());
+        m.put("Fil by Object ID:", this.isBobID_ctl());
+        m.put("Fil by Parcel ID:", this.isParcelid_ctl());
+        m.put("Fil by Start End Date:", this.isDate_startEnd_ctl());
+        m.put("Fil by Use Type:", this.isUseType_ctl());
+        m.put("Fil by User Field:", this.isUser_ctl());
+        m.put("Fil by Year Built:", this.isConstructionYear_ctl());
+        m.put("Fil by Zip:", this.isZip_ctl());
+        m.put("Fil by Zone Class:", this.isZoneClass_ctl());
     
         return m;
         
 }
-    
-    public HashMap getAllParams(){
-        return this.allParams;
-    }
-           
 
     /**
-     * @param allParams the allParams to set
+     * @return the useType_val
      */
-    public void setAllParams(HashMap allParams) {
-        this.allParams = allParams;
+    public PropertyUseType getUseType_val() {
+        return useType_val;
     }
 
     /**
-     * @return the dateSearchOptions
+     * @param useType_val the useType_val to set
      */
-    public List<Enum> getDateSearchOptions() {
-        List<Enum> dateOptList = SearchParamsPropertyDateFields.ABANDONED_START.getAllTitles();
-        dateSearchOptions = dateOptList;
-        return dateSearchOptions;
+    public void setUseType_val(PropertyUseType useType_val) {
+        this.useType_val = useType_val;
     }
 
     /**
-     * @param dateSearchOptions the dateSearchOptions to set
+     * @return the bobSource_val
      */
-    public void setDateSearchOptions(List<Enum> dateSearchOptions) {
-        this.dateSearchOptions = dateSearchOptions;
+    public BOBSource getBobSource_val() {
+        return bobSource_val;
     }
 
     /**
-     * @return the dateToSearchProps
+     * @param bobSource_val the bobSource_val to set
      */
-    public String getDateToSearchProps() {
-        return dateToSearchProps;
+    public void setBobSource_val(BOBSource bobSource_val) {
+        this.bobSource_val = bobSource_val;
     }
 
     /**
-     * @param dateToSearchProps the dateToSearchProps to set
+     * @return the taxStatus_ctl
      */
-    public void setDateToSearchProps(String dateToSearchProps) {
-        this.dateToSearchProps = dateToSearchProps;
+    public boolean isTaxStatus_ctl() {
+        return taxStatus_ctl;
     }
+
+    /**
+     * @param taxStatus_ctl the taxStatus_ctl to set
+     */
+    public void setTaxStatus_ctl(boolean taxStatus_ctl) {
+        this.taxStatus_ctl = taxStatus_ctl;
+    }
+
+    /**
+     * @return the taxStatus_val
+     */
+    public String getTaxStatus_val() {
+        return taxStatus_val;
+    }
+
+    /**
+     * @param taxStatus_val the taxStatus_val to set
+     */
+    public void setTaxStatus_val(String taxStatus_val) {
+        this.taxStatus_val = taxStatus_val;
+    }
+
+    /**
+     * @return the condition_intensityClass_val
+     */
+    public IntensityClass getCondition_intensityClass_val() {
+        return condition_intensityClass_val;
+    }
+
+    /**
+     * @param condition_intensityClass_val the condition_intensityClass_val to set
+     */
+    public void setCondition_intensityClass_val(IntensityClass condition_intensityClass_val) {
+        this.condition_intensityClass_val = condition_intensityClass_val;
+    }
+
+    /**
+     * @return the landbankprospect_intensityClass_val
+     */
+    public IntensityClass getLandbankprospect_intensityClass_val() {
+        return landbankprospect_intensityClass_val;
+    }
+
+    /**
+     * @param landbankprospect_intensityClass_val the landbankprospect_intensityClass_val to set
+     */
+    public void setLandbankprospect_intensityClass_val(IntensityClass landbankprospect_intensityClass_val) {
+        this.landbankprospect_intensityClass_val = landbankprospect_intensityClass_val;
+    }
+
+    /**
+     * @return the person_val
+     */
+    public Person getPerson_val() {
+        return person_val;
+    }
+
+    /**
+     * @param person_val the person_val to set
+     */
+    public void setPerson_val(Person person_val) {
+        this.person_val = person_val;
+    }
+
+    /**
+     * @return the person_ctl
+     */
+    public boolean isPerson_ctl() {
+        return person_ctl;
+    }
+
+    /**
+     * @param person_ctl the person_ctl to set
+     */
+    public void setPerson_ctl(boolean person_ctl) {
+        this.person_ctl = person_ctl;
+    }
+
    
     
 }

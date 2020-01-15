@@ -19,12 +19,15 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
+import com.tcvcog.tcvce.entities.IFace_Openable;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
@@ -47,12 +50,16 @@ public  class       OccPeriodDataHeavy
         extends     OccPeriod 
         implements  IFace_EventRuleGoverned, 
                     IFace_ProposalDriven,
-                    IFace_CredentialSigned{
+                    IFace_CredentialSigned,
+                    IFace_Openable {
+    
+    protected OccPeriodStatusEnum status;
 
     private List<OccPermitApplication> applicationList;
-    private List<PersonOccPeriod> personList;
+    private List<PersonOccPeriod> personListApplicants;
+    private List<Person> personList;
     
-    private List<Event> eventList;
+    private List<EventCnF> eventList;
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
     
@@ -61,14 +68,24 @@ public  class       OccPeriodDataHeavy
     
     private List<Integer> blobIDList;
     
-    private List<Payment> paymentList;
     private List<MoneyOccPeriodFeeAssigned> feeList;
+    private List<MoneyOccPeriodFeePayment> paymentList;
 
     private LocalDateTime configuredTS;
-    
     private String credentialSignature;
     
     public OccPeriodDataHeavy() {
+    }
+    
+     @Override
+    public boolean isOpen() {
+        // TEMPORARY until status flow is created
+        if(getStatus() != null){
+            return getStatus().isOpenPeriod();
+        } else {
+            return true;
+        }
+                
     }
     
     /**
@@ -84,9 +101,7 @@ public  class       OccPeriodDataHeavy
         this.periodID = opLight.periodID;
         this.propertyUnitID = opLight.propertyUnitID;
         this.type = opLight.type;
-        this.status = opLight.status;
         
-        this.readyForPeriodAuthorization = opLight.readyForPeriodAuthorization;
         this.governingInspection = opLight.governingInspection;
         this.manager = opLight.manager;
         
@@ -123,9 +138,7 @@ public  class       OccPeriodDataHeavy
         this.periodID = opLight.periodID;
         this.propertyUnitID = opLight.propertyUnitID;
         this.type = opLight.type;
-        this.status = opLight.status;
         
-        this.readyForPeriodAuthorization = opLight.readyForPeriodAuthorization;
         this.governingInspection = opLight.governingInspection;
         this.manager = opLight.manager;
         
@@ -158,7 +171,7 @@ public  class       OccPeriodDataHeavy
     }
     
       @Override
-    public void setEventList(List<Event> lst) {
+    public void setEventList(List<EventCnF> lst) {
         eventList = lst;
     }
     
@@ -176,9 +189,9 @@ public  class       OccPeriodDataHeavy
 
     @Override
     public List assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
-        List<Event> visEventList = new ArrayList<>();
+        List<EventCnF> visEventList = new ArrayList<>();
         if (eventList != null) {
-            for (Event ev : eventList) {
+            for (EventCnF ev : eventList) {
                 switch (voahle) {
                     case VIEW_ACTIVE_HIDDEN:
                         if (ev.isActive() && ev.isHidden()) {
@@ -283,14 +296,14 @@ public  class       OccPeriodDataHeavy
       /**
      * @return the paymentList
      */
-    public List<Payment> getPaymentList() {
+    public List<MoneyOccPeriodFeePayment> getPaymentList() {
         return paymentList;
     }
 
     /**
      * @param paymentList the paymentList to set
      */
-    public void setPaymentList(List<Payment> paymentList) {
+    public void setPaymentList(List<MoneyOccPeriodFeePayment> paymentList) {
         this.paymentList = paymentList;
     }
 
@@ -301,12 +314,6 @@ public  class       OccPeriodDataHeavy
         return applicationList;
     }
 
-    /**
-     * @return the personList
-     */
-    public List getPersonList() {
-        return personList;
-    }
 
     /**
      * @return the proposalList
@@ -344,10 +351,10 @@ public  class       OccPeriodDataHeavy
     }
 
     /**
-     * @param personList the personList to set
+     * @param personListApplicants the personListApplicants to set
      */
-    public void setPersonList(List<PersonOccPeriod> personList) {
-        this.personList = personList;
+    public void setPersonListApplicants(List<PersonOccPeriod> personListApplicants) {
+        this.personListApplicants = personListApplicants;
     }
 
     /**
@@ -419,6 +426,35 @@ public  class       OccPeriodDataHeavy
      */
     public void setCredentialSignature(String credentialSignature) {
         this.credentialSignature = credentialSignature;
+    }
+
+    /**
+     * @return the status
+     */
+    public OccPeriodStatusEnum getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(OccPeriodStatusEnum status) {
+        this.status = status;
+    }
+
+    /**
+     * @param personList the personList to set
+     */
+    public void setPersonList(List<Person> personList) {
+        this.personList = personList;
+    }
+    
+    public List<Person> getPersonList(){
+        return personList;
+    }
+    
+    public List<PersonOccPeriod> getPersonListApplicants(){
+        return personListApplicants;
     }
     
 }

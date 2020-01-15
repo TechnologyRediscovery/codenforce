@@ -5,309 +5,324 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseStage;
+import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.CasePhaseEnum;
+import com.tcvcog.tcvce.entities.CaseStageEnum;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.User;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import com.tcvcog.tcvce.entities.PropertyUnit;
 
 /**
  *
- * @author Sylvia Garland
+ * @author Ellen Bascomb
  */
-public class SearchParamsCECase 
-        extends SearchParams 
-        implements Serializable{
+public class        SearchParamsCECase 
+        extends     SearchParams{
     
+    public static final String MUNI_DBFIELD = "property.municipality_municode";
     
+    // filter CECASE-1
+    private boolean caseOpen_ctl;
+    private boolean caseOpen_val;
     
-    private boolean useIsOpen;
-    private boolean isOpen;
-   
-    private List<String> dateSearchOptions;
-    private String dateToSearchCECases;
+    // filter CECASE-2
+    private boolean property_ctl;
+    private Property property_val;
+    
+    // filter CECASE-3
+    private boolean propertyUnit_ctl;
+    private PropertyUnit propertyUnit_val;
+    
+    // filter CECASE-4
+    private boolean propInfoCase_ctl;
+    private boolean propInfoCase_val;
+    
+    // filter CECASE-5
+    private boolean personInfoCase_ctl;
+    private boolean personInfoCase_val;
+    
+    // filter CECASE-6
+    private boolean personInfoCaseID_ctl;
+    private Person personInfoCaseID_val;
+    
+    // filter CECASE-7
+    private boolean source_ctl;
+    private BOBSource source_val;
+    
+    // filter CECASE-8
+    private boolean pacc_ctl;
+    private boolean pacc_val;
 
-    private boolean useCasePhase;
-    private CasePhase casePhase;
+    // *******************************
+    // ** JavaLand switches only!   **
+    // *******************************
     
-    private boolean useCaseStage;
-    private CaseStage caseStage;
-    private List<CasePhase> caseStageAsPhaseList; 
+    // filter CECASE-9
+    private boolean casePhase_ctl;
+    private CasePhaseEnum casePhase_val;
     
-    private boolean useProperty;
-    private Property property;
+    // ****** END JAVALAND ONLY ********
     
-    private boolean usePropertyInfoCase;
-    private boolean propertyInfoCase;
-    
-    private boolean useCaseManager;
-    private User caseManagerUser;
     
    public SearchParamsCECase(){
        
    }
-
-    /**
-     * @return the useIsOpen
-     */
-    public boolean isUseIsOpen() {
-        return useIsOpen;
-    }
-
-    /**
-     * @return the isOpen
-     */
-    public boolean isIsOpen() {
-        return isOpen;
-    }
-
-    /**
-     * @return the useCaseManager
-     */
-    public boolean isUseCaseManager() {
-        return useCaseManager;
-    }
-
-    /**
-     * @return the caseManagerID
-     */
-    public User getCaseManagerID() {
-        return getCaseManagerUser();
-    }
-
-    /**
-     * @param useIsOpen the useIsOpen to set
-     */
-    public void setUseIsOpen(boolean useIsOpen) {
-        this.useIsOpen = useIsOpen;
-    }
-
-    /**
-     * @param isOpen the isOpen to set
-     */
-    public void setIsOpen(boolean isOpen) {
-        this.isOpen = isOpen;
-    }
-
-   
    
     /**
-     * @param useCaseManager the useCaseManager to set
+     * @return the property_ctl
      */
-    public void setUseCaseManager(boolean useCaseManager) {
-        this.useCaseManager = useCaseManager;
-    }
-
-    
-   
-
-    /**
-     * @return the useCasePhase
-     */
-    public boolean isUseCasePhase() {
-        return useCasePhase;
+    public boolean isProperty_ctl() {
+        return property_ctl;
     }
 
     /**
-     * @return the casePhase
+     * @return the property_val
      */
-    public CasePhase getCasePhase() {
-        return casePhase;
+    public Property getProperty_val() {
+        return property_val;
     }
 
     /**
-     * @return the useCaseStage
+     * @return the propInfoCase_ctl
      */
-    public boolean isUseCaseStage() {
-        return useCaseStage;
+    public boolean isPropInfoCase_ctl() {
+        return propInfoCase_ctl;
     }
 
     /**
-     * @return the useProperty
+     * @return the propInfoCase_val
      */
-    public boolean isUseProperty() {
-        return useProperty;
+    public boolean isPropInfoCase_val() {
+        return propInfoCase_val;
+    }
+
+
+    /**
+     * @param property_ctl the property_ctl to set
+     */
+    public void setProperty_ctl(boolean property_ctl) {
+        this.property_ctl = property_ctl;
     }
 
     /**
-     * @return the property
+     * @param property_val the property_val to set
      */
-    public Property getProperty() {
-        return property;
+    public void setProperty_val(Property property_val) {
+        this.property_val = property_val;
     }
 
     /**
-     * @return the usePropertyInfoCase
+     * @param propInfoCase_ctl the propInfoCase_ctl to set
      */
-    public boolean isUsePropertyInfoCase() {
-        return usePropertyInfoCase;
+    public void setPropInfoCase_ctl(boolean propInfoCase_ctl) {
+        this.propInfoCase_ctl = propInfoCase_ctl;
     }
 
     /**
-     * @return the propertyInfoCase
+     * @param propInfoCase_val the propInfoCase_val to set
      */
-    public boolean isPropertyInfoCase() {
-        return propertyInfoCase;
+    public void setPropInfoCase_val(boolean propInfoCase_val) {
+        this.propInfoCase_val = propInfoCase_val;
+    }
+
+
+    /**
+     * @return the propertyUnit_ctl
+     */
+    public boolean isPropertyUnit_ctl() {
+        return propertyUnit_ctl;
     }
 
     /**
-     * @return the caseManagerUser
+     * @return the propertyUnit_val
      */
-    public User getCaseManagerUser() {
-        return caseManagerUser;
+    public PropertyUnit getPropertyUnit_val() {
+        return propertyUnit_val;
     }
 
     /**
-     * @param useCasePhase the useCasePhase to set
+     * @return the personInfoCase_ctl
      */
-    public void setUseCasePhase(boolean useCasePhase) {
-        this.useCasePhase = useCasePhase;
+    public boolean isPersonInfoCase_ctl() {
+        return personInfoCase_ctl;
     }
 
     /**
-     * @param casePhase the casePhase to set
+     * @return the personInfoCase_val
      */
-    public void setCasePhase(CasePhase casePhase) {
-        this.casePhase = casePhase;
+    public boolean isPersonInfoCase_val() {
+        return personInfoCase_val;
     }
 
     /**
-     * @param useCaseStage the useCaseStage to set
+     * @return the source_ctl
      */
-    public void setUseCaseStage(boolean useCaseStage) {
-        this.useCaseStage = useCaseStage;
+    public boolean isSource_ctl() {
+        return source_ctl;
     }
 
     /**
-     * @param useProperty the useProperty to set
+     * @return the source_val
      */
-    public void setUseProperty(boolean useProperty) {
-        this.useProperty = useProperty;
+    public BOBSource getSource_val() {
+        return source_val;
     }
 
     /**
-     * @param property the property to set
+     * @return the pacc_ctl
      */
-    public void setProperty(Property property) {
-        this.property = property;
+    public boolean isPacc_ctl() {
+        return pacc_ctl;
     }
 
     /**
-     * @param usePropertyInfoCase the usePropertyInfoCase to set
+     * @return the pacc_val
      */
-    public void setUsePropertyInfoCase(boolean usePropertyInfoCase) {
-        this.usePropertyInfoCase = usePropertyInfoCase;
+    public boolean isPacc_val() {
+        return pacc_val;
     }
 
     /**
-     * @param propertyInfoCase the propertyInfoCase to set
+     * @param propertyUnit_ctl the propertyUnit_ctl to set
      */
-    public void setPropertyInfoCase(boolean propertyInfoCase) {
-        this.propertyInfoCase = propertyInfoCase;
+    public void setPropertyUnit_ctl(boolean propertyUnit_ctl) {
+        this.propertyUnit_ctl = propertyUnit_ctl;
     }
 
     /**
-     * @param caseManagerUser the caseManagerUser to set
+     * @param propertyUnit_val the propertyUnit_val to set
      */
-    public void setCaseManagerUser(User caseManagerUser) {
-        this.caseManagerUser = caseManagerUser;
+    public void setPropertyUnit_val(PropertyUnit propertyUnit_val) {
+        this.propertyUnit_val = propertyUnit_val;
     }
 
     /**
-     * @return the dateToSearchCECases
+     * @param personInfoCase_ctl the personInfoCase_ctl to set
      */
-    public String getDateToSearchCECases() {
-        return dateToSearchCECases;
+    public void setPersonInfoCase_ctl(boolean personInfoCase_ctl) {
+        this.personInfoCase_ctl = personInfoCase_ctl;
     }
 
     /**
-     * @param dateToSearchCECases the dateToSearchCECases to set
+     * @param personInfoCase_val the personInfoCase_val to set
      */
-    public void setDateToSearchCECases(String dateToSearchCECases) {
-        this.dateToSearchCECases = dateToSearchCECases;
+    public void setPersonInfoCase_val(boolean personInfoCase_val) {
+        this.personInfoCase_val = personInfoCase_val;
     }
 
     /**
-     * @return the caseStageAsPhaseList
+     * @param source_ctl the source_ctl to set
      */
-    public List<CasePhase> getCaseStageAsPhaseList() {
-        List<CasePhase> phaseList = new ArrayList<>();
-        if(caseStage != null){
-            switch(caseStage){
-                case Investigation:
-                    phaseList.add(CasePhase.PrelimInvestigationPending);
-                    phaseList.add(CasePhase.NoticeDelivery);
-                    break;
-                
-                case Enforcement:
-                    phaseList.add(CasePhase.InitialComplianceTimeframe);
-                    phaseList.add(CasePhase.SecondaryPostHearingComplianceTimeframe);
-                    break;
-                    
-                case Citation:
-                    phaseList.add(CasePhase.AwaitingHearingDate);
-                    phaseList.add(CasePhase.HearingPreparation);
-                    phaseList.add(CasePhase.InitialPostHearingComplianceTimeframe);
-                    phaseList.add(CasePhase.SecondaryPostHearingComplianceTimeframe);
-                    break;
-                
-                case Closed:
-                    phaseList.add(CasePhase.Closed);
-                    phaseList.add(CasePhase.InactiveHolding);
-                    break;
-            }
-        }
-        
-        caseStageAsPhaseList = phaseList;
-        return caseStageAsPhaseList;
+    public void setSource_ctl(boolean source_ctl) {
+        this.source_ctl = source_ctl;
     }
 
     /**
-     * @param caseStageAsPhaseList the caseStageAsPhaseList to set
+     * @param source_val the source_val to set
      */
-    public void setCaseStageAsPhaseList(List<CasePhase> caseStageAsPhaseList) {
-        this.caseStageAsPhaseList = caseStageAsPhaseList;
+    public void setSource_val(BOBSource source_val) {
+        this.source_val = source_val;
     }
 
     /**
-     * @return the caseStage
+     * @param pacc_ctl the pacc_ctl to set
      */
-    public CaseStage getCaseStage() {
-        return caseStage;
+    public void setPacc_ctl(boolean pacc_ctl) {
+        this.pacc_ctl = pacc_ctl;
     }
 
     /**
-     * @param caseStage the caseStage to set
+     * @param pacc_val the pacc_val to set
      */
-    public void setCaseStage(CaseStage caseStage) {
-        this.caseStage = caseStage;
+    public void setPacc_val(boolean pacc_val) {
+        this.pacc_val = pacc_val;
+    }
+
+
+    /**
+     * @return the casePhase_ctl
+     */
+    public boolean isCasePhase_ctl() {
+        return casePhase_ctl;
     }
 
     /**
-     * @return the dateSearchOptions
+     * @return the casePhase_val
      */
-    public List<String> getDateSearchOptions() {
-        List<String> dateOptList = new ArrayList<>();
-        dateOptList.add("Opening date of record");
-        dateOptList.add("Database record timestamp");
-        dateOptList.add("Closing date");
-        dateSearchOptions = dateOptList;
-        return dateSearchOptions;
+    public CasePhaseEnum getCasePhase_val() {
+        return casePhase_val;
+    }
+
+
+    /**
+     * @param casePhase_ctl the casePhase_ctl to set
+     */
+    public void setCasePhase_ctl(boolean casePhase_ctl) {
+        this.casePhase_ctl = casePhase_ctl;
     }
 
     /**
-     * @param dateSearchOptions the dateSearchOptions to set
+     * @param casePhase_val the casePhase_val to set
      */
-    public void setDateSearchOptions(List<String> dateSearchOptions) {
-        this.dateSearchOptions = dateSearchOptions;
+    public void setCasePhase_val(CasePhaseEnum casePhase_val) {
+        this.casePhase_val = casePhase_val;
     }
-   
-   
-   
 
-   
+    /**
+     * @return the caseOpen_ctl
+     */
+    public boolean isCaseOpen_ctl() {
+        return caseOpen_ctl;
+    }
+
+    /**
+     * @return the caseOpen_val
+     */
+    public boolean isCaseOpen_val() {
+        return caseOpen_val;
+    }
+
+    /**
+     * @param caseOpen_ctl the caseOpen_ctl to set
+     */
+    public void setCaseOpen_ctl(boolean caseOpen_ctl) {
+        this.caseOpen_ctl = caseOpen_ctl;
+    }
+
+    /**
+     * @param caseOpen_val the caseOpen_val to set
+     */
+    public void setCaseOpen_val(boolean caseOpen_val) {
+        this.caseOpen_val = caseOpen_val;
+    }
+
+    /**
+     * @return the personInfoCaseID_ctl
+     */
+    public boolean isPersonInfoCaseID_ctl() {
+        return personInfoCaseID_ctl;
+    }
+
+    /**
+     * @param personInfoCaseID_ctl the personInfoCaseID_ctl to set
+     */
+    public void setPersonInfoCaseID_ctl(boolean personInfoCaseID_ctl) {
+        this.personInfoCaseID_ctl = personInfoCaseID_ctl;
+    }
+
+    /**
+     * @return the personInfoCaseID_val
+     */
+    public Person getPersonInfoCaseID_val() {
+        return personInfoCaseID_val;
+    }
+
+    /**
+     * @param personInfoCaseID_val the personInfoCaseID_val to set
+     */
+    public void setPersonInfoCaseID_val(Person personInfoCaseID_val) {
+        this.personInfoCaseID_val = personInfoCaseID_val;
+    }
+
     
 }

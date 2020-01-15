@@ -213,7 +213,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         PropertyUnit unit;
         Property prop;
         try {
-            unit = pi.getPropertyUnitByPropertyUnitID(currentOccPeriod.getPropertyUnitID());
+            unit = pi.getPropertyUnit(currentOccPeriod.getPropertyUnitID());
             prop = pi.getProperty(unit.getPropertyID());
             address = prop.getAddress();
         } catch (IntegrationException ex) {

@@ -5,12 +5,9 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.BOb;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +16,7 @@ import java.util.Objects;
  * Query subclass for retrieving Code Enforcement Action Requests
  * @author Loretta
  */
-public class QueryPerson 
+public class    QueryPerson 
         extends Query{
 
     /**
@@ -30,15 +27,38 @@ public class QueryPerson
     private List<SearchParamsPerson> searchParamsList; 
     private List<Person> results;
 
-    public QueryPerson(QueryPersonEnum name,
-                        Municipality m, 
+    /**
+     * Unified Query subclass constructor
+     * @param name
+     * @param params if not null, the Query subclass is marked as CUSTOM and the
+     * passed in params are added to the params assembled according to the enum
+     * and no 
+     * @param c 
+     */
+    public QueryPerson( QueryPersonEnum name,
                         List<SearchParamsPerson> params,
-                        UserAuthorized u){
-        super(m, u);
+                        Credential c){
+        super(c);
         query = name;
         searchParamsList = new ArrayList<>();
-        searchParamsList.addAll(params);
+        if(params != null){
+            searchParamsList.addAll(params);
+        }
         results = new ArrayList<>();
+    }
+    
+    
+    @Override
+    public int getParamsListSize() {
+        return searchParamsList.size();
+    }
+    
+    @Override
+    public SearchParamsPerson getPrimaryParams() {
+        if(searchParamsList != null && !searchParamsList.isEmpty()){
+            return searchParamsList.get(0);
+        }
+        return null;
     }
 
     @Override
@@ -46,17 +66,31 @@ public class QueryPerson
         return query.getTitle();
     }
     
+    @Override
+    public int addParams(SearchParams params) {
+        if(params instanceof SearchParamsPerson){
+            searchParamsList.add((SearchParamsPerson) params);
+        }
+        return searchParamsList.size();
+    }
 
    public void addSearchParams(SearchParamsPerson sp){
        searchParamsList.add(sp);
-       
    }
-    
+   
     public void addToResults(List<Person> l){
         results.addAll(l);
     }
     
-    
+    /**
+     *
+     * @param l
+     */
+    @Override
+    public void addBObListToResults(List l) {
+        
+        
+    }
 
     /**
      * @return the results
@@ -65,26 +99,16 @@ public class QueryPerson
         return results;
     }
 
-    public void setParamsList(List l) {
-        searchParamsList = l;
-    }
-
     @Override
     public List<Person> getBOBResultList() {
         return results;
     }
 
-    @Override
-    public void setBOBResultList(List l) {
-        results = l;
-    }
-
+  
     @Override
     public List<SearchParamsPerson> getParmsList() {
         return searchParamsList;
     }
-
-    
 
     /**
      * @return the queryName
@@ -92,8 +116,6 @@ public class QueryPerson
     public QueryPersonEnum getQueryName() {
         return query;
     }
-
-  
 
     @Override
     public void clearResultList() {
@@ -128,6 +150,5 @@ public class QueryPerson
         }
         return true;
     }
-    
-    
+
 }
