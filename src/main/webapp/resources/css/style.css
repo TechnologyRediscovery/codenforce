@@ -31,22 +31,29 @@ COG yellow: #e3b73d
 
 */
 
+/* heebo-regular - latin */
 @font-face {
-    font-family: 'Montserrat';
-    src: url('https://fonts.googleapis.com/css?family=Montserrat');
+  font-family: 'Heebo';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/heebo-v5-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Heebo'), local('Heebo-Regular'),
+       url('../fonts/heebo-v5-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/heebo-v5-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/heebo-v5-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/heebo-v5-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/heebo-v5-latin-regular.svg#Heebo') format('svg'); /* Legacy iOS */
 }
 
 body{
     margin: 0 auto;
-    font-family: sans-serif;
-    
-   
+    font-family: Heebo;
 }
 
 /*---------------- HEADERS -------------------*/
 
 h1{
-    font-family: 'roboto', sans-serif;
+    font-family: 'Heebo', sans-serif;
     font-size: 1.5em;
     color: #5a5754;
     font-weight: normal;
@@ -169,7 +176,7 @@ h4{
 }
 
 .logo-image-wrapper{
-    margin-right: 15px;
+    
 }
 
 
@@ -440,7 +447,7 @@ div.printer-friendly-report .ui-widget-content{
 
 .report-header-info{
     font-size: small;
-    font-family: sans-serif;
+    font-family: Heebo;
 }
 
 .report-cear-requestbox{
@@ -463,7 +470,7 @@ div.printer-friendly-report .ui-widget-content{
 .cear-request-titlehead{
     font-size: 2em;
     font-weight: bold;
-    font-family: monospace;
+    font-family: Heebo;
 }
 
 .reportconfig-header{
@@ -488,7 +495,7 @@ div.printer-friendly-report .ui-widget-content{
     
     justify-content: flex-start;
     
-    font-family: 'roboto', sans-serif;
+    font-family: 'Heebo', sans-serif;
     margin-left: 0px;
     margin-right:0px;
     margin-top: 0px;
@@ -505,7 +512,7 @@ div.printer-friendly-report .ui-widget-content{
     
      justify-content: flex-start;
     
-    font-family: 'roboto', sans-serif;
+    font-family: 'Heebo', sans-serif;
     margin-left: 0px;
     margin-right:0px;
     margin-top: 0px;
@@ -519,14 +526,11 @@ div.printer-friendly-report .ui-widget-content{
 }
 
 .flexing-box-topbar{
-    
     flex-grow: 1;
     flex-basis: 100%;
     flex-shrink: 1;
-    
     height: 100px;
-    background-color: #6C6D70;
-    
+    background-color: #2F2F2F;
 }
 
 
@@ -637,7 +641,7 @@ div.printer-friendly-report .ui-widget-content{
 }
 
 .footer{
-    font-family: 'roboto', sans-serif;
+    font-family: 'Heebo', sans-serif;
     color: grey;
 }
 
@@ -772,7 +776,7 @@ i.status-display-icon-i{
 
 
 .mono{
-    font-family: mono;
+    font-family: Heebo;
 }
 
 
@@ -791,7 +795,7 @@ i.status-display-icon-i{
 
 .infoBarData{
     font-size: .9em;
-    font-family: mono;
+    font-family: Heebo;
     font-weight: normal;
 }
 
@@ -876,7 +880,7 @@ div.headerLinks{
 .ord-text{
     font-weight: normal;
     font-style: italic;
-    font-family: mono;
+    font-family: Heebo;
     white-space: normal;
     overflow-wrap: normal;
     padding: 20px;
@@ -917,8 +921,6 @@ div.ccBox{
 
 img{
     display: block;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 img.header{
@@ -1486,7 +1488,7 @@ i.inspection-notinspected{
 
 .nov-chosen-recipeint{
     margin: 10px;
-    font-family: monospace;
+    font-family: Heebo;
 }
 
 
@@ -1687,7 +1689,7 @@ tr.caseOpen{
 }
 
 .nav_containner{
-    color:#6C6D70;
+    color:#2F2F2F;
     float:left;
     display: inline-block;
 
@@ -1695,7 +1697,7 @@ tr.caseOpen{
 
 .nav_containner:hover {
     color:#E6E7E8;
-    background-color: #007AD9;
+    background-color: #00B4ED;
     
 }
 
@@ -1714,10 +1716,8 @@ tr.caseOpen{
 
 .nav_containner:hover .subnav_containner{
     color:#E6E7E8;
-    background-color: #007AD9;
+    background-color: #00B4ED;
     display: inline-block;
-    
-    
 }
 
 .subnav_containner{
@@ -1802,12 +1802,25 @@ tr.caseOpen{
     float: right;
     font-size: 14px;
     height: 40px;
-   
+    min-width: 80px;
     color: inherit;
     display: flex;
     flex-direction: column;
     justify-content: center;
     text-align: center;
+}
+
+.navItem_user{
+    float: right;
+    font-size: 14px;
+    height: 40px;
+    
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    margin-right: 15px;
 }
 
 
@@ -1894,7 +1907,7 @@ tr.caseOpen{
     cursor: pointer;
 }
 .sidebar_firstmenu_item:hover{
-    border-bottom: 1px solid #007AD9;
+    border-bottom: 1px solid #00B4ED;
 }
 
 
@@ -1916,7 +1929,7 @@ tr.caseOpen{
 }
 
 .sidebar_secondmenu_item:hover{
-    background-color:#007AD9;
+    background-color:#00B4ED;
     color:#000000;
 }
 .sidebar_secondmenu_item i{
@@ -1932,10 +1945,28 @@ tr.caseOpen{
     cursor: pointer;
 }
 
+
+/*Primeface styling*/
+
 body .ui-panel .ui-panel-titlebar{
     background-color: #6C6D70;
     border: 1px solid #6C6D70;
 }
+body .ui-dialog .ui-dialog-titlebar{
+    background-color: #6C6D70;
+    border: 1px solid #6C6D70;
+}
+
+body .ui-messages .ui-messages-info{
+    background-color: #99C221;
+}
 
 
+/*button*/
 
+.selectButton{
+    min-width: 60px;
+}
+.editButton{
+    min-width: 60px;
+}

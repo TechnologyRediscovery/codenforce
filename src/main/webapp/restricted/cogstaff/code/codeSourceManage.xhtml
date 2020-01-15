@@ -21,19 +21,12 @@
 
                     <div class="mainContainer">
 
+                        
                         <h1>Manage Municipal Code Sources</h1>
-                        
-                        
 
                         <h:form id="form-messages-global">
-                            
-                            <p:messages id="messages-global" />
-
-                           
+                            <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true"/>
                         </h:form>
-
-
-
 
                         <div class ="two-column-page-flex-container">
 
@@ -72,9 +65,9 @@
                                                       >
 
                                                 <p:commandButton id="button-editcodesource" 
+                                                                 styleClass="editButton" 
                                                                  ajax="true"
                                                                  value="Edit" 
-                                                                 icon="fa fa-pencil" 
                                                                  oncomplete="PF('codesourcemanage-dialog-updatesource-var').show();"
                                                                  update="codesourcemanage-dialog-updatesource"
                                                                  disabled="#{codeSourceBB.activeCodeSourceEdit()}"
@@ -89,6 +82,7 @@
 
                                                 <p:selectBooleanButton onLabel="Deselect" 
                                                                        offLabel="Select"
+                                                                       styleClass="selectButton" 
                                                                        value="#{codeSourceBB.codeSourceSelected}"
                                                                        >
                                                     <p:ajax update="
@@ -340,8 +334,8 @@
 
                                                 <p:commandButton id="button-editcodesourceelement" ajax="true"
                                                                  value="Edit" 
+                                                                 styleClass="editButton"
                                                                  actionListener="#{codeElementListBB.onEditCodeElementButtonChange(element)}"
-                                                                 icon="fa fa-pencil" 
                                                                  oncomplete="PF('codesourcemanage-dialog-editcodeelement-var').show();"
                                                                  update="codesourcemanage-dialog-editcodeelement"
 
