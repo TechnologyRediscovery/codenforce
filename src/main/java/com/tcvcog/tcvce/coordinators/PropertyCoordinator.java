@@ -108,6 +108,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             
         } catch (EventException | AuthorizationException ex) {
             System.out.println(ex);
+            System.out.println();
         } 
         return pdh;
     }

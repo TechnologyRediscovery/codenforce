@@ -1115,6 +1115,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private SearchParamsPerson genParams_person_initParams(Credential cred){
         SearchParamsPerson params = new SearchParamsPerson();
         
+        
         params = (SearchParamsPerson) genParams_initParams(params, cred);
         
         // filter PERS-1

@@ -190,7 +190,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
    
      /**
      * A CECaseDataHeavy's Stage is derived from its Phase based on the set of business
- rules encoded in this method.
+     * rules encoded in this method.
      * @param cse which needs its StageConfigured
      * @return the same CECas passed in with the CaseStageEnum configured
      * @throws BObStatusException 
