@@ -210,9 +210,10 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      */
     public String generateFieldDumpString(BOb obj){
         String dump = obj.toString();
+        PersonCoordinator pc = getPersonCoordinator();
         
         if(obj instanceof Person){
-            return dumpPerson((Person) obj);
+            return pc.dumpPerson((Person) obj);
         }
         return dump;
     }
@@ -252,18 +253,20 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      */
     //Nav Bar
     //Sub NavItem: Property
-    private final NavigationSubItem propertyInfo = getNavSubItem("Info", "/restricted/cogstaff/prop/propertyInfo.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyUnits = getNavSubItem("Units", "/restricted/cogstaff/prop/propertyUnits.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyEvents = getNavSubItem("Events", "/restricted/cogstaff/prop/propertyEvents.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyPersons = getNavSubItem("Persons", "/restricted/cogstaff/prop/propertyPersons.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyCases = getNavSubItem("Cases", "/restricted/cogstaff/prop/propertyCases.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "/restricted/cogstaff/prop/propertyOccPeriods.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyEvents = getNavSubItem("Events", "/restricted/cogstaff/prop/propertyEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyInfo = getNavSubItem("Info", "/restricted/cogstaff/prop/propertyInfo.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyDocuments = getNavSubItem("Files", "/restricted/cogstaff/prop/propertyFiles.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "/restricted/cogstaff/prop/propertyOccPeriods.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyPersons = getNavSubItem("Persons", "/restricted/cogstaff/prop/propertyPersons.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertySearch = getNavSubItem("Search", "/restricted/cogstaff/prop/propertySearch.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyUnits = getNavSubItem("Units", "/restricted/cogstaff/prop/propertyUnits.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Property
     public List<NavigationSubItem> getPropertyNavList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
+        navList.add(propertySearch);
         navList.add(propertyInfo);
         navList.add(propertyUnits);
         navList.add(propertyCases);
@@ -321,19 +324,27 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sub NavItem: Persons
-    private final NavigationSubItem personParcels = getNavSubItem("Parcels", "", "fa fa-sign-in", false);
-    private final NavigationSubItem personCases = getNavSubItem("Cases", "", "fa fa-sign-in", false);
-    private final NavigationSubItem personEvents = getNavSubItem("Events", "", "fa fa-sign-in", false);
-    private final NavigationSubItem personDocuments = getNavSubItem("Documents", "", "fa fa-sign-in", false);
+    // listed in file order
+    private final NavigationSubItem personCECases = getNavSubItem("CE Cases", "/restricted/cogstaff/person/personCECases.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personEvents = getNavSubItem("Events", "/restricted/cogstaff/person/personEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personInfo = getNavSubItem("Info", "/restricted/cogstaff/person/personInfo.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personOccPeriods = getNavSubItem("Occ periods", "/restricted/cogstaff/person/personOccPeriods.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personProperties = getNavSubItem("Properties", "/restricted/cogstaff/person/personProperties.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personPublic = getNavSubItem("Public", "/restricted/cogstaff/person/personPublic.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personSearch = getNavSubItem("Search", "/restricted/cogstaff/person/personSearch.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Person
+    // listed in display order
     public List<NavigationSubItem> getPersonNavList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
-        navList.add(personParcels);
-        navList.add(personCases);
+        navList.add(personSearch);
+        navList.add(personInfo);
+        navList.add(personProperties);
         navList.add(personEvents);
-        navList.add(personDocuments);
+        navList.add(personOccPeriods);
+        navList.add(personCECases);
+        navList.add(personPublic);
         return navList;
     }
 

@@ -19,8 +19,14 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
+import com.tcvcog.tcvce.entities.Property;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -29,6 +35,9 @@ import javax.annotation.PostConstruct;
 public class PersonPropertiesBB extends BackingBeanUtils{
 
     private PersonDataHeavy currPerson;
+    
+    private List<Property> propList;
+    private Property selectedProperty;
     
     /**
      * Creates a new instance of PersonBB
@@ -47,6 +56,32 @@ public class PersonPropertiesBB extends BackingBeanUtils{
        } else {
             currPerson = (getSessionBean().getSessPerson());
        }
+       
+       propList = new ArrayList<>();
+       if(getSessionBean().getSessPropertyList() != null && !getSessionBean().getSessPropertyList().isEmpty()){
+           propList.addAll(getSessionBean().getSessPropertyList());
+       }
+        
+    }
+    
+        /**
+     * Maps the session active property to the current person
+     * @param ev 
+     */
+    public void connectCurrentPersonToProperty(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        if(selectedProperty != null){
+            try {
+                pc.connectPersonToProperty(currPerson, selectedProperty);
+                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Successfully connected person ID " + currPerson.getPersonID() + " to property ID " + getSelectedProperty().getPropertyID() , ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            ex.getMessage(), ""));
+            }
+        }
+        // clear list so the list itself looks properties up again
         
     }
 
@@ -62,6 +97,34 @@ public class PersonPropertiesBB extends BackingBeanUtils{
      */
     public void setCurrPerson(PersonDataHeavy currPerson) {
         this.currPerson = currPerson;
+    }
+
+    /**
+     * @return the propList
+     */
+    public List<Property> getPropList() {
+        return propList;
+    }
+
+    /**
+     * @param propList the propList to set
+     */
+    public void setPropList(List<Property> propList) {
+        this.propList = propList;
+    }
+
+    /**
+     * @return the selectedProperty
+     */
+    public Property getSelectedProperty() {
+        return selectedProperty;
+    }
+
+    /**
+     * @param selectedProperty the selectedProperty to set
+     */
+    public void setSelectedProperty(Property selectedProperty) {
+        this.selectedProperty = selectedProperty;
     }
     
     

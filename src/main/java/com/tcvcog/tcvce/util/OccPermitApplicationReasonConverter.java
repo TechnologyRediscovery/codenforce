@@ -27,7 +27,7 @@ import javax.faces.convert.FacesConverter;
  * and object types
  * @author Dominic Pimpinella
  */
-@FacesConverter(forClass=OccPermitApplicationReason.class, value="occPermitApplicationReasonConverter")
+@FacesConverter(value="occPermitApplicationReasonConverter")
 public class OccPermitApplicationReasonConverter extends EntityConverter implements Converter {
     
     @Override

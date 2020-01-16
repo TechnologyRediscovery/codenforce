@@ -19,10 +19,13 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -38,7 +41,10 @@ public class PersonInfoBB extends BackingBeanUtils{
     private PersonDataHeavy currPerson;
     private Person workingPerson;
     private boolean connectToActiveProperty;
+    
     private String fieldDump;
+    
+    private String formNotes;
     
     /**
      * Creates a new instance of PersonBB
@@ -57,6 +63,8 @@ public class PersonInfoBB extends BackingBeanUtils{
        } else {
             currPerson = (getSessionBean().getSessPerson());
        }
+       
+       workingPerson = currPerson;
         
     }
     
@@ -78,6 +86,7 @@ public class PersonInfoBB extends BackingBeanUtils{
      */
     public void personEditCommit(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
+
         try {
             pc.personEdit(workingPerson, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
@@ -90,15 +99,15 @@ public class PersonInfoBB extends BackingBeanUtils{
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
-                 new FacesMessage(FacesMessage.SEVERITY_FATAL, 
+                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                      "Edits failed on person due to a database bug!", ""));
         }
     }
     
     
      public String viewPersonAssociatedProperty(Property p){
-        getSessionBean().getSessPropertyList().add(0, p);
-        return "properties";
+         getSessionBean().setSessPropertyQueued(p);
+        return "propertyInfo";
     }
     
     
@@ -119,28 +128,73 @@ public class PersonInfoBB extends BackingBeanUtils{
                if(connectToActiveProperty){
                    
                    Property property = getSessionBean().getSessProperty();
-                   
+                   pc.connectPersonToProperty(workingPerson, property);
                    getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Successfully added " + p.getFirstName() + " to the Database!" 
+                            "Successfully added " + workingPerson.getFirstName() + " to the Database!" 
                                 + " and connected to " + property.getAddress(), ""));
 
                } else {
 
                    getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                                "Successfully added " + p.getFirstName() + " to the Database!", ""));
-
+                                "Successfully added " + workingPerson.getFirstName() + " to the Database!", ""));
                }
-
            } catch (IntegrationException ex) {
                System.out.println(ex.toString());
                   getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                                "Unable to add new person to the database, my apologies!", ""));
            }
-
     }
+    
+    
+    
+    public void attachNoteToPerson(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+
+        try {
+            pc.addNotesToPerson(currPerson, getSessionBean().getSessUser(), getFormNotes());
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO
+                    , "Done: Notes added to person ID:" + currPerson.getPersonID(),"" ));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
+                    , "Unable to update notes, sorry!"
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+        }
+    }
+    
+    
+    public String deletePerson(){
+        System.out.println("PersonBB.deletePerson | in method");
+        PersonCoordinator pc = getPersonCoordinator();
+        
+        try {
+            pc.personNuke(currPerson, getSessionBean().getSessUser().getMyCredential());
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        currPerson.getFirstName() + " has been permanently deleted; Goodbye " 
+                                + currPerson.getFirstName() 
+                                + ". Search results have been cleared.", ""));
+            
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Cannot delete person." + ex.toString(), "Best not to delete folks anyway..."));
+            return "";
+            
+        } catch (AuthorizationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        ex.getLocalizedMessage(),""));
+            return "";
+            
+        }
+        return "personSearch";
+    }
+    
+    
     /**
      * @return the currPerson
      */
@@ -181,6 +235,20 @@ public class PersonInfoBB extends BackingBeanUtils{
      */
     public void setWorkingPerson(Person workingPerson) {
         this.workingPerson = workingPerson;
+    }
+
+    /**
+     * @return the formNotes
+     */
+    public String getFormNotes() {
+        return formNotes;
+    }
+
+    /**
+     * @param formNotes the formNotes to set
+     */
+    public void setFormNotes(String formNotes) {
+        this.formNotes = formNotes;
     }
     
     

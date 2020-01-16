@@ -60,7 +60,6 @@ public  class PersonDataHeavy
         this.muniCode = p.muniCode;
         this. muniName = p.muniName;
 
-        this.sourceID = p.sourceID;
         this.source = p.source;
         this.creatorUserID = p.creatorUserID;
         this.creationTimeStamp = p.creationTimeStamp;
@@ -150,7 +149,6 @@ public  class PersonDataHeavy
         this.muniCode = p.muniCode;
         this. muniName = p.muniName;
 
-        this.sourceID = p.sourceID;
         this.source = p.source;
         this.creatorUserID = p.creatorUserID;
         this.creationTimeStamp = p.creationTimeStamp;

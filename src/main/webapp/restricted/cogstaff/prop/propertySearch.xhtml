@@ -26,7 +26,7 @@
                                             widgetVar="prop-search-query-panel-var"
                                             collapsed="false"
                                             style="width:100%;"
-                                            header="Search for properties">
+                                            header="Property search configuration">
 
                                     <h:form id="prop-search-messages-form">
                                         <h:messages id="prop-search-messages"
@@ -35,9 +35,7 @@
                                         </h:messages>
                                     </h:form>
 
-                                    <h:form id="prop-saerch-query-form">
-
-                                        <h2>Search configuration</h2>
+                                    <h:form id="prop-search-query-form">
 
                                         <p:selectOneMenu id="prop-search-query-som" tabindex="1" value="#{propertySearchBB.querySelected}">
                                             <f:converter converterId="bOBQueryConverter"/>

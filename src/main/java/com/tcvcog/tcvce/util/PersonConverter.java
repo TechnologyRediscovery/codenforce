@@ -29,7 +29,7 @@ import javax.faces.convert.FacesConverter;
  * @author Eric Darsow
  */
 
-@FacesConverter(forClass=Person.class, value="personConverter")
+@FacesConverter(value="personConverter")
 public class PersonConverter extends EntityConverter implements Converter{
 
     @Override

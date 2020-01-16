@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Citation;
@@ -40,6 +41,7 @@ import com.tcvcog.tcvce.entities.search.QueryProperty;
 import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -313,7 +315,21 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return personTypes;
     }
 
-   
+   /**
+    * Logic and permissions check for main delete person method on integrator
+    * @param p
+    * @param cred
+    * @throws IntegrationException
+    * @throws AuthorizationException must be sys admin or higher
+    */
+    public void personNuke(Person p, Credential cred) throws IntegrationException, AuthorizationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        if(cred.isHasSysAdminPermissions()){
+            pi.deletePerson(p);
+        } else {
+            throw new AuthorizationException("Must have sys admin permissions or higher to delete");
+        }
+    }
     
     
     

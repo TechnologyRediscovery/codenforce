@@ -38,7 +38,7 @@ public class PersonSearchPublicBB extends BackingBeanUtils implements Serializab
     @PostConstruct
     public void initBean(){
         PersonCoordinator pc = getPersonCoordinator();
-        setParams(pc.getDefaultSearchParamsPersons());
+//        setParams(pc.);
     }
     
     public void queryPersons(SearchParamsPerson params) throws IntegrationException{

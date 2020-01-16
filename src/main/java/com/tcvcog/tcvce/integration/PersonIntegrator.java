@@ -967,14 +967,16 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    public void deletePerson(int personToDeleteID) throws IntegrationException {
+    public void deletePerson(Person pers) throws IntegrationException {
+        if(pers == null){ return; }
+        
         Connection con = getPostgresCon();
         String query = "DELETE FROM person WHERE personid = ?";
 
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, personToDeleteID);
+            stmt.setInt(1, pers.getPersonID());
             stmt.execute();
 
         } catch (SQLException ex) {

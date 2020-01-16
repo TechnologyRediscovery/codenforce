@@ -29,57 +29,82 @@
                                     widgetVar="pers-prop-list-panel-var"
                                     collapsed="false"
                                     header="Properties connected to #{person}">
-                               
-                            <h:form id="_________NAMEME_________">
-                                         <p:dataTable
-                                            id="prop-search-results-table"
-                                            var="prop"
-                                            value="#{propertySearchBB.propList}"
-                                            rowKey="#{prop.propertyID}"
-                                            tableStyleClass="primeDataTable"
-                                            draggableRows="false" 
-                                            draggableColumns="true"
-                                            tabindex="6"
-                                            >
-                                            <p:column width="8%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="ID"/>
-                                                </f:facet>
-                                                <h:outputText value="#{prop.propertyID}" />
-                                            </p:column>
-                                            <p:column width="15%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Address"/>
-                                                </f:facet>
-                                                <h:outputText value="#{prop.address}" />
-                                            </p:column>
+                       
+                            <h2>Person-connected properties</h2>
+                            
+                            
+                            <h:form id="connect-person-to-property-form">
+                                
 
-                                            <p:column width="10%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Muni" />
-                                                </f:facet>
-                                                <h:outputText value="#{prop.muni.muniName}"/>
-                                            </p:column>
+                                <p:selectOneMenu id="property-som" tabindex="3" value="#{personsBB.selectedProperty}">
+                                    <f:converter converterId="propertyConverter"/>
+                                    <f:selectItem itemLabel="select a property..." noSelectionOption="true" itemDisabled="true"/>
+                                    <f:selectItems id="propertylist-selitems" 
+                                                   value="#{personsBB.propertyCandidateList}" 
+                                                   var="p" 
+                                                   itemValue="#{p}" 
+                                                   itemLabel="#{p.address} (parid: #{p.parID}, propid: #{p.propertyID}" />
+                                </p:selectOneMenu>
+                                <p:spacer height="5px" />
+                                
+                                <p:commandButton value="connect #{personsBB.selectedPerson.firstName} #{personsBB.selectedPerson.lastName} to this property" 
+                                        ajax="true"
+                                         icon="fa fa-link"
+                                         update="table-person-associated-properties"
+                                         actionListener="#{personsBB.connectCurrentPersonToProperty}"
+                                         />
+                                <p:spacer height="5px" />
+                                
+                                <h3>Properties connected to this person</h3>
+                                <p:dataTable
+                                    id="table-person-associated-properties"
+                                    var="prop"
+                                    value="#{personsBB.propertyPersonList}"
+                                    rowKey="#{prop.propertyID}"
+                                    filteredValue="#{propertyProfileBB.filteredPropList}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6"
+                                    >
+                                    <p:column width="4%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyID}" />
+                                    </p:column>
+                                    <p:column width="12%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Address"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.address}" />
+                                    </p:column>
 
-                                            <p:column width="12%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Use Type"/>
-                                                </f:facet>
-                                                <h:outputText value="#{prop.useType}" />
-                                            </p:column>
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Muni" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.muni.muniName}"/>
+                                    </p:column>
 
-                                            <p:column width="5%">
-                                                <f:facet name="header">
-                                                    <h:outputText value=""/>
-                                                </f:facet>
-                                                <p:commandButton icon="fa fa-info-circle"
-                                                                 action="#{propertySearchBB.exploreProperty(prop)}" 
-                                                                 ajax="false"
-                                                                 />
-                                            </p:column>
-                                        </p:dataTable>
-                               </h:form>
-                                                
+                                    <p:column width="7%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Use Type"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.useType}" />
+                                    </p:column>
+
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value=""/>
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-home"
+                                                         value="view property"
+                                                         action="#{personsBB.viewPersonAssociatedProperty(prop)}" 
+                                                         ajax="true"/>
+                                    </p:column>
+                                </p:dataTable>
+
+                            </h:form>
+
                         </p:panel>
                         
                       
@@ -87,46 +112,6 @@
                     <!--close main container-->
                     </div>
                     
-                    
-                    <p:dialog   id="_________NAMEME_________"
-                                header="_________NAMEME_________" 
-                                widgetVar="_________NAMEME_________" 
-                                responsive="true" 
-                                width="400"
-                                modal="false"
-                                height="600">
-                        
-                          <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                        </h:form>
-                        
-                        <h:form id="_________NAMEME_________">
-                            
-
-                            <h2>_________NAMEME_________</h2>
-
-                            
-                            
-                            <p:commandButton    id="_________NAMEME_________"
-                                                value="_________NAMEME_________" 
-                                                ajax="true" 
-                                                icon="fa fa-edit"
-                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
-                                                disabled="false"
-                                                rendered="true"
-                                                oncomplete="PF('_________NAMEME_________').hide()"
-                                                update=""/>
-
-                            <p:commandLink  value="close" 
-                                            onclick="PF('_________NAMEME_________').hide()" 
-                                            styleClass="noFill"/>
-
-                        </h:form>
-
-                    </p:dialog>
 
 
                 </f:view>

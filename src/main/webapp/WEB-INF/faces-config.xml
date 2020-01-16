@@ -359,12 +359,6 @@
     </managed-bean>
  
     <managed-bean>
-        <managed-bean-name>userManageBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.userManageBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-   
-    <managed-bean>
         <managed-bean-name>userConfigBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.UserConfigBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
@@ -680,12 +674,6 @@
         <managed-bean-class>com.tcvcog.tcvce.integration.PropertyIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>propertyUnitCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.PropertyCoordinator</managed-bean-class>    
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
    
     <managed-bean>
         <managed-bean-name>unitChangesBB</managed-bean-name>
@@ -708,34 +696,53 @@
         <from-view-id>*</from-view-id>
         
         <navigation-case>
-            <from-outcome>properties</from-outcome>
-            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
+            <from-outcome>propertyCases</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertyCases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>unitchanges</from-outcome>
-            <to-view-id>/restricted/cogview/unitchanges.xhtml</to-view-id>
+            <from-outcome>propertyEvents</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertyEvents.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>unitchangedetail</from-outcome>
-            <to-view-id>/restricted/cogview/unitchangedetail.xhtml</to-view-id>
+            <from-outcome>propertyInfo</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertyInfo.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>propertyFiles</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertyFiles.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>propertyOccPeriods</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertyOccPeriods.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>propertyPersons</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertyPersons.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
             <from-outcome>propertySearch</from-outcome>
-            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/prop/propertySearch.xhtml</to-view-id>
             <redirect />
         </navigation-case>
-
+        
         <navigation-case>
-            <from-outcome>propertyProfile</from-outcome>
-            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
+            <from-outcome>propertyUnits</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertyUnits.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        
     </navigation-rule>
       
     
@@ -759,14 +766,11 @@
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
 
-    <!-- ^^^^^^^^^^^^^^^^ persons-core backing beans ^^^^^^^^^^^^^^^^ **-->
-    
     <managed-bean>
         <managed-bean-name>personCECasesBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PersonCECasesBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    
     
     <managed-bean>
         <managed-bean-name>personEventsBB</managed-bean-name>
@@ -802,40 +806,49 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    
-    
-    <!-- ^^^^^^^^^^^^^^^^ legacy? ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ **-->
-
-    <managed-bean>
-        <managed-bean-name>personsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
         
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     <navigation-rule>
         <from-view-id>*</from-view-id>
 
         <navigation-case>
-            <from-outcome>personProfile</from-outcome>
-            <to-view-id>/restricted/cogview/personProfile.xhtml</to-view-id>
+            <from-outcome>personCECases</from-outcome>
+            <to-view-id>/restricted/cogview/personCECases.xhtml</to-view-id>
         </navigation-case>
          
         <navigation-case>
+            <from-outcome>personEvents</from-outcome>
+            <to-view-id>/restricted/cogstaff/person/personEvents.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>personInfo</from-outcome>
+            <to-view-id>/restricted/cogstaff/person/personInfo.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>personOccPeriods</from-outcome>
+            <to-view-id>/restricted/cogstaff/person/personOccPeriods.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>personProperties</from-outcome>
+            <to-view-id>/restricted/cogstaff/person/personProperties.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>personPublic</from-outcome>
+            <to-view-id>/restricted/cogstaff/person/personPublic.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
             <from-outcome>personSearch</from-outcome>
-            <to-view-id>/restricted/cogview/persons.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>persons</from-outcome>
-            <to-view-id>/restricted/cogview/persons.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>personAdd</from-outcome>
-            <to-view-id>/restricted/munistaff/personAdd.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/person/personSearch.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
@@ -1111,12 +1124,6 @@
 </managed-bean>
     
 <managed-bean>
-    <managed-bean-name>cEEventsBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CEEventsBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
     <managed-bean-name>cECaseWorkflowBB</managed-bean-name>
     <managed-bean-class>com.tcvcog.tcvce.application.CECaseWorkflowBB</managed-bean-class>
     <managed-bean-scope>view</managed-bean-scope>
@@ -1131,13 +1138,6 @@
 <managed-bean>
     <managed-bean-name>cECaseNoticesBB</managed-bean-name>
     <managed-bean-class>com.tcvcog.tcvce.application.CECaseNoticesBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-    
-<managed-bean>
-    <managed-bean-name>cECaseUtilitiesBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CECaseUtilitiesBB</managed-bean-class>
     <managed-bean-scope>view</managed-bean-scope>
 </managed-bean>
     
@@ -1872,12 +1872,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <description>Handles client-side actions related to choice display and selection</description>
-        <managed-bean-name>choiceBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ChoiceBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
             
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 

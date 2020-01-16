@@ -26,7 +26,7 @@ import javax.faces.convert.FacesConverter;
  *
  * @author Nathan Dietz
  */
-@FacesConverter(forClass = IntensitySchema.class, value = "intensitySchemaConverter")
+@FacesConverter(value = "intensitySchemaConverter")
 public class IntensitySchemaConverter extends EntityConverter implements Converter {
 
     @Override

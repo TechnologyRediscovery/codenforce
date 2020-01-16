@@ -28,7 +28,7 @@ import javax.faces.convert.FacesConverter;
  *
  * @author ellen bascomb of apt 31y
  */
-@FacesConverter(forClass=CEActionRequestStatus.class, value="ceActionRequestStatusConverter")
+@FacesConverter(value="ceActionRequestStatusConverter")
 public class CEActionRequestStatusConverter extends EntityConverter implements Converter{
     
      @Override

@@ -168,11 +168,15 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     
     public int insertActionRequestorNewPerson(Person p){
         PersonIntegrator personIntegrator = getPersonIntegrator();
-        p.setSourceID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestPublicUserPersonSourceID")));
-        
+        SystemIntegrator si = getSystemIntegrator();
         int insertedPersonID = 0;
         
         try {
+            p.setSource(si.getBOBSource(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                    .getString("actionRequestPublicUserPersonSourceID"))));
+        
+        
             insertedPersonID = personIntegrator.insertPerson(p);
             System.out.println("CEActionReqeustSubmitBB.storeActionRequestorPerson | PersonID " + insertedPersonID);
         } catch (IntegrationException ex) {

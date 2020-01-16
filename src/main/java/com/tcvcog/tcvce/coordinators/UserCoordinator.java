@@ -565,7 +565,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         if(aup.getUserMuniAuthPeriodID() == u.getMyCredential().getGoverningAuthPeriod().getUserMuniAuthPeriodID()){
             throw new AuthorizationException("You are unauthorized to invalidate your current authorization period");
         }
-        aup.setNotes(sc.appendNoteBlock(new MessageBuilderParams(aup.getNotes(), "INVALIDATION OF AUTH PERIOD", "", note, u)));
+        aup.setNotes(sc.appendNoteBlock(new MessageBuilderParams(aup.getNotes(), "INVALIDATION OF AUTH PERIOD", "", note, u, u.getMyCredential())));
         ui.invalidateUserAuthRecord(aup);
         
         // We should be logging this action
