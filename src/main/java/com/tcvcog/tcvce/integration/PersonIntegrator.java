@@ -61,7 +61,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     /**
      * Looks up a person given a personID and creates a returns a new instance
-     * of Person with all the available information loaded about that person
+ of Person with all the available information loaded about that person
      *
      * @param personId the id of the person to look up
      * @return a Person object with all of the available data loaded
@@ -196,10 +196,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     
     /**
      * We have a special type of Person which are those who have been attached to an Occ period
-     * through an application, which may suggest a certain person type in relation to a particular
-     * occupancy period
-     * 
-     * As of Beta launch Jan 2020, this functionality wasn't turned on yet.
+ through an application, which may suggest a certain person type in relation to a particular
+ occupancy period
+ 
+ As of Beta launch Jan 2020, this functionality wasn't turned on yet.
      * 
      * @param period
      * @return
@@ -548,7 +548,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     public void connectPersonsToCitation(Citation c, List<Person> persList) throws IntegrationException {
         Iterator<Person> iter = persList.iterator();
         while (iter.hasNext()) {
-            connectPersonToCitation( c, (Person) iter.next());
+            connectPersonToCitation(c, (Person) iter.next());
         }
     }
     
@@ -583,7 +583,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     /**
      * Generates a linked list of Person objects given an array of person ID
-     * numbers. This is accomplished by making repeated calls to the
+ numbers. This is accomplished by making repeated calls to the
      * createPersonFromResultSet() method.
      *
      * @return a linked list of person objects that can be used for display and
@@ -603,11 +603,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     /**
      * Updates a given record for a person in the database. Will throw an error
-     * if the person does not exist. Note that this method will retrieve the
-     * Person object's ID number to determine which record to update in the db
+ if the person does not exist. Note that this method will retrieve the
+ Person object's ID number to determine which record to update in the db
      *
      * @param personToUpdate the Person object with the updated data to be
-     * stored in the database. All old information will be overwritten
+ stored in the database. All old information will be overwritten
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public void updatePerson(Person personToUpdate) throws IntegrationException {

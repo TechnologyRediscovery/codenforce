@@ -35,7 +35,7 @@
                             <h:form id="propertySearchForm">
 
                                 <p:commandButton id="propertyAddButton"
-                                                 value="Add new property in #{sessionBean.sessionMuni.muniName}" icon="fa fa-plus"
+                                                 value="Add new property in #{sessionBean.sessMuni.muniName}" icon="fa fa-plus"
                                                  action="#{propertyProfileBB.addProperty()}"
                                                  disabled="false"
 
@@ -74,7 +74,7 @@
                                             </p:outputLabel>
                                             <p:spacer height="5px"/>
                                             <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuni}">
-                                                <f:selectItems value="#{sessionBean.sessionUser.authMunis}"/>
+                                                <f:selectItems value="#{sessionBean.sessUser.authMunis}"/>
                                             </p:selectOneMenu>
                                             <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -84,7 +84,7 @@
 
                                     <h:panelGroup>
                                         <p:commandButton
-                                            value="Search in #{sessionBean.sessionMuni.muniName}" 
+                                            value="Search in #{sessionBean.sessMuni.muniName}" 
                                             tabindex="3" 
                                             ajax="true"
                                             icon="fa fa-search"  
@@ -154,7 +154,7 @@
                                                                      disabled="#{!propertyProfileBB.searchParams.filterByMuni}">
                                                         <f:converter converterId="muniConverter"/>
                                                         <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                                        <f:selectItems id="muniNameList" value="#{sessionBean.sessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                        <f:selectItems id="muniNameList" value="#{sessionBean.sessUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                                     </p:selectOneMenu>
                                                     <h:message for="prop-muni-som" showDetail="true" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -450,7 +450,7 @@
                                 <p:commandButton ajax="true" value="Update Selected Property Info" 
                                                  action="#{propertyProfileBB.updateProperty}" 
                                                  oncomplete="PF('dialog-widvar-propinfoedit').show()"
-                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                 rendered="#{sessionBean.sessessUseryCard.hasMuniStaffPermissions}"
                                                  icon="fa fa-edit"
                                                  disabled="false"
                                                  update="form-propinfoedit"/>
@@ -466,7 +466,7 @@
                                                        ajax="true" 
                                                        actionListener="#{propertyProfileBB.beginPropertyUnitChanges}"
                                                        oncomplete="PF('dialog-widvar-unitedit').show()"
-                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                       rendered="#{sessionBean.sessiosessUserrd.hasMuniStaffPermissions}"
                                                        value="Edit unit list"  
                                                        icon="fa fa-edit"
                                                        update="form-unitedit"/>
@@ -507,7 +507,7 @@
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
                                                                ajax="true" 
                                                                actionListener="#{propertyProfileBB.initiateNewOccPeriodCreation(unit)}"
-                                                               rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                               rendered="#{sessionBean.sessionUssessUserhasMuniStaffPermissions}"
                                                                disabled="#{!propertyProfileBB.currProp.active}"
                                                                oncomplete="PF('dialog-addoccperiod-var').show()"
                                                                value="Add new occupancy period" 
@@ -556,7 +556,7 @@
                                                 <p:commandButton       id="button-occperiodtable-editperiod"
                                                                        ajax="false" 
                                                                        action="#{propertyProfileBB.manageOccPeriod(period)}"
-                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                       rendered="#{sessionBean.sessionUser.sessUserMuniStaffPermissions}"
                                                                        value="manage occupancy period"  
                                                                        icon="fa fa-edit"/>
                                                
@@ -577,7 +577,7 @@
                                 <p:commandButton ajax="false"  icon="fa fa-plus"
                                                  value="Open a new code enforcement case" 
                                                  action="#{propertyProfileBB.openCECase}"
-                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                                 disabled="#{!(sessionBean.sessionUser.keysessUserOfficialPermissions)}"/>
                                 <p:spacer height="10px"/>
                                 <p:dataTable
                                     id="prop-cases-datatable"
@@ -975,7 +975,7 @@
                                                      value="#{propertyProfileBB.currProp.muni}">
                                         <f:converter converterId="muniConverter"/>
                                         <f:selectItems id="propinfoedit-muninamelist" 
-                                                       value="#{sessionBean.sessionUser.authMuniList}"
+                                                       value="#{sessionBean.sessessUserthMuniList}"
                                                        var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
 
                                     </h:selectOneMenu>

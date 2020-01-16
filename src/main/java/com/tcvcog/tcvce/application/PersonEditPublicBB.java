@@ -78,9 +78,9 @@ public class PersonEditPublicBB extends BackingBeanUtils implements Serializable
     public String addCloneToApplicantPersons(Person clone) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         pi.updatePerson(clone);
-        getSessionBean().getSessionOccPermitApplication().getAttachedPersons().add(clone);
+        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add(clone);
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        oc.verifyOccPermitPersonsRequirement(getSessionBean().getSessionOccPermitApplication());
+        oc.verifyOccPermitPersonsRequirement(getSessionBean().getSessOccPermitApplication());
         return "managePeople";
     }
     

@@ -104,7 +104,7 @@
                                 <p:commandButton ajax="true" value="Update Selected Property Info" 
                                                  actionListener="#{propertyProfileBB.initiatePropertyEdit}" 
                                                  oncomplete="PF('dialog-widvar-propinfoedit').show()"
-                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                 rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
                                                  icon="fa fa-edit"
                                                  disabled="false"
                                                  update="form-propinfoedit"/>
@@ -175,7 +175,7 @@
                                                      value="#{propertyProfileBB.currProp.muni}">
                                         <f:converter converterId="muniConverter"/>
                                         <f:selectItems id="propinfoedit-muninamelist" 
-                                                       value="#{sessionBean.sessionUser.authMuniList}"
+                                                       value="#{sessionBean.sessUser.authMuniList}"
                                                        var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
 
                                     </h:selectOneMenu>
@@ -190,7 +190,7 @@
                                <p:commandButton ajax="true" value="Commit edits" 
                                                 action="#{propertyProfileBB.commitPropertyUpdates}" 
                                                  oncomplete="PF('dialog-widvar-propinfoedit').hide()"
-                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                 rendered="#{sessionBean.sessiosessUserrd.hasMuniStaffPermissions}"
                                                  icon="fa fa-edit"
                                                  disabled="false"
                                                  update="property-info-form

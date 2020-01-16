@@ -99,10 +99,10 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         System.out.println("SystemServicesBB.initBean");
         UserCoordinator uc = getUserCoordinator();
         
-        bbSessionUser = getSessionBean().getSessionUser();
-        bbSessionMuni = getSessionBean().getSessionMuni();
-        bbSessionProperty = getSessionBean().getSessionProperty();
-        bbSessionPerson = getSessionBean().getSessionPerson();
+        bbSessionUser = getSessionBean().getSessUser();
+        bbSessionMuni = getSessionBean().getSessMuni();
+        bbSessionProperty = getSessionBean().getSessProperty();
+        bbSessionPerson = getSessionBean().getSessPerson();
         
         userListForSearch = uc.assembleUserListForSearchCriteria();
         
@@ -120,6 +120,11 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     }
     
      
+    /**
+     * Central point of exit for session endings: destroys session key's validity
+     * and redirects user to exit page
+     * @return 
+     */
     public String logout(){
         FacesContext context = getFacesContext();
         HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
@@ -166,7 +171,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
 
         ImprovementSuggestion is = new ImprovementSuggestion();
         
-        is.setSubmitter(getSessionBean().getSessionUser());
+        is.setSubmitter(getSessionBean().getSessUser());
         is.setImprovementTypeID(selectedImprovementType);
         is.setSuggestionText(systemImprovementTicketRText);
         // back to the hard-coded since I couldn't get the resource bundle lookup

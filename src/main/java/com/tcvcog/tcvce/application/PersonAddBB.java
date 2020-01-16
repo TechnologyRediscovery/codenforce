@@ -88,7 +88,7 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         if (formMuni != null){
             p.setMuniCode(formMuni.getMuniCode());
         } else {
-            p.setMuniCode(getSessionBean().getSessionMuni().getMuniCode());
+            p.setMuniCode(getSessionBean().getSessMuni().getMuniCode());
         }
         
         
@@ -124,7 +124,7 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         try {
             if(formConnectToActiveProperty){
                 
-                Property property = getSessionBean().getSessionProperty();
+                Property property = getSessionBean().getSessProperty();
                 personInt.insertPersonAndConnectToProperty(p, property);
             
                 getFacesContext().addMessage(null,
@@ -176,7 +176,7 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         
         temp.setEmail(formEmail);
         
-        getSessionBean().getSessionOccPermitApplication().getAttachedPersons().add(temp);
+        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add(temp);
         
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
@@ -474,7 +474,7 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
      */
     public Property getActiveProp() {
         
-        activeProp = getSessionBean().getSessionProperty();
+        activeProp = getSessionBean().getSessProperty();
         return activeProp;
     }
 

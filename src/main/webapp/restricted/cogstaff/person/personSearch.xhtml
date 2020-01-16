@@ -80,23 +80,14 @@
                                                     disabled="!#{sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}"
                                                     onclick="PF('search-params-dialog').show()"
                                                     icon="fa fa-gears"/>
-
-                                        
                             </h:form>
-                                                
-
-
                         </p:panel>
-                        
-                            
                         <p:panel    id="pers-search-results-panel"
                                     toggleable="true"
                                     widgetVar="pers-search-results-panel-var"
                                     collapsed="false"
                                     header="Person search results">
                             
-                            
-
                                 <h2>Search Results in <h:outputText value="#{personsBB.searchParams.muni_val.muniName}" /></h2>
 
                                 <p:commandButton    id="load-history-cb"
@@ -178,15 +169,11 @@
                             </h:form>
                         </p:panel>
                                
-                            
-                            
                         <p:panel    id="pers-add-panel"
                                     toggleable="true"
                                     widgetVar="pers-search-query-panel-var"
                                     collapsed="false"
                                     header="Add a new person">
-                               
-                            
                             <h:form id="start-new-person-form">
 
                                 <p:commandButton    id="new-person-cb"
@@ -198,55 +185,9 @@
                                                     icon="fa fa-plus"
                                                     />
                             </h:form>
-
                         </p:panel>
-                        
-
                     <!--close main container-->
                     </div>
-                    
-                    
-                    <p:dialog   id="_________NAMEME_________"
-                                header="_________NAMEME_________" 
-                                widgetVar="_________NAMEME_________" 
-                                responsive="true" 
-                                width="400"
-                                modal="false"
-                                height="600">
-                        
-                          <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                        </h:form>
-                        
-                        <h:form id="_________NAMEME_________">
-                            
-
-                            <h2>_________NAMEME_________</h2>
-
-                            
-                            
-                            <p:commandButton    id="_________NAMEME_________"
-                                                value="_________NAMEME_________" 
-                                                ajax="true" 
-                                                icon="fa fa-edit"
-                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
-                                                disabled="false"
-                                                rendered="true"
-                                                oncomplete="PF('_________NAMEME_________').hide()"
-                                                update=""/>
-
-                            <p:commandLink  value="close" 
-                                            onclick="PF('_________NAMEME_________').hide()" 
-                                            styleClass="noFill"/>
-
-                        </h:form>
-
-                    </p:dialog>
-
-
                 </f:view>
             </ui:define>
         </ui:composition>

@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * Stores search parameters and switches turning each one on and off 
- * for queries involving Person objects
+ for queries involving Person objects
  * 
  * @author Sylvia Garland
  */

@@ -106,7 +106,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
         QueryCEAR sessionQuery = getSessionBean().getQueryCEAR();
 
-        selectedRequest = getSessionBean().getSessionCEAR();
+        selectedRequest = getSessionBean().getSessCEAR();
         ReportCEARList rpt = null;
         
         try {
@@ -121,16 +121,16 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             }
             selectedQueryCEAR = sessionQuery;
             searchParams = sessionQuery.getParmsList().get(0);
-            queryList = sc.buildQueryCEARList(getSessionBean().getSessionUser().getMyCredential());
+            queryList = sc.buildQueryCEARList(getSessionBean().getSessUser().getMyCredential());
 
             CaseCoordinator cc = getCaseCoordinator();
             SearchCoordinator searchCoord = getSearchCoordinator();
             rpt = cc.getInitializedReportConficCEARs(
-                    getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
+                    getSessionBean().getSessUser(), getSessionBean().getSessMuni());
             rpt.setPrintFullCEARQueue(false);
             QueryCEAR query = searchCoord.initQuery(
                                                 QueryCEAREnum.CUSTOM, 
-                                                getSessionBean().getSessionUser().getMyCredential());
+                                                getSessionBean().getSessUser().getMyCredential());
             List<CEActionRequest> singleReqList = new ArrayList<>();
             if(selectedRequest != null){
                 selectedRequest.setInsertPageBreakBefore(false);
@@ -185,7 +185,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         try {
             
             selectedQueryCEAR = searchCoord.initQuery(QueryCEAREnum.CUSTOM,
-                                                    getSessionBean().getSessionUser().getMyCredential());
+                                                    getSessionBean().getSessUser().getMyCredential());
             requestList =searchCoord.runQuery(selectedQueryCEAR).getResults();
             
             generateCEARReasonDonutModel();
@@ -204,7 +204,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SearchCoordinator searchCoord = getSearchCoordinator();
         
         ReportCEARList rpt = cc.getInitializedReportConficCEARs(
-                getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
+                getSessionBean().getSessUser(), getSessionBean().getSessMuni());
         
         rpt.setPrintFullCEARQueue(true);
         if (selectedQueryCEAR != null) {
@@ -227,15 +227,15 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
   
 
     public String generateReportSingleCEAR() {
-        getSessionBean().setSessionCEAR(selectedRequest);
-        getSessionBean().setSessionReport(reportConfig);
+        getSessionBean().setSessCEAR(selectedRequest);
+        getSessionBean().setSessReport(reportConfig);
         getSessionBean().setQueryCEAR(selectedQueryCEAR);
         return "reportCEARList";
 
     }
     
     public String generateReportMultiCEAR(){
-        getSessionBean().setSessionCEAR(selectedRequest);
+        getSessionBean().setSessCEAR(selectedRequest);
         
         // Not working
 //        Collections.sort(reportConfig.getBOBQuery().getBOBResultList());
@@ -243,7 +243,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         // tell the first request in the list to not print a page break before itself
         reportConfig.getBOBQuery().getBOBResultList().get(0).setInsertPageBreakBefore(false);
         
-        getSessionBean().setSessionReport(reportConfig);
+        getSessionBean().setSessReport(reportConfig);
         getSessionBean().setQueryCEAR(selectedQueryCEAR);
         return "reportCEARList";
     }
@@ -256,11 +256,11 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         if (selectedRequest != null) {
             try {
                 if (selectedRequest.getRequestProperty() != null) {
-                    getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(selectedRequest.getRequestProperty(), getSessionBean().getSessionUser().getMyCredential()));
+                    getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(selectedRequest.getRequestProperty(), getSessionBean().getSessUser().getMyCredential()));
                 }
 
                 MessageBuilderParams mbp = new MessageBuilderParams();
-                mbp.setUser(getSessionBean().getSessionUser());
+                mbp.setUser(getSessionBean().getSessUser());
                 mbp.setExistingContent(selectedRequest.getPublicExternalNotes());
                 mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseHeader"));
                 mbp.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseExplanation"));
@@ -307,7 +307,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         selectedCaseForAttachment = c;
         try {
-            ceari.connectActionRequestToCECase(selectedRequest.getRequestID(), selectedCaseForAttachment.getCaseID(), getSessionBean().getSessionUser().getUserID());
+            ceari.connectActionRequestToCECase(selectedRequest.getRequestID(), selectedCaseForAttachment.getCaseID(), getSessionBean().getSessUser().getUserID());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Successfully connected action request ID " + selectedRequest.getRequestID()
                     + " to code enforcement case ID " + selectedCaseForAttachment.getCaseID(), ""));
@@ -333,7 +333,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
             // build message to document change
             MessageBuilderParams mcc = new MessageBuilderParams();
-            mcc.setUser(getSessionBean().getSessionUser());
+            mcc.setUser(getSessionBean().getSessUser());
             mcc.setExistingContent(selectedRequest.getPublicExternalNotes());
             mcc.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestHeader"));
             mcc.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestExplanation"));
@@ -368,7 +368,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
             // build message to document change
             MessageBuilderParams mbp = new MessageBuilderParams();
-            mbp.setUser(getSessionBean().getSessionUser());
+            mbp.setUser(getSessionBean().getSessUser());
             mbp.setExistingContent(selectedRequest.getPublicExternalNotes());
             mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundHeader"));
             mbp.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundExplanation"));
@@ -474,7 +474,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         }
 
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setUser(getSessionBean().getSessionUser());
+        mbp.setUser(getSessionBean().getSessUser());
         mbp.setExistingContent(selectedRequest.getPublicExternalNotes());
         mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedHeader"));
         mbp.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedExplanation"));
@@ -540,7 +540,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SystemCoordinator sc = getSystemCoordinator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setUser(getSessionBean().getSessionUser());
+        mbp.setUser(getSessionBean().getSessUser());
         mbp.setExistingContent(selectedRequest.getCogInternalNotes());
         mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("internalNote"));
         mbp.setExplanation("");
@@ -566,7 +566,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setUser(getSessionBean().getSessionUser());
+        mbp.setUser(getSessionBean().getSessUser());
         mbp.setExistingContent(selectedRequest.getMuniNotes());
         mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("muniNote"));
         mbp.setExplanation("");
@@ -591,7 +591,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SystemCoordinator sc = getSystemCoordinator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setUser(getSessionBean().getSessionUser());
+        mbp.setUser(getSessionBean().getSessUser());
         mbp.setExistingContent(selectedRequest.getPublicExternalNotes());
         mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("externalNote"));
         mbp.setExplanation("");
@@ -832,7 +832,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         disabledDueToRoutingNotAllowed
                 = !(cc.determineCEActionRequestRoutingActionEnabledStatus(
                         selectedRequest,
-                        getSessionBean().getSessionUser()));
+                        getSessionBean().getSessUser()));
 
         return disabledDueToRoutingNotAllowed;
     }
@@ -962,7 +962,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      */
     public boolean isDisablePACCControl() {
         disablePACCControl = false;
-        if (getSessionBean().getSessionUser().getMyCredential().isHasMuniStaffPermissions() == false) {
+        if (getSessionBean().getSessUser().getMyCredential().isHasMuniStaffPermissions() == false) {
             disablePACCControl = true;
         }
         return disablePACCControl;

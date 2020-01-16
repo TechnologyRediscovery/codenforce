@@ -86,7 +86,7 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
     
     private ArrayList<CodeElement> loadCodeElementList(){
         ArrayList<CodeElement> elList = null;
-        CodeSource source = getSessionBean().getActiveCodeSource();
+        CodeSource source = getSessionBean().getSessCodeSource();
         CodeIntegrator codeIntegrator = getCodeIntegrator();
         try {
             if(source != null){
@@ -263,7 +263,7 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
      * @return the currentSource
      */
     public CodeSource getCurrentSource() {
-        currentSource = getSessionBean().getActiveCodeSource();
+        currentSource = getSessionBean().getSessCodeSource();
         return currentSource;
     }
 

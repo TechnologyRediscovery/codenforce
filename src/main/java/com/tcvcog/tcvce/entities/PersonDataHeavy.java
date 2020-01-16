@@ -16,6 +16,9 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import java.util.List;
+
 /**
  *
  * @author sylvia
@@ -23,6 +26,11 @@ package com.tcvcog.tcvce.entities;
 public  class PersonDataHeavy 
         extends Person 
         implements IFace_CredentialSigned{
+    
+    private List<CECase> caseList;
+    private List<OccPeriod> periodList;
+    private List<Property> propertyList;
+    private List<EventCnF> eventList;
     
     private String credentialSignature;
     
@@ -212,6 +220,62 @@ public  class PersonDataHeavy
         this.cloneList = p.cloneList;
         this.mergedList = p.mergedList;
         
+    }
+
+    /**
+     * @return the caseList
+     */
+    public List<CECase> getCaseList() {
+        return caseList;
+    }
+
+    /**
+     * @return the periodList
+     */
+    public List<OccPeriod> getPeriodList() {
+        return periodList;
+    }
+
+    /**
+     * @return the propertyList
+     */
+    public List<Property> getPropertyList() {
+        return propertyList;
+    }
+
+    /**
+     * @return the eventList
+     */
+    public List<EventCnF> getEventList() {
+        return eventList;
+    }
+
+    /**
+     * @param caseList the caseList to set
+     */
+    public void setCaseList(List<CECase> caseList) {
+        this.caseList = caseList;
+    }
+
+    /**
+     * @param periodList the periodList to set
+     */
+    public void setPeriodList(List<OccPeriod> periodList) {
+        this.periodList = periodList;
+    }
+
+    /**
+     * @param propertyList the propertyList to set
+     */
+    public void setPropertyList(List<Property> propertyList) {
+        this.propertyList = propertyList;
+    }
+
+    /**
+     * @param eventList the eventList to set
+     */
+    public void setEventList(List<EventCnF> eventList) {
+        this.eventList = eventList;
     }
 
  

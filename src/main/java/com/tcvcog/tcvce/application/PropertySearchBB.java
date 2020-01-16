@@ -66,15 +66,15 @@ public class PropertySearchBB extends BackingBeanUtils{
         PropertyIntegrator pi = getPropertyIntegrator();
         
         
-        if(getSessionBean().getSessionPropertyList() == null){
+        if(getSessionBean().getSessPropertyList() == null){
             propList = new ArrayList<>();
         } else {
-            propList = getSessionBean().getSessionPropertyList();
+            propList = getSessionBean().getSessPropertyList();
         }
         appendResultsToList = false;
         
         try {
-            queryList = sc.buildQueryPropertyList(getSessionBean().getSessionUser().getMyCredential());
+            queryList = sc.buildQueryPropertyList(getSessionBean().getSessUser().getMyCredential());
             putList = pi.getPropertyUseTypeList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -130,11 +130,11 @@ public class PropertySearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
         
         try {
-            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessionUser().getMyCredential()));
+            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessUser().getMyCredential()));
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Managing property at " + prop.getAddress() , ""));
-            sc.logObjectView(getSessionBean().getSessionUser(), prop);
+            sc.logObjectView(getSessionBean().getSessUser(), prop);
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

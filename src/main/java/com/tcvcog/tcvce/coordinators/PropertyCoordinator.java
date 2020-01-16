@@ -175,7 +175,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
     public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
-        prop.setLastUpdatedBy(getSessionBean().getSessionUser());
+        prop.setLastUpdatedBy(getSessionBean().getSessUser());
         prop.setLastUpdatedTS(LocalDateTime.now());
         pi.updateProperty(prop);
         

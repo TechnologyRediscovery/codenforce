@@ -66,13 +66,13 @@ public class CECaseViolationsBB
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
-        currentCase = sb.getSessionCECase();
+        currentCase = sb.getSessCECase();
        
     }
     
     
     public String addViolation() {
-        getSessionBean().setSessionCECase(getCurrentCase());
+        getSessionBean().setSessCECase(getCurrentCase());
         return "violationSelectElement";
     }
       
@@ -122,7 +122,7 @@ public class CECaseViolationsBB
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Success: Updated Violation with new CodeBook linking", ""));
-                currentCase = cc.assembleCECaseDataHeavy(cc.getCECase(currentCase.getCaseID()), getSessionBean().getSessionUser().getMyCredential());
+                currentCase = cc.assembleCECaseDataHeavy(cc.getCECase(currentCase.getCaseID()), getSessionBean().getSessUser().getMyCredential());
             } else {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -144,12 +144,12 @@ public class CECaseViolationsBB
         // build event details package
         EventCnF e = null;
         try {
-            getSelectedViolation().setComplianceUser(getSessionBean().getSessionUser());
+            getSelectedViolation().setComplianceUser(getSessionBean().getSessUser());
             e = ec.generateViolationComplianceEvent(getSelectedViolation());
-            e.setOwner(getSessionBean().getSessionUser());
+            e.setOwner(getSessionBean().getSessUser());
             e.setTimeStart(LocalDateTime.now());
             cv.setActualComplianceDate(LocalDateTime.now());
-            cc.recordCompliance(cv, getSessionBean().getSessionUser());
+            cc.recordCompliance(cv, getSessionBean().getSessUser());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -163,7 +163,7 @@ public class CECaseViolationsBB
 
 //    Procedural vs. OO code
     public String editViolation(CodeViolation cv) {
-            getSessionBean().setSessionCodeViolation(cv);
+            getSessionBean().setSessCodeViolation(cv);
 //            positionCurrentCaseAtHeadOfQueue();
             return "violationEdit";
     }

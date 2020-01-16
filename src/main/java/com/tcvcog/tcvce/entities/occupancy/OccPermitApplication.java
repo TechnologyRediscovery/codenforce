@@ -41,8 +41,8 @@ public class OccPermitApplication {
     
     /**
     * This will contain either existing Person objects, new Person objects created by user, or 
-    * clones of existing Person objects whose reference persons data was changed as part of the 
-    * application. The occupancy coordinator will digest this list to determine if the requirements 
+ clones of existing Person objects whose reference persons data was changed as part of the 
+ application. The occupancy coordinator will digest this list to determine if the requirements 
     * have been satisfied.
     */
     private List<Person> attachedPersons;

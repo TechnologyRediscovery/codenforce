@@ -75,11 +75,11 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     @PostConstruct
     public void initBean(){
-        currentNotice = getSessionBean().getSessionNotice();
-        currentCase = getSessionBean().getSessionCECase();
+        currentNotice = getSessionBean().getSessNotice();
+        currentCase = getSessionBean().getSessCECase();
         blockListBeforeViolations = new ArrayList<>();
         blockListAfterViolations = new ArrayList<>();
-        PropertyDataHeavy pdh = getSessionBean().getSessionProperty();
+        PropertyDataHeavy pdh = getSessionBean().getSessProperty();
         
         personCandidateList = pdh.getPersonList();
         if(personCandidateList != null){
@@ -181,13 +181,13 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             currentNotice.setNoticeTextAfterViolations(sb.toString());
 
             try {
-                newNoticeId = cc.novInsertNotice(currentNotice, currentCase, getSessionBean().getSessionUser());
+                newNoticeId = cc.novInsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
                 System.out.println(ex);
             }
             currentNotice.setNoticeID(newNoticeId);
-            getSessionBean().setSessionNotice(currentNotice);
+            getSessionBean().setSessNotice(currentNotice);
             return "noticeOfViolationEditor";
         } else {
              getFacesContext().addMessage(null,
@@ -226,7 +226,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public NoticeOfViolation getCurrentNotice() {
         
-        currentNotice = getSessionBean().getSessionNotice();
+        currentNotice = getSessionBean().getSessNotice();
         return currentNotice;
     }
 
@@ -242,7 +242,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public List<TextBlock> getBlockList() {
         ViolationIntegrator cvi = getCodeViolationIntegrator();
-        Municipality m = getSessionBean().getSessionMuni();
+        Municipality m = getSessionBean().getSessMuni();
         if(blockList == null){
             try {
                 if(showTextBlocksAllMuni){
@@ -269,7 +269,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public List<CodeViolation> getActiveVList() {
         if(activeVList == null){
-            activeVList = getSessionBean().getSessionViolationList();
+            activeVList = getSessionBean().getSessViolationList();
         }
         return activeVList;
     }

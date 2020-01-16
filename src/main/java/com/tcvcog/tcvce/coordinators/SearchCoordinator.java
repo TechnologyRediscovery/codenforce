@@ -389,7 +389,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * Shared SQL builder for the search fields on the SearchParams superclass 
      * whose subclasses are passed to the searchForXXX(SearchParamsXXX params) method family spread across the
      * main Integrators. We remove duplication of building these shared search criteria across all 6 searchable
-     * BOBs as of the beta: Property, Person, Event, OccPeriod, CECase, and CEActionRequest
+ BOBs as of the beta: Property, Person, Event, OccPeriod, CECase, and CEActionRequest
      * @param params
      * @param muniDBField
      * @return the configured apram for      */
@@ -598,6 +598,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case HOUSESTREETNUM:
                 paramsList.add(genParams_property_address(params, cred));
                 break;
+            case PERSONS:
+                paramsList.add(genParams_property_persons(params, cred));
+                break;
             case CUSTOM:
                 break;
          }
@@ -667,6 +670,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
              case CECASE:
                  paramsList.add(genParams_event_cecase(params, cred));
                  break;
+             case PERSONS:
+                 paramsList.add(genParams_event_persons(params, cred));
+                 break;
             case CUSTOM:
                 break;
             default:
@@ -700,6 +706,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case RENTAL_ALL:
                 break;
             case RENTAL_REGISTERED:
+                break;
+            case PERSONS:
+                paramsList.add(genParams_occPeriod_persons(params, cred));
                 break;
             case RENTAL_UNREGISTERED:
                 break;
@@ -748,6 +757,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 break;
             case PROPINFOCASES:
                 paramsList.add(genParams_cecase_propInfo(params, cred));
+                break;
+            case PERSINFOCASES:
+                paramsList.add(genParams_ceCase_personinfo(params, cred));
                 break;
             case PACC:
                 paramsList.add(genParams_cecase_pacc(params, cred));
@@ -1080,6 +1092,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return params;
     }
     
+    private SearchParamsProperty genParams_property_persons(SearchParamsProperty params, Credential cred){
+        params.setPerson_ctl(true);
+        // downstream injects Person
+        return params;
+    }
+    
+    
     private SearchParamsProperty genParams_property_address(SearchParamsProperty params, Credential cred){
         params.setSearchName("Lead parameter bundle for property search by address");
         params.setSearchDescription("search by address");
@@ -1250,6 +1269,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
+    public SearchParamsEvent genParams_event_persons(SearchParamsEvent params, Credential cred ){
+        params.setPerson_ctl(true);
+        // downstream injects person
+        return params;
+    }
+    
     public SearchParamsEvent genParams_event_occperid(SearchParamsEvent params, Credential cred ){
         params.setEventDomain_ctl(true);
         params.setEventDomain_val(EventDomainEnum.OCCUPANCY);
@@ -1331,7 +1356,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
   
-    
+    private SearchParamsOccPeriod genParams_occPeriod_persons(SearchParamsOccPeriod params, Credential cred){
+        params.setPerson_ctl(true);
+        // user injects Person
+        return params;
+    }
     
     private SearchParamsOccPeriod generateParams_occPeriod_wip(SearchParamsOccPeriod params, Credential cred){
         
@@ -1394,6 +1423,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setCasePhase_ctl(false);
         params.setCasePhase_val(null);
 
+        return params;
+    }
+    
+    public SearchParamsCECase genParams_ceCase_personinfo(SearchParamsCECase params, Credential cred){
+        params.setPersonInfoCaseID_ctl(true);
+        params.setPersonInfoCase_ctl(true);
+        // downstream puts in a Person
+        
         return params;
     }
     

@@ -76,7 +76,7 @@ public class CECaseEventsBB
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
-        setCurrentCase(sb.getSessionCECase());
+        setCurrentCase(sb.getSessCECase());
        
     }
     /**
@@ -213,7 +213,7 @@ public class CECaseEventsBB
 
         // category is already set from initialization sequence
         getSelectedEvent().setCeCaseID(getCurrentCase().getCaseID());
-        getSelectedEvent().setOwner(getSessionBean().getSessionUser());
+        getSelectedEvent().setOwner(getSessionBean().getSessUser());
         try {
         
          

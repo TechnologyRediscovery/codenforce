@@ -60,7 +60,7 @@ public class PropertyUnitsBB
      
     @PostConstruct
     public void initBean(){
-        currProp = getSessionBean().getSessionProperty();
+        currProp = getSessionBean().getSessProperty();
       
         
     }
@@ -76,7 +76,7 @@ public class PropertyUnitsBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         
         try {
-            getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessionUser().getMyCredential()));
+            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessUser().getMyCredential()));
         } catch (IntegrationException | BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -229,7 +229,7 @@ public class PropertyUnitsBB
         // mark parent property as updated now
        
         try{
-            pc.editProperty(currProp, getSessionBean().getSessionUser());
+            pc.editProperty(currProp, getSessionBean().getSessUser());
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -246,7 +246,7 @@ public class PropertyUnitsBB
     private void refreshCurrPropWithLists(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            setCurrProp(pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessionUser().getMyCredential()));
+            setCurrProp(pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessUser().getMyCredential()));
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

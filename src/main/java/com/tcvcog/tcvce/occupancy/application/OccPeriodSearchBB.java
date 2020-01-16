@@ -75,7 +75,7 @@ public  class   OccPeriodSearchBB
     public void initBean(){
         SearchCoordinator sc = getSearchCoordinator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
+        occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
         occPeriodList = new ArrayList<>();
         
         
@@ -92,12 +92,12 @@ public  class   OccPeriodSearchBB
         SystemCoordinator sc = getSystemCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        Credential cred = getSessionBean().getSessionUser().getMyCredential();
+        Credential cred = getSessionBean().getSessUser().getMyCredential();
         
         try {
-            getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(op, cred));
-            getSessionBean().setSessionProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), cred));
-            sc.logObjectView(getSessionBean().getSessionUser(), op);
+            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, cred));
+            getSessionBean().setSessProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), cred));
+            sc.logObjectView(getSessionBean().getSessUser(), op);
         } catch (IntegrationException | BObStatusException | AuthorizationException | EventException | SearchException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,

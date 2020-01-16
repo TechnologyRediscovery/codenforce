@@ -70,10 +70,10 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
         redirTo = getSessionBean().getPaymentRedirTo();
         if (redirTo != null) {
-            currentOccPeriod = getSessionBean().getSessionOccPeriod();
-            if (getSessionBean().getSessionPayment() != null) {
+            currentOccPeriod = getSessionBean().getSessOccPeriod();
+            if (getSessionBean().getSessPayment() != null) {
                 paymentList = new ArrayList<>();
-                paymentList.add(getSessionBean().getSessionPayment());
+                paymentList.add(getSessionBean().getSessPayment());
                 try {
                     occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) paymentIntegrator.getFeeAssigned(currentOccPeriod);
                 } catch (IntegrationException ex) {
@@ -246,7 +246,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         payment.setCheckNum(formPayment.getCheckNum());
         payment.setCleared(formPayment.isCleared());
         payment.setNotes(formPayment.getNotes());
-        payment.setRecordedBy(getSessionBean().getSessionUser());
+        payment.setRecordedBy(getSessionBean().getSessUser());
 
         if (payment.getPayer() == null) {
             getFacesContext().addMessage(null,

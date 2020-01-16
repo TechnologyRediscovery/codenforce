@@ -76,7 +76,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean(){
-        currentUser = getSessionBean().getSessionUser();
+        currentUser = getSessionBean().getSessUser();
         userPersonList = new ArrayList<>();
         if(currentUser != null){
             userPersonList.add(currentUser.getPerson());
@@ -103,7 +103,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      * @param ev 
      */
     public void initiateUserUpdates(ActionEvent ev){
-        currentUser = getSessionBean().getSessionUser();
+        currentUser = getSessionBean().getSessUser();
     }
     
     /**
@@ -111,7 +111,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      * @return 
      */
     public String editUserPersonRecord(){
-        getSessionBean().setSessionPerson(currentUser.getPerson());
+        getSessionBean().setSessPersonQueued(currentUser.getPerson());
         return "persons";
     }
 

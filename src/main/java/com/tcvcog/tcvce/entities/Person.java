@@ -26,8 +26,8 @@ import java.util.Objects;
 
 /**
  * Model object representing a person in the system. A Person has a type
- * coordinated through the enum @PersonType. Contains getters and setters for
- * database fields related to a Person, stored in the person table. 
+ coordinated through the enum @PersonType. Contains getters and setters for
+ database fields related to a Person, stored in the person table. 
  * 
  * @author Eric Darsow
  */

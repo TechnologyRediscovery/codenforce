@@ -391,7 +391,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
         rpt.setCreator(usr);
-        rpt.setMuni(getSessionBean().getSessionMuni());
+        rpt.setMuni(getSessionBean().getSessMuni());
 
         rpt.setDefaultItemIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()))));

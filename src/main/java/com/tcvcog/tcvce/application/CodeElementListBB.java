@@ -50,7 +50,7 @@ public class CodeElementListBB extends BackingBeanUtils implements Serializable 
     
     private ArrayList<CodeElement> loadCodeElementList(){
         ArrayList<CodeElement> elList = null;
-        CodeSource source = getSessionBean().getActiveCodeSource();
+        CodeSource source = getSessionBean().getSessCodeSource();
         CodeIntegrator codeIntegrator = getCodeIntegrator();
         try {
             if(source != null){

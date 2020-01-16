@@ -68,7 +68,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String getCurrentDashBoardInfo() {
         SessionBean s = getSessionBean();
         try {
-            String info = s.getSessionMuni().getMuniName();
+            String info = s.getSessMuni().getMuniName();
             return "Current Municipality: " + info;
         } catch (Exception ex) {
             return "Current Municipality: ";
@@ -79,8 +79,8 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String getCurrentPropertyInfo() {
         SessionBean s = getSessionBean();
         try {
-            String propertyAddress = s.getSessionProperty().getAddress();
-            String propertyId = String.valueOf(s.getSessionProperty().getPropertyID());
+            String propertyAddress = s.getSessProperty().getAddress();
+            String propertyId = String.valueOf(s.getSessProperty().getPropertyID());
             return "Current Property: " + propertyAddress + " | ID: " + propertyId;
         } catch (Exception ex) {
             return "Current Property: " + " | ID: ";
@@ -91,8 +91,8 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String getCurrentCEInfo() {
         SessionBean s = getSessionBean();
         try {
-            String caseName = s.getSessionCECase().getCaseName();
-            String caseId = String.valueOf(s.getSessionCECase().getCaseID());
+            String caseName = s.getSessCECase().getCaseName();
+            String caseId = String.valueOf(s.getSessCECase().getCaseID());
             return "Current Case: " + caseName + " | ID: " + caseId;
         } catch (Exception ex) {
             return "Current Case: " + " | ID: ";
@@ -101,10 +101,12 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
 
     public String getCurrentPersonInfo() {
-        SessionBean s = getSessionBean();
+        SessionBean sb = getSessionBean();
         try {
-            String personName = s.getSessionPerson().getFirstName();
-            String personId = String.valueOf(s.getSessionPerson().getPersonID());
+            String personName = sb.getSessPerson().getFirstName() 
+            + " " + sb.getSessPerson().getLastName(); 
+            
+            String personId = String.valueOf(sb.getSessPerson().getPersonID());
             return "Current Person: " + personName + " | ID: " + personId;
         } catch (Exception ex) {
             return "Current Person: " + " | ID: ";
@@ -115,8 +117,8 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String getCurrentPeriodInfo() {
         SessionBean s = getSessionBean();
         try {
-            String periodId = String.valueOf(s.getSessionOccPeriod().getPeriodID());
-            String periodType = s.getSessionOccPeriod().getType().getTitle();
+            String periodId = String.valueOf(s.getSessOccPeriod().getPeriodID());
+            String periodType = s.getSessOccPeriod().getType().getTitle();
             return "Current Person: " + periodType + " | ID: " + periodId;
         } catch (Exception ex) {
             return "Current Person: " + " | ID: ";
@@ -187,7 +189,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
 
     //Eric
     public String gotoPropertyProfile() {
-        if (getSessionBean().getSessionProperty() != null) {
+        if (getSessionBean().getSessProperty() != null) {
             return "propertyProfile";
         } else {
             getFacesContext().addMessage(null,
@@ -200,7 +202,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
 
     public String gotoCaseProfile() {
-        if (getSessionBean().getSessionCECase() != null) {
+        if (getSessionBean().getSessCECase() != null) {
             return "caseProfile";
         } else {
             getFacesContext().addMessage(null,
@@ -213,7 +215,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
 
     public String gotoPersonProfile() {
-        if (getSessionBean().getSessionPerson() != null) {
+        if (getSessionBean().getSessPerson()!= null) {
             return "personProfile";
         } else {
             getFacesContext().addMessage(null,
@@ -228,7 +230,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveCase
      */
     public boolean isNoActiveCase() {
-        CECaseDataHeavy c = getSessionBean().getSessionCECase();
+        CECaseDataHeavy c = getSessionBean().getSessCECase();
         noActiveCase = (c == null);
         return noActiveCase;
     }
@@ -237,7 +239,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveProperty
      */
     public boolean isNoActiveProperty() {
-        Property p = getSessionBean().getSessionProperty();
+        Property p = getSessionBean().getSessProperty();
         noActiveProperty = (p == null);
         return noActiveProperty;
     }
@@ -274,7 +276,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveSource
      */
     public boolean isNoActiveSource() {
-        CodeSource cs = getSessionBean().getActiveCodeSource();
+        CodeSource cs = getSessionBean().getSessCodeSource();
         noActiveSource = (cs == null);
         return noActiveSource;
     }
@@ -290,7 +292,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActivePerson
      */
     public boolean isNoActivePerson() {
-        Person p = getSessionBean().getSessionPerson();
+        Person p = getSessionBean().getSessPerson();
         noActivePerson = (p == null);
         return noActivePerson;
     }
@@ -306,7 +308,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveUser
      */
     public boolean isNoActiveUser() {
-        noActiveUser = (getSessionBean().getSessionUser() == null);
+        noActiveUser = (getSessionBean().getSessUser() == null);
         return noActiveUser;
     }
 

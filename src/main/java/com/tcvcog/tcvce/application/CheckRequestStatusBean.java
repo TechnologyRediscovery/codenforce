@@ -45,7 +45,7 @@ public class CheckRequestStatusBean extends BackingBeanUtils implements Serializ
 //            retrievedRequest = ceari.getActionRequestByControlCode(lookupControlCode);
             // now that we've got a request, store it in our session's active action request
             
-            getSessionBean().setSessionCEAR(retrievedRequest);
+            getSessionBean().setSessCEAR(retrievedRequest);
             getFacesContext().addMessage(null, new FacesMessage 
                     (FacesMessage.SEVERITY_INFO, "Success! Code Enforcement Action Request Lookup returned the following information", ""));
             return "success";

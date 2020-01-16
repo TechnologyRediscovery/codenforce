@@ -70,7 +70,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean() {
         UserCoordinator uc = getUserCoordinator();
-        currentUser = getSessionBean().getSessionUser();
+        currentUser = getSessionBean().getSessUser();
         userList = uc.assembleUserListForSearchCriteria();
         
         generateMainDash();
@@ -113,8 +113,8 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         MunicipalityDataHeavy muniComp;
         try {
             muniComp = mi.getMunDataHeavy(selectedMuni.getMuniCode());
-            getSessionBean().setSessionMuni(muniComp);
-            getSessionBean().setSessionCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
+            getSessionBean().setSessMuni(muniComp);
+            getSessionBean().setSessCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
         } catch (IntegrationException ex) {
             FacesContext facesContext = getFacesContext();
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -135,12 +135,18 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
     
     public String switchToUser(){
+        System.out.println("MissionControlBB.switchToUser");
         if(selectedUser != null){
             getSessionBean().setUserForReInit(selectedUser);
-            return "startInitiationProcess";
         } else {
-            return "";
+            getSessionBean().setUserForReInit(getSessionBean().getSessUser());
         }
+        return "sessionReinit";
+    }
+    
+    public String reauthenticate(){
+        System.out.println("MissionControlBB.reauthenticate");
+        return "sessionReinit";
     }
     
    
@@ -163,7 +169,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      * @return the currentMuni
      */
     public Municipality getCurrentMuni() {
-        currentMuni = getSessionBean().getSessionMuni();
+        currentMuni = getSessionBean().getSessMuni();
         return currentMuni;
     }
 

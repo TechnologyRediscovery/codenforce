@@ -49,7 +49,7 @@
                                                        ajax="true" 
                                                        actionListener="#{propertyUnitsBB.beginPropertyUnitUpdates}"
                                                        oncomplete="PF('dialog-widvar-unitedit').show()"
-                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                       rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
                                                        value="Edit unit list"  
                                                        icon="fa fa-edit"
                                                        update="form-unitedit"/>
@@ -87,7 +87,7 @@
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
                                                                ajax="true" 
                                                                actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
-                                                               rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                               rendered="#{sessionBean.sessessUseryCard.hasMuniStaffPermissions}"
                                                                disabled="#{!propertyUnitsBB.currProp.active}"
                                                                oncomplete="PF('dialog-addoccperiod-var').show()"
                                                                value="Add new occupancy period" 
@@ -137,7 +137,7 @@
                                                 <p:commandButton       id="button-occperiodtable-editperiod"
                                                                        ajax="false" 
                                                                        action="#{PropertyUnitsBB.manageOccPeriod(period)}"
-                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                       rendered="#{sessionBean.sessiosessUserrd.hasMuniStaffPermissions}"
                                                                        value="manage occupancy period"  
                                                                        icon="fa fa-edit"/>
                                         </p:dataScroller>

@@ -33,8 +33,14 @@ public  enum            QueryEventEnum
                                         "All events by period",
                                         RoleType.MuniReader,
                                         false),
+    
     CECASE  (                          "Events by Code Enforcement case",
                                         "All events by case",
+                                        RoleType.MuniReader,
+                                        false),
+    
+    PERSONS(                           "Events associated with a given Person",
+                                       "in any way or capacity",
                                         RoleType.MuniReader,
                                         false),
     

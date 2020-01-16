@@ -77,19 +77,19 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         PersonCoordinator pc = getPersonCoordinator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessionMuni());
+        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessMuni());
         // the selected person should be initiated using logic in getSelectedPerson
-        selectedPerson = getSessionBean().getSessionPerson();
+        selectedPerson = getSessionBean().getSessPerson();
         try {
             muniNameIDMap = mi.getMunicipalityStringIDMap();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        propertyCandidateList = getSessionBean().getSessionPropertyList();
+        propertyCandidateList = getSessionBean().getSessPropertyList();
         loadPersonHistory();
         
          System.out.println("PersonBB.getPersonList");
-        personList = getSessionBean().getSessionPersonList();
+        personList = getSessionBean().getSessPersonList();
 
         
         
@@ -98,7 +98,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     }
     
     public String viewPersonAssociatedProperty(Property p){
-        getSessionBean().getSessionPropertyList().add(0, p);
+        getSessionBean().getSessPropertyList().add(0, p);
         return "properties";
     }
     
@@ -106,7 +106,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         PersonCoordinator pc = getPersonCoordinator();
 
         try {
-            pc.addNotesToPerson(selectedPerson, getSessionBean().getSessionUser(), notesToAppend);
+            pc.addNotesToPerson(selectedPerson, getSessionBean().getSessUser(), notesToAppend);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO
                     , "Done: Notes added to person ID:" + selectedPerson.getPersonID(),"" ));
         } catch (IntegrationException ex) {
@@ -123,7 +123,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         PersonIntegrator pi = getPersonIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            pc.editPerson(selectedPerson, getSessionBean().getSessionUser(), updateDescription);
+            pc.editPerson(selectedPerson, getSessionBean().getSessUser(), updateDescription);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Person updated! This updated person is now your 'active person'", ""));
@@ -162,7 +162,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     public void initiatePersonCreation(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        selectedPerson = pc.initPerson(getSessionBean().getSessionMuni());
+        selectedPerson = pc.initPerson(getSessionBean().getSessMuni());
         System.out.println("PersonsBB.initiatePersonCreation : selected person id: " + selectedPerson.getPersonID());
     }
     
@@ -173,7 +173,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     public void loadPersonHistory(){
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            personList = pc.assemblePersonHistory(getSessionBean().getSessionUser().getMyCredential());
+            personList = pc.assemblePersonHistory(getSessionBean().getSessUser().getMyCredential());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "History was loaded!", ""));
@@ -195,11 +195,11 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         
         int newPersonID;
         try {
-            selectedPerson.setCreatorUserID(getSessionBean().getSessionUser().getUserID());
-            newPersonID = pc.createPerson(selectedPerson);
+            selectedPerson.setCreatorUserID(getSessionBean().getSessUser().getUserID());
+            newPersonID = pc.initPersonAdd(selectedPerson);
             selectedPerson = pi.getPerson(newPersonID);
-            getSessionBean().setSessionPerson(selectedPerson);
-            getSessionBean().getSessionPersonList().add(selectedPerson);
+            getSessionBean().setSessPersonQueued(selectedPerson);
+            getSessionBean().getSessPersonList().add(selectedPerson);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Person created with ID " + newPersonID + "! This person is now your active one and has been added to your history.'", ""));
@@ -218,7 +218,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     public void selectPerson(Person p){
         SystemIntegrator si = getSystemIntegrator();
         try {
-            si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), p);
+            si.logObjectView_OverwriteDate(getSessionBean().getSessUser(), p);
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -275,7 +275,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
      */
     public Person getSelectedPerson() {
         if(selectedPerson == null){
-            selectedPerson = getSessionBean().getSessionPerson();
+            selectedPerson = getSessionBean().getSessPerson();
         }
         return selectedPerson;
     }

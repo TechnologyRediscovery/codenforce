@@ -128,7 +128,7 @@ public class CodeSetElementBB extends BackingBeanUtils implements Serializable{
      * @return the currentCodeSet
      */
     public CodeSet getCurrentCodeSet() {
-        currentCodeSet = getSessionBean().getSessionCodeSet();
+        currentCodeSet = getSessionBean().getSessCodeSet();
         if(eCEList != null){
             eCEList = currentCodeSet.getEnfCodeElementList();
         }

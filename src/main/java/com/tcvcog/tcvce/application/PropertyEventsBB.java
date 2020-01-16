@@ -42,7 +42,7 @@ public class PropertyEventsBB
      
     @PostConstruct
     public void initBean(){
-        currProp = getSessionBean().getSessionProperty();
+        currProp = getSessionBean().getSessProperty();
         
     }
     

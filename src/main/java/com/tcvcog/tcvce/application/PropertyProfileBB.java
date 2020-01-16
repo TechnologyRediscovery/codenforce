@@ -65,10 +65,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
         
-        currProp = (getSessionBean().getSessionProperty());
+        currProp = (getSessionBean().getSessProperty());
         
   
-        selectedMuni = getSessionBean().getSessionMuni();
+        selectedMuni = getSessionBean().getSessMuni();
 
         try {
             putList = pi.getPropertyUseTypeList();
@@ -89,7 +89,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      public void commitPropertyUpdates(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            pc.editProperty(currProp, getSessionBean().getSessionUser());
+            pc.editProperty(currProp, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Successfully updated property with ID " + getCurrProp().getPropertyID() 
@@ -109,7 +109,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private void refreshCurrPropWithLists(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            setCurrProp(pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessionUser().getMyCredential()));
+            setCurrProp(pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessUser().getMyCredential()));
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -129,7 +129,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     
     public String viewPersonProfile(Person p){
-        getSessionBean().getSessionPersonList().add(0,p);
+        getSessionBean().getSessPersonList().add(0,p);
         return "persons";
     }
     

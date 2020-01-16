@@ -62,8 +62,8 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         
-         currentViolation = getSessionBean().getSessionCodeViolation();
-         currentCase = getSessionBean().getSessionCECase();
+         currentViolation = getSessionBean().getSessCodeViolation();
+         currentCase = getSessionBean().getSessCECase();
          formDiscloseToMuni = true;
          formDiscloseToPublic = true;
     }
@@ -87,11 +87,11 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
             MessageBuilderParams mcc = new MessageBuilderParams();
             mcc.setExistingContent(currentViolation.getNotes());
             mcc.setNewMessageContent(formEventNotes);
-            mcc.setUser(getSessionBean().getSessionUser());
+            mcc.setUser(getSessionBean().getSessUser());
             currentViolation.setNotes(sc.appendNoteBlock(mcc));
 
             
-             cc.updateCodeViolation(currentCase, currentViolation, getSessionBean().getSessionUser());
+             cc.updateCodeViolation(currentCase, currentViolation, getSessionBean().getSessUser());
              
              // if update succeeds without throwing an error, then generate an
              // update violation event

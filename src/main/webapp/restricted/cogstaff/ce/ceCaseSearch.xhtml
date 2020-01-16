@@ -78,7 +78,7 @@
                                                                      disabled="#{!ceCaseSearchBB.searchParams.filterByMuni}">
                                                         <f:converter converterId="muniConverter"/>
                                                         <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                                        <f:selectItems id="muniNameList" value="#{sessionBean.sessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                        <f:selectItems id="muniNameList" value="#{sessionBean.sessUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                                     </p:selectOneMenu>
                                                     <h:message for="cecases-search-muni-som" showDetail="true" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -261,7 +261,7 @@
                                                                      disabled="#{!ceCaseSearchBB.searchParams.useProperty}">
 
                                                         <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
-                                                        <f:selectItems value="#{sessionBean.sessionPropertyList}"  var="p" itemValue="#{p}" 
+                                                        <f:selectItems value="#{sessionBean.sessPropertyList}"  var="p" itemValue="#{p}" 
                                                                        itemLabel="#{p.address} (#{p.muni.muniName})"/>
                                                         <f:converter converterId="propertyConverter"/>
 

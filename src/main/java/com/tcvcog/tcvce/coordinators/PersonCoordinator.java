@@ -19,12 +19,22 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
+import com.tcvcog.tcvce.entities.search.QueryEventEnum;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -32,6 +42,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -59,6 +71,33 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return pi.getPerson(personID);
     }
     
+    public PersonDataHeavy assemblePersonDataHeavy(Person pers, Credential cred){
+        PersonDataHeavy pdh = new PersonDataHeavy(pers, cred);
+        SearchCoordinator sc = getSearchCoordinator();
+        
+        try {
+            QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PERSINFOCASES, cred);
+            qcse.getPrimaryParams().setPersonInfoCaseID_val(pers);
+            pdh.setCaseList(sc.runQuery(qcse).getResults());
+        
+            QueryOccPeriod qop = sc.initQuery(QueryOccPeriodEnum.PERSONS, cred);
+            qop.getPrimaryParams().setPerson_val(pers);
+            pdh.setPeriodList(sc.runQuery(qop).getBOBResultList());
+            
+            QueryProperty qprop = sc.initQuery(QueryPropertyEnum.PERSONS, cred);
+            qprop.getPrimaryParams().setPerson_val(pers);
+            pdh.setPropertyList(sc.runQuery(qprop).getBOBResultList());
+            
+            QueryEvent qe = sc.initQuery(QueryEventEnum.PERSONS, cred);
+            qe.getPrimaryParams().setPerson_val(pers);
+            pdh.setEventList(sc.runQuery(qe).getBOBResultList());
+        
+        } catch (SearchException ex) {
+            System.out.println(ex);
+        }
+        
+        return pdh;
+    }
     
     /**
      * Entry point for new Person object requests
@@ -66,7 +105,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public int createPerson(Person p) throws IntegrationException{
+    public int initPersonAdd(Person p) throws IntegrationException{
         int newid;
         PersonIntegrator pi = getPersonIntegrator();
         newid = pi.insertPerson(p);
@@ -150,11 +189,11 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(previousNotes);
         sb.append("<br />**************************************<br />");
         sb.append("NOTE CREATED BY: ");
-        sb.append(getSessionBean().getSessionUser().getPerson().getFirstName());
+        sb.append(getSessionBean().getSessUser().getPerson().getFirstName());
         sb.append(" ");
-        sb.append(getSessionBean().getSessionUser().getPerson().getLastName());
+        sb.append(getSessionBean().getSessUser().getPerson().getLastName());
         sb.append(" (User ID ");
-        sb.append(String.valueOf(getSessionBean().getSessionUser().getUserID()));
+        sb.append(String.valueOf(getSessionBean().getSessUser().getUserID()));
         sb.append(") on ");
         sb.append(getPrettyDate(LocalDateTime.now()));
         sb.append(":<br />");
@@ -195,7 +234,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Intermediary logic unit for configuring histories of Person object views
-     * given an authorization context
+ given an authorization context
      * @param cred
      * @return
      * @throws IntegrationException 

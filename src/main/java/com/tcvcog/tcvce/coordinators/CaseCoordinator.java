@@ -441,8 +441,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param caseID can be extracted from the public info bundle
      * @param msg the text of the message the user wants to add to the case 
      * @param messagerName the first and last name of the person submitting the message
-     * Note that this submission info is not YET wired into the actual Person objects
-     * in the system.
+ Note that this submission info is not YET wired into the actual Person objects
+ in the system.
      * @param messagerPhone a simple String rendering of whatever the user types in. Length validation only.
      */
     public void attachPublicMessage(int caseID, String msg, String messagerName, String messagerPhone) throws IntegrationException, BObStatusException, EventException{
@@ -657,7 +657,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
-        e.setOwner(getSessionBean().getSessionUser());
+        e.setOwner(getSessionBean().getSessUser());
         e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         return ei.insertEvent(e);
