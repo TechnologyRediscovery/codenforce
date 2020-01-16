@@ -20,8 +20,10 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.LogIntegrator;
@@ -57,6 +59,13 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
 
     }
     
+    /**
+     * Logic pass through method for calls to the system integrator which will
+     * make database inserts recording any exploration of one of our BObs
+     * @param u
+     * @param ob
+     * @throws IntegrationException 
+     */
      public void logObjectView(User u, IFace_Loggable ob) throws IntegrationException {
          SystemIntegrator si = getSystemIntegrator();
          si.logObjectView(u, ob);
@@ -84,12 +93,22 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     protected void requestBaseInternalAccessCredential(UserAuthorized ua) {
         // TODO: Finish guts
     }
+    
+    
 
+    /**The official note appending tool of the entire codeNforce system!
+     * Consider all other appendNoteXXX methods scattered about to be rogue
+     * agents, operating without warrant, independent of any meaningful standards 
+     * or oversight
+     * 
+     * @param mbp containing as much information as possible which will be 
+     * formatted into a nice note block
+     * @return the exact text of the new note, with any previous text
+     * included in the message builder params object post-pended to the incoming note
+     */
     public String appendNoteBlock(MessageBuilderParams mbp) {
         StringBuilder sb = new StringBuilder();
-        if (mbp.getExistingContent() != null) {
-            sb.append(mbp.getExistingContent());
-        }
+        
         sb.append(Constants.FMT_HTML_BREAK);
         sb.append(Constants.FMT_NOTE_START);
         if (mbp.getHeader() != null) {
@@ -130,15 +149,37 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         sb.append(mbp.getUser().getUserID());
         sb.append(Constants.FMT_DTYPE_OBJECTID_INLINECLOSED);
 
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append(Constants.FMT_SIGNATURELEAD);
+        sb.append(mbp.getCred().getSignature());
+        
+        sb.append(Constants.FMT_HTML_BREAK);
+        
+        if (mbp.getExistingContent() != null) {
+            sb.append(mbp.getExistingContent());
+        }
         return sb.toString();
     }
 
+    /**
+     * Utility method for creating a string of the current date
+     * @return 
+     */
     public String stampCurrentTimeForNote() {
         return getPrettyDate(LocalDateTime.now());
     }
 
+    /**
+     * Adapter method for taking in simple note info, not in Object format
+     * and creating the populated MessageBuilderParams instance required
+     * by the official note appending tool of the entire codeNforce system
+     * @param u
+     * @param noteToAppend
+     * @param existingText
+     * @return 
+     */
     public String formatAndAppendNote(User u, String noteToAppend, String existingText) {
-        return appendNoteBlock(new MessageBuilderParams(existingText, noteToAppend, null, null, u));
+        return appendNoteBlock(new MessageBuilderParams(existingText, noteToAppend, null, null, u, null));
 
     }
 
@@ -159,6 +200,24 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         }
         return muniCodeNameMap;
     }
+    
+    /**
+     * Experimental method--decided to let respective Coordinators do this
+     * 
+     * @deprecated 
+     * @param obj
+     * @return 
+     */
+    public String generateFieldDumpString(BOb obj){
+        String dump = obj.toString();
+        
+        if(obj instanceof Person){
+            return dumpPerson((Person) obj);
+        }
+        return dump;
+    }
+    
+
 
     /**
      * @param muniCodeNameMap the muniCodeNameMap to set
@@ -475,5 +534,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         ni.setSearchpageurl(searchPageUrl);
         return ni;
     }
+    
+    
 
 }

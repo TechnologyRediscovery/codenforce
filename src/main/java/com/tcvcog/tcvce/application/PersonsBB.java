@@ -50,15 +50,12 @@ import javax.faces.event.ActionEvent;
  */
 public class PersonsBB extends BackingBeanUtils implements Serializable{
 
-    private List<Person> personList;
     private Person selectedPerson;
     private List<Property> propertyPersonList;
     
-    private List<Person> filteredPersonList;
-    private PersonType[] personTypes;
+    
     private String notesToAppend;
     private String updateDescription;
-    private Map<String, Integer> muniNameIDMap;
     
     private List<Property> propertyCandidateList;
     private Property selectedProperty;
@@ -80,11 +77,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessMuni());
         // the selected person should be initiated using logic in getSelectedPerson
         selectedPerson = getSessionBean().getSessPerson();
-        try {
-            muniNameIDMap = mi.getMunicipalityStringIDMap();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+       
         propertyCandidateList = getSessionBean().getSessPropertyList();
         loadPersonHistory();
         
@@ -97,10 +90,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public String viewPersonAssociatedProperty(Property p){
-        getSessionBean().getSessPropertyList().add(0, p);
-        return "properties";
-    }
+   
     
     public void attachNoteToPerson(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
@@ -118,7 +108,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     }
     
     
-    public String updatePerson(){
+    public String editPersonCommitChanges(){
         System.out.println("PersonsBB.updatePerson");
         PersonIntegrator pi = getPersonIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
@@ -140,15 +130,23 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         return "persons";
     }
     
-    public void initiatePersonUpdate(ActionEvent ev){
+    /**
+     * Action listener called when person edit dialog is activated
+     * @param ev 
+     */
+    public void editPersonInit(ActionEvent ev){
         
         
     }
     
+    /**
+     * Maps the session active property to the current person
+     * @param ev 
+     */
     public void connectCurrentPersonToProperty(ActionEvent ev){
-        PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
         try {
-            pi.connectPersonToProperty(selectedPerson, selectedProperty);
+            pc.connectPersonToProperty(selectedPerson, selectedProperty);
              getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Successfully connected person ID " + selectedPerson.getPersonID() + " to property ID " + selectedProperty.getPropertyID() , ""));
         } catch (IntegrationException ex) {
@@ -162,7 +160,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     public void initiatePersonCreation(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        selectedPerson = pc.initPerson(getSessionBean().getSessMuni());
+        selectedPerson = pc.personCreateMakeSkeleton(getSessionBean().getSessMuni());
         System.out.println("PersonsBB.initiatePersonCreation : selected person id: " + selectedPerson.getPersonID());
     }
     
@@ -170,21 +168,6 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         loadPersonHistory();
     }
     
-    public void loadPersonHistory(){
-        PersonCoordinator pc = getPersonCoordinator();
-        try {
-            personList = pc.assemblePersonHistory(getSessionBean().getSessUser().getMyCredential());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "History was loaded!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Could not load history, sorry", ""));
-            System.out.println(ex);
-        }
-        
-    }
     
     public String createNewPerson(){
         PersonCoordinator pc = getPersonCoordinator();

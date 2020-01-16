@@ -51,9 +51,6 @@ public  class       Person
      * @deprecated 
      */
     protected String muniName;
-    
-    protected int sourceID;
-    
     protected BOBSource source;
     
     /**
@@ -392,13 +389,7 @@ public  class       Person
         return this.firstName + this.lastName;
     }
 
-    /**
-     * @return the sourceID
-     */
-    public int getSourceID() {
-        return sourceID;
-    }
-
+    
    
     /**
      * @return the businessEntity
@@ -452,13 +443,6 @@ public  class       Person
     }
 
     
-
-    /**
-     * @param sourceID the sourceID to set
-     */
-    public void setSourceID(int sourceID) {
-        this.sourceID = sourceID;
-    }
 
 
     /**
@@ -533,7 +517,6 @@ public  class       Person
         int hash = 7;
         hash = 79 * hash + this.personID;
         hash = 79 * hash + Objects.hashCode(this.personType);
-        hash = 79 * hash + this.sourceID;
         hash = 79 * hash + Objects.hashCode(this.firstName);
         hash = 79 * hash + Objects.hashCode(this.lastName);
         hash = 79 * hash + (this.compositeLastName ? 1 : 0);

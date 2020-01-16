@@ -82,6 +82,11 @@ public class Constants implements Serializable {
     public final static String FMT_DTYPE_KEY_TIMESTAMP_LOCK = "lock";
     public final static String FMT_DTYPE_KEY_TIMESTAMP_DEACTIVATE = "deac";
     
+    public final static String FMT_SIGNATURELEAD = "Signature: ";
+    public final static String FMT_FIELDKVSEP_WSPACE = ": ";
+    
+    
+    
     
     
     

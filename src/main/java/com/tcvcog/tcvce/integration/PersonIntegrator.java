@@ -248,25 +248,13 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
    
 
+    
     /**
-     * Distributor method for handling requests to connect a person to a
-     * property
-     *
+     * Creates a record in the person-property linking table, after checking that it does not exist
      * @param person
      * @param prop
-     * @throws IntegrationException
+     * @throws IntegrationException 
      */
-    public void insertPersonAndConnectToProperty(Person person, Property prop) throws IntegrationException {
-
-        int newPersonID = insertPerson(person);
-        // Now that th person is in the DB, i've got the person ID to store in the
-        // bridge table: propertyperson
-        person.setPersonID(newPersonID);
-        // now send in a fully-baked person to an entry in the db
-        connectPersonToProperty(person, prop);
-
-    }
-    
     public void connectPersonToProperty(Person person, Property prop) throws IntegrationException {
 
         String selectQuery = "SELECT property_propertyid, person_personid\n" +
@@ -390,8 +378,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(20, personToStore.isCompositeLastName());
             
             
-            if(personToStore.getSourceID() != 0){
-                stmt.setInt(21, personToStore.getSourceID());
+            if(personToStore.getSource() != null){
+                stmt.setInt(21, personToStore.getSource().getSourceid());
             } else {
                 stmt.setInt(21, unknownPersonSourceID);
             }
@@ -615,19 +603,22 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         String query;
 
         query = "UPDATE public.person\n" +
-                "   SET persontype= CAST (? AS persontype), muni_municode=?, \n" +
-                "	fname=?, lname=?, jobtitle=?, \n" +
-                "	phonecell=?, phonehome=?, phonework=?, \n" +
-                "	email=?, address_street=?, address_city=?, \n" +
-                "	address_state=?, address_zip=?, \n" +
-                "	lastupdated=now(), expirydate=?, isactive=?, \n" +
-                "	isunder18=?, compositelname=?, \n" +
-                "       sourceid=?, businessentity=?, \n" +
-                "       mailing_address_street=?, mailing_address_city=?, mailing_address_zip=?, \n" +
-                "       mailing_address_state=?, useseparatemailingaddr=?, expirynotes=?,  \n" +
-                "       canexpire=?, mailing_address_thirdline=?  \n" +
+                "   SET persontype= CAST (? AS persontype), muni_municode=?, \n" +  // 1-2
+                "	fname=?, lname=?, jobtitle=?, \n" + // 3-5
+                "	phonecell=?, phonehome=?, phonework=?, \n" + // 6-8
+                "	email=?, address_street=?, address_city=?, \n" + // 9-11
+                "	address_state=?, address_zip=?, " + // 12-13
+                "	lastupdated=now(), expirydate=?, isactive=?, \n" +  // 14-15
+                "	isunder18=?, compositelname=?, \n" + // 16-17
+                "       sourceid=?, businessentity=?, \n" + // 18-19
+                "       mailing_address_street=?, mailing_address_city=?, mailing_address_zip=?, \n" +// 20-22
+                "       mailing_address_state=?, useseparatemailingaddr=?, expirynotes=?,  \n" + // 23-25
+                "       canexpire=?, mailing_address_thirdline=?  \n" +// 26-27
                 " WHERE personid=?;";
 
+       
+        
+        
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
@@ -661,7 +652,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(16, personToUpdate.isUnder18());          
             stmt.setBoolean(17, personToUpdate.isCompositeLastName());
             
-           
              if(personToUpdate.getSource() != null){
                 stmt.setInt(18, personToUpdate.getSource().getSourceid());
             } else {
@@ -679,6 +669,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.setBoolean(26, personToUpdate.isCanExpire());
             stmt.setString(27, personToUpdate.getMailingAddressThirdLine());
+            
             stmt.setInt(28, personToUpdate.getPersonID());
 
             stmt.execute();
@@ -805,6 +796,15 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Calls native database method to make a Ghost from a given Person--which
+     * is a copy of a person at a given time to be used in recreating official documents
+     * with addresses and such, like Citations, NOVs, etc.
+     * @param p of which you would like to create a Ghost
+     * @param u doing the connecting
+     * @return the database identifier of the sent in Person's very own ghost
+     * @throws IntegrationException 
+     */
     public int createGhost(Person p, User u) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -837,6 +837,20 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Calls database native function to make a clone of a person, which is an exact copy of 
+     * a Person at a given point in time that is used to safely edit person info 
+     * without allowing certain levels of users access to the primary Person record
+     * from which there is no recovery of core info
+     * 
+     * Ghosts are friendly and invited; clones are an unedesirable manifestation
+     * of the modern biotechnological era
+     * 
+     * @param p of which you would like to create a clone
+     * @param u doing the creating of clone
+     * @return the database identifer of the inputted Person's clone
+     * @throws IntegrationException 
+     */
     public int createClone(Person p, User u) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;

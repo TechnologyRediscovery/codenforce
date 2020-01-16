@@ -50,7 +50,7 @@
                                          icon="fa fa-edit"
                                          oncomplete="PF('person-addupdate-dialog-var').show()"
                                          update="person-addupdate-form"
-                                         actionListener="#{personsBB.initiatePersonUpdate}"
+                                         actionListener="#{personsBB.editPersonInit}"
                                          />
                                     
                                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
@@ -691,7 +691,7 @@
 
 
                             <p:commandButton id="update-person-cb" ajax="true"
-                                             value="Update Person" action="#{personsBB.updatePerson}"
+                                             value="Update Person" action="#{personsBB.editPersonCommitChanges}"
                                              icon="fa fa-check" tabindex="28"
                                              disabled="#{personsBB.selectedPerson.personID == 0}"
                                              oncomplete="PF('person-addupdate-dialog-var').hide()"

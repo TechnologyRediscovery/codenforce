@@ -811,20 +811,7 @@
         <managed-bean-class>com.tcvcog.tcvce.application.PersonsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    
         
-    <managed-bean>
-        <managed-bean-name>personAddBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonAddBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>personEditPublicBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonEditPublicBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     <navigation-rule>
         <from-view-id>*</from-view-id>
@@ -1759,6 +1746,14 @@
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPublicBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    
+    <managed-bean>
+        <managed-bean-name>personEditPublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonEditPublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules public info ~~~~~~~~~~~~~~~~~~~~~~ --> 
     
     <navigation-rule>

@@ -256,7 +256,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         Municipality m = currentRequest.getMuni();
-        Person skel = pc.initPerson(m);
+        Person skel = pc.personCreateMakeSkeleton(m);
         try {
             skel.setCreatorUserID(uc.getUserRobot().getUserID());
         } catch (IntegrationException ex) {
