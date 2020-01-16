@@ -43,8 +43,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
@@ -121,10 +119,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             refreshFeeAssignedList();
 
-            if (currentCase != null) {
-                violationList = (ArrayList<CodeViolation>) currentCase.getViolationList();
-            }
-
             if (allFees == null) {
                 try {
                     allFees = pi.getFeeTypeList(getSessionBean().getSessionMuni());
@@ -141,24 +135,28 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             refreshTypesAndElements();
 
+            if (currentCase != null) {
+                violationList = (ArrayList<CodeViolation>) currentCase.getViolationList();
+            }
+
         }
     }
 
     public String finishAndRedir() {
-        
+
         //The following if statement is temporary. If you redirect to the fee Managment page from the fee permissions page, the case or occperiod does not load.
         //until I create a better solution, this will remain here.
         //TODO: Make a better redirection system that lasts longer than one redirection.
-        if(!getSessionBean().getFeeRedirTo().equalsIgnoreCase("editFees")){
-        getSessionBean().setFeeRedirTo(null);
+        if (!getSessionBean().getFeeRedirTo().equalsIgnoreCase("editFees")) {
+            getSessionBean().setFeeRedirTo(null);
         }
         return redirTo;
     }
 
     public String goToFeePermissions() {
-        
-        if(editingCECase() || editingOccPeriod()){   
-        getSessionBean().setFeeRedirTo("editFees");
+
+        if (editingCECase() || editingOccPeriod()) {
+            getSessionBean().setFeeRedirTo("editFees");
         }
         return "feePermissions";
     }
@@ -239,6 +237,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     public String addAssignedFee() {
+        
+        if(assignedFormFee.getFee() == null) {
+            getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Please select a fee to assign", ""));
+        }
+        
         FeeAssigned firstSkeleton = new FeeAssigned();
         PaymentIntegrator pi = getPaymentIntegrator();
 
@@ -530,20 +535,29 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public void addFeeToPermittedFees() {
 
-        boolean duplicate = false;
-        
-       for(Fee test : workingFeeList){
-            duplicate = test.getOccupancyInspectionFeeID() == selectedFee.getOccupancyInspectionFeeID();
-            if (duplicate) {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "You cannot permit the same fee twice.", ""));
-                break;
-            }
+        if (selectedFee == null) {
 
-        }
-        if (!duplicate) {
-            workingFeeList.add(selectedFee);
+            getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Please select a fee to add to the list.", ""));
+            
+        } else {
+
+            boolean duplicate = false;
+
+            for (Fee test : workingFeeList) {
+                duplicate = test.getOccupancyInspectionFeeID() == selectedFee.getOccupancyInspectionFeeID();
+                if (duplicate) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "You cannot permit the same fee twice.", ""));
+                    break;
+                }
+
+            }
+            if (!duplicate) {
+                workingFeeList.add(selectedFee);
+            }
         }
     }
 
@@ -658,7 +672,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             if (notThisFee == existingFeeList.size()) {
                 insertOrReactivateOccPeriodJoin(workingFee);
-            
+
             }
         }
 
@@ -765,17 +779,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
                 try {
                     ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-                    
-                    for (MoneyOccPeriodFeeAssigned fee : tempList){
-                        
+
+                    for (MoneyOccPeriodFeeAssigned fee : tempList) {
+
                         FeeAssigned skeleton = fee;
-                        
+
                         skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
                         skeleton.setDomain(currentDomain);
                         feeAssignedList.add(skeleton);
-                        
+
                     }
-                    
+
                     feeList = (ArrayList<Fee>) currentOccPeriod.getType().getPermittedFees();
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
@@ -792,17 +806,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             if (currentCase != null) {
 
                 try {
-                    
+
                     ArrayList<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
-                    
-                    for (MoneyCECaseFeeAssigned fee : tempList){
-                        
+
+                    for (MoneyCECaseFeeAssigned fee : tempList) {
+
                         FeeAssigned skeleton = fee;
-                        
+
                         skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
                         skeleton.setDomain(currentDomain);
                         feeAssignedList.add(skeleton);
-                        
+
                     }
                     feeList = new ArrayList<>();
                 } catch (IntegrationException ex) {
@@ -822,7 +836,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
         CaseIntegrator csi = getCaseIntegrator();
-        
+
         try {
             typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessionMuni().getProfile().getProfileID());
         } catch (IntegrationException ex) {
@@ -831,33 +845,33 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                             "Oops! We encountered a problem trying to fetch the OccPeriodType List!", ""));
         }
 
-        try {      
+        try {
             ArrayList<CodeSet> codeSetList = ci.getCodeSets(getSessionBean().getSessionMuni().getMuniCode());
-            
+
             elementList = new ArrayList<>();
-            
-            for(CodeSet set : codeSetList){
-                
-             elementList.addAll(ci.getEnforcableCodeElementList(set.getCodeSetID()));
-                
+
+            for (CodeSet set : codeSetList) {
+
+                elementList.addAll(ci.getEnforcableCodeElementList(set.getCodeSetID()));
+
             }
-            
+
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Oops! We encountered a problem trying to fetch the CodeSetElement List!", ""));
         }
 
-        try {      
+        try {
             currentCase = csi.getCECase(currentCase.getCaseID());
-            
+
         } catch (IntegrationException | CaseLifecycleException ex) {
             System.out.println("FeeManagementBB.refreshTypesAndElements() | Error: " + ex.toString());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Oops! We encountered a problem trying to refresh the currentCase!", ""));
         }
-        
+
     }
 
     public void violationSelected(ActionEvent e) {

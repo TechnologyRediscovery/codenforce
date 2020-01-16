@@ -387,6 +387,9 @@
                                   widgetVar="feePermissionsDialogVar"
                                   closable="true">   
                             <h:form id="feePermissionsForm">
+                                <h:messages id="messages" globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
                                 <h2>Edit Fee Permissions for fee ID #<p:outputLabel value="#{feeManagementBB.lockedPeriodType.typeID}"/></h2>
                                 <p>Here you can remove or add permitted fees, and even choose which fees are automatically 
                                     applied to an Occupancy Period.</p>
