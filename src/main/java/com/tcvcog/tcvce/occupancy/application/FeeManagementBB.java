@@ -163,9 +163,18 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public String deleteSelectedOccPeriodFee(ActionEvent e) {
 
+        if (selectedAssignedFee == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a fee from the table to delete", ""));
+
+            return "";
+        }
+
         PaymentIntegrator pi = getPaymentIntegrator();
 
-        if (selectedAssignedFee != null) {
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+
             try {
                 pi.deleteOccPeriodFee((MoneyOccPeriodFeeAssigned) selectedAssignedFee);
                 refreshFeeAssignedList();
@@ -175,12 +184,20 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());
             }
-
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a fee from the table to delete", ""));
         }
+        if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+
+            try {
+                pi.deleteCECaseFee((MoneyCECaseFeeAssigned) selectedAssignedFee);
+                refreshFeeAssignedList();
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Fee deleted forever!", ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+            }
+        }
+
         return "";
     }
 
@@ -237,13 +254,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     public String addAssignedFee() {
-        
-        if(assignedFormFee.getFee() == null) {
+
+        if (assignedFormFee.getFee() == null) {
             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Please select a fee to assign", ""));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a fee to assign", ""));
         }
-        
+
         FeeAssigned firstSkeleton = new FeeAssigned();
         PaymentIntegrator pi = getPaymentIntegrator();
 
@@ -538,9 +555,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         if (selectedFee == null) {
 
             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Please select a fee to add to the list.", ""));
-            
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a fee to add to the list.", ""));
+
         } else {
 
             boolean duplicate = false;
