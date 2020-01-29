@@ -222,24 +222,65 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public void commitPaymentUpdates(ActionEvent e) {
+
+        boolean failed = false;
+
+        Payment payment = selectedPayment;
+
+        payment.setPaymentType(formPayment.getPaymentType());
+        payment.setDateDeposited(formPayment.getDateDeposited());
+        payment.setDateReceived(formPayment.getDateReceived());
+        payment.setAmount(formPayment.getAmount());
+        payment.setPayer(formPayment.getPayer());
+        payment.setReferenceNum(formPayment.getReferenceNum());
+        payment.setCheckNum(formPayment.getCheckNum());
+        payment.setCleared(formPayment.isCleared());
+        payment.setNotes(formPayment.getNotes());
+
         if (selectedAssignedFee == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a fee to assign this payment to.", " "));
             formPayment.setPayer(new Person());
-        } else {
-            PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
-            Payment payment = selectedPayment;
+            failed = true;
+        }
 
-            payment.setPaymentType(formPayment.getPaymentType());
-            payment.setDateDeposited(formPayment.getDateDeposited());
-            payment.setDateReceived(formPayment.getDateReceived());
-            payment.setAmount(formPayment.getAmount());
-            payment.setPayer(formPayment.getPayer());
-            payment.setReferenceNum(formPayment.getReferenceNum());
-            payment.setCheckNum(formPayment.getCheckNum());
-            payment.setCleared(formPayment.isCleared());
-            payment.setNotes(formPayment.getNotes());
+        if (payment.getPayer() == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "The Payer's ID is not in our database, please make sure it's correct.", " "));
+            formPayment.setPayer(new Person());
+            failed = true;
+        }
+
+        if (payment.getAmount() <= 0) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "The amount you entered is not valid.", " "));
+            formPayment.setPayer(new Person());
+            failed = true;
+        }
+
+        if (payment.getPaymentType().getPaymentTypeId() == 1
+                && (payment.getReferenceNum() == null || payment.getReferenceNum().equals(""))) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "A payment by check requires a reference number", " "));
+            formPayment.setPayer(new Person());
+            failed = true;
+        }
+
+        if (payment.getPaymentType().getPaymentTypeId() == 1
+                && (payment.getCheckNum() == 0)) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "A payment by check requires a check number.", " "));
+            failed = true;
+        }
+
+        if (!failed) {
+            PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
+
             //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
             try {
                 paymentIntegrator.updatePayment(payment);
@@ -349,6 +390,23 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "The Payer's ID is not in our database, please make sure it's correct.", " "));
+            formPayment.setPayer(new Person());
+            return "";
+        }
+
+        if (payment.getAmount() <= 0) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "The amount you entered is not valid.", " "));
+            formPayment.setPayer(new Person());
+            return "";
+        }
+
+        if (payment.getPaymentType().getPaymentTypeId() == 1
+                && (payment.getReferenceNum() == null || payment.getReferenceNum().equals(""))) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "A payment by check requires a reference number", " "));
             formPayment.setPayer(new Person());
             return "";
         }

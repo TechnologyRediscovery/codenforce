@@ -283,6 +283,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             firstSkeleton.setReducedBy(assignedFormFee.getReducedBy());
             firstSkeleton.setReducedByUser(getSessionBean().getSessionUser());
 
+        } else if (assignedFormFee.getReducedBy() < 0) {
+
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "You cannot reduce a fee by a negative number", ""));
+
         } else {
             firstSkeleton.setReducedByUser(new User());
         }
@@ -345,6 +351,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         if (waived == true) {
             firstSkeleton.setWaivedBy(getSessionBean().getSessionUser());
+        } else if (assignedFormFee.getReducedBy() < 0) {
+
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "You cannot reduce a fee by a negative number", ""));
+
         } else {
             firstSkeleton.setWaivedBy(new User());
         }

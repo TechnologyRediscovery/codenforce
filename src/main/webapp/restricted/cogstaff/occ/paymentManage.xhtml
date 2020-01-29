@@ -217,7 +217,7 @@
                                     <h:outputLabel value="Amount:" for="newPaymentAmount"/>
                                     <h:panelGroup>
                                         <p:inputText id="newPaymentAmount" value="#{paymentBB.formPaymentAmount}" 
-                                                     style="width: 250px;" tabindex="9" required="true" styleClass="inputText"/>
+                                                     style="width: 250px;" tabindex="9" required="false" styleClass="inputText"/>
                                         <h:message for="newPaymentAmount" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
@@ -225,7 +225,7 @@
                                     <h:outputLabel value="Payer ID:" for="newPaymentPayer"/>
                                     <h:panelGroup>
                                         <p:inputText id="newPaymentPayer" value="#{paymentBB.formPaymentPayer}" 
-                                                     style="width: 250px;" tabindex="10" required="true" styleClass="inputText"/>
+                                                     style="width: 250px;" tabindex="10" required="false" styleClass="inputText"/>
                                         <h:message for="newPaymentPayer" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
@@ -233,7 +233,7 @@
                                     <h:outputLabel value="Reference No:" for="newPaymentRefNo"/>
                                     <h:panelGroup>
                                         <p:inputText id="newPaymentRefNo" value="#{paymentBB.formPaymentReferenceNum}" 
-                                                     style="width: 250px;" tabindex="11" required="true" styleClass="inputText"/>
+                                                     style="width: 250px;" tabindex="11" required="false" styleClass="inputText"/>
                                         <h:message for="newPaymentRefNo" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
