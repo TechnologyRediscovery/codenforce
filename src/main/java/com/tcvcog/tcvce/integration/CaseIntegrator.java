@@ -19,14 +19,12 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseBase;
 import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.EventRuleAbstract;
-import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
@@ -39,10 +37,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -375,6 +370,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param ceCaseID
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
      */
     public CECaseBase getCECaseBase(int ceCaseID) throws IntegrationException, CaseLifecycleException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
@@ -582,6 +578,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         int insertedCaseID = 0;
         CECase freshlyInsertedCase = null;
         Connection con = null;
+        PaymentCoordinator pc = getPaymentCoordinator();
         
         try {
             
@@ -616,6 +613,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             }
             
             freshlyInsertedCase = getCECase(insertedCaseID);
+            
+            pc.insertAutoAssignedFees(freshlyInsertedCase);
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());

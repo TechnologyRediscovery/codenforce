@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -728,7 +729,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-
+        
         try {
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
@@ -820,6 +821,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         PreparedStatement stmt = null;
         int newPeriodId = 0;
 
+        PaymentCoordinator pc = getPaymentCoordinator();
+        
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
@@ -913,6 +916,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             while (rs.next()) {
                 newPeriodId = rs.getInt("currval");
             }
+            
+        pc.insertAutoAssignedFees(period);
 
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyIntegrator.insertOccPermitApplication"

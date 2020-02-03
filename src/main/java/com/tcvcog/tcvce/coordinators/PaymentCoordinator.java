@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
@@ -63,8 +64,8 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public void insertAutoAssignedFees(OccPeriod period, User u) throws IntegrationException {
-        
+    public void insertAutoAssignedFees(OccPeriod period) throws IntegrationException {
+
         PaymentIntegrator pi = getPaymentIntegrator();
 
         ArrayList<Fee> feeList = (ArrayList<Fee>) pi.getFeeList(period.getType());
@@ -85,48 +86,47 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
                 skeleton.setFee(fee);
 
                 pi.insertOccPeriodFee(skeleton);
-                
+
             }
 
         }
 
     }
-    
-    public void insertAutoAssignedFees(CECase cse, User u) throws IntegrationException {
+
+    public void insertAutoAssignedFees(CECase cse) throws IntegrationException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
-        
-        ArrayList<Fee> feeList = new ArrayList<>();
 
         List<CodeViolation> violationList = cse.getViolationList();
-        
-        for(CodeViolation violation : violationList){
-            
-            feeList.addAll(violation.getCodeViolated().getFeeList());
-            
-        }
-        
-        for (Fee fee : feeList) {
 
-            if (fee.isAutoAssigned()) {
+        for (CodeViolation violation : violationList) {
 
-                MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned();
+            EnforcableCodeElement codeElement = violation.getCodeViolated();
 
-                skeleton.setCaseID(cse.getCaseID());
-                //skeleton.setCodeSetElement(cse.get);
-                skeleton.setMoneyFeeAssigned(fee.getOccupancyInspectionFeeID());
-                skeleton.setAssignedBy(getSessionBean().getSessionUser());
-                skeleton.setAssigned(LocalDateTime.now());
-                skeleton.setLastModified(LocalDateTime.now());
-                skeleton.setNotes("Automatically assigned");
-                skeleton.setFee(fee);
+            ArrayList<Fee> feeList = (ArrayList<Fee>) codeElement.getFeeList();
 
-                pi.insertCECaseFee(skeleton);
-                
+            for (Fee fee : feeList) {
+
+                if (fee.isAutoAssigned()) {
+
+                    MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned();
+
+                    skeleton.setCaseID(cse.getCaseID());
+                    skeleton.setCodeSetElement(codeElement.getCodeSetElementID());
+                    skeleton.setMoneyFeeAssigned(fee.getOccupancyInspectionFeeID());
+                    skeleton.setAssignedBy(getSessionBean().getSessionUser());
+                    skeleton.setAssigned(LocalDateTime.now());
+                    skeleton.setLastModified(LocalDateTime.now());
+                    skeleton.setNotes("Automatically assigned");
+                    skeleton.setFee(fee);
+
+                    pi.insertCECaseFee(skeleton);
+
+                }
+
             }
 
         }
-
     }
 
 }
