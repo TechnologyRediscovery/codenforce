@@ -1116,7 +1116,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND bobsource_sourceid=? ");
                 } else {
                     params.setSource_ctl(false);
-                    params.logMessage("SOURCE: no BOb source object; source filter disabled");
+                    params.appendToParamLog("SOURCE: no BOb source object; source filter disabled");
                 }
             }
             
@@ -1130,7 +1130,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND propertyperson.property_propertyid=? ");
                 } else {
                     params.setProperty_ctl(false);
-                    params.logMessage("PROPERTY: no Property object; prop filter disabled");
+                    params.appendToParamLog("PROPERTY: no Property object; prop filter disabled");
                 }
             }
             
@@ -1142,7 +1142,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND propertyunit_unitid=? ");
                 } else {
                     params.setPropertyUnit_ctl(false);
-                    params.logMessage("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
+                    params.appendToParamLog("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
                 }
             }
             
@@ -1154,7 +1154,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND occperiod.periodid=? ");
                 } else {
                     params.setOccPeriod_ctl(false);
-                    params.logMessage("OCC PERIOD: no OccPeriod object; occ period filter disabled");
+                    params.appendToParamLog("OCC PERIOD: no OccPeriod object; occ period filter disabled");
                 }
                 params.appendSQL("AND event.ceevent_eventid=? ");
             }
@@ -1167,7 +1167,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND event.ceevent_eventid=? ");
                 } else {
                     params.setEvent_ctl(false);
-                    params.logMessage("EVENT: no EventCnF object; event filter disabled");
+                    params.appendToParamLog("EVENT: no EventCnF object; event filter disabled");
                 }
             }
             // ***********************************
@@ -1178,7 +1178,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND citation.citation_citationid=? ");
                 } else {
                     params.setCitation_ctl(false);
-                    params.logMessage("CITATION: no Citation object; citation filter disabled");
+                    params.appendToParamLog("CITATION: no Citation object; citation filter disabled");
                 }
             }
             // ***********************************
@@ -1189,7 +1189,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND personmergehistory.mergetarget_personid=? ");
                 } else {
                     params.setMergeTarget_ctl(false);
-                    params.logMessage("MergeTarget: no Person object as tartget; merge target filter disabled");
+                    params.appendToParamLog("MergeTarget: no Person object as tartget; merge target filter disabled");
                 }
             }
             // ***********************************
@@ -1200,7 +1200,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 //                    params.appendSQL("AND personmunilink.person_personid=? ");
 //                } else {
 //                    params.setMergeTarget_ctl(false);
-//                    params.logMessage("MUNICIPALITY: no MUNI object; muni filter disabled");
+//                    params.appendToParamLog("MUNICIPALITY: no MUNI object; muni filter disabled");
 //                }
 //            }
             
@@ -1334,8 +1334,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
             
-            params.logMessage("PersonIntegrator SQL before execution: ");
-            params.logMessage(stmt.toString());
+            params.appendToParamLog("PersonIntegrator SQL before execution: ");
+            params.appendToParamLog(stmt.toString());
             
             rs = stmt.executeQuery();
             

@@ -25,8 +25,8 @@ import java.util.List;
  */
 public  enum        SearchParamsPropertyDateFieldsEnum 
         implements  IFace_dateFieldHolder{
-    CREATIONTS("Database insert timestamp", "creationts"),    
-    LAST_UPDATED("Last updated on", "lastupdated"),
+    CREATIONTS("Database insert timestamp", "property.creationts"),    
+    LAST_UPDATED("Last updated on", "property.lastupdated"),
     UNFIT_START("Declared to be unfit - start date", "unfitdatestart"),
     UNFIT_STOP("Declared to be unfit - stop date", "unfitdatestop"),
     ABANDONED_START("Declared abandoned - start date", "abandoneddatestart"),

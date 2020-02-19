@@ -27,9 +27,11 @@ import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -49,6 +51,7 @@ public class PersonSearchBB extends BackingBeanUtils{
     private QueryPerson querySelected;
     private List<QueryPerson> queryList;
     private SearchParamsPerson paramsSelected;
+    private String queryLog;
 
     private List<Person> personList;
     private List<Person> filteredPersonList;
@@ -71,10 +74,27 @@ public class PersonSearchBB extends BackingBeanUtils{
        if(getSessionBean().getSessPersonQueued() != null){
             currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(), 
                     getSessionBean().getSessUser().getKeyCard());
+             getSessionBean().setSessPerson(currPerson);
+            getSessionBean().setSessPersonQueued(null);
        } else {
             currPerson = (getSessionBean().getSessPerson());
        }
        
+       personList = getSessionBean().getSessPersonList();
+       personTypes = PersonType.values();
+       
+       setupQueryInfrastructure();
+       
+    }
+    
+    public void clearResultList(ActionEvent ev){
+        personList.clear();
+        
+    }
+    
+    private void setupQueryInfrastructure(){
+        SearchCoordinator sc = getSearchCoordinator();
+
         try {
             queryList = sc.buildQueryPersonList(getSessionBean().getSessUser().getMyCredential());
         } catch (IntegrationException ex) {
@@ -82,17 +102,28 @@ public class PersonSearchBB extends BackingBeanUtils{
         }
         
         if(queryList != null && !queryList.isEmpty()){
-            paramsSelected = queryList.get(0).getPrimaryParams();
+            querySelected = queryList.get(0);
         }
+            
         
-        personList = getSessionBean().getSessPersonList();
-       
-       personTypes = PersonType.values();
-       
-       
+        if(querySelected != null && querySelected.getPrimaryParams() != null){
+            paramsSelected = querySelected.getPrimaryParams();
+        }
+    
+    }
+        
+    public void changeQuerySelected(){
+        
+        if(querySelected != null && querySelected.getPrimaryParams() != null){
+            paramsSelected = querySelected.getPrimaryParams();
+        }
+    
+        getFacesContext().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "New query loaded!", ""));
+
         
     }
-
     
     public void executeQuery(ActionEvent event){
         
@@ -104,12 +135,14 @@ public class PersonSearchBB extends BackingBeanUtils{
                 personList.clear();
             } 
             personList.addAll(pl);
+            queryLog = querySelected.getQueryLog();
             
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + pl.size() + " results", ""));
             
         } catch (SearchException ex) {
+            System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to complete search! ", ""));
@@ -117,6 +150,19 @@ public class PersonSearchBB extends BackingBeanUtils{
     }
     
     
+    public void resetCurrentQuery(ActionEvent ev){
+        setupQueryInfrastructure();
+        System.out.println("PersonSearchBB.resetCurrentQuery ");
+//        querySelected = sc.initQuery(QueryPersonEnum.valueOf(querySelected.getQueryName().toString()),
+//                getSessionBean().getSessUser().getMyCredential());
+        
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Query list rebuilt; filters reset", ""));
+        
+        queryLog = null;
+        
+    }
     
     
     
@@ -267,6 +313,20 @@ public class PersonSearchBB extends BackingBeanUtils{
      */
     public void setAppendResultsToList(boolean appendResultsToList) {
         this.appendResultsToList = appendResultsToList;
+    }
+
+    /**
+     * @return the queryLog
+     */
+    public String getQueryLog() {
+        return queryLog;
+    }
+
+    /**
+     * @param queryLog the queryLog to set
+     */
+    public void setQueryLog(String queryLog) {
+        this.queryLog = queryLog;
     }
     
     

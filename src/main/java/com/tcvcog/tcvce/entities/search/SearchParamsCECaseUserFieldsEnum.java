@@ -28,7 +28,7 @@ public  enum SearchParamsCECaseUserFieldsEnum
     
         
     CASE_MANAGER                ("Case manager",
-                                "login_userid");
+                                "cecase.login_userid");
     
     private final String title;
     private final String dbField;

@@ -810,6 +810,12 @@ i.status-display-icon-i{
     font-weight:normal;
 }
 
+.logoutput{
+    padding: 5px;
+    font-size: 0.9em;
+    
+}
+
 
 /***************** CLOSE TEXT AND SPANS ***********************/
 
@@ -1180,6 +1186,10 @@ gridTd-bignum{
 .ui-state-hover{
     
     
+}
+
+.ui-button-text{
+    margin-left: 5px;
 }
 
 .full-width{

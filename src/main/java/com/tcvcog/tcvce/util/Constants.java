@@ -62,11 +62,14 @@ public class Constants implements Serializable {
     public final static String PARAM_USERAGENT = "User-Agent";
     public final static String PARAM_DATERAW = "Date";
      
+    public final static String FMT_SEARCH_HEAD_QUERYOG =       "----------- QUERY LOG -------------";
+    public final static String FMT_SEARCH_HEAD_FILTERLOG =       "----------- filter log -------------";
     public final static String FMT_NOTE_START =       "----------- note start -------------";
     public final static String FMT_NOTE_END =    "----------- note end   -------------";
     public final static String FMT_NOTE_SEP_INTERNAL =       "....................................";
     public final static String FMT_HTML_BREAK = "<br>";
     public final static String FMT_SPACE_LITERAL = " ";
+    public final static String FMT_SPLAT = "*";
     
     public final static String FMT_DTYPE_SYMB_USERNAME = "+";
     

@@ -19,7 +19,9 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
+import java.util.List;
 import javax.annotation.PostConstruct;
 
 /**
@@ -29,6 +31,8 @@ import javax.annotation.PostConstruct;
 public class PersonCECasesBB extends BackingBeanUtils{
 
     private PersonDataHeavy currPerson;
+    
+    private List<CECase> caseListFiltered;
     
     /**
      * Creates a new instance of PersonBB
@@ -44,10 +48,17 @@ public class PersonCECasesBB extends BackingBeanUtils{
        if(getSessionBean().getSessPersonQueued() != null){
             currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(), 
                     getSessionBean().getSessUser().getKeyCard());
+             getSessionBean().setSessPerson(currPerson);
+            getSessionBean().setSessPersonQueued(null);
        } else {
             currPerson = (getSessionBean().getSessPerson());
        }
         
+    }
+    
+    public String exploreCECase(CECase cse){
+        getSessionBean().setSessCECaseQueued(cse);
+        return "ceCaseWorkflow";
     }
 
     /**
@@ -62,6 +73,20 @@ public class PersonCECasesBB extends BackingBeanUtils{
      */
     public void setCurrPerson(PersonDataHeavy currPerson) {
         this.currPerson = currPerson;
+    }
+
+    /**
+     * @return the caseListFiltered
+     */
+    public List<CECase> getCaseListFiltered() {
+        return caseListFiltered;
+    }
+
+    /**
+     * @param caseListFiltered the caseListFiltered to set
+     */
+    public void setCaseListFiltered(List<CECase> caseListFiltered) {
+        this.caseListFiltered = caseListFiltered;
     }
     
     

@@ -764,7 +764,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND status_id = ? "); // param 4 without ID search
                 } else {
                     params.setRequestStatus_ctl(false);
-                    params.logMessage("REQUEST STATUS: found null CEActionRequestStatus; status filter turned off; | ");
+                    params.appendToParamLog("REQUEST STATUS: found null CEActionRequestStatus; status filter turned off; | ");
                 }
             }
             
@@ -776,7 +776,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND issuetype_issuetypeid=? "); // param 4 without ID search
                 } else {
                     params.setIssueType_ctl(false);
-                    params.logMessage("ISSUE TYPE: found null CEActionRequestIssueType; issue type filter turned off; | ");
+                    params.appendToParamLog("ISSUE TYPE: found null CEActionRequestIssueType; issue type filter turned off; | ");
                 }
             }
             
@@ -822,7 +822,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND cecase_caseid=? ");
                 } else {
                     params.setCecase_ctl(false);
-                    params.logMessage("CECASE ID: no CECase found; case id filter turned off; | ");
+                    params.appendToParamLog("CECASE ID: no CECase found; case id filter turned off; | ");
                 }
             }
             
@@ -846,7 +846,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND actrequestor_requestorid=? ");
                 } else {
                     params.setRequestorPerson_ctl(false);
-                    params.logMessage("REQUESTING PERSON: no Person object found; person filter turned off; | ");
+                    params.appendToParamLog("REQUESTING PERSON: no Person object found; person filter turned off; | ");
                 }
             }
                 
@@ -859,7 +859,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND property.propertyid=? ");
                 } else {
                     params.setRequestorPerson_ctl(false);
-                    params.logMessage("PROPERTY: no Property object found; filter turned off; | ");
+                    params.appendToParamLog("PROPERTY: no Property object found; filter turned off; | ");
                 }
             }
 
@@ -920,8 +920,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
 
-            params.logMessage("CEActionRequestIntegrator SQL before execution: ");
-            params.logMessage(stmt.toString());
+            params.appendToParamLog("CEActionRequestIntegrator SQL before execution: ");
+            params.appendToParamLog(stmt.toString());
             
             rs = stmt.executeQuery();
             

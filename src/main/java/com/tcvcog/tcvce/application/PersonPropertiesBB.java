@@ -53,6 +53,8 @@ public class PersonPropertiesBB extends BackingBeanUtils{
        if(getSessionBean().getSessPersonQueued() != null){
             currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(), 
                     getSessionBean().getSessUser().getKeyCard());
+             getSessionBean().setSessPerson(currPerson);
+            getSessionBean().setSessPersonQueued(null);
        } else {
             currPerson = (getSessionBean().getSessPerson());
        }
@@ -64,7 +66,12 @@ public class PersonPropertiesBB extends BackingBeanUtils{
         
     }
     
-        /**
+    public String exploreProperty(Property pr){
+        getSessionBean().setSessPropertyQueued(pr);
+        return "propertyInfo";
+    }
+    
+   /**
      * Maps the session active property to the current person
      * @param ev 
      */
@@ -75,6 +82,7 @@ public class PersonPropertiesBB extends BackingBeanUtils{
                 pc.connectPersonToProperty(currPerson, selectedProperty);
                  getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully connected person ID " + currPerson.getPersonID() + " to property ID " + getSelectedProperty().getPropertyID() , ""));
+                currPerson = pc.assemblePersonDataHeavy(currPerson, getSessionBean().getSessUser().getMyCredential());
             } catch (IntegrationException ex) {
                 System.out.println(ex);
                  getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 

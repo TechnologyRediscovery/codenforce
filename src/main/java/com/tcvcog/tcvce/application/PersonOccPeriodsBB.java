@@ -20,6 +20,8 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import java.util.List;
 import javax.annotation.PostConstruct;
 
 /**
@@ -29,6 +31,8 @@ import javax.annotation.PostConstruct;
 public class PersonOccPeriodsBB extends BackingBeanUtils{
 
     private PersonDataHeavy currPerson;
+    
+    private List<OccPeriod> occPeriodListFiltered;
     
     /**
      * Creates a new instance of PersonBB
@@ -44,10 +48,17 @@ public class PersonOccPeriodsBB extends BackingBeanUtils{
        if(getSessionBean().getSessPersonQueued() != null){
             currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(), 
                     getSessionBean().getSessUser().getKeyCard());
+             getSessionBean().setSessPerson(currPerson);
+            getSessionBean().setSessPersonQueued(null);
        } else {
             currPerson = (getSessionBean().getSessPerson());
        }
         
+    }
+    
+    public String exploreOccPeriod(OccPeriod op){
+        getSessionBean().setSessOccPeriodQueued(op);
+        return "occPeriodWorkflow";
     }
 
     /**
@@ -62,6 +73,20 @@ public class PersonOccPeriodsBB extends BackingBeanUtils{
      */
     public void setCurrPerson(PersonDataHeavy currPerson) {
         this.currPerson = currPerson;
+    }
+
+    /**
+     * @return the occPeriodListFiltered
+     */
+    public List<OccPeriod> getOccPeriodListFiltered() {
+        return occPeriodListFiltered;
+    }
+
+    /**
+     * @param occPeriodListFiltered the occPeriodListFiltered to set
+     */
+    public void setOccPeriodListFiltered(List<OccPeriod> occPeriodListFiltered) {
+        this.occPeriodListFiltered = occPeriodListFiltered;
     }
     
     

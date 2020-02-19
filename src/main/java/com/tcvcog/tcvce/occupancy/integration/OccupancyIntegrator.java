@@ -145,7 +145,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                     params.appendSQL("AND property_propertyid=? ");
                 } else {
                     params.setProperty_ctl(false);
-                    params.logMessage("PROPERTY: no Property object; prop filter disabled");
+                    params.appendToParamLog("PROPERTY: no Property object; prop filter disabled");
                 }
             }
             
@@ -157,7 +157,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                     params.appendSQL("AND propertyunit_unitid=? ");
                 } else {
                     params.setPropertyUnit_ctl(false);
-                    params.logMessage("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
+                    params.appendToParamLog("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
                 }
             }
              
@@ -169,7 +169,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                     params.appendSQL("AND type_typeid=? ");
                 } else {
                     params.setPeriodType_ctl(false);
-                    params.logMessage("PERIOD TYPE: no type object found; type filter disabled");
+                    params.appendToParamLog("PERIOD TYPE: no type object found; type filter disabled");
                 }
             }
 
@@ -236,7 +236,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                     params.appendSQL("AND occperiodperson.person_personid=? ");
                 } else {
                     params.setPropertyUnit_ctl(false);
-                    params.logMessage("PERSON: no Person object found; person filter disabled");
+                    params.appendToParamLog("PERSON: no Person object found; person filter disabled");
                 }
             }
 

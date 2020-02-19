@@ -673,7 +673,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     params.appendSQL("AND bobsource_sourceid=? ");
                 } else {
                     params.setBobSource_ctl(false);
-                    params.logMessage("SOURCE: no BOb source object; source filter disabled");
+                    params.appendToParamLog("SOURCE: no BOb source object; source filter disabled");
                 }
             }
 
@@ -699,7 +699,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     params.appendSQL("AND condition_intensityclassid=? ");
                 } else {
                     params.setCondition_ctl(false);
-                    params.logMessage("CONDITION: no condition object; condition filter disabled; |");
+                    params.appendToParamLog("CONDITION: no condition object; condition filter disabled; |");
                 }
             }
 
@@ -711,7 +711,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     params.appendSQL("AND landbankprospect_intensityclassid=? ");
                 } else {
                     params.setLandbankprospect_ctl(false);
-                    params.logMessage("LANDBANKPROSPECT: No intensity object; land bank prospect disabled; |");
+                    params.appendToParamLog("LANDBANKPROSPECT: No intensity object; land bank prospect disabled; |");
                 }
             }
 
@@ -747,7 +747,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     params.appendSQL("AND property.usetype_typeid=? ");
                 } else {
                     params.setUseType_ctl(false);
-                    params.logMessage("USE TYPE: No intensity object found; use type filter disabled; | " );
+                    params.appendToParamLog("USE TYPE: No intensity object found; use type filter disabled; | " );
                 }
             }
 
@@ -789,7 +789,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     params.appendSQL("AND propertyperson.person_personid=? ");
                 } else {
                     params.setPerson_ctl(false);
-                    params.logMessage("PERSON: No object found; filter disabled; | " );
+                    params.appendToParamLog("PERSON: No object found; filter disabled; | " );
                 }
             }
            
@@ -889,8 +889,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
             
-            params.logMessage("Property Integrator SQL before execution: ");
-            params.logMessage(stmt.toString());
+            params.appendToParamLog("Property Integrator SQL before execution: ");
+            params.appendToParamLog(stmt.toString());
             rs = stmt.executeQuery();
             
             int counter = 0;

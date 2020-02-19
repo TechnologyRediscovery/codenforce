@@ -98,7 +98,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     params.appendSQL("AND property_propertyid=? ");
                 } else {
                     params.setProperty_ctl(false);
-                    params.logMessage("PROPERTY: no Property object; prop filter disabled");
+                    params.appendToParamLog("PROPERTY: no Property object; prop filter disabled");
                 }
             }
             
@@ -110,7 +110,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     params.appendSQL("AND propertyunit_unitid=? ");
                 } else {
                     params.setPropertyUnit_ctl(false);
-                    params.logMessage("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
+                    params.appendToParamLog("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
                 }
             }
             
@@ -144,7 +144,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     params.appendSQL("AND personinfocase_personid=? ");
                 } else {
                     params.setPersonInfoCaseID_ctl(false);
-                    params.logMessage("PERSONINFO: no Person object; Person Info case filter disabled");
+                    params.appendToParamLog("PERSONINFO: no Person object; Person Info case filter disabled");
                 }
             }
             
@@ -156,7 +156,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     params.appendSQL("AND bobsource_sourceid=? ");
                 } else {
                     params.setSource_ctl(false);
-                    params.logMessage("SOURCE: no BOb source object; source filter disabled");
+                    params.appendToParamLog("SOURCE: no BOb source object; source filter disabled");
                 }
             }
            

@@ -14,6 +14,11 @@ import com.tcvcog.tcvce.entities.RoleType;
 public  enum        QueryPersonEnum 
         implements  IFace_RankLowerBounded{
     
+    PERSON_NAME(        "First and or last name",
+                        "Filters by first or last name parts; case insensitive",
+                        RoleType.MuniStaff,
+                        true),
+    
     ACTIVE_PERSONS(     "Active persons", 
                         "Persons associated with active code enf and occ cases", 
                         RoleType.MuniReader,

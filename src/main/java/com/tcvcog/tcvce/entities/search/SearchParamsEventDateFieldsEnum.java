@@ -27,7 +27,7 @@ public  enum SearchParamsEventDateFieldsEnum
         implements IFace_dateFieldHolder {
     
     CREATED_TS              ("Creation timestamp", 
-                            "createdts"), 
+                            "event.createdts"), 
     
     TIME_START              ("Event start time",
                             "timestart"), 

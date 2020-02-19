@@ -38,43 +38,72 @@
 
                                     <h:form id="search-query-form">
                                         
+                                        <h:outputLabel styleClass="bold" value="Available queries" for="search-query-som" />
+                                        
+                                        <p:spacer height="5px" />
                                         
                                         <p:selectOneMenu id="search-query-som" tabindex="1" value="#{personSearchBB.querySelected}">
                                             <f:converter converterId="bOBQueryConverter"/>
                                             <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
                                             <f:selectItems id="search-query-si" value="#{personSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
-                                            <p:ajax update="search-query-desc-ot"/>
+                                            <p:ajax update="pers-search-messages-form
+                                                    search-query-form
+                                                    search-params-form"
+                                                    listener="#{personSearchBB.changeQuerySelected}"/>
                                         </p:selectOneMenu>
 
                                         <p:spacer height="5px" />
 
-                                        <h:outputLabel styleClass="bold" value="Query description: " for="cears-query-desc-ot" />
+                                        <h:outputLabel styleClass="bold" value="Description " />
 
-                                        <div class='search-query-desc'>
+                                        <div class='logoutput'>
                                             <h:outputText id="search-query-desc-ot" value="#{personSearchBB.querySelected.queryName.desc}" />
                                         </div>
 
                                         <p:spacer height="5px" />
-
-                                        <div class='search-query-ts'>
-                                            <h:outputLabel styleClass="bold" value="Last run timestamp: " for="cears-query-ts-ot" />
-                                            <h:outputText id="search-query-ts-ot" value="timestamp: #{personSearchBB.querySelected.executionTimestampPretty}" />
-                                        </div>
-
-                                        <p:selectOneMenu id="search-params-som" tabindex="1" value="#{personSearchBB.paramsSelected}">
-                                            <f:converter converterId="searchParamsConverter"/>
-                                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                            <f:selectItems id="search-params-si" value="#{personSearchBB.querySelected.parmsList}" var="sp" itemValue="#{sp}" itemLabel="#{sp.searchName}" />
-                                            <p:ajax update="search-params-form" />
-                                        </p:selectOneMenu>
+                                        
+                                          <p:outputLabel for="pers-query-appendresults-chkbx">
+                                                <h:outputText value="Append results to current result list? "
+                                                              styleClass="bold"/>
+                                        </p:outputLabel>
+                                        
+                                         <p:selectBooleanCheckbox   id="pers-query-appendresults-chkbx" 
+                                                                    value="#{personSearchBB.appendResultsToList}" 
+                                                                    disabled="false" />
+                                                          
                                         
                                         
-                                          <div class='search-query-desc'>
-                                              <h:outputText id="search-results-querylog" 
-                                                            value="#{personSearchBB.querySelected.resultsMessage}" />
-                                        </div>
-
+                                        <p:spacer height="5px" />
                                        
+                                        
+                                        <p:commandButton   id="pers-search-exec-cb" 
+                                                           ajax="true" 
+                                                           actionListener="#{personSearchBB.executeQuery}"
+                                                           icon="fa fa-search" 
+                                                           styleClass="button"
+                                                           value="execute selected query" 
+                                                           disabled="#{personSearchBB.querySelected.queryExecuted}"
+                                                           update="pers-search-messages-form
+                                                           pers-search-results-form
+                                                           search-query-form
+                                                           log-form"/>
+                                        
+                                        <p:commandButton   id="pers-search-clearquery-cb" 
+                                                           ajax="true" 
+                                                           actionListener="#{personSearchBB.resetCurrentQuery}"
+                                                           disabled="#{!personSearchBB.querySelected.queryExecuted}"
+                                                           icon="fa fa-eraser" 
+                                                           styleClass="button"
+                                                           value="reset query" 
+                                                           update="pers-search-messages-form
+                                                           search-query-form
+                                                           log-form
+                                                           search-params-form"/>
+                                        
+                                        <p:spacer height="5px" />
+                                       
+                                        
+
 
                                     </h:form>
                                 </p:panel>
@@ -88,17 +117,23 @@
                                             header="Search filters">
                                     <h:form id="search-params-form">
                                         
-                                        
-                                        <p:commandButton   id="pers-search-exec-cb" 
-                                                           ajax="true" 
-                                                           actionListener="#{personSearchBB.executeQuery}"
-                                                           icon="fa fa-search" 
-                                                           styleClass="button"
-                                                           value="execute selected query" 
-                                                           update="pers-search-messages-form
-                                                           pers-search-results-form
-                                                           search-query-form"/>
 
+                                        <h:outputLabel styleClass="bold" value="Available filters" />
+
+                                        <p:selectOneMenu id="search-params-som" tabindex="1" value="#{personSearchBB.paramsSelected}">
+                                            <f:converter converterId="searchParamsConverter"/>
+                                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                            <f:selectItems id="search-params-si" value="#{personSearchBB.querySelected.parmsList}" var="sp" itemValue="#{sp}" itemLabel="#{sp.filterName}" />
+                                            <p:ajax update="search-params-form" />
+                                        </p:selectOneMenu>
+                                        
+                                        <p:spacer height="5px" />
+                                        
+                                        <div class='logoutput'>
+                                            <h:outputText id="search-param-name-ot" 
+                                                          value="#{personSearchBB.paramsSelected.filterName}" />
+                                        </div>
+                                        
                                         <p:spacer height="5px" />
                                         
                                           <h:panelGrid  columns="1" 
@@ -115,7 +150,8 @@
                                                                         styleClass="datum-label"/>
                                                       </p:outputLabel>
                                                       <p:selectBooleanCheckbox id="pers-filter-name-first-ctl" 
-                                                                               value="#{personSearchBB.paramsSelected.name_first_ctl}" >
+                                                                               value="#{personSearchBB.paramsSelected.name_first_ctl}" 
+                                                                               disabled="#{personSearchBB.querySelected.queryExecuted}">
                                                           <p:ajax update="pers-filter-name-first-val"/>
                                                       </p:selectBooleanCheckbox>
                                                   </h:panelGroup>
@@ -125,7 +161,7 @@
                                                     </p:outputLabel>
                                                     <p:inputText id="pers-filter-name-first-val" value="#{personSearchBB.paramsSelected.name_first_val}" 
                                                                  style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
-                                                                 disabled="#{!personSearchBB.paramsSelected.name_first_ctl}">
+                                                                 disabled="#{!personSearchBB.paramsSelected.name_first_ctl or personSearchBB.querySelected.queryExecuted}">
                                                     </p:inputText>
                                                     <h:message for="pers-filter-name-first-val" showDetail="true" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -142,7 +178,8 @@
                                                                         styleClass="datum-label"/>
                                                       </p:outputLabel>
                                                       <p:selectBooleanCheckbox id="pers-filter-name-last-ctl" 
-                                                                               value="#{personSearchBB.paramsSelected.name_last_ctl}" >
+                                                                               value="#{personSearchBB.paramsSelected.name_last_ctl}" 
+                                                                               disabled="#{personSearchBB.querySelected.queryExecuted}">
                                                           <p:ajax update="pers-filter-name-last-val"/>
                                                       </p:selectBooleanCheckbox>
                                                   </h:panelGroup>
@@ -152,7 +189,7 @@
                                                     </p:outputLabel>
                                                     <p:inputText id="pers-filter-name-last-val" value="#{personSearchBB.paramsSelected.name_last_val}" 
                                                                  style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
-                                                                 disabled="#{!personSearchBB.paramsSelected.name_last_ctl}">
+                                                                 disabled="#{!personSearchBB.paramsSelected.name_last_ctl or personSearchBB.querySelected.queryExecuted}">
                                                     </p:inputText>
                                                     <h:message for="pers-filter-name-last-val" showDetail="true" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -183,9 +220,53 @@
 
                                                 </h:panelGroup>
                                             </h:panelGrid>
+                                              
+                                              <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="pers-filter-muni-ol" for="seev-filter-muni-chkbx" value="Filter by municipality? "/>
+                                                    <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" 
+                                                                             value="#{personSearchBB.paramsSelected.muni_ctl}" 
+                                                                             disabled="#{personSearchBB.querySelected.queryExecuted}">
+                                                        <p:ajax update="pers-search-muni-som"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:selectOneMenu id="pers-search-muni-som" tabindex="1" value="#{personSearchBB.paramsSelected.muni_val}"
+                                                                     disabled="#{!personSearchBB.paramsSelected.muni_ctl or personSearchBB.querySelected.queryExecuted}">
+                                                        <f:converter converterId="muniConverter"/>
+                                                        <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                                        <f:selectItems id="muniNameList" value="#{systemServicesBB.municipalityListForSearch}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                    </p:selectOneMenu>
+                                                    <h:message for="pers-search-muni-som" showDetail="true" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+                                              </h:panelGrid>
+
+                                              
+                                              
                                         </h:panelGrid>
                                     </h:form>
                                 </p:panel>
+                                <p:panel    id="pers-search-results-log-panel"
+                                            toggleable="true"
+                                            widgetVar="pers-search-results-log-var"
+                                            collapsed="false"
+                                            header="Query result log">
+                                    <h:form id="log-form">
+                                        
+
+                                            <h:outputLabel styleClass="bold" value="Log" />
+                                              <div class='logoutput'>
+
+                                                  <h:outputText id="search-results-querylog" 
+                                                                value="#{personSearchBB.querySelected.queryLog}" 
+                                                                escape="false"/>
+                                              </div>
+
+                                    </h:form>
+                                </p:panel>
+                                    
                             </h:panelGroup>
                             
                             <h:panelGroup>
@@ -193,21 +274,25 @@
                                             toggleable="true"
                                             widgetVar="pers-search-results-panel-var"
                                             collapsed="false"
-                                            header="Person search results">
+                                            header="Person search results in #{personSearchBB.paramsSelected.muni_val.muniName}">
                                     
                                     <h:form id="pers-search-results-form">
                                         
 
-
-                                        <h2>Search Results in <h:outputText value="#{personSearchBB.paramsSelected.muni_val.muniName}" /></h2>
-
                                         <p:commandButton    id="load-history-cb"
                                                             actionListener="#{personSearchBB.loadPersonHistory}"
-                                                            ajax="true" style="background-color: white;"
-                                                            value="Load person history"
+                                                            ajax="true"
+                                                            value="load person history"
                                                             update="pers-search-results-form
                                                             pers-search-messages-form"
                                                             icon="fa fa-history"/>
+                                        <p:commandButton    id="clear-results-cb"
+                                                            actionListener="#{personSearchBB.clearResultList}"
+                                                            ajax="true"
+                                                            value="clear result list"
+                                                            update="pers-search-results-form
+                                                            pers-search-messages-form"
+                                                            icon="fa fa-eraser"/>
 
                                         <p:spacer height="2px"/>
 
