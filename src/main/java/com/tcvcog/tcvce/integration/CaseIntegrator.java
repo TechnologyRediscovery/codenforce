@@ -614,8 +614,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             
             freshlyInsertedCase = getCECase(insertedCaseID);
             
-            pc.insertAutoAssignedFees(freshlyInsertedCase);
-            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Case Integrator: cannot insert new case, sorry", ex);

@@ -161,26 +161,28 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return "feePermissions";
     }
 
-    public String deleteSelectedOccPeriodFee(ActionEvent e) {
+    public String waiveSelectedOccPeriodFee(ActionEvent e) {
 
         if (selectedAssignedFee == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a fee from the table to delete", ""));
+                            "Please select a fee from the table to waive.", ""));
 
             return "";
         }
-
+        
+        selectedAssignedFee.setWaivedBy(getSessionBean().getSessionUser());
+        
         PaymentIntegrator pi = getPaymentIntegrator();
 
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
 
             try {
-                pi.deleteOccPeriodFee((MoneyOccPeriodFeeAssigned) selectedAssignedFee);
+                pi.updateOccPeriodFee((MoneyOccPeriodFeeAssigned) selectedAssignedFee);
                 refreshFeeAssignedList();
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Fee deleted forever!", ""));
+                                "Fee waived!", ""));
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());
             }
@@ -188,11 +190,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
 
             try {
-                pi.deleteCECaseFee((MoneyCECaseFeeAssigned) selectedAssignedFee);
+                pi.updateCECaseFee((MoneyCECaseFeeAssigned) selectedAssignedFee);
                 refreshFeeAssignedList();
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Fee deleted forever!", ""));
+                                "Fee waived!", ""));
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());
             }

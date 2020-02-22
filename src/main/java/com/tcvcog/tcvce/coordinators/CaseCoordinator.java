@@ -1131,6 +1131,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         EventCoordinator ec = getEventCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
+        PaymentCoordinator pc = getPaymentCoordinator();
         CECaseEvent tfEvent;
         int insertedViolationID;
         int eventID;
@@ -1164,6 +1165,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         } else {
             throw new ViolationException("Failed violation verification");
         }
+        
+        pc.insertAutoAssignedFees(cse, cv);
         return insertedViolationID;
     }
     

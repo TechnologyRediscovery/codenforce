@@ -1303,9 +1303,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     public void updateFeeCodeElementJoin(Fee fee, EnforcableCodeElement element) throws IntegrationException {
 
-        String query = "UPDATE public.moneyoccperiodtypefee\n"
+        String query = "UPDATE public.moneycodesetelementfee\n"
                 + "   SET autoassign=?\n"
-                + "   WHERE fee_feeid=? AND occperiodtype_typeid=?;";
+                + "   WHERE fee_feeid=? AND codesetelement_elementid=?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1841,68 +1841,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot delete occupancy inspection fee--probably because another" + "part of the database has a reference item.", ex);
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-        } // close finally
-    }
-
-    public void deleteOccPeriodFee(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
-        String query = "DELETE FROM public.moneyoccperiodfeepayment WHERE occperiodassignedfee_id= ?;\n"
-                + "DELETE FROM public.moneyoccperiodfeeassigned WHERE moneyoccperassignedfeeid= ?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getOccPerAssignedFeeID());
-            stmt.setInt(2, fee.getOccPerAssignedFeeID());
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot delete assigned fee", ex);
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-        } // close finally
-    }
-
-    public void deleteCECaseFee(MoneyCECaseFeeAssigned fee) throws IntegrationException {
-        String query = "DELETE FROM public.moneycecasefeepayment WHERE cecaseassignedfee_id= ?;\n"
-                + "DELETE FROM public.moneycecasefeeassigned WHERE cecaseassignedfeeid= ?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getCeCaseAssignedFeeID());
-            stmt.setInt(2, fee.getCeCaseAssignedFeeID());
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot delete assigned fee", ex);
         } finally {
             if (con != null) {
                 try {

@@ -168,8 +168,8 @@
                                 update="assignedFeeAddForm messages"
                                 value="Update Selected Fee" tabindex="2"/>
                             <p:commandButton ajax="false" 
-                                             actionListener="#{feeManagementBB.deleteSelectedOccPeriodFee}"
-                                             value="Nuke Selected Record Forever" tabindex="3"/>
+                                             actionListener="#{feeManagementBB.waiveSelectedOccPeriodFee}"
+                                             value="Waive Selected Fee" tabindex="3"/>
                             <p:commandButton    id="newFeeDialogButton"
                                                 actionListener="#{feeManagementBB.initializeNewAssignedFee(e)}"
                                                 oncomplete="PF('assignedFeeAddDialogVar').show()"

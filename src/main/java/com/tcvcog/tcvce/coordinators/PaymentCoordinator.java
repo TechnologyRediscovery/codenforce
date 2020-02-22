@@ -93,13 +93,9 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public void insertAutoAssignedFees(CECase cse) throws IntegrationException {
+    public void insertAutoAssignedFees(CECase cse, CodeViolation violation) throws IntegrationException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
-
-        List<CodeViolation> violationList = cse.getViolationList();
-
-        for (CodeViolation violation : violationList) {
 
             EnforcableCodeElement codeElement = violation.getCodeViolated();
 
@@ -126,7 +122,6 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
             }
 
-        }
     }
 
 }
