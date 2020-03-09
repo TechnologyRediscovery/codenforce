@@ -128,7 +128,7 @@
                                                 value="Create new Payment Record"
                                                 icon="fa fa-plus"
                                                 />
-                            <p:commandButton rendered="#{paymentBB.redirTo != null}" action="#{paymentBB.finishAndRedir()}"
+                            <p:commandButton rendered="#{paymentBB.redirected}" action="#{paymentBB.finishAndRedir()}"
                                              value="Finish editing payment list and return"/>
                         </h:form>    
 

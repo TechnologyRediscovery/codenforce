@@ -22,7 +22,7 @@
                     <f:view>
                         <h:form id="occPeriodFeeDisplay">
                             <h2>Recorded 
-                                <p:outputLabel rendered="#{feeManagementBB.redirTo ne null}" value="#{feeManagementBB.currentDomain}"/>
+                                <p:outputLabel rendered="#{feeManagementBB.redirected}" value="#{feeManagementBB.currentDomain}"/>
                                 Fees 
                                 <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/>
                                 <p:outputLabel rendered="#{feeManagementBB.editingCECase()}" value="At #{feeManagementBB.CECaseAddress}"/>
@@ -178,12 +178,12 @@
                                                 value="Create new Fee"
                                                 icon="fa fa-plus"
                                                 />
-                            <p:commandButton rendered="#{feeManagementBB.redirTo != null}" action="#{feeManagementBB.finishAndRedir()}"
+                            <p:commandButton rendered="#{feeManagementBB.redirected}" action="#{feeManagementBB.finishAndRedir()}"
                                              value="Finish editing fee list and return"/>
                             <p:spacer height="10px"/>
                             <p:commandButton    id="feePermissionButton"
                                                 action="#{feeManagementBB.goToFeePermissions()}"
-                                                rendered="#{feeManagementBB.redirTo != null}"
+                                                rendered="#{feeManagementBB.redirected}"
                                                 value="Edit Fees that may be used for #{feeManagementBB.whatDomainFees()}"
                                                 />
                         </h:form>    

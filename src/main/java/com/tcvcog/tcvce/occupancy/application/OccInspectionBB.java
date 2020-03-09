@@ -1147,7 +1147,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public String editOccPeriodPayments(){
          getSessionBean().setFeeManagementDomain(EventDomainEnum.OCCUPANCY);
          getSessionBean().setFeeManagementOccPeriod(currentOccPeriod);
-         getSessionBean().setPaymentRedirTo("occPeriodPayments");
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "payments";
      }
@@ -1155,7 +1155,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public String editOnePayment(Payment thisPayment){
          getSessionBean().setFeeManagementDomain(EventDomainEnum.OCCUPANCY);
          getSessionBean().setSessionPayment(thisPayment);
-         getSessionBean().setPaymentRedirTo("occPeriodPayments");
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "payments";
      }
@@ -1163,7 +1163,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public String editOccPeriodFees(){
          getSessionBean().setFeeManagementDomain(EventDomainEnum.OCCUPANCY);
          getSessionBean().setFeeManagementOccPeriod(currentOccPeriod);
-         getSessionBean().setFeeRedirTo("occPeriodPayments");
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "editFees";
      }

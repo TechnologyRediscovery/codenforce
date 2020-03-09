@@ -155,16 +155,16 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
 
     /* *** Payment and Fee Management Shelves *** */
     private Payment sessionPayment;
-    private String paymentRedirTo;
     
     private EventDomainEnum feeManagementDomain;
     private CECase feeManagementCeCase;
     private OccPeriod feeManagementOccPeriod;
-    private String feeRedirTo;
     /* *** Blob Upload Session Shelves *** */
     //linking
 
-
+    /* *** Navigation Shelves *** */
+    private NavigationStack navStack;
+    
     /**
      * Creates a new instance of getSessionBean()
      */
@@ -176,6 +176,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         System.out.println("SessionBean.initBean");
+        navStack = new NavigationStack();
     }
 
     /**
@@ -942,24 +943,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the paymentRedirTo
-     */
-    public String getPaymentRedirTo() {
-        return paymentRedirTo;
-    }
-
-    /**
      * @return the feeManagementOccPeriod
      */
     public OccPeriod getFeeManagementOccPeriod() {
         return feeManagementOccPeriod;
-    }
-
-    /**
-     * @return the feeRedirTo
-     */
-    public String getFeeRedirTo() {
-        return feeRedirTo;
     }
 
     /**
@@ -968,26 +955,11 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     public void setSessionPayment(Payment sessionPayment) {
         this.sessionPayment = sessionPayment;
     }
-
-    /**
-     * @param paymentRedirTo the paymentRedirTo to set
-     */
-    public void setPaymentRedirTo(String paymentRedirTo) {
-        this.paymentRedirTo = paymentRedirTo;
-    }
-
     /**
      * @param feeManagementOccPeriod the feeManagementOccPeriod to set
      */
     public void setFeeManagementOccPeriod(OccPeriod feeManagementOccPeriod) {
         this.feeManagementOccPeriod = feeManagementOccPeriod;
-    }
-
-    /**
-     * @param feeRedirTo the feeRedirTo to set
-     */
-    public void setFeeRedirTo(String feeRedirTo) {
-        this.feeRedirTo = feeRedirTo;
     }
 
     public CECase getFeeManagementCeCase() {
@@ -1004,6 +976,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
 
     public void setFeeManagementDomain(EventDomainEnum feeManagementDomain) {
         this.feeManagementDomain = feeManagementDomain;
+    }
+
+    public NavigationStack getNavStack() {
+        return navStack;
+    }
+
+    public void setNavStack(NavigationStack navStack) {
+        this.navStack = navStack;
     }
     
 }

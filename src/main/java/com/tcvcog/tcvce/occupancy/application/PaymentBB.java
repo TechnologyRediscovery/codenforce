@@ -65,7 +65,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     private EventDomainEnum currentDomain;
     private boolean editing;
-    private String redirTo;
+    private boolean redirected;
 
     public PaymentBB() {
     }
@@ -73,11 +73,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean() {
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
-        redirTo = getSessionBean().getPaymentRedirTo();
-        if (redirTo != null) {
+        if (getSessionBean().getNavStack().peekLastPage() != null) {
 
             refreshFeeAssignedList();
 
+            redirected = true;
         }
 
         formPayment = new Payment();
@@ -327,17 +327,16 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public String finishAndRedir() {
-        getSessionBean().setPaymentRedirTo(null);
 
-        return redirTo;
+        return getSessionBean().getNavStack().popLastPage();
     }
 
     public boolean editingOccPeriod() {
-        return (redirTo != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
     }
 
     public boolean editingCECase() {
-        return (redirTo != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
     }
 
     public String getCurrentAddress() {
@@ -799,14 +798,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         this.currentOccPeriod = currentOccPeriod;
     }
 
-    public String getRedirTo() {
-        return redirTo;
-    }
-
-    public void setRedirTo(String redirTo) {
-        this.redirTo = redirTo;
-    }
-
     public FeeAssigned getSelectedAssignedFee() {
         return selectedAssignedFee;
     }
@@ -845,6 +836,14 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     public void setCurrentDomain(EventDomainEnum currentDomain) {
         this.currentDomain = currentDomain;
+    }
+
+    public boolean isRedirected() {
+        return redirected;
+    }
+
+    public void setRedirected(boolean redirected) {
+        this.redirected = redirected;
     }
 
 }

@@ -1028,7 +1028,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public String editCeCasePayments(){
         getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
          getSessionBean().setFeeManagementCeCase(currentCase);
-         getSessionBean().setPaymentRedirTo("ceEventPayments");
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "payments";
      }
@@ -1036,7 +1036,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public String editOnePayment(Payment thisPayment){
         getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
          getSessionBean().setSessionPayment(thisPayment);
-         getSessionBean().setPaymentRedirTo("ceEventPayments");
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "payments";
      }
@@ -1044,7 +1044,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      public String editCeCaseFees(){
          getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
          getSessionBean().setFeeManagementCeCase(currentCase);
-         getSessionBean().setFeeRedirTo("ceEventPayments");
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "editFees";
      }

@@ -348,10 +348,21 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(2, fee.getOccPeriodID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
-            stmt.setInt(5, fee.getWaivedBy().getUserID());
+
+            if (fee.getWaivedBy().getUserID() != 0) {
+                stmt.setInt(5, fee.getWaivedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+
             stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
             stmt.setDouble(7, fee.getReducedBy());
-            stmt.setInt(8, fee.getReducedByUser().getUserID());
+            if (fee.getReducedByUser().getUserID() != 0) {
+                stmt.setInt(8, fee.getReducedByUser().getUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+
             stmt.setString(9, fee.getNotes());
             stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
             stmt.setInt(11, fee.getOccPeriodTypeID());
@@ -396,10 +407,19 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(2, fee.getCaseID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
-            stmt.setInt(5, fee.getWaivedBy().getUserID());
+
+            if (fee.getWaivedBy().getUserID() != 0) {
+                stmt.setInt(5, fee.getWaivedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
             stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
             stmt.setDouble(7, fee.getReducedBy());
-            stmt.setInt(8, fee.getReducedByUser().getUserID());
+            if (fee.getReducedByUser().getUserID() != 0) {
+                stmt.setInt(8, fee.getReducedByUser().getUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
             stmt.setString(9, fee.getNotes());
             stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
             stmt.setInt(11, fee.getCodeSetElement());
@@ -444,10 +464,18 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(2, fee.getOccPeriodID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
-            stmt.setInt(5, fee.getWaivedBy().getUserID());
+            if (fee.getWaivedBy().getUserID() != 0) {
+                stmt.setInt(5, fee.getWaivedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
             stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
             stmt.setDouble(7, fee.getReducedBy());
-            stmt.setInt(8, fee.getReducedByUser().getUserID());
+            if (fee.getReducedByUser().getUserID() != 0) {
+                stmt.setInt(8, fee.getReducedByUser().getUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
             stmt.setString(9, fee.getNotes());
             stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
             stmt.setInt(11, fee.getOccPeriodTypeID());
@@ -492,10 +520,18 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(2, fee.getCaseID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
-            stmt.setInt(5, fee.getWaivedBy().getUserID());
+            if (fee.getWaivedBy().getUserID() != 0) {
+                stmt.setInt(5, fee.getWaivedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
             stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
             stmt.setDouble(7, fee.getReducedBy());
-            stmt.setInt(8, fee.getReducedByUser().getUserID());
+            if (fee.getReducedByUser().getUserID() != 0) {
+                stmt.setInt(8, fee.getReducedByUser().getUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
             stmt.setString(9, fee.getNotes());
             stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
             stmt.setInt(11, fee.getCodeSetElement());

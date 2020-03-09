@@ -572,7 +572,7 @@
                         <p:spacer height="15px"/>
                         <p:commandButton    id="feePermissionFinishedButton"
                                             action="#{feeManagementBB.finishAndRedir()}"
-                                            rendered="#{feeManagementBB.redirTo != null}"
+                                            rendered="#{feeManagementBB.redirected}"
                                             value="Finish editing permissions and return"
                                             />
 

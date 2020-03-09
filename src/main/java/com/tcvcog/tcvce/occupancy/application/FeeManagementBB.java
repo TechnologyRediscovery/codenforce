@@ -96,8 +96,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     //Generalized fields
     private EventDomainEnum currentDomain;
     private boolean editing;
-    private String redirTo;
     private boolean waived;
+    private boolean redirected;
 
     /**
      * Creates a new instance of NewJSFManagedBean
@@ -115,10 +115,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         assignedFormFee = new FeeAssigned();
 
-        if (getSessionBean().getFeeRedirTo() != null) {
+        if (getSessionBean().getNavStack().peekLastPage() != null) {
 
             refreshFeeAssignedList();
 
+            redirected = true;
+            
             if (allFees == null) {
                 try {
                     allFees = pi.getFeeTypeList(getSessionBean().getSessionMuni());
@@ -144,19 +146,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public String finishAndRedir() {
 
-        //The following if statement is temporary. If you redirect to the fee Managment page from the fee permissions page, the case or occperiod does not load.
-        //until I create a better solution, this will remain here.
-        //TODO: Make a better redirection system that lasts longer than one redirection.
-        if (!getSessionBean().getFeeRedirTo().equalsIgnoreCase("editFees")) {
-            getSessionBean().setFeeRedirTo(null);
-        }
-        return redirTo;
+        return getSessionBean().getNavStack().popLastPage();
     }
 
     public String goToFeePermissions() {
 
         if (editingCECase() || editingOccPeriod()) {
-            getSessionBean().setFeeRedirTo("editFees");
+            getSessionBean().getNavStack().pushCurrentPage();
         }
         return "feePermissions";
     }
@@ -798,8 +794,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
-        redirTo = getSessionBean().getFeeRedirTo();
-
         currentDomain = getSessionBean().getFeeManagementDomain();
 
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
@@ -1096,14 +1090,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.feeAssignedList = feeAssignedList;
     }
 
-    public String getRedirTo() {
-        return redirTo;
-    }
-
-    public void setRedirTo(String redirTo) {
-        this.redirTo = redirTo;
-    }
-
     public ArrayList<FeeAssigned> getFilteredFeeAssignedList() {
         return filteredFeeAssignedList;
     }
@@ -1137,11 +1123,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     public boolean editingOccPeriod() {
-        return (redirTo != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
     }
 
     public boolean editingCECase() {
-        return (redirTo != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
     }
 
     public ArrayList<OccPeriodType> getTypeList() {
@@ -1308,4 +1294,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.lockedCodeElement = lockedCodeElement;
     }
 
+    public boolean isRedirected() {
+        return redirected;
+    }
+
+    public void setRedirected(boolean redirected) {
+        this.redirected = redirected;
+    }
+    
 }
