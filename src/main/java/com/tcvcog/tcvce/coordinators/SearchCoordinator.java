@@ -365,23 +365,26 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      */
     public String selectDefaultDateFieldString(SearchParams sp){
         String f = null;
-        if(sp.getDate_field().extractDateFieldString() != null){
-            f = sp.getDate_field().extractDateFieldString();
-        } else {
-            if(sp instanceof SearchParamsProperty){
-                f = SearchParamsPropertyDateFieldsEnum.CREATIONTS.extractDateFieldString();
-            } else if(sp instanceof SearchParamsPerson){
-                f = SearchParamsPersonDateFieldsEnum.CREATED_TS.extractDateFieldString();
-            } else if(sp instanceof SearchParamsEvent){
-                f = SearchParamsEventDateFieldsEnum.CREATED_TS.extractDateFieldString();
-            } else if(sp instanceof SearchParamsOccPeriod){
-                f = SearchParamsOccPeriodDateFieldsEnum.CREATED_TS.extractDateFieldString();
-            } else if(sp instanceof SearchParamsCECase){
-                f = SearchParamsOccPeriodDateFieldsEnum.CREATED_TS.extractDateFieldString();
-            } else if(sp instanceof SearchParamsCEActionRequests){
-                f = SearchParamsCEActionRequestsDateFieldsEnum.SUBMISSION_TS.extractDateFieldString();
+        if(sp != null){
+
+            if(sp.getDate_field().extractDateFieldString() != null){
+                f = sp.getDate_field().extractDateFieldString();
             } else {
-                return null;
+                if(sp instanceof SearchParamsProperty){
+                    f = SearchParamsPropertyDateFieldsEnum.CREATIONTS.extractDateFieldString();
+                } else if(sp instanceof SearchParamsPerson){
+                    f = SearchParamsPersonDateFieldsEnum.CREATED_TS.extractDateFieldString();
+                } else if(sp instanceof SearchParamsEvent){
+                    f = SearchParamsEventDateFieldsEnum.CREATED_TS.extractDateFieldString();
+                } else if(sp instanceof SearchParamsOccPeriod){
+                    f = SearchParamsOccPeriodDateFieldsEnum.CREATED_TS.extractDateFieldString();
+                } else if(sp instanceof SearchParamsCECase){
+                    f = SearchParamsOccPeriodDateFieldsEnum.CREATED_TS.extractDateFieldString();
+                } else if(sp instanceof SearchParamsCEActionRequests){
+                    f = SearchParamsCEActionRequestsDateFieldsEnum.SUBMISSION_TS.extractDateFieldString();
+                } else {
+                    return null;
+                }
             }
             
         } // close logic for default date field name selection
@@ -394,7 +397,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * Shared SQL builder for the search fields on the SearchParams superclass 
      * whose subclasses are passed to the searchForXXX(SearchParamsXXX params) method family spread across the
      * main Integrators. We remove duplication of building these shared search criteria across all 6 searchable
- BOBs as of the beta: Property, Person, Event, OccPeriod, CECase, and CEActionRequest
+     * BOBs as of the beta: Property, Person, Event, OccPeriod, CECase, and CEActionRequest
      * @param params
      * @param muniDBField
      * @return the configured apram for      */
@@ -864,7 +867,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 queryList.add(initQuery(queryTitle, cred));
             }
         }
-        
+        System.out.println("SearchCoordinator.buildQueryPropertyList | returning list of size " + queryList.size());
         return queryList;
     }
     

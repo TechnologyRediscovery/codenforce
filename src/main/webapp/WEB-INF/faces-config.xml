@@ -680,6 +680,12 @@
         <managed-bean-class>com.tcvcog.tcvce.application.UnitChangesBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
+   
+    <managed-bean>
+        <managed-bean-name>propertySearchBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertySearchBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
   
     

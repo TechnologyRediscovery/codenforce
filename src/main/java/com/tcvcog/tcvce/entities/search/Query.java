@@ -133,6 +133,8 @@ public abstract class   Query<E extends BOb>
     
     
     
+    
+    
     /**
      * @return the credentialSignature
      */

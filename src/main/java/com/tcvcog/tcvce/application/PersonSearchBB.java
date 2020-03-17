@@ -95,11 +95,12 @@ public class PersonSearchBB extends BackingBeanUtils{
     private void setupQueryInfrastructure(){
         SearchCoordinator sc = getSearchCoordinator();
 
-        try {
-            queryList = sc.buildQueryPersonList(getSessionBean().getSessUser().getMyCredential());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+//        try {
+              queryList = getSessionBean().getQueryPersonList();
+//            queryList = sc.buildQueryPersonList(getSessionBean().getSessUser().getMyCredential());
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//        }
         
         if(queryList != null && !queryList.isEmpty()){
             querySelected = queryList.get(0);

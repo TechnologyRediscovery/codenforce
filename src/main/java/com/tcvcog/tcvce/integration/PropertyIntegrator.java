@@ -621,7 +621,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
    
 
     /**
-     * Single entry point for searches against the property table. It's the job of
+     * Single entry point for searches against the property table. Since 
+     * my return type is Integer, It's the job of
      * the caller to iterate over the result list and make real objects
      * 
      * @param params

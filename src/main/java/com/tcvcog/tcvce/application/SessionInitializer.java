@@ -450,7 +450,7 @@ public  class       SessionInitializer
             }
         
             sessBean.setQueryPropertyList(sc.buildQueryPropertyList(cred));
-
+            
             if(!sessBean.getQueryPropertyList().isEmpty()){
                 sessBean.setQueryProperty(sessBean.getQueryPropertyList().get(0));
             }            

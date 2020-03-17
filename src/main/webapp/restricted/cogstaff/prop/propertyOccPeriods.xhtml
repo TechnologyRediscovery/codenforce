@@ -70,7 +70,7 @@
                                                            value="explore occ period"  
                                                            ajax="false" 
                                                            action="#{personOccPeriodsBB.exploreOccPeriod(period)}"
-                                                           rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
+                                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                            icon="fa fa-binoculars"/>
                                 </p:dataScroller>
                             </h:form>
