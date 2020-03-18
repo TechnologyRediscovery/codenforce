@@ -25,25 +25,14 @@
 
                             
                         <h1>Property units</h1>
-
-                         <h:form id="gotounitchanges">
-                                        <p:commandButton id="goToUnitChangesButton"
-                                                         value="Go to unit changes"
-                                                         action="#{propertyUnitsBB.goToChanges()}"
-                                                         />
-
-                                        <h1 class="property-blue">Properties</h1>
-                                    </h:form>
-                        
                         
                         <p:panel    id="prop-units-list-panel"
                                     toggleable="true"
                                     widgetVar="prop-units-list-panel-var"
                                     collapsed="false"
-                                    header="Property units">
+                                    header="Unit list">
                              
                             <h:form id="prop-units-list-form" >
-                                
                                 
                                 <p:commandButton       id="button-editunits"
                                                        ajax="true" 
@@ -72,12 +61,12 @@
 
                                         <p:spacer height="5px" />
 
-                                        <h:outputText value="Rental intent:" />
+                                        <h:outputText value="Rental intent: " />
                                         <h:outputText value="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
 
                                         <p:spacer height="5px" />
 
-                                        <h:outputText value="Unit Description:" />
+                                        <h:outputText value="Unit Description: " />
                                         <h:outputText value="#{unit.notes}" />
 
                                         <h4>Occupancy periods</h4>
@@ -87,7 +76,7 @@
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
                                                                ajax="true" 
                                                                actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
-                                                               rendered="#{sessionBean.sessessUseryCard.hasMuniStaffPermissions}"
+                                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                disabled="#{!propertyUnitsBB.currProp.active}"
                                                                oncomplete="PF('dialog-addoccperiod-var').show()"
                                                                value="Add new occupancy period" 
@@ -137,7 +126,7 @@
                                                 <p:commandButton       id="button-occperiodtable-editperiod"
                                                                        ajax="false" 
                                                                        action="#{PropertyUnitsBB.manageOccPeriod(period)}"
-                                                                       rendered="#{sessionBean.sessiosessUserrd.hasMuniStaffPermissions}"
+                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                        value="manage occupancy period"  
                                                                        icon="fa fa-edit"/>
                                         </p:dataScroller>
@@ -315,15 +304,16 @@
                                              actionListener="#{propertyUnitsBB.finalizeUnitList}"
                                              oncomplete="PF('dialog-widvar-unitedit').hide()"
                                              icon="fa fa-thumbs-o-up"
-                                             update="
-                                             prop-units-messages-form
-                                             prop-units-list-form"
+                                             update="   prop-units-messages-form
+                                                        prop-units-list-form"
                                              value="Save unit list" 
                                              tabindex="3"/>
                         </h:form>
                     </p:dialog>
                     
-                       <p:dialog    id="dialog-addoccperiod"
+                    
+                    
+                    <p:dialog    id="dialog-addoccperiod"
                                  height="400" width="600"
                                  widgetVar="dialog-addoccperiod-var"
                                  closable="true" >
@@ -350,6 +340,7 @@
                                                            itemValue="#{opt}" 
                                                            itemLabel="#{opt.title}" />
                                 </p:selectOneMenu>
+                            
                              <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('dialog-addoccperiod-var').hide()"

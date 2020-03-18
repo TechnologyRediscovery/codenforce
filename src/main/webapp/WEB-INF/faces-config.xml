@@ -686,6 +686,54 @@
         <managed-bean-class>com.tcvcog.tcvce.application.PropertySearchBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
+   
+    <managed-bean>
+        <managed-bean-name>propertyProfileBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyProfileBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
+    
+    <managed-bean>
+        <managed-bean-name>propertyCasesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyCasesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
+    
+    <managed-bean>
+        <managed-bean-name>propertyCreateBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyCreateBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
+    
+    <managed-bean>
+        <managed-bean-name>propertyEventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyEventsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
+    
+    <managed-bean>
+        <managed-bean-name>propertyFilesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyFilesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
+    
+    <managed-bean>
+        <managed-bean-name>propertyOccPeriodsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyOccPeriodsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
+    
+    <managed-bean>
+        <managed-bean-name>propertyPersonsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyPersonsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
+    
+    <managed-bean>
+        <managed-bean-name>propertyUnitsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyUnitsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
   
     

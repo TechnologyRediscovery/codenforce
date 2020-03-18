@@ -65,7 +65,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
         
-        currProp = (getSessionBean().getSessProperty());
+        currProp = getSessionBean().getSessProperty();
         
   
         selectedMuni = getSessionBean().getSessMuni();

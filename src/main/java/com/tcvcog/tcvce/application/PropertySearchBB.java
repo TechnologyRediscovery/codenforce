@@ -175,8 +175,9 @@ public class PropertySearchBB extends BackingBeanUtils{
     /**
      * Loads a data-heavy subclass of the selected property
      * @param prop 
+     * @return  
      */
-    public void exploreProperty(Property prop){
+    public String exploreProperty(Property prop){
         PropertyCoordinator pc = getPropertyCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
         
@@ -186,12 +187,15 @@ public class PropertySearchBB extends BackingBeanUtils{
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Managing property at " + prop.getAddress() , ""));
             sc.logObjectView(getSessionBean().getSessUser(), prop);
+            return "propertyInfo";
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                         ex.getMessage(), ""));
         } 
+        return "";
+        
     }
     
 

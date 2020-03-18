@@ -20,12 +20,10 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
-import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
@@ -120,8 +118,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         SystemIntegrator si = getSystemIntegrator();
         UserIntegrator ui = getUserIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
-        
-        
 
         Property p = new Property();
 
@@ -1163,28 +1159,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return unitList;
     }
 
-    /**
-     * 
-     * @param propUnitList
-     * @return
-     * @throws IntegrationException
-     * @throws EventException
-     * @throws com.tcvcog.tcvce.domain.AuthorizationException
-     * @throws com.tcvcog.tcvce.domain.BObStatusException
-     */
-    public List<PropertyUnitDataHeavy> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList) throws IntegrationException, EventException, EventException, AuthorizationException, BObStatusException{
-        List<PropertyUnitDataHeavy> puwll = new ArrayList<>();
-        Iterator<PropertyUnit> iter = propUnitList.iterator();
-        while(iter.hasNext()){
-            try {
-                PropertyUnit pu = iter.next();
-                puwll.add(getPropertyUnitWithLists(pu.getUnitID()));
-            } catch (ViolationException ex) {
-                System.out.println(ex);
-            }
-        }
-        return puwll;
-    }
+  
     
     /**
      * Adaptor method for calling getPropertyUnitWithLists(int unitID) given a PropertyUnit object
@@ -1196,7 +1171,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public PropertyUnitDataHeavy getPropertyUnitWithList(PropertyUnit pu) throws IntegrationException, EventException, AuthorizationException, BObStatusException{
+    public PropertyUnitDataHeavy getPropertyUnitWithLists(PropertyUnit pu) throws IntegrationException, EventException, AuthorizationException, BObStatusException{
         PropertyUnitDataHeavy puwl = null;
         try {
             puwl = getPropertyUnitWithLists(pu.getUnitID());

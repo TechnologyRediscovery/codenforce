@@ -18,7 +18,9 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
@@ -72,7 +74,8 @@ public class PropertyUnitsBB
         return "unitchanges";
     }
     
-      public String manageOccPeriod(OccPeriod op){
+    
+    public String manageOccPeriod(OccPeriod op){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         
         try {
@@ -107,9 +110,6 @@ public class PropertyUnitsBB
         PropertyUnit unitToAdd;
         PropertyCoordinator pc = getPropertyCoordinator();
         unitToAdd = pc.initPropertyUnit(currProp);
-        unitToAdd.setUnitNumber("");
-//        unitToAdd.setRental(false);
-        unitToAdd.setNotes("");
         getCurrProp().getUnitList().add(unitToAdd);
         
 //        clearAddUnitFormValues();
@@ -132,6 +132,7 @@ public class PropertyUnitsBB
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Unit deactivated with ID " + pu.getUnitID(), ""));
         } catch (IntegrationException ex) {
+            System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Could not deactivate unit with ID " + pu.getUnitID(), ""));
@@ -142,7 +143,7 @@ public class PropertyUnitsBB
        /**
      * Finalizes the unit list the user has created so that it can be compared
      * to the existing one in the database.
-     *
+     * 
      * @param ev
      */
     public void finalizeUnitList(ActionEvent ev) {
@@ -156,7 +157,8 @@ public class PropertyUnitsBB
 
         for (PropertyUnit firstUnit : getCurrProp().getUnitList()) {
             duplicateNums = 0;
-
+            
+            // remove any use of the word "unit" in a unit identifier
             firstUnit.setUnitNumber(firstUnit.getUnitNumber().replaceAll("(?i)unit", ""));
 
             if (firstUnit.getUnitNumber().compareTo("") == 0) {
@@ -195,11 +197,13 @@ public class PropertyUnitsBB
             Iterator<PropertyUnit> iter = getCurrProp().getUnitList().iterator();
             while(iter.hasNext()){
                 PropertyUnit pu = iter.next();
+                
+                // decide if we're updating a unit or inserting it based on initial value
+                // newly created units don't have an ID, just a default unit number
+                pu.setPropertyID(getCurrProp().getPropertyID());
                 if(pu.getUnitID() == 0){
                     try {
-                        pu.setPropertyID(getCurrProp().getPropertyID());
                         pi.insertPropertyUnit(pu);
-                        refreshCurrPropWithLists();
                         
                         getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -211,9 +215,7 @@ public class PropertyUnitsBB
                     }
                 } else {
                     try {
-                        pu.setPropertyID(getCurrProp().getPropertyID());
                         pi.updatePropertyUnit(pu);
-                        refreshCurrPropWithLists();
                         getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Success! Updated property unit: " + pu.getUnitNumber(), ""));
@@ -230,14 +232,15 @@ public class PropertyUnitsBB
        
         try{
             pc.editProperty(currProp, getSessionBean().getSessUser());
-        } catch (IntegrationException ex) {
+//            currProp = pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessUser().getMyCredential());
+        } catch (IntegrationException  ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not update associated property: ", ""));
-            
         }
         
+        refreshCurrPropWithLists();
         
     } // close method
     
@@ -246,8 +249,9 @@ public class PropertyUnitsBB
     private void refreshCurrPropWithLists(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            setCurrProp(pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessUser().getMyCredential()));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            currProp = pc.getPropertyDataHeavy(currProp.getPropertyID(), getSessionBean().getSessUser().getMyCredential());
+            getSessionBean().setSessProperty(currProp);
+        } catch (IntegrationException | BObStatusException | SearchException | AuthorizationException | EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

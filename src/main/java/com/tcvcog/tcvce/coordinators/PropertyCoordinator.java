@@ -46,6 +46,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,42 +62,42 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
     /**
      * Logic container for initializing members on the Property subclass PropertyWithLists
-     * @param pr
+     * @param prop
      * @param cred
      * @return
      * @throws IntegrationException
      * @throws BObStatusException 
      * @throws com.tcvcog.tcvce.domain.SearchException 
      */
-    public PropertyDataHeavy assemblePropertyDataHeavy(Property pr, Credential cred) throws IntegrationException, BObStatusException, SearchException{
+    public PropertyDataHeavy assemblePropertyDataHeavy(Property prop, Credential cred) throws IntegrationException, BObStatusException, SearchException{
         
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         
-        PropertyDataHeavy pdh = new PropertyDataHeavy(pr);
+        PropertyDataHeavy pdh = new PropertyDataHeavy(prop);
         
         try {
             // CECase list
             QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PROPERTY, cred);
-            qcse.getPrimaryParams().setProperty_val(pr);
+            qcse.getPrimaryParams().setProperty_val(prop);
             pdh.setCeCaseList(cc.getCECaseHeavyList(sc.runQuery(qcse).getResults(), cred));
 
             
             // Property info cases
             qcse = sc.initQuery(QueryCECaseEnum.PROPINFOCASES, cred);
-            qcse.getPrimaryParams().setProperty_val(pr);
+            qcse.getPrimaryParams().setProperty_val(prop);
             pdh.setPropInfoCaseList(cc.getCECaseHeavyList(sc.runQuery(qcse).getBOBResultList(), cred));
             
             // UnitDataHeavy list
             // remember that units data heavy contain all our occ periods and inspections
             if(pdh.getUnitList() != null && !pdh.getUnitList().isEmpty()){
-                pdh.setUnitWithListsList(pi.getPropertyUnitWithListsList(pdh.getUnitList()));
+                pdh.setUnitWithListsList(getPropertyUnitWithListsList(pdh.getUnitList(), cred));
             }
             
             // Person list
             QueryPerson qp = sc.initQuery(QueryPersonEnum.PROPERTY_PERSONS, cred);
-            qp.getPrimaryParams().setProperty_val(pr);
+            qp.getPrimaryParams().setProperty_val(prop);
             pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
             
             // change order list
@@ -114,6 +115,31 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     }
     
     /**
+     * 
+     * @param propUnitList
+     * @param cred
+     * @return
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public List<PropertyUnitDataHeavy> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList, Credential cred) throws IntegrationException, EventException, EventException, AuthorizationException, BObStatusException{
+        List<PropertyUnitDataHeavy> puwll = new ArrayList<>();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        Iterator<PropertyUnit> iter = propUnitList.iterator();
+        while(iter.hasNext()){
+            try {
+                PropertyUnit pu = iter.next();
+                puwll.add(configurePropertyUnitDataHeavy(pi.getPropertyUnitWithLists(pu.getUnitID()), cred));
+            } catch (ViolationException ex) {
+                System.out.println(ex);
+            }
+        }
+        return puwll;
+    }
+    
+    /**
      * Logic container for Property setting configuration
      * @param p
      * @return 
@@ -127,6 +153,23 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         return p;
     }
+    
+    
+    /**
+     * Logic container for checking and setting properties on PropertyUnitDataHeavy objects
+     * @param pudh
+     * @param cred
+     * @return 
+     */
+    public PropertyUnitDataHeavy configurePropertyUnitDataHeavy(PropertyUnitDataHeavy pudh, Credential cred){
+        pudh.setCredentialSignature(cred.getSignature());
+        
+        
+        return pudh;
+        
+    }
+    
+    
     
     /**
      * Logic container for checking the existence of a property info case on a given property and 
@@ -172,7 +215,12 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
     }
     
-    
+    /**
+     * Logic container for property updates
+     * @param prop
+     * @param ua
+     * @throws IntegrationException 
+     */
     public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         prop.setLastUpdatedBy(getSessionBean().getSessUser());
@@ -302,10 +350,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
-            
         }
         return propList;
-        
     }
     
     
@@ -330,8 +376,10 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     public PropertyUnit initPropertyUnit(Property p){
         PropertyUnit propUnit = new PropertyUnit();
         propUnit.setPropertyID(p.getPropertyID());
-        propUnit.setUnitNumber(Constants.DEFAULT_UNIT_NUMBER);
-//        propUnit.setRental(DEFAULTRENTAL);
+        propUnit.setUnitNumber(Constants.TEMP_UNIT_NUM);
+//        propUnit.setRental(false);
+        propUnit.setActive(true);
+        propUnit.setNotes("");
 //        propUnit.setPropertyUnitPersonList(new ArrayList<Person>());
         return propUnit;
     }

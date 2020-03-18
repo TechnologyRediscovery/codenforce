@@ -190,7 +190,7 @@
                                <p:commandButton ajax="true" value="Commit edits" 
                                                 action="#{propertyProfileBB.commitPropertyUpdates}" 
                                                  oncomplete="PF('dialog-widvar-propinfoedit').hide()"
-                                                 rendered="#{sessionBean.sessiosessUserrd.hasMuniStaffPermissions}"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                  icon="fa fa-edit"
                                                  disabled="false"
                                                  update="property-info-form
