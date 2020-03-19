@@ -23,7 +23,6 @@
                             </h:messages>
                         </h:form>
 
-                            
                         <h1>Property units</h1>
                         
                         <p:panel    id="prop-units-list-panel"
@@ -70,8 +69,6 @@
                                         <h:outputText value="#{unit.notes}" />
 
                                         <h4>Occupancy periods</h4>
-
-                                      
                                         
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
                                                                ajax="true" 
@@ -125,8 +122,8 @@
                                             </div>
                                                 <p:commandButton       id="button-occperiodtable-editperiod"
                                                                        ajax="false" 
-                                                                       action="#{PropertyUnitsBB.manageOccPeriod(period)}"
-                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                       action="#{propertyUnitsBB.manageOccPeriod(period)}"
+                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                                        value="manage occupancy period"  
                                                                        icon="fa fa-edit"/>
                                         </p:dataScroller>
@@ -160,7 +157,6 @@
                                              icon="fa fa-plus"
                                              tabindex="1"
                                              value="Add unit"/>
-
 
                             <p:spacer height="5px" />
                             <p:dataTable
@@ -321,7 +317,7 @@
                         <h2>Create new occupancy period</h2>
 
                         <h:form id="dialog-addoccperiod-form">
-                            <h:messages id="messages-properties-editunit"
+                            <h:messages id="prop-occperiods-addop-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
@@ -341,25 +337,23 @@
                                                            itemLabel="#{opt.title}" />
                                 </p:selectOneMenu>
                             
+                            <p:spacer height="5px" />
+                            
                              <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('dialog-addoccperiod-var').hide()"
                                              tabindex="4"/>
 
 
-                            <p:commandButton ajax="true"
+                            <p:commandButton ajax="false"
                                              action="#{propertyOccPeriodsBB.addNewOccPeriod}"
-                                             icon="fa fa-thumbs-o-up"
+                                             icon="fa fa-plus-square"
+                                             styleClass="inline-button"
                                              value="Create new period" 
                                              tabindex="3"/>
                             
-                                
-                            
-                            
                         </h:form>
                     </p:dialog>
-
-
                 </f:view>
             </ui:define>
         </ui:composition>

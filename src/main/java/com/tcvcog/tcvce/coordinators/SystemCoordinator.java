@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOb;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.Person;
@@ -151,7 +152,9 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
 
         sb.append(Constants.FMT_HTML_BREAK);
         sb.append(Constants.FMT_SIGNATURELEAD);
-        sb.append(mbp.getCred().getSignature());
+        if(mbp.getCred() != null){
+            sb.append(mbp.getCred().getSignature());
+        }
         
         sb.append(Constants.FMT_HTML_BREAK);
         
@@ -179,7 +182,34 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      * @return 
      */
     public String formatAndAppendNote(User u, String noteToAppend, String existingText) {
-        return appendNoteBlock(new MessageBuilderParams(existingText, noteToAppend, null, null, u, null));
+        MessageBuilderParams mbp = new MessageBuilderParams(existingText, 
+                                                            noteToAppend, 
+                                                            null, 
+                                                            null, 
+                                                            u, 
+                                                            null);
+        return appendNoteBlock(mbp);
+
+    }
+    /**
+     * Adapter method for taking in simple note info, not in Object format
+     * and creating the populated MessageBuilderParams instance required
+     * by the official note appending tool of the entire codeNforce system
+     * @param u
+     * @param cred
+     * @param noteToAppend
+     * @param existingText
+     * @return 
+     */
+    public String formatAndAppendNote(User u, Credential cred, String noteToAppend, String existingText) {
+        MessageBuilderParams mbp = new MessageBuilderParams(existingText, 
+                                                            noteToAppend, 
+                                                            null, 
+                                                            null, 
+                                                            u, 
+                                                            cred);
+        
+        return appendNoteBlock(mbp);
 
     }
 
@@ -305,7 +335,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sub NavItem: Occupancy
-    private final NavigationSubItem occPeriodStatus = getNavSubItem("Period Status", "/restricted/cogstaff/occ/occPeriodStatus.xhtml", "fa fa-sign-in", true);
+    private final NavigationSubItem occPeriodStatus = getNavSubItem("Period Status", "/restricted/cogstaff/occ/occPeriodWorkflow.xhtml", "fa fa-sign-in", true);
     private final NavigationSubItem occPermits = getNavSubItem("Permits", "/restricted/cogstaff/occ/occPeriodPermits.xhtml", "fa fa-sign-in", true);
     private final NavigationSubItem occEvents = getNavSubItem("Events", "/restricted/cogstaff/occ/occPeriodEvents.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem occInspections = getNavSubItem("Inspections", "/restricted/cogstaff/occ/occPeriodInspections.xhtml", "fa fa-sign-in", false);
@@ -373,7 +403,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             //NavItem: Code Enf
             NavigationItem CEItem = getNavItem("/restricted/cogstaff/ce/ceCaseSearch.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
             //NavItem: Occupancy
-            NavigationItem occItem = getNavItem("/restricted/cogstaff/occ/occPeriodsearch.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
+            NavigationItem occItem = getNavItem("/restricted/cogstaff/occ/occPeriodSearch.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
             //NavItem: Persons
             NavigationItem personItem = getNavItem("/restricted/cogstaff/person/personSearch.xhtml", "Person", "fa fa-female", getPersonNavList());
             //NavItem: Code

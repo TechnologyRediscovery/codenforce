@@ -70,7 +70,6 @@ public class PropertyOccPeriodsBB
     public String addNewOccPeriod(){
         
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        OccupancyIntegrator oi = getOccupancyIntegrator();
         try {
             if(getSelectedOccPeriodType() != null){
                 System.out.println("PropertyProfileBB.initateNewOccPeriod | selectedType: " + getSelectedOccPeriodType().getTypeID());
@@ -85,17 +84,14 @@ public class PropertyOccPeriodsBB
                                             "Please select a period type" , ""));
                 return "";
             }
-        } catch (EventException | AuthorizationException | ViolationException | IntegrationException | BObStatusException ex) {
+        } catch (EventException | AuthorizationException | ViolationException | IntegrationException | BObStatusException | InspectionException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                         "Could not commit new occ period: " , ""));
             return "";
-        } catch (InspectionException ex) { 
-            System.out.println(ex);
-            return "";
         }
-        return "inspection";
+        return "occPeriodWorkflow";
     }
     
     
@@ -107,6 +103,8 @@ public class PropertyOccPeriodsBB
            } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex);
            }
+       } else {
+           return "";
        }
        
        return "occPeriodWorkflow";

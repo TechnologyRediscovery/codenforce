@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Occ Period Workflow</title>
+        <title>Manage Occ Period</title>
     </h:head>
     <h:body>
         <ui:composition template="./../../../restricted/navContainer_restricted.xhtml">
@@ -21,46 +21,52 @@
                             </h:messages>
                         </h:form>
 
-                        <h1>Occupancy period workflow</h1>
-                            
                                 <h:form id="occperiod-form-address">
 
+                                    <h1>
+                                        <h:outputText value="Manage occupancy period (ID: #{occInspectionBB.currentOccPeriod.periodID})" />
+
+                                    </h1>
+
                                     <div class="occperiod-address-container">
+
+                                        <h:outputText value="Unit #{occInspectionBB.currentPropertyUnit.unitNumber} @ "
+                                                      rendered="#{occInspectionBB.currentPropertyUnit.unitNumber != '-1'}"
+                                                      styleClass="occperiod-address"/>
+
+                                        <h:outputText value="Primary dwelling @ "
+                                                      rendered="#{occInspectionBB.currentPropertyUnit.unitNumber == '-1'}"
+                                                      styleClass="occperiod-address" />
 
                                         <h:outputText styleClass="occperiod-address"
                                                       value="#{occInspectionBB.currentPropertyUnit.property.address}
                                                       (#{occInspectionBB.currentPropertyUnit.property.muni.muniName})" />
 
                                         <p:spacer height="3px" />
-
-                                        <h:outputText styleClass="ui-label-inline" value="Occupancy period for unit no. "  />
-
-                                        <h:outputText value="(single dwelling unit)"
-                                                      rendered="#{occInspectionBB.currentPropertyUnit.unitNumber == '-1'}"
-                                                      styleClass="data-text italic" />
-
-                                        <h:outputText value="#{occInspectionBB.currentPropertyUnit.unitNumber}"
-                                                      rendered="#{occInspectionBB.currentPropertyUnit.unitNumber != '-1'}"
-                                                      styleClass="data-text"/>
-
+                                        
+                                        
                                         <p:commandButton   id="occperiod-address-button-changepropunit"
+                                                           value="reassign period to different unit"
                                                            ajax="true"
-                                                           styleClass="noFill button-size-small"
+                                                           styleClass="noFill button-size-small inline-button"
                                                            actionListener="#{occInspectionBB.initiatePropUnitUpdate}"
                                                            oncomplete="PF('occperiod-dialog-periodpropunit-var').show()"
-                                                           icon="fa fa-gears"
+                                                           icon="fa fa-random"
                                                            update="occperiod-dialog-periodpropunit-form"/>
+
                                     </div>
 
                                 </h:form>
 
-                                <p:separator />
+                        <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                     columnClasses="gridTd, gridTd">
+                            <h:panelGroup>
 
                                 <p:panel id="occperiod-panel-periodmetadata"
                                          toggleable="true"
                                          widgetVar="occperiod-panel-periodmetadata-var"
                                          collapsed="false"
-                                         header="Occupancy period settings">
+                                         header="Occupancy period status">
 
                                     <h:form id="occperiod-form-periodmetadata">
                                         <h:panelGrid        id="occperiod-panelgrid-periodmetadata"
@@ -93,7 +99,8 @@
                                                                             value="certify period type"
                                                                             icon="fa fa-shield"
                                                                             update="occperiod-form-periodmetadata
-                                                                            form-messages-global"
+                                                                            form-messages-global
+                                                                            occperiod-form-periodmetadata:occperiod-button-changeperiodtype"
                                                                             title="secure this occupancy period's type">
                                                             <f:param name="fieldtocertify" value="occperiodtype" />
                                                             <f:param name="certifymode" value="certify" />
@@ -121,7 +128,8 @@
                                                                             disabled="false"
                                                                             value="remove type lock"
                                                                             update="occperiod-form-periodmetadata
-                                                                            form-messages-global"
+                                                                            form-messages-global
+                                                                            occperiod-form-periodmetadata:occperiod-button-changeperiodtype"
                                                                             icon="fa fa-unlock"
                                                                             title="clear a previously existing type authorization">
                                                             <f:param name="fieldtocertify" value="occperiodtype" />
@@ -129,6 +137,18 @@
                                                         </p:commandButton>
                                                     </f:subview>
                                                 </f:subview>
+
+                                                <p:commandButton    id="occperiod-button-changeperiodtype"
+                                                                    ajax="true"
+                                                                    styleClass="noFill button-size-small inline-button"
+                                                                    actionListener="#{occInspectionBB.updateOccPeriodInitialize}"
+                                                                    oncomplete="PF('occperiod-dialog-periodmetadata-var').show()"
+                                                                    icon="fa fa-window-restore"
+                                                                    disabled="#{!(empty occInspectionBB.currentOccPeriod.periodTypeCertifiedTS)}"
+                                                                    value="change period type"
+                                                                    update="occperiod-dialog-periodmetadata-form
+                                                                    "/>
+                                                
                                             </h:panelGroup>
 
                                             <h:panelGroup>
@@ -159,7 +179,8 @@
                                                                             value="authorize period"
                                                                             icon="fa fa-shield"
                                                                             update="occperiod-form-periodmetadata
-                                                                            form-messages-global"
+                                                                            form-messages-global
+                                                                            occperiod-form-periodmetadata:occperiod-button-changemanager"
                                                                             title="finalize all occupancy period settings which then allows permitting">
                                                             <f:param name="fieldtocertify" value="authorization" />
                                                             <f:param name="certifymode" value="certify" />
@@ -187,7 +208,8 @@
                                                                             value="withdraw authorization"
                                                                             icon="fa fa-warning"
                                                                             update="occperiod-form-periodmetadata
-                                                                            form-messages-global"
+                                                                            form-messages-global
+                                                                            occperiod-button-changemanager"
                                                                             title="finalize all occupancy period settings which then allows permitting">
                                                             <f:param name="fieldtocertify" value="authorization" />
                                                             <f:param name="certifymode" value="withdraw" />
@@ -243,6 +265,7 @@
                                                             <f:param name="certifymode" value="certify" />
                                                         </p:commandButton>
                                                     </f:subview>
+                                                    
                                                     <f:subview id="occperiod-periodmetadata-subview-startdate-locked"
                                                                rendered="#{!empty occInspectionBB.currentOccPeriod.startDateCertifiedTS}">
 
@@ -356,53 +379,176 @@
 
                                                 </f:subview>
                                             </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputText value="Period manager: "
+                                                              styleClass="ui-label font-smaller"/>
+                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.manager.person.firstName}" 
+                                                              styleClass="data-text"/>
+                                                <h:outputText value=" " 
+                                                              styleClass="data-text" />
+                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.manager.person.lastName}" 
+                                                              styleClass="data-text"/>
+                                                <h:outputText value=" (" 
+                                                              styleClass="data-text"/>
+                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.manager.username}" 
+                                                              styleClass="data-text"/>
+                                                <h:outputText value="; ID:" 
+                                                              styleClass="data-text"/>
+                                                <h:outputText value="#{occInspectionBB.currentOccPeriod.manager.userID}" 
+                                                              styleClass="data-text"/>
+                                                <h:outputText value=")" 
+                                                              styleClass="data-text"/>
+                                                
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <p:commandButton    id="occperiod-button-changemanager"
+                                                                    ajax="true"
+                                                                    styleClass="noFill button-size-small inline-button"
+                                                                    actionListener="#{occInspectionBB.updateOccPeriodInitialize}"
+                                                                    oncomplete="PF('occperiod-dialog-periodmetadata-var').show()"
+                                                                    icon="fa fa-window-restore"
+                                                                    disabled="#{!(empty occInspectionBB.currentOccPeriod.authorizedTS)}"
+                                                                    value="change manager"
+                                                                    update="occperiod-dialog-periodmetadata-form
+                                                                    "/>
+                                                
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                  <h:outputText value="Created by: "
+                                                              styleClass="ui-label font-smaller"/>
+                                                  
+                                                    <h:outputText value="#{occInspectionBB.currentOccPeriod.createdBy.person.firstName}" 
+                                                              styleClass="data-text"/>
+                                                    <h:outputText value=" " 
+                                                                  styleClass="data-text" />
+                                                    <h:outputText value="#{occInspectionBB.currentOccPeriod.createdBy.person.lastName}" 
+                                                                  styleClass="data-text"/>
+                                                    <h:outputText value=" (" 
+                                                                  styleClass="data-text"/>
+                                                    <h:outputText value="#{occInspectionBB.currentOccPeriod.createdBy.username}" 
+                                                                  styleClass="data-text"/>
+                                                    <h:outputText value="; ID:" 
+                                                                  styleClass="data-text"/>
+                                                    <h:outputText value="#{occInspectionBB.currentOccPeriod.createdBy.userID}" 
+                                                                  styleClass="data-text"/>
+                                                    <h:outputText value=")" 
+                                                                  styleClass="data-text"/>
+
+                                                
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputText value=" "/>
+                                            </h:panelGroup>
+                                            
+                                            
+                                            <h:panelGroup>
+                                                  <h:outputText value="Creation date: "
+                                                              styleClass="ui-label font-smaller"/>
+                                                  
+                                                  <h:outputText value="#{occInspectionBB.getPrettyDate(occInspectionBB.currentOccPeriod.createdTS)}" />
+                                                
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputText value=" "/>
+                                            </h:panelGroup>
+                                            
+                                            
                                         </h:panelGrid>
+                                        
                                         <p:spacer height="5px" />
-                                        <p:commandButton    id="occperiod-button-advancedperiodsettings"
-                                                            ajax="true"
-                                                            styleClass="noFill button-size-small"
-                                                            actionListener="#{occInspectionBB.updateOccPeriodInitialize}"
-                                                            oncomplete="PF('occperiod-dialog-periodmetadata-var').show()"
-                                                            icon="fa fa-gears"
-                                                            value="period id #{occInspectionBB.currentOccPeriod.periodID} settings"
-                                                            update="occperiod-dialog-periodmetadata-form
-                                                            "/>
+                                        
+                                   
+
+
+                                        <p:commandButton   id="occperiod-refreshperiod-button"
+                                                           value="reload current occ period"
+                                                           ajax="true"
+                                                           styleClass="noFill button-size-small inline-button"
+                                                           actionListener="#{occInspectionBB.reloadCurrentOccPeriodDataHeavy()}"
+                                                           icon="fa fa-refresh"
+                                                           update="occperiod-dialog-periodpropunit-form
+                                                           occperiod-form-proposals
+                                                           form-messages-global"/>
                                     </h:form>
                                 </p:panel>
+                                
+                                  <p:panel id="occperiod-panel-notes"
+                                         toggleable="true"
+                                         widgetVar="occperiod-panel-notes-var"
+                                         collapsed="false"
+                                        header="Notes">
+                                      <h:form id="occperiod-notes-form">
+                                          
+                                      
+                                      
+                                        <p:commandButton    id="occperiod-button-initiatenewnote"
+                                                            ajax="true"
+                                                            styleClass="noFill button-size-small"
+                                                            actionListener="#{occInspectionBB.initiateNoteOnPeriod}"
+                                                            oncomplete="PF('occperiod-dialog-notes-var').show()"
+                                                            icon="fa fa-sticky-note-o"
+                                                            value="create new note"
+                                                            update="occperiod-dialog-note-form
+                                                            "/>
+
+                                        <p:spacer height="5px" />
+                                      
+                                      
+                                      
+                                      <h:outputText value="#{occInspectionBB.currentOccPeriod.notes}"
+                                                    escape="false"/>
+                                             
+                                      </h:form>
+                                      
+                                      
+                                  </p:panel>
+                                
+                                
+                                
+
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+
 
                                 <p:panel id="occperiod-panel-proposals"
                                          toggleable="true"
                                          widgetVar="occperiod-panel-proposals-var"
                                          collapsed="false"
                                          header="Tasks and notices">
-                                    
+
                                     <h:form id="occperiod-panel-proposals-messages-form">
                                         <h:messages id="occperiod-panel-proposals-messages" globalOnly="true" showDetail="true" showSummary="true"
                                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                         </h:messages>
                                     </h:form>
-                                    
-                                    <p:commandButton    id="proposal-button-propmetadata"
-                                                        ajax="true"
-                                                        value="proposals settings"
-                                                        styleClass="noFill button-size-small"
-                                                        actionListener="#{occInspectionBB.proposals_initiateViewPropMetadata(proposal)}"
-                                                        oncomplete="PF('occperiod-dialog-proposalmetadata-var').show()"
-                                                        icon="fa fa-gears"
-                                                        update="occperiod-dialog-proposalmetadata-form-messages
-                                                        periodmetadata-form-proposalsconfig
-                                                        
-                                                        "/>
-
                                     <h:form id="occperiod-form-proposals">
+
+                                        <p:commandButton    id="proposal-button-propmetadata"
+                                                            ajax="true"
+                                                            value="proposals settings"
+                                                            styleClass="noFill button-size-small"
+                                                            actionListener="#{occInspectionBB.proposals_initiateViewPropMetadata(proposal)}"
+                                                            oncomplete="PF('occperiod-dialog-proposalmetadata-var').show()"
+                                                            icon="fa fa-gears"
+                                                            update="occperiod-dialog-proposalmetadata-form-messages
+                                                            periodmetadata-form-proposalsconfig
+
+                                                            "/>
+
                                         <h:outputLabel styleClass="ui-label" for="occperiod-viewoptionsproposals-solb">
                                             <h:outputText value="proposal list view options: "/>
                                         </h:outputLabel>
 
                                         <p:selectOneMenu style="width: 300px;" 
-                                                            id="occperiod-viewoptionsproposals-solb" 
-                                                            value="#{occInspectionBB.selectedProposalsViewOption}" 
-                                                            tabindex="10">
+                                                         id="occperiod-viewoptionsproposals-solb" 
+                                                         value="#{occInspectionBB.selectedProposalsViewOption}" 
+                                                         tabindex="10">
 
                                             <p:ajax update="proposals-proposalscroller"                                                           
                                                     immediate="true"/>
@@ -416,7 +562,7 @@
                                         <h:message for="occperiod-viewoptionsproposals-solb" showDetail="false" showSummary="true"  
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                        
+
                                         <p:dataScroller id="proposals-proposalscroller"
                                                         var="proposal"
                                                         widgetVar="proposals-proposalscroller-var"
@@ -428,20 +574,20 @@
                                                         <p:commandButton    id="proposal-button-showdescription"
                                                                             styleClass="noFill button-size-small button-moreinfo"
                                                                             icon="fa fa-info"/>
-                                                        
-                                                            <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
-                                                                            for="proposal-button-showdescription"
-                                                                            hideEffect="fade" 
-                                                                            dynamic="true" 
-                                                                            showCloseIcon="true"
-                                                                            style="width:300px" 
-                                                                            modal="false">
-                                                                
+
+                                                        <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
+                                                                        for="proposal-button-showdescription"
+                                                                        hideEffect="fade" 
+                                                                        dynamic="true" 
+                                                                        showCloseIcon="true"
+                                                                        style="width:300px" 
+                                                                        modal="false">
+
                                                             <h:outputText       styleClass="proposal-description"
                                                                                 value="#{proposal.directive.description}" />
                                                         </p:overlayPanel>
-                                                        
-                                                        
+
+
                                                         <p:commandButton    id="proposal-button-rejectionreason"
                                                                             styleClass="noFill button-size-small"
                                                                             oncomplete="PF('occperiod-rejectproposal-dialog-var').show()"
@@ -453,22 +599,22 @@
                                                         <h:outputText value="#{proposal.directive.title}" />
                                                     </div>
                                                     <p:spacer height="5px" />
-                                                        <h:panelGrid   id="occperiod-proposals-panelgrid-propinfo" 
-                                                                       columns="1" 
-                                                                       style="clear:both;"
-                                                                       columnClasses="gridTd" 
-                                                                       rendered="true">
-                                                            <h:panelGroup>
-                                                               <h:outputText styleClass="ui-label-inline" 
-                                                                             value="Intended for: "  />
-                                                               <h:outputText styleClass="data-text" 
-                                                                             value="#{occInspectionBB.currentProposal.responderIntended.person.firstName}" />
-                                                               <h:outputText styleClass="data-text" 
-                                                                             value=" " />
-                                                               <h:outputText styleClass="data-text" 
-                                                                             value="#{occInspectionBB.currentProposal.responderIntended.person.lastName}" />
-                                                            </h:panelGroup>
-                                                        </h:panelGrid>
+                                                    <h:panelGrid   id="occperiod-proposals-panelgrid-propinfo" 
+                                                                   columns="1" 
+                                                                   style="clear:both;"
+                                                                   columnClasses="gridTd" 
+                                                                   rendered="true">
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="ui-label-inline" 
+                                                                          value="Intended for: "  />
+                                                            <h:outputText styleClass="data-text" 
+                                                                          value="#{occInspectionBB.currentProposal.responderIntended.person.firstName}" />
+                                                            <h:outputText styleClass="data-text" 
+                                                                          value=" " />
+                                                            <h:outputText styleClass="data-text" 
+                                                                          value="#{occInspectionBB.currentProposal.responderIntended.person.lastName}" />
+                                                        </h:panelGroup>
+                                                    </h:panelGrid>
                                                 </div>
 
                                                 <p:dataScroller id="proposals-choicescroller"
@@ -491,15 +637,16 @@
                                                 </p:dataScroller>
                                             </div>
                                         </p:dataScroller>
-                                        
+
                                     </h:form>
                                 </p:panel>
 
-
+                            </h:panelGroup>
+                        </h:panelGrid>
 
 
                     </div>
-                    
+
                     
                     <p:dialog   id="occperiod-dialog-proposalmetadata"
                                 height="650" width="900"
@@ -1690,8 +1837,6 @@
                                             value="#{occInspectionBB.formProposalRejectionReason}"
                                             required="true"/>
 
-
-
                             <p:commandButton    id="proposal-button-reject"
                                                 ajax="true"
                                                 styleClass="noFill button-size-small"
@@ -1700,7 +1845,6 @@
                                                 oncomplete="PF('occperiod-rejectproposal-dialog-var').hide()"
                                                 icon="fa fa-hand-stop-o"
                                                 update="occperiod-form-proposals
-                                                
                                                 occperiod-panel-proposals-messages-form"/>
                         </h:form>
                     </p:dialog>
@@ -1720,7 +1864,7 @@
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
 
-                            <h:outputText   value="Property units on current property: #{sessionBean.sessProperty.address} (#{sessionBean.sessessPropertyni.muniName})"
+                            <h:outputText   value="Property units on current property: #{systemServicesBB.bbSessionProperty.address} (#{systemServicesBB.bbSessionProperty.muni.muniName})"
                                             styleClass="ui-label font-smaller"/>
 
                             <p:selectOneMenu id="occperiod-dialog-periodpropunit-candidatepropunit-som" required="true"
@@ -1742,12 +1886,15 @@
                                                 onclick="PF('occperiod-dialog-periodpropunit-var').hide()"
                                                 />
 
-                            <p:commandButton id="occperiod-dialog-periodpropunit-button-submit" ajax="true"
-                                             value="update property unit" action="#{occInspectionBB.checklistAction_editOccupancyInspectionMetadata}"
-                                             icon="fa fa-thumbs-o-up" tabindex="28"
+                            <p:commandButton id="occperiod-dialog-periodpropunit-button-submit" 
+                                             ajax="true"
+                                             value="update property unit" 
+                                             action="#{occInspectionBB.updatePeriodPropUnit}"
+                                             icon="fa fa-thumbs-o-up" 
+                                             tabindex="28"
                                              oncomplete="PF('occperiod-dialog-periodpropunit-var').hide()"
                                              update="occperiod-form-address
-                                             form-messages-global"
+                                                    form-messages-global"
                                              />
                         </h:form>
                     </p:dialog>
@@ -1771,33 +1918,49 @@
                                          columnClasses="gridTd, gridTd">
 
                                 <h:panelGroup>
-                                    <h:outputText value="Period type:"
-                                                  styleClass="ui-label font-smaller"/>
+                                    <h:outputText value="Choose a new period type:"
+                                                  styleClass="ui-label font-smaller bold"/>
+                                </h:panelGroup>
+                                
+                                <h:panelGroup>
                                     <p:selectOneMenu
                                         id="som-occperiodtype" tabindex="1"
                                         value="#{occInspectionBB.selectedOccPeriodType}">
 
                                         <f:converter converterId="occPeriodTypeConverter"/>
-                                        <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
+                                        <f:selectItem itemLabel="Select a period type..." 
+                                                      itemDisabled="true" noSelectionOption="true"/>
                                         <f:selectItems id="si-typelist"
                                                        value="#{occInspectionBB.occPeriodTypeList}"
                                                        var ="opt"
                                                        itemValue="#{opt}"
                                                        itemLabel="#{opt.title}" />
                                     </p:selectOneMenu>
-
-                                    <p:spacer height="5px" />
-
-                                    <p:commandButton    id="occperiod-periodmetadata-subview-typelock-unlocked-button-changetype"
-                                                        ajax="true"
-                                                        styleClass="noFill"
-                                                        actionListener="#{occInspectionBB.up}"
-                                                        disabled="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                        value="change period type"
-                                                        icon="fa fa-edit"
-                                                        title="update period type"/>
-
                                 </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputText value="Choose a period manager:"
+                                                  styleClass="ui-label font-smaller bold"/>
+                                </h:panelGroup>
+                                
+                                <h:panelGroup>
+                                    <p:selectOneMenu
+                                        id="occper-manager-som" tabindex="2"
+                                        value="#{occInspectionBB.selectedManager}">
+
+                                        <f:converter converterId="userConverter"/>
+                                        <f:selectItem itemLabel="Select a manager..." 
+                                                      itemDisabled="true" 
+                                                      noSelectionOption="true"/>
+                                        <f:selectItems id="occper-manager-selitems"
+                                                       value="#{occInspectionBB.managerInspectorCandidateList}"
+                                                       var ="mngr"
+                                                       itemValue="#{mngr}"
+                                                       itemLabel="#{mngr.person.firstName} #{mngr.person.lastName} (#{mngr.username}, ID #{mngr.userID})" />
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+
+
                             </h:panelGrid>
 
                             <p:commandButton    id="occperiod-updatemetadata-button-cancel"
@@ -1819,10 +1982,58 @@
                                              />
                         </h:form>
                     </p:dialog>
+                    
+                       <p:dialog   id="occperiod-dialog-notes"
+                                height="300" width="750"
+                                widgetVar="occperiod-dialog-notes-var"
+                                closable="true"
+                                header="notes"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                >
 
+                        <h:form id="occperiod-dialog-note-form">
 
+                            <h:messages id="occperiod-dialog-note-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
 
- 
+                            <h:panelGrid columns="1"
+                                         columnClasses="gridTd, gridTd">
+
+                                <h:panelGroup>
+                                    <h:outputText styleClass="ui-label" value="Note text: "/>
+                                    <p:editor   id="occperiod-notes-editor"
+                                                value="#{occInspectionBB.formNoteText}"
+                                                controls="bold italic underline strikethrough font size style color
+                                                bullets numbering center undo redo rule link removeformat"
+                                                width="400" required="false"
+                                                height="200"/>
+
+                               
+                                    <p:spacer height="5px" />
+                                          <p:commandButton    id="occperiod-updatemetadata-button-cancel"
+                                                ajax="true"  tabindex="27"
+                                                value="Cancel"
+                                                icon="fa fa-stop"
+                                                immediate="true"
+                                                onclick="PF('occperiod-dialog-notes-var').hide()"
+                                                />
+
+                                    <p:commandButton   id="occperiod-dialog-notes-button-addnote"
+                                                       ajax="true" 
+                                                       actionListener="#{occInspectionBB.attachNoteToPeriod}"
+                                                       oncomplete="PF('occperiod-dialog-notes-var').hide()"
+                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
+                                                       value="save note"  
+                                                       styleClass="inline-button"
+                                                       icon="fa fa-sticky-note-o"
+                                                       update="form-messages-global
+                                                       occperiod-notes-form"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
                 </f:view>
             </ui:define>
         </ui:composition>

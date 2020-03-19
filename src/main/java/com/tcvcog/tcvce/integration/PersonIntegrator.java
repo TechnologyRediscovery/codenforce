@@ -1151,12 +1151,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             // ***********************************
              if(params.isOccPeriod_ctl()){
                 if(params.getOccPeriod_val() != null){
-                    params.appendSQL("AND occperiod.periodid=? ");
+                    params.appendSQL("AND occperiodperson.period_periodid=? ");
                 } else {
                     params.setOccPeriod_ctl(false);
                     params.appendToParamLog("OCC PERIOD: no OccPeriod object; occ period filter disabled");
                 }
-                params.appendSQL("AND event.ceevent_eventid=? ");
             }
             
             // ***********************************

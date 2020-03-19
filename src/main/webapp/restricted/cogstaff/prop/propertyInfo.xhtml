@@ -108,6 +108,14 @@
                                                  icon="fa fa-edit"
                                                  disabled="false"
                                                  update="form-propinfoedit"/>
+                                
+                                <p:commandButton ajax="true" value="Refresh property info" 
+                                                 actionListener="#{propertyProfileBB.refreshCurrPropWithLists}" 
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                 icon="fa fa-refresh"
+                                                 disabled="false"
+                                                 styleClass="inline-button"
+                                                 update="form-propinfoedit"/>
                             </h:form>
                         </p:panel>
 

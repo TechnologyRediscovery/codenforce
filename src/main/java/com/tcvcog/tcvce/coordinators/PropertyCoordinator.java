@@ -206,7 +206,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                                 Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                 .getString("bobsourcePropertyInternal"))));
         prop.setNotes(sc.formatAndAppendNote(   ua, 
-                                                "Property created with signature: " + ua.getMyCredential().getSignature(), 
+                                                ua.getMyCredential(),
+                                                "Property created",
                                                 prop.getNotes()));
         
         return pi.insertProperty(prop);

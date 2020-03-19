@@ -981,13 +981,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    
-    <managed-bean>
-        <managed-bean-name>occPeriodWorkflowBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodWorkflowBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
+   
     <managed-bean>
         <managed-bean-name>occPeriodEventsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodEventsBB</managed-bean-class>
@@ -1014,16 +1008,10 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules occ periods ~~~~~~~~~~~~~~~~~~~~~ --> 
     
     
-    <navigation-rule>
-        <from-view-id>*</from-view-id>
-        <navigation-case>
-            <from-outcome>occPeriodWorkflow</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ</to-view-id>
-        </navigation-case>
-    </navigation-rule>
- 
+   
     
     <navigation-rule>
+        <from-view-id>*</from-view-id>
         <navigation-case>
             <from-view-id>/restricted/cogstaff/occ/inspection.xhtml</from-view-id>
             <from-outcome>inspectionReport</from-outcome>
@@ -1036,12 +1024,10 @@
         </navigation-case>
     </navigation-rule>
    
-    
-    
     <!--  OCCUPANCY  -->
-    
         
 <navigation-rule>
+    <from-view-id>*</from-view-id>
     <navigation-case>
         <from-outcome>occPermitApplications</from-outcome>
         <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
@@ -1049,13 +1035,13 @@
     </navigation-case>
         
     <navigation-case>
-        <from-outcome>occPeriodStatus</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/occPeriodStatus.xhtml</to-view-id>
+        <from-outcome>occPeriodWorkflow</from-outcome>
+        <to-view-id>/restricted/cogstaff/occ/occPeriodWorkflow.xhtml</to-view-id>
     </navigation-case>
         
     <navigation-case>
         <from-outcome>occInspectionAdd</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/occInspectionAdd.xhtml</to-view-id>
+        <to-view-id>/restricted/cogstaff/occ/occPeriodInspections.xhtml</to-view-id>
     </navigation-case>
         
     <navigation-case>

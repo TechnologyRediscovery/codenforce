@@ -86,7 +86,7 @@ public class PropertyUnitsBB
                             "Could not load occupancy period with data" + ex.getMessage(), ""));
             
         }
-        return "occPeriodStatus";
+        return "occPeriodWorkflow";
         
     }
       

@@ -3,7 +3,9 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -106,11 +108,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
   
     
-    private void refreshCurrPropWithLists(){
+    public void refreshCurrPropWithLists(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            setCurrProp(pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessUser().getMyCredential()));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            setCurrProp(pc.getPropertyDataHeavy(currProp.getPropertyID(), getSessionBean().getSessUser().getMyCredential()));
+        } catch (IntegrationException | BObStatusException | SearchException | AuthorizationException | EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
