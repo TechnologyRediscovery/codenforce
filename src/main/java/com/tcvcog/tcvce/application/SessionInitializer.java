@@ -740,7 +740,7 @@ public  class       SessionInitializer
      * Subsystem initialization controller
      *
      * >>> -------------------------------------------------------------- <<<
-     * >>>                   XIII PublicInfo                              <<<
+     * >>>                   XIV Logging                                  <<<
      * >>> -------------------------------------------------------------- <<<
      * 
      * Populates relevant SessionBean members through calls to the governing

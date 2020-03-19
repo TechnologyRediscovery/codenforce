@@ -401,7 +401,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @param params
      * @param muniDBField
      * @return the configured apram for      */
-    public SearchParams assembleBObSearchSQL_muniDatesUserActive(SearchParams params, String muniDBField){
+    public SearchParams assembleBObSearchSQL_muniDatesUserActive(   SearchParams params, 
+                                                                    String muniDBField){
         
          // ****************************
             // **         MUNI           **
@@ -713,7 +714,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          switch(qName){
             
             case ALL_PERIODS_IN_MUNI:
-                 
+                paramsList.add(genParams_occPeriod_allPeriodsInMuni(params, cred));
+                break;
             case AUTHWORKINPROGRESS:
                 paramsList.add(generateParams_occPeriod_wip(params, cred));
                 break;
@@ -912,7 +914,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * Assembles a list of Query objects available to each user given their 
      * Credential object. Calls internal method for verifying rank minimums
      * @param cred
-     * @param m
      * @return 
      */
     public List<QueryOccPeriod> buildQueryOccPeriodList(Credential cred){
@@ -1387,6 +1388,18 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return params;
     }
     
+    
+    private SearchParamsOccPeriod genParams_occPeriod_allPeriodsInMuni(SearchParamsOccPeriod params, Credential cred){
+        params.setFilterName("All periods");
+        params.setFilterDescription("All periods in muni");
+        
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        return params;
+        
+        
+    }
   
     private SearchParamsOccPeriod genParams_occPeriod_persons(SearchParamsOccPeriod params, Credential cred){
         params.setPerson_ctl(true);

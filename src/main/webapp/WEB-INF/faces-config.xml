@@ -969,7 +969,7 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>occPeriodsBB</managed-bean-name>
+        <managed-bean-name>occPeriodSearchBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodSearchBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>

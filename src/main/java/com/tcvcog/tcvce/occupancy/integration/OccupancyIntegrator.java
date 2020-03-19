@@ -119,16 +119,15 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        StringBuilder sb = new StringBuilder();
 
-        sb.append("SELECT DISTINCT occperiod.periodid ");
-        sb.append("FROM occperiod INNER JOIN occperiodtype ON (type_typeid = typeid) \n");
-        sb.append("INNER JOIN propertyunit ON (occperiod.propertyunit_unitid = unitid) \n");
-        sb.append("INNER JOIN property ON (propertyunit.property_propertyid = property.propertyid) \n ");
-        sb.append("LEFT OUTER JOIN occinspection ON (occinspection.occperiod_periodid = periodid) \n");
-        sb.append("LEFT OUTER JOIN occpermit ON (occpermit.occperiod_periodid = periodid) \n ");
-        sb.append("LEFT OUTER JOIN occperiodperson ON (occperiod.periodid = occperiodperson.person_personid) \n");
-        sb.append("WHERE occperiodid IS NOT NULL AND ");
+        params.appendSQL("SELECT DISTINCT occperiod.periodid ");
+        params.appendSQL("FROM occperiod INNER JOIN occperiodtype ON (type_typeid = typeid) \n");
+        params.appendSQL("INNER JOIN propertyunit ON (occperiod.propertyunit_unitid = unitid) \n");
+        params.appendSQL("INNER JOIN property ON (propertyunit.property_propertyid = property.propertyid) \n ");
+        params.appendSQL("LEFT OUTER JOIN occinspection ON (occinspection.occperiod_periodid = periodid) \n");
+        params.appendSQL("LEFT OUTER JOIN occpermit ON (occpermit.occperiod_periodid = periodid) \n ");
+        params.appendSQL("LEFT OUTER JOIN occperiodperson ON (occperiod.periodid = occperiodperson.person_personid) \n");
+        params.appendSQL("WHERE occperiod.periodid IS NOT NULL ");
 
         
         if (!params.isBobID_ctl()) {
@@ -224,7 +223,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 if(params.isPacc_val()){
                     params.appendSQL("AND paccenabled = TRUE ");
                 } else {
-                    params.appendSQL("AND paccenabled = TRUE ");
+                    params.appendSQL("AND paccenabled = FALSE ");
                 }
             }
              
@@ -239,10 +238,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                     params.appendToParamLog("PERSON: no Person object found; person filter disabled");
                 }
             }
+             
+             
 
 
         } else {
-            sb.append("AND periodid=? "); // will be param 1 with ID search
+            params.appendSQL("AND occperiod.periodid=? "); // will be param 1 with ID search
         }
         
         params.appendSQL(";");
@@ -250,7 +251,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         int paramCounter = 0;
 
         try {
-            stmt = con.prepareStatement(sb.toString());
+            stmt = con.prepareStatement(params.extractRawSQL());
 
             if (!params.isBobID_ctl()) {
                 if (params.isMuni_ctl()) {

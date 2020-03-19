@@ -13,9 +13,9 @@
         <ui:composition template="../navContainer_restricted.xhtml">
             <ui:define name="content">
                 <f:view id="cases-view">
-
-                    <div class="two-column-page-flex-container">
-                        <div class="list-column">
+                    <div class="mainContainer">
+                       <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                           columnClasses="gridTd, gridTd">
 
                             <h:form id="cecases-messages-form">
                                 <h:messages id="cecases-messages-global"
@@ -25,7 +25,6 @@
                             </h:form>
 
                             <h1><h:outputText value="Code enforcement case manager"/></h1>
-
 
                             <h2>CE Case docket</h2>
 
@@ -140,9 +139,8 @@
                                                                 cecases-search-relative-dates-start-it
                                                                 cecases-search-relative-dates-end-it" />
                                                     </p:selectBooleanCheckbox>
-
-
                                                 </h:panelGroup>
+                                                
                                                 <h:panelGroup>
                                                     <p:outputLabel id="cecases-search-relative-dates-start-ol" for="cecases-search-relative-dates-start-it" value="start date in days (relative to today)"/>
                                                     <p:spacer height="1px"/>
@@ -160,7 +158,6 @@
                                                                  disabled="#{!(ceCaseSearchBB.searchParams.filterByStartEndDate and ceCaseSearchBB.searchParams.useRelativeDates)}" />
                                                     <h:message for="cecases-search-relative-dates-end-it" showDetail="false" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
@@ -401,16 +398,9 @@
 
 
                             </h:form>
-                        </div>
-                        <div class="object-column">
-                        </div>
-
-                        
+                       
+                       </h:panelGrid>
                     </div>
-               
-                        
-                        
-
 
 
 

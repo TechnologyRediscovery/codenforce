@@ -27,22 +27,15 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
-import com.tcvcog.tcvce.integration.SystemIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -57,13 +50,16 @@ public  class   OccPeriodSearchBB
     private OccPeriodDataHeavy currentOccPeriod;
     private List<OccPeriodType> occPeriodTypeList;
     
-    private List<OccPeriod> occPeriodList;
-    private boolean clearListOnQueryExecute;
-    private List<OccPeriod> occPeriodListFiltered;
-    
     private List<QueryOccPeriod> occPeriodQueryList;
     private QueryOccPeriod occPeriodQuerySelected;
-    private SearchParamsOccPeriod searchParams;
+    
+    private List<Property> propListForSearch;
+   
+    private List<OccPeriod> occPeriodList;
+    private List<OccPeriod> occPeriodListFiltered;
+    private boolean appendResultsToList;
+    
+    private SearchParamsOccPeriod searchParamsSelected;
     
     /**
      * Creates a new instance of OccPeriodsBB
@@ -73,12 +69,34 @@ public  class   OccPeriodSearchBB
     
     @PostConstruct
     public void initBean(){
-        SearchCoordinator sc = getSearchCoordinator();
-        OccupancyIntegrator oi = getOccupancyIntegrator();
         occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
-        occPeriodList = new ArrayList<>();
+        occPeriodList = getSessionBean().getSessOccPeriodList();
+        if(occPeriodList != null && occPeriodList.isEmpty()){
+            occPeriodList = new ArrayList();
+        }
+        appendResultsToList = false;
+        occPeriodQueryList = getSessionBean().getQueryOccPeriodList();
+        if(occPeriodQueryList != null && !occPeriodQueryList.isEmpty()){
+            occPeriodQuerySelected = occPeriodQueryList.get(0);
+        }
+        configureParameters();
         
         
+        
+        
+    }
+    
+    private void configureParameters(){
+        if(occPeriodQuerySelected != null 
+                && 
+            occPeriodQuerySelected.getParmsList() != null 
+                && 
+            !occPeriodQuerySelected.getParmsList().isEmpty()){
+            
+            searchParamsSelected = occPeriodQuerySelected.getParmsList().get(0);
+        } else {
+            searchParamsSelected = null;
+        }
     }
     
      
@@ -109,6 +127,19 @@ public  class   OccPeriodSearchBB
         
     }
     
+    /**
+     * Listener method for requests from the user to clear the results list
+     * @param ev 
+     */
+    public void clearOccPeriodList(ActionEvent ev){
+        occPeriodList.clear();
+    }
+    
+    public void loadOccPeriodHistory(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        occPeriodList.addAll(oc.assembleOccPeriodHistoryList(getSessionBean().getSessUser().getMyCredential()));
+    }
+    
     
     /**
      * Responder to the query button on the UI
@@ -117,6 +148,8 @@ public  class   OccPeriodSearchBB
      */
     public void executeQuery(ActionEvent ev) {
         System.out.println("OccPeriodSearchBB.executeQuery");
+        
+        
         executeQuery();
     }
     
@@ -130,7 +163,7 @@ public  class   OccPeriodSearchBB
         CaseCoordinator cc = getCaseCoordinator();
         int listSize = 0;
         
-        if(clearListOnQueryExecute){
+        if(appendResultsToList){
             occPeriodList.clear();
         }
         try {
@@ -149,20 +182,37 @@ public  class   OccPeriodSearchBB
         }
     }
     
-    
+    public void changeQuerySelected(){
+        
+        configureParameters();
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "New query loaded!", ""));
+    }
 
+    public void resetQuery(ActionEvent ev){
+        SearchCoordinator sc = getSearchCoordinator();
+        occPeriodQueryList = sc.buildQueryOccPeriodList(getSessionBean().getSessUser().getMyCredential());
+        if(occPeriodQueryList != null && !occPeriodQueryList.isEmpty()){
+            occPeriodQuerySelected = occPeriodQueryList.get(0);
+        }
+        configureParameters();
+        
+    }
+    
+    
     /**
-     * @return the searchParams
+     * @return the searchParamsSelected
      */
-    public SearchParamsOccPeriod getSearchParams() {
-        return searchParams;
+    public SearchParamsOccPeriod getSearchParamsSelected() {
+        return searchParamsSelected;
     }
 
     /**
-     * @param searchParams the searchParams to set
+     * @param searchParamsSelected the searchParamsSelected to set
      */
-    public void setSearchParams(SearchParamsOccPeriod searchParams) {
-        this.searchParams = searchParams;
+    public void setSearchParamsSelected(SearchParamsOccPeriod searchParamsSelected) {
+        this.searchParamsSelected = searchParamsSelected;
     }
 
     /**
@@ -250,17 +300,31 @@ public  class   OccPeriodSearchBB
     }
 
     /**
-     * @return the clearListOnQueryExecute
+     * @return the appendResultsToList
      */
-    public boolean isClearListOnQueryExecute() {
-        return clearListOnQueryExecute;
+    public boolean isAppendResultsToList() {
+        return appendResultsToList;
     }
 
     /**
-     * @param clearListOnQueryExecute the clearListOnQueryExecute to set
+     * @param appendResultsToList the appendResultsToList to set
      */
-    public void setClearListOnQueryExecute(boolean clearListOnQueryExecute) {
-        this.clearListOnQueryExecute = clearListOnQueryExecute;
+    public void setAppendResultsToList(boolean appendResultsToList) {
+        this.appendResultsToList = appendResultsToList;
+    }
+
+    /**
+     * @return the propListForSearch
+     */
+    public List<Property> getPropListForSearch() {
+        return propListForSearch;
+    }
+
+    /**
+     * @param propListForSearch the propListForSearch to set
+     */
+    public void setPropListForSearch(List<Property> propListForSearch) {
+        this.propListForSearch = propListForSearch;
     }
     
 }

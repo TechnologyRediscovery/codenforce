@@ -577,10 +577,11 @@
                                                 <f:facet name="header">
                                                     <h:outputText value=""/>
                                                 </f:facet>
-                                                <p:commandButton icon="fa fa-info-circle"
-                                                                 action="#{propertySearchBB.exploreProperty(prop)}" 
-                                                                 ajax="false"
-                                                                 />
+                                                <p:commandButton    id="prop-search"
+                                                                    icon="fa fa-info-circle"
+                                                                    action="#{propertySearchBB.exploreProperty(prop)}" 
+                                                                    ajax="false"
+                                                                    />
                                             </p:column>
                                         </p:dataTable>
                                     </h:form>
