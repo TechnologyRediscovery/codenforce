@@ -63,6 +63,9 @@ import java.util.List;
  */
 public class OccupancyIntegrator extends BackingBeanUtils implements Serializable {
 
+    
+    final String ACTIVE_FIELD = "occperiod.active";
+    
     /**
      * Creates a new instance of OccupancyIntegrator
      */
@@ -134,7 +137,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
            // *******************************
            // **   MUNI,DATES,USER,ACTIVE  **
            // *******************************
-            params = (SearchParamsOccPeriod) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsOccPeriod.MUNI_DBFIELD);
+            params = (SearchParamsOccPeriod) sc.assembleBObSearchSQL_muniDatesUserActive(
+                                                            params, 
+                                                            SearchParamsOccPeriod.MUNI_DBFIELD,
+                                                            ACTIVE_FIELD);
             
            // *******************************
             // **        PROPERTY           **
@@ -328,7 +334,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "       typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n"
                 + "       startdatecertifiedts, enddate, enddatecertifiedby_userid, enddatecterifiedts, \n"
                 + "       manager_userid, authorizationts, authorizedby_userid, overrideperiodtypeconfig, \n"
-                + "       notes, createdby_userid\n"
+                + "       notes, createdby_userid, active \n"
                 + "  FROM public.occperiod WHERE periodid=?;";
 
         Connection con = getPostgresCon();
@@ -354,12 +360,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException {
-        OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
-        PersonIntegrator pi = getPersonIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         UserIntegrator ui = getUserIntegrator();
-        EventIntegrator ei = getEventIntegrator();
-        ChoiceIntegrator choiceInt = getChoiceIntegrator();
 
         OccPeriod op = new OccPeriod();
 
@@ -405,6 +407,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         op.setOverrideTypeConfig(rs.getBoolean("overrideperiodtypeconfig"));
         op.setNotes(rs.getString("notes"));
+        
+        op.setActive(rs.getBoolean("active"));
 
         return op;
     }
@@ -745,12 +749,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "            typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n"
                 + "            startdatecertifiedts, enddate, enddatecertifiedby_userid, enddatecterifiedts, \n"
                 + "            manager_userid, authorizationts, authorizedby_userid, overrideperiodtypeconfig, \n"
-                + "            notes, createdby_userid)\n"
+                + "            notes, createdby_userid, active)\n"
                 + "    VALUES (DEFAULT, ?, ?, now(), ?, \n"
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?, ?);   ";
+                + "            ?, ?, ?);   ";
         ResultSet rs = null;
         Connection con = null;
         PreparedStatement stmt = null;
@@ -837,6 +841,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             } else {
                 stmt.setNull(17, java.sql.Types.NULL);
             }
+            
+            stmt.setBoolean(18, period.isActive());
 
             stmt.execute();
 
@@ -868,7 +874,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "       startdatecertifiedby_userid=?, startdatecertifiedts=?, enddate=?, \n"
                 + "       enddatecertifiedby_userid=?, enddatecterifiedts=?, manager_userid=?, \n"
                 + "       authorizationts=?, authorizedby_userid=?, overrideperiodtypeconfig=?, \n"
-                + "       notes=?, createdby_userid=?\n"
+                + "       notes=?, createdby_userid=?, active=? \n"
                 + " WHERE periodid=?;";
         ResultSet rs = null;
         Connection con = null;
@@ -957,6 +963,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             }
             
             stmt.setInt(18, period.getPeriodID());
+            
+            stmt.setBoolean(19, period.isActive());
 
             stmt.executeUpdate();
 

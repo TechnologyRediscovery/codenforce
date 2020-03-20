@@ -449,11 +449,26 @@
                                             value="#{occPeriodSearchBB.occPeriodList}"
                                             tableStyleClass="primeDataTable">
 
-                                            <p:column width="8%">
+                                            <p:column width="5%">
                                                 <f:facet name="header">
                                                     <h:outputText value="ID" />
                                                 </f:facet>
                                                 <h:outputText value="#{per.periodID}"/>
+                                            </p:column>
+                                            
+
+                                            <p:column width="15%" sortBy="#{per.}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Type" />
+                                                </f:facet>
+                                                <h:outputText value="#{per.type.title}"/>
+                                            </p:column>
+
+                                            <p:column width="15%" sortBy="#{per.type.title}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Type" />
+                                                </f:facet>
+                                                <h:outputText value="#{per.type.title}"/>
                                             </p:column>
 
                                             <p:column width="15%" sortBy="#{per.type.title}">

@@ -53,6 +53,7 @@ import java.util.ListIterator;
  */
 public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
+    final String ACTIVE_FIELD = "person.isactive";
     /**
      * Creates a new instance of PersonIntegrator
      */
@@ -1024,7 +1025,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             //******************************************************************
            // **   FILTERS COM-1, COM-2, COM-3, COM-6 MUNI,DATES,USER,ACTIVE  **
            // ******************************************************************
-            params = (SearchParamsPerson) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsPerson.MUNI_DBFIELD);
+            params = (SearchParamsPerson) sc.assembleBObSearchSQL_muniDatesUserActive(
+                                                                    params, 
+                                                                    SearchParamsPerson.MUNI_DBFIELD,
+                                                                    ACTIVE_FIELD);
             
 
             // ***********************************

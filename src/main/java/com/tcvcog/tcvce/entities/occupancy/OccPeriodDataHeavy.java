@@ -125,6 +125,8 @@ public  class       OccPeriodDataHeavy
         
         this.overrideTypeConfig = opLight.overrideTypeConfig;
         this.notes = opLight.notes;
+        
+        this.active = opLight.active;
 
     }
 

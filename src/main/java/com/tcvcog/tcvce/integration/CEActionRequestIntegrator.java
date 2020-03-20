@@ -41,6 +41,10 @@ import java.util.List;
  */
 public class CEActionRequestIntegrator extends BackingBeanUtils implements Serializable {
 
+    
+    final String ACTIVE_FIELD = "ceactionrequest.active";
+    
+    
     //Connection integratorConn;
     /**
      * Creates a new instance of CEActionRequestIntegrator
@@ -167,12 +171,12 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "            issuetype_issuetypeid, actrequestor_requestorid, cecase_caseid, \n"
                 + "            submittedtimestamp, dateofrecord, notataddress, addressofconcern, \n"
                 + "            requestdescription, isurgent, anonymityrequested, coginternalnotes, \n"
-                + "            muniinternalnotes, publicexternalnotes, status_id )\n"
+                + "            muniinternalnotes, publicexternalnotes, status_id, active )\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
                 + "            ?, ?, ?, \n"
                 + "            now(), ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?);");
+                + "            ?, ?, ?, ?);");
 
         Connection con = null;
         PreparedStatement stmt = null;
@@ -210,6 +214,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             stmt.setString(14, actionRequest.getMuniNotes());
             stmt.setString(15, actionRequest.getPublicExternalNotes());
             stmt.setInt(16, Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestInitialStatusCode")));
+            stmt.setBoolean(17, actionRequest.isActive());
+            
 
             stmt.execute();
             
@@ -280,6 +286,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         actionRequest.setMuniNotes(rs.getString("muniinternalnotes"));
         actionRequest.setPublicExternalNotes(rs.getString("publicexternalnotes"));
+        actionRequest.setActive(rs.getBoolean("active"));
+        
         return actionRequest;
     }
 
@@ -335,7 +343,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, \n"
                 + "	muniinternalnotes, publicexternalnotes,\n"
-                + "	actionRqstIssueType.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid \n"
+                + "	actionRqstIssueType.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid, active \n"
                 + "FROM public.ceactionrequest \n"
                 + "     INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid ");
         sb.append("WHERE requestID = ?;");
@@ -754,7 +762,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             // **     MUNI,DATES,USER,ACTIVE    **
             // *********************************** 
            
-            params = (SearchParamsCEActionRequests) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsCEActionRequests.DBFIELD);
+            params = (SearchParamsCEActionRequests) sc.assembleBObSearchSQL_muniDatesUserActive(
+                                                                            params, 
+                                                                            SearchParamsCEActionRequests.DBFIELD,
+                                                                            ACTIVE_FIELD);
             
             // ****************************
             // **   1.REQUEST STATUS     **

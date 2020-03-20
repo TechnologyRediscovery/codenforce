@@ -400,9 +400,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * BOBs as of the beta: Property, Person, Event, OccPeriod, CECase, and CEActionRequest
      * @param params
      * @param muniDBField
+     * @param activeField
      * @return the configured apram for      */
     public SearchParams assembleBObSearchSQL_muniDatesUserActive(   SearchParams params, 
-                                                                    String muniDBField){
+                                                                    String muniDBField,
+                                                                    String activeField){
         
          // ****************************
             // **         MUNI           **
@@ -447,10 +449,16 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             // **         ACTIVE         **
             // **************************** 
             if(params.isActive_ctl()){
+                    params.appendSQL("AND ");
+                    if(activeField == null){
+                        params.appendSQL("active");
+                    } else {
+                        params.appendSQL(activeField);
+                    }
                 if(params.isActive_val()){
-                    params.appendSQL("AND active = TRUE ");
+                    params.appendSQL(" = TRUE ");
                 } else {
-                    params.appendSQL("AND active = FALSE ");
+                    params.appendSQL(" = FALSE ");
                 }
             } 
         

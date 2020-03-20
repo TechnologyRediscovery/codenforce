@@ -53,6 +53,7 @@ import java.util.List;
 public class PropertyIntegrator extends BackingBeanUtils implements Serializable {
 
     final int MAX_RESULTS = 100;
+    final String ACTIVE_FIELD = "property.active";
 
     /**
      * Creates a new instance of PropertyIntegrator
@@ -646,7 +647,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             //******************************************************************
            // **   FILTERS COM-1, COM-2, COM-3, COM-6 MUNI,DATES,USER,ACTIVE  **
            // ******************************************************************
-             params = (SearchParamsProperty) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsProperty.MUNI_DBFIELD);
+             params = (SearchParamsProperty) sc.assembleBObSearchSQL_muniDatesUserActive(
+                                                                        params, 
+                                                                        SearchParamsProperty.MUNI_DBFIELD,
+                                                                        ACTIVE_FIELD);
 
             //**************************************
            // **   FILTER PROP-1   ZIP            **

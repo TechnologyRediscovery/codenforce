@@ -55,6 +55,7 @@ import java.util.List;
  */
 public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
+    final String ACTIVE_FIELD = "event.activeevent";
     /**
      * Creates a new instance of EventIntegrator
      */
@@ -444,7 +445,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             //*******************************
            // **   MUNI,DATES,USER,ACTIVE  **
            // *******************************
-            params = (SearchParamsEvent) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsEvent.MUNI_DBFIELD);
+            params = (SearchParamsEvent) sc.assembleBObSearchSQL_muniDatesUserActive(
+                                                                        params, 
+                                                                        SearchParamsEvent.MUNI_DBFIELD,
+                                                                        ACTIVE_FIELD);
 
             //*******************************
            // **      1.EVENT CATEGORY     **

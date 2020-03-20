@@ -91,6 +91,8 @@ public class CEActionRequest implements Serializable{
     private String cogInternalNotes;
     private String muniNotes;
     private String publicExternalNotes;
+    
+    private boolean active;
     // end threes
     
     /**
@@ -598,6 +600,20 @@ public class CEActionRequest implements Serializable{
      */
     public void setIssue(CEActionRequestIssueType issue) {
         this.issue = issue;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
 }

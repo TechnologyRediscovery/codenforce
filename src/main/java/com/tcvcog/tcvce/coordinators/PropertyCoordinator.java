@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
@@ -112,6 +113,20 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             System.out.println();
         } 
         return pdh;
+    }
+    
+    
+    /**
+     * Logic pass through for acquiring a PropertyUnitWithProp for OccPeriods
+     * and such that need a property address but only have a unit ID on them
+     * @param unitid
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public PropertyUnitWithProp getPropertyUnitWithProp(int unitid) throws IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getPropertyUnitWithProp(unitid);
+        
     }
     
     /**

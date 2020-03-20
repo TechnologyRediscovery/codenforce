@@ -24,9 +24,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -41,7 +39,8 @@ import java.util.List;
  * @author ellen bascomb of apt 31y
  */
 public class CaseIntegrator extends BackingBeanUtils implements Serializable{
-
+    
+    final String ACTIVE_FIELD = "cecase.active";
     /**
      * Creates a new instance of CaseIntegrator
      */
@@ -77,7 +76,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             //*******************************
             // **   MUNI,DATES,USER,ACTIVE  **
             // *******************************
-            params = (SearchParamsCECase) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsCECase.MUNI_DBFIELD);
+            params = (SearchParamsCECase) sc.assembleBObSearchSQL_muniDatesUserActive(
+                                                                params, 
+                                                                SearchParamsCECase.MUNI_DBFIELD,
+                                                                ACTIVE_FIELD);
             
             // *******************************
             // **       1:OPEN/CLOSED       **
@@ -254,7 +256,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     public CECase getCECase(int ceCaseID) throws IntegrationException, BObStatusException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
             "            login_userid, casename, casephase, originationdate, closingdate, \n" +
-            "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
+            "            creationtimestamp, notes, paccenabled, allowuplinkaccess, active \n" +
             "  FROM public.cecase WHERE caseid = ?;";
         ResultSet rs = null;
         CaseCoordinator cc = getCaseCoordinator();
@@ -331,7 +333,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
         cse.setPaccEnabled(rs.getBoolean("paccenabled"));
         cse.setAllowForwardLinkedPublicAccess(rs.getBoolean("allowuplinkaccess"));
-        
+        cse.setActive(rs.getBoolean("active"));
         
 
         return cse;
@@ -394,10 +396,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         String query = "INSERT INTO public.cecase(\n" +
                         "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
                         "            login_userid, casename, casephase, originationdate, closingdate, \n" +
-                        "            notes, creationTimestamp) \n" +
+                        "            notes, creationTimestamp, active) \n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
                         "            ?, ?, CAST (? as casephase), ?, ?, \n" +
-                        "            ?, now());";
+                        "            ?, now(), ?);";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         int insertedCaseID = 0;
@@ -423,6 +425,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setNull(8, java.sql.Types.NULL); 
             
             stmt.setString(9, ceCase.getNotes());
+            stmt.setBoolean(19, ceCase.isActive());
+            
             
             System.out.println("CaseIntegrator.insertNewCase| sql: " + stmt.toString());
             
@@ -463,7 +467,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         String query =  "UPDATE public.cecase\n" +
                         "   SET cecasepubliccc=?, \n" +
                         "       casename=?, originationdate=?, closingdate=?, notes=?, \n" +
-                        " paccenabled=?, allowuplinkaccess=? " +
+                        " paccenabled=?, allowuplinkaccess=?, active=? " +
                         " WHERE caseid=?;";
         PreparedStatement stmt = null;
         Connection con = null;
@@ -486,7 +490,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setString(5, ceCase.getNotes());
             stmt.setBoolean(6, ceCase.isPaccEnabled());
             stmt.setBoolean(7, ceCase.isAllowForwardLinkedPublicAccess());
-            stmt.setInt(8, ceCase.getCaseID());
+            stmt.setBoolean(8, ceCase.isActive());
+            
+            stmt.setInt(9, ceCase.getCaseID());
             stmt.execute();
             
             
