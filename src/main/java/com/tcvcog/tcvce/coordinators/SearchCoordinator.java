@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitified;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -238,13 +239,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         prepareQueryForRun(q);
 
         List<SearchParamsOccPeriod> paramsList = q.getParmsList();
-        List<OccPeriod> periodListTemp = new ArrayList<>();
+        List<OccPeriodPropertyUnitified> periodListTemp = new ArrayList<>();
         
         for(SearchParamsOccPeriod sp: paramsList){
             periodListTemp.clear();
             for(Integer i: oi.searchForOccPeriods(sp)){
                 try {
-                    periodListTemp.add(oc.getOccPeriod(i));
+                    periodListTemp.add(oc.getOccPeriodPropertyUnitified(i));
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                     throw new SearchException("Integration exception when querying OccPeriods");

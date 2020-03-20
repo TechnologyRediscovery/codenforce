@@ -225,7 +225,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
            // *******************************
             // **          7:PACC          **
             // *******************************
-             if (params.isPacc_ctl()) {
+            if (params.isPacc_ctl()) {
                 if(params.isPacc_val()){
                     params.appendSQL("AND paccenabled = TRUE ");
                 } else {
@@ -236,7 +236,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             // *******************************
             // **       8:PERSON            **
             // *******************************
-             if (params.isPerson_ctl()) {
+            if (params.isPerson_ctl()) {
                 if(params.getPerson_val()!= null){
                     params.appendSQL("AND occperiodperson.person_personid=? ");
                 } else {

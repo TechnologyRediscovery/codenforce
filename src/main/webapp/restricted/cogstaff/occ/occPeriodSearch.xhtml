@@ -361,13 +361,60 @@
                                                         </p:selectOneMenu>
                                                     </h:panelGroup>
 
+                                                    <h:panelGroup>
+                                                        <p:outputLabel id="occperiod-filter-periodtype-ol" 
+                                                                       for="occperiod-filter-property" 
+                                                                       value="filter by period type"/>
+                                                        
+                                                        <p:selectBooleanCheckbox id="occperiod-filter-periodtype-ctl" 
+                                                                                 value="#{occPeriodSearchBB.searchParamsSelected.periodType_ctl}" >
+                                                            <p:ajax update="occperiod-criteria-periodtype-val" />
+                                                        </p:selectBooleanCheckbox>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:selectOneMenu id="occperiod-criteria-periodtype-val" required="false" 
+                                                                         value="#{occPeriodSearchBB.searchParamsSelected.periodType_val}"
+                                                                         disabled="#{!occPeriodSearchBB.searchParamsSelected.periodType_ctl}">
+
+                                                            <f:selectItem itemLabel="select a period type..." noSelectionOption="true" />
+                                                            <f:selectItems value="#{occPeriodSearchBB.occPeriodTypeList}"  var="t" itemValue="#{t}" 
+                                                                           itemLabel="#{t.title}"/>
+                                                            <f:converter converterId="occPeriodTypeConverter"/>
+
+                                                        </p:selectOneMenu>
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <p:outputLabel id="occperiod-filter-person-ol" 
+                                                                       for="occperiod-criteria-person-val" 
+                                                                       value="filter by person"/>
+                                                        
+                                                        <p:selectBooleanCheckbox id="occperiod-filter-person-ctl" 
+                                                                                 value="#{occPeriodSearchBB.searchParamsSelected.person_ctl}" >
+                                                            <p:ajax update="occperiod-criteria-person-val" />
+                                                        </p:selectBooleanCheckbox>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:selectOneMenu id="occperiod-criteria-person-val" required="false" 
+                                                                         value="#{occPeriodSearchBB.searchParamsSelected.person_val}"
+                                                                         disabled="#{!occPeriodSearchBB.searchParamsSelected.person_ctl}">
+
+                                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                                            <f:selectItems value="#{occPeriodSearchBB.personListForSearch}"  var="p" itemValue="#{p}" 
+                                                                           itemLabel="#{p.firstName} #{p.lastName} (ID:#{p.personID})"/>
+                                                            <f:converter converterId="personConverter"/>
+
+                                                        </p:selectOneMenu>
+                                                    </h:panelGroup>
 
 
 
                                                     <h:panelGroup>
                                                         <p:outputLabel id="occperiod-query-limit-ol" 
                                                                        for="occperiod-query-limit" 
-                                                                       value="limit results to 100? "/>
+                                                                       value="limit results"/>
                                                         <p:selectBooleanCheckbox id="occperiod-query-limit" 
                                                                                  value="#{occPeriodSearchBB.searchParamsSelected.limitResultCount_ctl}" />
                                                     </h:panelGroup>
@@ -380,6 +427,11 @@
                                                         <h:message for="occperiod-filter-limit-it" showDetail="false" showSummary="true"
                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                     </h:panelGroup>
+                                                    
+
+                                                    
+                                                    
+                                                    
 
                                                 </h:panelGrid> 
                                             </h:panelGroup>
@@ -437,7 +489,9 @@
                                                            update="occperiod-search-messages-form 
                                                            occperiod-search-results-form"/>
                                         
-                                            <p:spacer height="3px" />
+                                            <h:outputText value="list contains #{occPeriodSearchBB.periodListSize} periods" 
+                                                          styleClass="italic"/>
+                                            <p:spacer height="5px" />
 
                                         <p:dataTable
                                             id="occperiod-search-results-table"
@@ -457,48 +511,48 @@
                                             </p:column>
                                             
 
-                                            <p:column width="15%" sortBy="#{per.}">
+                                            <p:column width="15%" sortBy="#{per.propUnitProp.property.address}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Address" />
+                                                </f:facet>
+                                                <h:outputText value="#{per.propUnitProp.property.address}"/>
+                                            </p:column>
+
+                                            <p:column width="10%" sortBy="#{per.propUnitProp.property.muni.muniName}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Muni" />
+                                                </f:facet>
+                                                <h:outputText value="#{per.propUnitProp.property.muni.muniName}"/>
+                                            </p:column>
+
+                                            <p:column width="10%" sortBy="#{per.type.title}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Type" />
                                                 </f:facet>
                                                 <h:outputText value="#{per.type.title}"/>
                                             </p:column>
 
-                                            <p:column width="15%" sortBy="#{per.type.title}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Type" />
-                                                </f:facet>
-                                                <h:outputText value="#{per.type.title}"/>
-                                            </p:column>
-
-                                            <p:column width="15%" sortBy="#{per.type.title}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Type" />
-                                                </f:facet>
-                                                <h:outputText value="#{per.type.title}"/>
-                                            </p:column>
-
-                                            <p:column width="15%">
+                                            <p:column width="10%">
                                                 <f:facet name="header">
                                                     <h:outputText value="Authorized" />
                                                 </f:facet>
                                                 <h:outputText value="#{occPeriodSearchBB.getPrettyDateNoTime(per.authorizedTS)}"/>
                                             </p:column>
 
-                                            <p:column width="15%" sortBy="#{per.startDate}">
+                                            <p:column width="10%" sortBy="#{per.startDate}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Start" />
                                                 </f:facet>
                                                 <h:outputText value="#{occPeriodSearchBB.getPrettyDateNoTime(per.startDate)}"/>
                                             </p:column>
 
-                                            <p:column width="15%" sortBy="#{per.endDate}">
+                                            <p:column width="10%" sortBy="#{per.endDate}">
                                                 <f:facet name="header">
                                                     <h:outputText value="End" />
                                                 </f:facet>
                                                 <h:outputText value="#{occPeriodSearchBB.getPrettyDateNoTime(per.endDate)}"/>
                                             </p:column>
-                                            <p:column width="10%">
+                                            <p:column width="5%">
                                                 <f:facet name="header">
                                                     <h:outputText value="view" />
                                                 </f:facet>

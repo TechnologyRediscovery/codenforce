@@ -70,11 +70,8 @@
                                          <p:selectBooleanCheckbox   id="pers-query-appendresults-chkbx" 
                                                                     value="#{personSearchBB.appendResultsToList}" 
                                                                     disabled="false" />
-                                                          
-                                        
                                         
                                         <p:spacer height="5px" />
-                                       
                                         
                                         <p:commandButton   id="pers-search-exec-cb" 
                                                            ajax="true" 
@@ -293,6 +290,10 @@
                                                             update="pers-search-results-form
                                                             pers-search-messages-form"
                                                             icon="fa fa-eraser"/>
+                                        
+                                        <h:outputText value="list contains #{personSearchBB.personListSize} persons" 
+                                                          styleClass="italic"/>
+                                            <p:spacer height="5px" />
 
                                         <p:spacer height="2px"/>
 
@@ -354,7 +355,7 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="View" />
                                                 </f:facet>
-                                                <p:commandButton action="#{personSearchBB.explorePerson(p)}"
+                                                <p:commandButton action="#{personSearchBB.explorePerson(per)}"
                                                                  ajax="false" icon="fa fa-hand-o-right"
                                                                  value="explore"/>
 

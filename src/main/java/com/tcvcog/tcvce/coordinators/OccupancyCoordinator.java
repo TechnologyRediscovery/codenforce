@@ -92,6 +92,29 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     }
     
+    /**
+     * Assembles a special subclass of OccPeriod that contains a PropertyUnitWithProp object for
+     * displaying property address info
+     * @param periodid
+     * @return
+     * @throws IntegrationException 
+     */
+    public OccPeriodPropertyUnitified getOccPeriodPropertyUnitified(int periodid) throws IntegrationException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        OccPeriodPropertyUnitified oppu = new OccPeriodPropertyUnitified(getOccPeriod(periodid));
+        oppu.setPropUnitProp(pc.getPropertyUnitWithProp(oppu.getPropertyUnitID()));
+        return oppu;
+    }
+    
+    public List<OccPeriodPropertyUnitified> getOccPeriodPropertyUnitifiedList(List<OccPeriod> perList) throws IntegrationException{
+        List<OccPeriodPropertyUnitified> oppuList = new ArrayList<>();
+        for(OccPeriod op: perList){
+            oppuList.add(getOccPeriodPropertyUnitified(op.getPeriodID()));
+        }
+        
+        return oppuList;
+        
+    }
     
     /**
      * Retrieval point for Data-rich occupancy periods

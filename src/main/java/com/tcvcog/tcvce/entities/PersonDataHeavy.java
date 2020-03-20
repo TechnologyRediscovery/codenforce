@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitified;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public  class PersonDataHeavy
         implements IFace_CredentialSigned{
     
     private List<CECase> caseList;
-    private List<OccPeriod> periodList;
+    private List<OccPeriodPropertyUnitified> periodList;
     private List<Property> propertyList;
     private List<EventCnF> eventList;
     
@@ -230,7 +231,7 @@ public  class PersonDataHeavy
     /**
      * @return the periodList
      */
-    public List<OccPeriod> getPeriodList() {
+    public List<OccPeriodPropertyUnitified> getPeriodList() {
         return periodList;
     }
 
@@ -258,7 +259,7 @@ public  class PersonDataHeavy
     /**
      * @param periodList the periodList to set
      */
-    public void setPeriodList(List<OccPeriod> periodList) {
+    public void setPeriodList(List<OccPeriodPropertyUnitified> periodList) {
         this.periodList = periodList;
     }
 

@@ -28,9 +28,11 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitified;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
@@ -54,9 +56,10 @@ public  class   OccPeriodSearchBB
     private QueryOccPeriod occPeriodQuerySelected;
     
     private List<Property> propListForSearch;
+    protected List<Person> personListForSearch;
    
-    private List<OccPeriod> occPeriodList;
-    private List<OccPeriod> occPeriodListFiltered;
+    private List<OccPeriodPropertyUnitified> occPeriodList;
+    private List<OccPeriodPropertyUnitified> occPeriodListFiltered;
     private boolean appendResultsToList;
     
     private SearchParamsOccPeriod searchParamsSelected;
@@ -69,8 +72,13 @@ public  class   OccPeriodSearchBB
     
     @PostConstruct
     public void initBean(){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
-        occPeriodList = getSessionBean().getSessOccPeriodList();
+        try {
+            occPeriodList = oc.getOccPeriodPropertyUnitifiedList(getSessionBean().getSessOccPeriodList());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         if(occPeriodList != null && occPeriodList.isEmpty()){
             occPeriodList = new ArrayList();
         }
@@ -79,11 +87,10 @@ public  class   OccPeriodSearchBB
         if(occPeriodQueryList != null && !occPeriodQueryList.isEmpty()){
             occPeriodQuerySelected = occPeriodQueryList.get(0);
         }
+        propListForSearch = getSessionBean().getSessPropertyList();
+        personListForSearch = getSessionBean().getSessPersonList();
+        
         configureParameters();
-        
-        
-        
-        
     }
     
     private void configureParameters(){
@@ -97,6 +104,14 @@ public  class   OccPeriodSearchBB
         } else {
             searchParamsSelected = null;
         }
+    }
+    
+    public int getPeriodListSize(){
+        int s = 0;
+        if(occPeriodList != null && !occPeriodList.isEmpty()){
+            s = occPeriodList.size();
+        }
+        return s;
     }
     
      
@@ -137,7 +152,15 @@ public  class   OccPeriodSearchBB
     
     public void loadOccPeriodHistory(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        occPeriodList.addAll(oc.assembleOccPeriodHistoryList(getSessionBean().getSessUser().getMyCredential()));
+        try {
+            occPeriodList.addAll(oc.getOccPeriodPropertyUnitifiedList(oc.assembleOccPeriodHistoryList(getSessionBean().getSessUser().getMyCredential())));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                           "Unable to assemble the data-rich occ period", ""));
+            
+        }
     }
     
     
@@ -225,14 +248,14 @@ public  class   OccPeriodSearchBB
     /**
      * @return the occPeriodList
      */
-    public List<OccPeriod> getOccPeriodList() {
+    public List<OccPeriodPropertyUnitified> getOccPeriodList() {
         return occPeriodList;
     }
 
     /**
      * @return the occPeriodListFiltered
      */
-    public List<OccPeriod> getOccPeriodListFiltered() {
+    public List<OccPeriodPropertyUnitified> getOccPeriodListFiltered() {
         return occPeriodListFiltered;
     }
 
@@ -260,14 +283,14 @@ public  class   OccPeriodSearchBB
     /**
      * @param occPeriodList the occPeriodList to set
      */
-    public void setOccPeriodList(List<OccPeriod> occPeriodList) {
+    public void setOccPeriodList(List<OccPeriodPropertyUnitified> occPeriodList) {
         this.occPeriodList = occPeriodList;
     }
 
     /**
      * @param occPeriodListFiltered the occPeriodListFiltered to set
      */
-    public void setOccPeriodListFiltered(List<OccPeriod> occPeriodListFiltered) {
+    public void setOccPeriodListFiltered(List<OccPeriodPropertyUnitified> occPeriodListFiltered) {
         this.occPeriodListFiltered = occPeriodListFiltered;
     }
 
@@ -325,6 +348,20 @@ public  class   OccPeriodSearchBB
      */
     public void setPropListForSearch(List<Property> propListForSearch) {
         this.propListForSearch = propListForSearch;
+    }
+
+    /**
+     * @return the personListForSearch
+     */
+    public List<Person> getPersonListForSearch() {
+        return personListForSearch;
+    }
+
+    /**
+     * @param personListForSearch the personListForSearch to set
+     */
+    public void setPersonListForSearch(List<Person> personListForSearch) {
+        this.personListForSearch = personListForSearch;
     }
     
 }

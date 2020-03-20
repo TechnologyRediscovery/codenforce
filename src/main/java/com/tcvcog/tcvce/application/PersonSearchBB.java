@@ -92,15 +92,24 @@ public class PersonSearchBB extends BackingBeanUtils{
         
     }
     
+    
+    public int getPersonListSize(){
+        int s = 0;
+        if(personList != null && !personList.isEmpty()){
+            s = personList.size();
+        }
+        return s;
+    }
+    
     private void setupQueryInfrastructure(){
         SearchCoordinator sc = getSearchCoordinator();
 
-//        try {
-              queryList = getSessionBean().getQueryPersonList();
-//            queryList = sc.buildQueryPersonList(getSessionBean().getSessUser().getMyCredential());
-//        } catch (IntegrationException ex) {
-//            System.out.println(ex);
-//        }
+        try {
+//              queryList = getSessionBean().getQueryPersonList();
+            queryList = sc.buildQueryPersonList(getSessionBean().getSessUser().getMyCredential());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         
         if(queryList != null && !queryList.isEmpty()){
             querySelected = queryList.get(0);
@@ -175,7 +184,9 @@ public class PersonSearchBB extends BackingBeanUtils{
      */
     public String explorePerson(Person p){
         SystemIntegrator si = getSystemIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
         try {
+            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getMyCredential()));
             si.logObjectView_OverwriteDate(getSessionBean().getSessUser(), p);
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -190,7 +201,7 @@ public class PersonSearchBB extends BackingBeanUtils{
     public void loadPersonHistory(){
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            setPersonList(pc.assemblePersonHistory(getSessionBean().getSessUser().getMyCredential()));
+            personList = pc.assemblePersonHistory(getSessionBean().getSessUser().getMyCredential());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "History was loaded!", ""));
