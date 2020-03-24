@@ -20,6 +20,8 @@ As technical documentation designed for developers, the primary audience for the
 ### XI [Report](ss_Report.md)
 ### XII [Blob](ss_Blob.md)
 ### XIII [Publicinfobundle](ss_Publicinfobundle.md)
+### XIV [Search](ss_Search.md)
+### XV [Choice](ss_Choice.md)
 
 ## Legacy doc pages
 
