@@ -46,11 +46,11 @@ public class    QueryOccPeriod
     
     
     @Override
-    public int addParams(SearchParams params) {
+    public void addParams(SearchParams params) {
          if(params instanceof SearchParamsOccPeriod){
             searchParamsList.add((SearchParamsOccPeriod) params);
         }
-        return searchParamsList.size();
+        
     }
     
     @Override
@@ -106,8 +106,8 @@ public class    QueryOccPeriod
     }
 
     @Override
-    public List<SearchParamsOccPeriod> getParmsList() {
-        return getSearchParamsList();
+    public List<SearchParamsOccPeriod> getParamsList() {
+        return searchParamsList;
     }
 
     

@@ -56,7 +56,7 @@
                                                            itemValue="#{ql}" 
                                                            itemLabel="#{ql.queryTitle}" />
                                             <p:ajax update="prop-search-query-desc-ot
-                                                            prop-search-params-form
+                                                            @form
                                                             prop-search-messages-form"
                                                     listener="#{propertySearchBB.changeQuerySelected}"/>
                                         </p:selectOneMenu>
@@ -72,7 +72,6 @@
                                         </div>
 
                                         <p:spacer height="5px" />
-
 
                                     </h:form>
 
@@ -101,7 +100,7 @@
                                                            disabled="#{!propertySearchBB.querySelected.queryExecuted}"
                                                            update=" prop-search-messages-form
                                                                     prop-search-log-form
-                                                                    prop-search-params-form
+                                                                    @form
                                                                     prop-search-query-form"/>
                                         
                                         <p:spacer height="5px" />
@@ -155,27 +154,7 @@
                                                 </h:panelGrid>
                                             </h:panelGroup>
                                         </h:panelGrid>
-                                        
                                     
-
-                                            <h:outputLabel styleClass="bold" 
-                                                            value="Search parameter bundles" 
-                                                            for="prop-search-params-som" />
-
-                                            <p:selectOneMenu id="prop-search-params-som" 
-                                                             tabindex="1" 
-                                                             value="#{propertySearchBB.searchParamsSelected}">
-                                                <f:converter converterId="searchParamsConverter"/>
-                                                <f:selectItem itemLabel="select one..." 
-                                                              noSelectionOption="true" 
-                                                              itemDisabled="true"/>
-                                                <f:selectItems id="prop-search-params-si" 
-                                                               value="#{propertySearchBB.querySelected.parmsList}" 
-                                                               var="sp" itemValue="#{sp}" 
-                                                               itemLabel="#{sp.filterName}" />
-                                                <p:ajax update="prop-search-params-form" />
-                                            </p:selectOneMenu>
-
 
                                             <h:panelGrid    id="prop-search-filters-grid"
                                                             columns="1" 
@@ -419,7 +398,7 @@
                                                                    cellpadding="10" 
                                                                    columnClasses="topbottom-lines-left, topbottom-lines-right">
                                                         <h:panelGroup>
-                                                            <p:outputLabel for="prop-search-filter-id-ctl" 
+                                                            <p:outputLabel for="prop-search-filter-usetype-ctl" 
                                                                            value="Use type filter"/>
                                                             <p:selectBooleanCheckbox id="prop-search-filter-usetype-ctl" 
                                                                                      value="#{propertySearchBB.searchParamsSelected.useType_ctl}"
@@ -430,11 +409,6 @@
                                                         </h:panelGroup>
 
                                                         <h:panelGroup>
-                                                            <p:outputLabel for="prop-search-filter-usetype-val" 
-                                                                           value="Parcel ID:" />
-
-                                                            <p:spacer height="5px"/>
-
                                                             <p:selectOneMenu    id="prop-search-filter-usetype-val" 
                                                                                 tabindex="1" 
                                                                                 value="#{propertySearchBB.searchParamsSelected.useType_val}" 

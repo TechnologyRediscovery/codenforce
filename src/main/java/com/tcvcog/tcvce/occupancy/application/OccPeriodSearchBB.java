@@ -96,11 +96,11 @@ public  class   OccPeriodSearchBB
     private void configureParameters(){
         if(occPeriodQuerySelected != null 
                 && 
-            occPeriodQuerySelected.getParmsList() != null 
+            occPeriodQuerySelected.getParamsList() != null 
                 && 
-            !occPeriodQuerySelected.getParmsList().isEmpty()){
+            !occPeriodQuerySelected.getParamsList().isEmpty()){
             
-            searchParamsSelected = occPeriodQuerySelected.getParmsList().get(0);
+            searchParamsSelected = occPeriodQuerySelected.getParamsList().get(0);
         } else {
             searchParamsSelected = null;
         }
@@ -147,7 +147,9 @@ public  class   OccPeriodSearchBB
      * @param ev 
      */
     public void clearOccPeriodList(ActionEvent ev){
-        occPeriodList.clear();
+        if(occPeriodList !=  null){
+            occPeriodList.clear();
+        }
     }
     
     public void loadOccPeriodHistory(ActionEvent ev){
@@ -186,7 +188,7 @@ public  class   OccPeriodSearchBB
         CaseCoordinator cc = getCaseCoordinator();
         int listSize = 0;
         
-        if(appendResultsToList){
+        if(!appendResultsToList){
             occPeriodList.clear();
         }
         try {

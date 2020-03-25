@@ -234,7 +234,8 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             eventTypeListUserAllowed = ec.getPermittedEventTypesForOcc(currentOccPeriod, getSessionBean().getSessUser());
             eventTypeListAll = new ArrayList();
             eventTypeListAll = ec.getEventTypesAll();
-            eventCategoryListAllActive = ec.getEventCategoryListActive();
+//            TODO: Finish event category revisions
+//            eventCategoryListAllActive = ec.getEventCategoryListActive();
             occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
             currentEventRuleAbstract = ec.rules_getInitializedEventRuleAbstract();
             eventRuleSetList = ec.rules_getEventRuleSetList();

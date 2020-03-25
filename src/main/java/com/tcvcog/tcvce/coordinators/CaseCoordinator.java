@@ -148,7 +148,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Primary pathway for retrieving the CECaseDataHeavy data-light 
+     * Primary pathway for retrieving the data-light 
      * superclass CECase. Implements business logic.
      * @param caseID
      * @return
@@ -162,17 +162,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         CECase cse = null;
         try {
             cse = ci.getCECase(caseID);
-            
-            cse.setNoticeList(cvi.novGetList(cse));
-            Collections.sort(cse.getNoticeList());
-            Collections.reverse(cse.getNoticeList());
-            
-            cse.setCitationList(citInt.getCitations(cse));
-            
-            cse.setViolationList(cvi.getCodeViolations(cse.getCaseID()));
-            Collections.sort(cse.getViolationList());
-            
-            cse = configureCECaseStageAndPhase(cse);
+            if(cse != null){
+
+                cse.setNoticeList(cvi.novGetList(cse));
+                Collections.sort(cse.getNoticeList());
+                Collections.reverse(cse.getNoticeList());
+
+                cse.setCitationList(citInt.getCitations(cse));
+
+                cse.setViolationList(cvi.getCodeViolations(cse.getCaseID()));
+                Collections.sort(cse.getViolationList());
+
+                cse = configureCECaseStageAndPhase(cse);
+            }
         } catch (BObStatusException ex) {
             System.out.println(ex);
         }
@@ -366,7 +368,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Primary entry point for code enf cases. Two major pathways exist through this method:
+     * Primary entry point for inserting new code enf cases. 
+     * Two major pathways exist through this method:
      * - creating cases as a result of an action request submission
      * - creating cases from some other source than an action request
      * Depending on the source, an appropriately note-ified case origination event

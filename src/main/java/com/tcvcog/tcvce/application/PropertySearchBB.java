@@ -93,11 +93,11 @@ public class PropertySearchBB extends BackingBeanUtils{
     private void configureParameters(){
         if(querySelected != null 
                 && 
-            querySelected.getParmsList() != null 
+            querySelected.getParamsList() != null 
                 && 
-            !querySelected.getParmsList().isEmpty()){
+            !querySelected.getParamsList().isEmpty()){
             
-            searchParamsSelected = querySelected.getParmsList().get(0);
+            searchParamsSelected = querySelected.getParamsList().get(0);
         }
     }
     

@@ -908,11 +908,6 @@
         
     </navigation-rule>
     
-    
-    
-    
-    
-    
           
     <!--*********************************************************************-->
     <!--**                       V. EVENT                                  **-->
@@ -924,15 +919,45 @@
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
-    
-    
     <managed-bean>
         <managed-bean-name>eventCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.EventCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-    
-    
+        
+    <managed-bean>
+        <managed-bean-name>eventSearchBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventSearchBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>eventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+</faces-config>
+    <navigation-rule>
+      <from-view-id>*</from-view-id>
+      <navigation-case>
+          <from-outcome>eventSearch</from-outcome>
+          <to-view-id>/restricted/cogstaff/event/eventSearch.xhtml</to-view-id>
+          <redirect />
+      </navigation-case>
+      <navigation-case>
+          <from-outcome>eventConfig</from-outcome>
+          <to-view-id>/restricted/cogstaff/event/eventConfiguration.xhtml</to-view-id>
+          <redirect />
+      </navigation-case>
+      <navigation-case>
+          <from-outcome>eventRuleConfig</from-outcome>
+          <to-view-id>/restricted/cogstaff/event/eventRuleConfiguration.xhtml</to-view-id>
+          <redirect />
+      </navigation-case>
+
+    </navigation-rule>
+
     <!--*********************************************************************-->
     <!--**                       VI. OCCPERIOD                             **-->
     <!--*********************************************************************-->
@@ -1126,14 +1151,14 @@
 </managed-bean>    
     
 
+ 
+    
+       
 <managed-bean>
     <managed-bean-name>citationBB</managed-bean-name>
     <managed-bean-class>com.tcvcog.tcvce.application.CitationBB</managed-bean-class>
     <managed-bean-scope>view</managed-bean-scope>
-</managed-bean> 
-    
-       
-<managed-bean>
+</managed-bean><managed-bean>
     <managed-bean-name>noticeOfViolationBB</managed-bean-name>
     <managed-bean-class>com.tcvcog.tcvce.application.NoticeOfViolationBB</managed-bean-class>
     <managed-bean-scope>view</managed-bean-scope>
@@ -1178,12 +1203,6 @@
 <managed-bean>
     <managed-bean-name>cECaseNoticesBB</managed-bean-name>
     <managed-bean-class>com.tcvcog.tcvce.application.CECaseNoticesBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>cECaseEventsBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CECaseEventsBB</managed-bean-class>
     <managed-bean-scope>view</managed-bean-scope>
 </managed-bean>
     
@@ -1631,21 +1650,21 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>paymentBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.PaymentBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+    <!--*********************************************************************-->
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: payments ~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
     
     
     
-    <!--*********************************************************************-->
+    
     <!--**                       XI. REPORT                                **-->
     <!--*********************************************************************-->
     
     <managed-bean>
+        <managed-bean-name>paymentBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.PaymentBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean><managed-bean>
         <managed-bean-name>dashboardDataBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBB</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
@@ -1670,22 +1689,22 @@
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>dataCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.DataCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+    <!--*********************************************************************-->
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
     
     
     
-    <!--*********************************************************************-->
+    
     <!--**                       XII. BLOB                                 **-->
     <!--*********************************************************************-->
     
     
     <managed-bean>
+        <managed-bean-name>dataCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.DataCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean><managed-bean>
         <description>Utility application-scoped bean for handling blob upload and download	</description>
         <managed-bean-name>blobCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.BlobCoordinator</managed-bean-class>
@@ -1877,11 +1896,7 @@
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>cECaseSearchBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+    <!--*********************************************************************-->
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules search ~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
@@ -1890,11 +1905,15 @@
     
     
     
-    <!--*********************************************************************-->
+    
     <!--**                       XIV. CHOICE                               **-->
     <!--*********************************************************************-->
     
     <managed-bean>
+        <managed-bean-name>ceCaseSearchBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean><managed-bean>
         <managed-bean-name>choiceCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.ChoiceCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
@@ -1923,7 +1942,5 @@
     <!--*********************************************************************-->
     <!--**                       UNKNOWN                                   **-->
     <!--*********************************************************************-->
-
-    
     
 </faces-config>

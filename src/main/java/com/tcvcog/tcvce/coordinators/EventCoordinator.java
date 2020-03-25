@@ -383,9 +383,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public List<EventType> getEventTypesAll(){
         List<EventType> typeList = new ArrayList<>();
-        for(EventType et: EventType.values()){
-            typeList.add(et);
-        }
+        typeList.addAll(Arrays.asList(EventType.values()));
         return typeList;
     }
     

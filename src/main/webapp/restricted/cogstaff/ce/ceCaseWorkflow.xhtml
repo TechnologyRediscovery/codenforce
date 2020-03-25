@@ -159,9 +159,6 @@
 
                             </h:form>
 
-                                                
-
-
                         </p:panel>
                         
                            <p:panel    id="cecase-workflow-actions-panel"
@@ -345,7 +342,8 @@
                                     <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
                                     <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{ceCaseWorkflowBB.currentCase.paccEnabled}"
                                                              disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
-                                        <p:ajax listener="#{ceCaseWorkflowBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                        <p:ajax listener="#{ceCaseWorkflowBB.changePACCAccess()}" 
+                                                update="case-profile-messages-form" />
                                     </p:selectBooleanCheckbox>
                                     <p:spacer height="5px"/>
                                     <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />

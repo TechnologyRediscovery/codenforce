@@ -41,6 +41,7 @@ public class QueryEvent
     }
 
     
+    @Override
     public List<SearchParamsEvent> getParamsList() {
         return searchParamsList;
     }
@@ -67,10 +68,7 @@ public class QueryEvent
         throw new UnsupportedOperationException("must still deal with Inheritance snafoo");
     }
 
-    @Override
-    public List getParmsList() {
-        return searchParamsList;
-    }
+  
 
     @Override
     public String getQueryTitle() {
@@ -103,11 +101,10 @@ public class QueryEvent
     }
 
     @Override
-    public int addParams(SearchParams params) {
+    public void addParams(SearchParams params) {
          if(params instanceof SearchParamsEvent){
             searchParamsList.add((SearchParamsEvent) params);
         }
-        return searchParamsList.size();
     }
 
     @Override

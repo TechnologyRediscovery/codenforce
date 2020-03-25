@@ -67,11 +67,10 @@ public class    QueryPerson
     }
     
     @Override
-    public int addParams(SearchParams params) {
+    public void addParams(SearchParams params) {
         if(params instanceof SearchParamsPerson){
             searchParamsList.add((SearchParamsPerson) params);
         }
-        return searchParamsList.size();
     }
 
    public void addSearchParams(SearchParamsPerson sp){
@@ -106,7 +105,7 @@ public class    QueryPerson
 
   
     @Override
-    public List<SearchParamsPerson> getParmsList() {
+    public List<SearchParamsPerson> getParamsList() {
         return searchParamsList;
     }
 

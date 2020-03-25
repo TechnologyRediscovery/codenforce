@@ -483,15 +483,17 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sidebar Sub Nav Item: Reports
-    private final NavigationSubItem municipalityActivity = getNavSubItem("Municipality Activity", "", "fa fa-sign-in", false);
-    private final NavigationSubItem activeCases = getNavSubItem("Active Cases", "", "fa fa-sign-in", false);
+    private final NavigationSubItem events = getNavSubItem("Event Search", "/restricted/cogstaff/event/eventSearch.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem eventConfig = getNavSubItem("Event Setup", "/restricted/cogstaff/event/eventConfiguration.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem eventRuleConfig = getNavSubItem("Event Rules", "/restricted/cogstaff/event/eventRuleConfiguration.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Reports
     public List<NavigationSubItem> getSidebarReportList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
-        navList.add(municipalityActivity);
-        navList.add(activeCases);
+        navList.add(events);
+        navList.add(eventConfig);
+        navList.add(eventRuleConfig);
         return navList;
     }
 
@@ -529,7 +531,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         try {
             //NavItem: CE
             NavigationItem CEconfigItem = getNavItem("", "Code Enforcement", "fa fa-balance-scale", getSidebarCEConfigList());
-            //NavItem: CE
+            //NavItem: Occ
             NavigationItem OccconfigItem = getNavItem("", "Occupancy", "fa fa-list-alt", getSidebarOccConfigList());
             //NavItem: Code
             NavigationItem codeconfigItem = getNavItem("", "Municipal Code", "fa fa-book", getSidebarCodeConfigList());

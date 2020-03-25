@@ -35,7 +35,8 @@ import javax.faces.context.FacesContext;
 
 /**
  *
- * @author ellen bascomb of apt 31y
+ * @author Xiaohong Chen
+ * 
  */
 public class NavigationBB extends BackingBeanUtils implements Serializable {
 
@@ -119,9 +120,9 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         try {
             String periodId = String.valueOf(s.getSessOccPeriod().getPeriodID());
             String periodType = s.getSessOccPeriod().getType().getTitle();
-            return "Current Person: " + periodType + " | ID: " + periodId;
+            return "Current Period: " + periodType + " | ID: " + periodId;
         } catch (Exception ex) {
-            return "Current Person: " + " | ID: ";
+            return "Current Period: " + " | ID: ";
         }
 
     }

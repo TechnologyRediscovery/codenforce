@@ -40,11 +40,10 @@ public class QueryCECase
     
     
     @Override
-    public int addParams(SearchParams params) {
+    public void addParams(SearchParams params) {
         if(params != null && params instanceof SearchParamsCECase){
             searchParamsList.add((SearchParamsCECase) params);
         }
-        return searchParamsList.size();
     }
     
       @Override
@@ -67,7 +66,7 @@ public class QueryCECase
     }
 
     @Override
-    public List getParmsList() {
+    public List<SearchParamsCECase> getParamsList() {
         return searchParamsList;
     }
     
@@ -93,14 +92,7 @@ public class QueryCECase
         }
     }
 
-    /**
-     *
-     * @return
-     */
-    public List<SearchParamsCECase> getParamsList() {
-        return searchParamsList;
-    }
-
+   
     /**
      * @return the results
      */
@@ -162,7 +154,11 @@ public class QueryCECase
 
     @Override
     public int getParamsListSize() {
-        return searchParamsList.size();
+        int size = 0;
+        if(searchParamsList != null){
+            return searchParamsList.size();
+        }
+        return size;
     }
 
     

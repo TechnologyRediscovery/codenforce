@@ -439,14 +439,17 @@ public  class       SessionInitializer
         PropertyCoordinator pc = getPropertyCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         SessionBean sessBean = getSessionBean();
+        
         try {
 
-            sessBean.setSessPropertyList(pc.assemblePropertyHistoryList(cred));
+//            TODO: Fix hanging session on property history load
+//                  INCIDENT to hanging session on thindes session
+//            sessBean.setSessPropertyList(pc.assemblePropertyHistoryList(cred));
             
-            if(sessBean.getSessPropertyList().isEmpty()){
+            if(sessBean.getSessPropertyList() == null || sessBean.getSessPropertyList().isEmpty()){
                 sessBean.setSessProperty(pc.selectDefaultProperty(cred));
             } else {
-                sessBean.setSessProperty(pc.assemblePropertyDataHeavy(sessBean.getSessPropertyList().get(0), cred));
+//                sessBean.setSessProperty(pc.assemblePropertyDataHeavy(sessBean.getSessPropertyList().get(0), cred));
             }
         
             sessBean.setQueryPropertyList(sc.buildQueryPropertyList(cred));
@@ -454,7 +457,7 @@ public  class       SessionInitializer
             if(!sessBean.getQueryPropertyList().isEmpty()){
                 sessBean.setQueryProperty(sessBean.getQueryPropertyList().get(0));
             }            
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+        } catch (IntegrationException ex) {
             System.out.println(ex);
             throw new SessionException( "Error setting proerty query list", 
                                         ex, ss, 
@@ -602,7 +605,7 @@ public  class       SessionInitializer
         }
 
         sb.setQueryCECaseList(sc.buildQueryCECaseList(cred));
-        if(!sb.getQueryCECaseList().isEmpty()){
+        if(sb.getQueryCECaseList() != null && !sb.getQueryCECaseList().isEmpty()){
             sb.setQueryCECase(sb.getQueryCECaseList().get(0));
         }
         

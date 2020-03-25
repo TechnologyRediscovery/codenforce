@@ -11,7 +11,6 @@ import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUseType;
-import java.io.Serializable;
 
 /**
  *
@@ -66,6 +65,25 @@ public class        SearchParamsEvent
    public SearchParamsEvent(){
        
    }
+   
+     public SearchParamsEventDateFieldsEnum[] getDateFieldList(){
+       SearchParamsEventDateFieldsEnum[] fields = SearchParamsEventDateFieldsEnum.values();
+       return fields;
+   }
+   
+   public SearchParamsEventUserFieldsEnum[] getUserFieldList(){
+       SearchParamsEventUserFieldsEnum[] fields = SearchParamsEventUserFieldsEnum.values();
+       return fields;
+   }
+   
+   
+   public EventDomainEnum[] getEventDomainList(){
+       EventDomainEnum[] domains = EventDomainEnum.values();
+       return domains;
+   }
+   
+   
+   
 
     /**
      * @return the eventCat_ctl

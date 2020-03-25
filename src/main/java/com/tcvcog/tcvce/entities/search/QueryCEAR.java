@@ -87,7 +87,7 @@ public class QueryCEAR
     }
 
     @Override
-    public List<SearchParamsCEActionRequests> getParmsList() {
+    public List<SearchParamsCEActionRequests> getParamsList() {
         return searchParamsList;
     }
 
@@ -137,11 +137,10 @@ public class QueryCEAR
     }
 
     @Override
-    public int addParams(SearchParams params) {
+    public void addParams(SearchParams params) {
         if(params != null && params instanceof SearchParamsCEActionRequests){
             searchParamsList.add((SearchParamsCEActionRequests) params);
         }
-        return searchParamsList.size();
     }
 
     @Override

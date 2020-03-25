@@ -48,7 +48,7 @@
                                             <f:selectItems id="search-query-si" value="#{personSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
                                             <p:ajax update="pers-search-messages-form
                                                     search-query-form
-                                                    search-params-form"
+                                                    @form"
                                                     listener="#{personSearchBB.changeQuerySelected}"/>
                                         </p:selectOneMenu>
 
@@ -82,7 +82,7 @@
                                                            disabled="#{personSearchBB.querySelected.queryExecuted}"
                                                            update="pers-search-messages-form
                                                            pers-search-results-form
-                                                           search-query-form
+                                                           @form
                                                            log-form"/>
                                         
                                         <p:commandButton   id="pers-search-clearquery-cb" 
@@ -93,46 +93,11 @@
                                                            styleClass="button"
                                                            value="reset query" 
                                                            update="pers-search-messages-form
-                                                           search-query-form
-                                                           log-form
-                                                           search-params-form"/>
+                                                           @form
+                                                           log-form"/>
                                         
                                         <p:spacer height="5px" />
-                                       
-                                        
 
-
-                                    </h:form>
-                                </p:panel>
-                                
-                                
-                                <p:panel    id="search-params-panel"
-                                            toggleable="true"
-                                            widgetVar="prop-search-params-panel-var"
-                                            collapsed="false"
-                                            style="width:100%;"
-                                            header="Search filters">
-                                    <h:form id="search-params-form">
-                                        
-
-                                        <h:outputLabel styleClass="bold" value="Available filters" />
-
-                                        <p:selectOneMenu id="search-params-som" tabindex="1" value="#{personSearchBB.paramsSelected}">
-                                            <f:converter converterId="searchParamsConverter"/>
-                                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                            <f:selectItems id="search-params-si" value="#{personSearchBB.querySelected.parmsList}" var="sp" itemValue="#{sp}" itemLabel="#{sp.filterName}" />
-                                            <p:ajax update="search-params-form" />
-                                        </p:selectOneMenu>
-                                        
-                                        <p:spacer height="5px" />
-                                        
-                                        <div class='logoutput'>
-                                            <h:outputText id="search-param-name-ot" 
-                                                          value="#{personSearchBB.paramsSelected.filterName}" />
-                                        </div>
-                                        
-                                        <p:spacer height="5px" />
-                                        
                                           <h:panelGrid  columns="1" 
                                                         cellpadding="10" 
                                                         columnClasses="gridTd-solid-back"

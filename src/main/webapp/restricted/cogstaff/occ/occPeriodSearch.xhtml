@@ -45,7 +45,6 @@
                                             <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
                                             <f:selectItems id="querylist-si" value="#{occPeriodSearchBB.occPeriodQueryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
                                             <p:ajax update="occperiod-query-desc-ot
-                                                            occperiod-search-params-form
                                                             occperiod-search-messages-form" />
                                         </p:selectOneMenu>
 
@@ -80,7 +79,6 @@
                                                            disabled="#{!occPeriodSearchBB.occPeriodQuerySelected.queryExecuted}"
                                                            update=" occperiod-search-messages-form
                                                            occperiod-search-log-form
-                                                           occperiod-search-params-form
                                                            occperiod-search-form"/>
 
                                         <p:spacer height="5px" />
@@ -95,33 +93,10 @@
                                                                    disabled="false" />
 
                                         <p:spacer height="5px" />
-                                    </h:form>
 
-                                    <h:form id="occperiod-search-params-form">
                                         <h:panelGrid columns="1" cellpadding="10" columnClasses="gridTd"
                                                      footerClass="gridFooter">
                                             <h:panelGroup>
-
-
-                                                <h:outputLabel styleClass="bold" 
-                                                               value="Search parameter bundles" 
-                                                               for="occperiod-search-params-som" />
-                                                <p:spacer height="5px" />
-
-                                                <p:selectOneMenu id="occperiod-search-params-som" 
-                                                                 tabindex="1" 
-                                                                 value="#{occPeriodSearchBB.searchParamsSelected}">
-                                                    <f:converter converterId="searchParamsConverter"/>
-                                                    <f:selectItem itemLabel="select one..." 
-                                                                  noSelectionOption="true" 
-                                                                  itemDisabled="true"/>
-                                                    <f:selectItems id="occperiod-search-params-si" 
-                                                                   value="#{occPeriodSearchBB.occPeriodQuerySelected.parmsList}" 
-                                                                   var="sp" itemValue="#{sp}" 
-                                                                   itemLabel="#{sp.filterName}" />
-                                                    <p:ajax update="occperiod-search-params-form" />
-                                                </p:selectOneMenu>
-
 
 
                                                 <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
@@ -313,7 +288,6 @@
                                                     </h:panelGroup>
 
 
-
                                                     <h:panelGroup>
                                                         <p:outputLabel for="occperiod-search-filter-user-ctl" 
                                                                        value="User filter"/>
@@ -321,14 +295,37 @@
                                                         <p:selectBooleanCheckbox id="occperiod-search-filter-user-ctl" 
                                                                                  value="#{occPeriodSearchBB.searchParamsSelected.user_ctl}"
                                                                                  disabled="#{!(occPeriodSearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
-                                                            <p:ajax update="occperiod-search-filter-user-som" />
+                                                            <p:ajax update="occperiod-search-filter-user-som
+                                                                            occperiod-search-user-field-val" />
                                                         </p:selectBooleanCheckbox>
 
                                                     </h:panelGroup>
+                                                    
+                                                    
+
+                                                       
+                                                    <h:panelGroup>
+                                                        <p:selectOneMenu  id="occperiod-search-user-field-val" 
+                                                                          tabindex="1" 
+                                                                          value="#{occPeriodSearchBB.searchParamsSelected.user_field}"
+                                                                          disabled="#{!occPeriodSearchBB.searchParamsSelected.user_ctl}">
+                                                            <f:selectItem itemLabel="select a user field..." 
+                                                                          noSelectionOption="true" 
+                                                                          itemDisabled="true"/>
+                                                            <f:selectItems id="occperiod-search-user-field-val-items" 
+                                                                           value="#{occPeriodSearchBB.searchParamsSelected.userFieldList}" 
+                                                                           var="uf" itemValue="#{uf}" itemLabel="#{uf.title}" />
+                                                        </p:selectOneMenu>
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup styleClass="pgspacer">
+                                                        <h:outputText value=" " />
+                                                    </h:panelGroup>
+                                                    
                                                     <h:panelGroup>
                                                         <p:selectOneMenu id="occperiod-search-filter-user-som" required="false" 
                                                                          value="#{occPeriodSearchBB.searchParamsSelected.user_val}"
-                                                                         disabled="#{!(occPeriodSearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
+                                                                         disabled="#{!occPeriodSearchBB.searchParamsSelected.user_ctl}">
                                                             <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
                                                             <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}" 
                                                                            itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
@@ -408,8 +405,27 @@
 
                                                         </p:selectOneMenu>
                                                     </h:panelGroup>
-
-
+                                                    
+                                                    
+                                                    <h:panelGroup>
+                                                        <p:outputLabel for="occperiod-search-filter-active-ctl" 
+                                                                       value="filter by active"/>
+                                                        <p:selectBooleanCheckbox id="occperiod-search-filter-active-ctl" 
+                                                                                 value="#{occPeriodSearchBB.searchParamsSelected.active_ctl}"
+                                                                                 disabled="false">
+                                                            <p:ajax update="occperiod-search-filter-active-val" />
+                                                        </p:selectBooleanCheckbox>
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <p:outputLabel for="occperiod-search-filter-active-val" 
+                                                                       value="is active"/>
+                                                        <p:selectBooleanCheckbox id="occperiod-search-filter-active-val" 
+                                                                                 value="#{occPeriodSearchBB.searchParamsSelected.active_val}"
+                                                                                 disabled="#{!occPeriodSearchBB.searchParamsSelected.active_ctl}">
+                                                        </p:selectBooleanCheckbox>
+                                                    </h:panelGroup>
+                                                    
 
                                                     <h:panelGroup>
                                                         <p:outputLabel id="occperiod-query-limit-ol" 
@@ -427,11 +443,6 @@
                                                         <h:message for="occperiod-filter-limit-it" showDetail="false" showSummary="true"
                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                     </h:panelGroup>
-                                                    
-
-                                                    
-                                                    
-                                                    
 
                                                 </h:panelGrid> 
                                             </h:panelGroup>
@@ -439,8 +450,6 @@
 
                                     </h:form>
                                 </p:panel>
-
-
 
                                 <p:panel  id="occperiod-search-log-panel"
                                           toggleable="true"
@@ -471,7 +480,7 @@
 
                                     <h:form id="occperiod-search-results-form" >
                                         
-                                            <p:commandButton   id="prop-search-results-clear-button" 
+                                            <p:commandButton   id="occperiod-search-results-clear-button" 
                                                            ajax="true" 
                                                            actionListener="#{occPeriodSearchBB.clearOccPeriodList}"
                                                            icon="fa fa-eraser" 
@@ -480,7 +489,7 @@
                                                            update="occperiod-search-messages-form
                                                            occperiod-search-results-form"/>
                                         
-                                            <p:commandButton   id="prop-search-loadhistory-button" 
+                                            <p:commandButton   id="occperiod-search-loadhistory-button" 
                                                            ajax="true" 
                                                            actionListener="#{occPeriodSearchBB.loadOccPeriodHistory}"
                                                            icon="fa fa-clock-o" 

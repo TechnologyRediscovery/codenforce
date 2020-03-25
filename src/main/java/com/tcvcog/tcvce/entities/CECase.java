@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -17,7 +18,8 @@ import java.util.Objects;
 public class        CECase 
         extends     CECasePublic
         implements  IFace_Openable,
-                    Cloneable{
+                    Cloneable,
+                    IFace_Loggable{
     
     protected int caseID;
     protected int publicControlCode;

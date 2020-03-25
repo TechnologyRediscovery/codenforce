@@ -17,7 +17,10 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.util;
 
+import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CitationStatus;
+import com.tcvcog.tcvce.entities.search.IFace_dateFieldHolder;
+import com.tcvcog.tcvce.entities.search.IFace_userFieldHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -27,15 +30,15 @@ import javax.faces.convert.FacesConverter;
  *
  * @author ellen bascomb of apt 31y
  */
-@FacesConverter(value="citationStatusConverter")
-public class CitationStatusConverter extends EntityConverter implements Converter{
+@FacesConverter(value="userFieldConverter")
+public class SearchParamsUserFieldConverter extends EntityConverter implements Converter{
     
      @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
         if(titleS.isEmpty()) {
             return null; 
         }
-        CitationStatus o = (CitationStatus) this.getViewMap(fc).get(titleS);
+         IFace_userFieldHolder o = (IFace_userFieldHolder) this.getViewMap(fc).get(titleS);
         return o;
     }
 
@@ -46,14 +49,14 @@ public class CitationStatusConverter extends EntityConverter implements Converte
             return "";
         }
         
-        CitationStatus cs = (CitationStatus) o;
-        String title = cs.getStatusTitle();  
+        IFace_userFieldHolder usr = (IFace_userFieldHolder) o;
+        String title = usr.extractUserFieldString();  
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;
             
         } else {
-            return "status error";
+            return "user converter error";
         }
         
     }

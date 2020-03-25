@@ -147,14 +147,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
             // PERSON LIST
             QueryPerson qp = sc.initQuery(QueryPersonEnum.OCCPERIOD_PERSONS, cred);
-            if(!qp.getParmsList().isEmpty()){
-                qp.getParmsList().get(0).setOccPeriod_val(per);
+            if(!qp.getParamsList().isEmpty()){
+                qp.getParamsList().get(0).setOccPeriod_val(per);
             }
             opdh.setPersonList(sc.runQuery(qp).getBOBResultList());
 
             // EVENT LIST
             QueryEvent qe = sc.initQuery(QueryEventEnum.OCCPERIOD, cred);
-            if(!qe.getParmsList().isEmpty()){
+            if(!qe.getParamsList().isEmpty()){
                 qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
             }
             opdh.setEventList(qe.getBOBResultList());
