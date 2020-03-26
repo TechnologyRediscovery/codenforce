@@ -45,13 +45,16 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
 
     private CECaseDataHeavy currentCase;
     private OccPeriodDataHeavy currentPeriod;
+
+    private EventCnF currentEvent;
+    private EventCnF triggeringEventForProposal;
     
     private List<EventCategory> eventCategoryList;
     private EventCategory eventCategorySelected;
     
     private List<EventType> eventTypeList;
     private EventType eventTypeSelected;
-    
+    private Person selectedPerson;
     
     /**
      * Creates a new instance of EventsBB
@@ -72,11 +75,11 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         EventCoordinator ec = getEventCoordinator();
         
         EventCnF ev = null;
-        if (eventCategorySelected != null) {
+        if (getEventCategorySelected() != null) {
 
             try {
                 
-                ev = ec.initEvent(currentCase, eventCategorySelected);
+                ev = ec.initEvent(getCurrentCase(), getEventCategorySelected());
                 ev.setDiscloseToMunicipality(true);
                 ev.setDiscloseToPublic(false);
             } catch (BObStatusException ex) {
@@ -108,22 +111,22 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
 
         // category is already set from initialization sequence
-        getSelectedEvent().setCeCaseID(getCurrentCase().getCaseID());
-        getSelectedEvent().setOwner(getSessionBean().getSessUser());
+        currentEvent.setCeCaseID(getCurrentCase().getCaseID());
+        currentEvent.setOwner(getSessionBean().getSessUser());
         try {
         
          
             // main entry point for handing the new event off to the CaseCoordinator
             // only the compliance events need to pass in another object--the violation
             // otherwise just the case and the event go to the coordinator
-            if (getSelectedEvent().getCategory().getEventType() == EventType.Compliance) {
-//                getSelectedEvent().setEventID(cc.attachNewEventToCECase(getCurrentCase(), getSelectedEvent(), selectedViolation));
+            if (currentEvent.getCategory().getEventType() == EventType.Compliance) {
+//                currentEvent.setEventID(cc.attachNewEventToCECase(getCurrentCase(), currentEvent, selectedViolation));
             } else {
-                getSelectedEvent().setEventID(cc.attachNewEventToCECase(getCurrentCase(), getSelectedEvent(), null));
+                currentEvent.setEventID(cc.attachNewEventToCECase(getCurrentCase(), currentEvent, null));
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully logged event with an ID " + getSelectedEvent().getEventID(), ""));
+                            "Successfully logged event with an ID " + currentEvent.getEventID(), ""));
 
             // now update the triggering event with the newly inserted event's ID
             // (We saved the triggering event when the take action button was clicked, before the event
@@ -158,7 +161,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         EventCoordinator ec = getEventCoordinator();
 //        currentCase.getEventList().remove(selectedEvent);
         try {
-            ec.editEvent(getSelectedEvent());
+            ec.editEvent(currentEvent);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Event udpated!", ""));
         } catch (IntegrationException ex) {
@@ -171,13 +174,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         }
 
     }
-    
-    
-    
 
     public void queueSelectedPerson(ActionEvent ev) {
         if (getSelectedPerson() != null) {
-            selectedEvent.getPersonList().add(getSelectedPerson());
+            currentEvent.getPersonList().add(getSelectedPerson());
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -187,13 +187,139 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
 
     public void deQueuePersonFromEvent(Person p) {
-        if (selectedEvent.getPersonList() != null) {
-            selectedEvent.getPersonList().remove(p);
+        if (currentEvent.getPersonList() != null) {
+            currentEvent.getPersonList().remove(p);
         }
     }
 
     public void editEvent(EventCnF ev) {
-        selectedEvent = ev;
+        currentEvent = ev;
+    }
+
+    /**
+     * @return the currentCase
+     */
+    public CECaseDataHeavy getCurrentCase() {
+        return currentCase;
+    }
+
+    /**
+     * @return the currentPeriod
+     */
+    public OccPeriodDataHeavy getCurrentPeriod() {
+        return currentPeriod;
+    }
+
+    /**
+     * @return the eventCategoryList
+     */
+    public List<EventCategory> getEventCategoryList() {
+        return eventCategoryList;
+    }
+
+    /**
+     * @return the eventCategorySelected
+     */
+    public EventCategory getEventCategorySelected() {
+        return eventCategorySelected;
+    }
+
+    /**
+     * @return the eventTypeList
+     */
+    public List<EventType> getEventTypeList() {
+        return eventTypeList;
+    }
+
+    /**
+     * @return the eventTypeSelected
+     */
+    public EventType getEventTypeSelected() {
+        return eventTypeSelected;
+    }
+
+    /**
+     * @param currentCase the currentCase to set
+     */
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
+        this.currentCase = currentCase;
+    }
+
+    /**
+     * @param currentPeriod the currentPeriod to set
+     */
+    public void setCurrentPeriod(OccPeriodDataHeavy currentPeriod) {
+        this.currentPeriod = currentPeriod;
+    }
+
+    /**
+     * @param eventCategoryList the eventCategoryList to set
+     */
+    public void setEventCategoryList(List<EventCategory> eventCategoryList) {
+        this.eventCategoryList = eventCategoryList;
+    }
+
+    /**
+     * @param eventCategorySelected the eventCategorySelected to set
+     */
+    public void setEventCategorySelected(EventCategory eventCategorySelected) {
+        this.eventCategorySelected = eventCategorySelected;
+    }
+
+    /**
+     * @param eventTypeList the eventTypeList to set
+     */
+    public void setEventTypeList(List<EventType> eventTypeList) {
+        this.eventTypeList = eventTypeList;
+    }
+
+    /**
+     * @param eventTypeSelected the eventTypeSelected to set
+     */
+    public void setEventTypeSelected(EventType eventTypeSelected) {
+        this.eventTypeSelected = eventTypeSelected;
+    }
+
+    /**
+     * @return the currentEvent
+     */
+    public EventCnF getCurrentEvent() {
+        return currentEvent;
+    }
+
+    /**
+     * @param currentEvent the currentEvent to set
+     */
+    public void setCurrentEvent(EventCnF currentEvent) {
+        this.currentEvent = currentEvent;
+    }
+
+    /**
+     * @return the triggeringEventForProposal
+     */
+    public EventCnF getTriggeringEventForProposal() {
+        return triggeringEventForProposal;
+    }
+
+    /**
+     * @param triggeringEventForProposal the triggeringEventForProposal to set
+     */
+    public void setTriggeringEventForProposal(EventCnF triggeringEventForProposal) {
+        this.triggeringEventForProposal = triggeringEventForProposal;
+    }
+
+    /**
+     * @return the selectedPerson
+     */
+    public Person getSelectedPerson() {
+        return selectedPerson;
+    }
+
+    /**
+     * @param selectedPerson the selectedPerson to set
+     */
+    public void setSelectedPerson(Person selectedPerson) {
+        this.selectedPerson = selectedPerson;
     }
     
     

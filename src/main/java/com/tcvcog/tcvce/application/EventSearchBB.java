@@ -156,6 +156,7 @@ public class EventSearchBB
     
     
     
+    
     public void rejectRequestedEvent(EventCnF ev) {
         setSelectedEvent(ev);
 //        rejectedEventListIndex = currentCase.getEventProposalList().indexOf(ev);

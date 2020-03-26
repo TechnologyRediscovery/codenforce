@@ -111,7 +111,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 
     }
     
-    public EventPeriodPropUnitHeavy getEventPeriodPropUnitHeavy(EventCnF ev) throws EventException, IntegrationException{
+    public EventCnFPropUnitCasePeriodHeavy getEventPeriodPropUnitHeavy(EventCnF ev) throws EventException, IntegrationException{
         PropertyCoordinator pc = getPropertyCoordinator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         
@@ -120,7 +120,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             throw new EventException("Cannot create an EventCaseHeavy from an event not in Occ Domain");
         }
         
-        EventPeriodPropUnitHeavy eppuh = new EventPeriodPropUnitHeavy(ev);
+        EventCnFPropUnitCasePeriodHeavy eppuh = new EventCnFPropUnitCasePeriodHeavy(ev);
         
         eppuh.setPeriod(oc.getOccPeriod(ev.getOccPeriodID()));
         eppuh.setPropUnit(pc.getPropertyUnit(eppuh.getPeriod().getPropertyUnitID()));

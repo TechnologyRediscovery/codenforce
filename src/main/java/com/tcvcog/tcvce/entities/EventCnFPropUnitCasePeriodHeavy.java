@@ -31,14 +31,15 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
  * 
  * @author Ellen Bascomb
  */
-public  class   EventPeriodPropUnitHeavy 
+public  class   EventCnFPropUnitCasePeriodHeavy 
         extends EventCnF{
     
     protected Property prop;
     protected PropertyUnit propUnit;
     protected OccPeriod period;
+    protected CECase cecase;
     
-    public EventPeriodPropUnitHeavy(EventCnF ev){
+    public EventCnFPropUnitCasePeriodHeavy(EventCnF ev){
         this.eventID = ev.getEventID();
         this.category = ev.getCategory();
         
@@ -101,6 +102,20 @@ public  class   EventPeriodPropUnitHeavy
      */
     public void setPeriod(OccPeriod period) {
         this.period = period;
+    }
+
+    /**
+     * @return the cecase
+     */
+    public CECase getCecase() {
+        return cecase;
+    }
+
+    /**
+     * @param cecase the cecase to set
+     */
+    public void setCecase(CECase cecase) {
+        this.cecase = cecase;
     }
     
 }
