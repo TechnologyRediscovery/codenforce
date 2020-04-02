@@ -42,7 +42,7 @@
                                     <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currProp.propertyID}"/>  
                                 </h1>
 
-                                <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                <h:panelGrid columns="3" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                              columnClasses="gridTd, gridTd">
 
                                     <h:panelGroup>
@@ -99,6 +99,46 @@
                                             <h:outputText styleClass="uiLabel" value="Notes:" />
                                         <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.notes}"/>
                                     </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputText styleClass="uiLabel" value="Last Updated:" />
+                                        <h:outputText id="prop-info-last-updated-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.lastUpdatedTS}"/>
+                                        <h:outputText styleClass="uiLabel" value="Updated By:" />
+                                        <h:outputText id="prop-info-last-updated-by-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.lastUpdatedBy}"/>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="propinfo-abandoned-start-opt">
+                                            <h:outputText id="propinfo-abandoned-start-opt" styleClass="uiLabel" value="Abandoned Start Date:"/>
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.abandonedDateStart}"/>
+                                        </h:outputLabel>
+                                        <h:outputLabel for="propinfo-abandoned-end-opt">
+                                            <h:outputText id="propinfo-abandoned-end-opt" styleClass="uiLabel" value="Abandoned End Date:"/>
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.abandonedDateStop}"/>
+                                        </h:outputLabel>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="propinfo-vacant-start-opt">
+                                            <h:outputText id="propinfo-vacant-start-opt" styleClass="uiLabel" value="Vacant Start Date:"/>
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.vacantDateStart}"/>
+                                        </h:outputLabel>
+                                        <h:outputLabel for="propinfo-vacant-end-opt">
+                                            <h:outputText id="propinfo-vacant-end-opt" styleClass="uiLabel" value="Vacant End Date:"/>
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.vacantDateStop}"/>
+                                        </h:outputLabel>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="propinfo-unfit-start-opt">
+                                            <h:outputText id="propinfo-unfit-start-opt" styleClass="uiLabel" value="Abandoned Start Date:"/>
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.unfitDateStart}"/>
+                                        </h:outputLabel>
+                                        <h:outputLabel for="propinfo-unfit-end-opt">
+                                            <h:outputText id="propinfo-unfit-end-opt" styleClass="uiLabel" value="Abandoned End Date:"/>
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.unfitDateStop}"/>
+                                        </h:outputLabel>
+                                    </h:panelGroup>
                                 </h:panelGrid>
 
                                 <p:commandButton ajax="true" value="Update Selected Property Info" 
@@ -131,10 +171,10 @@
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
-                            <h:panelGrid id="panelgrid-propinfoedit" columns="2" cellpadding="10" cellspacing="30">
+                            <h:panelGrid id="panelgrid-propinfoedit" columns="3" cellpadding="10" cellspacing="30">
                                 <h:panelGroup>
                                     <p:outputLabel value="Street Address"/>
-                                    <p:spacer width="5px"/>
+                                    <p:spacer width="3px"/>
                                     <p:inputText value="#{propertyProfileBB.currProp.address}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
@@ -142,7 +182,7 @@
                                              
                                 <h:panelGroup>
                                     <p:outputLabel value="City"/>
-                                    <p:spacer width="5px"/>
+                                    <p:spacer width="3px"/>
                                     <p:inputText value="#{propertyProfileBB.currProp.address_city}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
@@ -150,46 +190,156 @@
                                 <h:panelGroup>
 
                                     <p:outputLabel value="Zip Code"/>
-                                    <p:spacer width="5px"/>
+                                    <p:spacer width="3px"/>
                                     <p:inputText value="#{propertyProfileBB.currProp.address_zip}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <p:outputLabel value="State"/>
-                                    <p:spacer width="5px"/>
-                                    <p:inputText value="#{propertyProfileBB.currProp.address_state}"
-                                                 onkeydown="PF('datatable').onKeyDown(event)"
-                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <p:outputLabel value="Lot and Block"/>
-                                    <p:spacer width="5px"/>
-                                    <p:inputText value="#{propertyProfileBB.currProp.lotAndBlock}"
-                                                 onkeydown="PF('datatable').onKeyDown(event)"
-                                                 onkeyup="PF('datatable').onKeyUp(event)"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <p:outputLabel value="ParcelID"/>
-                                    <p:spacer width="5px"/>
-                                    <p:inputText value="#{propertyProfileBB.currProp.parID}"
-                                                  onkeydown="PF('datatable').onKeyDown(event)"
-                                                  onkeyup="PF('datatable').onKeyUp(event)"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <p:outputLabel value="Municipality"/>
-                                    <p:spacer width="5px"/>
-                                    <h:selectOneMenu id="propinfoedit-muni-som"
-                                                     value="#{propertyProfileBB.currProp.muni}">
-                                        <f:converter converterId="muniConverter"/>
-                                        <f:selectItems id="propinfoedit-muninamelist" 
-                                                       value="#{sessionBean.sessUser.authMuniList}"
-                                                       var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+                                    <h:panelGroup>
+                                        <p:outputLabel value="Municipality"/>
+                                        <p:spacer width="3px"/>
+                                        <h:selectOneMenu id="propinfoedit-muni-som"
+                                                         value="#{propertyProfileBB.currProp.muni}" style="width:175px;height:25px">
+                                            <f:converter converterId="muniConverter"/>
+                                            <f:selectItems id="propinfoedit-muninamelist" 
+                                                           value="#{sessionBean.sessUser.authMuniList}"
+                                                           var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
 
-                                    </h:selectOneMenu>
+                                        </h:selectOneMenu>
+                                    </h:panelGroup>
+                                    <p:spacer width="3px"/>
+                                    <h:panelGroup>
+                                        <p:outputLabel value="State"/>
+                                        <p:spacer width="3px"/>
+                                        <p:inputText value="#{propertyProfileBB.currProp.address_state}"
+                                                     onkeydown="PF('datatable').onKeyDown(event)"
+                                                     onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                    </h:panelGroup>
                                 </h:panelGroup>
                                 
+                                <h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel value="Lot and Block"/>
+                                        <p:spacer width="3px"/>
+                                        <p:inputText value="#{propertyProfileBB.currProp.lotAndBlock}"
+                                                     onkeydown="PF('datatable').onKeyDown(event)"
+                                                     onkeyup="PF('datatable').onKeyUp(event)"/>
+                                    </h:panelGroup>
+                                    <p:spacer width="3px"/>
+                                    <h:panelGroup>
+                                        <p:outputLabel value="ParcelID"/>
+                                        <p:spacer width="3px"/>
+                                        <p:inputText value="#{propertyProfileBB.currProp.parID}"
+                                                      onkeydown="PF('datatable').onKeyDown(event)"
+                                                      onkeyup="PF('datatable').onKeyUp(event)"/>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                                
+                                <h:panelGroup>
+                                        <p:outputLabel value="Unfit Start Date" for="propinfoedit-start-unfit"/>
+                                        <p:spacer height="3px"/>
+                                        <p:calendar id="propinfoedit-start-unfit"
+                                                    value="#{propertyProfileBB.currProp.unfitDateUtilStart}"
+                                                    mode="popup"
+                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                    navigator="true" 
+                                                    tabindex="16" 
+                                                    timeInput="true" 
+                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" 
+                                                    showTodayButton="true"
+                                                    maxdate="#{propertyProfileBB.currProp.unfitDateUtilStop}">
+                                            <p:ajax event="dateSelect" update="propinfoedit-end-unfit"/>
+                                        </p:calendar>
+                                    <p:spacer height="3px"/>
+                                        <p:outputLabel value="Unfit End Date" for="propinfoedit-end-unfit"/>
+                                        <p:spacer height="3px"/>
+                                        <p:calendar id="propinfoedit-end-unfit"
+                                                    value="#{propertyProfileBB.currProp.unfitDateUtilStop}"
+                                                    mode="popup"
+                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                    navigator="true" 
+                                                    tabindex="16" 
+                                                    timeInput="true" 
+                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" 
+                                                    showTodayButton="true"
+                                                    mindate="#{propertyProfileBB.currProp.unfitDateUtilStart}">
+                                            <p:ajax event="dateSelect" update="propinfoedit-end-unfit"/>
+                                        </p:calendar>
+                                </h:panelGroup>
+                                
+                                <h:panelGroup>
+                                        <p:outputLabel value="Vacant Start Date" for="propinfoedit-start-vacant"/>
+                                        <p:spacer height="3px"/>
+                                        <p:calendar id="propinfoedit-start-vacant"
+                                                    value="#{propertyProfileBB.currProp.vacantDateUtilStart}"
+                                                    mode="popup"
+                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                    navigator="true" 
+                                                    tabindex="16" 
+                                                    timeInput="true" 
+                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" 
+                                                    showTodayButton="true"
+                                                    maxdate="#{propertyProfileBB.currProp.vacantDateUtilStop}">
+                                            <p:ajax event="dateSelect" update="propinfoedit-stop-vacant"/>
+                                        </p:calendar>
+                                    <p:spacer width="3px"/>
+                                        <p:outputLabel value="Vacant Stop Date" for="propinfoedit-stop-vacant"/>
+                                        <p:spacer height="3px"/>
+                                        <p:calendar id="propinfoedit-stop-vacant"
+                                                    value="#{propertyProfileBB.currProp.vacantDateUtilStop}"
+                                                    mode="popup"
+                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                    navigator="true" 
+                                                    tabindex="16" 
+                                                    timeInput="true" 
+                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" 
+                                                    showTodayButton="true"
+                                                    mindate="#{propertyProfileBB.currProp.vacantDateUtilStart}">
+                                            <p:ajax event="dateSelect" update="propinfoedit-start-vacant"/>
+                                        </p:calendar>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                        <p:outputLabel value="Abandoned Start Date" for="propinfoedit-start-abandoned"/>
+                                        <p:spacer height="3px"/>
+                                        <p:calendar id="propinfoedit-start-abandoned"
+                                                    value="#{propertyProfileBB.currProp.abandonedDateUtilStart}"
+                                                    mode="popup"
+                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                    navigator="true" 
+                                                    tabindex="16" 
+                                                    timeInput="true" 
+                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" 
+                                                    showTodayButton="true"
+                                                    maxdate="#{propertyProfileBB.currProp.abandonedDateUtilStop}">
+                                            <p:ajax event="dateSelect" update="propinfoedit-stop-abandoned"/>
+                                        </p:calendar>
+                                    <p:spacer width="3px"/>
+                                        <p:outputLabel value="Abandoned Stop Date" for="propinfoedit-stop-abandoned"/>
+                                        <p:spacer height="3px"/>
+                                        <p:calendar id="propinfoedit-stop-abandoned"
+                                                    value="#{propertyProfileBB.currProp.abandonedDateUtilStop}"
+                                                    mode="popup"
+                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                    navigator="true" 
+                                                    tabindex="16" 
+                                                    timeInput="true" 
+                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" 
+                                                    showTodayButton="true"
+                                                    mindate="#{propertyProfileBB.currProp.abandonedDateUtilStart}">
+                                            <p:ajax event="dateSelect" update="propinfoedit-stop-abandoned"/>
+                                        </p:calendar>
+                                </h:panelGroup>
                             </h:panelGrid>
+                            <p:outputLabel value="Notes"/>
+                            <p:spacer height="3px"/>
+                            <p:inputTextarea rows="6" cols="100" value="#{propertyProfileBB.currProp.notes}"/>
                             <p:spacer height="10px"/>
                              <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" immediate="true"
@@ -237,6 +387,65 @@
                                 });
                             </script>
                     </p:dialog>
+                </f:view>
+                <f:view id="prop-extended-info-view">
+
+                    <div class="mainContainer">
+
+                        <h:form id="prop-extended-info-messages-form">
+                            <h:messages id="prop-extended-info-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                        <p:panel    id="prop-extended-info-panel"
+                                    toggleable="true"
+                                    widgetVar="prop-info-var"
+                                    collapsed="false"
+                                    header="Property External Data">
+                               
+                            <h:form id="property-extended-info-form">
+
+                                <h:panelGrid columns="3" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                             columnClasses="gridTd, gridTd">
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-external-info-landbank-prospect" >
+                                            <h:outputText styleClass="uiLabel" value="Land Bank Prospect:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-external-info-sale-year-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.landBankProspect}"/>
+                                    </h:panelGroup>
+                                  
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-external-info-landbank-held" >
+                                            <h:outputText styleClass="uiLabel" value="Land Bank Held:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-usegroup-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.landBankHeld}"/>
+                                    </h:panelGroup>
+                                </h:panelGrid>
+
+                                <p:commandButton ajax="true" value="Update Property External Data" 
+                                                 actionListener="#{propertyProfileBB.initiatePropertyEdit}" 
+                                                 oncomplete="PF('dialog-widvar-propinfoedit').show()"
+                                                 rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
+                                                 icon="fa fa-edit"
+                                                 disabled="false"
+                                                 update="form-propinfoedit"/>
+                                
+                                <p:commandButton ajax="true" value="Refresh Property External Data" 
+                                                 actionListener="#{propertyProfileBB.refreshCurrPropWithLists}" 
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                 icon="fa fa-refresh"
+                                                 disabled="false"
+                                                 styleClass="inline-button"
+                                                 update="form-propinfoedit"/>
+                            </h:form>
+                        </p:panel>
+
+                    <!--close main container-->
+                    </div>
                 </f:view>
             </ui:define>
         </ui:composition>

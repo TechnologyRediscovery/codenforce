@@ -10,6 +10,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -185,7 +186,7 @@ public class    Property
      * @return the abandonedDateStop
      */
     public LocalDateTime getAbandonedDateStop() {
-        return abandonedDateStop;
+        return this.abandonedDateStop;
     }
 
     /**
@@ -281,12 +282,38 @@ public class    Property
     public void setUnfitDateStart(LocalDateTime unfitDateStart) {
         this.unfitDateStart = unfitDateStart;
     }
+    
+    public java.util.Date getUnfitDateUtilStart() {
+        if(unfitDateStart != null){
+            return java.util.Date.from(getUnfitDateStart().atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return null;
+    }
+    
+    public void setUnfitDateUtilStart(java.util.Date unfitDateUtilStart){
+        if(unfitDateUtilStart != null){
+            this.unfitDateStart = unfitDateUtilStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
 
     /**
      * @param unfitDateStop the unfitDateStop to set
      */
     public void setUnfitDateStop(LocalDateTime unfitDateStop) {
         this.unfitDateStop = unfitDateStop;
+    }
+    
+    public java.util.Date getUnfitDateUtilStop(){
+        if(unfitDateStop != null){
+            return java.util.Date.from(getUnfitDateStop().atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return null;
+    }
+    
+    public void setUnfitDateUtilStop(java.util.Date unfitDateUtilStop){
+        if(unfitDateUtilStop != null){
+            this.unfitDateStop = unfitDateUtilStop.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     /**
@@ -302,12 +329,38 @@ public class    Property
     public void setAbandonedDateStart(LocalDateTime abandonedDateStart) {
         this.abandonedDateStart = abandonedDateStart;
     }
+    
+    public void setAbandonedDateUtilStart(java.util.Date abandonedDateUtilStart){
+        if(abandonedDateUtilStart != null){
+            this.abandonedDateStart = abandonedDateUtilStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+    
+    public java.util.Date getAbandonedDateUtilStart(){
+        if(abandonedDateStart != null){
+            return java.util.Date.from(getAbandonedDateStart().atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return null;
+    }
 
     /**
      * @param abandonedDateStop the abandonedDateStop to set
      */
     public void setAbandonedDateStop(LocalDateTime abandonedDateStop) {
         this.abandonedDateStop = abandonedDateStop;
+    }
+    
+    public java.util.Date getAbandonedDateUtilStop(){
+        if(this.abandonedDateStop != null){
+            return java.util.Date.from(getAbandonedDateStop().atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return null;
+    }
+    
+    public void setAbandonedDateUtilStop(java.util.Date abandonedDateUtilStop){
+        if(abandonedDateUtilStop != null){
+            this.abandonedDateStart = abandonedDateUtilStop.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     /**
@@ -323,12 +376,38 @@ public class    Property
     public void setVacantDateStart(LocalDateTime vacantDateStart) {
         this.vacantDateStart = vacantDateStart;
     }
+    
+    public java.util.Date getVacantDateUtilStart(){
+        if(vacantDateStart != null){
+            return java.util.Date.from(getVacantDateStart().atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return null;
+    }
+    
+    public void setVacantDateUtilStart(java.util.Date vacantStartUtilDate){
+        if(vacantStartUtilDate != null){
+            this.vacantDateStart = vacantStartUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
 
     /**
      * @param vacantDateStop the vacantDateStop to set
      */
     public void setVacantDateStop(LocalDateTime vacantDateStop) {
         this.vacantDateStop = vacantDateStop;
+    }
+    
+    public java.util.Date getVacantDateUtilStop(){
+        if(vacantDateStop != null){
+            return java.util.Date.from(getVacantDateStop().atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return null;
+    }
+    
+    public void setVacantDateUtilStop(java.util.Date vacantStopUtilDate){
+        if(vacantStopUtilDate != null){
+            this.vacantDateStop = vacantStopUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     /**

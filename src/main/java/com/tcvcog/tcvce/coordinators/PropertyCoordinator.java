@@ -47,6 +47,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -169,7 +170,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return p;
     }
     
-    
+    public LocalDateTime configureDateTime(Date date){
+        return new java.sql.Timestamp(date.getTime()).toLocalDateTime();
+    }
     /**
      * Logic container for checking and setting properties on PropertyUnitDataHeavy objects
      * @param pudh
@@ -241,9 +244,39 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyIntegrator pi = getPropertyIntegrator();
         prop.setLastUpdatedBy(getSessionBean().getSessUser());
         prop.setLastUpdatedTS(LocalDateTime.now());
+//        prop.setAbandonedDateStart(LocalDateTime.parse(prop.getAbandonedDateStart().toString()));
+//        prop.setAbandonedDateStop(LocalDateTime.parse(prop.getAbandonedDateStop().toString()));
+//        prop.setVacantDateStart(LocalDateTime.parse(prop.getVacantDateStart().toString()));
+//        prop.setVacantDateStop(LocalDateTime.parse(prop.getVacantDateStop().toString()));
+//        prop.setUnfitDateStart(LocalDateTime.parse(prop.getUnfitDateStart().toString()));
+//        prop.setUnfitDateStop(LocalDateTime.parse(prop.getUnfitDateStop().toString()));
+        if (checkAllDates(prop) == false){
+            
+        }
         pi.updateProperty(prop);
         
         
+    }
+    
+    public boolean checkAllDates(Property prop){
+        boolean unfit, vacant, abandoned;
+        unfit = checkStartDTisBeforeEndDT(prop.getUnfitDateStart(), prop.getUnfitDateStop());
+        vacant = checkStartDTisBeforeEndDT(prop.getVacantDateStart(), prop.getVacantDateStop());
+        abandoned = checkStartDTisBeforeEndDT(prop.getAbandonedDateStart(), prop.getAbandonedDateStop());
+        if (unfit && vacant && abandoned){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
+    public boolean checkStartDTisBeforeEndDT(LocalDateTime start, LocalDateTime end){
+        if (end.isBefore(start) || end.equals(start)){
+            return false;
+        }else{
+        return true;
+        }
     }
     
     
