@@ -11,6 +11,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
@@ -91,8 +92,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return infoBundleList;
     }
     
-    private PublicInfoBundleCECase extractPublicInfo(CECase c){
+    private PublicInfoBundleCECase extractPublicInfo(CECase cse) throws IntegrationException{
+        CaseCoordinator cc = getCaseCoordinator();
+        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse);
+        
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
+        
         pib.setCaseID(c.getCaseID());
         pib.setPacc(c.getPublicControlCode());
         pib.setTypeName("CECASE");

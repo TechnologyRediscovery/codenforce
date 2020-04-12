@@ -69,7 +69,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
     
     /**
-     * Base object creation method under the Grand Unified EventCnF GER Model
+     * Base object creation method under the Grand Unified EventCnF GUER Model
      * 
      * @param evid
      * @return a fully-baked event, not configured for any application in 

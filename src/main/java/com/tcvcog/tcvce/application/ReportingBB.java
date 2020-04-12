@@ -11,6 +11,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.reports.Report;
@@ -69,9 +70,9 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         CaseCoordinator cc = getCaseCoordinator();
-        List<CECase> csel =  getSessionBean().getSessCECaseList();
+        List<CECasePropertyUnitHeavy> csel =  getSessionBean().getSessCECaseList();
         if(csel != null && !csel.isEmpty()){
-            caseList = cc.getCECaseHeavyList(csel, getSessionBean().getSessUser().getMyCredential());
+            caseList = cc.getCECaseHeavyList(cc.downcastCECasePropertyUnitHeavyList(csel), getSessionBean().getSessUser().getMyCredential());
         }
         
         DataCoordinator dc = getDataCoordinator();

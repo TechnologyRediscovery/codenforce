@@ -18,10 +18,15 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -32,7 +37,8 @@ public class PersonCECasesBB extends BackingBeanUtils{
 
     private PersonDataHeavy currPerson;
     
-    private List<CECase> caseListFiltered;
+    private List<CECasePropertyUnitHeavy> caseList;
+    private List<CECasePropertyUnitHeavy> caseListFiltered;
     
     /**
      * Creates a new instance of PersonBB
@@ -44,6 +50,7 @@ public class PersonCECasesBB extends BackingBeanUtils{
     @PostConstruct
     public void initBean(){
        PersonCoordinator pc = getPersonCoordinator();
+       CaseCoordinator cc = getCaseCoordinator();
        
        if(getSessionBean().getSessPersonQueued() != null){
             currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(), 
@@ -53,6 +60,7 @@ public class PersonCECasesBB extends BackingBeanUtils{
        } else {
             currPerson = (getSessionBean().getSessPerson());
        }
+        caseList = currPerson.getCaseList();
         
     }
     
@@ -78,15 +86,29 @@ public class PersonCECasesBB extends BackingBeanUtils{
     /**
      * @return the caseListFiltered
      */
-    public List<CECase> getCaseListFiltered() {
+    public List<CECasePropertyUnitHeavy> getCaseListFiltered() {
         return caseListFiltered;
     }
 
     /**
      * @param caseListFiltered the caseListFiltered to set
      */
-    public void setCaseListFiltered(List<CECase> caseListFiltered) {
+    public void setCaseListFiltered(List<CECasePropertyUnitHeavy> caseListFiltered) {
         this.caseListFiltered = caseListFiltered;
+    }
+
+    /**
+     * @return the caseList
+     */
+    public List<CECasePropertyUnitHeavy> getCaseList() {
+        return caseList;
+    }
+
+    /**
+     * @param caseList the caseList to set
+     */
+    public void setCaseList(List<CECasePropertyUnitHeavy> caseList) {
+        this.caseList = caseList;
     }
     
     

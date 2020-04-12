@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -23,7 +24,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitified;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -161,7 +162,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @throws SearchException 
      */
      public QueryEvent runQuery(QueryEvent q) throws SearchException{
-         
+         EventCoordinator ec = getEventCoordinator();
          if(q == null) return null;
         
         prepareQueryForRun(q);
@@ -182,9 +183,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             } else {
                 runQuery_event_IntegratorCall(sp, evTempList);
             }
-            // add each batch of OccPeriod objects from the SearchParam run to our
-            // ongoing list
-            q.addToResults(evTempList);
+             try {
+                 // add each batch of OccPeriod objects from the SearchParam run to our
+                 // ongoing list
+                 q.addToResults(ec.assembleEventCnFPropUnitCasePeriodHeavyList(evTempList));
+             } catch (EventException | IntegrationException ex) {
+                 System.out.println(ex);
+             }
             q.appendToQueryLog(sp);
         } // close parameter for
         
@@ -239,13 +244,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         prepareQueryForRun(q);
 
         List<SearchParamsOccPeriod> paramsList = q.getParamsList();
-        List<OccPeriodPropertyUnitified> periodListTemp = new ArrayList<>();
+        List<OccPeriodPropertyUnitHeavy> periodListTemp = new ArrayList<>();
         
         for(SearchParamsOccPeriod sp: paramsList){
             periodListTemp.clear();
             for(Integer i: oi.searchForOccPeriods(sp)){
                 try {
-                    periodListTemp.add(oc.getOccPeriodPropertyUnitified(i));
+                    periodListTemp.add(oc.getOccPeriodPropertyUnitHeavy(i));
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                     throw new SearchException("Integration exception when querying OccPeriods");
@@ -301,12 +306,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     caseListTemp.add(cse);
                 }
             }
+                q.addToResults(cc.assembleCECasePropertyUnitHeavyList(caseListTemp));
             } catch (IntegrationException | BObStatusException ex) {
                 throw new SearchException("Exception during search: " + ex.toString());
             }
             // add each batch of OccPeriod objects from the SearchParam run to our
             // ongoing list
-            q.addToResults(caseListTemp);
             q.appendToQueryLog(params);
         } // close for over parameters
         
@@ -704,6 +709,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                  paramsList.add(genParams_event_persons(params, cred));
                  break;
             case CUSTOM:
+                paramsList.add(genParams_event_custom(params, cred));
                 break;
             default:
          }
@@ -918,7 +924,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         List<QueryEvent> queryList = new ArrayList<>();
         for(QueryEventEnum queryTitle: nameArray){
             if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
-                queryList.add(initQuery(queryTitle, cred));
+                QueryEvent qe = initQuery(queryTitle, cred);
+                if(qe.getParamsListSize() != 0){
+                    queryList.add(qe);
+                }
             }
         }
         return queryList;
@@ -1324,6 +1333,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     public SearchParamsEvent genParams_event_persons(SearchParamsEvent params, Credential cred ){
         params.setPerson_ctl(true);
+        // downstream injects person
+        return params;
+    }
+    
+    public SearchParamsEvent genParams_event_custom(SearchParamsEvent params, Credential cred ){
         // downstream injects person
         return params;
     }

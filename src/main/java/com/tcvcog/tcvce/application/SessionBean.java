@@ -110,8 +110,8 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    private List<EventCaseHeavy> sessEventWithCasePropList;
-    private List<EventCnF> sessEventList;
+    
+    private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
     private EventCnF sessEventQueued;
     
     /* >>> QUERY EVENT <<< */
@@ -143,7 +143,7 @@ public class    SessionBean
     
     private CECaseDataHeavy sessCECase;
     private CECase sessCECaseQueued;
-    private List<CECase> sessCECaseList;
+    private List<CECasePropertyUnitHeavy> sessCECaseList;
     
     private CodeViolation sessCodeViolation;
     private List<CodeViolation> sessViolationList;
@@ -479,7 +479,7 @@ public class    SessionBean
     /**
      * @return the sessCECaseList
      */
-    public List<CECase> getSessCECaseList() {
+    public List<CECasePropertyUnitHeavy> getSessCECaseList() {
         return sessCECaseList;
     }
 
@@ -498,7 +498,7 @@ public class    SessionBean
     /**
      * @param sessCECaseList the sessCECaseList to set
      */
-    public void setSessCECaseList(List<CECase> sessCECaseList) {
+    public void setSessCECaseList(List<CECasePropertyUnitHeavy> sessCECaseList) {
         this.sessCECaseList = sessCECaseList;
     }
 
@@ -582,20 +582,6 @@ public class    SessionBean
     }
 
   
-    
-    /*
-     * @return the sessEventWithCasePropList
-     */
-    public List<EventCaseHeavy> getSessopmEvemtCaseHeavyList() {
-        return sessEventWithCasePropList;
-    }
-
-    /**
-     * @param sessEventWithCasePropList the sessEventWithCasePropList to set
-     */
-    public void setSessEventWithCasePropList(List<EventCaseHeavy> sessEventWithCasePropList) {
-        this.sessEventWithCasePropList = sessEventWithCasePropList;
-    }
 
     /**
      * @return the sessPropertyList
@@ -1126,14 +1112,14 @@ public class    SessionBean
     /**
      * @return the sessEventList
      */
-    public List<EventCnF> getSessEventList() {
+    public List<EventCnFPropUnitCasePeriodHeavy> getSessEventList() {
         return sessEventList;
     }
 
     /**
      * @param sessEventList the sessEventList to set
      */
-    public void setSessEventList(List<EventCnF> sessEventList) {
+    public void setSessEventList(List<EventCnFPropUnitCasePeriodHeavy> sessEventList) {
         this.sessEventList = sessEventList;
     }
 

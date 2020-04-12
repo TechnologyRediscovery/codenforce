@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
@@ -47,10 +48,10 @@ public class CECaseSearchBB
         extends BackingBeanUtils
         implements Serializable {
     
-    private CECase currentCase;
+    private CECasePropertyUnitHeavy currentCase;
     
-    private List<CECase> caseList;
-    private List<CECase> filteredCaseList;
+    private List<CECasePropertyUnitHeavy> caseList;
+    private List<CECasePropertyUnitHeavy> filteredCaseList;
     private SearchParamsCECase searchParamsSelected;
     
     private List<QueryCECase> queryList;
@@ -129,8 +130,15 @@ public class CECaseSearchBB
         System.out.println("CaseProfileBB.manageCECase | caseid: " + c.getCaseID());
         try {
             si.logObjectView(getSessionBean().getSessUser(), c);
-            getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential()));
-            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(c.getProperty(), getSessionBean().getSessUser().getMyCredential()));
+            
+            getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(
+                            currentCase, 
+                            getSessionBean().getSessUser().getMyCredential()));
+            
+            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(
+                            cc.assembleCECasePropertyUnitHeavy(c).getProperty(), 
+                            getSessionBean().getSessUser().getMyCredential()));
+            
         } catch (BObStatusException | IntegrationException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -203,7 +211,7 @@ public class CECaseSearchBB
     public void loadCECaseHistory(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            caseList.addAll(cc.assembleCaseHistory(getSessionBean().getSessUser().getMyCredential()));
+            caseList.addAll(cc.assembleCECasePropertyUnitHeavyList(cc.assembleCaseHistory(getSessionBean().getSessUser().getMyCredential())));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Case history loaded", ""));
@@ -289,14 +297,14 @@ public class CECaseSearchBB
     /**
      * @return the caseList
      */
-    public List<CECase> getCaseList() {
+    public List<CECasePropertyUnitHeavy> getCaseList() {
         return caseList;
     }
 
     /**
      * @return the filteredCaseList
      */
-    public List<CECase> getFilteredCaseList() {
+    public List<CECasePropertyUnitHeavy> getFilteredCaseList() {
         return filteredCaseList;
     }
 
@@ -339,14 +347,14 @@ public class CECaseSearchBB
     /**
      * @param caseList the caseList to set
      */
-    public void setCaseList(List<CECase> caseList) {
+    public void setCaseList(List<CECasePropertyUnitHeavy> caseList) {
         this.caseList = caseList;
     }
 
     /**
      * @param filteredCaseList the filteredCaseList to set
      */
-    public void setFilteredCaseList(List<CECase> filteredCaseList) {
+    public void setFilteredCaseList(List<CECasePropertyUnitHeavy> filteredCaseList) {
         this.filteredCaseList = filteredCaseList;
     }
 

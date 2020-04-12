@@ -25,6 +25,7 @@ public  class       OccPeriod
     
     protected int periodID;
     protected int propertyUnitID;
+    
     protected OccPeriodType type;
     
     protected OccInspection governingInspection;

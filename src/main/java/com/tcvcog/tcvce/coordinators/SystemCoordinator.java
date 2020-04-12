@@ -83,6 +83,36 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
          return li.writeLogEntry(entry);
      }
      
+     /**
+      * Generates a rich-text (contains HTML to be NOT escaped) given
+      * various input values
+      * @param objectID
+      * @param BObName
+      * @param formerVal
+      * @param updatedVal
+      * @return 
+      */
+     public String generateFieldUpdateNoteBody( int objectID, 
+                                                String BObName, 
+                                                String formerVal, 
+                                                String updatedVal){
+         StringBuilder sb = new StringBuilder();
+         sb.append(Constants.FMT_HTML_BREAK);
+         sb.append("FIELD UPDATE");
+         sb.append(" of ");
+         sb.append(BObName);
+         sb.append(" ID: ");
+         sb.append(objectID);
+         sb.append(Constants.FMT_HTML_BREAK);
+         sb.append("Prev val: ");
+         sb.append(formerVal);
+         sb.append(Constants.FMT_HTML_BREAK);
+         sb.append("New val: ");
+         sb.append(updatedVal);
+         sb.append(Constants.FMT_HTML_BREAK);
+         return sb.toString();
+         
+     }
     
     
     /**

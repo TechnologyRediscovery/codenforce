@@ -90,14 +90,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         EventCoordinator ec = getEventCoordinator();
         
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
-        CECaseDataHeavy cse = new CECaseDataHeavy(c);
+        CECaseDataHeavy cse = new CECaseDataHeavy(assembleCECasePropertyUnitHeavy(c));
 
         try {
             // EVENT LIST
             QueryEvent qe = sc.initQuery(QueryEventEnum.CECASE, cred);
             qe.getPrimaryParams().setBobID_ctl(true);
             qe.getPrimaryParams().setBobID_val(c.getCaseID());
-            cse.setCompleteEventList(sc.runQuery(qe).getBOBResultList());
+            cse.setCompleteEventList(ec.downcastEventCnFPropertyUnitHeavy(sc.runQuery(qe).getBOBResultList()));
         
             // PROPOSAL LIST
             cse.setProposalList(chc.getProposalList(cse, cred));
@@ -134,6 +134,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
     }
     
+    /**
+     * Utility for downcasting a list of CECasePropertyUnitDataHeavy 
+     * to the base class
+     * @param cspudhList
+     * @return 
+     */
+    public List<CECase> downcastCECasePropertyUnitHeavyList(List<CECasePropertyUnitHeavy> cspudhList){
+        List<CECase> cslist = new ArrayList<>();
+        if(cspudhList != null && !cspudhList.isEmpty()){
+            for(CECasePropertyUnitHeavy c: cspudhList){
+                cslist.add((CECase) c);
+            }
+            
+        }
+        return cslist;
+    }
+    
+    
+    /**
+     * Utility for assembling a list of data heavy cases from a list of base class
+     * instances
+     * @param cseList
+     * @param cred
+     * @return 
+     */
     public List<CECaseDataHeavy> getCECaseHeavyList(List<CECase> cseList, Credential cred){
         List<CECaseDataHeavy> heavyList = new ArrayList<>();
         for(CECase cse: cseList){
@@ -182,6 +207,38 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
         
     }
+    
+    /**
+     * Builds a property and propertyUnit heavy subclass of our CECase object
+     * 
+     * @param cse
+     * @return the data-rich subclass with Property and possible PropertyUnit
+     * @throws IntegrationException 
+     */
+    public CECasePropertyUnitHeavy assembleCECasePropertyUnitHeavy(CECase cse) throws IntegrationException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        CECasePropertyUnitHeavy csepuh = null;
+        if(cse != null){
+            csepuh= new CECasePropertyUnitHeavy(cse);
+            csepuh.setProperty(pc.getProperty(cse.getPropertyID()));
+            if(cse.getPropertyUnitID() != 0){
+                csepuh.setPropUnit(pc.getPropertyUnit(cse.getPropertyUnitID()));
+            }
+        }
+        return csepuh;
+    }
+    
+    public List<CECasePropertyUnitHeavy> assembleCECasePropertyUnitHeavyList(List<CECase> cseList) throws IntegrationException{
+        
+        List<CECasePropertyUnitHeavy> cspudhList = new ArrayList<>();
+        if(cseList != null && !cseList.isEmpty()){
+            for(CECase cse: cseList){
+                cspudhList.add(assembleCECasePropertyUnitHeavy(cse));
+            }
+        }
+        return cspudhList;
+    }
+    
     
     public Icon getIconByCasePhase(CasePhaseEnum phase) throws IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
@@ -353,15 +410,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return cl;
     }
     
-    public CECaseDataHeavy initCECase(Property p, User u){
-        CECaseDataHeavy newCase = new CECaseDataHeavy();
+    public CECase initCECase(Property p, User u){
+        CECase newCase = new CECase();
         
         int casePCC = generateControlCodeFromTime();
         // caseID set by postgres sequence
         // timestamp set by postgres
         // no closing date, by design of case flow
         newCase.setPublicControlCode(casePCC);
-        newCase.setProperty(p);
+        newCase.setPropertyID(p.getPropertyID());
         newCase.setCaseManager(u);
         
         return newCase;
@@ -557,7 +614,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         EventCnF newEvent = null;
         
         CasePhaseEnum oldCP = cse.getCasePhase();
-        ci.changeCECasePhase(cse);
 //        ec.generateAndInsertPhaseChangeEvent(cse, oldCP, rule);
 //        if(rule.getTriggeredEventCategoryID() != 0){
 //            newEvent = ec.initEvent(cse, ec.initEventCategory(rule.getTriggeredEventCategoryID()));
@@ -648,15 +704,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
      
     private int processClosingEvent(CECaseDataHeavy c, EventCnF e) throws IntegrationException, BObStatusException{
-        CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
         
         CasePhaseEnum closedPhase = CasePhaseEnum.Closed;
         c.setCasePhase(closedPhase);
-        ci.changeCECasePhase(c);
         
         c.setClosingDate(LocalDateTime.now());
-        updateCoreCECaseData(c);
+        updateCECaseMetadata(c);
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
@@ -841,7 +895,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     * @throws BObStatusException
     * @throws IntegrationException 
     */
-   public void updateCoreCECaseData(CECaseDataHeavy c) throws BObStatusException, IntegrationException{
+   public void updateCECaseMetadata(CECaseDataHeavy c) throws BObStatusException, IntegrationException{
        CaseIntegrator ci = getCaseIntegrator();
        if(c.getClosingDate() != null){
             if(c.getClosingDate().isBefore(c.getOriginationDate())){
@@ -1069,9 +1123,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("Case: ");
         sb.append(cse.getCaseName());
         sb.append(" at ");
-        sb.append(cse.getProperty().getAddress());
+        sb.append(cc.assembleCECasePropertyUnitHeavy(cse).getProperty().getAddress());
         sb.append("(");
-        sb.append(cse.getProperty().getMuni().getMuniName());
+        sb.append(cc.assembleCECasePropertyUnitHeavy(cse).getProperty().getMuni().getMuniName());
         sb.append(")");
         sb.append("; Violation: ");
         sb.append(cv.getViolatedEnfElement().getCodeElement().getHeaderString());

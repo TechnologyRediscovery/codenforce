@@ -592,7 +592,7 @@ public  class       SessionInitializer
         
         try {
         
-            sb.setSessCECaseList(cc.assembleCaseHistory(cred));
+            sb.setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(cc.assembleCaseHistory(cred)));
             if(sb.getSessCECaseList().isEmpty()){
                 sb.setSessCECase(cc.assembleCECaseDataHeavy(cc.selectDefaultCECase(cred), cred));
             } else {

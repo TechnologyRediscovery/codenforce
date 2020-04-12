@@ -27,7 +27,7 @@ public enum EventDomainEnum {
     
     CODE_ENFORCEMENT        (   "Code enforcement cases", 
                                 "cecase_caseid"             ),
-    OCCUPANCY               (   "Code enforcement cases", 
+    OCCUPANCY               (   "Occupancy Periods", 
                                 "occperiod_periodid"             ),
     UNIVERSAL               (   "All event subdomains", 
                                 "cecase_caseid"             );  // this field should never

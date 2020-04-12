@@ -99,17 +99,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @return
      * @throws IntegrationException 
      */
-    public OccPeriodPropertyUnitified getOccPeriodPropertyUnitified(int periodid) throws IntegrationException{
+    public OccPeriodPropertyUnitHeavy getOccPeriodPropertyUnitHeavy(int periodid) throws IntegrationException{
         PropertyCoordinator pc = getPropertyCoordinator();
-        OccPeriodPropertyUnitified oppu = new OccPeriodPropertyUnitified(getOccPeriod(periodid));
+        OccPeriodPropertyUnitHeavy oppu = new OccPeriodPropertyUnitHeavy(getOccPeriod(periodid));
         oppu.setPropUnitProp(pc.getPropertyUnitWithProp(oppu.getPropertyUnitID()));
         return oppu;
     }
     
-    public List<OccPeriodPropertyUnitified> getOccPeriodPropertyUnitifiedList(List<OccPeriod> perList) throws IntegrationException{
-        List<OccPeriodPropertyUnitified> oppuList = new ArrayList<>();
+    public List<OccPeriodPropertyUnitHeavy> getOccPeriodPropertyUnitHeavy(List<OccPeriod> perList) throws IntegrationException{
+        List<OccPeriodPropertyUnitHeavy> oppuList = new ArrayList<>();
         for(OccPeriod op: perList){
-            oppuList.add(getOccPeriodPropertyUnitified(op.getPeriodID()));
+            oppuList.add(OccupancyCoordinator.this.getOccPeriodPropertyUnitHeavy(op.getPeriodID()));
         }
         
         return oppuList;
@@ -157,7 +157,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             if(!qe.getParamsList().isEmpty()){
                 qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
             }
-            opdh.setEventList(qe.getBOBResultList());
+            opdh.setEventList(ec.downcastEventCnFPropertyUnitHeavy(qe.getBOBResultList()));
 
             // PROPOSAL LIST
             opdh.setProposalList(chc.getProposalList(opdh, cred));
@@ -186,6 +186,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return opdh;
         
     }
+    
+    
     
     /**
      * Logic container for determining occ period status based on a OPDH

@@ -28,7 +28,7 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.entities.EventCaseHeavy;
+import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
@@ -55,7 +55,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     private DashboardModel mainDash;
     
-    private List<EventCaseHeavy> filteredEventWithCasePropList;
+    private List<EventCnFPropUnitCasePeriodHeavy> filteredEventWithCasePropList;
     private int timelineEventViewDateRange;
     
     private List<ProposalCECase> ceProposalList;
@@ -202,14 +202,14 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredEventWithCasePropList
      */
-    public List<EventCaseHeavy> getFilteredEventWithCasePropList() {
+    public List<EventCnFPropUnitCasePeriodHeavy> getFilteredEventWithCasePropList() {
         return filteredEventWithCasePropList;
     }
 
     /**
      * @param filteredEventWithCasePropList the filteredEventWithCasePropList to set
      */
-    public void setFilteredEventWithCasePropList(ArrayList<EventCaseHeavy> filteredEventWithCasePropList) {
+    public void setFilteredEventWithCasePropList(List<EventCnFPropUnitCasePeriodHeavy> filteredEventWithCasePropList) {
         this.filteredEventWithCasePropList = filteredEventWithCasePropList;
     }
 

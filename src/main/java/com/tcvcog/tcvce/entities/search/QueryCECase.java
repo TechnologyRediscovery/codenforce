@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class QueryCECase
     
     private QueryCECaseEnum queryName;
     private List<SearchParamsCECase> searchParamsList; 
-    private List<CECase> results;
+    private List<CECasePropertyUnitHeavy> results;
     
     public QueryCECase( QueryCECaseEnum qName, 
                         List<SearchParamsCECase> params,
@@ -34,7 +35,7 @@ public class QueryCECase
         results = new ArrayList<>();
     }
     
-    public void addToResults(List<CECase> list){
+    public void addToResults(List<CECasePropertyUnitHeavy> list){
         results.addAll(list);
     }
     
@@ -96,14 +97,14 @@ public class QueryCECase
     /**
      * @return the results
      */
-    public List<CECase> getResults() {
+    public List<CECasePropertyUnitHeavy> getResults() {
         return results;
     }
 
     /**
      * @param results the results to set
      */
-    public void setResults(List<CECase> results) {
+    public void setResults(List<CECasePropertyUnitHeavy> results) {
         this.results = results;
     }
 

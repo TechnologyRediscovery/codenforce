@@ -16,34 +16,24 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUseType;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -57,8 +47,8 @@ public class EventSearchBB
         implements  Serializable {
 
     
-    private List<EventCnF> eventList;
-    private List<EventCnF> filteredEventList;
+    private List<EventCnFPropUnitCasePeriodHeavy> eventList;
+    private List<EventCnFPropUnitCasePeriodHeavy> filteredEventList;
     
     private boolean appendResultsToList;
     
@@ -150,11 +140,23 @@ public class EventSearchBB
     }
     
     public void loadEventHistory(ActionEvent ev){
+        eventList = getSessionBean().getSessEventList();
         
     }
     
     
-    
+    public String jumpToParentObject(EventCnFPropUnitCasePeriodHeavy ev){
+        if(ev != null){
+            switch(ev.getDomain()){
+                case CODE_ENFORCEMENT:
+                    return "ceCaseWorkflow";
+                case OCCUPANCY:
+                    return "occPeriodWorkflow";
+            }
+        }
+        return "";
+        
+    }
     
     
     public void rejectRequestedEvent(EventCnF ev) {
@@ -174,11 +176,14 @@ public class EventSearchBB
         System.out.println("EventSearchBB.executeQuery");
         SearchCoordinator sc = getSearchCoordinator();
         try {
-            eventList = sc.runQuery(querySelected).getBOBResultList();
             if(eventList != null){
-                Collections.sort(eventList);
-                Collections.reverse(eventList);
-            }
+                if(!appendResultsToList){
+                    eventList.clear();
+                }
+                eventList = sc.runQuery(querySelected).getBOBResultList();
+                    Collections.sort(eventList);
+                    Collections.reverse(eventList);
+                }
             
             generateQueryResultMessage();
         } catch (SearchException ex) {
@@ -199,7 +204,8 @@ public class EventSearchBB
         
     }
     
-    public void changeQuerySelected(ActionEvent ev){
+    public void changeQuerySelected(){
+        System.out.println("EventSearchBB.changeQuerySelected()");
         configureParameters();
         getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -316,7 +322,7 @@ public class EventSearchBB
     /**
      * @return the filteredEventList
      */
-    public List<EventCnF> getFilteredEventList() {
+    public List<EventCnFPropUnitCasePeriodHeavy> getFilteredEventList() {
         return filteredEventList;
     }
 
@@ -352,7 +358,7 @@ public class EventSearchBB
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(List<EventCnF> filteredEventList) {
+    public void setFilteredEventList(List<EventCnFPropUnitCasePeriodHeavy> filteredEventList) {
         this.filteredEventList = filteredEventList;
     }
 
@@ -408,7 +414,7 @@ public class EventSearchBB
     /**
      * @return the eventList
      */
-    public List<EventCnF> getEventList() {
+    public List<EventCnFPropUnitCasePeriodHeavy> getEventList() {
         return eventList;
     }
 
@@ -447,7 +453,7 @@ public class EventSearchBB
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<EventCnF> eventList) {
+    public void setEventList(List<EventCnFPropUnitCasePeriodHeavy> eventList) {
         this.eventList = eventList;
     }
 

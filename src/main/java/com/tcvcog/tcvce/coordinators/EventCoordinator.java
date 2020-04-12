@@ -26,12 +26,9 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
-import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodStatusEnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -44,8 +41,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 
@@ -92,64 +87,76 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             return null;
         }
         EventCnF ev = ei.getEvent(eventID);
-        configureEvent(ev);
+        try {
+            configureEvent(ev);
+        } catch (EventException ex) {
+            System.out.println(ex);
+        }
         return ev;
-    }
-    
-    public EventCaseHeavy getEventCaseHeavy(EventCnF ev) throws EventException, IntegrationException, BObStatusException{
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        if(ev == null) return null;
-        if(ev.getDomain() != EventDomainEnum.CODE_ENFORCEMENT){
-            throw new EventException("Cannot create an EventCaseHeavy from an event not in CE Domain");
-        }
-        
-        EventCaseHeavy ech = new EventCaseHeavy(ev);
-        ech.setCeCase(cc.getCECase(ev.getCeCaseID()));
-        
-        return ech;
-                
-    }
-    
-    public EventCnFPropUnitCasePeriodHeavy getEventPeriodPropUnitHeavy(EventCnF ev) throws EventException, IntegrationException{
-        PropertyCoordinator pc = getPropertyCoordinator();
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        
-        if(ev == null) return null;
-        if(ev.getDomain() != EventDomainEnum.OCCUPANCY){
-            throw new EventException("Cannot create an EventCaseHeavy from an event not in Occ Domain");
-        }
-        
-        EventCnFPropUnitCasePeriodHeavy eppuh = new EventCnFPropUnitCasePeriodHeavy(ev);
-        
-        eppuh.setPeriod(oc.getOccPeriod(ev.getOccPeriodID()));
-        eppuh.setPropUnit(pc.getPropertyUnit(eppuh.getPeriod().getPropertyUnitID()));
-        eppuh.setProp(pc.getProperty(eppuh.getPeriod().getPropertyUnitID()));
-        
-        return eppuh;
-        
     }
     
     
     /**
-     * Utility method for calling configureEvent on all EventCnF objects
-     * in a list passed back from a call to Query events
-     * @param evList
-     * @param user
-     * @param userAuthMuniList
-     * @return
+     * Creates a data-rich subclass of our events that contains a Property object
+     * and Property unit data useful for displaying the event without its parent
+     * object context (i.e. in an activity report)
+     * @param ev
+     * @return the data-rich subclass of EventCnF
+     * @throws EventException
      * @throws IntegrationException 
      */
-    public List<EventCaseHeavy> configureEventBundleList(List<EventCaseHeavy> evList, 
-                                                                        UserAuthorized user) throws IntegrationException{
-        Iterator<EventCaseHeavy> iter = evList.iterator();
-        while(iter.hasNext()){
-            configureEvent(iter.next());
+    public EventCnFPropUnitCasePeriodHeavy assembleEventCnFPropUnitCasePeriodHeavy(EventCnF ev) throws EventException, IntegrationException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(ev == null) return null;
+        EventCnFPropUnitCasePeriodHeavy edh = new EventCnFPropUnitCasePeriodHeavy(ev);
+        if(ev.getDomain() == EventDomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
+            edh.setPeriod(oc.getOccPeriodPropertyUnitHeavy(edh.getOccPeriodID()));
+        } else if(ev.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
+            edh.setCecase(cc.assembleCECasePropertyUnitHeavy(cc.getCECase(edh.getCeCaseID())));
+            // note that a Property object is already inside our CECase base class
+        } else {
+            throw new EventException("Cannot build data heavy event");
+        }
+        return edh;
+    }
+    
+    /**
+     * Utility method for assembling a list of data-heavy events from a List of 
+     * plain old events
+     * @param evList
+     * @return the list of data heavy events, never null
+     * @throws EventException
+     * @throws IntegrationException 
+     */
+    public List<EventCnFPropUnitCasePeriodHeavy> assembleEventCnFPropUnitCasePeriodHeavyList(List<EventCnF> evList) throws EventException, IntegrationException{
+        List<EventCnFPropUnitCasePeriodHeavy> edhList = new ArrayList<>();
+        if(evList != null && !evList.isEmpty() ){
+            for(EventCnF ev: evList){
+                edhList.add(assembleEventCnFPropUnitCasePeriodHeavy(ev));
+            }
+        }
+        return edhList;
+    }
+    
+     /**
+     * Utility for downcasting a list of CECasePropertyUnitDataHeavy 
+     * to the base class
+     * @param evHeavyList
+     * @return 
+     */
+    public List<EventCnF> downcastEventCnFPropertyUnitHeavy(List<EventCnFPropUnitCasePeriodHeavy> evHeavyList){
+        List<EventCnF> evList = new ArrayList<>();
+        if(evHeavyList != null && !evHeavyList.isEmpty()){
+            for(EventCnFPropUnitCasePeriodHeavy e: evHeavyList){
+                evList.add((EventCnF) e);
+            }
+            
         }
         return evList;
     }
-  
-    
     
     /**
      * Called by the EventIntegrator and other getEventCnF methods to set member variables based on business
@@ -160,17 +167,20 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return a nicely configured EventCEEcase
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    private EventCnF configureEvent(EventCnF ev) throws IntegrationException{
+    private EventCnF configureEvent(EventCnF ev) throws IntegrationException, EventException{
         
         // Declare this event as either in the CE or Occ domain with 
         // our hacky little enum thingy
         if(ev != null){
+            if(ev.getCeCaseID() !=0 && ev.getOccPeriodID() != 0 ){
+                throw new EventException("EventCnF cannot have a non-zero CECase and OccPeriod ID");
+            }
             if(ev.getCeCaseID() != 0){
                 ev.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
             } else if(ev.getCeCaseID() != 0){
                 ev.setDomain(EventDomainEnum.OCCUPANCY);
             } else {
-                ev.setDomain(null);
+                throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
         }
        
