@@ -422,25 +422,62 @@
                                             <h:outputText styleClass="uiLabel" value="Land Bank Held:" />
                                         </h:outputLabel>
                                         <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-usegroup-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.landBankHeld}"/>
+                                        <h:outputText id="prop-external-info-landbankheld-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.landBankHeld}"/>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-external-info-taxstatus">
+                                            <h:outputText styleClass="uiLabel" value="Tax Status:"/>
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-external-info-taxstatus-ot" styleClass="datatext" value="#{propertyProfileBB.currProp.taxStatus}"/>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-external-info-taxyear">
+                                            <h:outputText styleClass="uiLabel" value="Tax Year"/>
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-external-info-taxyear-ot" styleClass="datatext" value="#{propertyProfileBB.currProp.taxYear}"/>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-external-info-saleyear">
+                                            <h:outputText styleClass="uiLabel" value="Sale Year"/>
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-external-info-saleyear-ot" styleClass="datatext" value="#{propertyProfileBB.currProp.saleYear}"/>
+                                    
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-external-info-saleprice">
+                                            <h:outputText styleClass="uiLabel" value="Sale Price:"/>
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-external-info-saleprice-ot" styleClass="datatext" value="#{propertyProfileBB.currProp.salePrice}"/>
+                                    
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-external-info-landvalue">
+                                            <h:outputText styleClass="uiLabel" value="Land Value:"/>
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-external-info-landvalue-ot" styleClass="datatext" value="#{propertyProfileBB.currProp.landValue}"/>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-external-info-buildingvalue">
+                                            <h:outputText styleClass="uiLabel" value="Building Value:"/>
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-external-info-buildingvalue-ot" styleClass="datatext" value="#{propertyProfileBB.currProp.buildingValue}"/>
+                                    
                                     </h:panelGroup>
                                 </h:panelGrid>
 
-                                <p:commandButton ajax="true" value="Update Property External Data" 
-                                                 actionListener="#{propertyProfileBB.initiatePropertyEdit}" 
-                                                 oncomplete="PF('dialog-widvar-propinfoedit').show()"
-                                                 rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
-                                                 icon="fa fa-edit"
-                                                 disabled="false"
-                                                 update="form-propinfoedit"/>
-                                
-                                <p:commandButton ajax="true" value="Refresh Property External Data" 
-                                                 actionListener="#{propertyProfileBB.refreshCurrPropWithLists}" 
-                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                 icon="fa fa-refresh"
-                                                 disabled="false"
-                                                 styleClass="inline-button"
-                                                 update="form-propinfoedit"/>
+                  
                             </h:form>
                         </p:panel>
 

@@ -53,6 +53,18 @@ public class    Property
     protected boolean active;
     protected boolean nonAddressable;
     
+    protected int saleYear;
+    protected int salePrice;
+    protected int landValue;
+    protected int buildingValue;
+    protected int assessmentYear;
+    protected int yearBuilt;
+    protected int livingArea;
+    protected boolean taxStatus;
+    protected int taxYear;
+    
+    
+    
     /**
      * Creates a new instance of Property
      */
@@ -510,5 +522,75 @@ public class    Property
         this.creationTS = creationTS;
     }
 
+    public void setSaleYear(int saleyear){
+        this.saleYear = saleyear;
+    }
+    
+    public int getSaleYear(){
+        return saleYear;
+    }
+    
+    public void setSalePrice(int saleprice){
+        this.salePrice = saleprice;
+    }
+    
+    public int getSalePrice(){
+        return salePrice;
+    }
+    
+    public void setLandValue(int landval){
+        this.landValue = landval;
+    }
+    
+    public int getLandValue(){
+        return landValue;
+    }
+    
+    public void setBuildingValue(int buildingval){
+        this.buildingValue = buildingval;
+    }
+    
+    public int getBuildingValue(){
+        return buildingValue;
+    }
   
+    public void setAssessmentYear(int assessmentyear){
+        this.assessmentYear = assessmentyear;
+    }
+    
+    public int getAssessmentYear(){
+        return assessmentYear;
+    }
+    
+    public void setYearBuilt(int year){
+        this.yearBuilt = year;
+    }
+    
+    public int getYearBuilt(){
+        return yearBuilt;
+    }
+    
+    public void setLivingArea(int livingarea){
+        this.livingArea = livingarea;
+    }
+    
+    public int getLivingArea(){
+        return livingArea;
+    }
+    
+    public void setTaxStatus(boolean taxstatus){
+        this.taxStatus = taxstatus;
+    }
+    
+    public boolean getTaxStatus(){
+        return taxStatus;
+    }
+    
+    public void setTaxYear(int taxyear){
+        this.taxYear = taxyear;
+    }
+    
+    public int getTaxYear(){
+        return taxYear;
+    }
 }
