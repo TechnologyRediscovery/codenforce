@@ -94,6 +94,10 @@ public  class       MunicipalityDataHeavy
         this.muniName = m.getMuniName();
         this.muniCode = m.getMuniCode();
     }
+    
+    public MunicipalityDataHeavy(){
+        
+    }
 
     
     /**

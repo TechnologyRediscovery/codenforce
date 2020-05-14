@@ -896,7 +896,54 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }        
     
   
-    
+    //xiaohong add
+    public ArrayList<User> getUserList() throws IntegrationException {
+
+        String query = "   SELECT userid, username, notes, personlink, \n"
+                + "        active, nologinvirtualonly\n"
+                + "        FROM public.login ;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ArrayList<User> userList = new ArrayList<>();
+        User user ;
+
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                user = generateUser(rs);
+                userList.add(user);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error getting user", ex);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {/* ignored */ }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+
+        return userList;
+    }
    
     
     

@@ -300,36 +300,43 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setString(2, muni.getAddress_street());
             stmt.setString(3, muni.getAddress_city());
             stmt.setString(4, muni.getAddress_state());
-            
+
             stmt.setString(5, muni.getAddress_zip());
             stmt.setString(6, muni.getPhone());
             stmt.setString(7, muni.getFax());
             stmt.setString(8, muni.getEmail());
             stmt.setInt(9, muni.getPopulation());
             stmt.setBoolean(10, muni.isActiveInProgram());
-            
+
             stmt.setInt(11, muni.getCodeSet().getCodeSetID());
             stmt.setInt(12, muni.getIssuingCodeSource().getSourceID());
             stmt.setInt(13, muni.getDefaultNOVStyleID());
-            
+
             stmt.setInt(14, muni.getProfile().getProfileID());
             stmt.setBoolean(15, muni.isEnableCodeEnforcement());
             stmt.setBoolean(16, muni.isEnableOccupancy());
-            
-            stmt.setBoolean(17, muni.isEnablePublicOccPermitApp());
-            stmt.setBoolean(18, muni.isEnablePublicOccInspectionTODOs());
-            stmt.setInt(19, muni.getMuniManager().getUserID());
-            
-            stmt.setInt(20, muni.getMuniOfficePropertyId());
-            stmt.setString(21, muni.getNotes());
+
+            stmt.setBoolean(17, muni.isEnablePublicCEActionRequestSubmissions());
+            stmt.setBoolean(18, muni.isEnablePublicCEActionRequestInfo());
+
+            stmt.setBoolean(19, muni.isEnablePublicOccPermitApp());
+            stmt.setBoolean(20, muni.isEnablePublicOccInspectionTODOs());
+            stmt.setInt(21, muni.getMuniManager().getUserID());
+
+            //stmt.setInt(22, muni.getMuniOfficePropertyId());
+            stmt.setInt(22, 173134);
+            stmt.setString(23, muni.getNotes());
             // lastupdatedts=now()
-            stmt.setInt(22, muni.getLastUpdaetdBy().getUserID());
+            stmt.setInt(24, muni.getLastUpdaetdBy().getUserID());
+
+            stmt.setInt(25, muni.getPrimaryStaffContact().getUserID());
             
-            stmt.setInt(23, muni.getPrimaryStaffContact().getUserID());
+            //stmt.setInt(26, muni.getDefaultOccPeriodID());
+            stmt.setInt(26, 1006);
+
             
-            stmt.setInt(24, muni.getMuniCode());
-            stmt.setInt(25, muni.getDefaultOccPeriodID());
-            
+            stmt.setInt(27, muni.getMuniCode());
+
             stmt.executeUpdate();
             
         } catch (SQLException ex) {
@@ -449,6 +456,141 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         return muniList;
+    }
+    
+    //xiaohong add
+    public ArrayList<MuniProfile> getMuniProfileList() throws IntegrationException {
+
+        String query = "SELECT profileid, title, description, lastupdatedts, lastupdatedby_userid, \n"
+                + "       notes, continuousoccupancybufferdays, minimumuserranktodeclarerentalintent\n"
+                + "  FROM public.muniprofile;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ArrayList<MuniProfile> muniProfileList = new ArrayList<>();
+        MuniProfile muniProfile;
+
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                muniProfile = generateMuniProfile(rs);
+                if (muniProfile != null) {
+                    muniProfileList.add(muniProfile);
+                }
+
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("MunicipalityIntegrator.getMuni | " + ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.getMuni", ex);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {/* ignored */ }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+
+        return muniProfileList;
+    }
+    
+    //xiaohong add
+    public void insertMuniDataHeavy(MunicipalityDataHeavy muni) {
+
+        String query = "INSERT INTO public.municipality(\n"
+                + "            municode, muniname, address_street, address_city, address_state, \n"
+                + "            address_zip, phone, fax, email, population, activeinprogram, \n"
+                + "            defaultcodeset, occpermitissuingsource_sourceid, novprintstyle_styleid, \n"
+                + "            profile_profileid, enablecodeenforcement, enableoccupancy, enablepublicceactionreqsub, \n"
+                + "            enablepublicceactionreqinfo, enablepublicoccpermitapp, enablepublicoccinspectodo, \n"
+                + "            munimanager_userid, office_propertyid, notes, lastupdatedts, \n"
+                + "            lastupdated_userid, primarystaffcontact_userid, defaultoccperiod)\n"
+                + "    VALUES (?, ?, ?, ?, ?, \n"
+                + "            ?, ?, ?, ?, ?, ?, \n"
+                + "            ?, ?, ?, \n"
+                + "            ?, ?, ?, ?, \n"
+                + "            ?, ?, ?, \n"
+                + "            ?, ?, ?, now(), \n"
+                + "            ?, ?, ?);";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, muni.getMuniCode());
+            stmt.setString(2, muni.getMuniName());
+            stmt.setString(3, muni.getAddress_street());
+            stmt.setString(4, muni.getAddress_city());
+            stmt.setString(5, muni.getAddress_state());
+
+            stmt.setString(6, muni.getAddress_zip());
+            stmt.setString(7, muni.getPhone());
+            stmt.setString(8, muni.getFax());
+            stmt.setString(9, muni.getEmail());
+            stmt.setInt(10, muni.getPopulation());
+            stmt.setBoolean(11, muni.isActiveInProgram());
+
+            stmt.setInt(12, muni.getCodeSet().getCodeSetID());
+            stmt.setInt(13, muni.getIssuingCodeSource().getSourceID());
+            stmt.setInt(14, muni.getDefaultNOVStyleID());
+
+            stmt.setInt(15, muni.getProfile().getProfileID());
+            stmt.setBoolean(16, muni.isEnableCodeEnforcement());
+            stmt.setBoolean(17, muni.isEnableOccupancy());
+            stmt.setBoolean(18, muni.isEnablePublicCEActionRequestSubmissions());
+
+            stmt.setBoolean(19, muni.isEnablePublicCEActionRequestInfo());
+            stmt.setBoolean(20, muni.isEnablePublicOccPermitApp());
+            stmt.setBoolean(21, muni.isEnablePublicOccInspectionTODOs());
+
+            stmt.setInt(22, muni.getMuniManager().getUserID());
+            // DO WE NEED office_propertyid IN MUNICIPALITY TABLE?
+            stmt.setInt(23, 173134);
+            stmt.setString(24, muni.getNotes());
+
+            // lastupdatedts=now()
+            stmt.setInt(25, getSessionBean().getSessionUser().getUserID());
+            stmt.setInt(26, muni.getPrimaryStaffContact().getUserID());
+            stmt.setInt(27, 1006);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {/* ignored */ }
+            }
+
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
     }
     
 }

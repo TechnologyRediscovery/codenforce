@@ -482,6 +482,13 @@
         <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>municipalityManageSampleBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageSampleBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>cEComplianceTimeframeClosingsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CEComplianceTimeframeClosingsBB</managed-bean-class>
@@ -1646,7 +1653,13 @@
         
         <navigation-case>
             <from-outcome>muniManage</from-outcome>
-            <to-view-id>/restricted/cogadmin/muniManage.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/muni/muniManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>muniManageSample</from-outcome>
+            <to-view-id>/restricted/cogstaff/muni/muniManage_sample.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
