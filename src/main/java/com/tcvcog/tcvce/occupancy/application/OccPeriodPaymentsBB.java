@@ -33,7 +33,7 @@ public  class   OccPeriodPaymentsBB
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
-       currentOccPeriod = sb.getSessionOccPeriod();
+       currentOccPeriod = sb.getSessOccPeriod();
        
     }
     

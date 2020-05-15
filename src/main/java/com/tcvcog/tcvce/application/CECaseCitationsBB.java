@@ -42,7 +42,7 @@ public class CECaseCitationsBB
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
-        currentCase = sb.getSessionCECase();
+        currentCase = sb.getSessCECase();
        
     }
 
@@ -57,13 +57,13 @@ public class CECaseCitationsBB
     public String createNewCitation() {
         System.out.println("CaseProfileBB.createNewCitation  | current case tostring: "
                 + currentCase);
-        getSessionBean().setSessionCitation(null);
+        getSessionBean().setSessCitation(null);
 //        positionCurrentCaseAtHeadOfQueue();
         return "citationEdit";
     }
 
     public String updateCitation(Citation cit) {
-        getSessionBean().setSessionCitation(cit);
+        getSessionBean().setSessCitation(cit);
 //        positionCurrentCaseAtHeadOfQueue();
         return "citationEdit";
     }

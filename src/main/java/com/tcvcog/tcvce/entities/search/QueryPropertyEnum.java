@@ -24,6 +24,11 @@ public  enum        QueryPropertyEnum
                                         RoleType.MuniReader, 
                                         false),
     
+    PERSONS(                            "Properties connected to a given person",
+                                        "Includes all Person roles",
+                                        RoleType.MuniStaff,
+                                        true),
+    
     CUSTOM(                             "Custom", 
                                         "Custom", 
                                         RoleType.MuniReader, 

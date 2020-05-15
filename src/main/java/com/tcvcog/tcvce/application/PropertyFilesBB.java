@@ -44,7 +44,7 @@ public class PropertyFilesBB
      
     @PostConstruct
     public void initBean(){
-        currProp = getSessionBean().getSessionProperty();
+        currProp = getSessionBean().getSessProperty();
         
     }
     

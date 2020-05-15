@@ -40,6 +40,7 @@ public class Constants implements Serializable {
     
     // blasted unit numbers often have letters in them!
     public final static String DEFAULT_UNIT_NUMBER = "-1";
+    public final static String TEMP_UNIT_NUM = "-9";
     
     // Object management configuration parameters
     public final static int MAX_BOB_HISTORY_SIZE = 30;
@@ -62,11 +63,14 @@ public class Constants implements Serializable {
     public final static String PARAM_USERAGENT = "User-Agent";
     public final static String PARAM_DATERAW = "Date";
      
+    public final static String FMT_SEARCH_HEAD_QUERYOG =       "----------- QUERY LOG -------------";
+    public final static String FMT_SEARCH_HEAD_FILTERLOG =       "----------- filter log -------------";
     public final static String FMT_NOTE_START =       "----------- note start -------------";
     public final static String FMT_NOTE_END =    "----------- note end   -------------";
     public final static String FMT_NOTE_SEP_INTERNAL =       "....................................";
     public final static String FMT_HTML_BREAK = "<br>";
     public final static String FMT_SPACE_LITERAL = " ";
+    public final static String FMT_SPLAT = "*";
     
     public final static String FMT_DTYPE_SYMB_USERNAME = "+";
     
@@ -81,6 +85,11 @@ public class Constants implements Serializable {
     public final static String FMT_DTYPE_KEY_TIMESTAMP_CREATE = "cr";
     public final static String FMT_DTYPE_KEY_TIMESTAMP_LOCK = "lock";
     public final static String FMT_DTYPE_KEY_TIMESTAMP_DEACTIVATE = "deac";
+    
+    public final static String FMT_SIGNATURELEAD = "Signature: ";
+    public final static String FMT_FIELDKVSEP_WSPACE = ": ";
+    
+    
     
     
     

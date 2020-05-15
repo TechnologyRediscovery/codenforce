@@ -79,13 +79,13 @@ public class EventExplorerBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         
         
-        queryList = sc.buildQueryEventList(getSessionBean().getSessionUser().getMyCredential());
+        queryList = sc.buildQueryEventList(getSessionBean().getSessUser().getMyCredential());
         if(queryList != null && !queryList.isEmpty()){
             selectedBOBQuery = queryList.get(0);
         }
         
 //        eventList = getSessionBean().getSessopmEvemtCaseHeavyList();
-        eventList = getSessionBean().getSessionEventList();
+        eventList = getSessionBean().getSessEventList();
         
         // grab previously loaded event config from the session bean
         // which would have been placed there by the generateReport method in this bean
@@ -195,8 +195,8 @@ public class EventExplorerBB extends BackingBeanUtils implements Serializable {
            
             EventCoordinator ec = getEventCoordinator();
             reportConfig = ec.getDefaultReportConfigCEEventList();
-            reportConfig.setMuni(getSessionBean().getSessionMuni());
-            reportConfig.setCreator(getSessionBean().getSessionUser());
+            reportConfig.setMuni(getSessionBean().getSessMuni());
+            reportConfig.setCreator(getSessionBean().getSessUser());
             if(selectedBOBQuery != null){
                  reportConfig.setTitle(selectedBOBQuery.getQueryTitle());
             }
@@ -233,7 +233,7 @@ public class EventExplorerBB extends BackingBeanUtils implements Serializable {
 //       getSessionBean().setSessionEventWithCasePropList(eventList);
 
        getSessionBean().setReportConfigCEEventList(reportConfig);
-       getSessionBean().setSessionReport(reportConfig);
+       getSessionBean().setSessReport(reportConfig);
        return "reportCEEventList";
    }
 

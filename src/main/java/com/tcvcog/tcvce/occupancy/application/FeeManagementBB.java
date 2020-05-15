@@ -115,7 +115,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         if (allFees == null) {
             try {
-                allFees = pi.getFeeTypeList(getSessionBean().getSessionMuni());
+                allFees = pi.getFeeTypeList(getSessionBean().getSessMuni());
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -130,7 +130,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         if (typeList == null) {
             OccupancyIntegrator oi = getOccupancyIntegrator();
             try {
-                typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessionMuni().getProfile().getProfileID());
+                typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessMuni().getProfile().getProfileID());
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -213,14 +213,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         skeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
         skeleton.setPaymentList(occPeriodFormFee.getPaymentList());
         skeleton.setMoneyFeeAssigned(occPeriodFormFee.getMoneyFeeAssigned());
-        skeleton.setAssignedBy(getSessionBean().getSessionUser());
+        skeleton.setAssignedBy(getSessionBean().getSessUser());
         skeleton.setAssigned(LocalDateTime.now());
         skeleton.setLastModified(LocalDateTime.now());
         skeleton.setNotes(occPeriodFormFee.getNotes());
         skeleton.setFee(occPeriodFormFee.getFee());
 
         if (waived == true) {
-            skeleton.setWaivedBy(getSessionBean().getSessionUser());
+            skeleton.setWaivedBy(getSessionBean().getSessUser());
         } else {
             skeleton.setWaivedBy(new User());
         }
@@ -228,7 +228,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         if (occPeriodFormFee.getReducedBy() != 0) {
 
             skeleton.setReducedBy(occPeriodFormFee.getReducedBy());
-            skeleton.setReducedByUser(getSessionBean().getSessionUser());
+            skeleton.setReducedByUser(getSessionBean().getSessUser());
 
         } else {
             skeleton.setReducedByUser(new User());
@@ -257,21 +257,21 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         skeleton.setOccPeriodTypeID(occPeriodFormFee.getOccPeriodTypeID());
         skeleton.setPaymentList(occPeriodFormFee.getPaymentList());
         skeleton.setMoneyFeeAssigned(occPeriodFormFee.getMoneyFeeAssigned());
-        skeleton.setAssignedBy(getSessionBean().getSessionUser());
+        skeleton.setAssignedBy(getSessionBean().getSessUser());
         skeleton.setAssigned(LocalDateTime.now());
         skeleton.setLastModified(LocalDateTime.now());
         skeleton.setNotes(occPeriodFormFee.getNotes());
         skeleton.setFee(occPeriodFormFee.getFee());
 
         if (waived == true) {
-            skeleton.setWaivedBy(getSessionBean().getSessionUser());
+            skeleton.setWaivedBy(getSessionBean().getSessUser());
         } else {
             skeleton.setWaivedBy(new User());
         }
 
         if (occPeriodFormFee.getReducedBy() != 0) {
             skeleton.setReducedBy(occPeriodFormFee.getReducedBy());
-            skeleton.setReducedByUser(getSessionBean().getSessionUser());
+            skeleton.setReducedByUser(getSessionBean().getSessUser());
 
         } else {
             skeleton.setReducedByUser(new User());
@@ -542,7 +542,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
         OccupancyIntegrator oi = getOccupancyIntegrator();
         try {
-            typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessionMuni().getProfile().getProfileID());
+            typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessMuni().getProfile().getProfileID());
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

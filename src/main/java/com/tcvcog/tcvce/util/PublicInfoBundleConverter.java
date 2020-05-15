@@ -28,7 +28,7 @@ import javax.faces.convert.FacesConverter;
  *
  * @author ellen bascomb of apt 31y
  */
-@FacesConverter(forClass=PublicInfoBundle.class, value="publicInfoBundleConverter")
+@FacesConverter(value="publicInfoBundleConverter")
 public class PublicInfoBundleConverter extends EntityConverter implements Converter{
     
      @Override

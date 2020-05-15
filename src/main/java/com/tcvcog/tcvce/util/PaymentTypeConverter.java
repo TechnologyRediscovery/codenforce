@@ -28,7 +28,7 @@ import javax.faces.convert.FacesConverter;
  *
  * @author ellen bascomb of apt 31y
  */
-@FacesConverter(forClass=PaymentType.class, value="paymentTypeConverter")
+@FacesConverter(value="paymentTypeConverter")
 public class PaymentTypeConverter extends EntityConverter implements Converter{
 
     @Override

@@ -281,7 +281,7 @@
                                                                  value="#{eventsCECaseBB.searchParams.person}"
                                                                  disabled="#{!eventsCECaseBB.searchParams.filterByPerson}">
                                                     <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                                    <f:selectItems value="#{sessionBean.sessionPersonList}"  var="p" itemValue="#{p}" 
+                                                    <f:selectItems value="#{sessionBean.sessPersonList}"  var="p" itemValue="#{p}" 
                                                                    itemLabel="#{p.firstName} #{p.lastName}"/>
                                                     <f:converter converterId="personConverter"/>
                                                 </p:selectOneMenu>

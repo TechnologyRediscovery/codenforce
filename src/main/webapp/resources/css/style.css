@@ -783,6 +783,10 @@ i.status-display-icon-i{
     font-weight: bold;
 }
 
+.ui-label{
+    font-weight: bold;
+}
+
 .datum-data{
     
 }
@@ -808,6 +812,12 @@ i.status-display-icon-i{
 
 .weight-normal{
     font-weight:normal;
+}
+
+.logoutput{
+    padding: 5px;
+    font-size: 0.9em;
+    
 }
 
 
@@ -1182,6 +1192,10 @@ gridTd-bignum{
     
 }
 
+.ui-button-text{
+    margin-left: 5px;
+}
+
 .full-width{
     width:100%;
 }
@@ -1202,6 +1216,8 @@ gridTd-bignum{
     margin-left:10px;
     
 }
+
+
 
 /* formatting command buttons completeCodeSourceList & codeSourceTable on codeSourceManage.xhtml  */
 .buttonOwnLine1{

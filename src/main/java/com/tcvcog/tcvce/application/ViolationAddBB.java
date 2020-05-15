@@ -67,13 +67,13 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean(){
-        currentViolation = getSessionBean().getSessionCodeViolation();
-        currentCase = getSessionBean().getSessionCECase();
+        currentViolation = getSessionBean().getSessCodeViolation();
+        currentCase = getSessionBean().getSessCECase();
     }
     
     public void handlePhotoUpload(FileUploadEvent ev){
         if(this.currentViolation == null){
-            this.currentViolation = getSessionBean().getSessionCodeViolation();
+            this.currentViolation = getSessionBean().getSessCodeViolation();
         }
         if(ev == null){
             System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
@@ -113,7 +113,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
-             getSessionBean().getSessionBean().setSessionCECase(currentCase);
+             getSessionBean().getSessionBean().setSessCECase(currentCase);
             return "ceCases";
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -221,7 +221,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
      */
     public CodeViolation getCurrentViolation() {
         
-        currentViolation = getSessionBean().getSessionCodeViolation();
+        currentViolation = getSessionBean().getSessCodeViolation();
         return currentViolation;
     }
 

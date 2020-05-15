@@ -37,7 +37,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable{
         Blob blob = new Blob();
         blob.setDescription("No description.");
         blob.setTimestamp(LocalDateTime.now());
-        blob.setUploadPersonID(getSessionBean().getSessionUser().getPersonID());
+        blob.setUploadPersonID(getSessionBean().getSessUser().getPersonID());
         return blob;
     }
      

@@ -65,6 +65,11 @@ public  enum QueryCECaseEnum
                             RoleType.MuniStaff, 
                             true),
     
+    PERSINFOCASES(          "Cases associated with a single Person",
+                            "Person info cases are not normal CE cases, but rather containers for events related to a Person", 
+                            RoleType.MuniStaff, 
+                            true),
+    
     
     PACC(                   "CE cases by public access control code",
                             "All cases by PACC", 

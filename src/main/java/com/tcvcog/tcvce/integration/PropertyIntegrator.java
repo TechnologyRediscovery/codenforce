@@ -20,12 +20,10 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
-import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
@@ -55,6 +53,7 @@ import java.util.List;
 public class PropertyIntegrator extends BackingBeanUtils implements Serializable {
 
     final int MAX_RESULTS = 100;
+    final String ACTIVE_FIELD = "property.active";
 
     /**
      * Creates a new instance of PropertyIntegrator
@@ -120,8 +119,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         SystemIntegrator si = getSystemIntegrator();
         UserIntegrator ui = getUserIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
-        
-        
 
         Property p = new Property();
 
@@ -498,6 +495,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             if(prop.getUnfitDateStart() != null){
                 stmt.setTimestamp(18, java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
+                System.out.println("***************************************");
+                System.out.print(java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
+                System.out.println(java.sql.Timestamp.valueOf(prop.getUnfitDateStart()).getClass());
             } else {
                 stmt.setNull(18, java.sql.Types.NULL);
             }
@@ -621,7 +621,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
    
 
     /**
-     * Single entry point for searches against the property table. It's the job of
+     * Single entry point for searches against the property table. Since 
+     * my return type is Integer, It's the job of
      * the caller to iterate over the result list and make real objects
      * 
      * @param params
@@ -649,7 +650,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             //******************************************************************
            // **   FILTERS COM-1, COM-2, COM-3, COM-6 MUNI,DATES,USER,ACTIVE  **
            // ******************************************************************
-             params = (SearchParamsProperty) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsProperty.MUNI_DBFIELD);
+             params = (SearchParamsProperty) sc.assembleBObSearchSQL_muniDatesUserActive(
+                                                                        params, 
+                                                                        SearchParamsProperty.MUNI_DBFIELD,
+                                                                        ACTIVE_FIELD);
 
             //**************************************
            // **   FILTER PROP-1   ZIP            **
@@ -673,7 +677,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     params.appendSQL("AND bobsource_sourceid=? ");
                 } else {
                     params.setBobSource_ctl(false);
-                    params.logMessage("SOURCE: no BOb source object; source filter disabled");
+                    params.appendToParamLog("SOURCE: no BOb source object; source filter disabled");
                 }
             }
 
@@ -699,7 +703,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     params.appendSQL("AND condition_intensityclassid=? ");
                 } else {
                     params.setCondition_ctl(false);
-                    params.logMessage("CONDITION: no condition object; condition filter disabled; |");
+                    params.appendToParamLog("CONDITION: no condition object; condition filter disabled; |");
                 }
             }
 
@@ -711,7 +715,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     params.appendSQL("AND landbankprospect_intensityclassid=? ");
                 } else {
                     params.setLandbankprospect_ctl(false);
-                    params.logMessage("LANDBANKPROSPECT: No intensity object; land bank prospect disabled; |");
+                    params.appendToParamLog("LANDBANKPROSPECT: No intensity object; land bank prospect disabled; |");
                 }
             }
 
@@ -747,7 +751,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     params.appendSQL("AND property.usetype_typeid=? ");
                 } else {
                     params.setUseType_ctl(false);
-                    params.logMessage("USE TYPE: No intensity object found; use type filter disabled; | " );
+                    params.appendToParamLog("USE TYPE: No intensity object found; use type filter disabled; | " );
                 }
             }
 
@@ -789,7 +793,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     params.appendSQL("AND propertyperson.person_personid=? ");
                 } else {
                     params.setPerson_ctl(false);
-                    params.logMessage("PERSON: No object found; filter disabled; | " );
+                    params.appendToParamLog("PERSON: No object found; filter disabled; | " );
                 }
             }
            
@@ -889,8 +893,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
             
-            params.logMessage("Property Integrator SQL before execution: ");
-            params.logMessage(stmt.toString());
+            params.appendToParamLog("Property Integrator SQL before execution: ");
+            params.appendToParamLog(stmt.toString());
             rs = stmt.executeQuery();
             
             int counter = 0;
@@ -1162,28 +1166,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return unitList;
     }
 
-    /**
-     * 
-     * @param propUnitList
-     * @return
-     * @throws IntegrationException
-     * @throws EventException
-     * @throws com.tcvcog.tcvce.domain.AuthorizationException
-     * @throws com.tcvcog.tcvce.domain.BObStatusException
-     */
-    public List<PropertyUnitDataHeavy> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList) throws IntegrationException, EventException, EventException, AuthorizationException, BObStatusException{
-        List<PropertyUnitDataHeavy> puwll = new ArrayList<>();
-        Iterator<PropertyUnit> iter = propUnitList.iterator();
-        while(iter.hasNext()){
-            try {
-                PropertyUnit pu = iter.next();
-                puwll.add(getPropertyUnitWithLists(pu.getUnitID()));
-            } catch (ViolationException ex) {
-                System.out.println(ex);
-            }
-        }
-        return puwll;
-    }
+  
     
     /**
      * Adaptor method for calling getPropertyUnitWithLists(int unitID) given a PropertyUnit object
@@ -1195,7 +1178,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public PropertyUnitDataHeavy getPropertyUnitWithList(PropertyUnit pu) throws IntegrationException, EventException, AuthorizationException, BObStatusException{
+    public PropertyUnitDataHeavy getPropertyUnitWithLists(PropertyUnit pu) throws IntegrationException, EventException, AuthorizationException, BObStatusException{
         PropertyUnitDataHeavy puwl = null;
         try {
             puwl = getPropertyUnitWithLists(pu.getUnitID());

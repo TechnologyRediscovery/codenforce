@@ -10,6 +10,8 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -130,8 +132,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private boolean markNewlyAddedSpacesWithCompliance;
     private boolean promptForSpaceLocationUponAdd;
     
-    private List<User> inspectorCandidateList;
+    private List<User> managerInspectorCandidateList;
     private User selectedInspector;
+    private User selectedManager;
     
     private String formNoteText;
     private String formProposalRejectionReason;
@@ -191,31 +194,19 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean(){
-        OccupancyIntegrator oi = getOccupancyIntegrator();
+
         PropertyIntegrator pi = getPropertyIntegrator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         EventCoordinator ec = getEventCoordinator();
+        UserCoordinator uc = getUserCoordinator();
         
         // set our blank lists used only by elements on this page
         spacesInTypeList = new ArrayList<>();
         visibleInspectedSpaceList = new ArrayList<>();
-        OccPeriod sessionPeriod = getSessionBean().getSessionOccPeriod();
+        currentOccPeriod = getSessionBean().getSessOccPeriod();
         try {
-            if(sessionPeriod != null){
-                if(!(sessionPeriod instanceof OccPeriodDataHeavy)){
-                    currentOccPeriod = getSessionBean().getSessionOccPeriod();
-                }
-                if(currentOccPeriod.getConfiguredTS() == null){
-                    currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessionUser().getMyCredential());
-                }
-                currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-                currentInspection = currentOccPeriod.getGoverningInspection();
-                // all inspected spaces are visible by default
-                if(currentInspection != null){
-                    currentInspection.setViewSetting(ViewOptionsOccChecklistItemsEnum.ALL_ITEMS);
-                }
-            }
+            setupUnitMemberVariablesBasedOnCurrentOccPeriod();
         
 //            if(currentInspection == null){
 //                if(getSessionBean().getSessionOccInspection() != null){
@@ -233,18 +224,18 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 //                    currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
 //                } 
 //            }
-            propertyUnitCandidateList = pi.getPropertyUnitList(getSessionBean().getSessionProperty());
+            propertyUnitCandidateList = pi.getPropertyUnitList(getSessionBean().getSessProperty());
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
         
         // general setting of drop-down box lists
         try {
-            eventTypeListUserAllowed = ec.getPermittedEventTypesForOcc(currentOccPeriod, getSessionBean().getSessionUser());
+            eventTypeListUserAllowed = ec.getPermittedEventTypesForOcc(currentOccPeriod, getSessionBean().getSessUser());
             eventTypeListAll = new ArrayList();
             eventTypeListAll = ec.getEventTypesAll();
             eventCategoryListAllActive = ec.getEventCategoryListActive();
-            occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
+            occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
             currentEventRuleAbstract = ec.rules_getInitializedEventRuleAbstract();
             eventRuleSetList = ec.rules_getEventRuleSetList();
         } catch (IntegrationException ex) {
@@ -263,9 +254,10 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
         if(personCandidateList != null){
             personCandidateList = new ArrayList<>();
-            personCandidateList.addAll(getSessionBean().getSessionPersonList());
+            personCandidateList.addAll(getSessionBean().getSessPersonList());
         }
         
+        managerInspectorCandidateList = uc.assembleUserListForSearchCriteria();
         
         itemFilterOptions = Arrays.asList(ViewOptionsOccChecklistItemsEnum.values());
         inspectedElementAddValueCandidateList = Arrays.asList(OccInspectionStatusEnum.values());
@@ -281,18 +273,35 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
         
         try {
-            inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessionMuni());
+            inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessMuni());
             reportConfigOccInspec =
                     oc.getOccInspectionReportConfigDefault(
                             currentInspection,
                             currentOccPeriod,
-                            getSessionBean().getSessionUser());
+                            getSessionBean().getSessUser());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         
         periodEndDateNull = false;
         periodStartDateNull = false;
+    }
+    
+    private void setupUnitMemberVariablesBasedOnCurrentOccPeriod() throws IntegrationException, BObStatusException{
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        if(currentOccPeriod != null){
+                if(currentOccPeriod.getConfiguredTS() == null){
+                    currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessUser().getMyCredential());
+                }
+                currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+                currentInspection = currentOccPeriod.getGoverningInspection();
+                // all inspected spaces are visible by default
+                if(currentInspection != null){
+                    currentInspection.setViewSetting(ViewOptionsOccChecklistItemsEnum.ALL_ITEMS);
+                }
+            }
+        
     }
     
     public void loadSpacesInType(){
@@ -337,7 +346,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                     try {
                         oc.inspectionAction_commenceSpaceInspection(    
                                 currentInspection,
-                                getSessionBean().getSessionUser(),
+                                getSessionBean().getSessUser(),
                                 spc,
                                 selectedInspectedElementAddValue,
                                 null);
@@ -379,7 +388,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
     public void checklistAction_activateOccInspection(OccInspection ins){
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        if(getSessionBean().getSessionUser().getMyCredential().isHasEnfOfficialPermissions()){
+        if(getSessionBean().getSessUser().getMyCredential().isHasEnfOfficialPermissions()){
             try {
                 
                 oc.activateOccInspection(ins);
@@ -432,7 +441,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             sb.append(formNoteText);
             p.setNotes(sb.toString());
             
-            choiceCoord.rejectProposal(p, currentOccPeriod, getSessionBean().getSessionUser());
+            choiceCoord.rejectProposal(p, currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             "Proposal id " + p.getProposalID() + " has been rejected!", ""));
         } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
@@ -449,7 +458,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 oc.evaluateProposal(    p, 
                                         choice, 
                                         currentOccPeriod, 
-                                        getSessionBean().getSessionUser());
+                                        getSessionBean().getSessUser());
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
             }
@@ -466,7 +475,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         ChoiceCoordinator cc = getChoiceCoordinator();
          System.out.println("OccInspectionBB.clearChoice");
         try {
-            cc.clearProposalEvaluation(p, getSessionBean().getSessionUser());
+            cc.clearProposalEvaluation(p, getSessionBean().getSessUser());
             
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
@@ -494,19 +503,21 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    private void reloadCurrentOccPeriodDataHeavy(){
+    public void reloadCurrentOccPeriodDataHeavy(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessionUser().getMyCredential());
+            currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessUser().getMyCredential());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Reloaded occ period ID " + currentOccPeriod.getPeriodID(), ""));
+            setupUnitMemberVariablesBasedOnCurrentOccPeriod();
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Unable to reload occ period", ""));
         }
+        
     }
     
     public void markInspectionAsGoverning(OccInspection insp){
@@ -531,7 +542,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.inspectionAction_commenceSpaceInspection(currentInspection,
-                            getSessionBean().getSessionUser(),
+                            getSessionBean().getSessUser(),
                             space,
                             selectedInspectedElementAddValue,
                             null);
@@ -671,7 +682,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                                                                 currentOccPeriod, 
                                                                 null, 
                                                                 includeEventRuleInCurrentOccPeriodTemplate,
-                                                                getSessionBean().getSessionUser());
+                                                                getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "New event rule added with ID " + freshEventRuleID, ""));
@@ -690,7 +701,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
         try {
             EventRuleAbstract era = ec.rules_getEventRuleAbstract(formEventRuleIDToAdd);
-            ec.rules_attachEventRule(era, currentOccPeriod, getSessionBean().getSessionUser());
+            ec.rules_attachEventRule(era, currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Success! added rule to occ period", ""));
@@ -706,7 +717,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public void rules_addEventRuleSet(EventRuleSet ers){
         EventCoordinator ec = getEventCoordinator();
         try {
-            ec.rules_attachRuleSet(ers, currentOccPeriod, getSessionBean().getSessionUser());
+            ec.rules_attachRuleSet(ers, currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Success! added rule set to occ period", ""));
@@ -723,7 +734,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public void events_loadEventCategories() throws IntegrationException{
         System.out.println("OccInspectionBB.loadEventCategories | selected type: " + selectedEventType);
         EventCoordinator ec = getEventCoordinator();
-        eventCategoryListUserAllowed = ec.loadEventCategoryListUserAllowed(selectedEventType, getSessionBean().getSessionUser());
+        eventCategoryListUserAllowed = ec.loadEventCategoryListUserAllowed(selectedEventType, getSessionBean().getSessUser());
         
     }
     
@@ -750,7 +761,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         if(selectedInspectionTemplate != null){
             OccupancyCoordinator oc = getOccupancyCoordinator();
             try {
-                oc.activateOccInspection(oc.inspectionAction_commenceOccupancyInspection(null, selectedInspectionTemplate, currentOccPeriod, getSessionBean().getSessionUser()));
+                oc.activateOccInspection(oc.inspectionAction_commenceOccupancyInspection(null, selectedInspectionTemplate, currentOccPeriod, getSessionBean().getSessUser()));
                 reloadCurrentOccPeriodDataHeavy();
                 reloadCurrentInspection();
                 getFacesContext().addMessage(null,
@@ -769,9 +780,26 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
+    /**
+     * Action listener for new note
+     * @param ev 
+     */
     public void initiateNoteOnInspection(ActionEvent ev){
         formNoteText = null;
     }
+    
+    
+    
+    /**
+     * Action listener for new note on the occ period itself
+     * @param ev 
+     */
+    public void initiateNoteOnPeriod(ActionEvent ev){
+        formNoteText = null;
+    }
+    
+    
+    
     
     public void attachNoteToInspection(ActionEvent ev){
                  OccInspectionIntegrator oii = getOccInspectionIntegrator();
@@ -799,6 +827,33 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * Listener method called when the user is done creating a new note text
+     * @param ev 
+     */
+    public void attachNoteToPeriod(ActionEvent ev){
+        SystemCoordinator sc = getSystemCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentOccPeriod.setNotes(  sc.formatAndAppendNote(getSessionBean().getSessUser(),
+                                    getSessionBean().getSessUser().getMyCredential(),
+                                    formNoteText,
+                                    currentOccPeriod.getNotes()));
+        try {
+            oc.attachNoteToOccPeriod(currentOccPeriod);
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_INFO,
+               "Success! Note added", ""));
+        } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                   ex.getMessage(), ""));
+        }
+    }
+    
+    
+    
+        
+    
+    /**
      * Utility method called when the user begins inspection report process.
      * The report object is put in place on the bean during init()
      * @param ev 
@@ -818,7 +873,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
     public void reports_initializeOccPermitReport(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        currentOccPermit = oc.getOccPermitSkeleton(getSessionBean().getSessionUser());
+        currentOccPermit = oc.getOccPermitSkeleton(getSessionBean().getSessUser());
     }
 
     public String reports_generateOccPermit(OccPermit permit){
@@ -827,7 +882,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         reportConfigOccPermit = oc.getOccPermitReportConfigDefault( currentOccPermit, 
                                                                     currentOccPeriod, 
                                                                     currentPropertyUnit, 
-                                                                    getSessionBean().getSessionUser());
+                                                                    getSessionBean().getSessUser());
         getSessionBean().setReportConfigOccPermit(reportConfigOccPermit);
         
         return "occPermit";
@@ -848,13 +903,13 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         OccupancyCoordinator oc = getOccupancyCoordinator();
 
         // category is already set from initialization sequence
-        currentEvent.setOwner(getSessionBean().getSessionUser());
+        currentEvent.setOwner(getSessionBean().getSessUser());
         try {
         
 //             main entry point for handing the new event off to the CaseCoordinator
 //             only the compliance events need to pass in another object--the violation
 //             otherwise just the case and the event go to the coordinator
-            oc.attachNewEventToOccPeriod(currentOccPeriod, currentEvent, getSessionBean().getSessionUser());
+            oc.attachNewEventToOccPeriod(currentOccPeriod, currentEvent, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully logged event with an ID " + currentEvent.getEventID(), ""));
@@ -889,7 +944,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void checklistAction_editOccupancyInspectionMetadata(ActionEvent e){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.updateOccInspection(currentInspection, getSessionBean().getSessionUser());
+            oc.updateOccInspection(currentInspection, getSessionBean().getSessUser());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -898,7 +953,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void checklistAction_removeSpaceFromChecklist(OccInspectedSpace spc){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.inspectionAction_removeSpaceFromChecklist(spc, getSessionBean().getSessionUser(), currentInspection);
+            oc.inspectionAction_removeSpaceFromChecklist(spc, getSessionBean().getSessUser(), currentInspection);
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Successfully removed InspectedSpace ID: " + spc.getInspectedSpaceID() , ""));
@@ -914,7 +969,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.inspectionAction_recordComplianceWithInspectedElement(    inSpcEl,
-                                                        getSessionBean().getSessionUser(),
+                                                        getSessionBean().getSessUser(),
                                                         currentInspection);
             reloadCurrentInspection();
              getFacesContext().addMessage(null,
@@ -932,7 +987,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.inspectionAction_inspectWithoutCompliance(inSpcEl,
-                                                        getSessionBean().getSessionUser(),
+                                                        getSessionBean().getSessUser(),
                                                         currentInspection);
             reloadCurrentInspection();
              getFacesContext().addMessage(null,
@@ -950,7 +1005,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.inspectionAction_inspectWithoutCompliance(inSpcEl,
-                                        getSessionBean().getSessionUser(),
+                                        getSessionBean().getSessUser(),
                                         currentInspection);
             reloadCurrentInspection();
              getFacesContext().addMessage(null,
@@ -969,7 +1024,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.clearInspectionOfElement(    inSpcEl,
-                                            getSessionBean().getSessionUser(),
+                                            getSessionBean().getSessUser(),
                                             currentInspection);
             reloadCurrentInspection();
              getFacesContext().addMessage(null,
@@ -1020,7 +1075,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void checklistAction_certifyInspection(ActionEvent ev){
          OccupancyCoordinator oc = getOccupancyCoordinator();
          currentInspection.setPassedInspectionTS(LocalDateTime.now());
-         currentInspection.setPassedInspectionCertifiedBy(getSessionBean().getSessionUser());
+         currentInspection.setPassedInspectionCertifiedBy(getSessionBean().getSessUser());
         try {
             oc.updateOccInspection(currentInspection, selectedInspector);
              getFacesContext().addMessage(null,
@@ -1054,7 +1109,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
          
          System.out.println("OccInspectionBB.certifuyOccPeriodField | field: " + field + " | mode: " + certifymode);
          
-         User u = getSessionBean().getSessionUser();
+         User u = getSessionBean().getSessUser();
          LocalDateTime now = LocalDateTime.now();
          
          switch(field){
@@ -1107,7 +1162,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Successfully udpated field status!", ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 ex.getMessage(), ""));
@@ -1120,7 +1175,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void authorizeOccPeriod(ActionEvent ev){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.authorizeOccPeriod(currentOccPeriod, getSessionBean().getSessionUser());
+            oc.authorizeOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO,
                "Success! Occupancy period ID " + currentOccPeriod.getPeriodID() 
@@ -1150,14 +1205,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      }
      
      public String editOccPeriodPayments(){
-         getSessionBean().setSessionOccPeriod(currentOccPeriod);
+         getSessionBean().setSessOccPeriod(currentOccPeriod);
          getSessionBean().setPaymentRedirTo("inspection");
          
          return "payments";
      }
      
      public String editOnePayment(Payment thisPayment){
-         getSessionBean().setSessionPayment(thisPayment);
+         getSessionBean().setSessPayment(thisPayment);
          getSessionBean().setPaymentRedirTo("inspection");
          
          return "payments";
@@ -1185,12 +1240,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      
      public void updateOccPeriodCommit(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
+        if(selectedManager != null){
+            currentOccPeriod.setManager(selectedManager);
+        }
+        
+        if(selectedOccPeriodType != null){
+            currentOccPeriod.setType(selectedOccPeriodType);
+        }
+        
         try {
-            oc.updateOccPeriod(currentOccPeriod, getSessionBean().getSessionUser());
+            oc.updateOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Update successful on OccPeriod ID: " + currentOccPeriod.getPeriodID(), ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 ex.getMessage(), ""));
@@ -1317,17 +1380,17 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the inspectorCandidateList
+     * @return the managerInspectorCandidateList
      */
-    public List<User> getInspectorCandidateList() {
-        return inspectorCandidateList;
+    public List<User> getManagerInspectorCandidateList() {
+        return managerInspectorCandidateList;
     }
 
     /**
-     * @param inspectorCandidateList the inspectorCandidateList to set
+     * @param managerInspectorCandidateList the managerInspectorCandidateList to set
      */
-    public void setInspectorCandidateList(List<User> inspectorCandidateList) {
-        this.inspectorCandidateList = inspectorCandidateList;
+    public void setManagerInspectorCandidateList(List<User> managerInspectorCandidateList) {
+        this.managerInspectorCandidateList = managerInspectorCandidateList;
     }
 
     /**
@@ -2078,6 +2141,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedFee(MoneyOccPeriodFeeAssigned selectedFee) {
         this.selectedFee = selectedFee;
+    }
+
+    /**
+     * @return the selectedManager
+     */
+    public User getSelectedManager() {
+        return selectedManager;
+    }
+
+    /**
+     * @param selectedManager the selectedManager to set
+     */
+    public void setSelectedManager(User selectedManager) {
+        this.selectedManager = selectedManager;
     }
 
     

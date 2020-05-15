@@ -55,6 +55,8 @@ public  class       OccPeriod
     
     protected String notes;
     
+    protected boolean active;
+    
    
     
     /**
@@ -384,5 +386,19 @@ public  class       OccPeriod
      */
     public void setGoverningInspection(OccInspection governingInspection) {
         this.governingInspection = governingInspection;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

@@ -92,6 +92,29 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     }
     
+    /**
+     * Assembles a special subclass of OccPeriod that contains a PropertyUnitWithProp object for
+     * displaying property address info
+     * @param periodid
+     * @return
+     * @throws IntegrationException 
+     */
+    public OccPeriodPropertyUnitified getOccPeriodPropertyUnitified(int periodid) throws IntegrationException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        OccPeriodPropertyUnitified oppu = new OccPeriodPropertyUnitified(getOccPeriod(periodid));
+        oppu.setPropUnitProp(pc.getPropertyUnitWithProp(oppu.getPropertyUnitID()));
+        return oppu;
+    }
+    
+    public List<OccPeriodPropertyUnitified> getOccPeriodPropertyUnitifiedList(List<OccPeriod> perList) throws IntegrationException{
+        List<OccPeriodPropertyUnitified> oppuList = new ArrayList<>();
+        for(OccPeriod op: perList){
+            oppuList.add(getOccPeriodPropertyUnitified(op.getPeriodID()));
+        }
+        
+        return oppuList;
+        
+    }
     
     /**
      * Retrieval point for Data-rich occupancy periods
@@ -111,12 +134,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         SearchCoordinator sc = getSearchCoordinator();
         EventCoordinator ec = getEventCoordinator();
         
+        
         OccPeriodDataHeavy opdh = new OccPeriodDataHeavy(per);
         
         // now get all the lists from their respective integrators
         // this is the Java version of table joins in SQL; we're doing them interatively
         // in our integrators for each BOB
         try {
+            per = oi.getOccPeriod(per.getPeriodID());
             // APPLICATION LIST
             opdh.setApplicationList(oi.getOccPermitApplicationList(opdh));
 
@@ -154,7 +179,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             
             opdh.setGoverningInspection(designateGoverningInspection(opdh));
         
-        } catch (BObStatusException | SearchException ex) {
+        } catch (BObStatusException | SearchException | EventException | AuthorizationException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
         } 
         
@@ -391,7 +416,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
         rpt.setCreator(usr);
-        rpt.setMuni(getSessionBean().getSessionMuni());
+        rpt.setMuni(getSessionBean().getSessMuni());
 
         rpt.setDefaultItemIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()))));
@@ -497,7 +522,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
     
     
-    
+    /**
+     * Initialization method for creating a skeleton of an OccPeriod with 
+     * sensible default values for first insertion into DB
+     * @param p
+     * @param pu
+     * @param perType
+     * @param u
+     * @param muni
+     * @return
+     * @throws IntegrationException 
+     */
     public OccPeriod initOccPeriod(         Property p, 
                                             PropertyUnit pu, 
                                             OccPeriodType perType,
@@ -542,6 +577,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @return the unique ID given to the fresh OccPeriod by the database 
      * @throws IntegrationException
      * @throws InspectionException 
+     * @throws com.tcvcog.tcvce.domain.EventException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
+     * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
     public int insertNewOccPeriod(OccPeriod op, UserAuthorized u) 
             throws  IntegrationException, 
@@ -717,14 +755,35 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return occpermitapp;
     }
 
-    public void updateOccPeriod(OccPeriod period, User u) throws IntegrationException {
+    /**
+     * Logic pass through method for updates on the OccPeriod
+     * @param period
+     * @param u
+     * @throws IntegrationException
+     * @throws BObStatusException if the OccPeriod is authorized
+     */
+    public void updateOccPeriod(OccPeriod period, User u) throws IntegrationException, BObStatusException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
 
-        // TODO needs to check for status of period, if the period is auhtorized, only
-        // some udpates will be allowed
+        if(period.getAuthorizedTS() != null){
+            throw new BObStatusException("Cannot change period type or manager on an authorized period; the period must first be unauthorized");
+        }
 
         oi.updateOccPeriod(period);
     }
+    
+    /**
+     * Attaches a note to the given Occ Period. 
+     * @param period whose note field contains the properly formatted note
+     * that includes all old note text. This is best done by a call to the 
+     * SystemCoordinator's appendNoteBlock() method
+     * @throws IntegrationException 
+     */
+    public void attachNoteToOccPeriod(OccPeriod period) throws IntegrationException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        oi.updateOccPeriod(period);
+    }
+    
 
     public void updateOccInspection(OccInspection is, User u) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();

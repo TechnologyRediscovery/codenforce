@@ -50,6 +50,8 @@ public class        CECase
     protected List<Citation> citationList;
     protected List<NoticeOfViolation> noticeList;
     protected List<CodeViolation> violationList;
+    
+    protected boolean active;
 
     @Override
     public String toString() {
@@ -432,6 +434,20 @@ public class        CECase
      */
     public void setViolationList(List<CodeViolation> violationList) {
         this.violationList = violationList;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
   

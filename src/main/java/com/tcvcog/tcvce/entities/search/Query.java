@@ -13,6 +13,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public abstract class   Query<E extends BOb>
     private RoleType userRankAccessMinimum;
     private Credential credential;
     
-    private String resultsMessage;
+    private StringBuilder resultsMessage;
     private LocalDateTime executionTimestamp;
     
     
@@ -60,11 +61,20 @@ public abstract class   Query<E extends BOb>
      */
     public Query(Credential c) {
         this.credential = c;
+        this.resultsMessage = new StringBuilder();
+        initLog();
         
     }
     
     public Query(){
+        this.resultsMessage = new StringBuilder();
+        initLog();
         //blank
+    }
+    
+    private void initLog(){
+        resultsMessage.append(Constants.FMT_SEARCH_HEAD_QUERYOG);
+        resultsMessage.append(Constants.FMT_HTML_BREAK);
     }
     
     /**
@@ -123,6 +133,8 @@ public abstract class   Query<E extends BOb>
     
     
     
+    
+    
     /**
      * @return the credentialSignature
      */
@@ -137,6 +149,10 @@ public abstract class   Query<E extends BOb>
    
     public Credential getCredential(){
         return credential;
+    }
+    
+    public boolean isQueryExecuted(){
+        return executionTimestamp != null;
     }
     
 
@@ -160,18 +176,46 @@ public abstract class   Query<E extends BOb>
     /**
      * @return the resultsMessage
      */
-    public String getResultsMessage() {
-        return resultsMessage;
+    public String getQueryLog() {
+        resultsMessage.append(Constants.FMT_NOTE_SEP_INTERNAL);
+        resultsMessage.append(Constants.FMT_HTML_BREAK);
+        resultsMessage.append("EXECUTION TIMESTAMP: ");
+        resultsMessage.append(getExecutionTimestampPretty());
+        return resultsMessage.toString();
     }
 
     /**
-     * @param resultsMessage the resultsMessage to set
+     * @param msg
      */
-    public void setResultsMessage(String resultsMessage) {
-        this.resultsMessage = resultsMessage;
+    public void appendToQueryLog(String msg) {
+        if(msg != null){
+            resultsMessage.append(Constants.FMT_NOTE_SEP_INTERNAL);
+            resultsMessage.append(Constants.FMT_HTML_BREAK);
+            resultsMessage.append(msg);
+            resultsMessage.append(Constants.FMT_HTML_BREAK);
+        }
     }
-
     
+    public void appendToQueryLog(SearchParams sp){
+        if(sp != null){
+            resultsMessage.append(Constants.FMT_SEARCH_HEAD_FILTERLOG);
+            resultsMessage.append(Constants.FMT_HTML_BREAK);
+            resultsMessage.append("FILTER NAME: ");
+            resultsMessage.append(sp.getFilterName());
+            resultsMessage.append(Constants.FMT_HTML_BREAK);
+            resultsMessage.append("EXECUTION LOG: ");
+            resultsMessage.append(Constants.FMT_HTML_BREAK);
+            resultsMessage.append(sp.getParamLog());
+            resultsMessage.append(Constants.FMT_HTML_BREAK);
+            resultsMessage.append("RAW SQL: ");
+            resultsMessage.append(sp.extractRawSQL());
+        }
+        
+    }
+    
+    public void clearQueryLog(){
+        resultsMessage = new StringBuilder();
+    }
 
     /**
      * @return the executionTimestamp
@@ -197,6 +241,7 @@ public abstract class   Query<E extends BOb>
         return null;
     }
 
+    
    
    
     

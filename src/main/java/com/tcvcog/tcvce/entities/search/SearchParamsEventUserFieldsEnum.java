@@ -27,7 +27,7 @@ public enum SearchParamsEventUserFieldsEnum
         implements IFace_userFieldHolder{
     
     CREATOR              ("Event creator", 
-                            "owner_userid"); 
+                            "event.owner_userid"); 
     
     private final String title;
     private final String dbField;

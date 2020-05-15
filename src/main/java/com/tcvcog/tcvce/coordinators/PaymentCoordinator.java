@@ -76,7 +76,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
                 skeleton.setOccPeriodID(period.getPeriodID());
                 skeleton.setOccPeriodTypeID(period.getType().getTypeID());
                 skeleton.setMoneyFeeAssigned(fee.getOccupancyInspectionFeeID());
-                skeleton.setAssignedBy(getSessionBean().getSessionUser());
+                skeleton.setAssignedBy(getSessionBean().getSessUser());
                 skeleton.setAssigned(LocalDateTime.now());
                 skeleton.setLastModified(LocalDateTime.now());
                 skeleton.setNotes("Automatically assigned");

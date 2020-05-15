@@ -78,9 +78,9 @@ public class CECaseSearchBB
         UserCoordinator uc = getUserCoordinator();
         
         SessionBean sb = getSessionBean();
-        setCurrentCase(sb.getSessionCECase());
+        setCurrentCase(sb.getSessCECase());
         
-        setQueryList(sc.buildQueryCECaseList(getSessionBean().getSessionUser().getMyCredential()));
+        setQueryList(sc.buildQueryCECaseList(getSessionBean().getSessUser().getMyCredential()));
         setSelectedCECaseQuery(getSessionBean().getQueryCECase());
         
         setSearchParams(getSelectedCECaseQuery().getSearchParamsList().get(0));
@@ -116,14 +116,14 @@ public class CECaseSearchBB
         
         System.out.println("CaseProfileBB.manageCECase | caseid: " + c.getCaseID());
         try {
-            si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), c);
+            si.logObjectView_OverwriteDate(getSessionBean().getSessUser(), c);
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         setCurrentCase(c);
         try {
-            getSessionBean().setSessionCECase(cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessionUser().getMyCredential()));
-            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(c.getProperty(), getSessionBean().getSessionUser().getMyCredential()));
+            getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential()));
+            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(c.getProperty(), getSessionBean().getSessUser().getMyCredential()));
         } catch (BObStatusException | IntegrationException | SearchException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -185,13 +185,13 @@ public class CECaseSearchBB
     
 
     public String generateReportCECaseList() {
-        getReportCECaseList().setCreator(getSessionBean().getSessionUser());
-        getReportCECaseList().setMuni(getSessionBean().getSessionMuni());
+        getReportCECaseList().setCreator(getSessionBean().getSessUser());
+        getReportCECaseList().setMuni(getSessionBean().getSessMuni());
         getReportCECaseList().setGenerationTimestamp(LocalDateTime.now());
         
         getSessionBean().setReportConfigCECaseList(getReportCECaseList());
         getSessionBean().setReportConfigCECase(null);
-        getSessionBean().setSessionReport(getReportCECaseList());
+        getSessionBean().setSessReport(getReportCECaseList());
         
         return "reportCECaseList";
 

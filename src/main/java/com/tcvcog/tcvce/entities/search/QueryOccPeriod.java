@@ -12,6 +12,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitified;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,15 +24,13 @@ import java.util.Objects;
 public class    QueryOccPeriod 
         extends Query{
 
-  
-
     /**
      * Holds this Query's identity Enum which includes the Query's
      * title and description.
      */
     private QueryOccPeriodEnum queryName;
     private List<SearchParamsOccPeriod> searchParamsList; 
-    private List<OccPeriod> results;
+    private List<OccPeriodPropertyUnitified> results;
 
     public QueryOccPeriod(QueryOccPeriodEnum name,
                         List<SearchParamsOccPeriod> params,
@@ -79,7 +78,7 @@ public class    QueryOccPeriod
        
    }
     
-    public void addToResults(List<OccPeriod> l){
+    public void addToResults(List<OccPeriodPropertyUnitified> l){
         results.addAll(l);
     }
     
@@ -88,7 +87,7 @@ public class    QueryOccPeriod
     /**
      * @return the results
      */
-    public List<OccPeriod> getResults() {
+    public List<OccPeriodPropertyUnitified> getResults() {
         return results;
     }
 
@@ -97,7 +96,7 @@ public class    QueryOccPeriod
     }
 
     @Override
-    public List<OccPeriod> getBOBResultList() {
+    public List<OccPeriodPropertyUnitified> getBOBResultList() {
         return results;
     }
 

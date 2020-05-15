@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -30,8 +31,8 @@ public  class           SearchParams
         implements      Serializable{
 
     
-    private String searchName;
-    private String searchDescription;
+    private String filterName;
+    private String filterDescription;
     
     private StringBuilder sql;
     
@@ -84,10 +85,13 @@ public  class           SearchParams
     @Override
    public String toString(){
        StringBuilder sb = new StringBuilder();
-       sb.append("Muni: ");
-       sb.append(muni_val.getMuniName());
+       sb.append(filterName);
+       sb.append(" ");
+       sb.append(filterDescription);
        return sb.toString();
    }
+   
+   
    
    public void appendSQL(String str){
        if(str != null){
@@ -96,6 +100,7 @@ public  class           SearchParams
    }
    
    public void clearSQL(){
+       System.out.println("SearchParams.clearSQL");
        sql = new StringBuilder();
    }
    
@@ -104,14 +109,20 @@ public  class           SearchParams
         return sql.toString();
    }
    
-   public void logMessage(String str){
+   public void appendToParamLog(String str){
        if(str != null){
-            log.append(str);
+           log.append(Constants.FMT_HTML_BREAK);
+           log.append(Constants.FMT_SPLAT);
+           log.append(str);
        }
    }
    
-   public String getLog(){
+   public String getParamLog(){
         return log.toString();
+   }
+   
+   public void clearParamLog(){
+       log = new StringBuilder();
    }
    
    
@@ -299,31 +310,31 @@ public  class           SearchParams
     }
 
     /**
-     * @return the searchName
+     * @return the filterName
      */
-    public String getSearchName() {
-        return searchName;
+    public String getFilterName() {
+        return filterName;
     }
 
     /**
-     * @param searchName the searchName to set
+     * @param filterName the filterName to set
      */
-    public void setSearchName(String searchName) {
-        this.searchName = searchName;
+    public void setFilterName(String filterName) {
+        this.filterName = filterName;
     }
 
     /**
-     * @return the searchDescription
+     * @return the filterDescription
      */
-    public String getSearchDescription() {
-        return searchDescription;
+    public String getFilterDescription() {
+        return filterDescription;
     }
 
     /**
-     * @param searchDescription the searchDescription to set
+     * @param filterDescription the filterDescription to set
      */
-    public void setSearchDescription(String searchDescription) {
-        this.searchDescription = searchDescription;
+    public void setFilterDescription(String filterDescription) {
+        this.filterDescription = filterDescription;
     }
 
     /**

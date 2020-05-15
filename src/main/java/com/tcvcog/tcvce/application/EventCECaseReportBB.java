@@ -26,7 +26,7 @@ public class EventCECaseReportBB extends BackingBeanUtils{
     
     @PostConstruct
     public void initBean(){
-        Report configs = getSessionBean().getSessionReport();
+        Report configs = getSessionBean().getSessReport();
         if(configs instanceof ReportConfigCEEventList){
             reportConfig = (ReportConfigCEEventList) configs;
         }

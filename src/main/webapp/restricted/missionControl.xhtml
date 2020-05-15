@@ -38,24 +38,11 @@
                                          footer=""
                                          toggleableHeader="true"
                                          menuTitle="">
-
-                                    <p:selectOneListbox id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
-                                        <f:converter converterId="muniConverter"/>
-                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                        <f:selectItems id="muniNameList" 
-                                                       value="#{systemServicesBB.bbSessionUser.authMuniList}" 
-                                                       var="m" 
-                                                       itemValue="#{m}" 
-                                                       itemLabel="#{m.muniName}" />
-                                        <p:ajax update="dash-switchmuni-button-switch" />
-                                    </p:selectOneListbox>
-                                    <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     <p:commandButton    id="dash-switchmuni-button-switch"
-                                                        disabled="#{empty missionControlBB.selectedMuni}"
-                                                        value="switch to #{missionControlBB.selectedMuni.muniName}" 
+                                                        disabled="false"
+                                                        value="Change session credential" 
                                                         styleClass="button" 
-                                                        action="#{sessionInitializer.configureSession(missionControlBB.currentUser, missionControlBB.selectedMuni, null)}" 
+                                                        action="#{missionControlBB.reauthenticate}" 
                                                         icon="fa fa-exchange" />
                                 </p:panel>
                                 
@@ -64,7 +51,7 @@
                                          collapsed="false"
                                          closable="true"
                                          toggleable="true"
-                                         header="Switch your user"
+                                         header="Switch user"
                                          rendered="true"
                                          footer=""
                                          toggleableHeader="true"
@@ -77,7 +64,7 @@
                                                        value="#{missionControlBB.userList}"
                                                        var="u" itemValue="#{u}" itemLabel="#{u.username} (#{u.userID})" />
                                         <p:ajax update="dash-switchuser-button-switch" />
-                                    </p:selectOneMenu>>
+                                    </p:selectOneMenu>
                                     <h:message for="dash-switchuser-solb-chooseuser" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     <p:commandButton    id="dash-switchuser-button-switch"

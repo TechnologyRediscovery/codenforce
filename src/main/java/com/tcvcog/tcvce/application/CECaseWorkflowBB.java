@@ -77,7 +77,7 @@ public  class CECaseWorkflowBB
     public void initBean() {
         CaseCoordinator caseCoord = getCaseCoordinator();
         SessionBean sb = getSessionBean();
-        currentCase = sb.getSessionCECase();
+        currentCase = sb.getSessCECase();
         
         ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
         if (rpt != null) {
@@ -90,7 +90,7 @@ public  class CECaseWorkflowBB
         CaseCoordinator cc = getCaseCoordinator();
         try {
             if(p instanceof ProposalCECase){
-                cc.evaluateProposal(p, choice, currentCase, getSessionBean().getSessionUser());
+                cc.evaluateProposal(p, choice, currentCase, getSessionBean().getSessUser());
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
             }
@@ -133,8 +133,8 @@ public  class CECaseWorkflowBB
 
         reportCECase.setCse(currentCase);
 
-        reportCECase.setCreator(getSessionBean().getSessionUser());
-        reportCECase.setMuni(getSessionBean().getSessionMuni());
+        reportCECase.setCreator(getSessionBean().getSessUser());
+        reportCECase.setMuni(getSessionBean().getSessMuni());
         reportCECase.setGenerationTimestamp(LocalDateTime.now());
 
         try {
@@ -148,7 +148,7 @@ public  class CECaseWorkflowBB
         getSessionBean().setReportConfigCECase(reportCECase);
         // this is for use by the report header to have a super class with only
         // the basic info. reportingBB exposes it to the faces page
-        getSessionBean().setSessionReport(reportCECase);
+        getSessionBean().setSessReport(reportCECase);
         // force our reportingBB to choose the right bundle
         getSessionBean().setReportConfigCECaseList(null);
 

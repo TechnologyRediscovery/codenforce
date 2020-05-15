@@ -40,7 +40,7 @@ public  class       CECasePaymentsBB
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
-        currentCase = sb.getSessionCECase();
+        currentCase = sb.getSessCECase();
        
     }
     /**
@@ -51,21 +51,21 @@ public  class       CECasePaymentsBB
 
        
      public String editOccPeriodPayments(){
-         getSessionBean().setSessionCECase(currentCase);
+         getSessionBean().setSessCECase(currentCase);
          getSessionBean().setPaymentRedirTo("inspection");
          
          return "payments";
      }
      
      public String editOnePayment(Payment thisPayment){
-         getSessionBean().setSessionPayment(thisPayment);
+         getSessionBean().setSessPayment(thisPayment);
          getSessionBean().setPaymentRedirTo("inspection");
          
          return "payments";
      }
      
      public String editOccPeriodFees(){
-         getSessionBean().setSessionCECase(currentCase);
+         getSessionBean().setSessCECase(currentCase);
          getSessionBean().setFeeRedirTo("inspection");
          
          return "editFees";

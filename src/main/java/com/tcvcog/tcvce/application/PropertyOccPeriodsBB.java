@@ -60,8 +60,8 @@ public class PropertyOccPeriodsBB
      
     @PostConstruct
     public void initBean(){
-        currProp = getSessionBean().getSessionProperty();
-        occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
+        currProp = getSessionBean().getSessProperty();
+        occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
     }
     /**
      * Final step in creating a new occ period
@@ -70,32 +70,28 @@ public class PropertyOccPeriodsBB
     public String addNewOccPeriod(){
         
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        OccupancyIntegrator oi = getOccupancyIntegrator();
         try {
             if(getSelectedOccPeriodType() != null){
                 System.out.println("PropertyProfileBB.initateNewOccPeriod | selectedType: " + getSelectedOccPeriodType().getTypeID());
-                setCurrOccPeriod(oc.initOccPeriod(getCurrProp(), getCurrPropUnit(), getSelectedOccPeriodType(), getSessionBean().getSessionUser(), getSessionBean().getSessionMuni()));
+                setCurrOccPeriod(oc.initOccPeriod(getCurrProp(), getCurrPropUnit(), getSelectedOccPeriodType(), getSessionBean().getSessUser(), getSessionBean().getSessMuni()));
                 getCurrOccPeriod().setType(getSelectedOccPeriodType());
                 int newID = 0;
-                newID = oc.insertNewOccPeriod(getCurrOccPeriod(), getSessionBean().getSessionUser());
-                getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessionUser().getMyCredential()));
+                newID = oc.insertNewOccPeriod(getCurrOccPeriod(), getSessionBean().getSessUser());
+                getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessUser().getMyCredential()));
             } else {
                 getFacesContext().addMessage(null,
                                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                             "Please select a period type" , ""));
                 return "";
             }
-        } catch (EventException | AuthorizationException | ViolationException | IntegrationException | BObStatusException ex) {
+        } catch (EventException | AuthorizationException | ViolationException | IntegrationException | BObStatusException | InspectionException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                         "Could not commit new occ period: " , ""));
             return "";
-        } catch (InspectionException ex) { 
-            System.out.println(ex);
-            return "";
         }
-        return "inspection";
+        return "occPeriodWorkflow";
     }
     
     
@@ -103,10 +99,12 @@ public class PropertyOccPeriodsBB
        OccupancyCoordinator oc = getOccupancyCoordinator();
        if(op != null){
            try {
-               getSessionBean().setSessionOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessionUser().getMyCredential()));
+               getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessUser().getMyCredential()));
            } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex);
            }
+       } else {
+           return "";
        }
        
        return "occPeriodWorkflow";

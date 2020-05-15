@@ -16,237 +16,708 @@
 
                     <div class="mainContainer">
 
-                        <h:form id="pers-search-messages-form">
-                            <h:messages id="pers-search-messages"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                        </h:form>
 
-                            
-                        <p:panel    id="pers-search-query-panel"
-                                    toggleable="true"
-                                    widgetVar="pers-search-query-panel-var"
-                                    collapsed="false"
-                                    header="Search for persons">
-                               
-                            <h:form id="pers-search-query-form">
-                                
-                                
-                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                             columnClasses="gridTd-solid-back, gridTd-solid-back">
+                        <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                     columnClasses="gridTd, gridTd">
 
-                                    <h:panelGroup>
-                                        <p:outputLabel for="formFirstName-person">
-                                            <h:outputText value="First Name"/>
-                                        </p:outputLabel>
-                                        <p:inputText id="formFirstName-person" value="#{personsBB.searchParams.name_first_val}" 
-                                                     style="width: 200px;" tabindex="1" required="false" styleClass="inputText">
-                                        </p:inputText>
-                                        <h:message for="formFirstName-person" showDetail="true" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
+                            <h:panelGroup id="pers-search-query-pgrp">
 
-                                    <h:panelGroup id="lname-person-person">
-                                        <p:outputLabel for="formLastName-person">
-                                            <h:outputText value="Last Name"/>
-                                        </p:outputLabel>
-                                        <p:inputText id="formLastName-person" value="#{personsBB.searchParams.name_last_val}" 
-                                                     style="width: 200px;" tabindex="2" required="false" styleClass="inputText">
-                                        </p:inputText>
-                                        <h:message for="formLastName-person" showDetail="true" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-                                </h:panelGrid>
 
-                                <p:commandButton
-                                    value="Search by name only" tabindex="3" 
-                                    ajax="true" icon="fa fa-search"
-                                    process=    "@form
-                                    change-person-form:formFirstName-person
-                                    change-person-form:formLastName-person"
-                                    actionListener="#{personsBB.searchForPersons}" 
-                                    update=    ":search-params-form
-                                    change-person-form:formFirstName-person
-                                    change-person-form:formLastName-person
-                                    change-person-form:personTable
-                                    change-person-form:person-search-messages
-                                    messages-left-form:persons-messages-global"/>
-                                <hr />
+                                <p:panel    id="pers-search-query-panel"
+                                            toggleable="true"
+                                            widgetVar="pers-search-query-panel-var"
+                                            collapsed="false"
+                                            header="Search for persons">
 
-                                <p:commandButton    id="open-search-options-cb"
-                                                    ajax="true" process="@none"
-                                                    value="Advanced search options"
-                                                    disabled="!#{sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}"
-                                                    onclick="PF('search-params-dialog').show()"
-                                                    icon="fa fa-gears"/>
+                                    <h:form id="pers-search-messages-form">
+                                        <h:messages id="pers-search-messages"
+                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
 
+                                    <h:form id="search-query-form">
                                         
-                            </h:form>
-                                                
+                                        <h:outputLabel styleClass="bold" value="Available queries" for="search-query-som" />
+                                        
+                                        <p:spacer height="5px" />
+                                        
+                                        <p:selectOneMenu id="search-query-som" tabindex="1" value="#{personSearchBB.querySelected}">
+                                            <f:converter converterId="bOBQueryConverter"/>
+                                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                            <f:selectItems id="search-query-si" value="#{personSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                            <p:ajax update="pers-search-messages-form
+                                                    search-query-form
+                                                    search-params-form"
+                                                    listener="#{personSearchBB.changeQuerySelected}"/>
+                                        </p:selectOneMenu>
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputLabel styleClass="bold" value="Description " />
+
+                                        <div class='logoutput'>
+                                            <h:outputText id="search-query-desc-ot" value="#{personSearchBB.querySelected.queryName.desc}" />
+                                        </div>
+
+                                        <p:spacer height="5px" />
+                                        
+                                        <p:outputLabel for="pers-query-appendresults-chkbx">
+                                                <h:outputText value="Append results to current result list? "
+                                                              styleClass="bold"/>
+                                        </p:outputLabel>
+                                        
+                                         <p:selectBooleanCheckbox   id="pers-query-appendresults-chkbx" 
+                                                                    value="#{personSearchBB.appendResultsToList}" 
+                                                                    disabled="false" />
+                                        
+                                        <p:spacer height="5px" />
+                                        
+                                        <p:commandButton   id="pers-search-exec-cb" 
+                                                           ajax="true" 
+                                                           actionListener="#{personSearchBB.executeQuery}"
+                                                           icon="fa fa-search" 
+                                                           styleClass="button"
+                                                           value="execute selected query" 
+                                                           disabled="#{personSearchBB.querySelected.queryExecuted}"
+                                                           update="pers-search-messages-form
+                                                           pers-search-results-form
+                                                           search-query-form
+                                                           log-form"/>
+                                        
+                                        <p:commandButton   id="pers-search-clearquery-cb" 
+                                                           ajax="true" 
+                                                           actionListener="#{personSearchBB.resetCurrentQuery}"
+                                                           disabled="#{!personSearchBB.querySelected.queryExecuted}"
+                                                           icon="fa fa-eraser" 
+                                                           styleClass="button"
+                                                           value="reset query" 
+                                                           update="pers-search-messages-form
+                                                           search-query-form
+                                                           log-form
+                                                           search-params-form"/>
+                                        
+                                        <p:spacer height="5px" />
+                                       
+                                        
 
 
-                        </p:panel>
-                        
+                                    </h:form>
+                                </p:panel>
+                                
+                                
+                                <p:panel    id="search-params-panel"
+                                            toggleable="true"
+                                            widgetVar="prop-search-params-panel-var"
+                                            collapsed="false"
+                                            style="width:100%;"
+                                            header="Search filters">
+                                    <h:form id="search-params-form">
+                                        
+
+                                        <h:outputLabel styleClass="bold" value="Available filters" />
+
+                                        <p:selectOneMenu id="search-params-som" tabindex="1" value="#{personSearchBB.paramsSelected}">
+                                            <f:converter converterId="searchParamsConverter"/>
+                                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                            <f:selectItems id="search-params-si" value="#{personSearchBB.querySelected.parmsList}" var="sp" itemValue="#{sp}" itemLabel="#{sp.filterName}" />
+                                            <p:ajax update="search-params-form" />
+                                        </p:selectOneMenu>
+                                        
+                                        <p:spacer height="5px" />
+                                        
+                                        <div class='logoutput'>
+                                            <h:outputText id="search-param-name-ot" 
+                                                          value="#{personSearchBB.paramsSelected.filterName}" />
+                                        </div>
+                                        
+                                        <p:spacer height="5px" />
+                                        
+                                          <h:panelGrid  columns="1" 
+                                                        cellpadding="10" 
+                                                        columnClasses="gridTd-solid-back"
+                                                        footerClass="gridFooter">
+
+                                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="gridTd-solid-back, gridTd-solid-back">
+
+                                                <h:panelGroup>
+                                                      <p:outputLabel for="pers-filter-name-first-ctl">
+                                                          <h:outputText value="First name"
+                                                                        styleClass="datum-label"/>
+                                                      </p:outputLabel>
+                                                      <p:selectBooleanCheckbox id="pers-filter-name-first-ctl" 
+                                                                               value="#{personSearchBB.paramsSelected.name_first_ctl}" 
+                                                                               disabled="#{personSearchBB.querySelected.queryExecuted}">
+                                                          <p:ajax update="pers-filter-name-first-val"/>
+                                                      </p:selectBooleanCheckbox>
+                                                  </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:outputLabel for="pers-filter-name-first-val">
+                                                        <h:outputText value="First Name"/>
+                                                    </p:outputLabel>
+                                                    <p:inputText id="pers-filter-name-first-val" value="#{personSearchBB.paramsSelected.name_first_val}" 
+                                                                 style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
+                                                                 disabled="#{!personSearchBB.paramsSelected.name_first_ctl or personSearchBB.querySelected.queryExecuted}">
+                                                    </p:inputText>
+                                                    <h:message for="pers-filter-name-first-val" showDetail="true" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+                                            </h:panelGrid>
+
+                                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="gridTd-solid-back, gridTd-solid-back">
+
+                                                <h:panelGroup>
+                                                      <p:outputLabel for="pers-filter-name-last-ctl">
+                                                          <h:outputText value="Last name"
+                                                                        styleClass="datum-label"/>
+                                                      </p:outputLabel>
+                                                      <p:selectBooleanCheckbox id="pers-filter-name-last-ctl" 
+                                                                               value="#{personSearchBB.paramsSelected.name_last_ctl}" 
+                                                                               disabled="#{personSearchBB.querySelected.queryExecuted}">
+                                                          <p:ajax update="pers-filter-name-last-val"/>
+                                                      </p:selectBooleanCheckbox>
+                                                  </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:outputLabel for="pers-filter-name-last-val">
+                                                        <h:outputText value="First Name"/>
+                                                    </p:outputLabel>
+                                                    <p:inputText id="pers-filter-name-last-val" value="#{personSearchBB.paramsSelected.name_last_val}" 
+                                                                 style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
+                                                                 disabled="#{!personSearchBB.paramsSelected.name_last_ctl or personSearchBB.querySelected.queryExecuted}">
+                                                    </p:inputText>
+                                                    <h:message for="pers-filter-name-last-val" showDetail="true" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+                                            </h:panelGrid>
+
+                                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="gridTd-solid-back, gridTd-solid-back">
+                                              
+                                                <h:panelGroup>
+                                                    <p:outputLabel for="filter-bobid-val" value="Filter by person ID?"/>
+                                                    <p:spacer height="5px"/>
+                                                    <p:selectBooleanCheckbox id="filter-bobid-ctl" value="#{personSearchBB.paramsSelected.bobID_ctl}" >
+                                                        <p:ajax update="filter-bobid-val"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel for="filter-bobid-val">
+                                                        <h:outputText value="Person ID number"/>
+                                                    </p:outputLabel>
+                                                    <p:inputText id="filter-bobid-val" value="#{personSearchBB.paramsSelected.bobID_val}" 
+                                                                 style="width: 25%;" tabindex="3" required="false" styleClass="inputText"
+                                                                 disabled="#{!personSearchBB.paramsSelected.bobID_ctl}"/>
+                                                    <h:message for="filter-bobid-val" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+                                              
+                                              <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="pers-filter-muni-ol" for="seev-filter-muni-chkbx" value="Filter by municipality? "/>
+                                                    <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" 
+                                                                             value="#{personSearchBB.paramsSelected.muni_ctl}" 
+                                                                             disabled="#{personSearchBB.querySelected.queryExecuted}">
+                                                        <p:ajax update="pers-search-muni-som"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:selectOneMenu id="pers-search-muni-som" tabindex="1" value="#{personSearchBB.paramsSelected.muni_val}"
+                                                                     disabled="#{!personSearchBB.paramsSelected.muni_ctl or personSearchBB.querySelected.queryExecuted}">
+                                                        <f:converter converterId="muniConverter"/>
+                                                        <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                                        <f:selectItems id="muniNameList" value="#{systemServicesBB.municipalityListForSearch}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                    </p:selectOneMenu>
+                                                    <h:message for="pers-search-muni-som" showDetail="true" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+                                              </h:panelGrid>
+
+                                              
+                                              
+                                        </h:panelGrid>
+                                    </h:form>
+                                </p:panel>
+                                <p:panel    id="pers-search-results-log-panel"
+                                            toggleable="true"
+                                            widgetVar="pers-search-results-log-var"
+                                            collapsed="false"
+                                            header="Query result log">
+                                    <h:form id="log-form">
+                                        
+
+                                            <h:outputLabel styleClass="bold" value="Log" />
+                                              <div class='logoutput'>
+
+                                                  <h:outputText id="search-results-querylog" 
+                                                                value="#{personSearchBB.querySelected.queryLog}" 
+                                                                escape="false"/>
+                                              </div>
+
+                                    </h:form>
+                                </p:panel>
+                                    
+                            </h:panelGroup>
                             
-                        <p:panel    id="pers-search-results-panel"
-                                    toggleable="true"
-                                    widgetVar="pers-search-results-panel-var"
-                                    collapsed="false"
-                                    header="Person search results">
-                            
-                            
+                            <h:panelGroup>
+                                <p:panel    id="pers-search-results-panel"
+                                            toggleable="true"
+                                            widgetVar="pers-search-results-panel-var"
+                                            collapsed="false"
+                                            header="Person search results in #{personSearchBB.paramsSelected.muni_val.muniName}">
+                                    
+                                    <h:form id="pers-search-results-form">
+                                        
 
-                                <h2>Search Results in <h:outputText value="#{personsBB.searchParams.muni_val.muniName}" /></h2>
+                                        <p:commandButton    id="load-history-cb"
+                                                            actionListener="#{personSearchBB.loadPersonHistory}"
+                                                            ajax="true"
+                                                            value="load person history"
+                                                            update="pers-search-results-form
+                                                            pers-search-messages-form"
+                                                            icon="fa fa-history"/>
+                                        <p:commandButton    id="clear-results-cb"
+                                                            actionListener="#{personSearchBB.clearResultList}"
+                                                            ajax="true"
+                                                            value="clear result list"
+                                                            update="pers-search-results-form
+                                                            pers-search-messages-form"
+                                                            icon="fa fa-eraser"/>
+                                        
+                                        <h:outputText value="list contains #{personSearchBB.personListSize} persons" 
+                                                          styleClass="italic"/>
+                                            <p:spacer height="5px" />
 
-                                <p:commandButton    id="load-history-cb"
-                                                    actionListener="#{personsBB.loadPersonHistory}"
-                                                    ajax="true" style="background-color: white;"
-                                                    value="Load person history"
-                                                    update="change-person-form:personTable
-                                                    messages-left-form:persons-messages-global"
-                                                    icon="fa fa-history"/>
+                                        <p:spacer height="2px"/>
 
-                                <p:spacer height="2px"/>
+                                        <p:dataTable
+                                            id="personTable"
+                                            var="per"
+                                            value="#{personSearchBB.personList}"
+                                            rowKey="#{per.personID}"
+                                            tableStyleClass="primeDataTable"
+                                            rowExpandMode="single"
+                                            resizableColumns="true"
+                                            expandedRow="false"
+                                            filteredValue="#{personSearchBB.filteredPersonList}"
+                                            widgetVar="personSelectListTable">
 
-                                <p:dataTable
-                                    id="personTable"
-                                    var="per"
-                                    value="#{personsBB.personList}"
-                                    rowKey="#{per.personID}"
-                                    tableStyleClass="primeDataTable"
-                                    rowExpandMode="single"
-                                    resizableColumns="true"
-                                    expandedRow="false"
-                                    filteredValue="#{personsBB.filteredPersonList}"
-                                    widgetVar="personSelectListTable">
+                                            <p:column width="4%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="ID" />
+                                                </f:facet>
+                                                <h:outputText value="#{per.personID}"/>
+                                            </p:column>
 
-                                    <p:column width="4%">
-                                        <f:facet name="header">
-                                            <h:outputText value="ID" />
-                                        </f:facet>
-                                        <h:outputText value="#{per.personID}"/>
-                                    </p:column>
-
-                                    <p:column width="10%" sortBy="#{per.personType.label}">
-                                        <f:facet name="header">
-                                            <h:outputText value="Person Type" />
-                                        </f:facet>
-                                        <h:outputText value="#{per.personType.label}"/>
-                                    </p:column>
+                                            <p:column width="10%" sortBy="#{per.personType.label}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Person Type" />
+                                                </f:facet>
+                                                <h:outputText value="#{per.personType.label}"/>
+                                            </p:column>
 
 
-                                    <p:column width="10%" sortBy="#{per.firstName}"
-                                              filterBy="#{per.firstName}">
-                                        <f:facet name="header">
-                                            <h:outputText value="First" />
-                                        </f:facet>
-                                        <h:outputText value="#{per.firstName}"/>
-                                    </p:column>
+                                            <p:column width="10%" sortBy="#{per.firstName}"
+                                                      filterBy="#{per.firstName}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="First" />
+                                                </f:facet>
+                                                <h:outputText value="#{per.firstName}"/>
+                                            </p:column>
 
-                                    <p:column width="10%" filterBy="#{per.lastName}"
-                                              sortBy="#{per.lastName}">
-                                        <f:facet name="header">
-                                            <h:outputText value="Last" />
-                                        </f:facet>
-                                        <h:outputText value="#{per.lastName}"/>
-                                    </p:column>
+                                            <p:column width="10%" filterBy="#{per.lastName}"
+                                                      sortBy="#{per.lastName}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Last" />
+                                                </f:facet>
+                                                <h:outputText value="#{per.lastName}"/>
+                                            </p:column>
 
-                                    <p:column   width="20%"
-                                                sortBy="#{per.addressStreet}"
-                                                filterBy="#{per.addressStreet}">
-                                        <f:facet name="header">
-                                            <h:outputText value="Address" />
-                                        </f:facet>
-                                        <h:outputText escape="false" value="#{per.addressStreet}"/>
-                                        <p:spacer height="5px"/>
-                                        <h:outputText value="#{per.addressCity}, #{per.addressState} #{per.addressZip}"/>
-                                    </p:column>
+                                            <p:column   width="20%"
+                                                        sortBy="#{per.addressStreet}"
+                                                        filterBy="#{per.addressStreet}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Address" />
+                                                </f:facet>
+                                                <h:outputText escape="false" value="#{per.addressStreet}"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText value="#{per.addressCity}, #{per.addressState} #{per.addressZip}"/>
+                                            </p:column>
 
-                                    <p:column width="10%" >
-                                        <f:facet name="header">
-                                            <h:outputText value="View" />
-                                        </f:facet>
-                                        <p:commandButton actionListener="#{personsBB.selectPerson(per)}"
-                                                         ajax="true" icon="fa fa-hand-o-right"
-                                                         value="view"
-                                                         update="selected-person-info-form
-                                                         connect-person-to-property-form"/>
+                                            <p:column width="10%" >
+                                                <f:facet name="header">
+                                                    <h:outputText value="View" />
+                                                </f:facet>
+                                                <p:commandButton action="#{personSearchBB.explorePerson(per)}"
+                                                                 ajax="false" icon="fa fa-hand-o-right"
+                                                                 value="explore"/>
 
-                                    </p:column>
-                                </p:dataTable>
-                            </h:form>
-                        </p:panel>
-                               
-                            
-                            
-                        <p:panel    id="pers-add-panel"
-                                    toggleable="true"
-                                    widgetVar="pers-search-query-panel-var"
-                                    collapsed="false"
-                                    header="Add a new person">
-                               
-                            
-                            <h:form id="start-new-person-form">
+                                            </p:column>
+                                        </p:dataTable>
+                                    </h:form>
+                                </p:panel>
 
-                                <p:commandButton    id="new-person-cb"
-                                                    ajax="true" actionListener="#{personsBB.initiatePersonCreation}"
-                                                    oncomplete="PF('person-addupdate-dialog-var').show()"
-                                                    update="person-addupdate-form"
-                                                    value="Create new Person"
-                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                    icon="fa fa-plus"
-                                                    />
-                            </h:form>
+                                <p:panel    id="pers-add-panel"
+                                            toggleable="true"
+                                            widgetVar="pers-search-query-panel-var"
+                                            collapsed="false"
+                                            header="Add a new person">
+                                    <h:form id="start-new-person-form">
 
-                        </p:panel>
-                        
-
-                    <!--close main container-->
+                                        <p:commandButton    id="new-person-cb"
+                                                            ajax="true" actionListener="#{personInfoBB.personCreateInit}"
+                                                            oncomplete="PF('person-addupdate-dialog-var').show()"
+                                                            update="person-addupdate-form"
+                                                            value="Create new Person"
+                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                            icon="fa fa-plus"
+                                                            />
+                                    </h:form>
+                                </p:panel>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                        <!--close main container-->
                     </div>
                     
                     
-                    <p:dialog   id="_________NAMEME_________"
-                                header="_________NAMEME_________" 
-                                widgetVar="_________NAMEME_________" 
-                                responsive="true" 
-                                width="400"
-                                modal="false"
-                                height="600">
-                        
-                          <h:form id="_________NAMEME_________">
-                            <h:messages id="_________NAMEME_________"
-                                        globalOnly="true" showDetail="true" showSummary="true"
+                  
+
+                    <p:dialog   id="person-addupdate-dialog"
+                                height="650" width="900"
+                                widgetVar="person-addupdate-dialog-var"
+                                closable="true" 
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                >
+
+
+                        <h:form id="person-addupdate-form">
+
+                            
+                            <h:panelGrid columns="1"
+                                         columnClasses="gridTd">
+                                <h:panelGroup id="person-update-h1-pg" rendered="#{personInfoBB.workingPerson.personID != 0}">
+                                    <h2>
+                                        <h:outputText value="Update record: " /> 
+                                        <h:outputText id="pers-form-header-fname" value="#{personInfoBB.workingPerson.firstName} "/>
+                                        <h:outputText id="pers-form-header-lname" value="#{personInfoBB.workingPerson.lastName}"/>
+                                        <h:outputText value=", " /> 
+                                        <h:outputText id="pers-form-header-id" value="ID: #{personInfoBB.workingPerson.personID}"/> 
+                                    </h2>
+                                    <p>This record was last updated on: <h:outputText id="pers-form-lastupdated" value="#{personInfoBB.workingPerson.lastUpdatedPretty}"/></p>
+                                </h:panelGroup>
+                                <h:panelGroup id="person-add-h1-pg" rendered="#{personInfoBB.workingPerson.personID == 0}">
+                                    <h2>
+                                        <h:outputText value="Create new Person" /> 
+                                    </h2>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                            
+
+
+                            <h:messages globalOnly="true" showDetail="true" showSummary="true" id="messages-global"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
-                        </h:form>
-                        
-                        <h:form id="_________NAMEME_________">
-                            
 
-                            <h2>_________NAMEME_________</h2>
+                            <h:panelGrid columns="3" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
+                                         footerClass="gridFooter">
 
-                            
-                            
-                            <p:commandButton    id="_________NAMEME_________"
-                                                value="_________NAMEME_________" 
-                                                ajax="true" 
-                                                icon="fa fa-edit"
-                                                actionListener="#{occInspectionBB.events_commitEventEdits}"
-                                                disabled="false"
-                                                rendered="true"
-                                                oncomplete="PF('_________NAMEME_________').hide()"
-                                                update=""/>
+                                <ui:remove>FIRST ROW</ui:remove>
 
-                            <p:commandLink  value="close" 
-                                            onclick="PF('_________NAMEME_________').hide()" 
-                                            styleClass="noFill"/>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Person Type:" for="personTypeSelectMenu"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectOneMenu id="personTypeSelectMenu" required="true" 
+                                                     value="#{personInfoBB.workingPerson.personType}"
+                                                     tabindex="1"
+                                                     rendered="#{!(empty personInfoBB.workingPerson)}">
+                                        <f:selectItems value="#{personCoordinator.personTypes}"
+                                                       var="pt" itemValue="#{pt}" itemLabel="#{pt.label}"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="personTypeSelectMenu" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Municipality" for="personMuniSelectMenu"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectOneMenu
+                                        id="muniSM" tabindex="2"
+                                        value="#{personInfoBB.workingPerson.muniCode}">
+                                        <f:selectItems id="muniNameList" value="#{personsBB.muniNameIDMap}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+
+                                <h:panelGroup></h:panelGroup>
+
+                                <ui:remove>SECOND ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="First Name:" for="formFirstNameIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formFirstNameIT" value="#{personInfoBB.workingPerson.firstName}" 
+                                                 style="width: 200px;" tabindex="3" required="true" styleClass="inputText"/>
+                                    <h:message for="formFirstNameIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Last Name:" for="formLastNameIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formLastNameIT" value="#{personInfoBB.workingPerson.lastName}" 
+                                                 style="width: 200px;" tabindex="4" required="true" styleClass="inputText"/>
+                                    <h:message for="formLastNameIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Job Title:" for="formJobTitleIT"/>
+                                    <p:inputText id="formJobTitleIT" value="#{personInfoBB.workingPerson.jobTitle}"
+                                                 style="width: 150px;" tabindex="5" required="false" styleClass="inputText"/>
+                                    <p:spacer height="3px"/>
+                                    <h:message for="formJobTitleIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <ui:remove>THIRD ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Phone(cell):" for="formCellIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formCellIT" value="#{personInfoBB.workingPerson.phoneCell}" 
+                                                 style="width: 150px;" tabindex="6" required="false" styleClass="inputText" maxlength="12"/>
+                                    <h:message for="formCellIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Phone(home):" for="formHomeIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formHomeIT" value="#{personInfoBB.workingPerson.phoneHome}" 
+                                                 style="width: 150px;" tabindex="7" required="false" styleClass="inputText" maxlength="12"/>
+                                    <h:message for="formHomeIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Phone(work)" for="formWorkIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formWorkIT" value="#{personInfoBB.workingPerson.phoneWork}" 
+                                                 style="width: 150px;" tabindex="8" required="false" styleClass="inputText" maxlength="12"/>
+                                    <h:message for="formWorkIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+
+                                    <h:outputLabel styleClass="bold" value="Email:" for="formEmailIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formEmailIT" value="#{personInfoBB.workingPerson.email}" 
+                                                 style="width: 250px;" tabindex="9" required="false" styleClass="inputText">
+                                        <ui:remove>
+                                            Thanks SO https://stackoverflow.com/questions/7875108/email-validation-using-regular-expression-in-jsf-2-primefaces 
+                                            <f:validateRegex pattern="(^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[\p{L}\p{M}\p{N}.-]*(\.[\p{L}\p{M}]{2,})$)?"/>
+                                        </ui:remove>
+                                    </p:inputText>
+                                    <h:message for="formEmailIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <ui:remove>FOURTH ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Street:" for="formStreetIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formStreetIT" value="#{personInfoBB.workingPerson.addressStreet}" 
+                                                 style="width: 250px;" tabindex="10" required="false" styleClass="inputText"/>
+                                    <h:message for="formStreetIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="City:" for="formCityIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formCityIT" value="#{personInfoBB.workingPerson.addressCity}" 
+                                                 style="width: 250px;" tabindex="11" required="false" styleClass="inputText"/>
+                                    <h:message for="formCityIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="State:" for="formStateIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formStateIT" value="#{personInfoBB.workingPerson.addressState}" 
+                                                 style="width: 50px;" tabindex="12" required="false" styleClass="inputText"/>
+                                    <h:message for="formStateIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="ZipCode:" for="formZipIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formZipIT" value="#{personInfoBB.workingPerson.addressZip}" 
+                                                 style="width: 100px;" tabindex="13" required="false" styleClass="inputText"/>
+                                    <h:message for="formZipIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <ui:remove>FIFTH ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Active Person?" for="isActiveFormIS"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="isActiveFormIS" value="#{personInfoBB.workingPerson.active}" tabindex="14"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Allowed to expire?" for="canexpire-sbcb"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="canexpire-sbcb" value="#{personInfoBB.workingPerson.canExpire}" 
+                                                             tabindex="15"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" for="expiry-date-cal">
+                                        <h:outputText value="Expiry date"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="3px"/>
+                                    <p:calendar value="#{personInfoBB.workingPerson.expiryDateUtilDate}" 
+                                                mode="popup"  id="expiry-date-cal"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                navigator="true" tabindex="16" timeInput="true" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true" showTodayButton="false"
+                                                required="false">
+                                    </p:calendar>
+                                    <h:message for="expiry-date-cal" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Expiry notes" for="expiry-notes-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="expiry-notes-it" value="#{personInfoBB.workingPerson.expiryNotes}" 
+                                                 style="width: 100px;" tabindex="17" required="false" styleClass="inputText"/>
+                                    <h:message for="expiry-notes-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <ui:remove>SIXTH ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Person under 18?" for="isUnder18-pupdate-sbcb"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="isUnder18-pupdate-sbcb" 
+                                                             value="#{personInfoBB.workingPerson.under18}" 
+                                                             tabindex="18"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Composite last name?" for="composite-sbcb"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="composite-sbcb" 
+                                                             value="#{personInfoBB.workingPerson.compositeLastName}" 
+                                                             tabindex="19"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Person data source ID" for="datasource-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="datasource-it" value="#{personInfoBB.workingPerson.source.title}" 
+                                                 tabindex="19"
+                                                 rendered="#{!(empty personInfoBB.workingPerson.source)}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Business entity?" for="business-sbcb"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="business-sbcb" value="#{personInfoBB.workingPerson.businessEntity}" 
+                                                             tabindex="20"/>
+                                </h:panelGroup>
+
+                                <ui:remove>SEVENTH ROW</ui:remove>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Use separate mailing address?" for="sep-mailing-sbcb"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="sep-mailing-sbcb" 
+                                                             value="#{personInfoBB.workingPerson.useSeparateMailingAddress}" 
+                                                             tabindex="21"/>
+                                </h:panelGroup>
+
+                    <ui:remove>EIGTH ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Mailing street" for="form-mail-street-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="form-mail-street-it" value="#{personInfoBB.workingPerson.mailingAddressStreet}" 
+                                                 style="width: 250px;" tabindex="22" required="false" styleClass="inputText"/>
+                                    <h:message for="form-mail-street-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Mailing city" for="form-mail-city-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="form-mail-city-it" value="#{personInfoBB.workingPerson.mailingAddressCity}" 
+                                                 style="width: 200px;" tabindex="23" required="false" styleClass="inputText"/>
+                                    <h:message for="form-mail-city-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Mailing state" for="form-mail-state-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="form-mail-state-it" value="#{personInfoBB.workingPerson.mailingAddressState}" 
+                                                 style="width: 50px;" tabindex="24" required="false" styleClass="inputText"/>
+                                    <h:message for="form-mail-state-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Mailing zip" for="form-mail-zip-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="form-mail-zip-it" value="#{personInfoBB.workingPerson.mailingAddressZip}" 
+                                                 style="width: 100px;" tabindex="25" required="false" styleClass="inputText"/>
+                                    <h:message for="form-mail-zip-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                            </h:panelGrid>
+
+                            <hr />
+
+                            <p:spacer height="5px"/>
+
+
+
+                            <p:commandButton    id="cancel-cb"
+                                                ajax="true"  tabindex="27"
+                                                value="Cancel" 
+                                                icon="fa fa-stop" 
+                                                immediate="true"
+                                                onclick="PF('person-addupdate-dialog-var').hide()"
+                                                />
+                      
+
+                            <p:commandButton id="new-person-cb" ajax="false"
+                                             value="Create new Person" 
+                                             action="#{personInfoBB.personCreateCommit}"
+                                             icon="fa fa-plus" tabindex="29"
+                                             oncomplete="PF('person-addupdate-dialog-var').hide()"
+                                             disabled="#{personInfoBB.workingPerson.personID != 0}"
+                                             update="messages-left-form"
+                                             />
 
                         </h:form>
 
                     </p:dialog>
-
-
                 </f:view>
             </ui:define>
         </ui:composition>

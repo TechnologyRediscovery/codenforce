@@ -46,14 +46,14 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable {
     }
 
     public String addNewSource() {
-        getSessionBean().setActiveCodeSource(null);
+        getSessionBean().setSessCodeSource(null);
         return "codeSourceAddUpdate";
     }
 
     public String updateCodeSource() {
         System.out.println("CodeSourceBB.updateCodeSource | selected source: " + selectedCodeSource.getSourceName());
         if (selectedCodeSource != null) {
-            getSessionBean().setActiveCodeSource(selectedCodeSource);
+            getSessionBean().setSessCodeSource(selectedCodeSource);
             return "codeSourceAddUpdate";
         } else {
             getFacesContext().addMessage(null,
@@ -64,7 +64,7 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable {
     }
 
     public String addElementToSource() {
-        getSessionBean().setActiveCodeSource(selectedCodeSource);
+        getSessionBean().setSessCodeSource(selectedCodeSource);
         // remvoe any active element so when we jump to the
         // add page, there aren't any pre-populated element fields
         getSessionBean().setActiveCodeElement(null);
@@ -72,12 +72,12 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable {
     }
 
     public String viewElementsInSource() {
-        getSessionBean().setActiveCodeSource(selectedCodeSource);
+        getSessionBean().setSessCodeSource(selectedCodeSource);
         return "codeElementList";
     }
 
     public String linkElementsToCodeGuide() {
-        getSessionBean().setActiveCodeSource(selectedCodeSource);
+        getSessionBean().setSessCodeSource(selectedCodeSource);
         return "codeGuideLink";
     }
 
@@ -142,7 +142,7 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable {
             
             activeSessionCodeSource(selectedCodeSource);
             
-            getSessionBean().setActiveCodeSource(selectedCodeSource);
+            getSessionBean().setSessCodeSource(selectedCodeSource);
             
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -171,7 +171,7 @@ public class CodeSourceBB extends BackingBeanUtils implements Serializable {
     }
     
     public void activeSessionCodeSource(CodeSource selectedCodeSource){
-        getSessionBean().setActiveCodeSource(selectedCodeSource);
+        getSessionBean().setSessCodeSource(selectedCodeSource);
     }
     
     public boolean activeCodeSourceEdit(){

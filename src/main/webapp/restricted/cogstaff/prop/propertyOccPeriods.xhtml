@@ -35,8 +35,7 @@
                                     widgetVar="var-scroller-periodlist"
                                     rowIndexVar="#{period.periodID}"
                                     var="period"
-                                    value="#{propertyOccPeriodsBB.currProp.completePeriodList}"
-                                    >                                         
+                                    value="#{propertyOccPeriodsBB.currProp.completePeriodList}">                                         
 
 
                                     <div style="datum">
@@ -67,12 +66,12 @@
                                                       styleClass="ui-label-inline" />
                                         <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : propertyProfileBB.getPrettyDate(period.authorizedTS)}" />
                                     </div>
-                                    <p:commandButton       id="button-occperiodtable-editperiod"
+                                    <p:commandButton       id="button-occperiodtable-exploreperiod"
+                                                           value="explore occ period"  
                                                            ajax="false" 
-                                                           action="#{propertyOccPeriodsBB.exploreOccPeriod(period)}"
-                                                           rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                           value="manage occupancy period"  
-                                                           icon="fa fa-edit"/>
+                                                           action="#{personOccPeriodsBB.exploreOccPeriod(period)}"
+                                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                           icon="fa fa-binoculars"/>
                                 </p:dataScroller>
                             </h:form>
 

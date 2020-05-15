@@ -39,7 +39,7 @@ public class CECasePublicBB
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
-        currentCase = sb.getSessionCECase();
+        currentCase = sb.getSessCECase();
        
     }
     

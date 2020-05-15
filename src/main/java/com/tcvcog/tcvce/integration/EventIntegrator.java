@@ -55,6 +55,7 @@ import java.util.List;
  */
 public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
+    final String ACTIVE_FIELD = "event.activeevent";
     /**
      * Creates a new instance of EventIntegrator
      */
@@ -417,7 +418,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         // we need an EventDomain for the BOBID, too, so set it arbitrarily if it's null
         if(params.getEventDomain_val() == null){
             params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
-            params.logMessage("DOMAIN CONTROL: no object specified - Code Enforcement chosen as default; | ");
+            params.appendToParamLog("DOMAIN CONTROL: no object specified - Code Enforcement chosen as default; | ");
         }
         
         params.appendSQL("SELECT DISTINCT eventid \n");
@@ -444,7 +445,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             //*******************************
            // **   MUNI,DATES,USER,ACTIVE  **
            // *******************************
-            params = (SearchParamsEvent) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsEvent.MUNI_DBFIELD);
+            params = (SearchParamsEvent) sc.assembleBObSearchSQL_muniDatesUserActive(
+                                                                        params, 
+                                                                        SearchParamsEvent.MUNI_DBFIELD,
+                                                                        ACTIVE_FIELD);
 
             //*******************************
            // **      1.EVENT CATEGORY     **
@@ -454,7 +458,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND eventcategory.categoryid=? ");
                 } else {
                     params.setEventCat_ctl(false);
-                    params.logMessage("EVENT CATEGORY: no object specified; event cat filter disabled; |"); 
+                    params.appendToParamLog("EVENT CATEGORY: no object specified; event cat filter disabled; |"); 
                 }
             }
 
@@ -466,7 +470,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND public.eventcategory.categorytype = CAST(? AS eventType ");
                 } else {
                     params.setEventType_ctl(false);
-                    params.logMessage("EVENT TYPE: no object specified; event type filter disabled; | ");
+                    params.appendToParamLog("EVENT TYPE: no object specified; event type filter disabled; | ");
                 }
             }
             
@@ -498,7 +502,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND eventperson.person_personid=? ");
                 } else {
                     params.setPerson_ctl(false);
-                    params.logMessage("EVENT PERSONS: No Person object specified; person filter disabled; | ");
+                    params.appendToParamLog("EVENT PERSONS: No Person object specified; person filter disabled; | ");
                 }
             }
 
@@ -535,7 +539,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND property.propertyid=? ");
                 } else {
                     params.setProperty_ctl(false);
-                    params.logMessage("PROPERTY: No PROPERTY object specified; filter disabled; | ");
+                    params.appendToParamLog("PROPERTY: No PROPERTY object specified; filter disabled; | ");
                 }
             }
             
@@ -547,7 +551,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     params.appendSQL("AND property.propertyid=? ");
                 } else {
                     params.setPropertyUseType_ctl(false);
-                    params.logMessage("PROPERTY USE TYPE: No PROPERTY object specified; filter disabled; | ");
+                    params.appendToParamLog("PROPERTY USE TYPE: No PROPERTY object specified; filter disabled; | ");
                 }
             }
             

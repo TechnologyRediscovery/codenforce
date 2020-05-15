@@ -28,7 +28,7 @@ import javax.faces.convert.FacesConverter;
  * @author Eric Darsow
  */
 
-@FacesConverter(forClass=EventCategory.class, value="eventCategoryConverter")
+@FacesConverter(value="eventCategoryConverter")
 public class EventCategoryConverter extends EntityConverter implements Converter{
 
     @Override

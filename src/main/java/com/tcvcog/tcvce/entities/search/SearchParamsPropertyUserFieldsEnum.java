@@ -26,7 +26,7 @@ public enum SearchParamsPropertyUserFieldsEnum
     UNFIT_BY("Declared unfit for occupancy by", "unfitby_userid" ),
     ABANDONED_BY("Declared abandoned by", "abandonedby_userid"),
     VACANT_BY("Declared vacant by", "vacantby_userid"),
-    PROPERTY_UPDATEDBY("Property data last updated by", "lastupdatedby");
+    PROPERTY_UPDATEDBY("Property data last updated by", "property.lastupdatedby");
     
     private final String title;
     private final String dbField;

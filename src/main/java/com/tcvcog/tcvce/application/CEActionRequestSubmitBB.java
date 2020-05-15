@@ -109,7 +109,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public void initBean(){
         CEActionRequest req = getSessionBean().getCeactionRequestForSubmission();
         PropertyIntegrator pi = getPropertyIntegrator();
-        User usr = getSessionBean().getSessionUser();
+        User usr = getSessionBean().getSessUser();
         
         currentRequest = req;
         
@@ -132,19 +132,19 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //                System.out.println(ex);
 //            }
         } else if (usr != null && req != null ) {
-            personCandidateList = getSessionBean().getSessionPersonList();
+            personCandidateList = getSessionBean().getSessPersonList();
         }
         disabledPersonFormFields = false;
         actionRequestorAssignmentMethod = 1;
         if(usr != null){
-            selectedMuni = getSessionBean().getSessionMuni();
+            selectedMuni = getSessionBean().getSessMuni();
         }
     }
     
   
     
     public String requestActionAsFacesUser(){
-        currentRequest.setRequestor(getSessionBean().getSessionUser().getPerson());
+        currentRequest.setRequestor(getSessionBean().getSessUser().getPerson());
         getSessionBean().setCeactionRequestForSubmission(currentRequest);
         return "reviewAndSubmit";
     }
@@ -168,11 +168,15 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     
     public int insertActionRequestorNewPerson(Person p){
         PersonIntegrator personIntegrator = getPersonIntegrator();
-        p.setSourceID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestPublicUserPersonSourceID")));
-        
+        SystemIntegrator si = getSystemIntegrator();
         int insertedPersonID = 0;
         
         try {
+            p.setSource(si.getBOBSource(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                    .getString("actionRequestPublicUserPersonSourceID"))));
+        
+        
             insertedPersonID = personIntegrator.insertPerson(p);
             System.out.println("CEActionReqeustSubmitBB.storeActionRequestorPerson | PersonID " + insertedPersonID);
         } catch (IntegrationException ex) {
@@ -256,7 +260,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         Municipality m = currentRequest.getMuni();
-        Person skel = pc.initPerson(m);
+        Person skel = pc.personCreateMakeSkeleton(m);
         try {
             skel.setCreatorUserID(uc.getUserRobot().getUserID());
         } catch (IntegrationException ex) {
@@ -327,7 +331,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // the person or the request bounces
         
         if(currentRequest.getRequestor().getPersonID() == 0){
-            if(getSessionBean().getSessionUser() != null){
+            if(getSessionBean().getSessUser() != null){
                 currentRequest.getRequestor().setSource(
                         si.getBOBSource(Integer.parseInt(
                         getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
@@ -375,7 +379,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         try { 
             // send the request into the DB
             submittedActionRequestID = ceari.submitCEActionRequest(currentRequest);
-            getSessionBean().setSessionCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
+            getSessionBean().setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
             
             // insert photos to db and link to request
             
@@ -383,7 +387,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 try {
                     blobi.storeBlob(blob);
                     sb.getCeactionRequestForSubmission().getBlobIDList().add(blob.getBlobID());
-                    blobI.linkBlobToActionRequest(blob.getBlobID(), sb.getSessionCEAR().getRequestID());
+                    blobI.linkBlobToActionRequest(blob.getBlobID(), sb.getSessCEAR().getRequestID());
                 } catch (BlobException ex) {
                     System.out.println(ex);
                 }
