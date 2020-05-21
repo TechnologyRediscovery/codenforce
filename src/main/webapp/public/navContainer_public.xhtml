@@ -39,92 +39,58 @@
 
         <div class="flex-box-container">
 
-
-
-            <ui:insert name="top">
-                <div class="flexing-box-topbar">
-                    <div class="logo-image-wrapper">
-                        <h:graphicImage value="/images/Logo-N.png" height="100px"/>
-                    </div>
-                </div>
-            </ui:insert>
-
-
-        </div>
-
-
-        <div class="flex-box-container">
-            <div class="flexing-box-sidebar">
+            <div class="flexing-box-sidebar_new_public">
 
                 <f:view id="sideBarView">
 
+                    <p:spacer width="100px"/>
+
+                    <h:graphicImage styleClass="sidebar_logo_new_public" value="/images/Logo-N_public.png" width="400px"/>
+
+                    <p:spacer width="50px"/>
+
                     <h:form id="panelMenu">
-                        <p:menu>
 
-                            <p:menuitem value="Login" action="systemHome" ajax="false" icon="fa fa-sign-in" />
-                            <p:menuitem value="Request code&lt;br /&gt; enforcement" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard" escape="false"/>
-                            <p:menuitem value="Check on your case" action="paccSearch" ajax="false" icon="fa fa-tachometer" />
-                            <p:menuitem value="Apply for an &lt;br /&gt;occupancy permit" action="occPermitApplicationFlow" ajax="false" icon="fa fa-building" escape="false" disabled="true" />
-                            <p:menuitem value="About" action="about" ajax="false" icon="fa fa-info" />
-                            <p:menuitem value="Contact" action="contact" ajax="false" icon="fa fa-phone" />
+                        <p:commandButton styleClass="sidebar_new_public_button" value="Login" action="systemHome" ajax="false" icon="fa fa-sign-in" />
+                        <p:spacer width="10px"/>
+                        <p:commandButton styleClass="sidebar_new_public_button" value="Request Code Enforcement" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard" escape="false"/>
+                        <p:spacer width="10px"/>
+                        <p:commandButton styleClass="sidebar_new_public_button" value="Check On Your Case" action="paccSearch" ajax="false" icon="fa fa-tachometer" />
+                        <p:spacer width="10px"/>
+                        <p:commandButton styleClass="sidebar_new_public_button" value="Apply For An Occupancy Permit" action="occPermitApplicationFlow" ajax="false" icon="fa fa-building" escape="false" disabled="true" />
+                        <p:spacer width="10px"/>
+                        <p:commandButton styleClass="sidebar_new_public_button" value="About" action="about" ajax="false" icon="fa fa-info" />
+                        <p:spacer width="10px"/>
+                        <p:commandButton styleClass="sidebar_new_public_button" value="Contact" action="contact" ajax="false" icon="fa fa-phone" />
+                        <p:spacer width="10px"/>
+                        <p:commandButton styleClass="sidebar_new_public_button" value="How-To Guides" action="howtos" ajax="false" icon="fa fa-question-circle" />
+                        <p:spacer width="10px"/>
+                        <p:commandButton styleClass="sidebar_new_public_button" value="For Developers" action="technical"  ajax="false" icon="fa fa-database" />
 
-                            <p:submenu label="Help" expanded="true">
-
-                                <p:menuitem value="How-To Guides" action="howtos" ajax="false" 
-                                            icon="fa fa-question-circle" />
-
-
-                                <p:menuitem value="For developers" action="technical"  ajax="false" 
-                                            icon="fa fa-database" />
-                            </p:submenu>
-                        </p:menu>
                     </h:form>
+
+                    <p:spacer width="50px"/>
+
+                    <div class="sidebar_footer_new_public">
+                        <p>This database application is maintained and updated by the Turtle Creek Valley Council of Governments.</p>
+                    </div>
+
                 </f:view>
             </div>
 
-
-
             <div class="flexing-box-interior">
-
-                <div class="flex-box-container-interior">
+                
+                <div class="flex-box-container-interior_new_public">
                     <f:view id="sessionInfoView">
-
-
-                        <div class="flexing-box-sessioninfo">
-
-
-
-                        </div>
-
-                        <!--<div class="flexing-box-pagecontent narrow-content-container">-->
-                        <div class="flexing-box-pagecontent">
+                        <div class="flexing-box-pagecontent_new_public">
                             <ui:insert name="content">
                                 <p>I am content in the template content</p>
-
                             </ui:insert>
-
                         </div>
                     </f:view>
                 </div>
             </div>
         </div>
-        <div class="flex-box-container">
-
-            <div class="flexing-box-footer">
-                <ui:insert name="bottom">
-                    <div class="footer">
-                        <f:view id="footerView">
-                            <p>This database application is maintained and updated by the Turtle Creek Valley Council of Governments.</p>
-                        </f:view>
-                    </div>
-
-                </ui:insert>
-            </div>
-
-        </div>
-
-        <!--<div class="clearFix"></div>-->
-
 
     </h:body>
 
