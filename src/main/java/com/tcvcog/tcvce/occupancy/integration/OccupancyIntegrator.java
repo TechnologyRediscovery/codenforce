@@ -41,7 +41,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
-import com.tcvcog.tcvce.integration.ChoiceIntegrator;
+import com.tcvcog.tcvce.integration.WorkflowIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
 import java.sql.Array;

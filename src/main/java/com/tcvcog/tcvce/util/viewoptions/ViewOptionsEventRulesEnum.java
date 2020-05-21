@@ -22,8 +22,8 @@ package com.tcvcog.tcvce.util.viewoptions;
  */
 public enum ViewOptionsEventRulesEnum {
     VIEW_ALL("all rules"),
-    VIEW_ACTIVE_NOT_PASSED("active and not yet passed"),
-    VIEW_ACTIVE_PASSED("activ eand passed"),
+    VIEW_ACTIVE_NOT_PASSED("not yet passed rules"),
+    VIEW_ACTIVE_PASSED("passed rules"),
     VIEW_INACTIVE("inactive (i.e. deleted)");
     
     private final String label;

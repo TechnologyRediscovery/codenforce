@@ -114,7 +114,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
          
      }
     
-    
     /**
      * Skeleton of a system that may be needed to generate and release carefully
      * some level of "internal guest" level access Credential
@@ -124,8 +123,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     protected void requestBaseInternalAccessCredential(UserAuthorized ua) {
         // TODO: Finish guts
     }
-    
-    
 
     /**The official note appending tool of the entire codeNforce system!
      * Consider all other appendNoteXXX methods scattered about to be rogue

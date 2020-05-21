@@ -130,7 +130,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
-        ChoiceCoordinator chc = getChoiceCoordinator();
+        WorkflowCoordinator chc = getWorkflowCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         EventCoordinator ec = getEventCoordinator();
         
@@ -163,7 +163,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             opdh.setProposalList(chc.getProposalList(opdh, cred));
             
             // EVENT RULE LIST
-            opdh.setEventRuleList(ec.rules_getEventRuleImpList(opdh, cred));
+            opdh.setEventRuleList(chc.rules_getEventRuleImpList(opdh, cred, this));
             
             // INSPECTION LIST
             opdh.setInspectionList(inspecInt.getOccInspectionList(opdh));
@@ -875,7 +875,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                                         BObStatusException, 
                                         IntegrationException {
         
-        ChoiceCoordinator cc = getChoiceCoordinator();
+        WorkflowCoordinator cc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
         
@@ -890,7 +890,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             proposal.setChosenChoice(chosen);
 
             // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
-            propEvent = ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u);
+            propEvent = cc.generateEventDocumentingProposalEvaluation(proposal, chosen, u, this);
             // insert the event and grab the new ID
             insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
             // go get our new event by ID and inject it into our proposal before writing its evaluation to DB

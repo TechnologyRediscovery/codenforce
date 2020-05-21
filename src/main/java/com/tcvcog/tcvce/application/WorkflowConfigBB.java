@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -35,7 +36,7 @@ import javax.faces.event.ActionEvent;
  *
  * @author sylvia
  */
-public class ProposalEventRuleConfigBB extends BackingBeanUtils implements Serializable{
+public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
     
     
     private OccPeriodDataHeavy currentOccPeriod;
@@ -47,16 +48,23 @@ public class ProposalEventRuleConfigBB extends BackingBeanUtils implements Seria
     
     private boolean includeEventRuleInCurrentOccPeriodTemplate;
     private int formEventRuleIDToAdd;
+    
+    // rules
+    private List<EventRuleSet> eventRuleSetList;
+    private EventRuleSet selectedEventRuleSet;
+    
+    
     /**
      * Creates a new instance of ChoiceProposalConfigBB
      */
-    public ProposalEventRuleConfigBB() {
+    public WorkflowConfigBB() {
     }
     
         
     @PostConstruct
     public void initBean(){
         EventCoordinator ec = getEventCoordinator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         eventTypeListAll = ec.getEventTypesAll();
         try {
             eventCategoryListAllActive = ec.getEventCategoryListActive();
@@ -64,6 +72,8 @@ public class ProposalEventRuleConfigBB extends BackingBeanUtils implements Seria
             System.out.println(ex);
         }
         
+        setEventRuleSetList(wc.rules_getEventRuleSetList());
+
         
     }
     
@@ -98,7 +108,7 @@ public class ProposalEventRuleConfigBB extends BackingBeanUtils implements Seria
     public void rules_commitEventRuleEdits(ActionEvent ev){
         EventCoordinator ec = getEventCoordinator();
         try {
-            ec.rules_updateEventRuleAbstract(currentEventRuleAbstract);
+            ec.rules_updateEventRuleAbstract(currentEventRuleAbstract, this);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Update of event rule successful!", ""));
@@ -116,7 +126,7 @@ public class ProposalEventRuleConfigBB extends BackingBeanUtils implements Seria
         try {
             freshEventRuleID = ec.rules_createEventRuleAbstract(currentEventRuleAbstract, getCurrentOccPeriod(), 
                                                                 null, isIncludeEventRuleInCurrentOccPeriodTemplate(),
-                                                                getSessionBean().getSessUser());
+                                                                getSessionBean().getSessUser(), this);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "New event rule added with ID " + freshEventRuleID, ""));
@@ -134,8 +144,8 @@ public class ProposalEventRuleConfigBB extends BackingBeanUtils implements Seria
     public void rules_addEventRuleByID(ActionEvent ev){
         EventCoordinator ec = getEventCoordinator();
         try {
-            EventRuleAbstract era = ec.rules_getEventRuleAbstract(getFormEventRuleIDToAdd());
-            ec.rules_attachEventRule(era, getCurrentOccPeriod(), getSessionBean().getSessUser());
+            EventRuleAbstract era = ec.rules_getEventRuleAbstract(getFormEventRuleIDToAdd(), this);
+            ec.rules_attachEventRule(era, getCurrentOccPeriod(), getSessionBean().getSessUser(), this);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Success! added rule to occ period", ""));
@@ -263,6 +273,34 @@ public class ProposalEventRuleConfigBB extends BackingBeanUtils implements Seria
      */
     public void setFormEventRuleIDToAdd(int formEventRuleIDToAdd) {
         this.formEventRuleIDToAdd = formEventRuleIDToAdd;
+    }
+
+    /**
+     * @return the eventRuleSetList
+     */
+    public List<EventRuleSet> getEventRuleSetList() {
+        return eventRuleSetList;
+    }
+
+    /**
+     * @return the selectedEventRuleSet
+     */
+    public EventRuleSet getSelectedEventRuleSet() {
+        return selectedEventRuleSet;
+    }
+
+    /**
+     * @param eventRuleSetList the eventRuleSetList to set
+     */
+    public void setEventRuleSetList(List<EventRuleSet> eventRuleSetList) {
+        this.eventRuleSetList = eventRuleSetList;
+    }
+
+    /**
+     * @param selectedEventRuleSet the selectedEventRuleSet to set
+     */
+    public void setSelectedEventRuleSet(EventRuleSet selectedEventRuleSet) {
+        this.selectedEventRuleSet = selectedEventRuleSet;
     }
     
 }

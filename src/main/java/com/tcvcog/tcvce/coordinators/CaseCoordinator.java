@@ -86,7 +86,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      */
     public CECaseDataHeavy assembleCECaseDataHeavy(CECase c, Credential cred) throws BObStatusException, IntegrationException{
         SearchCoordinator sc = getSearchCoordinator();
-        ChoiceCoordinator chc = getChoiceCoordinator();
+        WorkflowCoordinator chc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
         
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
@@ -103,7 +103,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             cse.setProposalList(chc.getProposalList(cse, cred));
             
             // EVENT RULE LIST
-            cse.setEventRuleList(ec.rules_getEventRuleImpList(cse, cred));
+            cse.setEventRuleList(chc.rules_getEventRuleImpList(cse, cred, this));
             
             // CEAR LIST
             QueryCEAR qcear = sc.initQuery(QueryCEAREnum.ATTACHED_TO_CECASE, cred);
@@ -582,7 +582,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                                     IFace_Proposable chosen, 
                                     CECaseDataHeavy ceCase, 
                                     UserAuthorized u) throws EventException, AuthorizationException, BObStatusException, IntegrationException, ViolationException{
-        ChoiceCoordinator cc = getChoiceCoordinator();
+        WorkflowCoordinator cc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
         
@@ -595,7 +595,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             proposal.setChosenChoice(chosen);
             
             // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
-            EventCnF csEv = ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u);
+            EventCnF csEv = cc.generateEventDocumentingProposalEvaluation(proposal, chosen, u, this);
             // insert the event and grab the new ID
             insertedEventID = attachNewEventToCECase(ceCase, csEv, null);
             // go get our new event by ID and inject it into our proposal before writing its evaluation to DB

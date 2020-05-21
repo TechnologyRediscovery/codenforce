@@ -23,7 +23,6 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 public class CECaseDataHeavy
         extends CECasePropertyUnitHeavy
         implements Cloneable,
-        IFace_ProposalDriven,
         IFace_EventRuleGoverned,
         IFace_CredentialSigned,
         IFace_Loggable {

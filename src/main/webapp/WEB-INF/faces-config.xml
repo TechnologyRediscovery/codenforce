@@ -1921,36 +1921,42 @@
     
     
     <!--*********************************************************************-->
-    <!--**                       XIV. CHOICE                               **-->
+    <!--**                       XV. WORKFLOW                              **-->
     <!--*********************************************************************-->
     
     <managed-bean>
-        <managed-bean-name>choiceCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.ChoiceCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>workflowCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.WorkflowCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
-        <managed-bean-name>choiceIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.ChoiceIntegrator</managed-bean-class>
+        <managed-bean-name>workflowIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.WorkflowIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
    
     <managed-bean>
-        <managed-bean-name>proposalEventRuleBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ProposalEventRuleBB</managed-bean-class>
+        <managed-bean-name>workflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.WorkflowBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
             
     <managed-bean>
-        <managed-bean-name>proposalEventRuleConfigBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ProposalEventRuleConfigBB</managed-bean-class>
+        <managed-bean-name>workflowConfigBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.WorkflowConfigBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
-    
+      <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>workflowConfig</from-outcome>
+            <to-view-id>/restricted/cogstaff/workflow/workflowConfig.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
     
                                                             
