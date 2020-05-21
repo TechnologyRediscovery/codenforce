@@ -33,16 +33,16 @@ COG yellow: #e3b73d
 
 /* heebo-regular - latin */
 @font-face {
-  font-family: 'Heebo';
-  font-style: normal;
-  font-weight: 400;
-  src: url('../fonts/heebo-v5-latin-regular.eot'); /* IE9 Compat Modes */
-  src: local('Heebo'), local('Heebo-Regular'),
-       url('../fonts/heebo-v5-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('../fonts/heebo-v5-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
-       url('../fonts/heebo-v5-latin-regular.woff') format('woff'), /* Modern Browsers */
-       url('../fonts/heebo-v5-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
-       url('../fonts/heebo-v5-latin-regular.svg#Heebo') format('svg'); /* Legacy iOS */
+    font-family: 'Heebo';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/heebo-v5-latin-regular.eot'); /* IE9 Compat Modes */
+    src: local('Heebo'), local('Heebo-Regular'),
+        url('../fonts/heebo-v5-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('../fonts/heebo-v5-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+        url('../fonts/heebo-v5-latin-regular.woff') format('woff'), /* Modern Browsers */
+        url('../fonts/heebo-v5-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+        url('../fonts/heebo-v5-latin-regular.svg#Heebo') format('svg'); /* Legacy iOS */
 }
 
 body{
@@ -63,12 +63,14 @@ h1{
     border-left: none;
     border-bottom: 3px solid #5a5754;
     
+    margin-bottom: 20px;
+
 }
 
 h2{
     font-size: 1.4em;
     /* color: #00b5ec;  sky blue*/
-    
+
     /*darker sky*/
     color: #00637F; 
     font-weight: bold;
@@ -80,8 +82,8 @@ h3{
     font-weight: bold;
     color: #4F361E;
     font-weight: normal;
-    
-    
+
+
 }
 
 h4{
@@ -96,7 +98,7 @@ h4{
     display: inline-block;
     margin-left: 10px;
     margin-top: 10px;
-       
+
 }
 
 .logoBox h2{
@@ -118,14 +120,14 @@ h4{
     font-size: 1.3em;
     font-weight: bold;
     color: #cde162;
-    
+
 }
 
 .report-title-sub{
     font-size: 1.1em;
     color: #00b5ec;
     font-style: italic;
-    
+
 }
 
 
@@ -135,7 +137,7 @@ h4{
 
 .property-blue{
     color: #03305C;
-    
+
 }
 
 .person-maroon{
@@ -147,7 +149,7 @@ h4{
 }
 
 .occupancy-green{
-    
+
 }
 
 .action-request-header{
@@ -155,20 +157,20 @@ h4{
     font-weight: bold;
     font-size: 1.2em;
     padding-left:5px;
-    
-    
-    
+
+
+
 }
 
 .action-request-subheader{
     display: block;
     clear: both;
     font-size: 1.1em;
-    
+
 }
 
 .logoBox{
-    
+
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -176,7 +178,7 @@ h4{
 }
 
 .logo-image-wrapper{
-    
+
 }
 
 
@@ -192,8 +194,8 @@ h4{
     font-style: normal;
     background-color: #04284A;
     color: green;
-    
-    
+
+
 }
 
 .tabText{
@@ -202,7 +204,7 @@ h4{
 
 .menuLabel{
     color:white;
-    
+
 }
 
 
@@ -223,7 +225,7 @@ h4{
 
 .ui-menu .ui-menuitem-text{
     font-weight: bold;
-    
+
 }
 
 
@@ -254,7 +256,7 @@ i.material-icons{
 
 .ui-menu .ui-menuitem-link .ui-menuitem-icon, .ui-menu .ui-submenu-icon{
     padding-right: 8px;
-    
+
 }
 
 /*
@@ -270,25 +272,25 @@ i.material-icons{
 
 .userToolBar-icon{
     font-size: 1.5em;
-    
+
 }
 
 /*used from demo on Mozilla site*/
 /*https://developer.mozilla.org/en-US/docs/Web/CSS/fit-content*/
 
 .icon-container {
-  display: grid;
-  box-sizing: border-box;
-  height: 100%;
-  width: 100%;
-  clear: none;
+    display: grid;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    clear: none;
 }
 
 .icon-box-centered {
-  box-sizing: border-box;
-  margin-left: auto;
-  margin-right: auto;
-  
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+
 }
 
 
@@ -337,7 +339,7 @@ a.sblink:hover{
     font-size: 11px;
     float:left;
     clear:none;
-    
+
 }
 
 
@@ -365,7 +367,7 @@ a.headerLinks {
 div.headerLink a:before, a:visited{
     /*color: green;*/
 
-    
+
 }
 
 /************** END LINKS ******************/
@@ -380,7 +382,7 @@ div.headerLink a:before, a:visited{
     flex-direction: row;
     flex-wrap: nowrap;
     padding:5px;
-      
+
 }
 
 .list-column{
@@ -389,8 +391,8 @@ div.headerLink a:before, a:visited{
     min-width: 550px;
     max-width: 550px;
     padding-right:10px;
-    
-    
+
+
 }
 
 .list-column-persons{
@@ -399,8 +401,8 @@ div.headerLink a:before, a:visited{
     min-width: 600px;
     max-width: 600px;
     padding-right:10px;
-    
-    
+
+
 }
 
 .object-column{
@@ -408,7 +410,7 @@ div.headerLink a:before, a:visited{
     flex-grow: 1;
     padding-left: 10px;
 
-    
+
 }
 
 /* **************** END PAGE LAYOUT  *********************/
@@ -418,7 +420,7 @@ div.headerLink a:before, a:visited{
 
 .printing-page-break-before{
     page-break-before: always;
-    
+
 }
 
 .printing-page-break-after{
@@ -428,7 +430,7 @@ div.headerLink a:before, a:visited{
 
 div.printer-friendly-report .ui-widget-content{
     border: none;
-    
+
 }
 
 .event-ds-box-report{
@@ -457,8 +459,8 @@ div.printer-friendly-report .ui-widget-content{
     margin: 15px;
     border: thin solid #4774A0;
     padding: 10px;
-/*    These two attributes are taken from .rowExpansion to see if we can use
-    only .outlinedBox divs for the row expansion*/
+    /*    These two attributes are taken from .rowExpansion to see if we can use
+        only .outlinedBox divs for the row expansion*/
     white-space: normal;
     overflow-wrap: normal;
 }
@@ -475,7 +477,7 @@ div.printer-friendly-report .ui-widget-content{
 
 .reportconfig-header{
     text-align: left;
-    
+
 }
 /* *********** end Printing and reports******** */
 
@@ -492,9 +494,9 @@ div.printer-friendly-report .ui-widget-content{
     flex-direction: row;
     flex-wrap: nowrap;
     width: 100%;  
-    
+
     justify-content: flex-start;
-    
+
     font-family: 'Heebo', sans-serif;
     margin-left: 0px;
     margin-right:0px;
@@ -502,23 +504,23 @@ div.printer-friendly-report .ui-widget-content{
     margin-bottom: 0px;
     padding: 0px;
     position: relative;
-    
+
 }
 
 .flex-box-container-interior{
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    
-     justify-content: flex-start;
-    
+
+    justify-content: flex-start;
+
     font-family: 'Heebo', sans-serif;
     margin-left: 0px;
     margin-right:0px;
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 0px;
-    
+
 }
 
 .narrow-content-container{
@@ -536,22 +538,22 @@ div.printer-friendly-report .ui-widget-content{
 
 
 .flexing-box-sidebar{
-    
+
     flex-grow: 0;
     flex-basis: 200px;
     flex-shrink: 1;
     background-color: #CECECE;
     padding: 10px;
-    
+
 }
 
 .flexing-box-sessioninfo{
-    
+
     flex-grow: 1;
     flex-basis: 100%;
     flex-shrink: 1;
     height: 50px;
-    
+
     background-color: #181F36;
     margin-left: 0px;
     margin-right: 0px;
@@ -560,41 +562,41 @@ div.printer-friendly-report .ui-widget-content{
     padding-left: 0px;
     color: white;
     font-weight: normal;
-    
+
 }
 
 .flexing-box-pagecontent{
-    
-    
+
+
     flex-grow: 1;
     flex-basis: max-content;
     flex-shrink: 1;
-    
-    
+
+
     margin-left: 0px;
     padding: 10px;
 }
 
 .flexing-box-footer{
-    
+
     flex-grow: 1;
     flex-basis: 100%;
     flex-shrink: 1;
-    
+
     background-color: #1B1D20;
-    
+
     color: white;
-    
+
 }
 
 .flexing-box-interior{
-    
-    
+
+
     flex-grow: 1;
     flex-basis: 80%;
     flex-shrink: 3;
-    
-    
+
+
 }
 
 .split-page-panelgrid{
@@ -610,7 +612,7 @@ div.printer-friendly-report .ui-widget-content{
 }
 
 
-    
+
 
 #logoHeader{
     margin-top: 3px;
@@ -623,7 +625,7 @@ div.printer-friendly-report .ui-widget-content{
 
 .plainText{
     font-weight: normal;
-    
+
 }
 
 /*this mainContainer class is the containing bins on each user page*/
@@ -637,7 +639,7 @@ div.printer-friendly-report .ui-widget-content{
 
 
 .primaryContentContainer{
-  
+
 }
 
 .footer{
@@ -665,16 +667,16 @@ div.headerLinkCont{
     margin-bottom: 10px;
     margin-top: 10px;
     margin-right: 15px;
-    
-    
-    
+
+
+
 }
 
 .userToolBar{
     display: block;
     float: right;
     clear: none; 
-   height: 90px;
+    height: 90px;
 }
 
 .gridTd-splitPage{
@@ -693,19 +695,19 @@ div.headerLinkCont{
 .mced-status-enforcement{
     font-weight: bold;
     color: blueviolet;
-    
+
 }
 .mced-status-citation{
     font-weight: bold;
     color: red;
-    
+
 }
 .mced-status-closed{
     font-weight: bold;
     color: black;
 }
 .mced-status-holding{
-    
+
 }
 
 .status-list{
@@ -714,7 +716,7 @@ div.headerLinkCont{
     padding-left: 0px;
     margin-left: 10px;
     margin-top: 0px;
-    
+
 }
 
 i.status-display-icon-i{
@@ -722,15 +724,15 @@ i.status-display-icon-i{
 }
 
 .status-display-container{
-	display: flex;
-	flex-direction: row;
-	flex-basis: auto;
+    display: flex;
+    flex-direction: row;
+    flex-basis: auto;
 
 }
 
 .status-display-icon-container{
-	width: auto;
-	margin-right: 5px;
+    width: auto;
+    margin-right: 5px;
 
 
 }
@@ -743,22 +745,22 @@ i.status-display-icon-i{
 
 
 .status-display-icon-container i.material-icons{
-        font-size: 5em;
+    font-size: 5em;
 }
 
 
 .status-display-status-list-container{
-	flex-grow: 1;
-	flex-basis: auto;
+    flex-grow: 1;
+    flex-basis: auto;
 
 
 }
 
 .status-item{
-	font-size: 1em;
-        color: gray;
-        font-weight: normal;
-    
+    font-size: 1em;
+    color: gray;
+    font-weight: normal;
+
 }
 
 .stage-inactive{
@@ -788,7 +790,7 @@ i.status-display-icon-i{
 }
 
 .datum-data{
-    
+
 }
 
 .bold {
@@ -826,7 +828,7 @@ i.status-display-icon-i{
 /* --------------- SEARCH ---------------------------*/
 
 .search-inputtext{
-    
+
 }
 
 
@@ -855,8 +857,8 @@ i.status-display-icon-i{
     border: thin solid #4774A0;
     padding: 10px;
     background-color: white;
-/*    These two attributes are taken from .rowExpansion to see if we can use
-    only .outlinedBox divs for the row expansion*/
+    /*    These two attributes are taken from .rowExpansion to see if we can use
+        only .outlinedBox divs for the row expansion*/
     white-space: normal;
     overflow-wrap: normal;
 }
@@ -870,25 +872,25 @@ i.status-display-icon-i{
     padding: 5px;
     font-size:small;
     display: inline-block;
-    
-    
+
+
 }
 .compact-violation-list-container{
     margin-top: 5px;
-    
+
 }
 
 .activeObjectBox h4{
     margin-top: 3px;
     margin-bottom: 8px;
-   
+
 }
 
 .publicInfoBundleContainer{
     margin: 15px;
     border: #04284A solid thick;
     padding: 10px;
-    
+
 }
 
 
@@ -910,7 +912,7 @@ div.headerLinks{
     overflow-wrap: normal;
     padding: 20px;
     line-height: 105%;
-       
+
 }
 
 
@@ -977,7 +979,7 @@ img.headerImg{
 
 
 .ui-state-hover{
-    
+
 }
 
 /* ****************** END Primefaces Overrides ***********************/
@@ -1002,12 +1004,12 @@ img.headerImg{
 
 
 .ui-panel {
-                margin: 10px;
+    margin: 10px;
 }
-             
+
 .ui-dashboard-column {
     width:33%;
-   
+
 }
 
 .ui-widget-content{
@@ -1040,17 +1042,17 @@ img.headerImg{
 
 .no-border{
     border: none;
-    
+
 }
 
 .ui-expanded-row-content{
     background-color: #04284A;
-    
+
 }
 
 .spacier-rows{
     height: 150%;
-    
+
 }
 
 
@@ -1062,7 +1064,7 @@ table.primeDataTable td{
 
 
 table.borders{
-    
+
 }
 
 table.borders {
@@ -1080,12 +1082,12 @@ table.borders th{
 
 tr.resolved{
     background-color: lightgreen;
-    
+
 }
 
 tr.pending{
     background-color: lightyellow;
-    
+
 }
 
 tr.pastdeadline{
@@ -1108,9 +1110,9 @@ tr.reinspect{
     border-right: none;
     color: black;
     margin:0;
-    
+
 }
-    
+
 .topbottom-lines-right{
     text-align: left;
     border-left: none;
@@ -1133,7 +1135,7 @@ tr.reinspect{
 
 td.gridFooter {
     border: none;
-    
+
 }
 
 
@@ -1141,7 +1143,7 @@ td.gridFooter {
 td.userBarTd{
     align-content: center;
     border: none;
-    
+
 }
 
 td.centeredColumnContent{
@@ -1163,7 +1165,7 @@ gridTd-bignum{
 
 .gridTd-mccontainer{
     background-color: #181F36;
-    
+
 }
 
 .action-requests-search{
@@ -1188,8 +1190,8 @@ gridTd-bignum{
 /*---------------------BUTTONS & CONTROLS---------------------------*/
 
 .ui-state-hover{
-    
-    
+
+
 }
 
 .ui-button-text{
@@ -1201,10 +1203,10 @@ gridTd-bignum{
 }
 
 .hover-none:hover{
-    
+
     margin: auto;
     background-color: green;
-    
+
 }
 
 /* this styling is for use w/ command button on codeSourceManage.xhtml */
@@ -1214,7 +1216,7 @@ gridTd-bignum{
 
 .inline-button{
     margin-left:10px;
-    
+
 }
 
 
@@ -1235,7 +1237,7 @@ gridTd-bignum{
     display: block;
     margin-top: 10px;
     margin-bottom: 10px;
-        
+
 }
 
 .button-size-small {
@@ -1244,7 +1246,7 @@ gridTd-bignum{
 }
 
 .cear-actions-button {
-    
+
 }
 
 
@@ -1253,8 +1255,8 @@ gridTd-bignum{
     margin-bottom: 10px;
     margin-top: 5px;
     clear: left;
-/*    color: blue;
-    background-color: green;*/
+    /*    color: blue;
+        background-color: green;*/
 }
 
 .noFill{
@@ -1267,7 +1269,7 @@ gridTd-bignum{
 }
 .sessionInfoButton{
     background: none;
-    
+
 }
 
 .sessionInfoButton span{
@@ -1287,7 +1289,7 @@ gridTd-bignum{
 
 .proposal-choice-button{
     margin-top: 5px;
-    
+
 }
 
 .proposal-prophead{
@@ -1336,13 +1338,13 @@ gridTd-bignum{
     margin-right: 20px;
     height: 10px;
     width: 10px;
-    
+
 }
 
 .occperiod-inspace-info{
     display: block;
     clear: both;
-    
+
 }
 
 .ui-datascroller-item{
@@ -1394,7 +1396,7 @@ i.inspection-notinspected{
 .inspection-notinspected{
     color: #1a237e;
     font-weight: bold;
-    
+
 }
 
 .inspection-pass{
@@ -1415,8 +1417,8 @@ i.inspection-notinspected{
 }
 
 .occpermit-datagrid{
-    
-    
+
+
 }
 
 .gridTd-permit {
@@ -1447,7 +1449,7 @@ i.inspection-notinspected{
     clear: right;
     font-weight: bold;
     font-size: 1.2em;
-    
+
 }
 
 .occpermit-criticaldata-value{
@@ -1456,12 +1458,12 @@ i.inspection-notinspected{
 
 .occpermit-minordata-label{
     font-size: 1em;
-    
+
 }
 
 .occpermit-minordata-value{
     font-size: 1em;
-    
+
 }
 
 .occpermit-admindata-label{
@@ -1472,11 +1474,11 @@ i.inspection-notinspected{
 
 .occpermit-admindata-value{
     font-size: .8em;
-    
+
 }
 
 .occpermit-additionalnotes{
-    
+
 }
 
 .occpermit-muniheader{
@@ -1495,8 +1497,8 @@ i.inspection-notinspected{
 }
 
 .occperiod-periodvalue{
-    
-    
+
+
 }
 
 .occperiod-address{
@@ -1505,7 +1507,7 @@ i.inspection-notinspected{
 }
 
 .occinspection-reportheader{
-    
+
 }
 
 
@@ -1557,7 +1559,7 @@ span.uiLabel{
     clear: left;
     margin-bottom: 10px;
     font-weight: bold;
-    
+
 }
 
 input.selectBooleanCheckbox{
@@ -1579,7 +1581,7 @@ div.checkBoxLabel{
 
 .action-needed{
     color:red;
-    
+
 }
 
 .action-complete{
@@ -1598,13 +1600,13 @@ div.checkBoxLabel{
 }
 
 .newpasswd-cont{
-    
-    
+
+
 }
 
 .newpsswd-lead{
-    
-    
+
+
 }
 
 .newpasswd-text{
@@ -1612,7 +1614,7 @@ div.checkBoxLabel{
     margin-left: auto;
     margin-right: auto;
 }
-    
+
 .newpsswd{
     font-size: 3em;
     color: darkslateblue;
@@ -1647,7 +1649,7 @@ div.checkBoxLabel{
 table.cases{
     border-collapse: collapse;
     border: 1px solid black;
-    
+
 }
 
 table.cases th{
@@ -1676,13 +1678,13 @@ tr.caseOpen{
 .ui-fieldset-toggleable .ui-fieldset-legend{
     background-color: white;
     font-weight: normal;
-    
+
 }
 
 .ui-fieldset-legend{
     background-color: white;
     font-weight: normal;
-    
+
 }
 
 /* tab views */
@@ -1695,14 +1697,14 @@ tr.caseOpen{
 /* Documentation styling */
 .docContainer{
     max-width: 800px;
-    
+
 }
 
 .pageContentsList{
     list-style-type: none;
 }
-    
-    
+
+
 .pageContentsList li{
     font-size: 1.2em;
     margin-bottom: 10px;
@@ -1729,7 +1731,7 @@ tr.caseOpen{
 .nav_containner:hover {
     color:#E6E7E8;
     background-color: #00B4ED;
-    
+
 }
 
 .nav_content{
@@ -1845,7 +1847,7 @@ tr.caseOpen{
     float: right;
     font-size: 14px;
     height: 40px;
-    
+
     color: inherit;
     display: flex;
     flex-direction: column;
@@ -1893,7 +1895,7 @@ tr.caseOpen{
     border-bottom: 1px solid #E6E7E8;
     padding-right: 15px;
     align-items: flex-end;
-    
+
 }
 
 .toolSidebarTitle{
@@ -2000,4 +2002,61 @@ body .ui-messages .ui-messages-info{
 }
 .editButton{
     min-width: 60px;
+}
+
+/*public*/
+
+.flexing-box-sidebar_new_public{
+    position: fixed;
+    width: 500px;
+    height: 100vh;
+    background-color: #2F2F2F;
+    padding: 10px;
+    text-align: center;
+}
+
+.sidebar_new_public_button{
+    width: 400px;
+    padding-bottom: 10px;
+}
+
+.sidebar_logo_new_public{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sidebar_footer_new_public{
+    margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+    color: grey;
+
+}
+
+.flex-box-container-interior_new_public{
+    min-height: 100vh;
+    margin-left: 500px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    font-family: 'Heebo', sans-serif;
+    padding: 60px;
+    display: flex;
+  
+   justify-content: center;
+    
+}
+
+/*code pages*/
+.gridTd_code{
+    border: none;
+    padding: 7px;
+    
+}
+
+.gridTd_code_inputTextarea{
+    border: none;
+    padding: 7px;
+    width: 1100px;
 }
