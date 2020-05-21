@@ -23,29 +23,29 @@
                         </h:form>
 
                         
-                                <p:panel id="occperiod-fees"
+                                <p:panel id="cecase-fees"
                                          toggleable="true"
                                          collapsed="false"
                                          header="Fees"
                                          rendered="true">
 
-                                    <h:form id="occperiod-fees-form-messages">
-                                        <h:messages id="occperiod-fees-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                    <h:form id="cecase-fees-form-messages">
+                                        <h:messages id="cecase-fees-messages" globalOnly="true" showDetail="true" showSummary="true"
                                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                         </h:messages>
                                     </h:form>
 
-                                    <h:form id="occperiod-fees-form">
+                                    <h:form id="cecase-fees-form">
 
                                         <p:dataTable
                                             id="feeTable"
                                             var="fee"
-                                            value="#{occInspectionBB.feeList}"
-                                            rowKey="#{fee.occPerAssignedFeeID}"
+                                            value="#{caseProfileBB.feeList}"
+                                            rowKey="#{fee.ceCaseAssignedFeeID}"
                                             tableStyleClass="primeDataTable"
                                             rowExpandMode="single"
                                             expandedRow="false"
-                                            filteredValue="#{occInspectionBB.filteredFeeList}"
+                                            filteredValue="#{caseProfileBB.filteredFeeList}"
                                             >
 
                                             <p:column width="3%">
@@ -58,7 +58,7 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="ID" />
                                                 </f:facet>
-                                                <h:outputText value="#{fee.occPerAssignedFeeID}"/>
+                                                <h:outputText value="#{fee.ceCaseAssignedFeeID}"/>
                                             </p:column>
 
 
@@ -168,33 +168,33 @@
                                             </p:rowExpansion>
 
                                         </p:dataTable>
-                                        <p:commandButton value="Edit this Fee list" action="#{occInspectionBB.editOccPeriodFees()}"/>
+                                        <p:commandButton value="Edit this Fee list" action="#{caseProfileBB.editCeCaseFees()}"/>
                                     </h:form>
                                 </p:panel>
 
-                                <p:panel id="occperiod-payments"
+                                <p:panel id="cecase-payments"
                                          toggleable="true"
                                          collapsed="false"
                                          header="Payments"
                                          rendered="true">
 
-                                    <h:form id="occperiod-payments-form-messages">
-                                        <h:messages id="occperiod-payments-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                    <h:form id="cecase-payments-form-messages">
+                                        <h:messages id="cecase-payments-messages" globalOnly="true" showDetail="true" showSummary="true"
                                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                         </h:messages>
                                     </h:form>
 
-                                    <h:form id="occperiod-payments-form">
+                                    <h:form id="cecase-payments-form">
 
                                         <p:dataTable
                                             id="paymentTable"
                                             var="payment"
-                                            value="#{occInspectionBB.paymentList}"
+                                            value="#{caseProfileBB.paymentList}"
                                             rowKey="#{payment.paymentID}"
                                             tableStyleClass="primeDataTable"
                                             rowExpandMode="single"
                                             expandedRow="false"
-                                            filteredValue="#{occInspectionBB.filteredPaymentList}"
+                                            filteredValue="#{caseProfileBB.filteredPaymentList}"
                                             >
 
                                             <p:column width="3%">
@@ -356,7 +356,7 @@
                                                         <h:panelGroup>
                                                             <p:spacer height="15px"/>
                                                             <div class="rowExpansion">
-                                                                <p:commandButton value="Edit this payment" action="#{occInspectionBB.editOnePayment(payment)}"/>
+                                                                <p:commandButton value="Edit this payment" action="#{caseProfileBB.editOnePayment(payment)}"/>
                                                             </div>
                                                         </h:panelGroup>
 
@@ -366,7 +366,7 @@
 
                                         </p:dataTable>
 
-                                        <p:commandButton value="Edit this payment list" action="#{occInspectionBB.editOccPeriodPayments()}"/>
+                                        <p:commandButton value="Edit this payment list" action="#{caseProfileBB.editCeCasePayments()}"/>
 
                                     </h:form>
                                 </p:panel>

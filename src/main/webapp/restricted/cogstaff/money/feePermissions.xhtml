@@ -18,10 +18,13 @@
                     </h:messages>
 
                     <h1>Fee Permissions Tool (dev)</h1>
-                    <p>Occupancy period types only allow certain fees to be used in #{sessionBean.sessionMuni.muniName}. Edit those lists here.</p>
+                    <p>
+                        <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}">Occupancy period types</p:outputLabel> 
+                        <p:outputLabel rendered="#{feeManagementBB.editingCECase()}">Code Set Elements</p:outputLabel>
+                        only allow certain fees to be used in #{sessionBean.sessionMuni.muniName}. Edit those lists here.</p>
                     <f:view>
-                        <h:form id="chooseOccPeriodTypeForm">
-                            <h2>Recorded Fees</h2>
+                        <h:form id="chooseOccPeriodTypeForm" rendered="#{feeManagementBB.editingOccPeriod()}">
+                            <h2>Occupancy Period Types</h2>
                             <p:dataTable
                                 id="occPeriodTypeTable"
                                 var="type"
@@ -199,17 +202,200 @@
 
                         </h:form>    
 
+                        <h:form id="chooseCodeElementForm" rendered="#{feeManagementBB.editingCECase()}">
+                            <h2>Code Set Elements</h2>
+                            <p:dataTable
+                                id="codeElementTable"
+                                var="element"
+                                value="#{feeManagementBB.elementList}"
+                                rowKey="#{element.codeSetElementID}"
+                                tableStyleClass="primeDataTable"
+                                rowExpandMode="single"
+                                expandedRow="false"
+                                selectionMode="single"
+                                selection="#{feeManagementBB.selectedCodeElement}"
+                                filteredValue="#{feeManagementBB.filteredElementList}"
+                                scrollable="true"
+                                scrollHeight="500"
+                                >
+
+                                <p:column width="3%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Expand"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.codeSetElementID}">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID#" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.codeSetElementID}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.codeElement.ordSecTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Section" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.codeElement.ordSecTitle}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.codeElement.ordSubSecTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Subsection" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.codeElement.ordSubSecTitle}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.codeElement.guideEntry.category}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.codeElement.guideEntry.category}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{element.codeElement.guideEntry.subCategory}">
+                                    <f:facet name="header">
+                                        <h:outputText value="SubCategory" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.codeElement.guideEntry.subCategory}"/>
+                                </p:column>
+
+                                <p:rowExpansion>
+                                    <div class="outlinedBox">
+                                        <h3>Code element detail:</h3>
+
+                                        <h:outputLabel styleClass="bold" value="Penalty Notes:"/>
+                                        <p:spacer height="10px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.penaltyNotes}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Days to Comply Notes:"/>
+                                        <p:spacer height="10px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.daysToComplyNotes}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Muni-Specific Notes:"/>
+                                        <p:spacer height="10px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.muniSpecificNotes}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Code Element ID:"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.elementID}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+
+
+                                        <h:outputLabel styleClass="bold" value="Max Penalty:"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.maxPenalty}"/>
+                                        </div>
+
+                                        <h:outputLabel styleClass="bold" value="Min Penalty:"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.minPenalty}"/>
+                                        </div>
+
+                                        <h:outputLabel styleClass="bold" value="Norm Penalty:"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.normPenalty}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Norm Days To Comply:"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.normDaysToComply}"/>
+                                        </div>
+
+                                        <h:outputLabel styleClass="bold" value="Days To Comply notes:"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.daysToComplyNotes}"/>
+                                        </div>
+
+                                        <h:outputLabel styleClass="bold" value="Date Created:"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.dateCreated}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Chap"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordchapterNo}"/>
+                                        </div>
+
+                                        <h:outputLabel styleClass="bold" value="Chapter"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordchapterTitle}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Sec"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordSecNum}"/>
+                                        </div>
+
+                                        <h:outputLabel styleClass="bold" value="SubSec"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordSubSecNum}"/>
+                                        </div>
+
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Technical Text"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordTechnicalText}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        <h:outputLabel styleClass="bold" value="Human friendly text"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.ordHumanFriendlyText}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.enforcementGuidelines}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.inspectionGuidelines}"/>
+                                        </div>
+                                    </div>
+                                </p:rowExpansion>
+
+                            </p:dataTable>
+                            <p:spacer height="10px"/>
+                            <p:commandButton 
+                                actionListener="#{feeManagementBB.editCodeElementFees}"
+                                oncomplete="PF('feePermissionsDialogVar').show()"
+                                ajax="true"
+                                update="feePermissionsForm messages"
+                                value="Edit the Fee Permissions of this Code Element" tabindex="2"/>
+
+                        </h:form> 
+
                         <p:dialog id="feePermissionsDialog"
                                   height="450" width="1000"
                                   widgetVar="feePermissionsDialogVar"
                                   closable="true">   
                             <h:form id="feePermissionsForm">
+                                <h:messages id="messages" globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
                                 <h2>Edit Fee Permissions for fee ID #<p:outputLabel value="#{feeManagementBB.lockedPeriodType.typeID}"/></h2>
                                 <p>Here you can remove or add permitted fees, and even choose which fees are automatically 
                                     applied to an Occupancy Period.</p>
 
 
-                                <h:outputLabel value="Permitted Fees:" for="permittedFeeTable"/>
+                                <h:outputLabel value="Currently Permitted Fees:" for="permittedFeeTable"/>
                                 <h:panelGroup>
                                     <p:dataTable
                                         id="permittedFeeTable"
@@ -253,25 +439,25 @@
                                         </p:column>
 
                                         <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Effective Date" />
-                                        </f:facet>
-                                        <p:cellEditor>
-                                            <f:facet name="output"><h:outputText value="#{fee.effectiveDate}" /></f:facet>
-                                            <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
-                                        </p:cellEditor>
+                                            <f:facet name="header">
+                                                <h:outputText value="Effective Date" />
+                                            </f:facet>
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{fee.effectiveDate}" /></f:facet>
+                                                <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
+                                            </p:cellEditor>
                                         </p:column>
-                                        
+
                                         <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Expire Date" />
-                                        </f:facet>
-                                        <p:cellEditor>
-                                            <f:facet name="output"><h:outputText value="#{fee.expiryDate}" /></f:facet>
-                                            <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
-                                        </p:cellEditor>
+                                            <f:facet name="header">
+                                                <h:outputText value="Expire Date" />
+                                            </f:facet>
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{fee.expiryDate}" /></f:facet>
+                                                <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
+                                            </p:cellEditor>
                                         </p:column>
-                                        
+
                                         <p:column>
                                             <f:facet name="header">
                                                 <h:outputText value="Autoassign" />
@@ -298,7 +484,7 @@
                                                 <h:outputText value="Remove?" />
                                             </f:facet>
                                             <p:commandButton ajax="true" value="Remove" 
-                                                             action="#{feeManagementBB.removeOccPeriodFee(fee)}"
+                                                             action="#{feeManagementBB.removePermittedFee(fee)}"
                                                              update="#{p:component('permittedFeeTable')}
                                                              feePermissionsForm"/>                                      
                                         </p:column>
@@ -383,6 +569,12 @@
 
                             </h:form>
                         </p:dialog>
+                        <p:spacer height="15px"/>
+                        <p:commandButton    id="feePermissionFinishedButton"
+                                            action="#{feeManagementBB.finishAndRedir()}"
+                                            rendered="#{feeManagementBB.redirected}"
+                                            value="Finish editing permissions and return"
+                                            />
 
                     </f:view>
                 </div>

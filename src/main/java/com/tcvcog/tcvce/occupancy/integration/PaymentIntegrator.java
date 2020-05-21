@@ -20,8 +20,9 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.Fee;
-import com.tcvcog.tcvce.entities.FeeAssignedType;
+import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -288,9 +289,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         List<Fee> feeList = new ArrayList<>();
 
-        String query = "SELECT moneyfee.feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes\n"
+        String query = "SELECT moneyfee.feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes, autoassign\n"
                 + "FROM moneyfee, moneycodesetelementfee\n"
-                + "WHERE moneyfee.feeid = moneycodesetelementfee.fee_feeid AND moneycodesetelementfee. = ?;";
+                + "WHERE moneyfee.feeid = moneycodesetelementfee.fee_feeid AND moneycodesetelementfee.codesetelement_elementid = ? AND active = true;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -347,10 +348,21 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(2, fee.getOccPeriodID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
-            stmt.setInt(5, fee.getWaivedBy().getUserID());
+
+            if (fee.getWaivedBy().getUserID() != 0) {
+                stmt.setInt(5, fee.getWaivedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+
             stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
             stmt.setDouble(7, fee.getReducedBy());
-            stmt.setInt(8, fee.getReducedByUser().getUserID());
+            if (fee.getReducedByUser().getUserID() != 0) {
+                stmt.setInt(8, fee.getReducedByUser().getUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+
             stmt.setString(9, fee.getNotes());
             stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
             stmt.setInt(11, fee.getOccPeriodTypeID());
@@ -360,6 +372,63 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot insert OccPeriodFee", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+
+    }
+
+    public void insertCECaseFee(MoneyCECaseFeeAssigned fee) throws IntegrationException {
+        String query = "INSERT INTO public.moneycecasefeeassigned(\n"
+                + "    cecaseassignedfeeid, moneyfeeassigned_assignedid, cecase_caseid,"
+                + "    assignedby_userid, assignedbyts, waivedby_userid, lastmodifiedts, reduceby,"
+                + "    reduceby_userid, notes, fee_feeid, codesetelement_elementid)\n"
+                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?::numeric::money, ?, ?, ?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getMoneyFeeAssigned());
+            stmt.setInt(2, fee.getCaseID());
+            stmt.setInt(3, fee.getAssignedBy().getUserID());
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
+
+            if (fee.getWaivedBy().getUserID() != 0) {
+                stmt.setInt(5, fee.getWaivedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
+            stmt.setDouble(7, fee.getReducedBy());
+            if (fee.getReducedByUser().getUserID() != 0) {
+                stmt.setInt(8, fee.getReducedByUser().getUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            stmt.setString(9, fee.getNotes());
+            stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
+            stmt.setInt(11, fee.getCodeSetElement());
+            System.out.println("PaymentTypeIntegrator.insertCECaseFee | sql: " + stmt.toString());
+            System.out.println("TRYING TO EXECUTE INSERT METHOD");
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert CECaseFee", ex);
 
         } finally {
             if (con != null) {
@@ -395,10 +464,18 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(2, fee.getOccPeriodID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
-            stmt.setInt(5, fee.getWaivedBy().getUserID());
+            if (fee.getWaivedBy().getUserID() != 0) {
+                stmt.setInt(5, fee.getWaivedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
             stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
             stmt.setDouble(7, fee.getReducedBy());
-            stmt.setInt(8, fee.getReducedByUser().getUserID());
+            if (fee.getReducedByUser().getUserID() != 0) {
+                stmt.setInt(8, fee.getReducedByUser().getUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
             stmt.setString(9, fee.getNotes());
             stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
             stmt.setInt(11, fee.getOccPeriodTypeID());
@@ -428,15 +505,72 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
+    public void updateCECaseFee(MoneyCECaseFeeAssigned fee) throws IntegrationException {
+        String query = "UPDATE public.moneycecasefeeassigned\n"
+                + "SET moneyfeeassigned_assignedid=?, cecase_caseid=?, assignedby_userid=?,\n"
+                + "    assignedbyts=?, waivedby_userid=?, lastmodifiedts=?, reduceby=(?::numeric::money), reduceby_userid=?,\n"
+                + "    notes=?, fee_feeid=?, codesetelement_elementid=?\n"
+                + "WHERE cecaseassignedfeeid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getMoneyFeeAssigned());
+            stmt.setInt(2, fee.getCaseID());
+            stmt.setInt(3, fee.getAssignedBy().getUserID());
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
+            if (fee.getWaivedBy().getUserID() != 0) {
+                stmt.setInt(5, fee.getWaivedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
+            stmt.setDouble(7, fee.getReducedBy());
+            if (fee.getReducedByUser().getUserID() != 0) {
+                stmt.setInt(8, fee.getReducedByUser().getUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            stmt.setString(9, fee.getNotes());
+            stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
+            stmt.setInt(11, fee.getCodeSetElement());
+            stmt.setInt(12, fee.getCeCaseAssignedFeeID());
+            System.out.println("PaymentTypeIntegrator.updateOccPeriodFee | sql: " + stmt.toString());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot update OccPeriodFee", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+
+    }
+
+    public FeeAssigned generateFeeAssigned(ResultSet rs) throws IntegrationException {
 
         UserIntegrator ui = getUserIntegrator();
 
-        MoneyOccPeriodFeeAssigned fee = new MoneyOccPeriodFeeAssigned();
+        FeeAssigned fee = new FeeAssigned();
 
         try {
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
             fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
+            fee.setAssigned(rs.getTimestamp("assignedbyts").toLocalDateTime());
             fee.setWaivedBy(ui.getUser(rs.getInt("waivedby_userid")));
             fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
             fee.setReducedBy(rs.getDouble("reduceby"));
@@ -445,7 +579,26 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee.setFee(getFee(rs.getInt("fee_feeid")));
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
 
-            fee.setOccPeriodID(rs.getInt("occperiod_periodid"));
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error generating OccPeriodFeeAssigned from ResultSet", ex);
+        }
+
+        return fee;
+
+    }
+
+    public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
+
+        UserIntegrator ui = getUserIntegrator();
+
+        MoneyOccPeriodFeeAssigned fee = new MoneyOccPeriodFeeAssigned();
+
+        try {
+
+            fee = new MoneyOccPeriodFeeAssigned(generateFeeAssigned(rs));
+
+            fee.setAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
             fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
             fee.setOccPerAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
             fee.setPaymentList(getPaymentList(fee));
@@ -465,18 +618,13 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         MoneyCECaseFeeAssigned fee = new MoneyCECaseFeeAssigned();
 
         try {
-            fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
-            fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
-            fee.setWaivedBy(ui.getUser(rs.getInt("waivedby_userid")));
-            fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
-            fee.setReducedBy(rs.getDouble("reducedby"));
-            fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
-            fee.setNotes(rs.getString("notes"));
-            fee.setFee(getFee(rs.getInt("fee_feeid")));
+
+            fee = new MoneyCECaseFeeAssigned(generateFeeAssigned(rs));
 
             fee.setCeCaseAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
             fee.setCaseID(rs.getInt("cecase_caseid"));
             fee.setCodeSetElement(rs.getInt("codesetelement_elementid"));
+            fee.setPaymentList(getPaymentList(fee));
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error generating CECaseFeeAssigned from ResultSet", ex);
@@ -514,7 +662,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     public void updatePayment(Payment payment) throws IntegrationException {
         String query = "UPDATE public.moneypayment\n"
-                + "   SET occinspec_inspectionid=?, paymenttype_typeid=?, \n"
+                + "   SET paymenttype_typeid=?, \n"
                 + "       datereceived=?, datedeposited=?, amount=(?::numeric::money), payer_personid=?, referencenum=?, \n"
                 + "       checkno=?, cleared=?, notes=?\n"
                 + " WHERE paymentid=?;";
@@ -524,37 +672,30 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, payment.getOccupancyInspectionID());
-            stmt.setInt(2, payment.getPaymentType().getPaymentTypeId());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateReceived()));
-            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
-            stmt.setDouble(5, payment.getAmount());
-            stmt.setInt(6, payment.getPayer().getPersonID());
-            stmt.setString(7, payment.getReferenceNum());
-            stmt.setInt(8, payment.getCheckNum());
-            stmt.setBoolean(9, payment.isCleared());
-            stmt.setString(10, payment.getNotes());
+            stmt.setInt(1, payment.getPaymentType().getPaymentTypeId());
+
             if (payment.getDateReceived() != null) {
-                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateReceived()));
+                stmt.setTimestamp(2, java.sql.Timestamp.valueOf(payment.getDateReceived()));
+
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            //update date deposited
+            if (payment.getDateDeposited() != null) {
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
 
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
-            //update date deposited
-            if (payment.getDateDeposited() != null) {
-                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
 
-            } else {
-                stmt.setNull(4, java.sql.Types.NULL);
-            }
-            stmt.setBigDecimal(5, BigDecimal.valueOf(payment.getAmount()));
-            stmt.setInt(6, payment.getPayer().getPersonID());
-            stmt.setString(7, payment.getReferenceNum());
-            stmt.setInt(8, payment.getCheckNum());
-            stmt.setBoolean(9, payment.isCleared());
-            stmt.setString(10, payment.getNotes());
-            stmt.setInt(11, payment.getPaymentID());
-            System.out.println("PaymentBB.editPayment | sql: " + stmt.toString());
+            stmt.setBigDecimal(4, BigDecimal.valueOf(payment.getAmount()));
+            stmt.setInt(5, payment.getPayer().getPersonID());
+            stmt.setString(6, payment.getReferenceNum());
+            stmt.setInt(7, payment.getCheckNum());
+            stmt.setBoolean(8, payment.isCleared());
+            stmt.setString(9, payment.getNotes());
+            stmt.setInt(10, payment.getPaymentID());
+            System.out.println("PaymentIntegrator.updatePayment | sql: " + stmt.toString());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -588,7 +729,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
      */
     public List<Payment> getPaymentList(OccPeriod period) throws IntegrationException {
 
-        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
                 + "FROM moneyoccperiodfeeassigned, moneyoccperiodfeepayment, public.moneypayment\n"
@@ -636,7 +777,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     public List<Payment> getPaymentList(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
 
-        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
                 + "FROM moneyoccperiodfeepayment, public.moneypayment\n"
@@ -653,7 +794,115 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             while (rs.next()) {
                 Payment p = generatePayment(rs);
                 p.setAssignedFeeID(fee.getOccPerAssignedFeeID());
-                p.setAssignedTo(FeeAssignedType.OccPeriod);
+                p.setDomain(EventDomainEnum.OCCUPANCY);
+                paymentList.add(p);
+
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Payment List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return paymentList;
+    }
+
+    /**
+     * Extracts the ID of the given CECase and uses this to grab all relevant
+     * payments from the db associated with this CECase
+     *
+     * @param cse
+     * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<Payment> getPaymentList(CECase cse) throws IntegrationException {
+
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived, datedeposited, \n"
+                + "amount, payer_personid, referencenum, checkno, cleared,\n"
+                + "moneypayment.notes, recordedby_userid, entrytimestamp\n"
+                + "FROM moneycecasefeeassigned, moneycecasefeepayment, public.moneypayment\n"
+                + "WHERE cecase_caseid = ? AND cecaseassignedfeeid = cecaseassignedfee_id AND payment_paymentid = paymentid;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<Payment> paymentList = new ArrayList();
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cse.getCaseID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                paymentList.add(generatePayment(rs));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Payment List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return paymentList;
+    }
+
+    public List<Payment> getPaymentList(MoneyCECaseFeeAssigned fee) throws IntegrationException {
+
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
+                + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
+                + "recordedby_userid, entrytimestamp\n"
+                + "FROM moneycecasefeepayment, public.moneypayment\n"
+                + "WHERE cecaseassignedfee_id = ? AND payment_paymentid = paymentid;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<Payment> paymentList = new ArrayList();
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getCeCaseAssignedFeeID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                Payment p = generatePayment(rs);
+                p.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
+                p.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
                 paymentList.add(p);
 
             }
@@ -687,7 +936,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public ArrayList<Payment> getPaymentList() throws IntegrationException {
-        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived, \n"
                 + "       datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
                 + "  FROM public.moneypayment;";
@@ -733,7 +982,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public Payment getMostRecentPayment() throws IntegrationException {
-        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
                 + "FROM moneypayment\n"
@@ -781,36 +1030,35 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     public void insertPayment(Payment payment) throws IntegrationException {
         String query = "INSERT INTO public.moneypayment(\n"
-                + " paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
+                + " paymentid, paymenttype_typeid, datereceived, \n"
                 + " datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes, \n"
                 + " recordedby_userid, entrytimestamp)\n"
-                + "    VALUES (DEFAULT, ?, ?, ?, \n"
+                + "    VALUES (DEFAULT, ?, ?, \n"
                 + "            ?, ?::numeric::money, ?, ?, ?, DEFAULT, ?, ?, NOW());";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, payment.getOccupancyInspectionID());
-            stmt.setInt(2, payment.getPaymentType().getPaymentTypeId());
+            stmt.setInt(1, payment.getPaymentType().getPaymentTypeId());
             if (payment.getDateReceived() != null) {
-                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateReceived()));
+                stmt.setTimestamp(2, java.sql.Timestamp.valueOf(payment.getDateReceived()));
 
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            if (payment.getDateDeposited() != null) {
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
-            if (payment.getDateDeposited() != null) {
-                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(payment.getDateDeposited()));
-            } else {
-                stmt.setNull(4, java.sql.Types.NULL);
-            }
-            stmt.setBigDecimal(5, BigDecimal.valueOf(payment.getAmount()));
-            stmt.setInt(6, payment.getPayer().getPersonID());
-            stmt.setString(7, payment.getReferenceNum());
-            stmt.setInt(8, payment.getCheckNum());
-            stmt.setString(9, payment.getNotes());
-            stmt.setInt(10, payment.getRecordedBy().getUserID());
-            System.out.println("PaymentIntegrator.paymentIntegrator | sql: " + stmt.toString());
+            stmt.setBigDecimal(4, BigDecimal.valueOf(payment.getAmount()));
+            stmt.setInt(5, payment.getPayer().getPersonID());
+            stmt.setString(6, payment.getReferenceNum());
+            stmt.setInt(7, payment.getCheckNum());
+            stmt.setString(8, payment.getNotes());
+            stmt.setInt(9, payment.getRecordedBy().getUserID());
+            System.out.println("PaymentIntegrator.insertPayment | sql: " + stmt.toString());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -942,7 +1190,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         }
 
     }
-    
+
     public void updateFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
 
         String query = "UPDATE public.moneyoccperiodtypefee\n"
@@ -981,6 +1229,152 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+    public void insertFeeCodeElementJoin(Fee fee, EnforcableCodeElement element) throws IntegrationException {
+        String query = "INSERT INTO public.moneycodesetelementfee(\n"
+                + "    fee_feeid, codesetelement_elementid, autoassign, active)\n"
+                + "    VALUES (?, ?, ?, true);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, element.getCodeSetElementID());
+            stmt.setBoolean(3, fee.isAutoAssigned());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.insertFeeCodeElementJoin | Error: ", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+    }
+
+    public void deactivateFeeCodeElementJoin(Fee fee, EnforcableCodeElement element) throws IntegrationException {
+
+        String query = "UPDATE public.moneycodesetelementfee\n"
+                + "   SET active=false\n"
+                + "   WHERE fee_feeid=? AND codesetelement_elementid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, element.getCodeSetElementID());
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot Fee Code Set Element join", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+    }
+
+    public void reactivateFeeCodeElementJoin(Fee fee, EnforcableCodeElement element) throws IntegrationException {
+
+        String query = "UPDATE public.moneycodesetelementfee\n"
+                + "   SET active=true\n"
+                + "   WHERE fee_feeid=? AND codesetelement_elementid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, element.getCodeSetElementID());
+            System.out.println("TRYING TO EXECUTE UPDATE METHOD");
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to reactivate fee and Code Set Element join", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        }
+
+    }
+
+    public void updateFeeCodeElementJoin(Fee fee, EnforcableCodeElement element) throws IntegrationException {
+
+        String query = "UPDATE public.moneycodesetelementfee\n"
+                + "   SET autoassign=?\n"
+                + "   WHERE fee_feeid=? AND codesetelement_elementid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setBoolean(1, fee.isAutoAssigned());
+            stmt.setInt(2, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(3, element.getCodeSetElementID());
+            System.out.println("TRYING TO EXECUTE UPDATE METHOD");
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update fee and code set element join", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        }
+
+    }
+
     public void insertPaymentPeriodJoin(Payment payment, MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
         String query = "INSERT INTO public.moneyoccperiodfeepayment(\n"
                 + "    payment_paymentid, occperiodassignedfee_id)\n"
@@ -998,6 +1392,43 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot insert Payment-Occ Period join", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+
+    }
+
+    public void insertPaymentCaseJoin(Payment payment, MoneyCECaseFeeAssigned fee) throws IntegrationException {
+        String query = "INSERT INTO public.moneycecasefeepayment(\n"
+                + "    payment_paymentid, cecaseassignedfee_id)\n"
+                + "    VALUES (?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, payment.getPaymentID());
+            stmt.setInt(2, fee.getCeCaseAssignedFeeID());
+            System.out.println("PaymentIntegrator.insertPaymentCaseJoin | sql: " + stmt.toString());
+            System.out.println("TRYING TO EXECUTE INSERT METHOD");
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert Payment-CE Case join", ex);
 
         } finally {
             if (con != null) {
@@ -1061,7 +1492,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             newPayment.setPaymentID(rs.getInt("paymentid"));
-            newPayment.setOccupancyInspectionID(rs.getInt("occinspec_inspectionid"));
             newPayment.setPaymentType(getPaymentTypeFromPaymentTypeID(rs.getInt("paymenttype_typeid")));
             java.sql.Timestamp dateReceived = rs.getTimestamp("datereceived");
             //for received date
@@ -1447,35 +1877,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot delete occupancy inspection fee--probably because another" + "part of the database has a reference item.", ex);
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-        } // close finally
-    }
-
-    public void deleteOccPeriodFee(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
-        String query = "DELETE FROM public.moneyoccperiodfeeassigned\n" + " WHERE moneyoccperassignedfeeid= ?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getOccPerAssignedFeeID());
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot delete assigned fee", ex);
         } finally {
             if (con != null) {
                 try {

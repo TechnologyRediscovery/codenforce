@@ -115,6 +115,17 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
    
     private String formNoteText;
   
+    
+     // payments
+    private List<Payment> paymentList;
+    private List<Payment> filteredPaymentList;
+    private Payment selectedPayment;
+    
+    //fees
+    private List<MoneyOccPeriodFeeAssigned> feeList;
+    private List<MoneyOccPeriodFeeAssigned> filteredFeeList;
+    private MoneyOccPeriodFeeAssigned selectedFee;
+    
     /**
      * Creates a new instance of InspectionsBB
      */
@@ -136,31 +147,11 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         currentOccPeriod = getSessionBean().getSessOccPeriod();
         try {
             setupUnitMemberVariablesBasedOnCurrentOccPeriod();
-        
-//            if(currentInspection == null){
-//                if(getSessionBean().getSessionOccInspection() != null){
-//                    currentInspection = getSessionBean().getSessionOccInspection();
-                    // we don't really need to reload inspection from integrator
-//                    try {
-//                        currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
-//                    } catch (IntegrationException ex) {
-//                        System.out.println(ex);
-//                    }
-//                currentOccPeriod = oi.getOccPeriod(currentInspection.getOccPeriodID(), getSessionBean().getSessionUser());
-//                } else {
-//                    currentOccPeriod = oi.getOccPeriod(getSessionBean().getSessionOccPeriod().getPeriodID(), getSessionBean().getSessionUser());
-//                    currentInspection = oii.getOccInspection(currentOccPeriod.getInspectionList().get(0).getInspectionID());
-//                    currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-//                } 
-//            }
-            
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
         
         // general setting of drop-down box lists
-        
-        
         if(workingLocationList == null){
             workingLocationList = new ArrayList<>();
             try {
@@ -171,10 +162,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             }
         }
         
-     
-        
         managerInspectorCandidateList = uc.assembleUserListForSearchCriteria();
-        
         itemFilterOptions = Arrays.asList(ViewOptionsOccChecklistItemsEnum.values());
         inspectedElementAddValueCandidateList = Arrays.asList(OccInspectionStatusEnum.values());
         
@@ -206,6 +194,10 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                     currentInspection.setViewSetting(ViewOptionsOccChecklistItemsEnum.ALL_ITEMS);
                 }
             }
+        
+        feeList = currentOccPeriod.getFeeList();
+        paymentList = currentOccPeriod.getPaymentList();
+        
     }
     
     public void loadSpacesInType(){
@@ -708,24 +700,131 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      }
      
 
-  
-     public String editOccPeriodPayments(){
-         getSessionBean().setSessOccPeriod(currentOccPeriod);
-         getSessionBean().setPaymentRedirTo("inspection");
+     
+     public void certifyOccPeriodField(ActionEvent ev){
+         
+         OccupancyCoordinator oc = getOccupancyCoordinator();
+         FacesContext context = getFacesContext();
+         String field = context.getExternalContext().getRequestParameterMap().get("fieldtocertify");
+         String certifymode = context.getExternalContext().getRequestParameterMap().get("certifymode");
+         
+         System.out.println("OccInspectionBB.certifuyOccPeriodField | field: " + field + " | mode: " + certifymode);
+         
+         User u = getSessionBean().getSessUser();
+         LocalDateTime now = LocalDateTime.now();
+         
+         switch(field){
+            case "authorization":
+                currentOccPeriod.setAuthorizedBy(u);
+                currentOccPeriod.setAuthorizedTS(now);
+                if(certifymode.equals("withdraw")){
+                    currentOccPeriod.setAuthorizedBy(null);
+                    currentOccPeriod.setAuthorizedTS(null);
+                }
+                break;
+            case "occperiodtype":
+                currentOccPeriod.setPeriodTypeCertifiedBy(u);
+                currentOccPeriod.setPeriodTypeCertifiedTS(now);
+                if(certifymode.equals("withdraw")){
+                    currentOccPeriod.setPeriodTypeCertifiedBy(null);
+                    currentOccPeriod.setPeriodTypeCertifiedTS(null);
+                }
+                break;
+            case "startdate":
+                if(periodStartDateNull){
+                    currentOccPeriod.setStartDate(null);
+                }
+                currentOccPeriod.setStartDateCertifiedBy(u);
+                currentOccPeriod.setStartDateCertifiedTS(now);
+                if(certifymode.equals("withdraw")){
+                    currentOccPeriod.setStartDateCertifiedBy(null);
+                    currentOccPeriod.setStartDateCertifiedTS(null);
+                }
+                break;
+            case "enddate":
+                if(periodEndDateNull){
+                    currentOccPeriod.setEndDate(null);
+                }
+                currentOccPeriod.setEndDateCertifiedBy(u);
+                currentOccPeriod.setEndDateCertifiedTS(now);
+                if(certifymode.equals("withdraw")){
+                    currentOccPeriod.setEndDateCertifiedBy(null);
+                    currentOccPeriod.setEndDateCertifiedTS(null);
+                }
+                break;
+            default:
+                getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Error! Unable to certify field", ""));
+         }
+         
+        try {
+            oc.updateOccPeriod(currentOccPeriod, u);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Successfully udpated field status!", ""));
+        } catch (IntegrationException ex) {
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                ex.getMessage(), ""));
+        }
+        reloadCurrentOccPeriodDataHeavy();
+         
+     }
+     
+     
+     public void authorizeOccPeriod(ActionEvent ev){
+         OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.authorizeOccPeriod(currentOccPeriod, getSessionBean().getSessionUser());
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_INFO,
+               "Success! Occupancy period ID " + currentOccPeriod.getPeriodID() 
+                       + " is now authorized and permits can be generated.", ""));
+        } catch (AuthorizationException | CaseLifecycleException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_ERROR,
+               ex.getMessage(), ""));
+        }
+     }
+     
+     public void updatePeriodPropUnit(){
+         OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.updateOccPeriodPropUnit(currentOccPeriod, selectedPropertyUnit);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "The current occupancy period has been assigned to property unit ID " + selectedPropertyUnit.getUnitID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                ex.getMessage(), ""));
+        }
+        reloadCurrentOccPeriodDataHeavy();
+     }
+     
+    public String editOccPeriodPayments(){
+         getSessionBean().setFeeManagementDomain(EventDomainEnum.OCCUPANCY);
+         getSessionBean().setFeeManagementOccPeriod(currentOccPeriod);
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "payments";
      }
      
-     public String editOnePayment(Payment thisPayment){
-         getSessionBean().setSessPayment(thisPayment);
-         getSessionBean().setPaymentRedirTo("inspection");
+    public String editOnePayment(Payment thisPayment){
+         getSessionBean().setFeeManagementDomain(EventDomainEnum.OCCUPANCY);
+         getSessionBean().setSessionPayment(thisPayment);
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "payments";
      }
      
      public String editOccPeriodFees(){
+         getSessionBean().setFeeManagementDomain(EventDomainEnum.OCCUPANCY);
          getSessionBean().setFeeManagementOccPeriod(currentOccPeriod);
-         getSessionBean().setFeeRedirTo("inspection");
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "editFees";
      }
@@ -1169,7 +1268,283 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         this.inspectedElementAddValueCandidateList = inspectedElementAddValueCandidateList;
     }
 
+<<<<<<< HEAD
   
+=======
+    /**
+     * @return the periodStartDateNull
+     */
+    public boolean isPeriodStartDateNull() {
+        return periodStartDateNull;
+    }
+
+    /**
+     * @return the periodEndDateNull
+     */
+    public boolean isPeriodEndDateNull() {
+        return periodEndDateNull;
+    }
+
+    /**
+     * @param periodStartDateNull the periodStartDateNull to set
+     */
+    public void setPeriodStartDateNull(boolean periodStartDateNull) {
+        this.periodStartDateNull = periodStartDateNull;
+    }
+
+    /**
+     * @param periodEndDateNull the periodEndDateNull to set
+     */
+    public void setPeriodEndDateNull(boolean periodEndDateNull) {
+        this.periodEndDateNull = periodEndDateNull;
+    }
+
+    /**
+     * @return the formEventRuleIDToAdd
+     */
+    public int getFormEventRuleIDToAdd() {
+        return formEventRuleIDToAdd;
+    }
+
+    /**
+     * @param formEventRuleIDToAdd the formEventRuleIDToAdd to set
+     */
+    public void setFormEventRuleIDToAdd(int formEventRuleIDToAdd) {
+        this.formEventRuleIDToAdd = formEventRuleIDToAdd;
+    }
+
+    /**
+     * @return the currentEventRuleAbstract
+     */
+    public EventRuleAbstract getCurrentEventRuleAbstract() {
+        return currentEventRuleAbstract;
+    }
+
+    /**
+     * @param currentEventRuleAbstract the currentEventRuleAbstract to set
+     */
+    public void setCurrentEventRuleAbstract(EventRuleAbstract currentEventRuleAbstract) {
+        this.currentEventRuleAbstract = currentEventRuleAbstract;
+    }
+
+    /**
+     * @return the includeEventRuleInCurrentOccPeriodTemplate
+     */
+    public boolean isIncludeEventRuleInCurrentOccPeriodTemplate() {
+        return includeEventRuleInCurrentOccPeriodTemplate;
+    }
+
+    /**
+     * @param includeEventRuleInCurrentOccPeriodTemplate the includeEventRuleInCurrentOccPeriodTemplate to set
+     */
+    public void setIncludeEventRuleInCurrentOccPeriodTemplate(boolean includeEventRuleInCurrentOccPeriodTemplate) {
+        this.includeEventRuleInCurrentOccPeriodTemplate = includeEventRuleInCurrentOccPeriodTemplate;
+    }
+
+    /**
+     * @return the eventCategoryListAllActive
+     */
+    public List<EventCategory> getEventCategoryListAllActive() {
+        return eventCategoryListAllActive;
+    }
+
+    /**
+     * @param eventCategoryListAllActive the eventCategoryListAllActive to set
+     */
+    public void setEventCategoryListAllActive(List<EventCategory> eventCategoryListAllActive) {
+        this.eventCategoryListAllActive = eventCategoryListAllActive;
+    }
+
+    /**
+     * @return the eventTypeListAll
+     */
+    public List<EventType> getEventTypeListAll() {
+        return eventTypeListAll;
+    }
+
+    /**
+     * @param eventTypeListAll the eventTypeListAll to set
+     */
+    public void setEventTypeListAll(List<EventType> eventTypeListAll) {
+        this.eventTypeListAll = eventTypeListAll;
+    }
+
+    /**
+     * @return the eventsViewOptions
+     */
+    public List<ViewOptionsActiveHiddenListsEnum> getEventsViewOptions() {
+        return eventsViewOptions;
+    }
+
+    /**
+     * @return the selectedEventView
+     */
+    public ViewOptionsActiveHiddenListsEnum getSelectedEventView() {
+        return selectedEventView;
+    }
+
+    /**
+     * @param selectedEventView the selectedEventView to set
+     */
+    public void setSelectedEventView(ViewOptionsActiveHiddenListsEnum selectedEventView) {
+        this.selectedEventView = selectedEventView;
+    }
+
+    /**
+     * @return the proposalsViewOptions
+     */
+    public List<ViewOptionsProposalsEnum> getProposalsViewOptions() {
+        return proposalsViewOptions;
+    }
+
+    /**
+     * @return the selectedProposalsViewOption
+     */
+    public ViewOptionsProposalsEnum getSelectedProposalsViewOption() {
+        return selectedProposalsViewOption;
+    }
+
+    /**
+     * @return the rulesViewOptions
+     */
+    public List<ViewOptionsEventRulesEnum> getRulesViewOptions() {
+        return rulesViewOptions;
+    }
+
+    /**
+     * @return the selectedRulesViewOption
+     */
+    public ViewOptionsEventRulesEnum getSelectedRulesViewOption() {
+        return selectedRulesViewOption;
+    }
+
+    /**
+     * @param proposalsViewOptions the proposalsViewOptions to set
+     */
+    public void setProposalsViewOptions(List<ViewOptionsProposalsEnum> proposalsViewOptions) {
+        this.proposalsViewOptions = proposalsViewOptions;
+    }
+
+    /**
+     * @param selectedProposalsViewOption the selectedProposalsViewOption to set
+     */
+    public void setSelectedProposalsViewOption(ViewOptionsProposalsEnum selectedProposalsViewOption) {
+        this.selectedProposalsViewOption = selectedProposalsViewOption;
+    }
+
+    /**
+     * @param rulesViewOptions the rulesViewOptions to set
+     */
+    public void setRulesViewOptions(List<ViewOptionsEventRulesEnum> rulesViewOptions) {
+        this.rulesViewOptions = rulesViewOptions;
+    }
+
+    /**
+     * @param selectedRulesViewOption the selectedRulesViewOption to set
+     */
+    public void setSelectedRulesViewOption(ViewOptionsEventRulesEnum selectedRulesViewOption) {
+        this.selectedRulesViewOption = selectedRulesViewOption;
+    }
+
+    /**
+     * @return the eventRuleSetList
+     */
+    public List<EventRuleSet> getEventRuleSetList() {
+        return eventRuleSetList;
+    }
+
+    /**
+     * @param eventRuleSetList the eventRuleSetList to set
+     */
+    public void setEventRuleSetList(List<EventRuleSet> eventRuleSetList) {
+        this.eventRuleSetList = eventRuleSetList;
+    }
+
+    /**
+     * @return the selectedEventRuleSet
+     */
+    public EventRuleSet getSelectedEventRuleSet() {
+        return selectedEventRuleSet;
+    }
+
+    /**
+     * @param selectedEventRuleSet the selectedEventRuleSet to set
+     */
+    public void setSelectedEventRuleSet(EventRuleSet selectedEventRuleSet) {
+        this.selectedEventRuleSet = selectedEventRuleSet;
+    }
+
+    /**
+     * @return the filteredPaymentList
+     */
+    public List<Payment> getFilteredPaymentList() {
+        return filteredPaymentList;
+    }
+
+    /**
+     * @return the selectedPayment
+     */
+    public Payment getSelectedPayment() {
+        return selectedPayment;
+    }
+
+    /**
+     * @return the filteredFeeList
+     */
+    public List<MoneyOccPeriodFeeAssigned> getFilteredFeeList() {
+        return filteredFeeList;
+    }
+
+    /**
+     * @return the selectedFee
+     */
+    public MoneyOccPeriodFeeAssigned getSelectedFee() {
+        return selectedFee;
+    }
+
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
+    }
+    
+    /**
+     * @param filteredPaymentList the filteredPaymentList to set
+     */
+    public void setFilteredPaymentList(List<Payment> filteredPaymentList) {
+        this.filteredPaymentList = filteredPaymentList;
+    }
+
+    /**
+     * @param selectedPayment the selectedPayment to set
+     */
+    public void setSelectedPayment(Payment selectedPayment) {
+        this.selectedPayment = selectedPayment;
+    }
+
+    public List<MoneyOccPeriodFeeAssigned> getFeeList() {
+        return feeList;
+    }
+
+    public void setFeeList(List<MoneyOccPeriodFeeAssigned> feeList) {
+        this.feeList = feeList;
+    }
+    
+    /**
+     * @param filteredFeeList the filteredFeeList to set
+     */
+    public void setFilteredFeeList(List<MoneyOccPeriodFeeAssigned> filteredFeeList) {
+        this.filteredFeeList = filteredFeeList;
+    }
+
+    /**
+     * @param selectedFee the selectedFee to set
+     */
+    public void setSelectedFee(MoneyOccPeriodFeeAssigned selectedFee) {
+        this.selectedFee = selectedFee;
+    }
 
      
 }

@@ -5,21 +5,20 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Objects;
 
 /**
  *
  * @author sylvia
  */
-public class        CECase 
-        extends     CECasePublic
-        implements  IFace_Openable,
-                    Cloneable,
-                    IFace_Loggable{
+public class CECaseBase 
+        extends EntityUtils 
+        implements Serializable, 
+                    Openable,
+                    Cloneable{
     
     protected int caseID;
     protected int publicControlCode;
@@ -32,41 +31,32 @@ public class        CECase
      * that contains a link to this case.
      */
     protected boolean allowForwardLinkedPublicAccess;
-    
-    protected int propertyID;
-    protected int propertyUnitID;
+    protected Property property;
+    protected PropertyUnit propertyUnit;
     
     protected User caseManager;
     protected String caseName;
+    protected CasePhase casePhase;
     
-    protected CasePhaseEnum casePhase;
     protected Icon casePhaseIcon;
     
+    protected java.util.Date originationDateUtilDate;
     protected LocalDateTime originationDate;
-    protected LocalDateTime closingDate;
-    protected LocalDateTime creationTimestamp;
+    protected String originiationDatePretty;
     
+    protected java.util.Date closingDateUtilDate;
+    protected LocalDateTime closingDate;
+    protected String closingDatePretty;
+    
+    protected LocalDateTime creationTimestamp;
     protected String notes;
     
-    protected BOBSource source;
-    
-    protected List<Citation> citationList;
-    protected List<NoticeOfViolation> noticeList;
-    protected List<CodeViolation> violationList;
-    
-    protected boolean active;
-
-    private List<Payment> paymentList;
-    private List<MoneyCECaseFeeAssigned> feeList;
-    
-    public CECase(){
-    }
+    private BOBSource source;
 
     @Override
     public String toString() {
         return caseName;
     }
-    
     
     /**
      *
@@ -74,7 +64,7 @@ public class        CECase
      * @throws CloneNotSupportedException
      */
     @Override
-    public CECase clone() throws CloneNotSupportedException{
+    public CECaseBase clone() throws CloneNotSupportedException{
         super.clone();
         return null;
         
@@ -90,7 +80,7 @@ public class        CECase
   
     
     public long getCaseAge() {
-        return EntityUtils.getTimePeriodAsDays(originationDate, LocalDateTime.now());
+        return getTimePeriodAsDays(originationDate, LocalDateTime.now());
     }
 
     /**
@@ -105,6 +95,34 @@ public class        CECase
      */
     public void setCaseID(int caseID) {
         this.caseID = caseID;
+    }
+
+    /**
+     * @return the property
+     */
+    public Property getProperty() {
+        return property;
+    }
+
+    /**
+     * @param property the property to set
+     */
+    public void setProperty(Property property) {
+        this.property = property;
+    }
+
+    /**
+     * @return the propertyUnit
+     */
+    public PropertyUnit getPropertyUnit() {
+        return propertyUnit;
+    }
+
+    /**
+     * @param propertyUnit the propertyUnit to set
+     */
+    public void setPropertyUnit(PropertyUnit propertyUnit) {
+        this.propertyUnit = propertyUnit;
     }
 
     /**
@@ -138,14 +156,14 @@ public class        CECase
     /**
      * @return the casePhase
      */
-    public CasePhaseEnum getCasePhase() {
+    public CasePhase getCasePhase() {
         return casePhase;
     }
 
     /**
      * @param casePhase the casePhase to set
      */
-    public void setCasePhase(CasePhaseEnum casePhase) {
+    public void setCasePhase(CasePhase casePhase) {
         this.casePhase = casePhase;
     }
 
@@ -224,9 +242,9 @@ public class        CECase
      */
     public String getOriginiationDatePretty() {
         if(originationDate != null){
-            return EntityUtils.getPrettyDate(originationDate);
+            originiationDatePretty = getPrettyDate(originationDate);
         }
-        return null;
+        return originiationDatePretty;
     }
 
     /**
@@ -234,12 +252,25 @@ public class        CECase
      */
     public String getClosingDatePretty() {
         if(closingDate != null){
-            return EntityUtils.getPrettyDate(closingDate);
+            closingDatePretty = getPrettyDate(closingDate);
         }
-        return null;
+        return closingDatePretty;
     }
 
-    
+    /**
+     * @param originiationDatePretty the originiationDatePretty to set
+     */
+    public void setOriginiationDatePretty(String originiationDatePretty) {
+        this.originiationDatePretty = originiationDatePretty;
+    }
+
+    /**
+     * @param closingDatePretty the closingDatePretty to set
+     */
+    public void setClosingDatePretty(String closingDatePretty) {
+        this.closingDatePretty = closingDatePretty;
+    }
+
     /**
      * @return the paccEnabled
      */
@@ -291,14 +322,16 @@ public class        CECase
         hash = 53 * hash + this.publicControlCode;
         hash = 53 * hash + (this.paccEnabled ? 1 : 0);
         hash = 53 * hash + (this.allowForwardLinkedPublicAccess ? 1 : 0);
+        hash = 53 * hash + Objects.hashCode(this.property);
+        hash = 53 * hash + Objects.hashCode(this.propertyUnit);
         hash = 53 * hash + Objects.hashCode(this.caseManager);
         hash = 53 * hash + Objects.hashCode(this.caseName);
-        hash = 53 * hash + Objects.hashCode(this.propertyID);
-        hash = 53 * hash + Objects.hashCode(this.propertyUnitID);
         hash = 53 * hash + Objects.hashCode(this.casePhase);
         hash = 53 * hash + Objects.hashCode(this.casePhaseIcon);
         hash = 53 * hash + Objects.hashCode(this.originationDate);
+        hash = 53 * hash + Objects.hashCode(this.originiationDatePretty);
         hash = 53 * hash + Objects.hashCode(this.closingDate);
+        hash = 53 * hash + Objects.hashCode(this.closingDatePretty);
         hash = 53 * hash + Objects.hashCode(this.creationTimestamp);
         hash = 53 * hash + Objects.hashCode(this.notes);
         return hash;
@@ -315,7 +348,7 @@ public class        CECase
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CECase other = (CECase) obj;
+        final CECaseBase other = (CECaseBase) obj;
         if (this.caseID != other.caseID) {
             return false;
         }
@@ -329,9 +362,10 @@ public class        CECase
      */
     public java.util.Date getClosingDateUtilDate() {
         if(closingDate != null){
-            return  java.util.Date.from(closingDate.atZone(ZoneId.systemDefault()).toInstant());
+            closingDateUtilDate = java.util.Date.from(
+                    closingDate.atZone(ZoneId.systemDefault()).toInstant());
         }
-        return null;
+        return closingDateUtilDate;
     }
 
     /**
@@ -341,6 +375,7 @@ public class        CECase
         if(cd != null){
             this.closingDate = cd.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
+        this.closingDateUtilDate = cd;
     }
 
     /**
@@ -348,9 +383,10 @@ public class        CECase
      */
     public java.util.Date getOriginationDateUtilDate() {
         if(originationDate != null){
-            return  java.util.Date.from(originationDate.atZone(ZoneId.systemDefault()).toInstant());
+            originationDateUtilDate = java.util.Date.from(
+                    originationDate.atZone(ZoneId.systemDefault()).toInstant());
         }
-        return null;
+        return originationDateUtilDate;
     }
 
     /**
@@ -358,8 +394,9 @@ public class        CECase
      */
     public void setOriginationDateUtilDate(java.util.Date od) {
         if(od != null){
-            this.originationDate = od.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            originationDate = od.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
+        this.originationDateUtilDate = od;
     }
 
     /**
@@ -376,105 +413,6 @@ public class        CECase
         this.source = source;
     }
 
-    /**
-     * @return the citationList
-     */
-    public List<Citation> getCitationList() {
-        return citationList;
-    }
+  
 
-    /**
-     * @return the noticeList
-     */
-    public List<NoticeOfViolation> getNoticeList() {
-        return noticeList;
-    }
-
-    /**
-     * @return the violationList
-     */
-    public List<CodeViolation> getViolationList() {
-        return violationList;
-    }
-
-    /**
-     * @param citationList the citationList to set
-     */
-    public void setCitationList(List<Citation> citationList) {
-        this.citationList = citationList;
-    }
-
-    /**
-     * @param noticeList the noticeList to set
-     */
-    public void setNoticeList(List<NoticeOfViolation> noticeList) {
-        this.noticeList = noticeList;
-    }
-
-    /**
-     * @param violationList the violationList to set
-     */
-    public void setViolationList(List<CodeViolation> violationList) {
-        this.violationList = violationList;
-    }
-
-    /**
-     * @return the active
-     */
-    public boolean isActive() {
-        return active;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    /**
-     * @return the propertyID
-     */
-    public int getPropertyID() {
-        return propertyID;
-    }
-
-    /**
-     * @return the propertyUnitID
-     */
-    public int getPropertyUnitID() {
-        return propertyUnitID;
-    }
-
-    /**
-     * @param propertyID the propertyID to set
-     */
-    public void setPropertyID(int propertyID) {
-        this.propertyID = propertyID;
-    }
-
-    /**
-     * @param propertyUnitID the propertyUnitID to set
-     */
-    public void setPropertyUnitID(int propertyUnitID) {
-        this.propertyUnitID = propertyUnitID;
-    }
-
-    public List<Payment> getPaymentList() {
-        return paymentList;
-    }
-
-    public void setPaymentList(List<Payment> paymentList) {
-        this.paymentList = paymentList;
-    }
-
-    public List<MoneyCECaseFeeAssigned> getFeeList() {
-        return feeList;
-    }
-
-    public void setFeeList(List<MoneyCECaseFeeAssigned> feeList) {
-        this.feeList = feeList;
-    }
-
-    
 }

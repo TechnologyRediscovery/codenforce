@@ -107,6 +107,7 @@
         
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ session infrastructure ~~~~~~~~~~~~~~~~~~~~~~~--> 
+
     
     <managed-bean>
         <description>Creates and coordinates singletons for use during all users' visits.</description>
@@ -114,6 +115,15 @@
         <managed-bean-class>com.tcvcog.tcvce.application.Initializer</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
+    
+    
+    <managed-bean>
+        <managed-bean-name>systemCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.SystemCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    
+   
     
     <managed-bean>
         <managed-bean-name>sessionBean</managed-bean-name>
@@ -159,8 +169,6 @@
             <redirect />
         </navigation-case>
     </navigation-rule>
-    
-    
 
     <navigation-rule> 
         <navigation-case>
@@ -204,8 +212,6 @@
         </navigation-case>
     </navigation-rule>
         
-    
-    
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ display and navigation beans ~~~~~~~~~~~~~~~~--> 
     
@@ -363,6 +369,8 @@
         <managed-bean-class>com.tcvcog.tcvce.application.UserConfigBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    
    
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules user ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
@@ -478,9 +486,15 @@
             <to-view-id>/restricted/cogadmin/muniManage.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        <navigation-case>
+            <from-outcome>muniManageSample</from-outcome>
+            <to-view-id>/restricted/cogstaff/muni/muniManage_sample.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    
     </navigation-rule>
         
-    
+        
     
     <!--*********************************************************************-->
     <!--**                       II. CODEBOOK                              **-->
@@ -535,7 +549,7 @@
         <managed-bean-class>com.tcvcog.tcvce.application.CodeElementGuideAddUpdateBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
+    
     <managed-bean>
         <managed-bean-name>codeElementBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CodeElementBB</managed-bean-class>
@@ -1362,8 +1376,34 @@
             <from-outcome>textBlockManage</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/textBlockManage.xhtml</to-view-id>
             <redirect/>
+        
+        <navigation-case>
+            <from-outcome>occPermitApplications</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
+            <redirect />       
         </navigation-case>
-       
+        
+        <navigation-case>
+            <from-outcome>occPeriodStatus</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occPeriodStatus.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>occInspectionAdd</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occInspectionAdd.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>occInspectionProfile</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occProfile.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>checklists</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/checklists.xhtml</to-view-id>
+        </navigation-case>
+        
+  
         <navigation-case>
             <from-outcome>noticeOfViolationBuilder</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilder.xhtml</to-view-id>
@@ -1642,12 +1682,21 @@
     <!--*********************************************************************-->
     <!--**                       X. PAYMENT                                **-->
     <!--*********************************************************************-->
+
+
+    <managed-bean>
+        <managed-bean-name>feeManagementBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.FeeManagementBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    
     <managed-bean>
         <managed-bean-name>paymentCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.PaymentCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-    
+
     <managed-bean>
         <managed-bean-name>cECasePaymentsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECasePaymentsBB</managed-bean-class>
@@ -1661,7 +1710,40 @@
     </managed-bean>
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: payments ~~~~~~~~~~~~~~~~~~~~~~~~ --> 
-    
+        <navigation-rule>
+            <from-view-id>*</from-view-id>
+            <navigation-case>
+                <from-outcome>payments</from-outcome>
+                <to-view-id>/restricted/cogstaff/occ/paymentManage.xhtml</to-view-id>
+            </navigation-case>
+
+            <navigation-case>
+                <from-outcome>paymentTypeManage</from-outcome>
+                <to-view-id>/restricted/cogstaff/occ/paymentTypeManage.xhtml</to-view-id>
+            </navigation-case>
+
+            <navigation-case>
+                <from-outcome>occPeriodPayments</from-outcome>
+                <to-view-id>/restricted/cogstaff/occ/occPeriodPayments.xhtml</to-view-id>
+            </navigation-case>
+
+            <navigation-case>
+                <from-outcome>ceEventPayments</from-outcome>
+                <to-view-id>/restricted/cogstaff/ce/cEEventPayments.xhtml</to-view-id>
+            </navigation-case>
+
+            <navigation-case>
+                <from-outcome>feeTypeManage</from-outcome>
+                <to-view-id>/restricted/cogstaff/occ/feeTypeManage.xhtml</to-view-id>
+            </navigation-case>
+
+            <navigation-case>
+                <from-outcome>editFees</from-outcome>
+                <to-view-id>/restricted/cogstaff/occ/feeManage.xhtml</to-view-id>
+
+            </navigation-case>
+
+        </navigation-rule>
     
     
     
@@ -1757,7 +1839,11 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
+    
+    
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: blobs ~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+    
+    
     <navigation-rule>
         <from-view-id>*</from-view-id>
         <navigation-case>
@@ -1815,6 +1901,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
+        
     <managed-bean>
         <managed-bean-name>personSearchPublicBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PersonSearchPublicBB</managed-bean-class>
@@ -1891,22 +1978,10 @@
         
     <navigation-rule>
         <navigation-case>
-<<<<<<< HEAD
             <from-view-id> /public/services/personSearchPublic.xhtml</from-view-id>
             <from-outcome> editPerson </from-outcome>
             <to-view-id> /public/services/personEditPublic.xhtml </to-view-id>
-=======
-            <from-outcome>muniManage</from-outcome>
-            <to-view-id>/restricted/cogstaff/muni/muniManage.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>muniManageSample</from-outcome>
-            <to-view-id>/restricted/cogstaff/muni/muniManage_sample.xhtml</to-view-id>
->>>>>>> origin/muniUI
-            <redirect />
-        </navigation-case>
+            
     </navigation-rule>
     
     <navigation-rule>
@@ -1980,4 +2055,45 @@
     <!--*********************************************************************-->
     <!--**                       UNKNOWN                                   **-->
     <!--*********************************************************************-->
+    
+    
+    
+    <managed-bean>
+        <managed-bean-name>textBlockBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>dashboardDataBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>navMenuBean</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.NavMenuBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>actionRequestManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>publicInfoBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PublicInfoBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    
+    <managed-bean>
+        <managed-bean-name>municipalityManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    
 </faces-config>

@@ -32,9 +32,15 @@ import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
-import com.tcvcog.tcvce.integration.*;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.CitationIntegrator;
+import com.tcvcog.tcvce.integration.ViolationIntegrator;
+import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -44,8 +50,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -1106,6 +1110,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         UserCoordinator uc = getUserCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         EventCnF tfEvent;
+        PaymentCoordinator pc = getPaymentCoordinator();
         int insertedViolationID;
         int eventID;
         StringBuilder sb = new StringBuilder();
@@ -1138,6 +1143,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         } else {
             throw new ViolationException("Failed violation verification");
         }
+        
+        pc.insertAutoAssignedFees(cse, cv);
         return insertedViolationID;
     }
     
