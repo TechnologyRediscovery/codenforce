@@ -91,6 +91,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      public void commitPropertyUpdates(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
+//            currProp.setAbandonedDateStart(pc.configureDateTime(currProp.getAbandonedDateStart().to));
             pc.editProperty(currProp, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,

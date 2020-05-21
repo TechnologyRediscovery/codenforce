@@ -495,6 +495,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             if(prop.getUnfitDateStart() != null){
                 stmt.setTimestamp(18, java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
+                System.out.println("***************************************");
+                System.out.print(java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
+                System.out.println(java.sql.Timestamp.valueOf(prop.getUnfitDateStart()).getClass());
             } else {
                 stmt.setNull(18, java.sql.Types.NULL);
             }
