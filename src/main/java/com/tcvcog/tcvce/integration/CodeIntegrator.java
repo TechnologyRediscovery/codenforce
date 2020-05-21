@@ -1075,4 +1075,50 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
+    //xiaohong add
+    public ArrayList getCodeSets() throws IntegrationException {
+        String query = "SELECT codesetid, name, description, municipality_municode\n"
+                + "  FROM public.codeset;";
+
+        //System.out.println("CodeIntegrator.getCodeSets | MuniCode: "+ muniCode);
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ArrayList<CodeSet> codeSetList = new ArrayList();
+
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                codeSetList.add(populateCodeSetFromRS(rs));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("CodeIntegrator.getCodeSetByMuniCode | " + ex.toString());
+            throw new IntegrationException("Exception in CodeSetIntegrator", ex);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {/* ignored */ }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+        return codeSetList;
+    }
+    
 } // close class

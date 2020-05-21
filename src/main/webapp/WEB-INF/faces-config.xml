@@ -681,8 +681,14 @@
         <managed-bean-name>propertySearchBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertySearchBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>    
-   
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>municipalityManageSampleBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageSampleBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>propertyProfileBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyProfileBB</managed-bean-class>
@@ -1885,9 +1891,20 @@
         
     <navigation-rule>
         <navigation-case>
+<<<<<<< HEAD
             <from-view-id> /public/services/personSearchPublic.xhtml</from-view-id>
             <from-outcome> editPerson </from-outcome>
             <to-view-id> /public/services/personEditPublic.xhtml </to-view-id>
+=======
+            <from-outcome>muniManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/muni/muniManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>muniManageSample</from-outcome>
+            <to-view-id>/restricted/cogstaff/muni/muniManage_sample.xhtml</to-view-id>
+>>>>>>> origin/muniUI
             <redirect />
         </navigation-case>
     </navigation-rule>

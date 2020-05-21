@@ -51,85 +51,82 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
      */
     public MunicipalityCoordinator() {
     }
-    
-    public MunicipalityDataHeavy assembleMuniDataHeavy(Municipality muni, Credential cred) throws IntegrationException, AuthorizationException, BObStatusException, EventException{
+
+    public MunicipalityDataHeavy assembleMuniDataHeavy(Municipality muni, Credential cred) throws IntegrationException, AuthorizationException, BObStatusException, EventException {
         MunicipalityDataHeavy mdh = null;
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         mdh = mi.getMunDataHeavy(muni.getMuniCode());
         return configureMuniDataHeavy(mdh, cred);
     }
 
-
-    private MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException{
+    private MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException {
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
             pc.getPropertyDataHeavy(mdh.getMuniOfficePropertyId(), cred);
         } catch (SearchException ex) {
             System.out.println(ex);
         }
-        
+
         return mdh;
-        
-        
+
     }
-    
-    public Municipality getMuni(int muniCode) throws IntegrationException{
+
+    public Municipality getMuni(int muniCode) throws IntegrationException {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         try {
             return mi.getMuni(muniCode);
         } catch (SQLException ex) {
             System.out.println(ex);
         }
-        
+
         return null;
-        
+
     }
-   
-    
-    public OccPeriod selectDefaultMuniOccPeriod(Credential cred) throws IntegrationException, AuthorizationException{
+
+    public OccPeriod selectDefaultMuniOccPeriod(Credential cred) throws IntegrationException, AuthorizationException {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         MunicipalityDataHeavy mdh = null;
-        if(cred != null){
+        if (cred != null) {
             try {
                 mdh = assembleMuniDataHeavy(cred.getGoverningAuthPeriod().getMuni(), cred);
             } catch (BObStatusException | EventException ex) {
                 System.out.println(ex);
             }
-            if(mdh != null && mdh.getDefaultOccPeriodID() != 0){
+            if (mdh != null && mdh.getDefaultOccPeriodID() != 0) {
                 return oc.getOccPeriod(mdh.getDefaultOccPeriodID());
             }
-        } 
+        }
         return null;
     }
-    
-    
-    
-     
+
     /**
-     * !!SECURITY CRITICAL!!
-     * Implements logic to generate the authorized list of Municipalities to which
-     * a given Administrator User can assign a new User in the system.
-     * 
-     * 
+     * !!SECURITY CRITICAL!! Implements logic to generate the authorized list of
+     * Municipalities to which a given Administrator User can assign a new User
+     * in the system.
+     *
+     *
      * @param user
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
-      public List<Municipality> getPermittedMunicipalityListForAdminMuniAssignment(UserAuthorized user) throws IntegrationException{
+    public List<Municipality> getPermittedMunicipalityListForAdminMuniAssignment(UserAuthorized user) throws IntegrationException {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         List<Municipality> muniList = new ArrayList<>();
-        if(user.getMyCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer){
+        if (user.getMyCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer) {
             muniList.addAll(mi.getMuniList());
         } else {
-            if(user.getRole() != null && user.getRole() == RoleType.SysAdmin){
+            if (user.getRole() != null && user.getRole() == RoleType.SysAdmin) {
                 muniList.add(user.getMyCredential().getGoverningAuthPeriod().getMuni());
             }
         }
-        
+
         return muniList;
     }
-    
-  
-    
-    
+
+    //xiaohong add
+    public MunicipalityDataHeavy getMuniDataHeavyList(int muniCode) throws IntegrationException, AuthorizationException {
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        return mi.getMunDataHeavy(muniCode);
+    }
+
 }
