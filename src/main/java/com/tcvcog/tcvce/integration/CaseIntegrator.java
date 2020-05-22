@@ -21,6 +21,8 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
@@ -302,16 +304,16 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
      private CECase generateCECase(ResultSet rs) throws SQLException, IntegrationException{
-        PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         
         CECase cse = new CECase();
 
         cse.setCaseID(rs.getInt("caseid"));
         cse.setPublicControlCode(rs.getInt("cecasepubliccc"));
-        cse.setProperty(pi.getProperty(rs.getInt("property_propertyid")));
-        cse.setPropertyUnit(null); // change when units are integrated
 
+        cse.setPropertyID(rs.getInt("property_propertyid"));
+        cse.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
+        
         cse.setCaseManager(ui.getUser(rs.getInt("login_userid")));
 
         cse.setCaseName(rs.getString("casename"));
@@ -395,38 +397,37 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         String query = "INSERT INTO public.cecase(\n" +
                         "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
-                        "            login_userid, casename, casephase, originationdate, closingdate, \n" +
+                        "            login_userid, casename, originationdate, closingdate, \n" +
                         "            notes, creationTimestamp, active) \n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
-                        "            ?, ?, CAST (? as casephase), ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
                         "            ?, now(), ?);";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         int insertedCaseID = 0;
         CECase freshlyInsertedCase = null;
         Connection con = null;
+        PaymentCoordinator pc = getPaymentCoordinator();
         
         try {
             
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
-            stmt.setInt(2, ceCase.getProperty().getPropertyID());
-            if(ceCase.getPropertyUnit() != null) {
-                stmt.setInt(3, ceCase.getPropertyUnit().getUnitID());
+            stmt.setInt(2, ceCase.getPropertyID());
+            if(ceCase.getPropertyUnitID() != 0) {
+                stmt.setInt(3, ceCase.getPropertyUnitID());
             } else { stmt.setNull(3, java.sql.Types.NULL); }
             
             stmt.setInt(4, ceCase.getCaseManager().getUserID());
             stmt.setString(5, ceCase.getCaseName());
-            stmt.setString(6, ceCase.getCasePhase().toString());
-            stmt.setTimestamp(7, java.sql.Timestamp
+            stmt.setTimestamp(6, java.sql.Timestamp
                     .valueOf(ceCase.getOriginationDate()));
             // closing date
-            stmt.setNull(8, java.sql.Types.NULL); 
+            stmt.setNull(7, java.sql.Types.NULL); 
             
-            stmt.setString(9, ceCase.getNotes());
-            stmt.setBoolean(19, ceCase.isActive());
-            
+            stmt.setString(8, ceCase.getNotes());
+            stmt.setBoolean(9, ceCase.isActive());
             
             System.out.println("CaseIntegrator.insertNewCase| sql: " + stmt.toString());
             
@@ -512,35 +513,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    /**
-     * The calling method is responsible for setting the new case phase
-     * This is just a plain old update operation. The CaseCoordinator is responsible
-     * for creating a case phase change event for logging purposes
-     * @param ceCase
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void changeCECasePhase(CECaseDataHeavy ceCase) throws IntegrationException{
-        String query = "UPDATE public.cecase\n" +
-                    "   SET casephase= CAST (? AS casephase)\n" +
-                    " WHERE caseid = ?;";
-        Connection con = null;
-        PreparedStatement stmt = null;
-
-         try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, ceCase.getCasePhase().toString());
-            stmt.setInt(2, ceCase.getCaseID());
-            stmt.executeUpdate();
-             
-        } catch (SQLException ex) { 
-             System.out.println(ex.toString());
-             throw new IntegrationException("Error updating case phase", ex);
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
+  
     
     public List<Integer> getCECaseHistoryList(int userID) 
             throws IntegrationException, BObStatusException{

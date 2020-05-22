@@ -22,12 +22,12 @@ import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
  *
  * @author sylvia
  */
-public class OccPeriodPropertyUnitified 
+public class OccPeriodPropertyUnitHeavy 
         extends OccPeriod{
     
     protected PropertyUnitWithProp propUnitProp;
     
-    public OccPeriodPropertyUnitified(OccPeriod opLight){
+    public OccPeriodPropertyUnitHeavy(OccPeriod opLight){
         this.periodID = opLight.periodID;
         this.propertyUnitID = opLight.propertyUnitID;
         this.type = opLight.type;

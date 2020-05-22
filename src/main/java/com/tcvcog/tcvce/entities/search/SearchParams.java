@@ -16,6 +16,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Encapsulates municipality restrictions and start/end
@@ -29,7 +30,6 @@ import java.util.List;
 
 public  class           SearchParams 
         implements      Serializable{
-
     
     private String filterName;
     private String filterDescription;
@@ -603,6 +603,141 @@ public  class           SearchParams
     public void setActive_rtMin(RoleType active_rtMin) {
         this.active_rtMin = active_rtMin;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 71 * hash + Objects.hashCode(this.filterName);
+        hash = 71 * hash + Objects.hashCode(this.filterDescription);
+        hash = 71 * hash + Objects.hashCode(this.sql);
+        hash = 71 * hash + Objects.hashCode(this.muni_rtMin);
+        hash = 71 * hash + (this.muni_ctl ? 1 : 0);
+        hash = 71 * hash + Objects.hashCode(this.muni_val);
+        hash = 71 * hash + Objects.hashCode(this.date_rtMin);
+        hash = 71 * hash + (this.date_startEnd_ctl ? 1 : 0);
+        hash = 71 * hash + Objects.hashCode(this.date_field);
+        hash = 71 * hash + Objects.hashCode(this.date_start_val);
+        hash = 71 * hash + Objects.hashCode(this.date_end_val);
+        hash = 71 * hash + (this.date_relativeDates_ctl ? 1 : 0);
+        hash = 71 * hash + this.date_relativeDates_start_val;
+        hash = 71 * hash + this.date_realtiveDates_end_val;
+        hash = 71 * hash + Objects.hashCode(this.user_rtMin);
+        hash = 71 * hash + (this.user_ctl ? 1 : 0);
+        hash = 71 * hash + Objects.hashCode(this.user_field);
+        hash = 71 * hash + Objects.hashCode(this.user_val);
+        hash = 71 * hash + Objects.hashCode(this.bobID_rtMin);
+        hash = 71 * hash + (this.bobID_ctl ? 1 : 0);
+        hash = 71 * hash + this.bobID_val;
+        hash = 71 * hash + Objects.hashCode(this.limitResultCount_rtMin);
+        hash = 71 * hash + (this.limitResultCount_ctl ? 1 : 0);
+        hash = 71 * hash + this.limitResultCount_val;
+        hash = 71 * hash + Objects.hashCode(this.active_rtMin);
+        hash = 71 * hash + (this.active_ctl ? 1 : 0);
+        hash = 71 * hash + (this.active_val ? 1 : 0);
+        hash = 71 * hash + Objects.hashCode(this.log);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SearchParams other = (SearchParams) obj;
+        if (this.muni_ctl != other.muni_ctl) {
+            return false;
+        }
+        if (this.date_startEnd_ctl != other.date_startEnd_ctl) {
+            return false;
+        }
+        if (this.date_relativeDates_ctl != other.date_relativeDates_ctl) {
+            return false;
+        }
+        if (this.date_relativeDates_start_val != other.date_relativeDates_start_val) {
+            return false;
+        }
+        if (this.date_realtiveDates_end_val != other.date_realtiveDates_end_val) {
+            return false;
+        }
+        if (this.user_ctl != other.user_ctl) {
+            return false;
+        }
+        if (this.bobID_ctl != other.bobID_ctl) {
+            return false;
+        }
+        if (this.bobID_val != other.bobID_val) {
+            return false;
+        }
+        if (this.limitResultCount_ctl != other.limitResultCount_ctl) {
+            return false;
+        }
+        if (this.limitResultCount_val != other.limitResultCount_val) {
+            return false;
+        }
+        if (this.active_ctl != other.active_ctl) {
+            return false;
+        }
+        if (this.active_val != other.active_val) {
+            return false;
+        }
+        if (!Objects.equals(this.filterName, other.filterName)) {
+            return false;
+        }
+        if (!Objects.equals(this.filterDescription, other.filterDescription)) {
+            return false;
+        }
+        if (!Objects.equals(this.sql, other.sql)) {
+            return false;
+        }
+        if (this.muni_rtMin != other.muni_rtMin) {
+            return false;
+        }
+        if (!Objects.equals(this.muni_val, other.muni_val)) {
+            return false;
+        }
+        if (this.date_rtMin != other.date_rtMin) {
+            return false;
+        }
+        if (!Objects.equals(this.date_field, other.date_field)) {
+            return false;
+        }
+        if (!Objects.equals(this.date_start_val, other.date_start_val)) {
+            return false;
+        }
+        if (!Objects.equals(this.date_end_val, other.date_end_val)) {
+            return false;
+        }
+        if (this.user_rtMin != other.user_rtMin) {
+            return false;
+        }
+        if (!Objects.equals(this.user_field, other.user_field)) {
+            return false;
+        }
+        if (!Objects.equals(this.user_val, other.user_val)) {
+            return false;
+        }
+        if (this.bobID_rtMin != other.bobID_rtMin) {
+            return false;
+        }
+        if (this.limitResultCount_rtMin != other.limitResultCount_rtMin) {
+            return false;
+        }
+        if (this.active_rtMin != other.active_rtMin) {
+            return false;
+        }
+        if (!Objects.equals(this.log, other.log)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 
    
     

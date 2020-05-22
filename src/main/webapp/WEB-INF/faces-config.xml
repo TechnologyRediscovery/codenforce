@@ -107,6 +107,7 @@
         
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ session infrastructure ~~~~~~~~~~~~~~~~~~~~~~~--> 
+
     
     <managed-bean>
         <description>Creates and coordinates singletons for use during all users' visits.</description>
@@ -114,6 +115,15 @@
         <managed-bean-class>com.tcvcog.tcvce.application.Initializer</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
+    
+    
+    <managed-bean>
+        <managed-bean-name>systemCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.SystemCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    
+   
     
     <managed-bean>
         <managed-bean-name>sessionBean</managed-bean-name>
@@ -159,8 +169,6 @@
             <redirect />
         </navigation-case>
     </navigation-rule>
-    
-    
 
     <navigation-rule> 
         <navigation-case>
@@ -204,8 +212,6 @@
         </navigation-case>
     </navigation-rule>
         
-    
-    
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ display and navigation beans ~~~~~~~~~~~~~~~~--> 
     
@@ -363,6 +369,8 @@
         <managed-bean-class>com.tcvcog.tcvce.application.UserConfigBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    
    
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules user ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
@@ -389,7 +397,7 @@
         </navigation-case>
     </navigation-rule>
     
-     <navigation-rule>
+    <navigation-rule>
         <from-view-id>*</from-view-id>
         <navigation-case>
             <from-outcome>userMuniMapping</from-outcome>
@@ -478,9 +486,15 @@
             <to-view-id>/restricted/cogadmin/muniManage.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        <navigation-case>
+            <from-outcome>muniManageSample</from-outcome>
+            <to-view-id>/restricted/cogstaff/muni/muniManage_sample.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    
     </navigation-rule>
         
-    
+        
     
     <!--*********************************************************************-->
     <!--**                       II. CODEBOOK                              **-->
@@ -535,7 +549,7 @@
         <managed-bean-class>com.tcvcog.tcvce.application.CodeElementGuideAddUpdateBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
+    
     <managed-bean>
         <managed-bean-name>codeElementBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CodeElementBB</managed-bean-class>
@@ -659,10 +673,6 @@
     </navigation-rule>
 
     
-    
-    
-    
-    
 
     <!--*********************************************************************-->
     <!--**                       III. PROPERTY                             **-->
@@ -685,8 +695,14 @@
         <managed-bean-name>propertySearchBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertySearchBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>    
-   
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>municipalityManageSampleBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageSampleBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>propertyProfileBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyProfileBB</managed-bean-class>
@@ -908,11 +924,6 @@
         
     </navigation-rule>
     
-    
-    
-    
-    
-    
           
     <!--*********************************************************************-->
     <!--**                       V. EVENT                                  **-->
@@ -924,19 +935,52 @@
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
-    
-    
     <managed-bean>
         <managed-bean-name>eventCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.EventCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-    
-    
+        
+    <managed-bean>
+        <managed-bean-name>eventSearchBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventSearchBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>eventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>eventSearch</from-outcome>
+            <to-view-id>/restricted/cogstaff/event/eventSearch.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>eventConfig</from-outcome>
+            <to-view-id>/restricted/cogstaff/event/eventConfiguration.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>eventRuleConfig</from-outcome>
+            <to-view-id>/restricted/cogstaff/event/eventRuleConfiguration.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
     <!--*********************************************************************-->
     <!--**                       VI. OCCPERIOD                             **-->
     <!--*********************************************************************-->
-    
+    <managed-bean>
+        <managed-bean-name>occPeriodWorkflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodWorkflowBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>occupancyCoordinator</managed-bean-name>
@@ -1026,599 +1070,633 @@
    
     <!--  OCCUPANCY  -->
         
-<navigation-rule>
-    <from-view-id>*</from-view-id>
-    <navigation-case>
-        <from-outcome>occPermitApplications</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
-        <redirect />       
-    </navigation-case>
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>occPermitApplications</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
+            <redirect />       
+        </navigation-case>
         
-    <navigation-case>
-        <from-outcome>occPeriodWorkflow</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/occPeriodWorkflow.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>occPeriodWorkflow</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occPeriodWorkflow.xhtml</to-view-id>
+        </navigation-case>
         
-    <navigation-case>
-        <from-outcome>occInspectionAdd</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/occPeriodInspections.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>occInspectionAdd</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occPeriodInspections.xhtml</to-view-id>
+        </navigation-case>
         
-    <navigation-case>
-        <from-outcome>occInspectionProfile</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/occProfile.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>occInspectionProfile</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occProfile.xhtml</to-view-id>
+        </navigation-case>
         
-    <navigation-case>
-        <from-outcome>checklists</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/checklists.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>checklists</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/checklists.xhtml</to-view-id>
+        </navigation-case>
         
-    <navigation-case>
-        <from-outcome>payments</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/paymentManage.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>payments</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/paymentManage.xhtml</to-view-id>
+        </navigation-case>
 
-    <navigation-case>
-        <from-outcome>paymentTypeManage</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/paymentTypeManage.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>paymentTypeManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/paymentTypeManage.xhtml</to-view-id>
+        </navigation-case>
 
-    <navigation-case>
-        <from-outcome>feeManage</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/feeManage.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>feeManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/feeManage.xhtml</to-view-id>
+        </navigation-case>
         
-    <navigation-case>
-        <from-outcome>occPermitTypeManage</from-outcome>
-        <to-view-id>/restricted/cogstaff/occ/occPermitTypeManage.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>occPermitTypeManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occPermitTypeManage.xhtml</to-view-id>
+        </navigation-case>
         
-    <navigation-case>
-        <from-outcome>selectForApply</from-outcome>
-        <to-view-id>/public/services/occPermitApplicationFlow/occPermitSelectForApply.xhtml#currentStep</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>selectForApply</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitSelectForApply.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
         
-</navigation-rule>
+    </navigation-rule>
          
     
  
     
-<!--*********************************************************************-->
-<!--**                       VII. CECASE                               **-->
-<!--*********************************************************************-->
-<managed-bean>
-    <description>Interfaces between business objects, the integration layer, and jsf beans </description>
-    <managed-bean-name>caseCoordinator</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.coordinators.CaseCoordinator</managed-bean-class>
-    <managed-bean-scope>application</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>caseIntegrator</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.integration.CaseIntegrator</managed-bean-class>
-    <managed-bean-scope>application</managed-bean-scope>
-</managed-bean>
+    <!--*********************************************************************-->
+    <!--**                       VII. CECASE                               **-->
+    <!--*********************************************************************-->
+    <managed-bean>
+        <description>Interfaces between business objects, the integration layer, and jsf beans </description>
+        <managed-bean-name>caseCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.CaseCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
 
-<managed-bean>
-    <managed-bean-name>violationIntegrator</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.integration.ViolationIntegrator</managed-bean-class>
-    <managed-bean-scope>application</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>violationAddBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.ViolationAddBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>violationSelectElementBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.ViolationSelectElementBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>caseAddBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CaseAddBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>    
-    
+    <managed-bean>
+        <managed-bean-name>ceCaseSearchBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 
-<managed-bean>
-    <managed-bean-name>citationBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CitationBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean> 
+    <managed-bean>
+        <managed-bean-name>caseIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.CaseIntegrator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>violationIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.ViolationIntegrator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>violationAddBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ViolationAddBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>violationSelectElementBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ViolationSelectElementBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>ceCaseAddBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseAddBB</managed-bean-class>
+
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
+
+
+
+
+
+    <managed-bean>
+        <managed-bean-name>citationBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CitationBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>noticeOfViolationBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.NoticeOfViolationBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>violationEditBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ViolationEditBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>textBlockBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>cEComplianceTimeframeClosingsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEComplianceTimeframeClosingsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>cENoticeAcknowledgementsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CENoticeAcknowledgementsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>ceCaseWorkflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseWorkflowBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>cECaseViolationsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseViolationsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>cECaseNoticesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseNoticesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>cECaseCitationsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseCitationsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules code enforcement ~~~~~~~~~~~~~~~~ --> 
+
+
+
+
+
+    <navigation-rule>
+        <from-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</from-view-id>
+        <navigation-case>
+            <from-action>#{caseAddBB.addNewCase}</from-action>
+            <from-outcome>ceCases</from-outcome>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>violationAdd</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/violationAdd.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/restricted/cogstaff/ce/violationAdd.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>violationPhotos</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/violationPhotos.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/restricted/cogstaff/ce/violationPhotos.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>ceHome</from-outcome>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+
+    <navigation-rule>
+        <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>violationEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/violationEdit.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{ceCaseViolations.addViolation}</from-action>
+            <from-outcome>violationSelectElement</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/restricted/cogview/ceEvents.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>reportCEEventList</from-outcome>
+            <to-view-id>/restricted/reports/reportCEEventList.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>addNewCase</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+
+        <navigation-case>
+            <from-outcome>ceCaseWorkflow</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseWorkflow.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseViolations</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseViolations.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseNotices</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseNotices.xhtml</to-view-id>    
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseCitations</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseCitations.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseEvents</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseEvents.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCasePayments</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCasePayments.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseRequests</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseRequests.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseFiles</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseFiles.xhtml</to-view-id>
+        </navigation-case>
+    
+        <navigation-case>
+            <from-outcome>ceCasePublic</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCasePublic.xhtml</to-view-id>
+        </navigation-case>
+
+        <navigation-case>
+            <from-outcome>reportCECase</from-outcome>
+            <to-view-id>/restricted/reports/reportCECase.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>reportCECaseList</from-outcome>
+            <to-view-id>/restricted/reports/reportCECaseList.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
        
-<managed-bean>
-    <managed-bean-name>noticeOfViolationBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.NoticeOfViolationBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>violationEditBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.ViolationEditBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>textBlockBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>cEComplianceTimeframeClosingsBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CEComplianceTimeframeClosingsBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>cENoticeAcknowledgementsBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CENoticeAcknowledgementsBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>cECaseWorkflowBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CECaseWorkflowBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>cECaseViolationsBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CECaseViolationsBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>cECaseNoticesBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CECaseNoticesBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>cECaseEventsBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CECaseEventsBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-    
-<managed-bean>
-    <managed-bean-name>cECaseCitationsBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CECaseCitationsBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-<!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules code enforcement ~~~~~~~~~~~~~~~~ --> 
+        <navigation-case>
+            <from-outcome>textBlockManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/textBlockManage.xhtml</to-view-id>
+            <redirect/>
+        
+        <navigation-case>
+            <from-outcome>occPermitApplications</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
+            <redirect />       
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>occPeriodStatus</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occPeriodStatus.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>occInspectionAdd</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occInspectionAdd.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>occInspectionProfile</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occProfile.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>checklists</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/checklists.xhtml</to-view-id>
+        </navigation-case>
+        
   
-    
-    
-   
-  
-<navigation-rule>
-    <from-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</from-view-id>
-    <navigation-case>
-        <from-action>#{caseAddBB.addNewCase}</from-action>
-        <from-outcome>ceCases</from-outcome>
-        <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
-</navigation-rule>
-
-<navigation-rule>
-    <from-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</from-view-id>
-    <navigation-case>
-        <from-outcome>violationAdd</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/violationAdd.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
-</navigation-rule>
-    
-<navigation-rule>
-    <from-view-id>/restricted/cogstaff/ce/violationAdd.xhtml</from-view-id>
-    <navigation-case>
-        <from-outcome>violationPhotos</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/violationPhotos.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
-</navigation-rule>
-    
-<navigation-rule>
-    <from-view-id>/restricted/cogstaff/ce/violationPhotos.xhtml</from-view-id>
-    <navigation-case>
-        <from-outcome>ceHome</from-outcome>
-        <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
-</navigation-rule>
-    
-   
-<navigation-rule>
-    <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
-    <navigation-case>
-        <from-outcome>violationEdit</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/violationEdit.xhtml</to-view-id>
-    </navigation-case>
-    <navigation-case>
-        <from-action>#{ceCaseViolations.addViolation}</from-action>
-        <from-outcome>violationSelectElement</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
-    </navigation-case>
-</navigation-rule>
-   
-<navigation-rule>
-    <from-view-id>/restricted/cogview/ceEvents.xhtml</from-view-id>
-    <navigation-case>
-        <from-outcome>reportCEEventList</from-outcome>
-        <to-view-id>/restricted/reports/reportCEEventList.xhtml</to-view-id>
-    </navigation-case>
-</navigation-rule>
-    
-    
-        
-<navigation-rule>
-    <from-view-id>*</from-view-id>
-    <navigation-case>
-        <from-outcome>addNewCase</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
-</navigation-rule>
-        
-    
-<navigation-rule>
-    <from-view-id>*</from-view-id>
-
-    <navigation-case>
-        <from-outcome>ceCaseWorkflow</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/ceCaseWorkflow.xhtml</to-view-id>
-    </navigation-case>
-        
-    <navigation-case>
-        <from-outcome>ceCaseViolations</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/ceCaseViolations.xhtml</to-view-id>
-    </navigation-case>
-        
-    <navigation-case>
-        <from-outcome>ceCaseNotices</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/ceCaseNotices.xhtml</to-view-id>    
-    </navigation-case>
-        
-    <navigation-case>
-        <from-outcome>ceCaseCitations</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/ceCaseCitations.xhtml</to-view-id>
-    </navigation-case>
-        
-    <navigation-case>
-        <from-outcome>ceCaseEvents</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/ceCaseEvents.xhtml</to-view-id>
-    </navigation-case>
-        
-    <navigation-case>
-        <from-outcome>ceCasePayments</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/ceCasePayments.xhtml</to-view-id>
-    </navigation-case>
-        
-    <navigation-case>
-        <from-outcome>ceCaseRequests</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/ceCaseRequests.xhtml</to-view-id>
-    </navigation-case>
-        
-    <navigation-case>
-        <from-outcome>ceCaseFiles</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/ceCaseFiles.xhtml</to-view-id>
-    </navigation-case>
-    
-    <navigation-case>
-        <from-outcome>ceCasePublic</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/ceCasePublic.xhtml</to-view-id>
-    </navigation-case>
-
-    <navigation-case>
-        <from-outcome>reportCECase</from-outcome>
-        <to-view-id>/restricted/reports/reportCECase.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
-        
-    <navigation-case>
-        <from-outcome>reportCECaseList</from-outcome>
-        <to-view-id>/restricted/reports/reportCECaseList.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
-       
-    <navigation-case>
-        <from-outcome>textBlockManage</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/textBlockManage.xhtml</to-view-id>
-        <redirect/>
-    </navigation-case>
-       
-    <navigation-case>
-        <from-outcome>noticeOfViolationBuilder</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilder.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>noticeOfViolationBuilder</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilder.xhtml</to-view-id>
+        </navigation-case>
  
-    <navigation-case>
-        <from-outcome>noticeOfViolationPrint</from-outcome>
-        <to-view-id>/restricted/cogview/noticeOfViolationPrint.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>noticeOfViolationPrint</from-outcome>
+            <to-view-id>/restricted/cogview/noticeOfViolationPrint.xhtml</to-view-id>
+        </navigation-case>
 
-    <navigation-case>
-        <from-outcome>noticeOfViolationEditor</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/noticeOfViolationEditor.xhtml</to-view-id>
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>noticeOfViolationEditor</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/noticeOfViolationEditor.xhtml</to-view-id>
+        </navigation-case>
                 
-    <navigation-case>
-        <from-outcome>eventManage</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/eventConfiguration.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>eventManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/eventConfiguration.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
         
-    <navigation-case>
-        <from-outcome>litigationManage</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/courtEntityManage.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>litigationManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/courtEntityManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
     
-    <navigation-case>
-        <from-outcome>intensityManage</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/intensityManage.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-outcome>intensityManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/intensityManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
     
-</navigation-rule>
+    </navigation-rule>
     
             
              
-<!--*********************************************************************-->
-<!--**                       VIII. CEACTIONREQUEST                     **-->
-<!--*********************************************************************-->
-<managed-bean>
-    <description>Responsible for reading code enforcement action requests into and out of the PostgreSQL Database</description>
-    <managed-bean-name>cEActionRequestIntegrator</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.integration.CEActionRequestIntegrator</managed-bean-class>
-    <managed-bean-scope>application</managed-bean-scope>
-</managed-bean>
+    <!--*********************************************************************-->
+    <!--**                       VIII. CEACTIONREQUEST                     **-->
+    <!--*********************************************************************-->
+    <managed-bean>
+        <description>Responsible for reading code enforcement action requests into and out of the PostgreSQL Database</description>
+        <managed-bean-name>cEActionRequestIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.CEActionRequestIntegrator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
 
-<managed-bean>
-    <description>Coordinates view-coordinator ignteractions around code enforcement actions</description>
-    <managed-bean-name>cEActionRequestsBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
+    <managed-bean>
+        <description>Coordinates view-coordinator ignteractions around code enforcement actions</description>
+        <managed-bean-name>cEActionRequestsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 
-<managed-bean>
-    <description>Used by the submission system for action requests</description>
-    <managed-bean-name>cEActionRequestSubmitBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestSubmitBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
+    <managed-bean>
+        <description>Used by the submission system for action requests</description>
+        <managed-bean-name>cEActionRequestSubmitBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestSubmitBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
-<managed-bean>
-    <description>Provides backing bean utilities for the action requestmanagement.xhtml page</description>
-    <managed-bean-name>requestManagementBean</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.RequestManagementBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
+    <managed-bean>
+        <description>Provides backing bean utilities for the action requestmanagement.xhtml page</description>
+        <managed-bean-name>requestManagementBean</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.RequestManagementBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
-<managed-bean>
-    <description>Backing bean for the action request checking form and results page.</description>
-    <managed-bean-name>checkRequestStatusBean</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CheckRequestStatusBean</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
+    <managed-bean>
+        <description>Backing bean for the action request checking form and results page.</description>
+        <managed-bean-name>checkRequestStatusBean</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CheckRequestStatusBean</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
-<managed-bean>
-    <managed-bean-name>actionRequestManageBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
+    <managed-bean>
+        <managed-bean-name>actionRequestManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
-<managed-bean>
-    <managed-bean-name>cECasesActionRequestsBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.application.CECaseActionRequestsBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECasesActionRequestsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseActionRequestsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
-<!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules CEAR   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+    <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules CEAR   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
-<navigation-rule>
-    <from-view-id>*</from-view-id>  
-    <navigation-case>
-        <from-outcome>cEActionRequests</from-outcome>
-        <to-view-id>/restricted/cogview/cEActionRequests.xhtml</to-view-id>
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>cEActionRequests</from-outcome>
+            <to-view-id>/restricted/cogview/cEActionRequests.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>reportCEARList</from-outcome>
+            <to-view-id>/restricted/reports/reportCEARList.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>requestCEActionFlow</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</to-view-id>
+        </navigation-case>
         <redirect />
-    </navigation-case>
-</navigation-rule>
-
-<navigation-rule>
-    <from-view-id>*</from-view-id>  
-    <navigation-case>
-        <from-outcome>reportCEARList</from-outcome>
-        <to-view-id>/restricted/reports/reportCEARList.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
-</navigation-rule>
-
-<navigation-rule>
-    <from-view-id>*</from-view-id>  
-    <navigation-case>
-        <from-outcome>requestCEActionFlow</from-outcome>
-        <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</to-view-id>
-    </navigation-case>
-    <redirect />
-</navigation-rule>
+    </navigation-rule>
     
-<navigation-rule>
-    <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</from-view-id>  
-    <navigation-case>
-        <from-outcome>chooseProperty</from-outcome>
-        <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_chooseProperty.xhtml</to-view-id>
-    </navigation-case>
-</navigation-rule>
+    <navigation-rule>
+        <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</from-view-id>  
+        <navigation-case>
+            <from-outcome>chooseProperty</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_chooseProperty.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
     
-<navigation-rule>
-    <from-view-id>*</from-view-id>  
-    <navigation-case>
-        <from-outcome>describeConcern</from-outcome>
-        <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_describeConcern.xhtml</to-view-id>
-    </navigation-case>
-</navigation-rule>
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>describeConcern</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_describeConcern.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
     
-<navigation-rule>
-    <from-view-id>*</from-view-id>  
-    <navigation-case>
-        <from-outcome>photoUpload</from-outcome>
-        <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_photoUpload.xhtml</to-view-id>
-    </navigation-case>
-</navigation-rule>
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>photoUpload</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_photoUpload.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
     
-<navigation-rule>
-    <from-view-id>*</from-view-id>  
-    <navigation-case>
-        <from-outcome>requestorDetails</from-outcome>
-        <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_requestorDetails.xhtml</to-view-id>
-    </navigation-case>
-</navigation-rule>
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>requestorDetails</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_requestorDetails.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
     
-<navigation-rule>
-    <from-view-id>*</from-view-id>  
-    <navigation-case>
-        <from-outcome>reviewAndSubmit</from-outcome>
-        <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit.xhtml</to-view-id>
-    </navigation-case>
-</navigation-rule>
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>reviewAndSubmit</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
         
 
-<navigation-rule>
-    <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit.xhtml</from-view-id>
-    <navigation-case>
-        <from-outcome>successCEAR</from-outcome>
-        <to-view-id>/public/services/actionReqSubConf.xhtml</to-view-id>
-    </navigation-case>
-    <navigation-case>
-        <from-outcome>addPropertyUnit</from-outcome>
-        <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep</to-view-id>
-        <redirect />
-    </navigation-case>
-</navigation-rule>
+    <navigation-rule>
+        <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>successCEAR</from-outcome>
+            <to-view-id>/public/services/actionReqSubConf.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>addPropertyUnit</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
   
-<navigation-rule>
-    <from-view-id>/restricted/cogstaff/ce/requestManagement.xhtml</from-view-id>
-    <navigation-case>
-        <from-action>#{requestManagementBean.manage}</from-action>
-        <from-outcome>manageRequest</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/mangeActionRequest.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
-</navigation-rule>
+    <navigation-rule>
+        <from-view-id>/restricted/cogstaff/ce/requestManagement.xhtml</from-view-id>
+        <navigation-case>
+            <from-action>#{requestManagementBean.manage}</from-action>
+            <from-outcome>manageRequest</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/mangeActionRequest.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
-<navigation-rule>
-    <from-view-id>*</from-view-id>
-    <navigation-case>
-        <from-outcome>actionRequestManage</from-outcome>
-        <to-view-id>/restricted/cogstaff/ce/actionRequestManage.xhtml</to-view-id>
-    </navigation-case>
-</navigation-rule>
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>actionRequestManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/actionRequestManage.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
 
       
-<!--*********************************************************************-->
-<!--**                       VIV. OCCAPP                               **-->
-<!--*********************************************************************-->
+    <!--*********************************************************************-->
+    <!--**                       VIV. OCCAPP                               **-->
+    <!--*********************************************************************-->
     
     
-<managed-bean>
-    <managed-bean-name>occPermitApplicationBB</managed-bean-name>
-    <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPermitApplicationBB</managed-bean-class>
-    <managed-bean-scope>view</managed-bean-scope>
-</managed-bean>
-<!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: occupancy application ~~~~~~~~~~~~~~~ --> 
+    <managed-bean>
+        <managed-bean-name>occPermitApplicationBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPermitApplicationBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: occupancy application ~~~~~~~~~~~~~~~ --> 
     
-<navigation-rule>
+    <navigation-rule>
         
-    <navigation-case>
-        <from-view-id>/public/services/occpermitApplicationFlow/occPermitChooseMuni.xhtml</from-view-id>
-        <from-outcome>chooseProperty</from-outcome>
-        <to-view-id>/public/services/occPermitApplicationFlow/occPermitChoosePropertyUnit.xhtml#currentStep</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-view-id>/public/services/occpermitApplicationFlow/occPermitChooseMuni.xhtml</from-view-id>
+            <from-outcome>chooseProperty</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitChoosePropertyUnit.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
         
-    <navigation-case>
-        <from-view-id>/public/services/occPermitApplicationFlow/occPermitChooseProperty.xhtml</from-view-id>
-        <from-outcome>addPropertyUnit</from-outcome>
-        <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-view-id>/public/services/occPermitApplicationFlow/occPermitChooseProperty.xhtml</from-view-id>
+            <from-outcome>addPropertyUnit</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
     
-    <navigation-case>
-        <from-view-id>/public/services/occPermitApplicationFlow/occPermitChooseProperty.xhtml</from-view-id>
-        <from-outcome>addReason</from-outcome>
-        <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddReason.xhtml#currentStep</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-view-id>/public/services/occPermitApplicationFlow/occPermitChooseProperty.xhtml</from-view-id>
+            <from-outcome>addReason</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddReason.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
         
-    <navigation-case>
-        <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml </from-view-id>
-        <from-outcome>addReason</from-outcome>
-        <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddReason.xhtml#currentStep</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml </from-view-id>
+            <from-outcome>addReason</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddReason.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
         
-    <navigation-case>
-        <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddReason.xhtml </from-view-id>
-        <from-outcome> addPeople </from-outcome>
-        <to-view-id> /public/services/occPermitApplicationFlow/occPermitAddPeople.xhtml#currentStep</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddReason.xhtml </from-view-id>
+            <from-outcome> addPeople </from-outcome>
+            <to-view-id> /public/services/occPermitApplicationFlow/occPermitAddPeople.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
         
-    <navigation-case>
-        <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddReason.xhtml </from-view-id>
-        <from-outcome> managePeople </from-outcome>
-        <to-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtml#currentStep</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddReason.xhtml </from-view-id>
+            <from-outcome> managePeople </from-outcome>
+            <to-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
         
-    <navigation-case>
-        <from-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtl </from-view-id>
-        <from-outcome> searchPeople </from-outcome>
-        <to-view-id> /public/services/personSearchPublic.xhtml </to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtl </from-view-id>
+            <from-outcome> searchPeople </from-outcome>
+            <to-view-id> /public/services/personSearchPublic.xhtml </to-view-id>
+            <redirect />
+        </navigation-case>
         
-    <navigation-case>
-        <from-view-id> /public/services/personSearchPublic.xhtml </from-view-id>
-        <from-outcome> addPerson </from-outcome>
-        <to-view-id> /public/services/personAddPublic.xhtml </to-view-id>
-        <redirect /> 
-    </navigation-case>
+        <navigation-case>
+            <from-view-id> /public/services/personSearchPublic.xhtml </from-view-id>
+            <from-outcome> addPerson </from-outcome>
+            <to-view-id> /public/services/personAddPublic.xhtml </to-view-id>
+            <redirect /> 
+        </navigation-case>
 
-    <navigation-case>
-        <from-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtl</from-view-id>
-        <from-outcome> reviewApplication </from-outcome>
-        <to-view-id> /public/services/occPermitApplicationFlow/reviewAndSubmit.xhtml</to-view-id>
-        <redirect />
-    </navigation-case>
+        <navigation-case>
+            <from-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtl</from-view-id>
+            <from-outcome> reviewApplication </from-outcome>
+            <to-view-id> /public/services/occPermitApplicationFlow/reviewAndSubmit.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
         
-    <navigation-case>
-        <from-view-id> /public/services/personSearchPublic.xhtml </from-view-id>
-        <from-outcome> managePeople </from-outcome>
-        <to-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtml#currentStep</to-view-id>
-        <redirect />
-    </navigation-case>
-</navigation-rule>
+        <navigation-case>
+            <from-view-id> /public/services/personSearchPublic.xhtml </from-view-id>
+            <from-outcome> managePeople </from-outcome>
+            <to-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
     
     <!--*********************************************************************-->
     <!--**                       X. PAYMENT                                **-->
     <!--*********************************************************************-->
+
+
+    <managed-bean>
+        <managed-bean-name>feeManagementBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.FeeManagementBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    
     <managed-bean>
         <managed-bean-name>paymentCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.PaymentCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-    
+
     <managed-bean>
         <managed-bean-name>cECasePaymentsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECasePaymentsBB</managed-bean-class>
@@ -1631,12 +1709,41 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>paymentBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.PaymentBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: payments ~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+        <navigation-rule>
+            <from-view-id>*</from-view-id>
+            <navigation-case>
+                <from-outcome>payments</from-outcome>
+                <to-view-id>/restricted/cogstaff/occ/paymentManage.xhtml</to-view-id>
+            </navigation-case>
+
+            <navigation-case>
+                <from-outcome>paymentTypeManage</from-outcome>
+                <to-view-id>/restricted/cogstaff/occ/paymentTypeManage.xhtml</to-view-id>
+            </navigation-case>
+
+            <navigation-case>
+                <from-outcome>occPeriodPayments</from-outcome>
+                <to-view-id>/restricted/cogstaff/occ/occPeriodPayments.xhtml</to-view-id>
+            </navigation-case>
+
+            <navigation-case>
+                <from-outcome>ceEventPayments</from-outcome>
+                <to-view-id>/restricted/cogstaff/ce/cEEventPayments.xhtml</to-view-id>
+            </navigation-case>
+
+            <navigation-case>
+                <from-outcome>feeTypeManage</from-outcome>
+                <to-view-id>/restricted/cogstaff/occ/feeTypeManage.xhtml</to-view-id>
+            </navigation-case>
+
+            <navigation-case>
+                <from-outcome>editFees</from-outcome>
+                <to-view-id>/restricted/cogstaff/occ/feeManage.xhtml</to-view-id>
+
+            </navigation-case>
+
+        </navigation-rule>
     
     
     
@@ -1645,6 +1752,11 @@
     <!--**                       XI. REPORT                                **-->
     <!--*********************************************************************-->
     
+    <managed-bean>
+        <managed-bean-name>paymentBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.PaymentBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     <managed-bean>
         <managed-bean-name>dashboardDataBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBB</managed-bean-class>
@@ -1670,12 +1782,8 @@
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>dataCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.DataCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+    
     
     
     
@@ -1686,8 +1794,22 @@
     
     
     <managed-bean>
-        <description>Utility application-scoped bean for handling blob upload and download	</description>
+        <managed-bean-name>dataCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.DataCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    
+         
+    <managed-bean>
+        <managed-bean-name>uploadBlobBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.UploadBlobBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    
+    <managed-bean>
         <managed-bean-name>blobCoordinator</managed-bean-name>
+        <description>Utility application-scoped bean for handling blob upload and download	</description>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.BlobCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
@@ -1717,7 +1839,11 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
+    
+    
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: blobs ~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+    
+    
     <navigation-rule>
         <from-view-id>*</from-view-id>
         <navigation-case>
@@ -1775,6 +1901,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
+        
     <managed-bean>
         <managed-bean-name>personSearchPublicBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PersonSearchPublicBB</managed-bean-class>
@@ -1854,8 +1981,7 @@
             <from-view-id> /public/services/personSearchPublic.xhtml</from-view-id>
             <from-outcome> editPerson </from-outcome>
             <to-view-id> /public/services/personEditPublic.xhtml </to-view-id>
-            <redirect />
-        </navigation-case>
+            
     </navigation-rule>
     
     <navigation-rule>
@@ -1877,11 +2003,6 @@
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>cECaseSearchBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules search ~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
@@ -1890,40 +2011,89 @@
     
     
     
+    
     <!--*********************************************************************-->
-    <!--**                       XIV. CHOICE                               **-->
+    <!--**                       XV. WORKFLOW                              **-->
     <!--*********************************************************************-->
     
     <managed-bean>
-        <managed-bean-name>choiceCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.ChoiceCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>workflowCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.WorkflowCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
-        <managed-bean-name>choiceIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.ChoiceIntegrator</managed-bean-class>
+        <managed-bean-name>workflowIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.WorkflowIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-        
+   
     <managed-bean>
-        <managed-bean-name>uploadBlobBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.UploadBlobBB</managed-bean-class>
+        <managed-bean-name>workflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.WorkflowBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+            
+    <managed-bean>
+        <managed-bean-name>workflowConfigBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.WorkflowConfigBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    
-            
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
-    
+      <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>workflowConfig</from-outcome>
+            <to-view-id>/restricted/cogstaff/workflow/workflowConfig.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
     
                                                             
     <!--*********************************************************************-->
     <!--**                       UNKNOWN                                   **-->
     <!--*********************************************************************-->
-
+    
+    
+    
+    <managed-bean>
+        <managed-bean-name>textBlockBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>dashboardDataBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>navMenuBean</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.NavMenuBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>actionRequestManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>publicInfoBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PublicInfoBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    
+    <managed-bean>
+        <managed-bean-name>municipalityManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     
 </faces-config>

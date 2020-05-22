@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 public class Payment {
     
     private int paymentID;
-    private int occupancyInspectionID;
     private PaymentType paymentType;
     private LocalDateTime dateDeposited;
     private LocalDateTime dateReceived;
@@ -38,7 +37,7 @@ public class Payment {
     private User recordedBy;
     private LocalDateTime entryTimestamp;
     private int assignedFeeID;
-    private FeeAssignedType assignedTo;
+    private EventDomainEnum domain;
     
    public Payment() {
        
@@ -55,20 +54,6 @@ public class Payment {
        paymentType.setPaymentTypeId(2);
        
    }
-
-    /**
-     * @return the occupancyInspectionID
-     */
-    public int getOccupancyInspectionID() {
-        return occupancyInspectionID;
-    }
-
-    /**
-     * @param occupancyInspectionID the occupancyInspectionID to set
-     */
-    public void setOccupancyInspectionID(int occupancyInspectionID) {
-        this.occupancyInspectionID = occupancyInspectionID;
-    }
 
     /**
      * @return the dateDeposited
@@ -169,7 +154,7 @@ public class Payment {
     }
 
     /**
-     * @return the paymentPayerID
+     * @return the payment Payer
      */
     public Person getPayer() {
         return payer;
@@ -234,11 +219,11 @@ public class Payment {
         this.assignedFeeID = assignedFeeID;
     }
 
-    public FeeAssignedType getAssignedTo() {
-        return assignedTo;
+    public EventDomainEnum getDomain() {
+        return domain;
     }
 
-    public void setAssignedTo(FeeAssignedType assignedTo) {
-        this.assignedTo = assignedTo;
+    public void setDomain(EventDomainEnum domain) {
+        this.domain = domain;
     }
 }

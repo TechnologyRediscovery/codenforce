@@ -13,7 +13,7 @@
 
     <h:body>
 
-        <ui:composition template="../../navContainer_restricted.xhtml">
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
 
             <ui:define name="content">
 
@@ -21,7 +21,6 @@
 
                     <div class="mainContainer">
 
-                        
                         <h1>Manage Municipal Code Sources</h1>
 
                         <h:form id="form-messages-global">
@@ -386,103 +385,108 @@
                                        header="Update &amp; Add Code Source"
                                        >
 
-                                <p>Current code source: <h:outputText value="#{codeSourceAddUpdateBB.currentCodeSource.sourceName} (#{codeSourceAddUpdateBB.currentCodeSource.sourceYear})(Blank means Add New Source)"/></p>
-
                                 <h:form id="addUpdateSourceForm">
 
-                                    <div style="font-size: inherit;">Source ID Number: 
-                                        <h:outputText value="#{codeSourceAddUpdateBB.formSourceID}"/>
-                                    </div>
+                                    <h1>Current Code Source: 
+                                        <h:outputText value="#{codeSourceAddUpdateBB.currentCodeSource.sourceName} (#{codeSourceAddUpdateBB.currentCodeSource.sourceYear}) | ID: #{codeSourceAddUpdateBB.formSourceID} (Blank means Add New Source)"/>
+                                    </h1>
 
-                                    <p:spacer height="15"/>
+                                    <p:spacer height="10"/>
 
-                                    <p:outputLabel for="selectedSourceName">
-                                        <h:outputText value="Code Source Name"/>
-                                    </p:outputLabel>
+                                    <h:panelGrid columns="3" cellpadding="5" columnClasses="gridTd_code,gridTd_code,gridTd_code" >
 
-                                    <p:inputText id="selectedSourceName" 
-                                                 value="#{codeSourceAddUpdateBB.formSourceName}" 
-                                                 style="width: 20%;" 
-                                                 required="true" 
-                                                 styleClass="inputText"/>
+                                        <p:outputLabel for="selectedSourceName" value="Code Source Name: "/>
 
-                                    <h:message for="selectedSourceName" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                    <p:spacer height="15"/>
-
-                                    <p:outputLabel for="selectedSourceYear">
-                                        <h:outputText value="Year"/>
-                                    </p:outputLabel>
-
-                                    <p:inputText id="selectedSourceYear" 
-                                                 value="#{codeSourceAddUpdateBB.formSourceYear}" 
-                                                 style="width: 20%;" 
-                                                 required="true" 
-                                                 styleClass="inputText"/>
-
-                                    <h:message for="selectedSourceYear" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                    <p:spacer height="15"/>
-
-                                    <p:outputLabel for="selectedSourceIsActive">
-                                        <h:outputText value="Active Source?"/>
-                                    </p:outputLabel>
-
-                                    <p:selectBooleanButton id="selectedSourceIsActive"
-                                                           value="#{codeSourceAddUpdateBB.formSourceIsActive}"
-                                                           required="true"
-                                                           onLabel="Yes"
-                                                           offLabel="No"/> 
-
-                                    <h:message for="selectedSourceIsActive" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                    <p:spacer height="15"/>
-
-                                    <p:outputLabel for="selectedSourceDescription">
-                                        <h:outputText value="Description of Code Source"/>
-                                    </p:outputLabel>
-
-                                    <p:inputTextarea id="selectedSourceDescription" 
-                                                     value="#{codeSourceAddUpdateBB.formSourceDescription}" 
-                                                     style="width: 100%;"
+                                        <p:inputText id="selectedSourceName" 
+                                                     value="#{codeSourceAddUpdateBB.formSourceName}" 
                                                      required="true"
-                                                     styleClass="inputTextarea" />
+                                                     />
 
-                                    <h:message for="selectedSourceDescription" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        <p:message for="selectedSourceName" showDetail="false" showSummary="true"/>
 
-                                    <p:spacer height="15"/>
+                                        <p:outputLabel for="selectedSourceYear" value="Year: "/>
 
-                                    <p:outputLabel for="selectedSourceURL">
-                                        <h:outputText value="Web link to source specification"/>
-                                    </p:outputLabel>
-
-                                    <p:inputText id="selectedSourceURL" 
-                                                 value="#{codeSourceAddUpdateBB.formSourceURL}" 
-                                                 style="width: 100%;" 
-                                                 required="true"
-                                                 styleClass="inputText"/>
-
-                                    <h:message for="selectedSourceURL" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                    <p:spacer height="15"/>
-
-                                    <p:outputLabel for="selectedSourceNotes">
-                                        <h:outputText value="Notes on Source (i.e. Who approved it? When does it expire?)"/>
-                                    </p:outputLabel>
-
-                                    <p:inputTextarea id="selectedSourceNotes" 
-                                                     value="#{codeSourceAddUpdateBB.formSourceNotes}" 
-                                                     style="width: 100%;" 
+                                        <p:inputText id="selectedSourceYear" 
+                                                     value="#{codeSourceAddUpdateBB.formSourceYear}" 
                                                      required="true" 
-                                                     styleClass="inputText"/>
+                                                     />
 
-                                    <h:message for="selectedSourceNotes" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        <p:message for="selectedSourceYear" showDetail="false" showSummary="true" />
+
+                                        <p:outputLabel for="selectedSourceIsActive" value="Active Source? "/>
+
+
+                                        <p:selectBooleanButton id="selectedSourceIsActive"
+                                                               value="#{codeSourceAddUpdateBB.formSourceIsActive}"
+                                                               required="true"
+                                                               onLabel="Yes"
+                                                               offLabel="No"/> 
+
+                                        <p:message for="selectedSourceIsActive" showDetail="false" showSummary="true" />
+
+                                    </h:panelGrid>
+
+                                    <h:panelGrid columns="1" cellpadding="5" columnClasses="gridTd_code_inputTextarea" >
+
+                                        <p:row>
+                                            <p:column>
+                                                <p:outputLabel for="selectedSourceURL" value="Web link to source specification"/>
+                                            </p:column>
+                                            <p:column>
+                                                <p:message for="selectedSourceURL" showDetail="false" showSummary="true"  />
+                                            </p:column>
+
+                                        </p:row>
+                                        <p:row>
+                                            <p:column>
+                                                <p:inputText id="selectedSourceURL" 
+                                                             value="#{codeSourceAddUpdateBB.formSourceURL}" 
+                                                             style="width: 100%;" 
+                                                             required="true"
+                                                             styleClass="inputText"/>
+                                            </p:column>
+                                        </p:row>
+
+                                        <p:row>
+                                            <p:column>
+                                                <p:outputLabel for="selectedSourceDescription" value="Description of Code Source"/>
+                                            </p:column>
+                                            <p:column>
+                                                <p:message for="selectedSourceDescription" showDetail="false" showSummary="true"/>
+                                            </p:column>
+
+                                        </p:row>
+                                        <p:row>
+                                            <p:column>
+                                                <p:inputTextarea id="selectedSourceDescription" 
+                                                                 value="#{codeSourceAddUpdateBB.formSourceDescription}" 
+                                                                 style="width: 100%;"
+                                                                 required="true"
+                                                                 styleClass="inputTextarea" />
+                                            </p:column>
+                                        </p:row>
+
+                                        <p:row>
+                                            <p:column>
+                                                <p:outputLabel for="selectedSourceNotes" value="Notes on Source (i.e. Who approved it? When does it expire?)"/>
+                                            </p:column>
+                                            <p:column>
+                                                <p:message for="selectedSourceNotes" showDetail="false" showSummary="true"  />
+                                            </p:column>
+
+                                        </p:row>
+                                        <p:row>
+                                            <p:column>
+                                                <p:inputTextarea id="selectedSourceNotes" 
+                                                                 value="#{codeSourceAddUpdateBB.formSourceNotes}" 
+                                                                 style="width: 100%;" 
+                                                                 required="true" 
+                                                                 styleClass="inputText"/>
+
+                                            </p:column>
+                                        </p:row>
+                                    </h:panelGrid>
+
 
                                     <p:commandButton 
                                         id="commitButton" 

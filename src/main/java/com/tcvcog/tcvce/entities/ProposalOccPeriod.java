@@ -5,11 +5,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Objects;
-
 /**
  *
  * Mapped to database table choiceproposal
@@ -18,10 +13,8 @@ import java.util.Objects;
  */
 public class ProposalOccPeriod extends Proposal {
     
-    private int occperiodID;
-    private OccPeriod period;
-    
-    public ProposalOccPeriod(Proposal pr){
+    public ProposalOccPeriod(Proposal pr, int occPeriodID){
+        this.hostObjectID = occPeriodID;
         
         this.proposalID  = pr.proposalID;
         this.directive = pr.directive;
@@ -51,37 +44,7 @@ public class ProposalOccPeriod extends Proposal {
         this.order = pr.order;
     }
 
-    /**
-     * @return the occperiodID
-     */
-    public int getOccperiodID() {
-        return occperiodID;
-    }
-
-    /**
-     * @return the period
-     */
-    public OccPeriod getPeriod() {
-        return period;
-    }
-
-    /**
-     * @param occperiodID the occperiodID to set
-     */
-    public void setOccperiodID(int occperiodID) {
-        this.occperiodID = occperiodID;
-    }
-
-    /**
-     * @param period the period to set
-     */
-    public void setPeriod(OccPeriod period) {
-        this.period = period;
-    }
-    
-
-  
-    
+       
     
     
 }

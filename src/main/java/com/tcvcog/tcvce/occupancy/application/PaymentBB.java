@@ -18,6 +18,10 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.entities.Payment;
@@ -33,7 +37,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -55,12 +58,14 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     private PaymentType newPaymentType;
 
     private OccPeriod currentOccPeriod;
-    private MoneyOccPeriodFeeAssigned selectedOccPeriodFee;
-    private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFeeList;
+    private CECase currentCase;
+    private FeeAssigned selectedAssignedFee;
+    private ArrayList<FeeAssigned> feeAssignedList;
     private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList;
 
+    private EventDomainEnum currentDomain;
     private boolean editing;
-    private String redirTo;
+    private boolean redirected;
 
     public PaymentBB() {
     }
@@ -68,40 +73,131 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean() {
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
-        redirTo = getSessionBean().getPaymentRedirTo();
-        if (redirTo != null) {
-            currentOccPeriod = getSessionBean().getSessOccPeriod();
-            if (getSessionBean().getSessPayment() != null) {
-                paymentList = new ArrayList<>();
-                paymentList.add(getSessionBean().getSessPayment());
+        if (getSessionBean().getNavStack().peekLastPage() != null) {
+
+            refreshFeeAssignedList();
+
+            redirected = true;
+        }
+
+        formPayment = new Payment();
+
+        formPaymentType = new PaymentType();
+
+    }
+
+    public void refreshFeeAssignedList() {
+
+        feeAssignedList = new ArrayList<>();
+
+        paymentList = new ArrayList<>();
+
+        boolean paymentSet = false;
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        currentDomain = getSessionBean().getFeeManagementDomain();
+
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+
+            currentOccPeriod = getSessionBean().getSessionOccPeriod();
+
+            if (getSessionBean().getSessionPayment() != null) {
+                paymentList.add(getSessionBean().getSessionPayment());
+                paymentSet = true;
                 try {
-                    occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) paymentIntegrator.getFeeAssigned(currentOccPeriod);
+                    ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
+
+                    for (MoneyOccPeriodFeeAssigned fee : tempList) {
+
+                        FeeAssigned skeleton = fee;
+
+                        skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
+                        skeleton.setDomain(currentDomain);
+                        feeAssignedList.add(skeleton);
+
+                    }
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to fetch the fee list!", ""));
+                                    "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
                 }
             } else if (currentOccPeriod != null) {
+
                 try {
-                    occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) paymentIntegrator.getFeeAssigned(currentOccPeriod);
-                    paymentList = new ArrayList<>();
-                    
-                    for (MoneyOccPeriodFeeAssigned skeleton : occPeriodFeeList) {
+                    ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
+
+                    for (MoneyOccPeriodFeeAssigned fee : tempList) {
+
+                        FeeAssigned skeleton = fee;
+
+                        skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
+                        skeleton.setDomain(currentDomain);
+                        feeAssignedList.add(skeleton);
                         paymentList.addAll(skeleton.getPaymentList());
                     }
-                    
+                    paymentSet = true;
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Unable to load payment list (from occperiod)",
-                                    "This must be corrected by the system administrator"));
+                                    "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
                 }
 
             }
-        } else {
 
+        } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+
+            currentCase = getSessionBean().getFeeManagementCeCase();
+
+            if (getSessionBean().getSessionPayment() != null) {
+                paymentList.add(getSessionBean().getSessionPayment());
+                paymentSet = true;
+                try {
+                    ArrayList<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
+
+                    for (MoneyCECaseFeeAssigned fee : tempList) {
+
+                        FeeAssigned skeleton = fee;
+
+                        skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
+                        skeleton.setDomain(currentDomain);
+                        feeAssignedList.add(skeleton);
+
+                    }
+                } catch (IntegrationException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
+                }
+            } else if (currentCase != null) {
+
+                try {
+
+                    ArrayList<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
+
+                    for (MoneyCECaseFeeAssigned fee : tempList) {
+
+                        FeeAssigned skeleton = fee;
+
+                        skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
+                        skeleton.setDomain(currentDomain);
+                        feeAssignedList.add(skeleton);
+                        paymentList.addAll(skeleton.getPaymentList());
+                    }
+                    paymentSet = true;
+                } catch (IntegrationException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
+                }
+
+            }
+
+        }
+
+        if (!paymentSet) {
             try {
-                paymentList = paymentIntegrator.getPaymentList();
+                paymentList = pi.getPaymentList();
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -109,10 +205,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                                 "This must be corrected by the system administrator"));
             }
         }
-
-        formPayment = new Payment();
-
-        formPaymentType = new PaymentType();
 
     }
 
@@ -130,25 +222,65 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public void commitPaymentUpdates(ActionEvent e) {
-        if (selectedOccPeriodFee == null) {
+
+        boolean failed = false;
+
+        Payment payment = selectedPayment;
+
+        payment.setPaymentType(formPayment.getPaymentType());
+        payment.setDateDeposited(formPayment.getDateDeposited());
+        payment.setDateReceived(formPayment.getDateReceived());
+        payment.setAmount(formPayment.getAmount());
+        payment.setPayer(formPayment.getPayer());
+        payment.setReferenceNum(formPayment.getReferenceNum());
+        payment.setCheckNum(formPayment.getCheckNum());
+        payment.setCleared(formPayment.isCleared());
+        payment.setNotes(formPayment.getNotes());
+
+        if (selectedAssignedFee == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a fee to assign this payment to.", " "));
             formPayment.setPayer(new Person());
-        } else {
-            PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
-            Payment payment = selectedPayment;
+            failed = true;
+        }
 
-            payment.setPaymentType(formPayment.getPaymentType());
-            payment.setOccupancyInspectionID(formPayment.getOccupancyInspectionID());
-            payment.setDateDeposited(formPayment.getDateDeposited());
-            payment.setDateReceived(formPayment.getDateReceived());
-            payment.setAmount(formPayment.getAmount());
-            payment.setPayer(formPayment.getPayer());
-            payment.setReferenceNum(formPayment.getReferenceNum());
-            payment.setCheckNum(formPayment.getCheckNum());
-            payment.setCleared(formPayment.isCleared());
-            payment.setNotes(formPayment.getNotes());
+        if (payment.getPayer() == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "The Payer's ID is not in our database, please make sure it's correct.", " "));
+            formPayment.setPayer(new Person());
+            failed = true;
+        }
+
+        if (payment.getAmount() <= 0) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "The amount you entered is not valid.", " "));
+            formPayment.setPayer(new Person());
+            failed = true;
+        }
+
+        if (payment.getPaymentType().getPaymentTypeId() == 1
+                && (payment.getReferenceNum() == null || payment.getReferenceNum().equals(""))) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "A payment by check requires a reference number", " "));
+            formPayment.setPayer(new Person());
+            failed = true;
+        }
+
+        if (payment.getPaymentType().getPaymentTypeId() == 1
+                && (payment.getCheckNum() == 0)) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "A payment by check requires a check number.", " "));
+            failed = true;
+        }
+
+        if (!failed) {
+            PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
+
             //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
             try {
                 paymentIntegrator.updatePayment(payment);
@@ -171,7 +303,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         if (getSelectedPayment() != null) {
             formPayment.setPaymentID(selectedPayment.getPaymentID());
             formPayment.setPaymentType(selectedPayment.getPaymentType());
-            formPayment.setOccupancyInspectionID(selectedPayment.getOccupancyInspectionID());
             formPayment.setAmount(selectedPayment.getAmount());
             formPayment.setPayer(selectedPayment.getPayer());
             formPayment.setReferenceNum(selectedPayment.getReferenceNum());
@@ -196,28 +327,35 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public String finishAndRedir() {
-        getSessionBean().setPaymentRedirTo(null);
 
-        return redirTo;
+        return getSessionBean().getNavStack().popLastPage();
     }
 
     public boolean editingOccPeriod() {
-        return (redirTo != null && currentOccPeriod != null);
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
     }
 
-    public String getOccPeriodAddress() {
+    public boolean editingCECase() {
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
+    }
 
-        PropertyIntegrator pi = getPropertyIntegrator();
+    public String getCurrentAddress() {
 
         String address = "";
-        PropertyUnit unit;
-        Property prop;
+
         try {
-            unit = pi.getPropertyUnit(currentOccPeriod.getPropertyUnitID());
-            prop = pi.getProperty(unit.getPropertyID());
-            address = prop.getAddress();
+
+            if (editingOccPeriod()) {
+                PropertyIntegrator pi = getPropertyIntegrator();
+                PropertyUnit unit = pi.getPropertyUnitByPropertyUnitID(currentOccPeriod.getPropertyUnitID());
+                Property prop = pi.getProperty(unit.getPropertyID());
+                address = prop.getAddress();
+            } else if (editingCECase()) {
+                address = currentCase.getProperty().getAddress();
+            }
+
         } catch (IntegrationException ex) {
-            System.out.println("PaymentBB had problems getting the OccPeriodAddress");
+            System.out.println("PaymentBB had problems getting the currentAddress");
         }
 
         return address;
@@ -225,7 +363,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public String addPayment() {
-        if (selectedOccPeriodFee == null) {
+        if (selectedAssignedFee == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a fee to assign this payment to.", " "));
@@ -236,7 +374,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         Payment payment = new Payment();
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
         payment.setPaymentID(formPayment.getPaymentID());
-        payment.setOccupancyInspectionID(formPayment.getOccupancyInspectionID());
         payment.setPaymentType(formPayment.getPaymentType());
         payment.setDateDeposited(formPayment.getDateDeposited());
         payment.setDateReceived(formPayment.getDateReceived());
@@ -256,6 +393,23 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             return "";
         }
 
+        if (payment.getAmount() <= 0) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "The amount you entered is not valid.", " "));
+            formPayment.setPayer(new Person());
+            return "";
+        }
+
+        if (payment.getPaymentType().getPaymentTypeId() == 1
+                && (payment.getReferenceNum() == null || payment.getReferenceNum().equals(""))) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "A payment by check requires a reference number", " "));
+            formPayment.setPayer(new Person());
+            return "";
+        }
+
         if (payment.getPaymentType().getPaymentTypeId() == 1
                 && (payment.getCheckNum() == 0)) {
             getFacesContext().addMessage(null,
@@ -266,9 +420,14 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         try {
             paymentIntegrator.insertPayment(payment);
+            payment = paymentIntegrator.getMostRecentPayment(); //So that the join insert knows what payment to join to
+
             if (editingOccPeriod()) {
-                payment = paymentIntegrator.getMostRecentPayment();
-                paymentIntegrator.insertPaymentPeriodJoin(payment, selectedOccPeriodFee);
+                MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned(selectedAssignedFee);
+                paymentIntegrator.insertPaymentPeriodJoin(payment, skeleton);
+            } else if (editingCECase()) {
+                MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned(selectedAssignedFee);
+                paymentIntegrator.insertPaymentCaseJoin(payment, skeleton);
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -336,15 +495,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     public void setFormPayment(Payment formPayment) {
         this.formPayment = formPayment;
-    }
-
-    // Below are the methods to driectly access the fields of formPayment
-    public int getFormPaymentOccupancyInspectionID() {
-        return formPayment.getOccupancyInspectionID();
-    }
-
-    public void setFormPaymentOccupancyInspectionID(int occupancyInspectionID) {
-        formPayment.setOccupancyInspectionID(occupancyInspectionID);
     }
 
     public Date getFormPaymentDateDeposited() {
@@ -648,28 +798,20 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         this.currentOccPeriod = currentOccPeriod;
     }
 
-    public String getRedirTo() {
-        return redirTo;
+    public FeeAssigned getSelectedAssignedFee() {
+        return selectedAssignedFee;
     }
 
-    public void setRedirTo(String redirTo) {
-        this.redirTo = redirTo;
+    public void setSelectedAssignedFee(FeeAssigned selectedAssignedFee) {
+        this.selectedAssignedFee = selectedAssignedFee;
     }
 
-    public MoneyOccPeriodFeeAssigned getSelectedOccPeriodFee() {
-        return selectedOccPeriodFee;
+    public ArrayList<FeeAssigned> getAssignedFeeList() {
+        return feeAssignedList;
     }
 
-    public void setSelectedOccPeriodFee(MoneyOccPeriodFeeAssigned selectedOccPeriodFee) {
-        this.selectedOccPeriodFee = selectedOccPeriodFee;
-    }
-
-    public ArrayList<MoneyOccPeriodFeeAssigned> getOccPeriodFeeList() {
-        return occPeriodFeeList;
-    }
-
-    public void setOccPeriodFeeList(ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFeeList) {
-        this.occPeriodFeeList = occPeriodFeeList;
+    public void setAssignedFeeList(ArrayList<FeeAssigned> assignedFeeList) {
+        this.feeAssignedList = assignedFeeList;
     }
 
     public ArrayList<MoneyOccPeriodFeeAssigned> getOccPeriodFilteredFeeList() {
@@ -678,6 +820,30 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     public void setOccPeriodFilteredFeeList(ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList) {
         this.occPeriodFilteredFeeList = occPeriodFilteredFeeList;
+    }
+
+    public CECase getCurrentCase() {
+        return currentCase;
+    }
+
+    public void setCurrentCase(CECase currentCase) {
+        this.currentCase = currentCase;
+    }
+
+    public EventDomainEnum getCurrentDomain() {
+        return currentDomain;
+    }
+
+    public void setCurrentDomain(EventDomainEnum currentDomain) {
+        this.currentDomain = currentDomain;
+    }
+
+    public boolean isRedirected() {
+        return redirected;
+    }
+
+    public void setRedirected(boolean redirected) {
+        this.redirected = redirected;
     }
 
 }

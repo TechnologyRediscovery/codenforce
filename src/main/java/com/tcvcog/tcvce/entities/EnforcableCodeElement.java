@@ -18,17 +18,18 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *  Represents a codesetelement stated with fidelity to the ERD
  * @author ellen bascomb of apt 31y
  */
-public class EnforcableCodeElement extends CodeElement implements Serializable{
-    
-    public EnforcableCodeElement(){
-    
+public class EnforcableCodeElement extends CodeElement implements Serializable, Cloneable {
+
+    public EnforcableCodeElement() {
+
     }
-    
+
     // code set elements and enforcable code elments are equivalent
     // TODO: unify these names
     private int codeSetElementID;
@@ -40,12 +41,18 @@ public class EnforcableCodeElement extends CodeElement implements Serializable{
     private int normDaysToComply;
     private String daysToComplyNotes;
     private String muniSpecificNotes;
+    private List<Fee> feeList;
 
     @Override
-    public String toString(){
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    @Override
+    public String toString() {
         return codeElement.getHeaderString();
     }
-    
+
     /**
      * @return the maxPenalty
      */
@@ -171,5 +178,13 @@ public class EnforcableCodeElement extends CodeElement implements Serializable{
     public void setMuniSpecificNotes(String muniSpecificNotes) {
         this.muniSpecificNotes = muniSpecificNotes;
     }
-    
+
+    public List<Fee> getFeeList() {
+        return feeList;
+    }
+
+    public void setFeeList(List<Fee> feeList) {
+        this.feeList = feeList;
+    }
+
 }

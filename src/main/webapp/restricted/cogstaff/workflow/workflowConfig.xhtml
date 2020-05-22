@@ -1,0 +1,609 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Proposal and event rule configuration</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="proposaleventrule-config-view">
+
+                    <div class="mainContainer">
+
+                        <h:form id="proposaleventrule-config-messages-form">
+                            <h:messages id="proposaleventrule-config-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                        <h:form id="proposaleventrule-config-form">
+
+                            <h1>Proposal and event rule configuration</h1>
+                            
+                            <p:panel    id="proposaleventrule-choose-panel"
+                                        toggleable="true"
+                                        widgetVar="proposaleventrule-choose-panel-var"
+                                        collapsed="false"
+                                        header="Choose event rule">
+                                
+                                 <p:dataTable
+                                    id="occperiod-proposals-eventrules-datatable"
+                                    var="rule"
+                                    rowKey="#{rule.ruleid}"
+                                    value="#{proposalEventRuleConfigBB.eventRuleList}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableColumns="true"
+                                    expandedRow="false"
+                                    rowExpandMode="multiple"
+                                    resizableColumns="true">
+
+                                      <p:column width="3%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Exp"/>
+                                            </f:facet>
+                                            <p:rowToggler/>
+                                        </p:column>
+
+                                     <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                         <h:outputText value="#{rule.ruleid}"/>
+                                    </p:column>
+
+                                     <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Title" />
+                                        </f:facet>
+                                         <h:outputText value="#{rule.title}"/>
+                                    </p:column>
+
+                                    <p:rowExpansion>
+                                        
+                                    <p:commandButton    id="eventrules-editrule-cb"
+                                                        ajax="true" 
+                                                        styleClass="proposal-choice-button"
+                                                        actionListener="#{occInspectionBB.rules_initiateEventRuleEdit(rule)}"
+                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                        value="Edit rule"
+                                                        oncomplete="PF('occperiod-dialog-addediteventrule-var').show()"
+                                                        icon="fa fa-plus"
+                                                        update="occperiod-dialog-addediteventrule-form"/>
+                                    
+                                    <p:spacer height="5px" />
+
+                                          <h:panelGrid    id="eventrules-grid" 
+                                                            columns="2" 
+                                                            columnClasses="td-dense" 
+                                                            rendered="true">
+                                                <h:panelGroup>
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Rule ID: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.ruleid}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Title:  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.title}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Description: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.description}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required event type: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.requiredEventType) ? rule.requiredEventType.label : ''}" />
+
+                                                    <p:spacer height="5px" />
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Forbidden event type: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.forbiddenEventType) ? rule.forbiddenEventType.label : ''}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required event category:  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.requiredEventCategory) 
+                                                                           ? rule.requiredEventCategory.eventCategoryTitle 
+                                                                                + 'ID: ' 
+                                                                                + rule.requiredEventCategory.categoryID  
+                                                                           : '' }" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Forbidden event category:  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.forbiddenEventCategory) 
+                                                                           ? rule.forbiddenEventCategory.eventCategoryTitle 
+                                                                                + 'ID: ' 
+                                                                                + rule.forbiddenEventCategory.categoryID  
+                                                                            : '' }" />
+                                                </h:panelGroup>
+                                              <h:panelGroup>
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Req EC type-internal order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_typeInternalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC Type-internal order thresold upper bound? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC global order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_globalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC global order thresold upper bound?  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_globalOrder_treatAsUpperBound}" />
+
+                                              </h:panelGroup>
+                                              <h:panelGroup>
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Req EC type-internal order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_typeInternalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC Type-internal order thresold upper bound? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC global order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_globalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Required EC global order thresold upper bound?  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_globalOrder_treatAsUpperBound}" />
+
+                                              </h:panelGroup>
+
+                                              <h:panelGroup>
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Mondatory rule pass required for BOB close?"  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.mandatoryRulePassRequiredToCloseEntity}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Inactivate rule on BOB close?"  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.inactivateRuleOnEntityClose}" />
+
+                                                    <p:spacer height="5px" />
+
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Triggered EC On pass: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.triggeredECOnRulePass) ? rule.triggeredECOnRulePass.categoryID : ''}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Triggered EC On fail: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.triggeredECOnRuleFail) ? rule.triggeredECOnRuleFail.categoryID : ''}" />
+
+                                              </h:panelGroup>
+                                              <h:panelGroup>
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Active? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.activeRuleAbstract}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Notes: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.notes}" escape="false" />
+                                              </h:panelGroup>
+                                          </h:panelGrid>
+                                    </p:rowExpansion>
+                                </p:dataTab
+                                
+                                
+                                
+                                
+                            </p:panel>
+                            
+                            <p:panel    id="proposaleventrule-config-panel"
+                                        toggleable="true"
+                                        widgetVar="proposaleventrule-config-panel-var"
+                                        collapsed="false"
+                                        header="Event rule explorer">
+
+                                <h:form id="occperiod-dialog-addediteventrule-form">
+
+                                    <h2>Add and edit event rules</h2>
+
+                                    <h:panelGrid    id="eventrule-create-grid" 
+                                                    columns="2" 
+                                                    columnClasses="gridTD, gridTD" 
+                                                    rendered="true">
+
+                                        <h:panelGroup>
+                                            <h:outputLabel for="rule-title-it">
+                                                <h:outputText styleClass="ui-label" value="Rule title:"/>
+                                            </h:outputLabel>
+                                            <p:spacer height="3px"/>
+                                            <p:inputText id="rule-title-it" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.title}" 
+                                                         style="width: 200px;" tabindex="3" required="true" styleClass="inputText"/>
+                                            <h:message    id="rule-title-msg"
+                                                          for="rule-title-it" 
+                                                          showDetail="false" showSummary="true" 
+                                                          warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:spacer height="5px" />
+
+                                            <h:outputLabel for="rule-title-it">
+                                                <h:outputText styleClass="ui-label" 
+                                                              value="Rule description" />
+                                            </h:outputLabel>
+                                            <p:inputText id="rule-desc-it" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.description}" 
+                                                         style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
+                                            <h:message    id="rule-descr-msg"
+                                                          for="rule-descr-it" 
+                                                          showDetail="false" showSummary="true" 
+                                                          warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:outputText value=" " />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+
+                                            <h3>Required attributes</h3>
+
+                                            <h:outputLabel  for="rule-lb-reqet">
+                                                <h:outputText styleClass="ui-label" value="Required event type"/>
+                                            </h:outputLabel>
+                                            <p:selectOneMenu id="rule-lb-reqet" required="false" 
+                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredEventType}" 
+                                                             tabindex="3"
+                                                             styleClass="full-width">
+                                                <f:selectItem itemLabel="Select an event type..." itemDisabled="true" noSelectionOption="true"/>
+                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
+                                            </p:selectOneMenu>
+                                            <h:message for="rule-lb-reqet" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:spacer height="5px" />
+
+                                            <h:outputLabel for="rule-lb-reqcat">
+                                                <h:outputText styleClass="ui-label" value="Required event category"/>
+                                            </h:outputLabel>
+                                            <p:selectOneMenu id="rule-lb-reqcat" required="false" 
+                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredEventCategory}" 
+                                                             tabindex="3"
+                                                             styleClass="full-width">
+                                                <f:converter converterId="eventCategoryConverter" />
+                                                <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
+                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventCategoryListAllActive}" 
+                                                               var="ec" 
+                                                               itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
+                                            </p:selectOneMenu>
+                                            <h:message for="rule-lb-reqcat" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="Req cat thresold (internal to type)" 
+                                                           for="rule-it-reqec-thres-typeint"/>
+                                            <p:spacer height="3px"/>
+                                            <p:inputText id="rule-it-reqec-thres-typeint" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder}" 
+                                                         style="width: 20px;" 
+                                                         tabindex="3" 
+                                                         required="false" 
+                                                         styleClass="inputText"/>
+                                            <h:message     id="rule-reqec-thres-typeint-msg"
+                                                           for="rule-it-reqec-thres-typeint" 
+                                                           showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:spacer height="3px"/>
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="upper bound? (uncheck = lower bound)" 
+                                                           for="rule-reqrec-thres-global-upperbound-switch"/>
+                                            <p:selectBooleanCheckbox id="rule-req-thres-typeint-upperbound-switch"
+                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder_treatAsUpperBound}" />
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="Req cat thresold (global order)" 
+                                                           for="rule-it-reqec-thres-global"/>
+
+                                            <p:spacer height="3px"/>
+
+                                            <p:inputText id="rule-it-reqec-thres-global" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredECThreshold_globalOrder}" 
+                                                         style="width: 20px;" 
+                                                         tabindex="3" 
+                                                         required="false" 
+                                                         styleClass="inputText"/>
+                                            <h:message     id="rule-reqec-thres-global-msg"
+                                                           for="rule-it-reqec-thres-global" 
+                                                           showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:spacer height="3px"/>
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="upper bound? (uncheck = lower bound)" 
+                                                           for="rule-reqrec-thres-global-upperbound-switch"/>
+                                            <p:selectBooleanCheckbox id="rule-reqrec-thres-global-upperbound-switch"
+                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredECThreshold_globalOrder_treatAsUpperBound}" />
+                                        </h:panelGroup>    
+
+
+                                        <h:panelGroup>
+                                            <h3>Forbidden attributes</h3>
+                                            <h:outputLabel styleClass="ui-label" for="rule-lb-forbiddenet">
+                                                <h:outputText value="Forbidden event type"/>
+                                            </h:outputLabel>
+                                            <p:selectOneMenu id="rule-lb-forbiddenet" required="false" 
+                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenEventType}" 
+                                                             tabindex="3"
+                                                             styleClass="full-width">
+                                                <f:selectItem itemLabel="Select an event type..." itemDisabled="true" noSelectionOption="true"/>
+                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
+                                            </p:selectOneMenu>
+                                            <h:message for="rule-lb-forbiddenet" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:spacer height="3px"/>
+
+                                            <h:outputLabel styleClass="ui-label" for="rule-lb-forcat">
+                                                <h:outputText value="Forbidden event category"/>
+                                            </h:outputLabel>
+                                            <p:selectOneMenu id="rule-lb-forcat" required="false" 
+                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenEventCategory}" 
+                                                             tabindex="3"
+                                                             styleClass="full-width">
+                                                <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
+                                                <f:converter converterId="eventCategoryConverter" />
+                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventCategoryListAllActive}" 
+                                                               var="ec" itemLabel="#{ec.eventCategoryTitle}  (ID: #{ec.categoryID})" />
+                                            </p:selectOneMenu>
+                                            <h:message for="rule-lb-forcat" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:spacer height="3px"/>
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="Forbidden cat thresold (internal to type)" 
+                                                           for="rule-it-forec-thres-typeint"/>
+
+                                            <p:spacer height="3px"/>
+
+                                            <p:inputText id="rule-it-forec-thres-typeint" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder}" 
+                                                         style="width: 20px;" 
+                                                         tabindex="3" 
+                                                         required="false" 
+                                                         styleClass="inputText"/>
+                                            <h:message     id="rule-forec-thres-typeint-msg"
+                                                           for="rule-it-forec-thres-typeint" 
+                                                           showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:spacer height="3px"/>
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="upper bound? (uncheck = lower bound)" 
+                                                           for="rule-forec-thres-typeint-upperbound-switch"/>
+                                            <p:selectBooleanCheckbox id="rule-forec-thres-typeint-upperbound-switch"
+                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound}" />
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="Forbidden cat thresold (global order)" 
+                                                           for="rule-it-forec-thres-global"/>
+                                            <p:spacer height="3px"/>
+                                            <p:inputText id="rule-it-forec-thres-global" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder}" 
+                                                         style="width: 20px;" 
+                                                         tabindex="3" 
+                                                         required="false" 
+                                                         styleClass="inputText"/>
+                                            <h:message     id="rule-forec-thres-global-msg"
+                                                           for="rule-it-forec-thres-global" 
+                                                           showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:spacer height="3px"/>
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="upper bound? (uncheck = lower bound)" 
+                                                           for="rule-forec-thres-global-upperbound-switch"/>
+                                            <p:selectBooleanCheckbox id="rule-forec-thres-global-upperbound-switch"
+                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder_treatAsUpperBound}" />
+
+                                        </h:panelGroup>    
+
+                                        <h:panelGroup>
+                                            <h3>Other rule settings</h3>
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="Required pass for entity close" 
+                                                           for="rule-req-switch"/>
+                                            <p:selectBooleanCheckbox id="rule-req-switch"
+                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.mandatoryRulePassRequiredToCloseEntity}" />
+
+                                            <p:spacer height="5px" />
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="Inactivate on entity close" 
+                                                           for="rule-inactivate-switch"/>
+                                            <p:selectBooleanCheckbox id="rule-inactivate-switch"
+                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.inactivateRuleOnEntityClose}" />
+
+                                            <p:spacer height="5px" />
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="Active?" 
+                                                           for="rule-active-switch"/>
+                                            <p:selectBooleanCheckbox id="rule-active-switch"
+                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.activeRuleAbstract}" />
+
+                                            <p:spacer height="3px"/>
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="Propmpting directive ID" 
+                                                           for="rule-promptprop"/>
+                                            <p:inputText id="rule-promptprop" 
+                                                         value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.formPromptingDirectiveID}" 
+                                                         style="width: 20px;" 
+                                                         tabindex="3" 
+                                                         required="false" 
+                                                         styleClass="inputText"/>
+                                            <h:message     id="rule-promptprop-msg"
+                                                           for="rule-promptprop" 
+                                                           showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>    
+
+                                        <h:panelGroup>
+
+                                            <h3>Notes</h3>
+
+                                            <p:spacer height="3px"/>
+
+                                            <h:outputLabel styleClass="ui-label" 
+                                                           value="Notes" 
+                                                           for="rule-notes"/>
+                                            <p:spacer height="3px"/>
+                                            <p:inputTextarea id="rule-notes" 
+                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.notes}" 
+                                                             style="width: 100%; height: 50px;" 
+                                                             tabindex="3" 
+                                                             required="false" 
+                                                             styleClass="inputText"/>
+                                            <h:message     id="rule-notes-msg"
+                                                           for="rule-notes" 
+                                                           showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>    
+
+                                        <h:panelGroup>
+                                            <h3>Triggers</h3>
+                                            <h:outputLabel styleClass="ui-label" for="rule-lb-triggeredcatonpass">
+                                                <h:outputText value="Event category triggered on rule pass"/>
+                                            </h:outputLabel>
+                                            <p:selectOneMenu id="rule-lb-triggeredcatonpass" required="false" 
+                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.triggeredECOnRulePass}" 
+                                                             styleClass="full-width"
+                                                             tabindex="3">
+                                                <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
+                                                <f:converter converterId="eventCategoryConverter" />
+                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventCategoryListAllActive}" 
+                                                               var="ec" 
+                                                               itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
+                                            </p:selectOneMenu>
+                                            <h:message for="rule-lb-triggeredcatonpass" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            <p:spacer height="5px" />
+
+                                            <h:outputLabel styleClass="ui-label" for="rule-lb-triggeredcatonfail">
+                                                <h:outputText value="Event category triggered on rule fail"/>
+                                            </h:outputLabel>
+                                            <p:selectOneMenu id="rule-lb-triggeredcatonfail" required="false" 
+                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.triggeredECOnRuleFail}" 
+                                                             tabindex="3" 
+                                                             styleClass="full-width">
+                                                <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
+                                                <f:converter converterId="eventCategoryConverter" />
+                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventCategoryListAllActive}" 
+                                                               var="ec" itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
+                                            </p:selectOneMenu>
+                                            <h:message for="rule-lb-triggeredcatonfail" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>    
+
+
+                                    </h:panelGrid>
+
+                                    <p:spacer height="5px" />
+
+                                    <p:spacer height="5px" />
+
+                                    <p:commandButton    id="addediteventrule-button-addrule"
+                                                        ajax="true" 
+                                                        actionListener="#{proposalEventRuleConfigBB.rules_commitEventRuleCreate}"
+                                                        value="create new rule" icon="fa fa-plus"
+                                                        disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{proposalEventRuleConfigBB.currentEventRuleAbstract.ruleid == 0}"
+                                                        oncomplete="PF('occperiod-dialog-addediteventrule-var').hide()"
+                                                        update="occperiod-dialog-proposalmetadata-form-messages
+                                                        periodmetadata-form-proposalsconfig
+                                                        occperiod-propoals-eventrules-form"/>
+
+                                    <p:commandButton    id="addediteventrule-button-editrule"
+                                                        ajax="true" 
+                                                        actionListener="#{proposalEventRuleConfigBB.rules_commitEventRuleEdits}"
+                                                        value="update rule" icon="fa fa-edit"
+                                                        disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{proposalEventRuleConfigBB.currentEventRuleAbstract.ruleid != 0}"
+                                                        oncomplete="PF('occperiod-dialog-addediteventrule-var').hide()"
+                                                        update="occperiod-dialog-proposalmetadata-form-messages
+                                                        periodmetadata-form-proposalsconfig
+                                                        occperiod-propoals-eventrules-form"/>
+
+                                </h:form>
+
+                            </p:panel>
+
+                         
+
+
+                        <!--close main container-->
+                    </div>
+
+
+               
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

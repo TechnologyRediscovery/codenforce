@@ -29,8 +29,6 @@ import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -93,11 +91,11 @@ public class PropertySearchBB extends BackingBeanUtils{
     private void configureParameters(){
         if(querySelected != null 
                 && 
-            querySelected.getParmsList() != null 
+            querySelected.getParamsList() != null 
                 && 
-            !querySelected.getParmsList().isEmpty()){
+            !querySelected.getParamsList().isEmpty()){
             
-            searchParamsSelected = querySelected.getParmsList().get(0);
+            searchParamsSelected = querySelected.getParamsList().get(0);
         }
     }
     

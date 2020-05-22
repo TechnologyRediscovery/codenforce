@@ -10,7 +10,7 @@
         <title>Create A Case</title>
     </h:head>
     <h:body>
-        <ui:composition template="../../navContainer_restricted.xhtml">
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
                 <div class="mainContainer">
                     <h:messages globalOnly="true" showDetail="true" showSummary="true"
@@ -18,8 +18,8 @@
                     </h:messages>
                             
                     <h1>Create New Code Enforcement Case</h1>
-                    <h2>For your current property: <h:outputText value="#{caseAddBB.caseProperty.address}"/> 
-                        in <h:outputText value="#{caseAddBB.caseProperty.muni.muniName}"/></h2>
+                    <h2>For your current property: <h:outputText value="#{ceCaseAddBB.caseProperty.address}"/> 
+                        in <h:outputText value="#{ceCaseAddBB.caseProperty.muni.muniName}"/></h2>
                     <f:view>
                         <h:form id="caseAddForm">
                             
@@ -30,7 +30,7 @@
                                 <h:outputLabel value="Case Name:" for="caseNameIT"/>
 
                                 <h:panelGroup>
-                                    <p:inputText id="caseNameIT" value="#{caseAddBB.formCaseName}" 
+                                    <p:inputText id="caseNameIT" value="#{ceCaseAddBB.formCaseName}" 
                                            style="width: 250px;" tabindex="1" required="true" styleClass="inputText"/>
                                     <h:message for="caseNameIT" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -38,7 +38,7 @@
 
                                 <h:outputLabel value="Case Opening Date:" for="formOpenDateCal"/>
                                 <h:panelGroup>
-                                    <p:calendar value="#{caseAddBB.formOriginationDate}" 
+                                    <p:calendar value="#{ceCaseAddBB.formOriginationDate}" 
                                             mode="popup" tabindex="3"
                                             id="formOpenDateCal"
                                             showOn="button"
@@ -58,7 +58,7 @@
                                     <h:panelGroup>
 
                                         <h:outputLabel value="Case Notes:" for="caseNotesIT"/>
-                                        <p:inputTextarea id="caseNotesIT" value="#{caseAddBB.formCaseNotes}" 
+                                        <p:inputTextarea id="caseNotesIT" value="#{ceCaseAddBB.formCaseNotes}" 
                                                style="width: 100%;" tabindex="4" required="false" styleClass="inputText"/>
                                         <h:message for="caseNotesIT" showDetail="false" showSummary="true" 
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -72,7 +72,7 @@
                             
                             <p:spacer height="10px"/>
                             
-                            <p:commandButton ajax="false" tabindex="5" value="Create New Case" action="#{caseAddBB.addNewCase}" />
+                            <p:commandButton ajax="false" tabindex="5" value="Create New Case" action="#{ceCaseAddBB.addNewCase}" />
                             
                             
                         </h:form>

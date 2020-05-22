@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
+import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
@@ -38,7 +38,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.ChoiceIntegrator;
+import com.tcvcog.tcvce.integration.WorkflowIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
@@ -829,21 +829,21 @@ public class        BackingBeanUtils
     }
 
     
-    public ChoiceCoordinator getChoiceCoordinator(){
-        ChoiceCoordinator cc;
+    public WorkflowCoordinator getWorkflowCoordinator(){
+        WorkflowCoordinator cc;
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{choiceCoordinator}", ChoiceCoordinator.class);
-        cc = (ChoiceCoordinator) ve.getValue(context.getELContext());
+                .createValueExpression(context.getELContext(), "#{workflowCoordinator}", WorkflowCoordinator.class);
+        cc = (WorkflowCoordinator) ve.getValue(context.getELContext());
         return cc;
     }
     
-    public ChoiceIntegrator getChoiceIntegrator(){
-        ChoiceIntegrator ci;
+    public WorkflowIntegrator getWorkflowIntegrator(){
+        WorkflowIntegrator ci;
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{choiceIntegrator}", ChoiceIntegrator.class);
-        ci = (ChoiceIntegrator) ve.getValue(context.getELContext());
+                .createValueExpression(context.getELContext(), "#{workflowIntegrator}", WorkflowIntegrator.class);
+        ci = (WorkflowIntegrator) ve.getValue(context.getELContext());
         return ci;
     }
     /**

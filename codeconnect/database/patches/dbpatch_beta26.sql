@@ -6,6 +6,12 @@
 -- 
 -- ****************************************************************************
 
+ALTER TABLE occperiod ADD COLUMN active boolean DEFAULT true;
+ALTER TABLE ceactionrequest ADD COLUMN active boolean DEFAULT true;
+ALTER TABLE cecase ADD COLUMN active boolean DEFAULT true;
+
+-- Run on production server up to this point 
+
 
 
 --IF datepublished IS NULL the patch is still open and receiving changes

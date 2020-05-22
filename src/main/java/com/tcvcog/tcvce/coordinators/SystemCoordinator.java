@@ -25,6 +25,10 @@ import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.application.SessionBean;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.NavigationItem;
+import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.LogIntegrator;
@@ -37,6 +41,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -83,7 +88,36 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
          return li.writeLogEntry(entry);
      }
      
-    
+     /**
+      * Generates a rich-text (contains HTML to be NOT escaped) given
+      * various input values
+      * @param objectID
+      * @param BObName
+      * @param formerVal
+      * @param updatedVal
+      * @return 
+      */
+     public String generateFieldUpdateNoteBody( int objectID, 
+                                                String BObName, 
+                                                String formerVal, 
+                                                String updatedVal){
+         StringBuilder sb = new StringBuilder();
+         sb.append(Constants.FMT_HTML_BREAK);
+         sb.append("FIELD UPDATE");
+         sb.append(" of ");
+         sb.append(BObName);
+         sb.append(" ID: ");
+         sb.append(objectID);
+         sb.append(Constants.FMT_HTML_BREAK);
+         sb.append("Prev val: ");
+         sb.append(formerVal);
+         sb.append(Constants.FMT_HTML_BREAK);
+         sb.append("New val: ");
+         sb.append(updatedVal);
+         sb.append(Constants.FMT_HTML_BREAK);
+         return sb.toString();
+         
+     }
     
     /**
      * Skeleton of a system that may be needed to generate and release carefully
@@ -94,8 +128,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     protected void requestBaseInternalAccessCredential(UserAuthorized ua) {
         // TODO: Finish guts
     }
-    
-    
 
     /**The official note appending tool of the entire codeNforce system!
      * Consider all other appendNoteXXX methods scattered about to be rogue
@@ -483,15 +515,17 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sidebar Sub Nav Item: Reports
-    private final NavigationSubItem municipalityActivity = getNavSubItem("Municipality Activity", "", "fa fa-sign-in", false);
-    private final NavigationSubItem activeCases = getNavSubItem("Active Cases", "", "fa fa-sign-in", false);
+    private final NavigationSubItem events = getNavSubItem("Event Search", "/restricted/cogstaff/event/eventSearch.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem eventConfig = getNavSubItem("Event Setup", "/restricted/cogstaff/event/eventConfiguration.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem eventRuleConfig = getNavSubItem("Event Rules", "/restricted/cogstaff/event/eventRuleConfiguration.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Reports
     public List<NavigationSubItem> getSidebarReportList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
-        navList.add(municipalityActivity);
-        navList.add(activeCases);
+        navList.add(events);
+        navList.add(eventConfig);
+        navList.add(eventRuleConfig);
         return navList;
     }
 
@@ -529,7 +563,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         try {
             //NavItem: CE
             NavigationItem CEconfigItem = getNavItem("", "Code Enforcement", "fa fa-balance-scale", getSidebarCEConfigList());
-            //NavItem: CE
+            //NavItem: Occ
             NavigationItem OccconfigItem = getNavItem("", "Occupancy", "fa fa-list-alt", getSidebarOccConfigList());
             //NavItem: Code
             NavigationItem codeconfigItem = getNavItem("", "Municipal Code", "fa fa-book", getSidebarCodeConfigList());

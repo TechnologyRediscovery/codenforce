@@ -5,11 +5,9 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.entities.User;
 import org.primefaces.model.menu.Submenu;
 import java.io.Serializable;
 import org.primefaces.model.menu.DefaultMenuItem;
-import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.DefaultSubMenu;
 import org.primefaces.model.menu.MenuModel;
 

@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -40,7 +41,9 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
+import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriodDateFields;
 import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
@@ -49,6 +52,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -407,6 +411,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         op.setOverrideTypeConfig(rs.getBoolean("overrideperiodtypeconfig"));
         op.setNotes(rs.getString("notes"));
+
         
         op.setActive(rs.getBoolean("active"));
 
@@ -668,7 +673,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-
+        
         try {
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
@@ -760,6 +765,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         PreparedStatement stmt = null;
         int newPeriodId = 0;
 
+        PaymentCoordinator pc = getPaymentCoordinator();
+        
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
@@ -855,6 +862,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             while (rs.next()) {
                 newPeriodId = rs.getInt("currval");
             }
+            
+        pc.insertAutoAssignedFees(period);
 
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyIntegrator.insertOccPermitApplication"
@@ -983,7 +992,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     private OccPeriodType generateOccPeriodType(ResultSet rs) throws IntegrationException {
         OccPeriodType opt = new OccPeriodType();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-
+        PaymentIntegrator pi = getPaymentIntegrator();
+        
         try {
             opt.setTypeID(rs.getInt("typeid"));
             opt.setMuni(mi.getMuni(rs.getInt("muni_municode")));
@@ -1017,8 +1027,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setPermitTitle(rs.getString("permittitle"));
             opt.setPermitTitleSub(rs.getString("permittitlesub"));
 
-            // wire up when nathan is done
-            // opt.setFeeList(fee);
+            opt.setFeeList(pi.getFeeList(opt));
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Error generating OccPermitType from ResultSet", ex);

@@ -21,21 +21,17 @@ import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.NavigationItem;
-import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 
 /**
  *
- * @author ellen bascomb of apt 31y
+ * @author Xiaohong Chen
+ * 
  */
 public class NavigationBB extends BackingBeanUtils implements Serializable {
 
@@ -119,9 +115,9 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         try {
             String periodId = String.valueOf(s.getSessOccPeriod().getPeriodID());
             String periodType = s.getSessOccPeriod().getType().getTitle();
-            return "Current Person: " + periodType + " | ID: " + periodId;
+            return "Current Period: " + periodType + " | ID: " + periodId;
         } catch (Exception ex) {
-            return "Current Person: " + " | ID: ";
+            return "Current Period: " + " | ID: ";
         }
 
     }

@@ -17,7 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitified;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import java.util.List;
 
 /**
@@ -28,10 +28,10 @@ public  class PersonDataHeavy
         extends Person 
         implements IFace_CredentialSigned{
     
-    private List<CECase> caseList;
-    private List<OccPeriodPropertyUnitified> periodList;
+    private List<CECasePropertyUnitHeavy> caseList;
+    private List<OccPeriodPropertyUnitHeavy> periodList;
     private List<Property> propertyList;
-    private List<EventCnF> eventList;
+    private List<EventCnFPropUnitCasePeriodHeavy> eventList;
     
     private String credentialSignature;
     
@@ -224,14 +224,14 @@ public  class PersonDataHeavy
     /**
      * @return the caseList
      */
-    public List<CECase> getCaseList() {
+    public List<CECasePropertyUnitHeavy> getCaseList() {
         return caseList;
     }
 
     /**
      * @return the periodList
      */
-    public List<OccPeriodPropertyUnitified> getPeriodList() {
+    public List<OccPeriodPropertyUnitHeavy> getPeriodList() {
         return periodList;
     }
 
@@ -245,21 +245,21 @@ public  class PersonDataHeavy
     /**
      * @return the eventList
      */
-    public List<EventCnF> getEventList() {
+    public List<EventCnFPropUnitCasePeriodHeavy> getEventList() {
         return eventList;
     }
 
     /**
      * @param caseList the caseList to set
      */
-    public void setCaseList(List<CECase> caseList) {
+    public void setCaseList(List<CECasePropertyUnitHeavy> caseList) {
         this.caseList = caseList;
     }
 
     /**
      * @param periodList the periodList to set
      */
-    public void setPeriodList(List<OccPeriodPropertyUnitified> periodList) {
+    public void setPeriodList(List<OccPeriodPropertyUnitHeavy> periodList) {
         this.periodList = periodList;
     }
 
@@ -273,7 +273,7 @@ public  class PersonDataHeavy
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<EventCnF> eventList) {
+    public void setEventList(List<EventCnFPropUnitCasePeriodHeavy> eventList) {
         this.eventList = eventList;
     }
 

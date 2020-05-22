@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.FeeAssignedType.EventDomainEnum;
 import com.tcvcog.tcvce.entities.reports.*;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.entities.occupancy.*;
@@ -110,8 +111,8 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    private List<EventCaseHeavy> sessEventWithCasePropList;
-    private List<EventCnF> sessEventList;
+    
+    private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
     private EventCnF sessEventQueued;
     
     /* >>> QUERY EVENT <<< */
@@ -143,7 +144,7 @@ public class    SessionBean
     
     private CECaseDataHeavy sessCECase;
     private CECase sessCECaseQueued;
-    private List<CECase> sessCECaseList;
+    private List<CECasePropertyUnitHeavy> sessCECaseList;
     
     private CodeViolation sessCodeViolation;
     private List<CodeViolation> sessViolationList;
@@ -196,6 +197,11 @@ public class    SessionBean
     
     private OccPeriod feeManagementOccPeriod;
     private String feeRedirTo;
+      /* *** Payment and Fee Management Shelves *** */
+    private Payment sessionPayment;
+    
+    private EventDomainEnum feeManagementDomain;
+    private CECase feeManagementCeCase;
     
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -230,7 +236,13 @@ public class    SessionBean
     
     /* *** Public Person Search/Edit Session Shelves *** */
     private Person activeAnonPerson;
-    
+
+  
+    /* *** Blob Upload Session Shelves *** */
+    //linking
+
+    /* *** Navigation Shelves *** */
+    private NavigationStack navStack;
     
     /**
      * Creates a new instance of getSessionBean()
@@ -243,6 +255,7 @@ public class    SessionBean
     @PostConstruct
     public void initBean(){
         System.out.println("SessionBean.initBean");
+        navStack = new NavigationStack();
     }
 
     /**
@@ -479,7 +492,7 @@ public class    SessionBean
     /**
      * @return the sessCECaseList
      */
-    public List<CECase> getSessCECaseList() {
+    public List<CECasePropertyUnitHeavy> getSessCECaseList() {
         return sessCECaseList;
     }
 
@@ -498,7 +511,7 @@ public class    SessionBean
     /**
      * @param sessCECaseList the sessCECaseList to set
      */
-    public void setSessCECaseList(List<CECase> sessCECaseList) {
+    public void setSessCECaseList(List<CECasePropertyUnitHeavy> sessCECaseList) {
         this.sessCECaseList = sessCECaseList;
     }
 
@@ -582,20 +595,6 @@ public class    SessionBean
     }
 
   
-    
-    /*
-     * @return the sessEventWithCasePropList
-     */
-    public List<EventCaseHeavy> getSessopmEvemtCaseHeavyList() {
-        return sessEventWithCasePropList;
-    }
-
-    /**
-     * @param sessEventWithCasePropList the sessEventWithCasePropList to set
-     */
-    public void setSessEventWithCasePropList(List<EventCaseHeavy> sessEventWithCasePropList) {
-        this.sessEventWithCasePropList = sessEventWithCasePropList;
-    }
 
     /**
      * @return the sessPropertyList
@@ -963,13 +962,6 @@ public class    SessionBean
     }
 
     /**
-     * @return the paymentRedirTo
-     */
-    public String getPaymentRedirTo() {
-        return paymentRedirTo;
-    }
-
-    /**
      * @return the feeManagementOccPeriod
      */
     public OccPeriod getFeeManagementOccPeriod() {
@@ -989,14 +981,6 @@ public class    SessionBean
     public void setSessPayment(Payment sessPayment) {
         this.sessPayment = sessPayment;
     }
-
-    /**
-     * @param paymentRedirTo the paymentRedirTo to set
-     */
-    public void setPaymentRedirTo(String paymentRedirTo) {
-        this.paymentRedirTo = paymentRedirTo;
-    }
-
     /**
      * @param feeManagementOccPeriod the feeManagementOccPeriod to set
      */
@@ -1004,11 +988,28 @@ public class    SessionBean
         this.feeManagementOccPeriod = feeManagementOccPeriod;
     }
 
-    /**
-     * @param feeRedirTo the feeRedirTo to set
-     */
-    public void setFeeRedirTo(String feeRedirTo) {
-        this.feeRedirTo = feeRedirTo;
+    public CECase getFeeManagementCeCase() {
+        return feeManagementCeCase;
+    }
+
+    public void setFeeManagementCeCase(CECase feeManagementCeCase) {
+        this.feeManagementCeCase = feeManagementCeCase;
+    }
+
+    public EventDomainEnum getFeeManagementDomain() {
+        return feeManagementDomain;
+    }
+
+    public void setFeeManagementDomain(EventDomainEnum feeManagementDomain) {
+        this.feeManagementDomain = feeManagementDomain;
+    }
+
+    public NavigationStack getNavStack() {
+        return navStack;
+    }
+
+    public void setNavStack(NavigationStack navStack) {
+        this.navStack = navStack;
     }
 
     /**
@@ -1126,14 +1127,14 @@ public class    SessionBean
     /**
      * @return the sessEventList
      */
-    public List<EventCnF> getSessEventList() {
+    public List<EventCnFPropUnitCasePeriodHeavy> getSessEventList() {
         return sessEventList;
     }
 
     /**
      * @param sessEventList the sessEventList to set
      */
-    public void setSessEventList(List<EventCnF> sessEventList) {
+    public void setSessEventList(List<EventCnFPropUnitCasePeriodHeavy> sessEventList) {
         this.sessEventList = sessEventList;
     }
 
@@ -1275,6 +1276,34 @@ public class    SessionBean
      */
     public void setSessCECaseQueued(CECase sessCECaseQueued) {
         this.sessCECaseQueued = sessCECaseQueued;
+    }
+
+    /**
+     * @return the paymentRedirTo
+     */
+    public String getPaymentRedirTo() {
+        return paymentRedirTo;
+    }
+
+    /**
+     * @return the sessionPayment
+     */
+    public Payment getSessionPayment() {
+        return sessionPayment;
+    }
+
+    /**
+     * @param paymentRedirTo the paymentRedirTo to set
+     */
+    public void setPaymentRedirTo(String paymentRedirTo) {
+        this.paymentRedirTo = paymentRedirTo;
+    }
+
+    /**
+     * @param sessionPayment the sessionPayment to set
+     */
+    public void setSessionPayment(Payment sessionPayment) {
+        this.sessionPayment = sessionPayment;
     }
     
     

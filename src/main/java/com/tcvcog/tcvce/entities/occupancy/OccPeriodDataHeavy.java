@@ -49,7 +49,6 @@ import java.util.List;
 public  class       OccPeriodDataHeavy 
         extends     OccPeriod 
         implements  IFace_EventRuleGoverned, 
-                    IFace_ProposalDriven,
                     IFace_CredentialSigned,
                     IFace_Openable {
     

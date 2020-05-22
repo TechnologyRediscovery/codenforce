@@ -32,7 +32,7 @@ public  class       PropertyDataHeavy
         implements  IFace_CredentialSigned{
     
     
-    private List<CECaseDataHeavy> ceCaseList;
+    private List<CECasePropertyUnitHeavy> ceCaseList;
     
     private List<PropertyUnitDataHeavy> unitWithListsList;
     
@@ -200,7 +200,7 @@ public  class       PropertyDataHeavy
     /**
      * @return the ceCaseList
      */
-    public List<CECaseDataHeavy> getCeCaseList() {
+    public List<CECasePropertyUnitHeavy> getCeCaseList() {
         return ceCaseList;
     }
 
@@ -215,7 +215,7 @@ public  class       PropertyDataHeavy
     /**
      * @param ceCaseList the ceCaseList to set
      */
-    public void setCeCaseList(List<CECaseDataHeavy> ceCaseList) {
+    public void setCeCaseList(List<CECasePropertyUnitHeavy> ceCaseList) {
         this.ceCaseList = ceCaseList;
     }
 

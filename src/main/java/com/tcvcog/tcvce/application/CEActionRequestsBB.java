@@ -120,7 +120,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                 generateCEARReasonDonutModel();
             }
             selectedQueryCEAR = sessionQuery;
-            searchParams = sessionQuery.getParmsList().get(0);
+            searchParams = sessionQuery.getParamsList().get(0);
             queryList = sc.buildQueryCEARList(getSessionBean().getSessUser().getMyCredential());
 
             CaseCoordinator cc = getCaseCoordinator();

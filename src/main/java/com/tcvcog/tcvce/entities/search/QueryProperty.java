@@ -58,11 +58,10 @@ public class QueryProperty
     
     
     @Override
-    public int addParams(SearchParams params) {
+    public void addParams(SearchParams params) {
       if(params instanceof SearchParamsProperty){
             searchParamsList.add((SearchParamsProperty) params);
         }
-        return searchParamsList.size();
     }
 
     @Override
@@ -94,7 +93,7 @@ public class QueryProperty
     }
 
     @Override
-    public List<SearchParamsProperty> getParmsList() {
+    public List<SearchParamsProperty> getParamsList() {
         return searchParamsList;
     }
 
