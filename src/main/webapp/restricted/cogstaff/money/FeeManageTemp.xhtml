@@ -1,0 +1,369 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Add Fee</title>
+    </h:head>
+
+    <h:body id="feeManageBody">
+
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view >
+
+                    <p:outputPanel id="body-panel">
+                        <h1>Fee Record Configuration Tool (dev)</h1>
+                        <p>View, create, and manage fees</p>
+
+                        <h2>Recorded 
+                            <p:outputLabel rendered="#{feeManagementBB.redirected}" value="#{feeManagementBB.currentDomain}"/>
+                            Fees 
+                            <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/>
+                            <p:outputLabel rendered="#{feeManagementBB.editingCECase()}" value="At #{feeManagementBB.CECaseAddress}"/>
+                        </h2>
+
+                        <h:form id="form-messages-global">
+                            <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
+                        </h:form>
+
+                        <div class="mainContainer">
+
+                            <div class ="two-column-page-flex-container">
+
+                                <div class="list-column" >
+
+                                    <h:form id="mode-form">
+
+                                        <p:selectOneButton style="width: 100%; margin-top: 10px ; height: 20px;"
+                                                           value="#{feeManagementBB.currentMode}" 
+                                                           >
+                                            <f:selectItem itemLabel="LOOKUP" itemValue="Lookup"  />
+                                            <f:selectItem itemLabel="INSERT" itemValue="Insert"  />
+                                            <f:selectItem itemLabel="UPDATE" itemValue="Update"  />
+                                            <f:selectItem itemLabel="REMOVE" itemValue="Remove"  />
+
+                                            <f:ajax render="@all"/>
+
+                                        </p:selectOneButton> 
+
+                                    </h:form>
+
+                                    <p:spacer height="30px"/>
+
+                                    <p:scrollPanel style="height: 550px;" >
+
+                                        
+                                        <h:form id="feeManage-form-side">
+
+                                            <p:dataTable id="feeAssignedTable"
+                                                         var="fee"
+                                                         value="#{feeManagementBB.feeAssignedList}"
+                                                         rowKey="#{fee.assignedFeeID}"
+                                                         tableStyleClass="primeDataTable"
+                                                         rowExpandMode="single"
+                                                         expandedRow="false"
+                                                         selectionMode="single"
+                                                         selection="#{feeManagementBB.selectedAssignedFee}"
+                                                         filteredValue="#{feeManagementBB.filteredFeeAssignedList}"
+                                                         >
+
+                                                <p:column width="3%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Exp"/>
+                                                    </f:facet>
+                                                    <p:rowToggler/>
+                                                </p:column>
+                                                <p:column width="8%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="ID" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{fee.assignedFeeID}"/>
+                                                </p:column>
+
+
+                                                <p:column width="10%" sortBy="#{fee.fee.name}"
+                                                          filterBy="#{fee.fee.name}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Fee Name" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{fee.fee.name}"/>
+                                                </p:column>
+
+                                                <p:column width="10%" sortBy="#{fee.fee.amount}"
+                                                          filterBy="#{fee.fee.amount}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Amount" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{fee.fee.amount}"/>
+                                                </p:column>
+
+                                                <p:column width="15%" filterBy="#{fee.fee.effectiveDate}"
+                                                          sortBy="#{fee.fee.effectiveDate}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Effective" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{fee.fee.effectiveDate}"/>
+                                                </p:column>
+
+                                                <p:column width="15%" filterBy="#{fee.fee.expiryDate}"
+                                                          sortBy="#{fee.fee.expiryDate}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Expiry" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{fee.fee.expiryDate}"/>
+                                                </p:column>
+                                                <p:rowExpansion>
+                                                    <div class="outlinedBox">
+                                                        <h2>Full fee listing for fee <h:outputText value="#{fee.assignedFeeID}"/> </h2>
+                                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{fee.fee.notes}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Assigned By"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Last Modified"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{fee.lastModified}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Other notes"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{fee.notes}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup rendered="#{not empty fee.reducedByUser}">
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Amount Reduced By"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="$ #{fee.reducedBy}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup rendered="#{not empty fee.reducedByUser}">
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Reduced By"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{fee.reducedByUser.person.firstName} #{fee.reducedByUser.person.lastName} (ID: #{fee.reducedByUser.userID}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup rendered="#{not empty fee.waivedBy}">
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Waived By"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{fee.waivedBy.person.firstName} #{fee.waivedBy.person.lastName} (ID: #{fee.waivedBy.userID}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <ui:remove>
+                                                                <h:panelGroup>
+                                                                    <p:spacer height="15px"/>
+                                                                    <div class="rowExpansion">
+                                                                        <p:commandButton value="Edit this Fee" action="#{occInspectionBB.editOnePayment(payment)}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+                                                            </ui:remove>
+                                                        </h:panelGrid>
+                                                    </div>
+                                                </p:rowExpansion>
+
+                                                <p:selectBooleanButton onLabel="Deselect" 
+                                                                       offLabel="Select"
+                                                                       styleClass="selectButton" 
+                                                                       value="#{feeManagementBB.currentFeeSelected}"
+                                                                       disabled="#{feeManagementBB.getSelectedButtonActive()}"
+                                                                       >
+
+                                                    <p:ajax update="
+                                                            form-messages-global
+                                                            feeManage-form-side
+                                                            feeManage-panel"
+                                                            listener="#{municipalityManageSampleBB.onMuniSelectedButtonChange(muni.muniCode)}"/>
+
+                                                </p:selectBooleanButton>
+
+                                                </p:column>
+
+                                            </p:dataTable>
+
+                                            <p:spacer height="10px"/>
+
+                                        </h:form>
+
+                                    </p:scrollPanel>
+
+                                </div>
+
+
+
+                                <div class ="object-column">
+
+                                    <p:outputPanel id = "feeManage-panel" >
+
+                                        <!--LookUp Table-->
+                                        <p:panel id="feeManage-panel-lookup"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LoopUp Panel"
+                                                 rendered="#{municipalityManageSampleBB.getActiveLookupMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="muniManage-form-lookup">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <!--LookUp Table Content-->
+
+                                                </p:panelGrid>
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Insert Table-->
+                                        <p:panel id="muniManage-panel-insert"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Insert Panel"
+                                                 rendered="#{municipalityManageSampleBB.getActiveInsertMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="muniManage-form-insert">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <!--Insert Table Content-->
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Insert Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{municipalityManageSampleBB.onInsertButtonChange()}"
+                                                                 value="INSERT"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Update Table-->
+                                        <p:panel id="muniManage-panel-update"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LoopUp Panel"
+                                                 rendered="#{municipalityManageSampleBB.getActiveUpdateMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="muniManage-form-update">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <!--Update Table Content-->
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Update Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{municipalityManageSampleBB.onUpdateButtonChange()}"
+                                                                 value="UPDATE"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Remove Table-->
+                                        <p:panel id="muniManage-panel-remove"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LoopUp Panel"
+                                                 rendered="#{municipalityManageSampleBB.getActiveRemoveMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="muniManage-form-remove">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <!--Remove Table Content-->
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Remove Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{municipalityManageSampleBB.onRemoveButtonChange()}"
+                                                                 value="Remove"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                    </p:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </p:outputPanel>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

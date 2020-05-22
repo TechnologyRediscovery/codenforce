@@ -17,6 +17,8 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeSet;
@@ -94,10 +96,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     //Generalized fields
     private EventDomainEnum currentDomain;
-    private boolean editing;
+    private String currentMode;
     private boolean waived;
     private boolean redirected;
-
+    private boolean currentFeeSelected;
+    
     /**
      * Creates a new instance of NewJSFManagedBean
      */
@@ -114,6 +117,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         assignedFormFee = new FeeAssigned();
 
+        currentMode = "Lookup";
+        
         if (getSessionBean().getNavStack().peekLastPage() != null) {
 
             refreshFeeAssignedList();
@@ -143,6 +148,32 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
     }
 
+    /**
+     * Initialize the whole page into default setting
+     */
+    public void defaultSetting() {
+        try {
+            //initialize default select button in list-column: false
+            currentFeeSelected = false;
+            //Current fee list is initialized in initBean
+            
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Municipality Page Unsuccessfully Initialized", ""));
+        }
+    }
+    
+    /**
+     * Getting basic municipality list in terms of session user
+     *
+     * @return
+     * @throws IntegrationException
+     */
+    public List<Municipality> getMuniList() throws IntegrationException {
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        return mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessUser());
+    }
+    
     public String finishAndRedir() {
 
         return getSessionBean().getNavStack().popLastPage();
@@ -786,7 +817,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
 
     }
-
+    
+    /**
+     * Refreshes the lists of assigned fees, the current Domain, etc.
+     */
     public void refreshFeeAssignedList() {
 
         feeAssignedList = new ArrayList<>();
@@ -870,7 +904,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
 
         try {
-            ArrayList<CodeSet> codeSetList = ci.getCodeSets(getSessionBean().getSessionMuni().getMuniCode());
+            ArrayList<CodeSet> codeSetList = ci.getCodeSets(getSessionBean().getSessMuni().getMuniCode());
 
             elementList = new ArrayList<>();
 
@@ -889,7 +923,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         try {
             currentCase = csi.getCECase(currentCase.getCaseID());
 
-        } catch (IntegrationException | CaseLifecycleException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println("FeeManagementBB.refreshTypesAndElements() | Error: " + ex.toString());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1033,12 +1067,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.formFee.setNotes(formFeeNotes);
     }
 
-    public boolean isEditing() {
-        return editing;
+    public String getCurrentMode() {
+        return currentMode;
     }
 
-    public void setEditing(boolean editing) {
-        this.editing = editing;
+    public void setCurrentMode(String currentMode) {
+        this.currentMode = currentMode;
     }
 
     public Fee getFormFee() {
@@ -1195,7 +1229,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             unit = pi.getPropertyUnit(currentOccPeriod.getPropertyUnitID());
             prop = pi.getProperty(unit.getPropertyID());
         } catch (IntegrationException ex) {
-            System.out.println("PaymentBB had problems getting the OccPeriodProperty");
+            System.out.println("FeeManagementBB had problems getting the OccPeriodProperty");
         }
 
         return prop;
@@ -1210,7 +1244,25 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public String getCECaseAddress() {
 
-        return currentCase.getProperty().getAddress();
+        String currentCECaseAddress ="";
+        
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        Property currentProp = new Property();
+        
+        currentProp.setAddress("");
+        
+        try {
+        
+            currentProp = pi.getProperty(currentCase.getPropertyID());
+            
+        } catch (IntegrationException e) {
+        
+            System.out.println("FeeManagementBB had problems getting the CECase address");
+            
+        }
+        
+        return currentProp.getAddress();
     }
 
     public OccPeriodType getLockedPeriodType() {
@@ -1299,6 +1351,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public void setRedirected(boolean redirected) {
         this.redirected = redirected;
+    }
+
+    public boolean isCurrentFeeSelected() {
+        return currentFeeSelected;
+    }
+
+    public void setCurrentFeeSelected(boolean currentFeeSelected) {
+        this.currentFeeSelected = currentFeeSelected;
     }
     
 }

@@ -18,11 +18,9 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.entities.*;
-import com.tcvcog.tcvce.entities.FeeAssignedType.EventDomainEnum;
 import com.tcvcog.tcvce.entities.reports.*;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.entities.occupancy.*;
-import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
 
