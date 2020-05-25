@@ -11,6 +11,9 @@ import itertools
 # import csv_utils
 import requests
 import bs4
+from os.path import join
+import argparse
+from copy import deepcopy
 
 CSV_FILE_ENCODING = 'utf-8'
 # global municodemap
@@ -27,11 +30,13 @@ def main():
 
     # parcels whose base property data is not written are written here before moving on
     global LOG_FILE
-    LOG_FILE = 'output/swissvaleerror.csv'
+    LOG_FILE = join('output', 'foresthillserror.csv')
+    # LOG_FILE = 'output/swissvaleerror.csv'
 
     # this log file is used for storing parcels whose person and propertyperson inserts fail
     global LOG_FILE_AUX
-    LOG_FILE_AUX = 'output/swissvaleerror_aux.csv'
+    LOG_FILE_AUX = join('output', 'foresthillserror_aux.csv')
+    # LOG_FILE_AUX = 'output/swissvaleerror_aux.csv'
 
     # ID number of the system user connected to these original inserts
     # user 99 is sylvia, our COG robot
@@ -45,11 +50,13 @@ def main():
     # PARID_FILE = 'parcelidlists/eastmckeesportparids.csv'
     # PARID_FILE = 'parcelidlists/wilkinsparcelids.csv'
     # PARID_FILE = 'parcelidlists/chalfantparcelids.csv'
-    PARID_FILE = 'parcelidlists/swissvaleparcelids.csv'
+    # PARID_FILE = 'parcelidlists/swissvaleparcelids.csv'
+    PARID_FILE = join('parcelidlists', 'foresthillsparcelids.csv')
     
     # used as the access key for muni codes and ID bases in the dictionaries below
     global current_muni
-    current_muni = 'swissvale'
+    current_muni = 'foresthills'
+    # current_muni = 'swissvale'
 
     # use as floor value for all new propertyIDs
     global PROP_ID_BASE
@@ -65,16 +72,21 @@ def main():
     global BUMP_UP
     BUMP_UP = 0
 
+    # Todo: Find out where these numbers come from. I just choose a random number
     global municodemap
-    municodemap = {'chalfant':814,'churchhill':816, 'eastmckeesport':821, 'pitcairn':847, 'wilmerding':867, 'wilkins':953, 'cogland':999, 'swissvale':111}
+    municodemap = {'chalfant':814,'churchhill':816, 'eastmckeesport':821, 'pitcairn':847, 'wilmerding':867, 'wilkins':953, 'cogland':999, 'swissvale':111,
+                   'foresthills': 828}
 
     # add these base amounts to the universal base to get starting IDs
+    # Todo: Why is this seperate from person_id_base map when it contains the exact same values?
     global muni_idbase_map
-    muni_idbase_map = {'chalfant':10000,'churchhill':20000, 'eastmckeesport':30000, 'pitcairn':40000, 'wilmerding':0, 'wilkins':50000, 'cogland':60000, 'swissvale':70000}
+    muni_idbase_map = {'chalfant':10000,'churchhill':20000, 'eastmckeesport':30000, 'pitcairn':40000, 'wilmerding':0, 'wilkins':50000, 'cogland':60000, 'swissvale':70000,
+                       'foresthills': 110000}
 
     # add these base amounts to the universal base to get starting IDs
     global person_idbase_map
-    person_idbase_map = {'chalfant':10000,'churchhill':20000, 'eastmckeesport':30000, 'pitcairn':40000, 'wilmerding':0, 'wilkins':50000, 'cogland':60000, 'swissvale':70000}
+    person_idbase_map = {'chalfant':10000,'churchhill':20000, 'eastmckeesport':30000, 'pitcairn':40000, 'wilmerding':0, 'wilkins':50000, 'cogland':60000, 'swissvale':70000,
+                       'foresthills': 110000}
 
     # jump into the actual work here
     insert_property_basetableinfo()
@@ -116,15 +128,20 @@ def insert_property_basetableinfo():
     personidgenerator = get_nextpersonid(person_idbase_map[current_muni])
 
     # user 99 is the cog robot, Sylvia
-    insert_sql = """
+    # Todo: Add properly formatted SQL for tables that have moved. For example, propertyusetype
+    # propertyusetype
+
+
+
+    insert_sql = """    
         INSERT INTO public.property(
             propertyid, municipality_municode, parid, address, 
             notes, addr_city, addr_state, addr_zip,
-            lotandblock, propclass, propertyusetype, ownercode,
+            lotandblock, propclass, ownercode,
             lastupdated, lastupdatedby)
         VALUES (%(propid)s, %(muni)s, %(parcelid)s, %(addr)s, 
                 %(notes)s, %(city)s, %(state)s, %(zipcode)s,
-                %(lotandblock)s, %(propclass)s, %(propertyusetype)s, %(ownercode)s,
+                %(lotandblock)s, %(propclass)s, %(ownercode)s,
                 now(), %(updatinguser)s);
 
     """
@@ -171,36 +188,40 @@ def insert_property_basetableinfo():
 
         print('Inserting parcelid data: %s' % (parid))
         
-        try:
-            # execute insert on property table
-            cursor.execute(insert_sql, insertmap)
-            # commit core propertytable insert
-            db_conn.commit()
-            propertycount = propertycount + 1
-            print('----- committed property core table -----')
-        except:
-            print('ERROR: unable to insert base property data...skipping')
-            print('********* MOVING ON ********************')
-            logerror_aux(parid)
-            continue
-        try:
-            # this try catches soup related errors
-            # and sql errors bubbling up from the extraction methods that also commit
-            personid = next(personidgenerator)
-            extract_and_insert_person(rawhtml, propid, personid)
-            connect_person_to_property(propid, personid )
-            personcount = personcount + 1
-        except:
-            print('ERROR: unable to extract, commit, or connect person owner')
-            logerror_aux(parid)
-            continue
-        try:
+        # try:
+        # execute insert on property table
+        cursor.execute(insert_sql, insertmap)
+        # commit core propertytable insert
+        db_conn.commit()
+        propertycount = propertycount + 1
+        print('----- committed property core table -----')
+        # except:
+        #     print('ERROR: unable to insert base property data...skipping')
+        #     print('********* MOVING ON ********************')
+        #     logerror_aux(parid)
+        #     continue
+        # try:
+        # this try catches soup related errors
+        # and sql errors bubbling up from the extraction methods that also commit
+        personid = next(personidgenerator)
+        extract_and_insert_person(rawhtml, propid, personid)
+        connect_person_to_property(propid, personid )
+        personcount = personcount + 1
+
+        # Todo: Find out what the soup error is, currently also catches psycop2.IntegrityError
+        # except:
+        #     print('ERROR: unable to extract, commit, or connect person owner')
+        #     logerror_aux(parid)
+        #     continue
+        # try:
             # create standard unit number 0 for each property in system
-            create_and_insert_unitzero(propid)
-        except:
-            print('ERROR: unable to create unit zero for property no.'+ str(propid))
-            logerror(parid)
-            continue
+            # Todo: Fix later
+        # print("---- Skipping unit zero insert ----")
+        create_and_insert_unitzero(propid)
+        # except:
+        #     print('ERROR: unable to create unit zero for property no.'+ str(propid))
+        #     logerror(parid)
+        #     continue
         print('--------- running totals --------')
         print('Props inserted: ' + str(propertycount))
         print('Persons inserted: ' + str(personcount))
@@ -227,7 +248,7 @@ def extract_and_insert_person(rawhtml, propertyid, personid):
     db_conn = get_db_conn()
     cursor = db_conn.cursor()
 
-    notemsg = """In case of confusion, check autmated record entry with raw text from the county database:"""
+    notemsg = """In case of confusion, check autmated record entry with raw text from the county database: """
 
     insert_sql = """
         INSERT INTO public.person(
@@ -271,7 +292,7 @@ def extract_and_insert_person(rawhtml, propertyid, personid):
 
     insertmap['notes'] = notemsg + ownernamemap['note_namedump'] + " Raw address: " + owneraddrmap['notes_adrdump']
     print('Inserting person data for id: %s' % (insertmap['personid']))
-    print('person notes:' + insertmap['notes'])
+    print('person notes: ' + insertmap['notes'])
     
     cursor.execute(insert_sql, insertmap)
     db_conn.commit()
@@ -386,6 +407,8 @@ def extract_lotandblock_fromparid(parid):
     if(gl):
         lob = gl.group(1) + '-' + gl.group(2) + '-' + gl.group(3)
         return lob
+
+    # Todo: Should this return -1?
     else:
         print('ERROR: LOB parsing')
         return ''
@@ -625,6 +648,7 @@ def get_db_conn():
     global db_conn
     if db_conn is not None:
         return db_conn
+    # Todo: Read connection credentials from a secrets.json
     db_conn = psycopg2.connect(
         database="cogdb",
         user="sylvia",

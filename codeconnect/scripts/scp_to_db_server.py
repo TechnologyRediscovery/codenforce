@@ -2,7 +2,8 @@ import paramiko
 
 HOSTNAME = 'capstone1016.heinz.cmu.edu'
 USER = 'dsarmien'
-PUBLIC_KEY = 'C:\Users\lemon\.ssh\id_rsa.pub'
+# Todo: Use sys.path?
+PUBLIC_KEY = r'C:\Users\lemon\.ssh\id_rsa.pub'
 DESTINATION_DIRECTORY = '/home/dsarmien/dropbox'
 
 FILES_TO_COPY = (

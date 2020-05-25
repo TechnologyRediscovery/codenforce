@@ -31,9 +31,9 @@ cnxn = pyodbc.connect(
 skipped_properties = []
 
 def main():
-    print "Starting the export process of %d files..." % len(CSVS_TO_EXPORT)
+    print("Starting the export process of %d files..." % len(CSVS_TO_EXPORT))
     for i, csv_file in enumerate(CSVS_TO_EXPORT, start=1):
-        print '[%d/%d] Exporting %s' % (i, len(CSVS_TO_EXPORT), csv_file)
+        print('[%d/%d] Exporting %s' % (i, len(CSVS_TO_EXPORT), csv_file))
         export_csv(csv_file)
 
 
@@ -54,7 +54,7 @@ def export_csv(csv_file):
         'codeEnfCaseViolation': export_codeEnfCaseViolation
     }
     if csv_file not in CSV_FILE_FUNCTION_MAPPING:
-        print "Don't know how to generate csv file %s." % csv_file
+        print("Don't know how to generate csv file %s." % csv_file)
         return
     # Generate the file using the right function
     CSV_FILE_FUNCTION_MAPPING[csv_file]()
@@ -123,10 +123,10 @@ def export_codeEnfCase():
     def get_rows():
         for r in cursor.fetchall():
             if r.EventID is None:
-                print 'Warning: Skipping row with missing eventID: %s' % r
+                print('Warning: Skipping row with missing eventID: %s' % r)
                 continue
             if r.PropertyID in skipped_properties:
-                print 'Warning: Skipping row with invalid propertyID: %s' % r
+                print('Warning: Skipping row with invalid propertyID: %s' % r)
                 continue
             # Assign case status 6 (undetermined) to all cases from Access
             ceEventStatus = 6
@@ -175,10 +175,10 @@ def export_codeEnfEvent():
     def get_rows():
         for r in cursor.fetchall():
             if r.EventID is None:
-                print 'Warning: Skipping row with missing eventID: %s' % r
+                print('Warning: Skipping row with missing eventID: %s' % r)
                 continue
             if r.EventDate is None:
-                print 'Warning: Skipping row with missing date: %s' % r
+                print('Warning: Skipping row with missing date: %s' % r)
                 continue
             # If officerID is missing, assign it to officer 0
             officerID = 0 if r.OrdinanceOfficer is None else r.OrdinanceOfficer
@@ -652,9 +652,9 @@ def export_property():
     def get_rows():
         for r in cursor.fetchall():
             if r.parID is None or r.PropertyID is None:
-                print(
+                print((
                   "Warning: Skipping row with missing"
-                  " parcel or property id: %s" % r)
+                  " parcel or property id: %s" % r))
                 skipped_properties.append(r.PropertyID)
                 continue
             municipalityID = '%d' % r.municipality_municipalityID
@@ -786,7 +786,7 @@ def write_to_csv(output_file, header, rows):
 def clean_value(value):
     # Common cleaning operations on fields
     # Convert to string
-    as_string = unicode(value).strip()
+    as_string = str(value).strip()
     # Remove trailing zeroes
     as_string = re.sub('[.]0+$', '', as_string)
     # Replace multiple whitespace characters with a single space
