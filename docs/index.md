@@ -1,6 +1,9 @@
 # CodeNForce system documentation
 CodeNForce is a JavaEE-based, open source web database application for managing municpal government code enforcement and occupancy permitting workflows. Built by Technology Rediscovery LLC and students attending the Community College of Allgheny County, CodeNForce's geographic center is the Turtle Creek Valley on the outskirts of Pittsburgh, PA.
 
+## Current UI state:
+![Current UI state](img/uistate_MAY2020.png)
+
 ## About this documentation
 As technical documentation designed for developers, the primary audience for these pages are system administrators and developers who wish to build, edit, or maintain an existing CodeConnect instance. Sub-components of the system each have their own briefing page which links to specific files in the repo as they are explained and indexes how-to pages for various tasks. 
 
@@ -21,7 +24,7 @@ As technical documentation designed for developers, the primary audience for the
 ### XII [Blob](ss_Blob.md)
 ### XIII [Publicinfobundle](ss_Publicinfobundle.md)
 ### XIV [Search](ss_Search.md)
-### XV [Choice](ss_Choice.md)
+### XV [Workflow](ss_Workflow.md)
 
 ## Legacy doc pages
 
