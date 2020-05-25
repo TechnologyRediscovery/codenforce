@@ -25,6 +25,8 @@ As technical documentation designed for developers, the primary audience for the
 ### XIII [Publicinfobundle](ss_Publicinfobundle.md)
 ### XIV [Search](ss_Search.md)
 ### XV [Workflow](ss_Workflow.md)
+### XVI [Analytics](ss_analytics.md)
+### VII [Data integrity](ss_dataintegrity.md)
 
 ## Legacy doc pages
 
