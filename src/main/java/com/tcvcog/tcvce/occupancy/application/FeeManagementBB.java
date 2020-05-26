@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
@@ -119,6 +120,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         currentMode = "Lookup";
         
+        //initialize default select button in list-column: false
+            currentFeeSelected = false;
+        
         if (getSessionBean().getNavStack().peekLastPage() != null) {
 
             refreshFeeAssignedList();
@@ -147,21 +151,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         }
     }
-
-    /**
-     * Initialize the whole page into default setting
-     */
-    public void defaultSetting() {
-        try {
-            //initialize default select button in list-column: false
-            currentFeeSelected = false;
-            //Current fee list is initialized in initBean
-            
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Municipality Page Unsuccessfully Initialized", ""));
-        }
-    }
     
     /**
      * Getting basic municipality list in terms of session user
@@ -172,6 +161,234 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     public List<Municipality> getMuniList() throws IntegrationException {
         MunicipalityCoordinator mc = getMuniCoordinator();
         return mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessUser());
+    }
+    
+    //check if current mode == Lookup
+    public boolean getActiveLookupMode() {
+        return "Lookup".equals(currentMode);
+    }
+    
+    //check if current mode == Insert
+    public boolean getActiveInsertMode() {
+        return "Insert".equals(currentMode);
+    }
+
+    //check if current mode == Update
+    public boolean getActiveUpdateMode() {
+        return "Update".equals(currentMode);
+    }
+
+    //check if current mode == Remove
+    public boolean getActiveRemoveMode() {
+        return "Remove".equals(currentMode);
+    }
+
+    //Select button on side panel can only be used in either Lookup Mode or Update Mode
+    public boolean getSelectedButtonActive() {
+        return !("Lookup".equals(currentMode) || "Update".equals(currentMode));
+    }
+    
+    public String onInsertAssignedFeeButtonChange() {
+        if (assignedFormFee.getFee() == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a fee to assign", ""));
+        }
+
+        FeeAssigned firstSkeleton = new FeeAssigned();
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        firstSkeleton.setPaymentList(assignedFormFee.getPaymentList());
+        firstSkeleton.setMoneyFeeAssigned(assignedFormFee.getMoneyFeeAssigned());
+        firstSkeleton.setAssignedBy(getSessionBean().getSessUser());
+        firstSkeleton.setAssigned(LocalDateTime.now());
+        firstSkeleton.setLastModified(LocalDateTime.now());
+        firstSkeleton.setNotes(assignedFormFee.getNotes());
+        firstSkeleton.setFee(assignedFormFee.getFee());
+
+        if (waived == true) {
+            firstSkeleton.setWaivedBy(getSessionBean().getSessUser());
+        } else {
+            firstSkeleton.setWaivedBy(new User());
+        }
+
+        if (assignedFormFee.getReducedBy() != 0) {
+
+            firstSkeleton.setReducedBy(assignedFormFee.getReducedBy());
+            firstSkeleton.setReducedByUser(getSessionBean().getSessUser());
+
+        } else if (assignedFormFee.getReducedBy() < 0) {
+
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "You cannot reduce a fee by a negative number", ""));
+
+        } else {
+            firstSkeleton.setReducedByUser(new User());
+        }
+
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+            MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(firstSkeleton);
+            MoneyOccPeriodFeeAssigned occPeriodFormFee = (MoneyOccPeriodFeeAssigned) assignedFormFee;
+
+            secondSkeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
+            secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
+            secondSkeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
+
+            try {
+                pi.insertOccPeriodFee(secondSkeleton);
+                refreshFeeAssignedList();
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully added new fee!", ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to add fee to database, sorry!", "Check server print out..."));
+            }
+
+        } else {
+
+            MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(firstSkeleton);
+            MoneyCECaseFeeAssigned caseFormFee = new MoneyCECaseFeeAssigned(assignedFormFee);
+
+            secondSkeleton.setCeCaseAssignedFeeID(caseFormFee.getCeCaseAssignedFeeID());
+            secondSkeleton.setCaseID(currentCase.getCaseID());
+            secondSkeleton.setCodeSetElement(selectedViolation.getCodeViolated().getCodeSetElementID());
+
+            try {
+                pi.insertCECaseFee(secondSkeleton);
+                refreshFeeAssignedList();
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to add fee to database, sorry!", "Check server print out..."));
+            }
+
+        }
+        return "feeManage";
+    }
+    
+    public String onUpdateAssignedFeeButtonChange() {
+        FeeAssigned firstSkeleton = new FeeAssigned();
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        firstSkeleton.setAssignedFeeID(assignedFormFee.getAssignedFeeID());
+        firstSkeleton.setPaymentList(assignedFormFee.getPaymentList());
+        firstSkeleton.setMoneyFeeAssigned(assignedFormFee.getMoneyFeeAssigned());
+        firstSkeleton.setAssignedBy(getSessionBean().getSessUser());
+        firstSkeleton.setAssigned(LocalDateTime.now());
+        firstSkeleton.setLastModified(LocalDateTime.now());
+        firstSkeleton.setNotes(assignedFormFee.getNotes());
+        firstSkeleton.setFee(assignedFormFee.getFee());
+
+        if (waived == true) {
+            firstSkeleton.setWaivedBy(getSessionBean().getSessUser());
+        } else  {
+            firstSkeleton.setWaivedBy(new User());
+        }
+
+        if (assignedFormFee.getReducedBy() < 0) {
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "You cannot reduce a fee by a negative number", ""));
+
+            return "";
+        }
+        
+        if (assignedFormFee.getReducedBy() != 0) {
+
+            firstSkeleton.setReducedBy(assignedFormFee.getReducedBy());
+            firstSkeleton.setReducedByUser(getSessionBean().getSessUser());
+
+        } else {
+            firstSkeleton.setReducedByUser(new User());
+        }
+
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+            MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(firstSkeleton);
+            MoneyOccPeriodFeeAssigned occPeriodFormFee = (MoneyOccPeriodFeeAssigned) assignedFormFee;
+
+            secondSkeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
+            secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
+            secondSkeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
+
+            try {
+                pi.updateOccPeriodFee(secondSkeleton);
+                refreshFeeAssignedList();
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated fee!", ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to update fee in database, sorry!", "Check server print out..."));
+            }
+
+        } else {
+
+            MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(firstSkeleton);
+            MoneyCECaseFeeAssigned caseFormFee = (MoneyCECaseFeeAssigned) assignedFormFee;
+
+            secondSkeleton.setCeCaseAssignedFeeID(caseFormFee.getCeCaseAssignedFeeID());
+            secondSkeleton.setCaseID(currentCase.getCaseID());
+            secondSkeleton.setCodeSetElement(selectedViolation.getCodeViolated().getCodeSetElementID());
+
+            try {
+                pi.updateCECaseFee(secondSkeleton);
+                refreshFeeAssignedList();
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated fee!", ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to update fee in database, sorry!", "Check server print out..."));
+            }
+
+        }
+        return "muniManage";
+    }
+    
+    public String onRemoveAssignedFeeButtonChange() {
+        
+        if (selectedAssignedFee == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a fee from the table to waive.", ""));
+
+            return "";
+        }
+        
+        selectedAssignedFee.setWaivedBy(getSessionBean().getSessUser());
+        
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+
+            try {
+                pi.updateOccPeriodFee((MoneyOccPeriodFeeAssigned) selectedAssignedFee);
+                refreshFeeAssignedList();
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Fee waived!", ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+            }
+        }
+        if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+
+            try {
+                pi.updateCECaseFee((MoneyCECaseFeeAssigned) selectedAssignedFee);
+                refreshFeeAssignedList();
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Fee waived!", ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+            }
+        }
+        
+        return "muniManage";
     }
     
     public String finishAndRedir() {
