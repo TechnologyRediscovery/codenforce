@@ -37,7 +37,6 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
@@ -72,8 +71,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private ArrayList<CodeViolation> violationList;
     private ArrayList<CodeViolation> filteredViolationList;
     private CodeViolation selectedViolation;
-
-    private FeeAssigned assignedFormFee;
 
     private FeeAssigned selectedAssignedFee;
     private ArrayList<FeeAssigned> feeAssignedList;
@@ -116,7 +113,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
-        assignedFormFee = new FeeAssigned();
+        selectedAssignedFee = new FeeAssigned();
 
         currentMode = "Lookup";
         
@@ -189,7 +186,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
     
     public String onInsertAssignedFeeButtonChange() {
-        if (assignedFormFee.getFee() == null) {
+        if (selectedAssignedFee.getFee() == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a fee to assign", ""));
@@ -198,13 +195,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         FeeAssigned firstSkeleton = new FeeAssigned();
         PaymentIntegrator pi = getPaymentIntegrator();
 
-        firstSkeleton.setPaymentList(assignedFormFee.getPaymentList());
-        firstSkeleton.setMoneyFeeAssigned(assignedFormFee.getMoneyFeeAssigned());
+        firstSkeleton.setPaymentList(selectedAssignedFee.getPaymentList());
+        firstSkeleton.setMoneyFeeAssigned(selectedAssignedFee.getMoneyFeeAssigned());
         firstSkeleton.setAssignedBy(getSessionBean().getSessUser());
         firstSkeleton.setAssigned(LocalDateTime.now());
         firstSkeleton.setLastModified(LocalDateTime.now());
-        firstSkeleton.setNotes(assignedFormFee.getNotes());
-        firstSkeleton.setFee(assignedFormFee.getFee());
+        firstSkeleton.setNotes(selectedAssignedFee.getNotes());
+        firstSkeleton.setFee(selectedAssignedFee.getFee());
 
         if (waived == true) {
             firstSkeleton.setWaivedBy(getSessionBean().getSessUser());
@@ -212,12 +209,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             firstSkeleton.setWaivedBy(new User());
         }
 
-        if (assignedFormFee.getReducedBy() != 0) {
+        if (selectedAssignedFee.getReducedBy() != 0) {
 
-            firstSkeleton.setReducedBy(assignedFormFee.getReducedBy());
+            firstSkeleton.setReducedBy(selectedAssignedFee.getReducedBy());
             firstSkeleton.setReducedByUser(getSessionBean().getSessUser());
 
-        } else if (assignedFormFee.getReducedBy() < 0) {
+        } else if (selectedAssignedFee.getReducedBy() < 0) {
 
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -229,7 +226,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
             MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(firstSkeleton);
-            MoneyOccPeriodFeeAssigned occPeriodFormFee = (MoneyOccPeriodFeeAssigned) assignedFormFee;
+            MoneyOccPeriodFeeAssigned occPeriodFormFee = (MoneyOccPeriodFeeAssigned) selectedAssignedFee;
 
             secondSkeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
             secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
@@ -249,7 +246,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         } else {
 
             MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(firstSkeleton);
-            MoneyCECaseFeeAssigned caseFormFee = new MoneyCECaseFeeAssigned(assignedFormFee);
+            MoneyCECaseFeeAssigned caseFormFee = new MoneyCECaseFeeAssigned(selectedAssignedFee);
 
             secondSkeleton.setCeCaseAssignedFeeID(caseFormFee.getCeCaseAssignedFeeID());
             secondSkeleton.setCaseID(currentCase.getCaseID());
@@ -273,14 +270,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         FeeAssigned firstSkeleton = new FeeAssigned();
         PaymentIntegrator pi = getPaymentIntegrator();
 
-        firstSkeleton.setAssignedFeeID(assignedFormFee.getAssignedFeeID());
-        firstSkeleton.setPaymentList(assignedFormFee.getPaymentList());
-        firstSkeleton.setMoneyFeeAssigned(assignedFormFee.getMoneyFeeAssigned());
+        firstSkeleton.setAssignedFeeID(selectedAssignedFee.getAssignedFeeID());
+        firstSkeleton.setPaymentList(selectedAssignedFee.getPaymentList());
+        firstSkeleton.setMoneyFeeAssigned(selectedAssignedFee.getMoneyFeeAssigned());
         firstSkeleton.setAssignedBy(getSessionBean().getSessUser());
         firstSkeleton.setAssigned(LocalDateTime.now());
         firstSkeleton.setLastModified(LocalDateTime.now());
-        firstSkeleton.setNotes(assignedFormFee.getNotes());
-        firstSkeleton.setFee(assignedFormFee.getFee());
+        firstSkeleton.setNotes(selectedAssignedFee.getNotes());
+        firstSkeleton.setFee(selectedAssignedFee.getFee());
 
         if (waived == true) {
             firstSkeleton.setWaivedBy(getSessionBean().getSessUser());
@@ -288,7 +285,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             firstSkeleton.setWaivedBy(new User());
         }
 
-        if (assignedFormFee.getReducedBy() < 0) {
+        if (selectedAssignedFee.getReducedBy() < 0) {
             
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -297,9 +294,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             return "";
         }
         
-        if (assignedFormFee.getReducedBy() != 0) {
+        if (selectedAssignedFee.getReducedBy() != 0) {
 
-            firstSkeleton.setReducedBy(assignedFormFee.getReducedBy());
+            firstSkeleton.setReducedBy(selectedAssignedFee.getReducedBy());
             firstSkeleton.setReducedByUser(getSessionBean().getSessUser());
 
         } else {
@@ -308,7 +305,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
             MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(firstSkeleton);
-            MoneyOccPeriodFeeAssigned occPeriodFormFee = (MoneyOccPeriodFeeAssigned) assignedFormFee;
+            MoneyOccPeriodFeeAssigned occPeriodFormFee = (MoneyOccPeriodFeeAssigned) selectedAssignedFee;
 
             secondSkeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
             secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
@@ -328,7 +325,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         } else {
 
             MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(firstSkeleton);
-            MoneyCECaseFeeAssigned caseFormFee = (MoneyCECaseFeeAssigned) assignedFormFee;
+            MoneyCECaseFeeAssigned caseFormFee = (MoneyCECaseFeeAssigned) selectedAssignedFee;
 
             secondSkeleton.setCeCaseAssignedFeeID(caseFormFee.getCeCaseAssignedFeeID());
             secondSkeleton.setCaseID(currentCase.getCaseID());
@@ -445,7 +442,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         return "";
     }
-
+/*
+    
+    TODO: Cannibalize for parts
     public void editSelectedAssignedFee(ActionEvent e) {
 
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
@@ -478,13 +477,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
 
     }
-
-    public void initializeNewAssignedFee(ActionEvent e) {
-
-        editing = false;
-        assignedFormFee = new FeeAssigned();
-
-    }
+*/
 
     public String whatDomainFees() {
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
@@ -498,6 +491,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /*
+    TODO: Cannibalize for parts
     public String addAssignedFee() {
 
         if (assignedFormFee.getFee() == null) {
@@ -580,6 +575,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return "";
 
     }
+*/
+/*
+    TODO: Cannibalize for parts
 
     public String commitAssignedFeeUpdates(ActionEvent e) {
         FeeAssigned firstSkeleton = new FeeAssigned();
@@ -656,7 +654,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         return "";
     }
-
+*/
+    
+    /*
+    TODO: Cannibalize for parts
+    
     public void editFeeType(ActionEvent e) {
         if (getSelectedFeeType() != null) {
             editing = true;
@@ -665,19 +667,23 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             formFee.setName(selectedFeeType.getName());
             formFee.setAmount(selectedFeeType.getAmount());
             formFee.setNotes(selectedFeeType.getNotes());
-            /*
-            Have to figure out what to do w/ setting dates...
-            setFormOccupancyInspectionFeeEffDate(formFeeEffDate.toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime());
-             */
+            
+            //Have to figure out what to do w/ setting dates...
+            //setFormOccupancyInspectionFeeEffDate(formFeeEffDate.toInstant()
+            //        .atZone(ZoneId.systemDefault())
+            //        .toLocalDateTime());
+             
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select an occupancy inspection fee to update", ""));
         }
     }
-
+*/
+    
+/*
+    
+    TODO: cannibalize for parts
     public void commitFeeUpdates(ActionEvent e) {
         OccupancyIntegrator oifi = getOccupancyIntegrator();
         PaymentIntegrator pi = getPaymentIntegrator();
@@ -698,7 +704,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Occupancy Inspection Fee updated!", ""));
     }
-
+*/
+    /*
+    TODO: Cannibalize for parts
+    
     public void initializeNewFee(ActionEvent e) {
 
         editing = false;
@@ -706,7 +715,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         formFee.setEffectiveDate(LocalDateTime.now());
         formFee.setExpiryDate(LocalDateTime.now());
     }
-
+*/
     public String saveNewFeeType() {
         PaymentIntegrator pi = getPaymentIntegrator();
         Fee oif = new Fee();
@@ -1504,14 +1513,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public void setCurrentCase(CECase currentCase) {
         this.currentCase = currentCase;
-    }
-
-    public FeeAssigned getAssignedFormFee() {
-        return assignedFormFee;
-    }
-
-    public void setAssignedFormFee(FeeAssigned assignedFormFee) {
-        this.assignedFormFee = assignedFormFee;
     }
 
     public ArrayList<CodeViolation> getFilteredViolationList() {
