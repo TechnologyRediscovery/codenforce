@@ -17,7 +17,6 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
-import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;

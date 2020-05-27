@@ -195,12 +195,10 @@ public class    SessionBean
     
     private OccPeriod feeManagementOccPeriod;
     private String feeRedirTo;
-      /* *** Payment and Fee Management Shelves *** */
     private Payment sessionPayment;
     
     private EventDomainEnum feeManagementDomain;
     private CECase feeManagementCeCase;
-    
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                         XI Report                              <<< */
@@ -215,15 +213,12 @@ public class    SessionBean
     private ReportConfigOccInspection reportConfigInspection;
     private ReportConfigOccPermit reportConfigOccPermit;
     
-    
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                         XII Blob                                <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
     private Blob sessBlob;
     private List<Blob> blobList;
-    
-    
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                  XIII PublicInfoBundle                          <<< */
@@ -237,8 +232,8 @@ public class    SessionBean
 
   
     /* *** Blob Upload Session Shelves *** */
-    //linking
 
+    
     /* *** Navigation Shelves *** */
     private NavigationStack navStack;
     

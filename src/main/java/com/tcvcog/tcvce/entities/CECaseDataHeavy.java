@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;

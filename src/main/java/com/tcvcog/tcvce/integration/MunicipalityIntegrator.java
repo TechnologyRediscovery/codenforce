@@ -229,6 +229,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         EventIntegrator ei = getEventIntegrator();
         UserIntegrator ui = getUserIntegrator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
+        WorkflowIntegrator wi = getWorkflowIntegrator();
         
         mp.setProfileID(rs.getInt("profileid"));
         mp.setTitle(rs.getString("title"));
@@ -239,7 +240,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mp.setContinuousoccupancybufferdays(rs.getInt("continuousoccupancybufferdays"));
         mp.setMinimumuserranktodeclarerentalintent(rs.getInt("minimumuserranktodeclarerentalintent"));
         
-        mp.setEventRuleSetCE(ei.rules_getEventRuleSet(rs.getInt("profileid"), this));
+        mp.setEventRuleSetCE(wi.rules_getEventRuleSet(rs.getInt("profileid")));
         mp.setOccPeriodTypeList(oi.getOccPeriodTypeList(rs.getInt("profileid")));
         if(mp.getOccPeriodTypeList() == null){
             mp.setOccPeriodTypeList(new ArrayList<OccPeriodType>());
@@ -562,12 +563,13 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setBoolean(21, muni.isEnablePublicOccInspectionTODOs());
 
             stmt.setInt(22, muni.getMuniManager().getUserID());
+            
             // DO WE NEED office_propertyid IN MUNICIPALITY TABLE?
             stmt.setInt(23, 173134);
             stmt.setString(24, muni.getNotes());
 
             // lastupdatedts=now()
-            stmt.setInt(25, getSessionBean().getSessionUser().getUserID());
+            stmt.setInt(25, getSessionBean().getSessUser().getUserID());
             stmt.setInt(26, muni.getPrimaryStaffContact().getUserID());
             stmt.setInt(27, 1006);
 
