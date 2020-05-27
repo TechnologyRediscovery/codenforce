@@ -71,7 +71,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public void initBean() {
         UserCoordinator uc = getUserCoordinator();
         currentUser = getSessionBean().getSessUser();
-        userList = uc.assembleUserListForSearchCriteria();
+        userList = uc.assembleUserListForSearch(getSessionBean().getSessUser());
         
         generateMainDash();
     }

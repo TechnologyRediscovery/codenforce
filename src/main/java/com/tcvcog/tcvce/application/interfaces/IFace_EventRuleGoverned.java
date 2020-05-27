@@ -28,21 +28,27 @@ import java.util.List;
  * Specifies a unified set of behaviors for business objects whose management
  * is directed by EventRule objects--which in short specify a required or forbidden
  * type or category of EventCnF
+ * 
+ * For beta launch, these were CECase and OccPeriod objects
  *  
  * @author sylvia
  */
 public interface IFace_EventRuleGoverned {
     
     public void setEventList(List<EventCnF> lst);
+
     public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle);
     
     public void setEventRuleList(List<EventRuleImplementation> lst);
+
     public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere);
     
     public boolean isAllRulesPassed();
-    
-    // Proposals
+     
     public void setProposalList(List<Proposal> propList);
     
     public List<Proposal> assembleProposalList(ViewOptionsProposalsEnum vope); 
+    
+    public boolean isOpen();
+    
 }

@@ -460,21 +460,5 @@ public class        CECase
         this.propertyUnitID = propertyUnitID;
     }
 
-    public List<Payment> getPaymentList() {
-        return paymentList;
-    }
-
-    public void setPaymentList(List<Payment> paymentList) {
-        this.paymentList = paymentList;
-    }
-
-    public List<MoneyCECaseFeeAssigned> getFeeList() {
-        return feeList;
-    }
-
-    public void setFeeList(List<MoneyCECaseFeeAssigned> feeList) {
-        this.feeList = feeList;
-    }
-
     
 }

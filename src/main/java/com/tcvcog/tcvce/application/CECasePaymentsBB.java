@@ -65,8 +65,10 @@ public  class       CECasePaymentsBB
      }
      
      public String editOccPeriodFees(){
+         
          getSessionBean().setSessCECase(currentCase);
-         getSessionBean().setFeeRedirTo("inspection");
+//         TODO: Check with NADGIT on this one
+//         getSessionBean().setFeeRedirTo("inspection");
          
          return "editFees";
      }

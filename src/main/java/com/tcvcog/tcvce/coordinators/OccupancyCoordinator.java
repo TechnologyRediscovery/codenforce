@@ -19,11 +19,14 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.EventType;
@@ -32,7 +35,6 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.Proposable;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -45,7 +47,6 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
-import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
@@ -70,6 +71,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
@@ -148,7 +151,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @return
      * @throws IntegrationException 
      */
-    public OccPeriodDataHeavy assembleOccPeriodDataHeavy(OccPeriod per, Credential cred) throws IntegrationException, BObStatusException{
+    public OccPeriodDataHeavy assembleOccPeriodDataHeavy(OccPeriod per, Credential cred) throws IntegrationException, BObStatusException, SearchException{
         if(per == null || cred == null){
             throw new BObStatusException("Cannot assemble an OccPeriod data heavy without base period or Credential");
         }
@@ -158,7 +161,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         WorkflowCoordinator chc = getWorkflowCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         EventCoordinator ec = getEventCoordinator();
-        
         
         OccPeriodDataHeavy opdh = new OccPeriodDataHeavy(per);
         
@@ -415,6 +417,16 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oi.updateOccPeriod(period);
     }
 
+    /**
+     * Logic container for checking the basic permissions for authorization of an
+     * occupancy period. An authorized occupancy period is one for which an 
+     * occupancy permit can be issued
+     * @param period
+     * @param u doing the authorizing; must have code officer permissions
+     * @throws AuthorizationException
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
     public void authorizeOccPeriod(OccPeriod period, UserAuthorized u) throws AuthorizationException, BObStatusException, IntegrationException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         if (u.getKeyCard().isHasEnfOfficialPermissions()) {

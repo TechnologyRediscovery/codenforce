@@ -18,7 +18,6 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
-import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -66,16 +65,16 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     public WorkflowCoordinator() {
     }
     
-    public List<Proposal> getProposalList(IFace_ProposalDriven pd, Credential cred){
+    public List<Proposal> getProposalList(IFace_EventRuleGoverned erg, Credential cred){
         WorkflowIntegrator ci = getWorkflowIntegrator();
         List<Proposal> propList = new ArrayList<>();
         
         try {
-            if(pd instanceof CECase){
-                CECase cse = (CECase) pd;
+            if(erg instanceof CECase){
+                CECase cse = (CECase) erg;
                 propList.addAll(ci.getProposalList(cse));
-            } else if (pd instanceof OccPeriod){
-                OccPeriod op = (OccPeriod) pd;
+            } else if (erg instanceof OccPeriod){
+                OccPeriod op = (OccPeriod) erg;
                 propList.addAll(ci.getProposalList(op))    ;
             }
             
@@ -99,8 +98,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
      * @param u
      * @return 
      */
-    private void configureProposal( Proposal proposal, 
-                                        Credential cred){
+    private void configureProposal( Proposal proposal, Credential cred){
         
         if(proposal != null && cred != null){
 
@@ -196,15 +194,15 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     
     /**
      * Takes in a Directive object and an OccPeriod or CECaseDataHeavy and 
- implements that directive by assigning it via a Proposal given sensible initial values
+     * implements that directive by assigning it via a Proposal given sensible initial values
      * @param dir Extracted from the EventCnF to be implemented
-     * @param propDriven which in beta v.0.9 are CECaseDataHeavy and OccPeriod objects
+     * @param erg which in beta v.0.9 are CECaseDataHeavy and OccPeriod objects
      * @param ev 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public void implementDirective(Directive dir, IFace_ProposalDriven propDriven, EventCnF ev) 
+    public void implementDirective(Directive dir, IFace_EventRuleGoverned erg, EventCnF ev) 
             throws IntegrationException{
-        WorkflowIntegrator ci = getWorkflowIntegrator();
+        WorkflowIntegrator wi = getWorkflowIntegrator();
         Proposal pr = new Proposal();
         pr.setDirective(dir);
         if(dir.isActive()){
@@ -216,42 +214,36 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         } else {
             return;
         }
-              
         
         if(ev != null){
             pr.setGeneratingEvent(ev);
             pr.setGeneratingEventID(ev.getEventID());
         }
         
-        if(propDriven instanceof OccPeriod){
-            OccPeriod op = (OccPeriod) propDriven;
+        if(erg instanceof OccPeriod){
+            OccPeriod op = (OccPeriod) erg;
             if(!dir.isApplyToClosedBOBs()){
                 return;
             }
-            ProposalOccPeriod pop = new ProposalOccPeriod(pr);
-            pop.setOccperiodID(op.getPeriodID());
-            pop.setPeriod(op);
-            ci.insertProposal(pop);
+            ProposalOccPeriod pop = new ProposalOccPeriod(pr, op.getPeriodID());
+            wi.insertProposal(pop);
             
-        } else if(propDriven instanceof CECaseDataHeavy){
-            CECaseDataHeavy cse = (CECaseDataHeavy) propDriven;
+        } else if(erg instanceof CECaseDataHeavy){
+            CECaseDataHeavy cse = (CECaseDataHeavy) erg;
             if(!cse.isOpen() && !dir.isApplyToClosedBOBs()){
                 return;
             }
-            ProposalCECase pcec = new ProposalCECase(pr);
-            pcec.setCeCase(cse);
-            pcec.setCeCaseID(cse.getCaseID());
-            ci.insertProposal(pcec);
+            ProposalCECase pcec = new ProposalCECase(pr, cse.getCaseID());
+            wi.insertProposal(pcec);
         }
     }
     
     
     /**
      * Processes requests to reject a proposal by checking user rank, required status, 
- and the CECaseDataHeavy's or OccPeriod's open/closed status
+     * and the CECaseDataHeavy's or OccPeriod's open/closed status
      * @param p to be rejected
-     * @param bob this interface allows you to ask the object if it's open or closed. For Occbeta, this is only
- OccPeriod and CECaseDataHeavy objects
+     * @param erg
      * @param u the current session user
      * @throws IntegrationException
      * @throws AuthorizationException
@@ -262,7 +254,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     public void rejectProposal(Proposal p, IFace_EventRuleGoverned erg, UserAuthorized u) throws IntegrationException, AuthorizationException, BObStatusException{
         WorkflowIntegrator ci = getWorkflowIntegrator();
         if(u.getRole().getRank() >= p.getDirective().getMinimumRequiredUserRankToEvaluate()){
-            if(!p.getDirective().isRequiredEvaluationForBOBClose() && bob.isOpen()){
+            if(!p.getDirective().isRequiredEvaluationForBOBClose() && erg.isOpen()){
                 // configure our proposal for rejection
                 p.setProposalRejected(true);
                 p.setResponderActual(u);
@@ -573,7 +565,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
      * @throws IntegrationException
      */
     public List<EventRuleSet> rules_getEventRuleSetList(EventCoordinator eventCoordinator) throws IntegrationException {
-        
+        EventIntegrator ei = getEventIntegrator();
         return ei.rules_getEventRuleSetList(this);
     }
 

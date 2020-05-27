@@ -731,7 +731,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 }
                 break;
             case "startdate":
-                if(periodStartDateNull){
+                if(currentOccPeriod.getStartDate() != null){
                     currentOccPeriod.setStartDate(null);
                 }
                 currentOccPeriod.setStartDateCertifiedBy(u);
@@ -739,7 +739,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 if(certifymode.equals("withdraw")){
                     currentOccPeriod.setStartDateCertifiedBy(null);
                     currentOccPeriod.setStartDateCertifiedTS(null);
-                }
+                }                                                        
                 break;
             case "enddate":
                 if(periodEndDateNull){
@@ -776,7 +776,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void authorizeOccPeriod(ActionEvent ev){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.authorizeOccPeriod(currentOccPeriod, getSessionBean().getSessionUser());
+            oc.authorizeOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO,
                "Success! Occupancy period ID " + currentOccPeriod.getPeriodID() 
@@ -1268,211 +1268,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         this.inspectedElementAddValueCandidateList = inspectedElementAddValueCandidateList;
     }
 
-<<<<<<< HEAD
-  
-=======
-    /**
-     * @return the periodStartDateNull
-     */
-    public boolean isPeriodStartDateNull() {
-        return periodStartDateNull;
-    }
 
-    /**
-     * @return the periodEndDateNull
-     */
-    public boolean isPeriodEndDateNull() {
-        return periodEndDateNull;
-    }
-
-    /**
-     * @param periodStartDateNull the periodStartDateNull to set
-     */
-    public void setPeriodStartDateNull(boolean periodStartDateNull) {
-        this.periodStartDateNull = periodStartDateNull;
-    }
-
-    /**
-     * @param periodEndDateNull the periodEndDateNull to set
-     */
-    public void setPeriodEndDateNull(boolean periodEndDateNull) {
-        this.periodEndDateNull = periodEndDateNull;
-    }
-
-    /**
-     * @return the formEventRuleIDToAdd
-     */
-    public int getFormEventRuleIDToAdd() {
-        return formEventRuleIDToAdd;
-    }
-
-    /**
-     * @param formEventRuleIDToAdd the formEventRuleIDToAdd to set
-     */
-    public void setFormEventRuleIDToAdd(int formEventRuleIDToAdd) {
-        this.formEventRuleIDToAdd = formEventRuleIDToAdd;
-    }
-
-    /**
-     * @return the currentEventRuleAbstract
-     */
-    public EventRuleAbstract getCurrentEventRuleAbstract() {
-        return currentEventRuleAbstract;
-    }
-
-    /**
-     * @param currentEventRuleAbstract the currentEventRuleAbstract to set
-     */
-    public void setCurrentEventRuleAbstract(EventRuleAbstract currentEventRuleAbstract) {
-        this.currentEventRuleAbstract = currentEventRuleAbstract;
-    }
-
-    /**
-     * @return the includeEventRuleInCurrentOccPeriodTemplate
-     */
-    public boolean isIncludeEventRuleInCurrentOccPeriodTemplate() {
-        return includeEventRuleInCurrentOccPeriodTemplate;
-    }
-
-    /**
-     * @param includeEventRuleInCurrentOccPeriodTemplate the includeEventRuleInCurrentOccPeriodTemplate to set
-     */
-    public void setIncludeEventRuleInCurrentOccPeriodTemplate(boolean includeEventRuleInCurrentOccPeriodTemplate) {
-        this.includeEventRuleInCurrentOccPeriodTemplate = includeEventRuleInCurrentOccPeriodTemplate;
-    }
-
-    /**
-     * @return the eventCategoryListAllActive
-     */
-    public List<EventCategory> getEventCategoryListAllActive() {
-        return eventCategoryListAllActive;
-    }
-
-    /**
-     * @param eventCategoryListAllActive the eventCategoryListAllActive to set
-     */
-    public void setEventCategoryListAllActive(List<EventCategory> eventCategoryListAllActive) {
-        this.eventCategoryListAllActive = eventCategoryListAllActive;
-    }
-
-    /**
-     * @return the eventTypeListAll
-     */
-    public List<EventType> getEventTypeListAll() {
-        return eventTypeListAll;
-    }
-
-    /**
-     * @param eventTypeListAll the eventTypeListAll to set
-     */
-    public void setEventTypeListAll(List<EventType> eventTypeListAll) {
-        this.eventTypeListAll = eventTypeListAll;
-    }
-
-    /**
-     * @return the eventsViewOptions
-     */
-    public List<ViewOptionsActiveHiddenListsEnum> getEventsViewOptions() {
-        return eventsViewOptions;
-    }
-
-    /**
-     * @return the selectedEventView
-     */
-    public ViewOptionsActiveHiddenListsEnum getSelectedEventView() {
-        return selectedEventView;
-    }
-
-    /**
-     * @param selectedEventView the selectedEventView to set
-     */
-    public void setSelectedEventView(ViewOptionsActiveHiddenListsEnum selectedEventView) {
-        this.selectedEventView = selectedEventView;
-    }
-
-    /**
-     * @return the proposalsViewOptions
-     */
-    public List<ViewOptionsProposalsEnum> getProposalsViewOptions() {
-        return proposalsViewOptions;
-    }
-
-    /**
-     * @return the selectedProposalsViewOption
-     */
-    public ViewOptionsProposalsEnum getSelectedProposalsViewOption() {
-        return selectedProposalsViewOption;
-    }
-
-    /**
-     * @return the rulesViewOptions
-     */
-    public List<ViewOptionsEventRulesEnum> getRulesViewOptions() {
-        return rulesViewOptions;
-    }
-
-    /**
-     * @return the selectedRulesViewOption
-     */
-    public ViewOptionsEventRulesEnum getSelectedRulesViewOption() {
-        return selectedRulesViewOption;
-    }
-
-    /**
-     * @param proposalsViewOptions the proposalsViewOptions to set
-     */
-    public void setProposalsViewOptions(List<ViewOptionsProposalsEnum> proposalsViewOptions) {
-        this.proposalsViewOptions = proposalsViewOptions;
-    }
-
-    /**
-     * @param selectedProposalsViewOption the selectedProposalsViewOption to set
-     */
-    public void setSelectedProposalsViewOption(ViewOptionsProposalsEnum selectedProposalsViewOption) {
-        this.selectedProposalsViewOption = selectedProposalsViewOption;
-    }
-
-    /**
-     * @param rulesViewOptions the rulesViewOptions to set
-     */
-    public void setRulesViewOptions(List<ViewOptionsEventRulesEnum> rulesViewOptions) {
-        this.rulesViewOptions = rulesViewOptions;
-    }
-
-    /**
-     * @param selectedRulesViewOption the selectedRulesViewOption to set
-     */
-    public void setSelectedRulesViewOption(ViewOptionsEventRulesEnum selectedRulesViewOption) {
-        this.selectedRulesViewOption = selectedRulesViewOption;
-    }
-
-    /**
-     * @return the eventRuleSetList
-     */
-    public List<EventRuleSet> getEventRuleSetList() {
-        return eventRuleSetList;
-    }
-
-    /**
-     * @param eventRuleSetList the eventRuleSetList to set
-     */
-    public void setEventRuleSetList(List<EventRuleSet> eventRuleSetList) {
-        this.eventRuleSetList = eventRuleSetList;
-    }
-
-    /**
-     * @return the selectedEventRuleSet
-     */
-    public EventRuleSet getSelectedEventRuleSet() {
-        return selectedEventRuleSet;
-    }
-
-    /**
-     * @param selectedEventRuleSet the selectedEventRuleSet to set
-     */
-    public void setSelectedEventRuleSet(EventRuleSet selectedEventRuleSet) {
-        this.selectedEventRuleSet = selectedEventRuleSet;
-    }
 
     /**
      * @return the filteredPaymentList

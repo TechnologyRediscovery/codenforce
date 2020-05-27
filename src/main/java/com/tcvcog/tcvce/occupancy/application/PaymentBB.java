@@ -37,6 +37,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -86,6 +87,8 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    
+    
     public void refreshFeeAssignedList() {
 
         feeAssignedList = new ArrayList<>();
@@ -100,7 +103,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
 
-            currentOccPeriod = getSessionBean().getSessionOccPeriod();
+            currentOccPeriod = getSessionBean().getSessOccPeriod();
 
             if (getSessionBean().getSessionPayment() != null) {
                 paymentList.add(getSessionBean().getSessionPayment());
@@ -152,8 +155,10 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             if (getSessionBean().getSessionPayment() != null) {
                 paymentList.add(getSessionBean().getSessionPayment());
                 paymentSet = true;
-                try {
-                    ArrayList<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
+//                try {
+                    // TODO NADGIT rewire to use Coordinator
+//                    List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
+                    List<MoneyCECaseFeeAssigned> tempList = new ArrayList<>();
 
                     for (MoneyCECaseFeeAssigned fee : tempList) {
 
@@ -164,16 +169,18 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                         feeAssignedList.add(skeleton);
 
                     }
-                } catch (IntegrationException ex) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
-                }
+//                } catch (IntegrationException ex) {
+//                    getFacesContext().addMessage(null,
+//                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                                    "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
+//                }
             } else if (currentCase != null) {
 
-                try {
+//                try {
 
-                    ArrayList<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
+                    // TODO NADGIT rewire to use Coordinator
+//                    List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
+                    List<MoneyCECaseFeeAssigned> tempList = new ArrayList<>();
 
                     for (MoneyCECaseFeeAssigned fee : tempList) {
 
@@ -185,11 +192,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                         paymentList.addAll(skeleton.getPaymentList());
                     }
                     paymentSet = true;
-                } catch (IntegrationException ex) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
-                }
+//                } catch (IntegrationException ex) {
+//                    getFacesContext().addMessage(null,
+//                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                                    "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
+//                }
 
             }
 
@@ -339,24 +346,29 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
     }
 
+    /**
+     * TODO NADGIT refactor to use Coordinator
+     * @return 
+     */
     public String getCurrentAddress() {
 
         String address = "";
 
-        try {
-
-            if (editingOccPeriod()) {
-                PropertyIntegrator pi = getPropertyIntegrator();
-                PropertyUnit unit = pi.getPropertyUnitByPropertyUnitID(currentOccPeriod.getPropertyUnitID());
-                Property prop = pi.getProperty(unit.getPropertyID());
-                address = prop.getAddress();
-            } else if (editingCECase()) {
-                address = currentCase.getProperty().getAddress();
-            }
-
-        } catch (IntegrationException ex) {
-            System.out.println("PaymentBB had problems getting the currentAddress");
-        }
+//        try {
+//
+//            if (editingOccPeriod()) {
+//                PropertyIntegrator pi = getPropertyIntegrator();
+//            // TODO NADGIT migrate to data heavy
+//                PropertyUnit unit = pi.getPropertyUnitByPropertyUnitID(currentOccPeriod.getPropertyUnitID());
+//                Property prop = pi.getProperty(unit.getPropertyID());
+//                address = prop.getAddress();
+//            } else if (editingCECase()) {
+//                address = currentCase.getProperty().getAddress();
+//            }
+//
+//        } catch (IntegrationException ex) {
+//            System.out.println("PaymentBB had problems getting the currentAddress");
+//        }
 
         return address;
 
