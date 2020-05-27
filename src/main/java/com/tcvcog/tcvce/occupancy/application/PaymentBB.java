@@ -27,11 +27,8 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -50,7 +47,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     private ArrayList<Payment> paymentList;
     private Payment selectedPayment;
-    private Payment formPayment;
     private ArrayList<PaymentType> paymentTypeList;
     private ArrayList<PaymentType> paymentTypeTitleList;
     private PaymentType selectedPaymentType;
@@ -65,8 +61,9 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList;
 
     private EventDomainEnum currentDomain;
-    private boolean editing;
+    private String currentMode;
     private boolean redirected;
+    private boolean currentFeeSelected;    
 
     public PaymentBB() {
     }
@@ -794,12 +791,20 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         this.paymentTypeTitleList = paymentTypeTitleList;
     }
 
-    public boolean isEditing() {
-        return editing;
+    public String getCurrentMode() {
+        return currentMode;
     }
 
-    public void setEditing(boolean editing) {
-        this.editing = editing;
+    public void setCurrentMode(String currentMode) {
+        this.currentMode = currentMode;
+    }
+
+    public boolean isCurrentFeeSelected() {
+        return currentFeeSelected;
+    }
+
+    public void setCurrentFeeSelected(boolean currentFeeSelected) {
+        this.currentFeeSelected = currentFeeSelected;
     }
 
     public OccPeriod getCurrentOccPeriod() {
