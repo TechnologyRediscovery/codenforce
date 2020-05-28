@@ -17,7 +17,7 @@ import java.util.Objects;
 public class CECaseBase 
         extends EntityUtils 
         implements Serializable, 
-                    Openable,
+                    IFace_Openable,
                     Cloneable{
     
     protected int caseID;
@@ -36,7 +36,7 @@ public class CECaseBase
     
     protected User caseManager;
     protected String caseName;
-    protected CasePhase casePhase;
+    protected CasePhaseEnum casePhase;
     
     protected Icon casePhaseIcon;
     
@@ -156,14 +156,14 @@ public class CECaseBase
     /**
      * @return the casePhase
      */
-    public CasePhase getCasePhase() {
+    public CasePhaseEnum getCasePhase() {
         return casePhase;
     }
 
     /**
      * @param casePhase the casePhase to set
      */
-    public void setCasePhase(CasePhase casePhase) {
+    public void setCasePhase(CasePhaseEnum casePhase) {
         this.casePhase = casePhase;
     }
 

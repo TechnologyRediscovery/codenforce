@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
@@ -33,6 +34,8 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -100,6 +103,8 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Unable to reload occ period", ""));
+        } catch (SearchException ex) {
+            Logger.getLogger(OccPeriodWorkflowBB.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }

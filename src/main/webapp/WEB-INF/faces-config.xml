@@ -1172,12 +1172,8 @@
     <managed-bean>
         <managed-bean-name>ceCaseAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseAddBB</managed-bean-class>
-
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
-
-
-
 
 
     <managed-bean>
@@ -1185,6 +1181,7 @@
         <managed-bean-class>com.tcvcog.tcvce.application.CitationBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>noticeOfViolationBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.NoticeOfViolationBB</managed-bean-class>
@@ -1376,7 +1373,7 @@
             <from-outcome>textBlockManage</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/textBlockManage.xhtml</to-view-id>
             <redirect/>
-        
+        </navigation-case>
         <navigation-case>
             <from-outcome>occPermitApplications</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
@@ -1436,7 +1433,6 @@
             <to-view-id>/restricted/cogstaff/ce/intensityManage.xhtml</to-view-id>
             <redirect />
         </navigation-case>
-    
     </navigation-rule>
     
             

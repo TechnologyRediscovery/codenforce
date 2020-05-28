@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -84,7 +85,7 @@ public class PropertyOccPeriodsBB
                                             "Please select a period type" , ""));
                 return "";
             }
-        } catch (EventException | AuthorizationException | ViolationException | IntegrationException | BObStatusException | InspectionException ex) {
+        } catch (EventException | AuthorizationException | ViolationException | IntegrationException | BObStatusException | InspectionException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -100,7 +101,7 @@ public class PropertyOccPeriodsBB
        if(op != null){
            try {
                getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessUser().getMyCredential()));
-           } catch (IntegrationException | BObStatusException ex) {
+           } catch (IntegrationException | BObStatusException | SearchException ex) {
                System.out.println(ex);
            }
        } else {

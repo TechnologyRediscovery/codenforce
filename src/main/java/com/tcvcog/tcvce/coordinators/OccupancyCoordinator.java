@@ -73,6 +73,7 @@ import java.util.ListIterator;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodStatusEnum;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
@@ -190,7 +191,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             opdh.setProposalList(chc.getProposalList(opdh, cred));
             
             // EVENT RULE LIST
-            opdh.setEventRuleList(chc.rules_getEventRuleImpList(opdh, cred, this));
+            opdh.setEventRuleList(chc.rules_getEventRuleImpList(opdh, cred));
             
             // INSPECTION LIST
             opdh.setInspectionList(inspecInt.getOccInspectionList(opdh));
@@ -906,13 +907,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     public void evaluateProposal(Proposal proposal,
             IFace_Proposable chosen,
-            OccPeriod occPeriod,
             UserAuthorized u) throws    EventException, 
                                         AuthorizationException, 
                                         BObStatusException, 
                                         IntegrationException {
         
-        WorkflowCoordinator cc = getWorkflowCoordinator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
         
@@ -920,19 +920,20 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         int insertedEventID = 0;
         
-        if (cc.determineProposalEvaluatability(proposal, chosen, u)) {
+        if (wc.determineProposalEvaluatability(proposal, chosen, u)) {
             // since we can evaluate this proposal with the chosen Proposable, configure members
             proposal.setResponderActual(u);
             proposal.setResponseTS(LocalDateTime.now());
             proposal.setChosenChoice(chosen);
 
+//            TODO ECD: finish proposal infrastructure
             // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
-            propEvent = cc.generateEventDocumentingProposalEvaluation(proposal, chosen, u, this);
+//            propEvent = wc.generateEventDocumentingProposalEvaluation(proposal, chosen, u);
             // insert the event and grab the new ID
-            insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
+//            insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
             // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
             proposal.setResponseEvent(ec.getEvent(insertedEventID));
-            cc.recordProposalEvaluation(proposal);
+            wc.recordProposalEvaluation(proposal);
         } else {
             throw new BObStatusException("Unable to evaluate proposal due to business rule violation");
         }

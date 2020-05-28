@@ -107,7 +107,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         bbSessionProperty = getSessionBean().getSessProperty();
         bbSessionPerson = getSessionBean().getSessPerson();
         
-        userListForSearch = uc.assembleUserListForSearchCriteria();
+        userListForSearch = uc.assembleUserListForSearch(getSessionBean().getSessUser());
         propertyListForSearch = getSessionBean().getSessPropertyList();
         personListForSearch = getSessionBean().getSessPersonList();
         
