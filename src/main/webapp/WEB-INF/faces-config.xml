@@ -1977,6 +1977,7 @@
             <from-view-id> /public/services/personSearchPublic.xhtml</from-view-id>
             <from-outcome> editPerson </from-outcome>
             <to-view-id> /public/services/personEditPublic.xhtml </to-view-id>
+        </navigation-case>
             
     </navigation-rule>
     
@@ -2015,7 +2016,8 @@
     <managed-bean>
         <managed-bean-name>workflowCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.WorkflowCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>workflowIntegrator</managed-bean-name>
