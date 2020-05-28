@@ -7,7 +7,7 @@ CodeNForce is a JavaEE-based, open source web database application for managing 
 ## About this documentation
 As technical documentation designed for developers, the primary audience for these pages are system administrators and developers who wish to build, edit, or maintain an existing CodeConnect instance. Sub-components of the system each have their own briefing page which links to specific files in the repo as they are explained and indexes how-to pages for various tasks. 
 
-## Subsystem briefing pages
+## Contents by subsystem
 
 ### N [User](ss_User.md)
 ### I [Municipality](ss_Municipality.md)
@@ -26,7 +26,10 @@ As technical documentation designed for developers, the primary audience for the
 ### XIV [Search](ss_Search.md)
 ### XV [Workflow](ss_Workflow.md)
 ### XVI [Analytics](ss_analytics.md)
-### VII [Data integrity](ss_dataintegrity.md)
+### XVII [Data integrity](ss_dataintegrity.md)
+### XVIII [Help](ss_help.md)
+### XVIV [UX](ss_ux.md)
+### XX [External Data](ss_externaldata.md)
 
 ## Legacy doc pages
 
