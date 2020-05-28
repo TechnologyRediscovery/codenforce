@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
+import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.LogIntegrator;
@@ -474,6 +475,16 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         ni.setSubNavitem(navSubList);
         ni.setSearchpageurl(searchPageUrl);
         return ni;
+    }
+    
+    public ArrayList<PrintStyle> getPrintStyleList() throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        return si.getPrintStyle();
+    }
+    
+    public PrintStyle getPrintStyle(int styleid) throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        return si.getPrintStyle(styleid);
     }
 
 }

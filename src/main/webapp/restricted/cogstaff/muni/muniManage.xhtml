@@ -110,17 +110,17 @@
                                     <p:outputPanel id = "muniManage-panel" >
 
                                         <!--LookUp Table-->
-                                        <p:panel id="muniManage-panel-lookup"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="LoopUp Panel | Current Municipality: #{municipalityManageBB.currentMuniDataheavy.muniName} "
-                                                 rendered="#{municipalityManageBB.getActiveLookupMode()}"
+                                        <h:form id="muniManage-form-lookup" 
+                                                rendered="#{municipalityManageBB.getActiveLookupMode()}">
 
-                                                 >
+                                            <p:panel id="muniManage-panel-lookup"
+                                                     toggleable="true"
+                                                     collapsed="false"
+                                                     header="LoopUp Panel | Current Municipality: #{municipalityManageBB.currentMuniDataheavy.muniName} "
+                                                     >
 
-                                            <p:spacer height="10px"/>
+                                                <p:spacer height="10px"/>
 
-                                            <h:form id="muniManage-form-lookup">
 
                                                 <p:panelGrid columns="4" 
                                                              layout="grid"
@@ -218,19 +218,30 @@
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
-                                                        <h:outputLabel value="Active in Program:"/>
+                                                        <h:outputLabel value="Default Occpancy Period ID:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.activeInProgram}"/>
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.defaultOccPeriodID} | From #{municipalityManageBB.getCurrentOccPeriod().startDate} To #{municipalityManageBB.getCurrentOccPeriod().endDate}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
+                                                        <h:outputLabel value="Municipality Office Property ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.muniOfficePropertyId} | #{municipalityManageBB.getCurrentOfficeProperty().address}" />
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+
+
+                                                    <h:panelGroup>
                                                         <h:outputLabel value="Code Set ID:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.codeSet.codeSetID}"/>
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.codeSet.codeSetID} | #{municipalityManageBB.currentMuniDataheavy.codeSet.codeSetName}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -239,7 +250,7 @@
                                                         <h:outputLabel value="Issuing Code Source ID:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.issuingCodeSource.sourceID}"/>
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.issuingCodeSource.sourceID} | #{municipalityManageBB.currentMuniDataheavy.issuingCodeSource.sourceName}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -248,7 +259,7 @@
                                                         <h:outputLabel value="Default NOV Style ID:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.defaultNOVStyleID}"/>
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.defaultNOVStyleID} | #{municipalityManageBB.getCurrentPrintStyle().description}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -257,7 +268,61 @@
                                                         <h:outputLabel value="Profile ID:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.profile.profileID}"/>
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.profile.profileID} | #{municipalityManageBB.currentMuniDataheavy.profile.title}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Primary Staff Contact User ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.primaryStaffContact.userID} | #{municipalityManageBB.currentMuniDataheavy.primaryStaffContact.username}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Municipality Manager ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.muniManager.userID} | #{municipalityManageBB.currentMuniDataheavy.muniManager.username}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Last Updated User ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.lastUpdatedBy.userID} | #{municipalityManageBB.currentMuniDataheavy.lastUpdatedBy.username}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Last Updated Date Time:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.lastUpdatedTS}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.notes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Active in Program:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.activeInProgram}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -311,34 +376,1181 @@
                                                         <h:outputLabel value="Enable Public Occupancy Inspection TODOs:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.enablePublicOccInspectionTODOs}"/>
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.enablePublicOccInspectionTODOs}" />
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
+                                                </p:panelGrid>
+
+                                            </p:panel>
+
+                                        </h:form>
+
+
+                                        <!--Insert Table-->
+                                        <h:form id="muniManage-form-insert"
+                                                rendered="#{municipalityManageBB.getActiveInsertMode()}">
+
+                                            <p:panel id="muniManage-panel-insert"
+                                                     toggleable="true"
+                                                     collapsed="false"
+                                                     header="Insert Panel"
+                                                     >
+
+                                                <p:spacer height="10px"/>
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
                                                     <h:panelGroup>
-                                                        <h:outputLabel value="User ID:"/>
+                                                        <p:outputLabel value="Code:"/>
                                                         <p:spacer height="5px"/>
-                                                        <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.muniManager.userID}"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
+
+                                                        <p:inputText id="muniManage-insert-municode"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.muniCode}"
+                                                                     styleClass="MuniReadTableInputText" 
+                                                                     required="true"
+                                                                     label="MuniCode"/>
+
+                                                        <p:message for="muniManage-insert-municode" showDetail="false" showSummary="true" style="width: 100%"/>
+
                                                     </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Name:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-insert-muniname"
+                                                                     label="MuniName"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.muniName}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-insert-muniname" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Street:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-insert-street"
+                                                                     label="Street"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.address_street}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-insert-street" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="City:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-insert-city"
+                                                                     label="City"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.address_city}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-insert-city" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="State:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-insert-state"
+                                                                     label="State"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.address_state}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-insert-state" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Zip Code:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-insert-zip"
+                                                                     label="Zip Code"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.address_zip}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-insert-zip" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Phone:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-insert-phone"
+                                                                     label="Phone"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.phone}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-insert-phone" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Fax:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-insert-fax"
+                                                                     label="Fax"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.fax}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-insert-fax" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="E-mail:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-insert-email"
+                                                                     label="E-mail"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.email}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-insert-email" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Population:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-insert-population"
+                                                                     label="Population"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.population}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-insert-population" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Default Occpancy Period ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-insert-occperiod"
+                                                                         label="Occpancy Period ID"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.defaultOccPeriodID}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select Period ID" />
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentOccperiodList}"
+                                                                           var="occperiod"
+                                                                           itemValue="#{occperiod.periodID}"
+                                                                           itemLabel="ID: #{occperiod.periodID} | #{occperiod.startDate} - #{occperiod.endDate}"
+                                                                           />
+
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-insert-occperiod" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
 
                                                     <h:panelGroup>
                                                         <h:outputLabel value="Municipality Office Property Id:"/>
                                                         <p:spacer height="5px"/>
-                                                        <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.muniOfficePropertyId}"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
+
+                                                        <p:selectOneMenu id="muniManage-insert-property"
+                                                                         label="Municipality Office Property"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.muniOfficePropertyId}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select Property ID" />
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentPropertyList}"
+                                                                           var="property"
+                                                                           itemValue="#{property.propertyID}"
+                                                                           itemLabel="ID: #{property.propertyID} | #{property.address}"
+                                                                           />
+
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-insert-property" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Code Set ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-insert-codeset"
+                                                                         label="Code Set ID"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.codeSet}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Code Set"  />
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentCodeSetList}"
+                                                                           var="codeset"
+                                                                           itemValue="#{codeset}"
+                                                                           itemLabel="ID: #{codeset.codeSetID} | #{codeset.codeSetName}"/>
+                                                            <f:converter converterId="codeSetConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-insert-codeset" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Issuing Code Source ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-insert-codesource"
+                                                                         label="Code Source"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.issuingCodeSource}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Code Source"/>
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentCodeSourceList}"
+                                                                           var="codesource"
+                                                                           itemValue="#{codesource}"
+                                                                           itemLabel="ID: #{codesource.sourceID} | #{codesource.sourceName}"
+                                                                           />
+                                                            <f:converter converterId="codeSourceConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-insert-codesource" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Default NOV Style ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-insert-style"
+                                                                         label="NOV Style"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.defaultNOVStyleID}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Code Source"/>
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentStyleList}"
+                                                                           var="style"
+                                                                           itemValue="#{style.styleID}"
+                                                                           itemLabel="ID: #{style.styleID} | #{style.description}"
+                                                                           />
+
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-insert-style" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Profile ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-insert-profile"
+                                                                         label="Profile"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.profile}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Profile" />
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentMuniProfileList}"
+                                                                           var="muniprofile"
+                                                                           itemValue="#{muniprofile}"
+                                                                           itemLabel="ID: #{muniprofile.profileID} | #{muniprofile.title}"
+                                                                           />
+                                                            <f:converter converterId="muniProfileConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-insert-profile" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Primary Staff Contact User ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-insert-primaryuser"
+                                                                         label="Primary Staff Contact User"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.primaryStaffContact}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Primary Staff" />
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentUserList}"
+                                                                           var="user"
+                                                                           itemValue="#{user}"
+                                                                           itemLabel="ID: #{user.userID} | #{user.username}"
+                                                                           />
+                                                            <f:converter converterId="userConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-insert-primaryuser" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Municipality Manager ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-insert-manager"
+                                                                         label="Municipality Manager"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.muniManager}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Manager"/>
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentUserList}"
+                                                                           var="user"
+                                                                           itemValue="#{user}"
+                                                                           itemLabel="ID: #{user.userID} | #{user.username}"
+                                                                           />
+                                                            <f:converter converterId="userConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-insert-manager" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Active in Program:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-insert-Active"
+                                                                               label="Active in Program"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.activeInProgram}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-insert-Active" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Code Enforcement:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-insert-EnableCodeEnforcement"
+                                                                               label="Enable Code Enforcement"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enableCodeEnforcement}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-insert-EnableCodeEnforcement" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Occpancy:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-insert-EnableOccpancy"
+                                                                               label="Enable Occpancy"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enableOccupancy}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-insert-EnableOccpancy" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Public CE Action Request Submissions:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-insert-EnablePublicCEActionRequestSubmissions"
+                                                                               label="Enable Public CE Action Request Submissions"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enablePublicCEActionRequestSubmissions}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-insert-EnablePublicCEActionRequestSubmissions" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Public CE Action Request Info:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-insert-EnablePublicCEActionRequestInfo"
+                                                                               label="Enable Public CE Action Request Info"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enablePublicCEActionRequestInfo}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-insert-EnablePublicCEActionRequestInfo" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Public Occupancy Permit App:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-insert-EnablePublicOccupancyPermitApp"
+                                                                               label="Enable Public Occupancy Permit App"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enablePublicOccPermitApp}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-insert-EnablePublicOccupancyPermitApp" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Public Occupancy Inspection TODOs:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-insert-EnablePublicOccupancyInspectionTODOs"
+                                                                               label="Enable Public Occupancy Inspection TODOs"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enablePublicOccInspectionTODOs}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-insert-EnablePublicOccupancyInspectionTODOs" showDetail="false" showSummary="true" style="width: 100%"/>
+
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputLabel value="Notes:"/>
                                                         <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-insert-note"
+                                                                     label="Notes"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.notes}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-insert-note" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                            </p:panel>
+
+                                            <p:commandButton icon="fa fa-edit"
+                                                             ajax="false"
+                                                             action="#{municipalityManageBB.onInsertButtonChange()}"
+                                                             value="Insert Municipality Record"
+                                                             style="margin: 10px; float: right; width: 25%"
+                                                             />
+
+                                        </h:form>
+
+                                        <!--Update Table-->
+                                        <h:form id="muniManage-form-update"
+                                                rendered="#{municipalityManageBB.getActiveUpdateMode()}">
+
+                                            <p:panel id="muniManage-panel-update"
+                                                     toggleable="true"
+                                                     collapsed="false"
+                                                     header="LoopUp Panel | Current Municipality: #{municipalityManageBB.currentMuniDataheavy.muniName} "
+                                                     >
+
+                                                <p:spacer height="10px"/>
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Code:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-municode"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.muniCode}"
+                                                                     styleClass="MuniReadTableInputText" 
+                                                                     required="true"
+                                                                     label="MuniCode"/>
+
+                                                        <p:message for="muniManage-update-municode" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Name:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-muniname"
+                                                                     label="MuniName"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.muniName}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-update-muniname" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Street:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-street"
+                                                                     label="Street"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.address_street}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-update-street" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                        <p:spacer height="5px"/>                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="City:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-city"
+                                                                     label="City"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.address_city}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-update-city" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                        <p:spacer height="5px"/>
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="State:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-state"
+                                                                     label="State"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.address_state}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-update-state" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Zip Code:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-zip"
+                                                                     label="Zip Code"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.address_zip}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-update-zip" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Phone:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-phone"
+                                                                     label="Phone"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.phone}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-update-phone" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Fax:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-fax"
+                                                                     label="Fax"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.fax}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-update-fax" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="E-mail:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-email"
+                                                                     label="E-mail"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.email}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-update-email" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Population:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-population"
+                                                                     label="Population"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.population}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-update-population" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Default Occpancy Period ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-update-occperiod"
+                                                                         label="Occpancy Period ID"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.defaultOccPeriodID}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select Period ID" />
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentOccperiodList}"
+                                                                           var="occperiod"
+                                                                           itemValue="#{occperiod.periodID}"
+                                                                           itemLabel="ID: #{occperiod.periodID} | #{occperiod.startDate} - #{occperiod.endDate}"
+                                                                           />
+
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-update-occperiod" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Municipality Office Property Id:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-update-property"
+                                                                         label="Municipality Office Property"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.muniOfficePropertyId}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select Property ID" />
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentPropertyList}"
+                                                                           var="property"
+                                                                           itemValue="#{property.propertyID}"
+                                                                           itemLabel="ID: #{property.propertyID} | #{property.address}"
+                                                                           />
+
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-update-property" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Code Set ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-update-codeset"
+                                                                         label="Code Set ID"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.codeSet}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Code Set"  />
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentCodeSetList}"
+                                                                           var="codeset"
+                                                                           itemValue="#{codeset}"
+                                                                           itemLabel="ID: #{codeset.codeSetID} | #{codeset.codeSetName}"/>
+                                                            <f:converter converterId="codeSetConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-update-codeset" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Issuing Code Source ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-update-codesource"
+                                                                         label="Code Source"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.issuingCodeSource}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Code Source"/>
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentCodeSourceList}"
+                                                                           var="codesource"
+                                                                           itemValue="#{codesource}"
+                                                                           itemLabel="ID: #{codesource.sourceID} | #{codesource.sourceName}"
+                                                                           />
+                                                            <f:converter converterId="codeSourceConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-update-codesource" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Default NOV Style ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-update-style"
+                                                                         label="NOV Style"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.defaultNOVStyleID}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Code Source"/>
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentStyleList}"
+                                                                           var="style"
+                                                                           itemValue="#{style.styleID}"
+                                                                           itemLabel="ID: #{style.styleID} | #{style.description}"
+                                                                           />
+
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-update-style" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Profile ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-update-profile"
+                                                                         label="Profile"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.profile}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Profile" />
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentMuniProfileList}"
+                                                                           var="muniprofile"
+                                                                           itemValue="#{muniprofile}"
+                                                                           itemLabel="ID: #{muniprofile.profileID} | #{muniprofile.title}"
+                                                                           />
+                                                            <f:converter converterId="muniProfileConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-update-profile" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Primary Staff Contact User ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-update-primaryuser"
+                                                                         label="Primary Staff Contact User"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.primaryStaffContact}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Primary Staff" />
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentUserList}"
+                                                                           var="user"
+                                                                           itemValue="#{user}"
+                                                                           itemLabel="ID: #{user.userID} | #{user.username}"
+                                                                           />
+                                                            <f:converter converterId="userConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-update-primaryuser" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Municipality Manager ID:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectOneMenu id="muniManage-update-manager"
+                                                                         label="Municipality Manager"
+                                                                         value="#{municipalityManageBB.currentMuniDataheavy.muniManager}"
+                                                                         style="width: 100%; font-family: inherit;"
+                                                                         required="true">
+
+                                                            <f:selectItem  itemLabel="Select One Manager"/>
+
+                                                            <f:selectItems value="#{municipalityManageBB.currentUserList}"
+                                                                           var="user"
+                                                                           itemValue="#{user}"
+                                                                           itemLabel="ID: #{user.userID} | #{user.username}"
+                                                                           />
+                                                            <f:converter converterId="userConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message for="muniManage-update-manager" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Code Enforcement:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-update-EnableCodeEnforcement"
+                                                                               label="Enable Code Enforcement"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enableCodeEnforcement}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-update-EnableCodeEnforcement" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Occpancy:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-update-EnableOccpancy"
+                                                                               label="Enable Occpancy"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enableOccupancy}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-update-EnableOccpancy" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Public CE Action Request Submissions:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-update-EnablePublicCEActionRequestSubmissions"
+                                                                               label="Enable Public CE Action Request Submissions"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enablePublicCEActionRequestSubmissions}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-update-EnablePublicCEActionRequestSubmissions" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Public CE Action Request Info:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-update-EnablePublicCEActionRequestInfo"
+                                                                               label="Enable Public CE Action Request Info"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enablePublicCEActionRequestInfo}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-update-EnablePublicCEActionRequestInfo" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Public Occupancy Permit App:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-update-EnablePublicOccupancyPermitApp"
+                                                                               label="Enable Public Occupancy Permit App"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enablePublicOccPermitApp}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-update-EnablePublicOccupancyPermitApp" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Enable Public Occupancy Inspection TODOs:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:selectBooleanButton id="muniManage-update-EnablePublicOccupancyInspectionTODOs"
+                                                                               label="Enable Public Occupancy Inspection TODOs"
+                                                                               value="#{municipalityManageBB.currentMuniDataheavy.enablePublicOccInspectionTODOs}" 
+                                                                               onLabel="True" 
+                                                                               offLabel="False" 
+                                                                               styleClass="MuniReadTableInputText"
+                                                                               />
+
+                                                        <p:message for="muniManage-update-EnablePublicOccupancyInspectionTODOs" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Notes:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText id="muniManage-update-note"
+                                                                     label="Notes"
+                                                                     value="#{municipalityManageBB.currentMuniDataheavy.notes}"
+                                                                     styleClass="MuniReadTableInputText"/>
+
+                                                        <p:message for="muniManage-update-note" showDetail="false" showSummary="true" style="width: 100%"/>
+
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                            </p:panel>
+
+                                            <p:commandButton icon="fa fa-edit"
+                                                             ajax="false"
+                                                             action="#{municipalityManageBB.onUpdateButtonChange()}"
+                                                             value="Update Municipality Record"
+                                                             style="margin: 10px; float: right; width: 25%"
+                                                             />
+
+                                        </h:form>
+
+
+                                        <!--Remove Table-->
+                                        <h:form id="muniManage-form-remove"
+                                                rendered="#{municipalityManageBB.getActiveRemoveMode()}">
+
+                                            <p:panel id="muniManage-panel-remove"
+                                                     toggleable="true"
+                                                     collapsed="false"
+                                                     header="Remove Panel | Current Municipality: #{municipalityManageBB.currentMuniDataheavy.muniName} "
+                                                     >
+
+                                                <p:spacer height="10px"/>
+
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Code:"/>
+                                                        <p:spacer height="5px"/>
                                                         <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.notes}"/>
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.muniCode}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Name:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.muniName}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Street:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.address_street}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="City:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.address_city}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="State:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.address_state}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Zip Code:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.address_zip}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Phone:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.phone}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Fax:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.fax}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="E-mail:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.email}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Population:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.population}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Default Occpancy Period ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.defaultOccPeriodID} | From #{municipalityManageBB.getCurrentOccPeriod().startDate} To #{municipalityManageBB.getCurrentOccPeriod().endDate}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Municipality Office Property ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.muniOfficePropertyId} | #{municipalityManageBB.getCurrentOfficeProperty().address}" />
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Code Set ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.codeSet.codeSetID} | #{municipalityManageBB.currentMuniDataheavy.codeSet.codeSetName}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Issuing Code Source ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.issuingCodeSource.sourceID} | #{municipalityManageBB.currentMuniDataheavy.issuingCodeSource.sourceName}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Default NOV Style ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.defaultNOVStyleID} | #{municipalityManageBB.getCurrentPrintStyle().description}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Profile ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.profile.profileID} | #{municipalityManageBB.currentMuniDataheavy.profile.title}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Primary Staff Contact User ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.primaryStaffContact.userID} | #{municipalityManageBB.currentMuniDataheavy.primaryStaffContact.username}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Municipality Manager ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.muniManager.userID} | #{municipalityManageBB.currentMuniDataheavy.muniManager.username}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Last Updated User ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;ID: #{municipalityManageBB.currentMuniDataheavy.lastUpdatedBy.userID} | #{municipalityManageBB.currentMuniDataheavy.lastUpdatedBy.username}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -353,818 +1565,90 @@
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
-                                                        <h:outputLabel value="Last Updated User ID:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.lastUpdaetdBy.userID}"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Primary Staff Contact User ID:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.primaryStaffContact.userID}"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Default Occpancy Period ID:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="MuniReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.defaultOccPeriodID}"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                </p:panelGrid>
-
-                                            </h:form>
-
-                                        </p:panel>
-
-
-                                        <!--Insert Table-->
-                                        <p:panel id="muniManage-panel-insert"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Insert Panel"
-                                                 rendered="#{municipalityManageBB.getActiveInsertMode()}"
-                                                 >
-
-                                            <p:spacer height="10px"/>
-
-                                            <h:form id="muniManage-form-insert">
-
-
-                                                <p:panelGrid columns="4" 
-                                                             layout="grid"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
-                                                             >
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Code:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.muniCode}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Name:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.muniName}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Street:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.address_street}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="City:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.address_city}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="State:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.address_state}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Zip Code:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.address_zip}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Phone:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.phone}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Fax:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.fax}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="E-mail:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.email}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Population:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.population}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Default Occpancy Period ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.defaultOccPeriodID}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Municipality Office Property Id:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.muniOfficePropertyId}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
                                                         <h:outputLabel value="Notes:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.notes}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Code Set ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.codeSet}"
-                                                                         style="width: 100%; font-family: inherit;">
-
-                                                            <f:selectItem  itemLabel="Select One Code Set"  />
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentCodeSetList}"
-                                                                           var="codeset"
-                                                                           itemValue="#{codeset}"
-                                                                           itemLabel="ID: #{codeset.codeSetID} | #{codeset.codeSetName}"/>
-                                                            <f:converter converterId="codeSetConverter"/>
-                                                        </p:selectOneMenu>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Issuing Code Source ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.issuingCodeSource}"
-                                                                         style="width: 100%; font-family: inherit;">
-
-                                                            <f:selectItem  itemLabel="Select One Code Source"/>
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentCodeSourceList}"
-                                                                           var="codesource"
-                                                                           itemValue="#{codesource}"
-                                                                           itemLabel="ID: #{codesource.sourceID} | #{codesource.sourceName}"
-                                                                           />
-                                                            <f:converter converterId="codeSourceConverter"/>
-                                                        </p:selectOneMenu>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Default NOV Style ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.defaultNOVStyleID}"
-                                                                         style="width: 100%; font-family: inherit;">
-
-                                                            <f:selectItem  itemLabel="Select One Code Source"/>
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentStyleList}"
-                                                                           var="style"
-                                                                           itemValue="#{style.styleID}"
-                                                                           itemLabel="ID: #{style.styleID} | #{style.description}"
-                                                                           />
-
-                                                        </p:selectOneMenu>
-
-
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Profile ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.profile}"
-                                                                         style="width: 100%; font-family: inherit;">
-
-                                                            <f:selectItem  itemLabel="Select One Code Source" />
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentMuniProfileList}"
-                                                                           var="muniprofile"
-                                                                           itemValue="#{muniprofile}"
-                                                                           itemLabel="ID: #{muniprofile.profileID} | #{muniprofile.title}"
-                                                                           />
-                                                            <f:converter converterId="muniProfileConverter"/>
-                                                        </p:selectOneMenu>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Primary Staff Contact User ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.primaryStaffContact}"
-                                                                         style="width: 100%; font-family: inherit;">
-
-                                                            <f:selectItem  itemLabel="Select One Primary Staff" />
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentUserList}"
-                                                                           var="user"
-                                                                           itemValue="#{user}"
-                                                                           itemLabel="ID: #{user.userID} | #{user.username}"
-                                                                           />
-                                                            <f:converter converterId="userConverter"/>
-                                                        </p:selectOneMenu>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Municipality Manager ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.muniManager}"
-                                                                         style="width: 100%; font-family: inherit;">
-                                                            <f:selectItem  itemLabel="Select One Manager"/>
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentUserList}"
-                                                                           var="user"
-                                                                           itemValue="#{user}"
-                                                                           itemLabel="ID: #{user.userID} | #{user.username}"
-                                                                           />
-                                                            <f:converter converterId="userConverter"/>
-                                                        </p:selectOneMenu>
-
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.notes}"/>
+                                                        </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputLabel value="Active in Program:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.activeInProgram}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.activeInProgram}"/>
+                                                        </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputLabel value="Enable Code Enforcement:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enableCodeEnforcement}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.enableCodeEnforcement}"/>
+                                                        </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputLabel value="Enable Occpancy:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enableOccupancy}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.enableOccupancy}"/>
+                                                        </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputLabel value="Enable Public CE Action Request Submissions:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enablePublicCEActionRequestSubmissions}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.enablePublicCEActionRequestSubmissions}"/>
+                                                        </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputLabel value="Enable Public CE Action Request Info:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enablePublicCEActionRequestInfo}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.enablePublicCEActionRequestInfo}"/>
+                                                        </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputLabel value="Enable Public Occupancy Permit App:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enablePublicOccPermitApp}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.enablePublicOccPermitApp}"/>
+                                                        </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputLabel value="Enable Public Occupancy Inspection TODOs:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enablePublicOccInspectionTODOs}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
+                                                        <div class="MuniReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{municipalityManageBB.currentMuniDataheavy.enablePublicOccInspectionTODOs}" />
+                                                        </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
                                                 </p:panelGrid>
 
-                                                <p:spacer height="15px" />
-
-                                                <p:commandButton icon="fa fa-edit"
-                                                                 ajax="false"
-                                                                 action="#{municipalityManageBB.onInsertButtonChange()}"
-
-                                                                 value="Insert Municipality Record"
-                                                                 />
-
-                                            </h:form>
-
-                                        </p:panel>
-
-
-                                        <!--Update Table-->
-                                        <p:panel id="muniManage-panel-update"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="LoopUp Panel | Current Municipality: #{municipalityManageBB.currentMuniDataheavy.muniName} "
-                                                 rendered="#{municipalityManageBB.getActiveUpdateMode()}"
-                                                 >
-
-                                            <p:spacer height="10px"/>
-
-                                            <h:form id="muniManage-form-update">
-
-                                                <p:panelGrid columns="4" 
-                                                             layout="grid"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
-                                                             >
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Code:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.muniCode}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Name:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.muniName}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Street:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.address_street}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="City:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.address_city}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="State:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.address_state}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Zip Code:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.address_zip}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Phone:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.phone}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Fax:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.fax}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="E-mail:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.email}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Population:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.population}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Default Occpancy Period ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.defaultOccPeriodID}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Municipality Office Property Id:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.muniOfficePropertyId}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Notes:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputText value="#{municipalityManageBB.currentMuniDataheavy.notes}"
-                                                                     styleClass="MuniReadTableInputText"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Code Set ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.codeSet.codeSetID}"
-                                                                         style="width: 100%; font-family: inherit;">
-
-                                                            <f:selectItem  itemLabel="Select One Code Set"  />
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentCodeSetList}"
-                                                                           var="codeset"
-                                                                           itemValue="#{codeset.codeSetID}"
-                                                                           itemLabel="ID: #{codeset.codeSetID} | #{codeset.codeSetName}"/>
-                                                        </p:selectOneMenu>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Issuing Code Source ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.issuingCodeSource.sourceID}"
-                                                                         style="width: 100%; font-family: inherit;">
-
-                                                            <f:selectItem  itemLabel="Select One Code Source"/>
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentCodeSourceList}"
-                                                                           var="codesource"
-                                                                           itemValue="#{codesource.sourceID}"
-                                                                           itemLabel="ID: #{codesource.sourceID} | #{codesource.sourceName}"
-                                                                           />
-                                                        </p:selectOneMenu>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Default NOV Style ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.defaultNOVStyleID}"
-                                                                         style="width: 100%; font-family: inherit;">
-
-                                                            <f:selectItem  itemLabel="Select One Code Source"/>
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentStyleList}"
-                                                                           var="style"
-                                                                           itemValue="#{style.styleID}"
-                                                                           itemLabel="ID: #{style.styleID} | #{style.description}"
-                                                                           />
-
-                                                        </p:selectOneMenu>
-
-
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Profile ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.profile.profileID}"
-                                                                         style="width: 100%; font-family: inherit;">
-
-                                                            <f:selectItem  itemLabel="Select One Code Source" />
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentMuniProfileList}"
-                                                                           var="muniprofile"
-                                                                           itemValue="#{muniprofile.profileID}"
-                                                                           itemLabel="ID: #{muniprofile.profileID} | #{muniprofile.title}"
-                                                                           />
-                                                        </p:selectOneMenu>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Primary Staff Contact User ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.primaryStaffContact.userID}"
-                                                                         style="width: 100%; font-family: inherit;">
-
-                                                            <f:selectItem  itemLabel="Select One Primary Staff" />
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentUserList}"
-                                                                           var="user"
-                                                                           itemValue="#{user.userID}"
-                                                                           itemLabel="ID: #{user.userID} | #{user.username}"
-                                                                           />
-                                                        </p:selectOneMenu>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Municipality Manager ID:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectOneMenu value="#{municipalityManageBB.currentMuniDataheavy.muniManager.userID}"
-                                                                         style="width: 100%; font-family: inherit;">
-                                                            <f:selectItem  itemLabel="Select One Manager"/>
-
-                                                            <f:selectItems value="#{municipalityManageBB.currentUserList}"
-                                                                           var="user"
-                                                                           itemValue="#{user.userID}"
-                                                                           itemLabel="ID: #{user.userID} | #{user.username}"
-                                                                           />
-                                                        </p:selectOneMenu>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Active in Program:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.activeInProgram}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Enable Code Enforcement:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enableCodeEnforcement}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Enable Occpancy:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enableOccupancy}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Enable Public CE Action Request Submissions:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enablePublicCEActionRequestSubmissions}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Enable Public CE Action Request Info:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enablePublicCEActionRequestInfo}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Enable Public Occupancy Permit App:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enablePublicOccPermitApp}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel value="Enable Public Occupancy Inspection TODOs:"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:selectBooleanButton value="#{municipalityManageBB.currentMuniDataheavy.enablePublicOccInspectionTODOs}" 
-                                                                               onLabel="True" 
-                                                                               offLabel="False" 
-                                                                               styleClass="MuniReadTableInputText"
-                                                                               />
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                </p:panelGrid>
-
-                                                <p:spacer height="15px" />
-
-                                                <p:commandButton icon="fa fa-edit"
-                                                                 ajax="false"
-                                                                 action="#{municipalityManageBB.onUpdateButtonChange()}"
-                                                                 value="Update Municipality Record"
-                                                                 />
-
-
-                                            </h:form>
-
-                                        </p:panel>
-                                        
-                                        
-                                        <!--Remove Table-->
-                                        <p:panel id="muniManage-panel-remove"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="LoopUp Panel"
-                                                 rendered="#{municipalityManageSampleBB.getActiveRemoveMode()}"
-                                                 >
-
-                                            <p:spacer height="10px"/>
-
-                                            <h:form id="muniManage-form-remove">
-
-                                                <p:panelGrid columns="4" 
-                                                             layout="grid"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
-                                                             >
-
-                                                    <!--Remove Table Content-->
-
-                                                </p:panelGrid>
-
-                                                <p:spacer height="10px" />
-
-                                                <!--Remove Button-->
-                                                <p:commandButton icon="fa fa-edit"
-                                                                 ajax="false"
-                                                                 action="#{municipalityManageSampleBB.onRemoveButtonChange()}"
-                                                                 value="Remove"
-                                                                 />
-
-                                            </h:form>
-
-                                        </p:panel>
+                                            </p:panel>
+
+                                            <!--Remove Button-->
+                                            <p:commandButton icon="fa fa-edit"
+                                                             ajax="false"
+                                                             action="#{municipalityManageBB.onRemoveButtonChange()}"
+                                                             value="Remove"
+                                                             style="margin: 10px; float: right; width: 25%"
+                                                             />
+
+                                        </h:form>
 
                                     </p:outputPanel>
                                 </div>

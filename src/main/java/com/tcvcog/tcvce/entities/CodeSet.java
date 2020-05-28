@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  *
@@ -117,5 +118,44 @@ public class CodeSet implements Serializable {
     public void setEnfCodeElementList(ArrayList<EnforcableCodeElement> enfCodeElementList) {
         this.enfCodeElementList = enfCodeElementList;
     }
+    
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 200 * hash + this.codeSetID;
+        hash = 200 * hash + this.muniCode;
+        hash = 200 * hash + Objects.hashCode(this.codeSetName);
+        hash = 200 * hash + Objects.hashCode(this.codeSetDescription);
+        
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CodeSet other = (CodeSet) obj;
+        if (this.codeSetID != other.codeSetID) {
+            return false;
+        }
+        if (this.muniCode != other.muniCode) {
+            return false;
+        }
+        if (!Objects.equals(this.codeSetName, other.codeSetName)) {
+            return false;
+        }
+        if (!Objects.equals(this.codeSetDescription, other.codeSetDescription)) {
+            return false;
+        }
+        return true;
+    }
+
     
 }

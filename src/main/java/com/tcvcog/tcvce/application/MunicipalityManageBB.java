@@ -5,7 +5,12 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeSet;
@@ -14,11 +19,10 @@ import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.PrintStyle;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
-import com.tcvcog.tcvce.integration.SystemIntegrator;
-import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,15 +110,19 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
 
     private String currentMode;
 
-    private ArrayList<CodeSet> currentCodeSetList;
+    private List<CodeSet> currentCodeSetList;
 
-    private ArrayList<CodeSource> currentCodeSourceList;
+    private List<CodeSource> currentCodeSourceList;
 
-    private ArrayList<MuniProfile> currentMuniProfileList;
+    private List<MuniProfile> currentMuniProfileList;
 
-    private ArrayList<User> currentUserList;
+    private List<User> currentUserList;
 
-    private ArrayList<PrintStyle> currentStyleList;
+    private List<PrintStyle> currentStyleList;
+
+    private List<OccPeriod> currentOccperiodList;
+
+    private List<Property> currentPropertyList;
 
     @PostConstruct
     public void initBean() {
@@ -129,12 +137,12 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
      * Initialize the whole page into default setting
      */
     public void defaultSetting() {
+        
 
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         MunicipalityCoordinator mc = getMuniCoordinator();
-        CodeIntegrator ci = getCodeIntegrator();
-        UserIntegrator ui = getUserIntegrator();
-        SystemIntegrator si = getSystemIntegrator();
+        CodeCoordinator cc = getCodeCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
 
         try {
 
@@ -145,15 +153,23 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
             //initialize default current MunicipalityDataHeavy object in terms of current session muni
             currentMuniDataheavy = mc.getMuniDataHeavyList(getSessionBean().getSessionMuni().getMuniCode());
             //initialize default current code set list 
-            currentCodeSetList = ci.getCodeSets();
+            currentCodeSetList = cc.retrieveAllcodeSet();
             //initialize default current code source list
-            currentCodeSourceList = ci.getCompleteCodeSourceList();
+            currentCodeSourceList = cc.retrieveAllCodeSources();
             //initialize default current muni profile list
-            currentMuniProfileList = mi.getMuniProfileList();
+            currentMuniProfileList = mc.getMuniProfilesList();
             //initialize default current user list
-            currentUserList = ui.getUserList();
+            currentUserList = uc.assembleUserListForSearchCriteria();
             //initialize default current print style list
-            currentStyleList = si.getPrintStyle();
+            currentStyleList = sc.getPrintStyleList();
+
+            // NOTE: 
+            //initialize default current occperiod list
+            currentOccperiodList = new ArrayList<>();
+            currentOccperiodList.add(getSessionBean().getSessionOccPeriod());
+
+            currentPropertyList = new ArrayList<>();
+            currentPropertyList.add(getSessionBean().getSessionProperty());
 
         } catch (AuthorizationException | IntegrationException ex) {
 
@@ -212,7 +228,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
 
     //Select button on side panel can only be used in either Lookup Mode or Update Mode
     public boolean getSelectedButtonActive() {
-        return !("Lookup".equals(currentMode) || "Update".equals(currentMode));
+        return !("Lookup".equals(currentMode) || "Update".equals(currentMode) || "Remove".equals(currentMode));
     }
 
     /**
@@ -228,7 +244,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
 
         // "Select" button was selected
         if (currentMuniSelected == true) {
-            
+
             //set current selected muni (basic)
             setCurrentMuniBasic(mc.getMuni(currentMuniCode));
             //update the current selected muni list in side panel
@@ -237,15 +253,15 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
             //set current selected muni (heavy)
             this.currentMuniCode = currentMuniCode;
             currentMuniDataheavy = mc.getMuniDataHeavyList(currentMuniCode);
-            
+
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Municipality: " + currentMuniDataheavy.getMuniName(), ""));
 
-        // "Select" button wasn't selected
+            // "Select" button wasn't selected
         } else {
             //turn to default setting
             defaultSetting();
-            
+
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Municipality: " + currentMuniDataheavy.getMuniName(), ""));
         }
@@ -264,20 +280,64 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
     }
 
     public String onUpdateButtonChange() {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
         try {
-            mi.updateMuniDataHeavy(currentMuniDataheavy);
+            mc.updateMuni(currentMuniDataheavy,getSessionBean().getSessionUser());
         } catch (IntegrationException ex) {
-            System.out.println("update error!");
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fail To Update Municipality", ""));
         }
         return "muniManage";
     }
 
     public String onInsertButtonChange() {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        mi.insertMuniDataHeavy(currentMuniDataheavy);
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        mc.insertMuni(currentMuniDataheavy, getSessionBean().getSessionUser());
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successful Insert New Municipality", ""));
         return "muniManage";
+    }
+
+    public String onRemoveButtonChange() {
+        currentMuniDataheavy.setActiveInProgram(false);
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        try {
+            mc.updateMuni(currentMuniDataheavy,getSessionBean().getSessionUser());
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fail To Remove Municipality", ""));
+        }
+        return "muniManage";
+    }
+
+    public OccPeriod getCurrentOccPeriod() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        OccPeriod occperiod = null;
+        try {
+            occperiod = oc.getOccPeriod(currentMuniDataheavy.getDefaultOccPeriodID());
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fail To Load Default Occpancy Period", ""));
+        }
+        return occperiod;
+    }
+
+    public Property getCurrentOfficeProperty() {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        Property property = null;
+        try {
+            property = pc.getProperty(currentMuniDataheavy.getMuniOfficePropertyId());
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fail to load Municipality Office Property", ""));
+        }
+        return property;
+    }
+
+    public PrintStyle getCurrentPrintStyle() {
+        SystemCoordinator sc = getSystemCoordinator();
+        PrintStyle printStyle = null;
+        try {
+            printStyle = sc.getPrintStyle(currentMuniDataheavy.getDefaultNOVStyleID());
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fail to load Default NOV Style", ""));
+        }
+        return printStyle;
     }
 
     public int getCurrentMuniCode() {
@@ -324,44 +384,62 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
         return currentMode;
     }
 
-    public ArrayList<CodeSet> getCurrentCodeSetList() {
+    public List<CodeSet> getCurrentCodeSetList() {
         return currentCodeSetList;
     }
 
-    public void setCurrentCodeSetList(ArrayList<CodeSet> currentCodeSetList) {
+    public void setCurrentCodeSetList(List<CodeSet> currentCodeSetList) {
         this.currentCodeSetList = currentCodeSetList;
     }
 
-    public ArrayList<CodeSource> getCurrentCodeSourceList() {
+    public List<CodeSource> getCurrentCodeSourceList() {
         return currentCodeSourceList;
     }
 
-    public void setCurrentCodeSourceList(ArrayList<CodeSource> currentCodeSourceList) {
+    public void setCurrentCodeSourceList(List<CodeSource> currentCodeSourceList) {
         this.currentCodeSourceList = currentCodeSourceList;
     }
 
-    public ArrayList<MuniProfile> getCurrentMuniProfileList() {
+    public List<MuniProfile> getCurrentMuniProfileList() {
         return currentMuniProfileList;
     }
 
-    public void setCurrentMuniProfileList(ArrayList<MuniProfile> currentMuniProfileList) {
+    public void setCurrentMuniProfileList(List<MuniProfile> currentMuniProfileList) {
         this.currentMuniProfileList = currentMuniProfileList;
     }
 
-    public ArrayList<User> getCurrentUserList() {
+    public List<User> getCurrentUserList() {
         return currentUserList;
     }
 
-    public void setCurrentUserList(ArrayList<User> currentUserList) {
+    public void setCurrentUserList(List<User> currentUserList) {
         this.currentUserList = currentUserList;
     }
 
-    public ArrayList<PrintStyle> getCurrentStyleList() {
+    public List<PrintStyle> getCurrentStyleList() {
         return currentStyleList;
     }
 
-    public void setCurrentStyleList(ArrayList<PrintStyle> currentStyleList) {
+    public void setCurrentStyleList(List<PrintStyle> currentStyleList) {
         this.currentStyleList = currentStyleList;
     }
+
+    public List<OccPeriod> getCurrentOccperiodList() {
+        return currentOccperiodList;
+    }
+
+    public void setCurrentOccperiodList(List<OccPeriod> currentOccperiodList) {
+        this.currentOccperiodList = currentOccperiodList;
+    }
+
+    public List<Property> getCurrentPropertyList() {
+        return currentPropertyList;
+    }
+
+    public void setCurrentPropertyList(List<Property> currentPropertyList) {
+        this.currentPropertyList = currentPropertyList;
+    }
+
+    
 
 }
