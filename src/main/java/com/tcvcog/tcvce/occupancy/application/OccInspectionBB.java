@@ -10,9 +10,11 @@ import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
@@ -27,6 +29,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -149,6 +153,8 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             setupUnitMemberVariablesBasedOnCurrentOccPeriod();
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
+        } catch (SearchException ex) {
+            Logger.getLogger(OccInspectionBB.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         // general setting of drop-down box lists
@@ -162,7 +168,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             }
         }
         
-        managerInspectorCandidateList = uc.assembleUserListForSearchCriteria();
+        managerInspectorCandidateList = uc.assembleUserListForSearch(getSessionBean().getSessUser());
         itemFilterOptions = Arrays.asList(ViewOptionsOccChecklistItemsEnum.values());
         inspectedElementAddValueCandidateList = Arrays.asList(OccInspectionStatusEnum.values());
         
@@ -180,7 +186,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
        
     }
     
-    private void setupUnitMemberVariablesBasedOnCurrentOccPeriod() throws IntegrationException, BObStatusException{
+    private void setupUnitMemberVariablesBasedOnCurrentOccPeriod() throws IntegrationException, BObStatusException, SearchException{
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         if(currentOccPeriod != null){
@@ -195,8 +201,13 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 }
             }
         
+       
         feeList = currentOccPeriod.getFeeList();
-        paymentList = currentOccPeriod.getPaymentList();
+        
+        // TODO NADGIT could you give this a look-see and make sure we've got a unified
+        // approach to payments across CECases and OccPeriods? This may be something
+        // to talk with Eric about
+//        paymentList = currentOccPeriod.getPaymentList();
         
     }
     
@@ -386,7 +397,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Reloaded occ period ID " + currentOccPeriod.getPeriodID(), ""));
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -713,6 +724,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
          User u = getSessionBean().getSessUser();
          LocalDateTime now = LocalDateTime.now();
          
+         // TODO check logic on OccPeriod field auth
          switch(field){
             case "authorization":
                 currentOccPeriod.setAuthorizedBy(u);
@@ -742,7 +754,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 }                                                        
                 break;
             case "enddate":
-                if(periodEndDateNull){
+                if(currentOccPeriod.getEndDate() != null){
                     currentOccPeriod.setEndDate(null);
                 }
                 currentOccPeriod.setEndDateCertifiedBy(u);
@@ -763,7 +775,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Successfully udpated field status!", ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 ex.getMessage(), ""));
@@ -781,7 +793,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                new FacesMessage(FacesMessage.SEVERITY_INFO,
                "Success! Occupancy period ID " + currentOccPeriod.getPeriodID() 
                        + " is now authorized and permits can be generated.", ""));
-        } catch (AuthorizationException | CaseLifecycleException | IntegrationException ex) {
+        } catch (AuthorizationException | BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -790,12 +802,12 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      }
      
      public void updatePeriodPropUnit(){
-         OccupancyCoordinator oc = getOccupancyCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.updateOccPeriodPropUnit(currentOccPeriod, selectedPropertyUnit);
+            oc.updateOccPeriodPropUnit(currentOccPeriod, currentPropertyUnit);
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "The current occupancy period has been assigned to property unit ID " + selectedPropertyUnit.getUnitID(), ""));
+                "The current occupancy period has been assigned to property unit ID " + currentPropertyUnit.getUnitID(), ""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,

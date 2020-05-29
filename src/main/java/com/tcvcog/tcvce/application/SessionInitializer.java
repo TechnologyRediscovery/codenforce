@@ -543,7 +543,7 @@ public  class       SessionInitializer
         MunicipalityCoordinator mc = getMuniCoordinator();
         
         OccPeriod op = null;
-            try {
+        try {
             // Session object init
             sb.setSessOccPeriodList(occCord.assembleOccPeriodHistoryList(cred));
             if(sb.getSessOccPeriodList().isEmpty()){
@@ -563,7 +563,7 @@ public  class       SessionInitializer
             if(!sb.getQueryOccPeriodList().isEmpty()){
                 sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
             }
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             throw new SessionException( "Occ period list or query assembly failure", 
                                         ex, 

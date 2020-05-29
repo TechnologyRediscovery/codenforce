@@ -87,10 +87,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param cred
      * @return the CECaseDataHeavy with the action request list ready to roll
      * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public CECaseDataHeavy assembleCECaseDataHeavy(CECase c, Credential cred) throws BObStatusException, IntegrationException{
+    public CECaseDataHeavy assembleCECaseDataHeavy(CECase c, Credential cred) 
+            throws BObStatusException, IntegrationException{
         SearchCoordinator sc = getSearchCoordinator();
-        WorkflowCoordinator chc = getWorkflowCoordinator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
         
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
@@ -104,10 +106,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             cse.setCompleteEventList(ec.downcastEventCnFPropertyUnitHeavy(sc.runQuery(qe).getBOBResultList()));
         
             // PROPOSAL LIST
-            cse.setProposalList(chc.getProposalList(cse, cred));
+            cse.setProposalList(wc.getProposalList(cse, cred));
             
             // EVENT RULE LIST
-            cse.setEventRuleList(chc.rules_getEventRuleImpList(cse, cred, this));
+            cse.setEventRuleList(wc.rules_getEventRuleImpList(cse, cred));
             
             // CEAR LIST
             QueryCEAR qcear = sc.initQuery(QueryCEAREnum.ATTACHED_TO_CECASE, cred);
@@ -581,11 +583,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     } // close method
     
     
-    
+    /**
+     * Pathway for "Evaluating a Proposal" or in other words, making a workflow choice.
+     * The exception list is a beast because so many things happen when such an event occurs.
+     * TODO: Move to WorkflowCoordinator
+     * 
+     * @param proposal
+     * @param chosen
+     * @param ceCase
+     * @param u
+     * @throws EventException
+     * @throws AuthorizationException
+     * @throws BObStatusException
+     * @throws IntegrationException
+     * @throws ViolationException 
+     */
     public void evaluateProposal(   Proposal proposal, 
                                     IFace_Proposable chosen, 
                                     CECaseDataHeavy ceCase, 
-                                    UserAuthorized u) throws EventException, AuthorizationException, BObStatusException, IntegrationException, ViolationException{
+                                    UserAuthorized u) 
+                            throws  EventException, 
+                                    AuthorizationException, 
+                                    BObStatusException, 
+                                    IntegrationException, 
+                                    ViolationException{
+        
         WorkflowCoordinator cc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
@@ -599,7 +621,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             proposal.setChosenChoice(chosen);
             
             // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
-            EventCnF csEv = cc.generateEventDocumentingProposalEvaluation(proposal, chosen, u, this);
+            EventCnF csEv = cc.generateEventDocumentingProposalEvaluation(ceCase, proposal, chosen, u);
             // insert the event and grab the new ID
             insertedEventID = attachNewEventToCECase(ceCase, csEv, null);
             // go get our new event by ID and inject it into our proposal before writing its evaluation to DB

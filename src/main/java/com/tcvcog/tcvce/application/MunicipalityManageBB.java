@@ -143,7 +143,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
             //initialize default current basic muni list 
             currentMuniList = getMuniList();
             //initialize default current MunicipalityDataHeavy object in terms of current session muni
-            currentMuniDataheavy = mc.getMuniDataHeavyList(getSessionBean().getSessionMuni().getMuniCode());
+            currentMuniDataheavy = mc.getMuniDataHeavyList(getSessionBean().getSessMuni().getMuniCode());
             //initialize default current code set list 
             currentCodeSetList = ci.getCodeSets();
             //initialize default current code source list
@@ -260,7 +260,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
      */
     public List<Municipality> getMuniList() throws IntegrationException {
         MunicipalityCoordinator mc = getMuniCoordinator();
-        return mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessionUser());
+        return mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessUser());
     }
 
     public String onUpdateButtonChange() {

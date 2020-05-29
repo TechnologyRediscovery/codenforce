@@ -1172,12 +1172,8 @@
     <managed-bean>
         <managed-bean-name>ceCaseAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseAddBB</managed-bean-class>
-
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
-
-
-
 
 
     <managed-bean>
@@ -1185,6 +1181,7 @@
         <managed-bean-class>com.tcvcog.tcvce.application.CitationBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>noticeOfViolationBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.NoticeOfViolationBB</managed-bean-class>
@@ -1376,7 +1373,7 @@
             <from-outcome>textBlockManage</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/textBlockManage.xhtml</to-view-id>
             <redirect/>
-        
+        </navigation-case>
         <navigation-case>
             <from-outcome>occPermitApplications</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
@@ -1436,7 +1433,6 @@
             <to-view-id>/restricted/cogstaff/ce/intensityManage.xhtml</to-view-id>
             <redirect />
         </navigation-case>
-    
     </navigation-rule>
     
             
@@ -1981,6 +1977,7 @@
             <from-view-id> /public/services/personSearchPublic.xhtml</from-view-id>
             <from-outcome> editPerson </from-outcome>
             <to-view-id> /public/services/personEditPublic.xhtml </to-view-id>
+        </navigation-case>
             
     </navigation-rule>
     
@@ -2019,7 +2016,8 @@
     <managed-bean>
         <managed-bean-name>workflowCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.WorkflowCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>workflowIntegrator</managed-bean-name>

@@ -102,11 +102,10 @@ public class WorkflowBB extends BackingBeanUtils implements Serializable{
     
     public void proposals_makeChoice(Choice choice, Proposal p){
         WorkflowCoordinator wc = getWorkflowCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             if(p instanceof ProposalOccPeriod){
-                wc.evaluateProposal(p, 
-                                        choice, getCurrentOccPeriod(), 
-                                        getSessionBean().getSessUser());
+                oc.evaluateProposal(p, choice, getSessionBean().getSessUser());
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
             }

@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleSet;
@@ -28,6 +29,8 @@ import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import java.io.Serializable;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -72,7 +75,11 @@ public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
             System.out.println(ex);
         }
         
-        setEventRuleSetList(wc.rules_getEventRuleSetList());
+        try {
+            setEventRuleSetList(wc.rules_getEventRuleSetList());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
 
         
     }
@@ -84,7 +91,7 @@ public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Reloaded occ period ID " + getCurrentOccPeriod().getPeriodID(), ""));
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -96,8 +103,8 @@ public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
     
     
     public void rules_initiateEventRuleCreate(ActionEvent ev){
-        EventCoordinator ec = getEventCoordinator();
-        currentEventRuleAbstract = ec.rules_getInitializedEventRuleAbstract();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
+        currentEventRuleAbstract = wc.rules_getInitializedEventRuleAbstract();
     }
     
     public void rules_initiateEventRuleEdit(EventRuleAbstract era){
@@ -106,9 +113,9 @@ public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
     }
     
     public void rules_commitEventRuleEdits(ActionEvent ev){
-        EventCoordinator ec = getEventCoordinator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         try {
-            ec.rules_updateEventRuleAbstract(currentEventRuleAbstract, this);
+            wc.rules_updateEventRuleAbstract(currentEventRuleAbstract);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Update of event rule successful!", ""));
@@ -121,12 +128,12 @@ public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
     }
     
     public void rules_commitEventRuleCreate(ActionEvent ev){
-        EventCoordinator ec = getEventCoordinator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         int freshEventRuleID;
         try {
-            freshEventRuleID = ec.rules_createEventRuleAbstract(currentEventRuleAbstract, getCurrentOccPeriod(), 
+            freshEventRuleID = wc.rules_createEventRuleAbstract(currentEventRuleAbstract, getCurrentOccPeriod(), 
                                                                 null, isIncludeEventRuleInCurrentOccPeriodTemplate(),
-                                                                getSessionBean().getSessUser(), this);
+                                                                getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "New event rule added with ID " + freshEventRuleID, ""));
@@ -142,10 +149,10 @@ public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
     
     
     public void rules_addEventRuleByID(ActionEvent ev){
-        EventCoordinator ec = getEventCoordinator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         try {
-            EventRuleAbstract era = ec.rules_getEventRuleAbstract(getFormEventRuleIDToAdd(), this);
-            ec.rules_attachEventRule(era, getCurrentOccPeriod(), getSessionBean().getSessUser(), this);
+            EventRuleAbstract era = wc.rules_getEventRuleAbstract(getFormEventRuleIDToAdd());
+            wc.rules_attachEventRule(era, getCurrentOccPeriod(), getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Success! added rule to occ period", ""));
@@ -159,9 +166,9 @@ public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
     }
     
     public void rules_addEventRuleSet(EventRuleSet ers){
-        EventCoordinator ec = getEventCoordinator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         try {
-            ec.rules_attachRuleSet(ers, getCurrentOccPeriod(), getSessionBean().getSessUser());
+            wc.rules_attachRuleSet(ers, getCurrentOccPeriod(), getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Success! added rule set to occ period", ""));
