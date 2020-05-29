@@ -176,6 +176,34 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return !("Lookup".equals(currentMode) || "Update".equals(currentMode));
     }
 
+    
+    /**
+     *
+     * @param currentMode Lookup, Insert, Update, Remove
+     * @throws IntegrationException
+     */
+    public void setCurrentMode(String currentMode) throws IntegrationException {
+
+        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
+        String tempCurMode = this.currentMode;
+        //reset default setting every time the Mode has been selected 
+        currentFeeSelected = false;
+        //check the currentMode == null or not
+        if (currentMode == null) {
+            this.currentMode = tempCurMode;
+        } else {
+            this.currentMode = currentMode;
+        }
+        //create an instance object of fees if current mode == "Insert"
+        if (getActiveInsertMode()) {
+            selectedAssignedFee = new FeeAssigned();
+            
+            selectedFee = new Fee();
+        }
+        //show the current mode in p:messages box
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, this.currentMode + " Mode Selected", ""));
+    }
+
     /**
      * Changing which fee is selected and not selected
      *
@@ -1091,10 +1119,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public String getCurrentMode() {
         return currentMode;
-    }
-
-    public void setCurrentMode(String currentMode) {
-        this.currentMode = currentMode;
     }
 
     public Fee getFormFee() {

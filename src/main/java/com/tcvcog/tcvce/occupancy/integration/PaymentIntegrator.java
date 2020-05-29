@@ -1449,6 +1449,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+    
+    //TODO: change this to deactivate payment records instead of deleting them.
     public void deletePayment(Payment payment) throws IntegrationException {
         String query = "DELETE FROM public.moneypayment\n"
                 + " WHERE paymentid=?;";

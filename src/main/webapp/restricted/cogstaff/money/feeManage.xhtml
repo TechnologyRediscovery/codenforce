@@ -46,7 +46,7 @@
                                             <f:selectItem itemLabel="LOOKUP" itemValue="Lookup"  />
                                             <f:selectItem itemLabel="INSERT" itemValue="Insert"  />
                                             <f:selectItem itemLabel="UPDATE" itemValue="Update"  />
-                                            <f:selectItem itemLabel="REMOVE" itemValue="Remove"  />
+                                            <f:selectItem itemLabel="REMOVE" itemValue="Waive"  />
 
                                             <f:ajax render="@all"/>
 
@@ -244,7 +244,7 @@
                                                              >
 
                                                     <h:panelGroup>
-                                                        <p:outputLabel value="Code:"/>
+                                                        <p:outputLabel value="ID:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="FeeReadTableOutputLabel">
                                                             <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.assignedFeeID}"/>
