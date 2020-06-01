@@ -1021,7 +1021,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setPermitTitle(rs.getString("permittitle"));
             opt.setPermitTitleSub(rs.getString("permittitlesub"));
 
-            opt.setFeeList(pi.getFeeList(opt));
+            opt.setPermittedFees(pi.getFeeList(opt));
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Error generating OccPermitType from ResultSet", ex);

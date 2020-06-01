@@ -228,6 +228,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                     "Please select an assigned fee to update", ""));
                 }
+                
+                //set selected fee
+                selectedAssignedFee = skeleton;
+                //update the current selected fee list in side panel
+                feeAssignedList = new ArrayList<>();
+                feeAssignedList.add(skeleton);
+                
             } else {
 
                 MoneyCECaseFeeAssigned skeleton = (MoneyCECaseFeeAssigned) currentFee;
@@ -246,7 +253,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 selectedAssignedFee = skeleton;
                 //update the current selected fee list in side panel
                 feeAssignedList = new ArrayList<>();
-                feeAssignedList.add(currentFee);
+                feeAssignedList.add(skeleton);
 
             }
 
@@ -978,6 +985,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Oops! We encountered a problem trying to refresh the currentCase!", ""));
+        } catch (NullPointerException ex) {
+        
+            System.out.println("FeeManagementBB.refreshTypesAndElements() | Null Pointer Exception when accessing case.");
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "No CE Case is currently selected!", ""));
+        
         }
 
     }

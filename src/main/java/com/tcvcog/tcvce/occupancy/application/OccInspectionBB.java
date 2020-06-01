@@ -838,7 +838,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
          getSessionBean().setFeeManagementOccPeriod(currentOccPeriod);
          getSessionBean().getNavStack().pushCurrentPage();
          
-         return "editFees";
+         return "feeManage";
      }
      
      

@@ -56,7 +56,7 @@
 
                                     <p:spacer height="30px"/>
 
-                                    <p:scrollPanel style="height: 550px;" >
+                                    <p:scrollPanel style="height: 550px; border: none" >
 
 
                                         <h:form id="feeManage-form-side">
@@ -66,58 +66,32 @@
                                                          value="#{feeManagementBB.feeAssignedList}"
                                                          rowKey="#{fee.assignedFeeID}"
                                                          tableStyleClass="primeDataTable"
-                                                         rowExpandMode="single"
-                                                         expandedRow="false"
-                                                         filteredValue="#{feeManagementBB.filteredFeeAssignedList}"
                                                          >
 
-                                                <p:column width="3%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Exp"/>
-                                                    </f:facet>
-                                                    <p:rowToggler/>
-                                                </p:column>
-                                                <p:column width="8%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="ID" />
-                                                    </f:facet>
+
+                                                <p:column headerText="ID"
+                                                          styleClass="centeredColumnContent">
                                                     <h:outputText value="#{fee.assignedFeeID}"/>
                                                 </p:column>
 
 
-                                                <p:column width="10%" sortBy="#{fee.fee.name}"
+                                                <p:column headerText="Fee Name"
+                                                          styleClass="centeredColumnContent"
+                                                          sortBy="#{fee.fee.name}"
                                                           filterBy="#{fee.fee.name}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Fee Name" />
-                                                    </f:facet>
                                                     <h:outputText value="#{fee.fee.name}"/>
                                                 </p:column>
 
-                                                <p:column width="10%" sortBy="#{fee.fee.amount}"
+
+                                                <p:column headerText="Amount"
+                                                          styleClass="centeredColumnContent"
+                                                          sortBy="#{fee.fee.amount}"
                                                           filterBy="#{fee.fee.amount}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Amount" />
-                                                    </f:facet>
                                                     <h:outputText value="#{fee.fee.amount}"/>
                                                 </p:column>
 
-                                                <p:column width="15%" filterBy="#{fee.fee.effectiveDate}"
-                                                          sortBy="#{fee.fee.effectiveDate}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Effective" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{fee.fee.effectiveDate}"/>
-                                                </p:column>
-
-                                                <p:column width="15%" filterBy="#{fee.fee.expiryDate}"
-                                                          sortBy="#{fee.fee.expiryDate}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Expiry" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{fee.fee.expiryDate}"/>
-                                                </p:column>
-
-                                                <p:column>
+                                                <p:column styleClass="centeredColumnContent"
+                                                          style="width: 80px">
 
                                                     <p:selectBooleanButton onLabel="Deselect" 
                                                                            offLabel="Select"
@@ -135,80 +109,6 @@
                                                     </p:selectBooleanButton>
 
                                                 </p:column>
-
-                                                <p:rowExpansion>
-                                                    <div class="outlinedBox">
-                                                        <h2>Full fee listing for fee <h:outputText value="#{fee.assignedFeeID}"/> </h2>
-                                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
-
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.fee.notes}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Assigned By"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Last Modified"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.lastModified}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Other notes"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.notes}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup rendered="#{not empty fee.reducedByUser}">
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Amount Reduced By"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="$ #{fee.reducedBy}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup rendered="#{not empty fee.reducedByUser}">
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Reduced By"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.reducedByUser.person.firstName} #{fee.reducedByUser.person.lastName} (ID: #{fee.reducedByUser.userID}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup rendered="#{not empty fee.waivedBy}">
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Waived By"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.waivedBy.person.firstName} #{fee.waivedBy.person.lastName} (ID: #{fee.waivedBy.userID}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <ui:remove>
-                                                                <h:panelGroup>
-                                                                    <p:spacer height="15px"/>
-                                                                    <div class="rowExpansion">
-                                                                        <p:commandButton value="Edit this Fee" action="#{occInspectionBB.editOnePayment(payment)}"/>
-                                                                    </div>
-                                                                </h:panelGroup>
-                                                            </ui:remove>
-                                                        </h:panelGrid>
-                                                    </div>
-                                                </p:rowExpansion>
 
                                             </p:dataTable>
 
@@ -230,7 +130,7 @@
                                         <p:panel id="feeManage-panel-lookup"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="LoopUp Panel"
+                                                 header="LookUp Panel"
                                                  rendered="#{feeManagementBB.getActiveLookupMode()}"
                                                  >
 
@@ -301,7 +201,7 @@
                                                         <p:outputLabel value="Assigned By:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="FeeReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.assignedBy.person.firstName} #{feeManagementBB.selectedAssignedFee.fee.assignedBy.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.fee.assignedBy.userID})"/>
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.assignedBy.person.firstName} #{feeManagementBB.selectedAssignedFee.assignedBy.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.assignedBy.userID})"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -337,7 +237,7 @@
                                                         <p:outputLabel value="Reduced By:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="FeeReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.reducedByUser.person.firstName} #{feeManagementBB.selectedAssignedFee.fee.reducedByUser.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.fee.reducedByUser.userID})"/>
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.reducedByUser.person.firstName} #{feeManagementBB.selectedAssignedFee.reducedByUser.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.reducedByUser.userID})"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -346,7 +246,7 @@
                                                         <p:outputLabel value="Waived By:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="FeeReadTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.waivedBy.person.firstName} #{feeManagementBB.selectedAssignedFee.fee.waivedBy.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.fee.waivedBy.userID})"/>
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.waivedBy.person.firstName} #{feeManagementBB.selectedAssignedFee.waivedBy.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.waivedBy.userID})"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -378,7 +278,7 @@
                                                         id="feeFeeTable"
                                                         var="o"
                                                         selectionMode="single"
-                                                        selection="#{feeManagementBB.assignedFormFee.fee}"
+                                                        selection="#{feeManagementBB.selectedAssignedFee.fee}"
                                                         rowKey="#{o.occupancyInspectionFeeID}"
                                                         value="#{feeManagementBB.feeList}"
                                                         tableStyleClass="primeDataTable"
@@ -586,7 +486,7 @@
                                         <p:panel id="feeManage-panel-update"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="LoopUp Panel"
+                                                 header="LookUp Panel"
                                                  rendered="#{feeManagmentBB.getActiveUpdateMode()}"
                                                  >
 
@@ -602,7 +502,7 @@
                                                         id="feeFeeTable"
                                                         var="o"
                                                         selectionMode="single"
-                                                        selection="#{feeManagementBB.assignedFormFee.fee}"
+                                                        selection="#{feeManagementBB.selectedAssignedFee.fee}"
                                                         rowKey="#{o.occupancyInspectionFeeID}"
                                                         value="#{feeManagementBB.feeList}"
                                                         tableStyleClass="primeDataTable"

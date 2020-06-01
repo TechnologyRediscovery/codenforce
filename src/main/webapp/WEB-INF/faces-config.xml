@@ -1099,21 +1099,6 @@
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>payments</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/paymentManage.xhtml</to-view-id>
-        </navigation-case>
-
-        <navigation-case>
-            <from-outcome>paymentTypeManage</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/paymentTypeManage.xhtml</to-view-id>
-        </navigation-case>
-
-        <navigation-case>
-            <from-outcome>feeManage</from-outcome>
-            <to-view-id>/restricted/cogstaff/money/feeManage.xhtml</to-view-id>
-        </navigation-case>
-        
-        <navigation-case>
             <from-outcome>occPermitTypeManage</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/occPermitTypeManage.xhtml</to-view-id>
         </navigation-case>
@@ -1706,40 +1691,44 @@
     </managed-bean>
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: payments ~~~~~~~~~~~~~~~~~~~~~~~~ --> 
-        <navigation-rule>
-            <from-view-id>*</from-view-id>
-            <navigation-case>
-                <from-outcome>payments</from-outcome>
-                <to-view-id>/restricted/cogstaff/occ/paymentManage.xhtml</to-view-id>
-            </navigation-case>
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>payments</from-outcome>
+            <to-view-id>/restricted/cogstaff/money/paymentManage.xhtml</to-view-id>
+        </navigation-case>
 
-            <navigation-case>
-                <from-outcome>paymentTypeManage</from-outcome>
-                <to-view-id>/restricted/cogstaff/occ/paymentTypeManage.xhtml</to-view-id>
-            </navigation-case>
+        <navigation-case>
+            <from-outcome>paymentTypeManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/money/paymentTypeManage.xhtml</to-view-id>
+        </navigation-case>
 
-            <navigation-case>
-                <from-outcome>occPeriodPayments</from-outcome>
-                <to-view-id>/restricted/cogstaff/occ/occPeriodPayments.xhtml</to-view-id>
-            </navigation-case>
+        <navigation-case>
+            <from-outcome>feeManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/money/feeManage.xhtml</to-view-id>
+        </navigation-case>
 
-            <navigation-case>
-                <from-outcome>ceEventPayments</from-outcome>
-                <to-view-id>/restricted/cogstaff/ce/cEEventPayments.xhtml</to-view-id>
-            </navigation-case>
+        <navigation-case>
+            <from-outcome>feePermissions</from-outcome>
+            <to-view-id>/restricted/cogstaff/money/feePermissions.xhtml</to-view-id>
+        </navigation-case>
 
-            <navigation-case>
-                <from-outcome>feeTypeManage</from-outcome>
-                <to-view-id>/restricted/cogstaff/occ/feeTypeManage.xhtml</to-view-id>
-            </navigation-case>
+        <navigation-case>
+            <from-outcome>occPeriodPayments</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occPeriodPayments.xhtml</to-view-id>
+        </navigation-case>
 
-            <navigation-case>
-                <from-outcome>editFees</from-outcome>
-                <to-view-id>/restricted/cogstaff/occ/feeManage.xhtml</to-view-id>
+        <navigation-case>
+            <from-outcome>ceEventPayments</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/cEEventPayments.xhtml</to-view-id>
+        </navigation-case>
 
-            </navigation-case>
+        <navigation-case>
+            <from-outcome>feeTypeManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/feeTypeManage.xhtml</to-view-id>
+        </navigation-case>
 
-        </navigation-rule>
+    </navigation-rule>
     
     
     
@@ -2039,7 +2028,7 @@
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
-      <navigation-rule>
+    <navigation-rule>
         <from-view-id>*</from-view-id>
         <navigation-case>
             <from-outcome>workflowConfig</from-outcome>
