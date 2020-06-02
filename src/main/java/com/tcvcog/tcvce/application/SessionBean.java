@@ -232,7 +232,7 @@ public class    SessionBean
     private Person activeAnonPerson;
 
   
-    /* *** Blob Upload Session Shelves *** */
+    /* *** Blob Upload Session Shelves *** */ 
 
     
     /* *** Navigation Shelves *** */
