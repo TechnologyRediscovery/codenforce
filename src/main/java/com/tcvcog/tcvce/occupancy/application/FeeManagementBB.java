@@ -173,10 +173,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     //Select button on side panel can only be used in either Lookup Mode or Update Mode
     public boolean getSelectedButtonActive() {
-        return !("Lookup".equals(currentMode) || "Update".equals(currentMode));
+        return !("Lookup".equals(currentMode) || "Update".equals(currentMode) || "Remove".equals(currentMode));
     }
 
-    
     /**
      *
      * @param currentMode Lookup, Insert, Update, Remove
@@ -197,7 +196,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         //create an instance object of fees if current mode == "Insert"
         if (getActiveInsertMode()) {
             selectedAssignedFee = new FeeAssigned();
-            
+
             selectedFee = new Fee();
         }
         //show the current mode in p:messages box
@@ -228,13 +227,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                     "Please select an assigned fee to update", ""));
                 }
-                
+
                 //set selected fee
                 selectedAssignedFee = skeleton;
                 //update the current selected fee list in side panel
                 feeAssignedList = new ArrayList<>();
                 feeAssignedList.add(skeleton);
-                
+
             } else {
 
                 MoneyCECaseFeeAssigned skeleton = (MoneyCECaseFeeAssigned) currentFee;
@@ -278,6 +277,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a fee to assign", ""));
+            return "feeManage";
         }
 
         FeeAssigned firstSkeleton = new FeeAssigned();
@@ -314,9 +314,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
             MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(firstSkeleton);
-            MoneyOccPeriodFeeAssigned occPeriodFormFee = (MoneyOccPeriodFeeAssigned) selectedAssignedFee;
 
-            secondSkeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
             secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
             secondSkeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
 
@@ -358,6 +356,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         FeeAssigned firstSkeleton = new FeeAssigned();
         PaymentIntegrator pi = getPaymentIntegrator();
 
+        if (!currentFeeSelected) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a fee from the table to update.", ""));
+
+            return "feeManage";
+        }
+        
         firstSkeleton.setAssignedFeeID(selectedAssignedFee.getAssignedFeeID());
         firstSkeleton.setPaymentList(selectedAssignedFee.getPaymentList());
         firstSkeleton.setMoneyFeeAssigned(selectedAssignedFee.getMoneyFeeAssigned());
@@ -382,20 +388,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             return "";
         }
 
+        firstSkeleton.setReducedBy(selectedAssignedFee.getReducedBy());
+
         if (selectedAssignedFee.getReducedBy() != 0) {
-
-            firstSkeleton.setReducedBy(selectedAssignedFee.getReducedBy());
             firstSkeleton.setReducedByUser(getSessionBean().getSessUser());
-
         } else {
             firstSkeleton.setReducedByUser(new User());
         }
 
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
             MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(firstSkeleton);
-            MoneyOccPeriodFeeAssigned occPeriodFormFee = (MoneyOccPeriodFeeAssigned) selectedAssignedFee;
 
-            secondSkeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
             secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
             secondSkeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
 
@@ -431,17 +434,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             }
 
         }
-        return "muniManage";
+        return "feeManage";
     }
 
     public String onRemoveAssignedFeeButtonChange() {
 
-        if (selectedAssignedFee == null) {
+        if (!currentFeeSelected) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a fee from the table to waive.", ""));
 
-            return "";
+            return "feeManage";
         }
 
         selectedAssignedFee.setWaivedBy(getSessionBean().getSessUser());
@@ -473,7 +476,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             }
         }
 
-        return "muniManage";
+        return "feeManage";
     }
 
     public String finishAndRedir() {
@@ -500,7 +503,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
 
     }
-    
+
     public void editFeeType(ActionEvent e) {
         if (getSelectedFeeType() != null) {
             formFee.setOccupancyInspectionFeeID(selectedFeeType.getOccupancyInspectionFeeID());
@@ -508,19 +511,18 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             formFee.setName(selectedFeeType.getName());
             formFee.setAmount(selectedFeeType.getAmount());
             formFee.setNotes(selectedFeeType.getNotes());
-            
+
             //Have to figure out what to do w/ setting dates...
             //setFormOccupancyInspectionFeeEffDate(formFeeEffDate.toInstant()
             //        .atZone(ZoneId.systemDefault())
             //        .toLocalDateTime());
-             
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select an occupancy inspection fee to update", ""));
         }
     }
-    
+
     public void commitFeeUpdates(ActionEvent e) {
         OccupancyIntegrator oifi = getOccupancyIntegrator();
         PaymentIntegrator pi = getPaymentIntegrator();
@@ -541,7 +543,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                         "Occupancy Inspection Fee updated!", ""));
     }
 
-    
     public void initializeNewFee(ActionEvent e) {
 
         formFee = new Fee();
@@ -986,12 +987,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Oops! We encountered a problem trying to refresh the currentCase!", ""));
         } catch (NullPointerException ex) {
-        
+
             System.out.println("FeeManagementBB.refreshTypesAndElements() | Null Pointer Exception when accessing case.");
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN,
                             "No CE Case is currently selected!", ""));
-        
+
         }
 
     }
@@ -1299,6 +1300,24 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     public String getOccPeriodAddress() {
 
         return getOccPeriodProperty().getAddress();
+
+    }
+
+    /**
+     * This is used by the interface to display the returned value
+     *
+     * @return Whether or not the currently selected fee has been waived
+     */
+    public String isSelectedFeeWaived() {
+
+        if (selectedAssignedFee.getWaivedBy() != null) {
+
+            return "Yes";
+
+        } else {
+
+            return "No";
+        }
 
     }
 

@@ -32,6 +32,19 @@
                             <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
                         </h:form>
 
+                        <h:form>
+
+                            <p:commandButton ajax="false"
+                                             action="#{feeManagementBB.finishAndRedir()}"
+                                             value="Finish editing fee list and return."
+                                             />
+                            <p:commandButton ajax="false"
+                                             action="#{feeManagementBB.goToFeePermissions()}"
+                                             value="Edit fee permissions"
+                                             />
+
+                        </h:form>
+
                         <div class="mainContainer">
 
                             <div class ="two-column-page-flex-container">
@@ -46,7 +59,7 @@
                                             <f:selectItem itemLabel="LOOKUP" itemValue="Lookup"  />
                                             <f:selectItem itemLabel="INSERT" itemValue="Insert"  />
                                             <f:selectItem itemLabel="UPDATE" itemValue="Update"  />
-                                            <f:selectItem itemLabel="REMOVE" itemValue="Waive"  />
+                                            <f:selectItem itemLabel="WAIVE" itemValue="Remove"  />
 
                                             <f:ajax render="@all"/>
 
@@ -224,7 +237,7 @@
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
-                                                    <h:panelGroup rendered="#{not empty fee.reducedByUser}">
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.reducedByUser}">
                                                         <p:outputLabel value="Amount Reduced by:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="FeeReadTableOutputLabel">
@@ -233,7 +246,7 @@
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
-                                                    <h:panelGroup rendered="#{not empty fee.reducedByUser}">
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.reducedByUser}">
                                                         <p:outputLabel value="Reduced By:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="FeeReadTableOutputLabel">
@@ -242,7 +255,16 @@
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
-                                                    <h:panelGroup rendered="#{not empty fee.waivedBy}">
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Waived?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160; #{feeManagementBB.isSelectedFeeWaived()}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.waivedBy}">
                                                         <p:outputLabel value="Waived By:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="FeeReadTableOutputLabel">
@@ -487,7 +509,7 @@
                                                  toggleable="true"
                                                  collapsed="false"
                                                  header="LookUp Panel"
-                                                 rendered="#{feeManagmentBB.getActiveUpdateMode()}"
+                                                 rendered="#{feeManagementBB.getActiveUpdateMode()}"
                                                  >
 
                                             <p:spacer height="10px"/>
@@ -661,16 +683,6 @@
                                                              >
 
                                                     <h:panelGroup>
-                                                        <p:outputLabel value="Waived?"/>
-                                                        <p:spacer height="5px"/>
-
-                                                        <p:inputSwitch id="feeWaived" value="#{feeManagementBB.waived}" 
-                                                                       tabindex="13" onLabel="Yes" offLabel="No"/>
-
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
                                                         <p:outputLabel value="Reduce By:"/>
                                                         <p:spacer height="5px"/>
 
@@ -710,7 +722,7 @@
                                         <p:panel id="feeManage-panel-remove"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="LoopUp Panel"
+                                                 header="LookUp Panel"
                                                  rendered="#{feeManagementBB.getActiveRemoveMode()}"
                                                  >
 
@@ -723,7 +735,123 @@
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
-                                                    <!--Remove Table Content-->
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.assignedFeeID}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Fee Name:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.name}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Amount:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.amount}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Effective:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.effectiveDate}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Expiry:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.expiryDate}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Fee Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.notes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Assigned By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.assignedBy.person.firstName} #{feeManagementBB.selectedAssignedFee.assignedBy.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.assignedBy.userID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Last Modified:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.lastModified}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Other Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.notes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.reducedByUser}">
+                                                        <p:outputLabel value="Amount Reduced by:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160; $#{feeManagementBB.selectedAssignedFee.reducedBy}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.reducedByUser}">
+                                                        <p:outputLabel value="Reduced By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.reducedByUser.person.firstName} #{feeManagementBB.selectedAssignedFee.reducedByUser.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.reducedByUser.userID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Waived?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160; #{feeManagementBB.isSelectedFeeWaived()}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.waivedBy}">
+                                                        <p:outputLabel value="Waived By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.waivedBy.person.firstName} #{feeManagementBB.selectedAssignedFee.waivedBy.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.waivedBy.userID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
                                                 </p:panelGrid>
 
