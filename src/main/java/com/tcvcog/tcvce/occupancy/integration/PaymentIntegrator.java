@@ -520,14 +520,14 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(2, fee.getCaseID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
-            if (fee.getWaivedBy().getUserID() != 0) {
+            if (fee.getWaivedBy() != null) {
                 stmt.setInt(5, fee.getWaivedBy().getUserID());
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
             stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
             stmt.setDouble(7, fee.getReducedBy());
-            if (fee.getReducedByUser().getUserID() != 0) {
+            if (fee.getReducedByUser() != null) {
                 stmt.setInt(8, fee.getReducedByUser().getUserID());
             } else {
                 stmt.setNull(8, java.sql.Types.NULL);

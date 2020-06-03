@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -44,6 +45,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
@@ -63,7 +66,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     //feeManage.xhtml fields
     private OccPeriod currentOccPeriod;
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     private Fee formFee;
     private Fee selectedFee;
     private ArrayList<Fee> feeList;
@@ -139,6 +142,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             if (feeList == null) {
                 feeList = (ArrayList<Fee>) allFees;
             }
+            
             try {
                 refreshTypesAndElements();
             } catch (BObStatusException e) {
@@ -912,20 +916,27 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
+                                    "Oops! We encountered a problem trying to refresh the assigned fees list!", ""));
                 }
 
             }
 
         } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
 
-            currentCase = getSessionBean().getFeeManagementCeCase();
+            CaseCoordinator cc = getCaseCoordinator();
+            
+            try {
+                currentCase = cc.assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser().getMyCredential());
+            } catch (IntegrationException  | BObStatusException ex) {
+                getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Oops! We encountered a problem trying to prepare your selected CE Case before refreshing the assigned fees list!", ""));
+            }
 
             if (currentCase != null) {
 
                 try {
 
-                    // TODO NADGIT is this cast okay?
                     List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned((CECaseDataHeavy) currentCase);
 
                     for (MoneyCECaseFeeAssigned fee : tempList) {
@@ -951,7 +962,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         OccupancyIntegrator oi = getOccupancyIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
-        CaseIntegrator csi = getCaseIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
 
         try {
             typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessMuni().getProfile().getProfileID());
@@ -979,7 +990,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
 
         try {
-            currentCase = csi.getCECase(currentCase.getCaseID());
+            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
 
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println("FeeManagementBB.refreshTypesAndElements() | Error: " + ex.toString());
@@ -1322,37 +1333,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * getter that needs to be refactored
      *
      * @return
      */
     public String getCECaseAddress() {
 
-        /*
-        String currentCECaseAddress ="";
-        
-        PropertyIntegrator pi = getPropertyIntegrator();
-        
-        Property currentProp = new Property();
-        
-        currentProp.setAddress("");
-        
-        try {
-        
-            currentProp = pi.getProperty(currentCase.getPropertyID());
-            
-        } catch (IntegrationException e) {
-        
-            System.out.println("FeeManagementBB had problems getting the CECase address");
-            
-        }
-        
-        return currentProp.getAddress();
-         */
-//        TODO: NADGIT - upgrade to case with a Property in it
-// so the member variable should be a CECasePropertyUnitHeavy and you can extract
-// that objecet durectly in the XHTML and ask it for its address and drop into view
-        return String.valueOf(currentCase.getPropertyID());
+        return currentCase.getProperty().getAddress();
 
     }
 
@@ -1377,7 +1363,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     public void setCurrentCase(CECase currentCase) {
-        this.currentCase = currentCase;
+        this.currentCase = (CECaseDataHeavy) currentCase;
     }
 
     public ArrayList<CodeViolation> getFilteredViolationList() {

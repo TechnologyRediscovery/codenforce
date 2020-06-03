@@ -24,20 +24,20 @@ import java.time.LocalDateTime;
  */
 public class Payment {
     
-    private int paymentID;
-    private PaymentType paymentType;
-    private LocalDateTime dateDeposited;
-    private LocalDateTime dateReceived;
-    private double amount;
-    private Person payer;
-    private String referenceNum;
-    private int checkNum;
-    private boolean cleared;
-    private String notes;
-    private User recordedBy;
-    private LocalDateTime entryTimestamp;
-    private int assignedFeeID;
-    private EventDomainEnum domain;
+    protected int paymentID;
+    protected PaymentType paymentType;
+    protected LocalDateTime dateDeposited;
+    protected LocalDateTime dateReceived;
+    protected double amount;
+    protected Person payer;
+    protected String referenceNum;
+    protected int checkNum;
+    protected boolean cleared;
+    protected String notes;
+    protected User recordedBy;
+    protected LocalDateTime entryTimestamp;
+    protected int assignedFeeID;
+    protected EventDomainEnum domain;
     
    public Payment() {
        

@@ -1323,11 +1323,6 @@
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>ceCasePayments</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/ceCasePayments.xhtml</to-view-id>
-        </navigation-case>
-        
-        <navigation-case>
             <from-outcome>ceCaseRequests</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/ceCaseRequests.xhtml</to-view-id>
         </navigation-case>
@@ -1684,12 +1679,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>feeManagementBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.FeeManagementBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: payments ~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     <navigation-rule>
         <from-view-id>*</from-view-id>
@@ -1719,8 +1708,8 @@
         </navigation-case>
 
         <navigation-case>
-            <from-outcome>ceEventPayments</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/cEEventPayments.xhtml</to-view-id>
+            <from-outcome>ceCasePayments</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCasePayments.xhtml</to-view-id>
         </navigation-case>
 
         <navigation-case>
