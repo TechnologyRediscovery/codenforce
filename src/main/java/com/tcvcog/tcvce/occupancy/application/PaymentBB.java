@@ -17,8 +17,10 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
@@ -52,7 +54,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     private PaymentType newPaymentType;
 
     private OccPeriod currentOccPeriod;
-    private CECase currentCase;
+    private CECaseDataHeavy currentCase;
     private FeeAssigned selectedAssignedFee;
     private ArrayList<FeeAssigned> feeAssignedList;
     private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList;
@@ -143,10 +145,18 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
 
-            currentCase = getSessionBean().getFeeManagementCeCase();
+            CaseCoordinator cc = getCaseCoordinator();
+
+            try {
+                currentCase = cc.assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser().getMyCredential());
+            } catch (IntegrationException | BObStatusException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
+            }
 
             if (getSessionBean().getSessionPayment() != null) {
-                paymentList.add(getSessionBean().getSessionPayment());
+
                 paymentSet = true;
 //                try {
                 // TODO NADGIT rewire to use Coordinator
@@ -172,17 +182,14 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 //                try {
                 // TODO NADGIT rewire to use Coordinator
 //                    List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
-                List<MoneyCECaseFeeAssigned> tempList = new ArrayList<>();
+                feeAssignedList.addAll(currentCase.getFeeList());
 
-                for (MoneyCECaseFeeAssigned fee : tempList) {
-
-                    FeeAssigned skeleton = fee;
-
-                    skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
-                    skeleton.setDomain(currentDomain);
-                    feeAssignedList.add(skeleton);
-                    paymentList.addAll(skeleton.getPaymentList());
+                for(FeeAssigned fee : feeAssignedList){
+                    
+                    paymentList.addAll(fee.getPaymentList());
+                    
                 }
+
                 paymentSet = true;
 //                } catch (IntegrationException ex) {
 //                    getFacesContext().addMessage(null,
@@ -254,7 +261,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     //Select button on side panel can only be used in either Lookup Mode or Update Mode
     public boolean getSelectedButtonActive() {
-        return !("Lookup".equals(currentMode) || "Update".equals(currentMode));
+        return !("Lookup".equals(currentMode) || "Update".equals(currentMode) || "Remove".equals(currentMode));
     }
 
     /**
@@ -480,7 +487,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Unable to delete payment record--probably because it is used "
                                 + "somewhere in the database. Sorry.",
-                                "This category will always be with us."));
+                                "This payment will always be with us."));
             }
 
         } else {
@@ -488,7 +495,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a payment record from the table to delete", ""));
         }
-        
+
         return "payments";
     }
 
@@ -497,6 +504,13 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         return getSessionBean().getNavStack().popLastPage();
     }
 
+    public String goToPaymentTypeManage(){
+        getSessionBean().getNavStack().pushCurrentPage();
+        
+        return "paymentTypeManage";
+        
+    }
+    
     public boolean editingOccPeriod() {
         return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
     }
@@ -660,7 +674,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Unable to delete payment type--probably because it is used "
                                 + "somewhere in the database. Sorry.",
-                                "This category will always be with us."));
+                                "This payment will always be with us."));
             }
 
         } else {
@@ -799,11 +813,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         this.occPeriodFilteredFeeList = occPeriodFilteredFeeList;
     }
 
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
-    public void setCurrentCase(CECase currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 
