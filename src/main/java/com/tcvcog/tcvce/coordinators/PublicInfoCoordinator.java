@@ -123,6 +123,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             
             
             pib.setPublicEventList(new ArrayList<EventCnF>());
+            // TODO: Finish me
 //            for(EventCnF ev: c.getVisibleEventList()){
 //                if(ev.isDiscloseToPublic()){
 //                    pib.getPublicEventList().add(ev);

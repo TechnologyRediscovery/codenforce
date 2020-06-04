@@ -24,8 +24,6 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Choice;
-import com.tcvcog.tcvce.entities.EventRuleAbstract;
-import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
@@ -51,8 +49,11 @@ public class WorkflowBB extends BackingBeanUtils implements Serializable{
     private IFace_EventRuleGoverned currentERG;
     
     private Proposal currentProposal;
+    private int formEventRuleIDToAdd;
     
     private String formProposalRejectionReason;
+    
+    
     
     // view config
     private List<ViewOptionsProposalsEnum> proposalsViewOptions;
@@ -74,8 +75,6 @@ public class WorkflowBB extends BackingBeanUtils implements Serializable{
         setSelectedRulesViewOption(ViewOptionsEventRulesEnum.VIEW_ALL);
         
     }
-    
-    
     
     public void proposals_initiateViewPropMetadata(Proposal p){
         System.out.println("OccInspectionBB.proposals_viewPropMetadata");
@@ -226,6 +225,20 @@ public class WorkflowBB extends BackingBeanUtils implements Serializable{
      */
     public void setCurrentERG(IFace_EventRuleGoverned currentERG) {
         this.currentERG = currentERG;
+    }
+
+    /**
+     * @return the formEventRuleIDToAdd
+     */
+    public int getFormEventRuleIDToAdd() {
+        return formEventRuleIDToAdd;
+    }
+
+    /**
+     * @param formEventRuleIDToAdd the formEventRuleIDToAdd to set
+     */
+    public void setFormEventRuleIDToAdd(int formEventRuleIDToAdd) {
+        this.formEventRuleIDToAdd = formEventRuleIDToAdd;
     }
     
     

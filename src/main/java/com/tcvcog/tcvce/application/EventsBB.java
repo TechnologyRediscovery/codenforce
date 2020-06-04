@@ -22,13 +22,11 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import java.io.Serializable;
 import java.util.List;
@@ -82,12 +80,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                 ev = ec.initEvent(getCurrentCase(), getEventCategorySelected());
                 ev.setDiscloseToMunicipality(true);
                 ev.setDiscloseToPublic(false);
-            } catch (BObStatusException ex) {
+            } catch (BObStatusException | EventException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            } catch (EventException ex) {
-                Logger.getLogger(EventSearchBB.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             getFacesContext().addMessage(null,

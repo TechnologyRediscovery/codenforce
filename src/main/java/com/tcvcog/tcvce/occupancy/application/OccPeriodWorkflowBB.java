@@ -63,7 +63,9 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
     private List<PropertyUnit> propertyUnitCandidateList;
     private PropertyUnit selectedPropertyUnit;
     
+    private List<User> managerInspectorCandidateList;
     private User selectedManager;
+    
     
     
 
@@ -396,5 +398,19 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
      */
     public void setCurrentPropertyUnit(PropertyUnit currentPropertyUnit) {
         this.currentPropertyUnit = currentPropertyUnit;
+    }
+
+    /**
+     * @return the managerInspectorCandidateList
+     */
+    public List<User> getManagerInspectorCandidateList() {
+        return managerInspectorCandidateList;
+    }
+
+    /**
+     * @param managerInspectorCandidateList the managerInspectorCandidateList to set
+     */
+    public void setManagerInspectorCandidateList(List<User> managerInspectorCandidateList) {
+        this.managerInspectorCandidateList = managerInspectorCandidateList;
     }
 }
