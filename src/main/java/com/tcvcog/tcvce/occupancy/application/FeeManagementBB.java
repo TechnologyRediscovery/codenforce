@@ -80,12 +80,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private ArrayList<OccPeriodType> typeList;
     private ArrayList<OccPeriodType> filteredTypeList;
     private OccPeriodType selectedPeriodType;
-    private OccPeriodType lockedPeriodType;
 
     private ArrayList<EnforcableCodeElement> elementList;
     private ArrayList<EnforcableCodeElement> filteredElementList;
     private EnforcableCodeElement selectedCodeElement;
-    private EnforcableCodeElement lockedCodeElement;
 
     private List<Fee> existingFeeList;
     private ArrayList<Fee> workingFeeList;
@@ -273,6 +271,46 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Changing which type is selected and not selected
+     *
+     * @param currentType
+     * @throws IntegrationException
+     */
+    public void onOccPeriodTypeSelectedButtonChange(OccPeriodType currentType) throws IntegrationException {
+
+        selectedPeriodType = currentType;
+        
+        try {
+            existingFeeList = selectedPeriodType.getPermittedFees();
+            workingFeeList = new ArrayList<>(existingFeeList);
+        } catch (NullPointerException e) {
+            System.out.println("OccPeriodType has no existing permitted fee list, making new ArrayList...");
+            workingFeeList = new ArrayList<>();
+        }
+
+    }
+    
+    /**
+     * Changing which element is selected and not selected
+     *
+     * @param currentElement
+     * @throws IntegrationException
+     */
+    public void onCodeElementSelectedButtonChange(EnforcableCodeElement currentElement) throws IntegrationException {
+
+        selectedCodeElement = currentElement;
+        
+        try {
+            existingFeeList = selectedCodeElement.getFeeList();
+            workingFeeList = new ArrayList<>(existingFeeList);
+        } catch (NullPointerException e) {
+            System.out.println("EnforcableCodeElement has no existing permitted fee list, making new ArrayList...");
+            workingFeeList = new ArrayList<>();
+        }
+
+    }
+    
     public String onInsertAssignedFeeButtonChange() {
         if (selectedAssignedFee.getFee() == null) {
             getFacesContext().addMessage(null,
@@ -488,6 +526,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     public String goToFeePermissions() {
 
         if (editingCECase() || editingOccPeriod()) {
+            getSessionBean().setFeeManagementDomain(currentDomain);
             getSessionBean().getNavStack().pushCurrentPage();
         }
         return "feePermissions";
@@ -611,44 +650,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-    public void editOccPeriodFees() {
-
-        try {
-            lockedPeriodType = (OccPeriodType) selectedPeriodType.clone();
-        } catch (CloneNotSupportedException ex) {
-            System.out.println("OccPeriodType had a problem cloning. Oops!");
-        }
-
-        try {
-            existingFeeList = lockedPeriodType.getPermittedFees();
-            workingFeeList = new ArrayList<>(existingFeeList);
-        } catch (NullPointerException e) {
-            System.out.println("OccPeriodType has no existing permitted fee list, making new ArrayList...");
-            workingFeeList = new ArrayList<>();
-        }
-
-    }
-
     public void removePermittedFee(Fee selectedFee) {
         workingFeeList.remove(selectedFee);
-    }
-
-    public void editCodeElementFees() {
-
-        try {
-            lockedCodeElement = (EnforcableCodeElement) selectedCodeElement.clone();
-        } catch (CloneNotSupportedException ex) {
-            System.out.println("EnforcableCodeElement had a problem cloning. Oops!");
-        }
-
-        try {
-            existingFeeList = lockedCodeElement.getFeeList();
-            workingFeeList = new ArrayList<>(existingFeeList);
-        } catch (NullPointerException e) {
-            System.out.println("EnforcableCodeElement has no existing permitted fee list, making new ArrayList...");
-            workingFeeList = new ArrayList<>();
-        }
-
     }
 
     public void addFeeToPermittedFees() {
@@ -1339,14 +1342,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public OccPeriodType getLockedPeriodType() {
-        return lockedPeriodType;
-    }
-
-    public void setLockedPeriodType(OccPeriodType lockedPeriodType) {
-        this.lockedPeriodType = lockedPeriodType;
-    }
-
     public EventDomainEnum getCurrentDomain() {
         return currentDomain;
     }
@@ -1401,14 +1396,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public void setSelectedCodeElement(EnforcableCodeElement selectedCodeElement) {
         this.selectedCodeElement = selectedCodeElement;
-    }
-
-    public EnforcableCodeElement getLockedCodeElement() {
-        return lockedCodeElement;
-    }
-
-    public void setLockedCodeElement(EnforcableCodeElement lockedCodeElement) {
-        this.lockedCodeElement = lockedCodeElement;
     }
 
     public boolean isRedirected() {
