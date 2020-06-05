@@ -303,6 +303,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             //turn to default setting
             currentFeeSelected = false;
 
+            selectedPeriodType = new OccPeriodType();
+            
             refreshFeeAssignedList();
 
             try {
@@ -349,6 +351,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             //turn to default setting
             currentFeeSelected = false;
 
+            selectedCodeElement = new EnforcableCodeElement();
+            
             refreshFeeAssignedList();
 
             try {

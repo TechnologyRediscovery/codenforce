@@ -49,7 +49,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     private ArrayList<PaymentType> paymentTypeList;
     private ArrayList<PaymentType> paymentTypeTitleList;
     private PaymentType selectedPaymentType;
-    private PaymentType formPaymentType;
     private PaymentType newSelectedPaymentType;
     private PaymentType newPaymentType;
 
@@ -77,9 +76,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             redirected = true;
         }
 
+        currentMode = "Lookup";
+        
         selectedPayment = new Payment();
 
-        formPaymentType = new PaymentType();
+        selectedPaymentType = new PaymentType();
 
         currentPaymentSelected = false;
     }
@@ -184,10 +185,10 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 //                    List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
                 feeAssignedList.addAll(currentCase.getFeeList());
 
-                for(FeeAssigned fee : feeAssignedList){
-                    
+                for (FeeAssigned fee : feeAssignedList) {
+
                     paymentList.addAll(fee.getPaymentList());
-                    
+
                 }
 
                 paymentSet = true;
@@ -290,6 +291,8 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             refreshFeeAssignedList();
 
             currentPaymentSelected = false;
+
+            selectedPayment = new Payment();
 
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Municipality: " + selectedPayment.getPaymentID(), ""));
@@ -504,13 +507,13 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         return getSessionBean().getNavStack().popLastPage();
     }
 
-    public String goToPaymentTypeManage(){
+    public String goToPaymentTypeManage() {
         getSessionBean().getNavStack().pushCurrentPage();
-        
+
         return "paymentTypeManage";
-        
+
     }
-    
+
     public boolean editingOccPeriod() {
         return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
     }
@@ -585,24 +588,36 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    /*METHODS IMPORTED FROM PAYMENTTYPEBB*/
-    public void editPaymentType(ActionEvent e) {
-        if (getSelectedPaymentType() != null) {
-            formPaymentType.setPaymentTypeId(selectedPaymentType.getPaymentTypeId());
-            formPaymentType.setPaymentTypeTitle(selectedPaymentType.getPaymentTypeTitle());
+    public void onSelectedPayTypeButtonChange(PaymentType type) {
+        // "Select" button was selected
+        if (currentPaymentSelected == true) {
+
+            selectedPaymentType = type;
+
+            //update the current selected type list in side panel
+            paymentTypeList = new ArrayList<>();
+            paymentTypeList.add(type);
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Payment Type: " + selectedPaymentType.getPaymentTypeTitle(), ""));
+
+            // "Select" button wasn't selected
         } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a payment type to update", ""));
+            //turn to default setting
+            selectedPaymentType = new PaymentType();
+
+            currentPaymentSelected = false;
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Payment Type: " + selectedPaymentType.getPaymentTypeTitle(), ""));
         }
     }
 
-    public void commitPaymentTypeUpdates(ActionEvent e) {
+public String onUpdatePayTypeButtonChange(){
+    
         PaymentIntegrator pti = getPaymentIntegrator();
         PaymentType pt = selectedPaymentType;
 
-        pt.setPaymentTypeTitle(formPaymentType.getPaymentTypeTitle());
-        //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
         try {
             pti.updatePaymentType(pt);
             getFacesContext().addMessage(null,
@@ -614,17 +629,16 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                             "Unable to update Payment type in database.",
                             "This must be corrected by the System Administrator"));
         }
+
+        return "paymentTypeManage";
+        
     }
 
-    public void initializeNewType(ActionEvent e) {
-        formPaymentType = new PaymentType();
-    }
-
-    public String addPaymentType() {
+    public String onInsertPayTypeButtonChange(){
         PaymentType pt = new PaymentType();
         PaymentIntegrator pti = new PaymentIntegrator();
-        pt.setPaymentTypeId(formPaymentType.getPaymentTypeId());
-        pt.setPaymentTypeTitle(formPaymentType.getPaymentTypeTitle());
+        pt.setPaymentTypeId(selectedPaymentType.getPaymentTypeId());
+        pt.setPaymentTypeTitle(selectedPaymentType.getPaymentTypeTitle());
         try {
             pti.insertPaymentType(pt);
             getFacesContext().addMessage(null,
@@ -638,8 +652,30 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         }
 
         return "paymentTypeManage";
+        
     }
 
+    public String onRemovePayTypeButtonChange(){
+    
+        PaymentIntegrator pti = getPaymentIntegrator();
+        PaymentType pt = selectedPaymentType;
+
+        try {
+            pti.deletePaymentType(pt);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Payment type deleted!", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to delete Payment type in database.",
+                            "It's probably being used somewhere in the database."));
+        }
+
+        return "paymentTypeManage";
+        
+    }
+    
     /**
      * @return the paymentTypeList
      */
@@ -717,31 +753,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
      */
     public void setNewSelectedPaymentType(PaymentType newSelectedPaymentType) {
         this.newSelectedPaymentType = newSelectedPaymentType;
-    }
-
-    public PaymentType getFormPaymentType() {
-        return formPaymentType;
-    }
-
-    public void setFormPaymentType(PaymentType formPaymentType) {
-        this.formPaymentType = formPaymentType;
-    }
-
-    //Below are the methods to directly access formPaymentType's fields
-    public int getFormPaymentTypeId() {
-        return formPaymentType.getPaymentTypeId();
-    }
-
-    public void setFormPaymentTypeId(int paymentTypeId) {
-        formPaymentType.setPaymentTypeId(paymentTypeId);
-    }
-
-    public String getFormPaymentTypeTitle() {
-        return formPaymentType.getPaymentTypeTitle();
-    }
-
-    public void setFormPaymentTypeTitle(String paymentTypeTitle) {
-        formPaymentType.setPaymentTypeTitle(paymentTypeTitle);
     }
 
     public PaymentType getNewPaymentType() {
