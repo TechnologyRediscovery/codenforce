@@ -24,19 +24,25 @@ CSV_FILE_ENCODING = 'utf-8'
 # global TEST_PARID_FILE
 
 def main():
-    # for accessing a list of all parcelIDs by with one muni's list per file
-    # global INPUT_FILE
-    # INPUT_FILE = 'workspace/pitcairnparids.csv'
+    globals_setup()
+    insert_property_basetableinfo()
 
-    # parcels whose base property data is not written are written here before moving on
+
+def globals_setup():
+    """
+    Refactored legacy code where global variables are set.
+    TODO: Global variables are unpythonic. Consider more refactoring
+    """
+    global CSV_FILE_ENCODING
+    CSV_FILE_ENCODING = 'utf-8'
+    global current_muni
+    current_muni = 'foresthills'
+
+    global logger # logger details set in logger_setup()
+
     global LOG_FILE
-    LOG_FILE = join('output', 'foresthillserror.csv')
-    # LOG_FILE = 'output/swissvaleerror.csv'
+    LOG_FILE = join('output', current_muni + '_error.log')
 
-    # this log file is used for storing parcels whose person and propertyperson inserts fail
-    global LOG_FILE_AUX
-    LOG_FILE_AUX = join('output', 'foresthillserror_aux.csv')
-    # LOG_FILE_AUX = 'output/swissvaleerror_aux.csv'
 
     # ID number of the system user connected to these original inserts
     # user 99 is sylvia, our COG robot
@@ -44,19 +50,7 @@ def main():
     UPDATING_USER_ID = 99
 
     global PARID_FILE
-    # PARID_FILE = 'parcelidlists/wilmerdingparids.csv'
-    # PARID_FILE = 'parcelidlists/parcelidstest.csv'
-    # PARID_FILE = 'parcelidlists/pitcairnparids_correct.csv'
-    # PARID_FILE = 'parcelidlists/eastmckeesportparids.csv'
-    # PARID_FILE = 'parcelidlists/wilkinsparcelids.csv'
-    # PARID_FILE = 'parcelidlists/chalfantparcelids.csv'
-    # PARID_FILE = 'parcelidlists/swissvaleparcelids.csv'
-    PARID_FILE = join('parcelidlists', 'foresthillsparcelids.csv')
-    
-    # used as the access key for muni codes and ID bases in the dictionaries below
-    global current_muni
-    current_muni = 'foresthills'
-    # current_muni = 'swissvale'
+    PARID_FILE = join('parcelidlists', current_muni + '_parcelids.csv')
 
     # use as floor value for all new propertyIDs
     global PROP_ID_BASE
@@ -72,30 +66,38 @@ def main():
     global BUMP_UP
     BUMP_UP = 0
 
-    # Todo: Find out where these numbers come from. I just choose a random number
+    global county_info_cache
+    county_info_cache = {}
+
+    # Todo: Explain where numbers come from
     global municodemap
-    municodemap = {'chalfant':814,'churchhill':816, 'eastmckeesport':821, 'pitcairn':847, 'wilmerding':867, 'wilkins':953, 'cogland':999, 'swissvale':111,
+    municodemap = {'chalfant':814,
+                   'churchhill':816,
+                   'eastmckeesport':821,
+                   'pitcairn':847,
+                   'wilmerding':867,
+                   'wilkins':953,
+                   'cogland':999,
+                   'swissvale':111,
                    'foresthills': 828}
 
     # add these base amounts to the universal base to get starting IDs
     # Todo: Why is this seperate from person_id_base map when it contains the exact same values?
     global muni_idbase_map
-    muni_idbase_map = {'chalfant':10000,'churchhill':20000, 'eastmckeesport':30000, 'pitcairn':40000, 'wilmerding':0, 'wilkins':50000, 'cogland':60000, 'swissvale':70000,
+    muni_idbase_map = {'chalfant':10000,
+                       'churchhill':20000,
+                       'eastmckeesport':30000,
+                       'pitcairn':40000,
+                       'wilmerding':0,
+                       'wilkins':50000,
+                       'cogland':60000,
+                       'swissvale':70000,
                        'foresthills': 110000}
 
     # add these base amounts to the universal base to get starting IDs
     global person_idbase_map
-    person_idbase_map = {'chalfant':10000,'churchhill':20000, 'eastmckeesport':30000, 'pitcairn':40000, 'wilmerding':0, 'wilkins':50000, 'cogland':60000, 'swissvale':70000,
-                       'foresthills': 110000}
+    person_idbase_map = deepcopy(muni_idbase_map)
 
-    # jump into the actual work here
-    insert_property_basetableinfo()
-    
-    # Add owner data to properties
-    # properties_with_owner_info = add_prop_info(properties)
-    # Save new CSV file with property plus owner data
-    # OUTPUT_FILE = 'output/testPropOut.txt'
-    # save_properties_as_csv(properties_with_owner_info, OUTPUT_FILE)
 
 def get_nextpropertyid(munioffset):
     # consider a range multiplier by municipality to generate starting 
