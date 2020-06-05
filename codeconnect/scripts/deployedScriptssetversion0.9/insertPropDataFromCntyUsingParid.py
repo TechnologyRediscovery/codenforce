@@ -11,7 +11,8 @@ import logging
 from os.path import join
 from copy import deepcopy
 
-from _exceptions import MalformedAddressError
+from _exceptions import MalformedDataError, \
+    MalformedAddressError, MalformedOwnerError
 
 
 def main():
@@ -73,7 +74,6 @@ def globals_setup():
                    'foresthills': 828}
 
     # add these base amounts to the universal base to get starting IDs
-    # Todo: Why is this seperate from person_id_base map when it contains the exact same values?
     global muni_idbase_map
     muni_idbase_map = {'chalfant':10000,
                        'churchhill':20000,
@@ -98,6 +98,7 @@ def logger_setup():
         ],
         level=logging.WARNING
     )
+    global logger
     logger = logging.getLogger(__name__)
     logger.info("Logger initialized")
 
@@ -165,71 +166,57 @@ def insert_property_basetableinfo():
         insertmap['parcelid'] = parid
         insertmap['muni'] = municodemap[current_muni]
         try:
-            addrmap = extract_propertyaddress(rawhtml)
-        # TODO: What exception are we looking for?
-        except MalformedAddressError:
-            # Todo: Make sure this actually works. Deprecate logerror func
-            logger.warning("Malformed address at: %s", parid, exc_info=True)
-            logerror(parid)
-            continue
-        insertmap['addr'] = addrmap['street']
-        insertmap['notes'] = 'core data scraped from county site'
-        insertmap['city'] = addrmap['city']
-        insertmap['state'] = addrmap['state']
-        insertmap['zipcode'] = addrmap['zipc']   
-        insertmap['lotandblock'] = extract_lotandblock_fromparid(parid)
-        # print('lob:' + insertmap['lotandblock'])
+            addrmap = extract_propertyaddress(rawhtml) # Potentially raises Malformed Address Error
 
-        insertmap['propclass'] = str(extract_class(rawhtml))
-        # print('class:' + insertmap['propclass'])
+            insertmap['addr'] = addrmap['street']
+            insertmap['notes'] = 'core data scraped from county site'
+            insertmap['city'] = addrmap['city']
+            insertmap['state'] = addrmap['state']
+            insertmap['zipcode'] = addrmap['zipc']
+            insertmap['lotandblock'] = extract_lotandblock_fromparid(parid)
+            # print('lob:' + insertmap['lotandblock'])
 
-        insertmap['propertyusetype'] = extract_propertyusetype(rawhtml)
-        # print('use:' + insertmap['propertyusetype'])
+            insertmap['propclass'] = str(extract_class(rawhtml))
+            # print('class:' + insertmap['propclass'])
 
-        insertmap['ownercode'] = extract_ownercode(rawhtml)
-        # print('owner code:' + insertmap['ownercode'])
+            insertmap['propertyusetype'] = extract_propertyusetype(rawhtml)
+            # print('use:' + insertmap['propertyusetype'])
 
-        insertmap['updatinguser'] = str(99)
-        # print('updater id:' + insertmap['updatinguser'])
+            insertmap['ownercode'] = extract_ownercode(rawhtml)
+            # print('owner code:' + insertmap['ownercode'])
 
-        print('Inserting parcelid data: %s' % (parid))
-        cursor.execute(insert_sql, insertmap)
+            insertmap['updatinguser'] = str(99)
+            # print('updater id:' + insertmap['updatinguser'])
 
-        # commit core propertytable insert
-        db_conn.commit()
-        propertycount = propertycount + 1
-        print('----- committed property core table -----')
-        # except:
-        #     print('ERROR: unable to insert base property data...skipping')
-        #     print('********* MOVING ON ********************')
-        #     logerror_aux(parid)
-        #     continue
-        # try:
-        # this try catches soup related errors
-        # and sql errors bubbling up from the extraction methods that also commit
-        personid = next(personidgenerator)
-        extract_and_insert_person(rawhtml, propid, personid)
-        connect_person_to_property(propid, personid )
-        personcount = personcount + 1
 
-        # Todo: Find out what the soup error is, currently also catches psycop2.IntegrityError
-        # except:
-        #     print('ERROR: unable to extract, commit, or connect person owner')
-        #     logerror_aux(parid)
-        #     continue
-        # try:
-            # create standard unit number 0 for each property in system
-            # Todo: Fix later
+            print('Inserting parcelid data: %s' % (parid))
+            cursor.execute(insert_sql, insertmap)
 
-        create_and_insert_unitzero(propid)
-        # except:
-        #     print('ERROR: unable to create unit zero for property no.'+ str(propid))
-        #     logerror(parid)
-        #     continue
-        print('--------- running totals --------')
-        print('Props inserted: ' + str(propertycount))
-        print('Persons inserted: ' + str(personcount))
-        print('********** DONE! *************')
+            # commit core propertytable insert
+            db_conn.commit()
+            propertycount = propertycount + 1
+            # and sql errors bubbling up from the extraction methods that also commit
+            personid = next(personidgenerator)
+
+
+            extract_and_insert_person(rawhtml, propid, personid)    # Potentially raises MalformedDataErrors
+
+            connect_person_to_property(propid, personid )
+            personcount = personcount + 1
+
+            create_and_insert_unitzero(propid)
+            # except:
+            #     print('ERROR: unable to create unit zero for property no.'+ str(propid))
+            #     logerror(parid)
+            #     continue
+
+        except MalformedDataError as e:
+            logger.warning("Malformed %s at parcel ID %s", e.type, parid, exc_info=True)
+        finally:
+            print('--------- running totals --------')
+            print('Props inserted: ' + str(propertycount))
+            print('Persons inserted: ' + str(personcount))
+            print('********** DONE! *************')
 
         # run insert with sql statement all loaded up
     cursor.close()
@@ -273,16 +260,12 @@ def extract_and_insert_person(rawhtml, propertyid, personid):
     print("personid:"+str(insertmap['personid']))
     insertmap['muni_municode'] = str(municodemap[current_muni])
 
-    try:
-        ownernamemap = extract_owner_name(rawhtml)
-        insertmap['fname'] = ownernamemap['fname']
-        insertmap['lname'] = ownernamemap['lname']
-        print('extracted owner:' + insertmap['fname'] + ' ' + insertmap['lname'] )
+    ownernamemap = extract_owner_name(rawhtml)  # Potentially raises MalformedOwnerError
+    insertmap['fname'] = ownernamemap['fname']
+    insertmap['lname'] = ownernamemap['lname']
+    print('extracted owner:' + insertmap['fname'] + ' ' + insertmap['lname'] )
 
-    except Exception:
-        print("ERROR malformed address at:" + propertyid)
-
-    owneraddrmap = extract_owneraddress(rawhtml)
+    owneraddrmap = extract_owneraddress(rawhtml) # Potentially raises MalformedAddressError
 
     insertmap['address_street'] = owneraddrmap['street']
     insertmap['address_city'] = owneraddrmap['city']
@@ -432,6 +415,7 @@ def extract_propertyaddress(property_html):
     soup = bs4.BeautifulSoup(str(scrapedhtml), 'lxml')
     adrlistraw = soup.span.contents 
     # make sure we have all the parts of the address
+
     if len(adrlistraw) < 3:
         raise MalformedAddressError
 
@@ -466,7 +450,7 @@ def extract_owneraddress(property_html):
     adrlistraw = soup.span.contents 
     # make sure we have all the parts of the address
     if len(adrlistraw) < 3:
-        raise Exception
+        raise MalformedAddressError
 
     owneraddrmap['street'] = re.sub('  ', ' ', adrlistraw[0])
     print(owneraddrmap['street'])
@@ -474,8 +458,6 @@ def extract_owneraddress(property_html):
     exp = re.compile('[^,]*')
     owneraddrmap['city'] = exp.search(adrlistraw[2]).group()
     print("city:" + owneraddrmap['city'])
-    # grap with string indexes (fragile if there is more than one space before zip)
-    # TODO: use regexp
     exp=re.compile(r',\s*(\w\w)')
     m = re.search(exp,adrlistraw[2])
     owneraddrmap['state'] = str(m.group(1))
