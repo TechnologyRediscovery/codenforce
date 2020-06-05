@@ -11,8 +11,7 @@ import logging
 from os.path import join
 from copy import deepcopy
 
-from _exceptions import MalformedDataError, \
-    MalformedAddressError, MalformedOwnerError
+from _exceptions import MalformedDataError, MalformedAddressError, MalformedOwnerError
 
 
 def main():
@@ -27,14 +26,13 @@ def globals_setup():
     TODO: Global variables are unpythonic. Consider more refactoring
     """
     global CSV_FILE_ENCODING
-    CSV_FILE_ENCODING = 'utf-8'
+    CSV_FILE_ENCODING = "utf-8"
     global current_muni
-    current_muni = 'foresthills'
+    current_muni = "foresthills"
 
-    global logger # logger details set in logger_setup()
+    global logger  # logger details set in logger_setup()
     global LOG_FILE
-    LOG_FILE = join('output', current_muni + '_error.log')
-
+    LOG_FILE = join("output", current_muni + "_error.log")
 
     # ID number of the system user connected to these original inserts
     # user 99 is sylvia, our COG robot
@@ -42,7 +40,7 @@ def globals_setup():
     UPDATING_USER_ID = 99
 
     global PARID_FILE
-    PARID_FILE = join('parcelidlists', current_muni + '_parcelids.csv')
+    PARID_FILE = join("parcelidlists", current_muni + "_parcelids.csv")
 
     # use as floor value for all new propertyIDs
     global PROP_ID_BASE
@@ -63,27 +61,31 @@ def globals_setup():
 
     # Todo: Explain where numbers come from
     global municodemap
-    municodemap = {'chalfant':814,
-                   'churchhill':816,
-                   'eastmckeesport':821,
-                   'pitcairn':847,
-                   'wilmerding':867,
-                   'wilkins':953,
-                   'cogland':999,
-                   'swissvale':111,
-                   'foresthills': 828}
+    municodemap = {
+        "chalfant": 814,
+        "churchhill": 816,
+        "eastmckeesport": 821,
+        "pitcairn": 847,
+        "wilmerding": 867,
+        "wilkins": 953,
+        "cogland": 999,
+        "swissvale": 111,
+        "foresthills": 828,
+    }
 
     # add these base amounts to the universal base to get starting IDs
     global muni_idbase_map
-    muni_idbase_map = {'chalfant':10000,
-                       'churchhill':20000,
-                       'eastmckeesport':30000,
-                       'pitcairn':40000,
-                       'wilmerding':0,
-                       'wilkins':50000,
-                       'cogland':60000,
-                       'swissvale':70000,
-                       'foresthills': 110000}
+    muni_idbase_map = {
+        "chalfant": 10000,
+        "churchhill": 20000,
+        "eastmckeesport": 30000,
+        "pitcairn": 40000,
+        "wilmerding": 0,
+        "wilkins": 50000,
+        "cogland": 60000,
+        "swissvale": 70000,
+        "foresthills": 110000,
+    }
 
     # add these base amounts to the universal base to get starting IDs
     global person_idbase_map
@@ -92,11 +94,8 @@ def globals_setup():
 
 def logger_setup():
     logging.basicConfig(
-        handlers=[
-            logging.FileHandler(LOG_FILE),
-            logging.StreamHandler()
-        ],
-        level=logging.WARNING
+        handlers=[logging.FileHandler(LOG_FILE), logging.StreamHandler()],
+        level=logging.WARNING,
     )
     global logger
     logger = logging.getLogger(__name__)
@@ -104,26 +103,29 @@ def logger_setup():
 
 
 def get_nextpropertyid(munioffset):
-    # consider a range multiplier by municipality to generate starting 
+    # consider a range multiplier by municipality to generate starting
     # at, say 110000 and the next at 120000 which allows for non-overlapping
-    #ids for munis with a property count of up to 10000
-    for i in list(range(PROP_ID_BASE + munioffset + BUMP_UP, PROP_ID_BASE + munioffset + 9999)):
-        yield i;
+    # ids for munis with a property count of up to 10000
+    for i in list(
+        range(PROP_ID_BASE + munioffset + BUMP_UP, PROP_ID_BASE + munioffset + 9999)
+    ):
+        yield i
+
 
 def get_nextpersonid(munioffset):
-    for i in list(range(PERSON_ID_BASE + munioffset + BUMP_UP, PERSON_ID_BASE + munioffset + 9999)):
-        yield i;
-
+    for i in list(
+        range(PERSON_ID_BASE + munioffset + BUMP_UP, PERSON_ID_BASE + munioffset + 9999)
+    ):
+        yield i
 
 
 def get_nextparcelid(input_file):
     # Read the CSV file and iterate through every property
-    with open(input_file, 'r', encoding=CSV_FILE_ENCODING) as csv_file:
+    with open(input_file, "r", encoding=CSV_FILE_ENCODING) as csv_file:
         reader = csv.DictReader(csv_file)
         for row in reader:
-            parid = str(row['parcelid']).strip()
+            parid = str(row["parcelid"]).strip()
             yield parid
-
 
 
 def insert_property_basetableinfo():
@@ -136,7 +138,6 @@ def insert_property_basetableinfo():
     # user 99 is the cog robot, Sylvia
     # Todo: Add properly formatted SQL for tables that have moved. For example, propertyusetype
     # propertyusetype
-
 
     insert_sql = """    
         INSERT INTO public.property(
@@ -157,39 +158,40 @@ def insert_property_basetableinfo():
     for parid in parcelgenerator:
         # go get raw HTML
         rawhtml = get_county_page_for(parid)
-        
-        # load up vars for use in SQL from each of the parse methods
-        insertmap['propid'] = next(propertyidgenerator)
-        propid = insertmap['propid']
-        print("newid:"+ str(propid))
-        # parid comes from the iterated item variable parid
-        insertmap['parcelid'] = parid
-        insertmap['muni'] = municodemap[current_muni]
-        try:
-            addrmap = extract_propertyaddress(rawhtml) # Potentially raises Malformed Address Error
 
-            insertmap['addr'] = addrmap['street']
-            insertmap['notes'] = 'core data scraped from county site'
-            insertmap['city'] = addrmap['city']
-            insertmap['state'] = addrmap['state']
-            insertmap['zipcode'] = addrmap['zipc']
-            insertmap['lotandblock'] = extract_lotandblock_fromparid(parid)
+        # load up vars for use in SQL from each of the parse methods
+        insertmap["propid"] = next(propertyidgenerator)
+        propid = insertmap["propid"]
+        print("newid:" + str(propid))
+        # parid comes from the iterated item variable parid
+        insertmap["parcelid"] = parid
+        insertmap["muni"] = municodemap[current_muni]
+        try:
+            addrmap = extract_propertyaddress(
+                rawhtml
+            )  # Potentially raises Malformed Address Error
+
+            insertmap["addr"] = addrmap["street"]
+            insertmap["notes"] = "core data scraped from county site"
+            insertmap["city"] = addrmap["city"]
+            insertmap["state"] = addrmap["state"]
+            insertmap["zipcode"] = addrmap["zipc"]
+            insertmap["lotandblock"] = extract_lotandblock_fromparid(parid)
             # print('lob:' + insertmap['lotandblock'])
 
-            insertmap['propclass'] = str(extract_class(rawhtml))
+            insertmap["propclass"] = str(extract_class(rawhtml))
             # print('class:' + insertmap['propclass'])
 
-            insertmap['propertyusetype'] = extract_propertyusetype(rawhtml)
+            insertmap["propertyusetype"] = extract_propertyusetype(rawhtml)
             # print('use:' + insertmap['propertyusetype'])
 
-            insertmap['ownercode'] = extract_ownercode(rawhtml)
+            insertmap["ownercode"] = extract_ownercode(rawhtml)
             # print('owner code:' + insertmap['ownercode'])
 
-            insertmap['updatinguser'] = str(99)
+            insertmap["updatinguser"] = str(99)
             # print('updater id:' + insertmap['updatinguser'])
 
-
-            print('Inserting parcelid data: %s' % (parid))
+            print("Inserting parcelid data: %s" % (parid))
             cursor.execute(insert_sql, insertmap)
 
             # commit core propertytable insert
@@ -198,10 +200,11 @@ def insert_property_basetableinfo():
             # and sql errors bubbling up from the extraction methods that also commit
             personid = next(personidgenerator)
 
+            extract_and_insert_person(
+                rawhtml, propid, personid
+            )  # Potentially raises MalformedDataErrors
 
-            extract_and_insert_person(rawhtml, propid, personid)    # Potentially raises MalformedDataErrors
-
-            connect_person_to_property(propid, personid )
+            connect_person_to_property(propid, personid)
             personcount = personcount + 1
 
             create_and_insert_unitzero(propid)
@@ -213,28 +216,29 @@ def insert_property_basetableinfo():
         except MalformedDataError as e:
             logger.warning("Malformed %s at parcel ID %s", e.type, parid, exc_info=True)
         finally:
-            print('--------- running totals --------')
-            print('Props inserted: ' + str(propertycount))
-            print('Persons inserted: ' + str(personcount))
-            print('********** DONE! *************')
+            print("--------- running totals --------")
+            print("Props inserted: " + str(propertycount))
+            print("Persons inserted: " + str(personcount))
+            print("********** DONE! *************")
 
         # run insert with sql statement all loaded up
     cursor.close()
     db_conn.close()
-    print('Count of properties inserted: ' + str(propertycount))
-    print('Count of persons inserted: ' + str(personcount))
+    print("Count of properties inserted: " + str(propertycount))
+    print("Count of persons inserted: " + str(personcount))
+
 
 # db debugging--don't forget conn.commit!
-    # newid = insertmap['id']
-    #     selectsql = """
-    #         SELECT * from property;
-    #     """
-    #     cursor.execute(selectsql)
-    #     print(cursor.fetchone())
+# newid = insertmap['id']
+#     selectsql = """
+#         SELECT * from property;
+#     """
+#     cursor.execute(selectsql)
+#     print(cursor.fetchone())
+
 
 def extract_and_insert_person(rawhtml, propertyid, personid):
     # fixed values specific to keys in lookup tables
-
 
     db_conn = get_db_conn()
     cursor = db_conn.cursor()
@@ -254,37 +258,51 @@ def extract_and_insert_person(rawhtml, propertyid, personid):
             FALSE, NULL);
     """
     insertmap = {}
-    
+
     # load up vars for use in SQL from each of the parse methods
-    insertmap['personid'] = personid
-    print("personid:"+str(insertmap['personid']))
-    insertmap['muni_municode'] = str(municodemap[current_muni])
+    insertmap["personid"] = personid
+    print("personid:" + str(insertmap["personid"]))
+    insertmap["muni_municode"] = str(municodemap[current_muni])
 
     ownernamemap = extract_owner_name(rawhtml)  # Potentially raises MalformedOwnerError
-    insertmap['fname'] = ownernamemap['fname']
-    insertmap['lname'] = ownernamemap['lname']
-    print('extracted owner:' + insertmap['fname'] + ' ' + insertmap['lname'] )
+    insertmap["fname"] = ownernamemap["fname"]
+    insertmap["lname"] = ownernamemap["lname"]
+    print("extracted owner:" + insertmap["fname"] + " " + insertmap["lname"])
 
-    owneraddrmap = extract_owneraddress(rawhtml) # Potentially raises MalformedAddressError
+    owneraddrmap = extract_owneraddress(
+        rawhtml
+    )  # Potentially raises MalformedAddressError
 
-    insertmap['address_street'] = owneraddrmap['street']
-    insertmap['address_city'] = owneraddrmap['city']
-    insertmap['address_state'] = owneraddrmap['state']
-    insertmap['address_zip'] = owneraddrmap['zipc']   
-    print('extracted owner address:' \
-        + ' ' + insertmap['address_street'] \
-        + ' ' + insertmap['address_city'] \
-        + ', ' + insertmap['address_state'] \
-        + ' ' + insertmap['address_zip'])
+    insertmap["address_street"] = owneraddrmap["street"]
+    insertmap["address_city"] = owneraddrmap["city"]
+    insertmap["address_state"] = owneraddrmap["state"]
+    insertmap["address_zip"] = owneraddrmap["zipc"]
+    print(
+        "extracted owner address:"
+        + " "
+        + insertmap["address_street"]
+        + " "
+        + insertmap["address_city"]
+        + ", "
+        + insertmap["address_state"]
+        + " "
+        + insertmap["address_zip"]
+    )
 
-    insertmap['notes'] = notemsg + ownernamemap['note_namedump'] + " Raw address: " + owneraddrmap['notes_adrdump']
-    print('Inserting person data for id: %s' % (insertmap['personid']))
-    print('person notes: ' + insertmap['notes'])
-    
+    insertmap["notes"] = (
+        notemsg
+        + ownernamemap["note_namedump"]
+        + " Raw address: "
+        + owneraddrmap["notes_adrdump"]
+    )
+    print("Inserting person data for id: %s" % (insertmap["personid"]))
+    print("person notes: " + insertmap["notes"])
+
     cursor.execute(insert_sql, insertmap)
     db_conn.commit()
-    print('----- committed person owner -----')
+    print("----- committed person owner -----")
     # commit core propertytable insert
+
 
 def connect_person_to_property(propertyid, personid):
     db_conn = get_db_conn()
@@ -296,19 +314,20 @@ def connect_person_to_property(propertyid, personid):
     VALUES (%(prop)s, %(pers)s);
     """
     insertmap = {}
-    
+
     # load up vars for use in SQL from each of the parse methods
-    insertmap['prop'] = propertyid
-    insertmap['pers'] = personid
+    insertmap["prop"] = propertyid
+    insertmap["pers"] = personid
 
     cursor.execute(insert_sql, insertmap)
     db_conn.commit()
-    print('----- connected person owner to property -----')
+    print("----- connected person owner to property -----")
+
 
 def create_and_insert_unitzero(propertyid):
     db_conn = get_db_conn()
     cursor = db_conn.cursor()
-    
+
     insert_sql = """
         INSERT INTO public.propertyunit(
             unitid, unitnumber, property_propertyid, otherknownaddress, notes, 
@@ -318,219 +337,230 @@ def create_and_insert_unitzero(propertyid):
             FALSE);
     """
     insertmap = {}
-    
+
     # load up vars for use in SQL from each of the parse methods
-    insertmap['property_propertyid'] = propertyid
+    insertmap["property_propertyid"] = propertyid
 
     cursor.execute(insert_sql, insertmap)
     db_conn.commit()
-    print('----- built unit zero -----')
+    print("----- built unit zero -----")
 
 
 def get_county_page_for(parcel_id):
     # # Todo: Examine if this line should be deleted
     # if parcel_id in county_info_cache:
     #     return county_info_cache[parcel_id]
-    COUNTY_REAL_ESTATE_URL = ('http://www2.county.allegheny.pa.us/'
-                              'RealEstate/GeneralInfo.aspx?')
+    COUNTY_REAL_ESTATE_URL = (
+        "http://www2.county.allegheny.pa.us/" "RealEstate/GeneralInfo.aspx?"
+    )
     search_parameters = {
-        'ParcelID': parcel_id,
-        'SearchType': 3,
-        'SearchParcel': parcel_id}
+        "ParcelID": parcel_id,
+        "SearchType": 3,
+        "SearchParcel": parcel_id,
+    }
     # # Todo: Why are we pretending to be a human? It takes a lot of time. Let's see if it breaks if we just request data
     # waittime = random.uniform(0.0,1.0)
     # print("waiting:" + str(waittime))
     # time.sleep(waittime)
     try:
         response = requests.get(
-                COUNTY_REAL_ESTATE_URL,
-                params=search_parameters,
-                timeout=5)
-        print('Scraping data from county: %s' + parcel_id)
+            COUNTY_REAL_ESTATE_URL, params=search_parameters, timeout=5
+        )
+        print("Scraping data from county: %s" + parcel_id)
     except requests.exceptions.Timeout:
         # Todo: Error handaling if this also fails
         # Wait 10 secs and try one more time
         time.sleep(10)
         response = requests.get(
-                COUNTY_REAL_ESTATE_URL,
-                params=search_parameters,
-                timeout=5)
+            COUNTY_REAL_ESTATE_URL, params=search_parameters, timeout=5
+        )
     # Todo: See if county_info_cache is a good thing.
     # county_info_cache[parcel_id] = response.text
     return response.text
 
-#---------------------------------------------
+
+# ---------------------------------------------
 #           HTML SCRAPING METHODS
-#---------------------------------------------
+# ---------------------------------------------
+
 
 def extract_lotandblock_fromparid(parid):
     trimmedparid = parid[0:11]
-    exp = re.compile(r'([1-9]+)(\w)[0]*([1-9]+)')
+    exp = re.compile(r"([1-9]+)(\w)[0]*([1-9]+)")
     gl = re.search(exp, trimmedparid)
-    if(gl):
-        lob = gl.group(1) + '-' + gl.group(2) + '-' + gl.group(3)
+    if gl:
+        lob = gl.group(1) + "-" + gl.group(2) + "-" + gl.group(3)
         return lob
 
     # Todo: Should this return -1?
     else:
-        print('ERROR: LOB parsing')
-        return ''
+        print("ERROR: LOB parsing")
+        return ""
+
 
 def extract_owner_name(property_html):
-    OWNER_NAME_SPAN_ID = 'BasicInfo1_lblOwner'
+    OWNER_NAME_SPAN_ID = "BasicInfo1_lblOwner"
     persondict = {}
 
-    soup = bs4.BeautifulSoup(property_html, 'lxml')
-    owner_full_name = soup.find('span', id=OWNER_NAME_SPAN_ID).text
-    print('owner_raw_name:' + str(owner_full_name))
+    soup = bs4.BeautifulSoup(property_html, "lxml")
+    owner_full_name = soup.find("span", id=OWNER_NAME_SPAN_ID).text
+    print("owner_raw_name:" + str(owner_full_name))
     # Remove extra spaces from owner's name
-    persondict['note_namedump'] = re.sub(r'\s+', ' ', owner_full_name.strip())
-    
-    exp = re.compile(r'(\w+|[&])\s+(\w+|[&])\s*(\w*|[&]).*')
+    persondict["note_namedump"] = re.sub(r"\s+", " ", owner_full_name.strip())
+
+    exp = re.compile(r"(\w+|[&])\s+(\w+|[&])\s*(\w*|[&]).*")
     namegroups = re.search(exp, owner_full_name)
     # print(len(namegroups.groups()))
-    persondict['lname'] = str(namegroups.group(1)).title()
-    
-    if len(namegroups.groups()) == 2:
-        persondict['fname'] = str(namegroups.group(2)).title()
-    elif len(namegroups.groups()) == 3:
-        persondict['fname'] = str(namegroups.group(2)).title() + ' ' + str(namegroups.group(3)).title()
+    try:
+        persondict["lname"] = str(namegroups.group(1)).title()
 
-    print(str(persondict['fname']) + ' ' + str(persondict['lname']))
-    
+        if len(namegroups.groups()) == 2:
+            persondict["fname"] = str(namegroups.group(2)).title()
+        elif len(namegroups.groups()) == 3:
+            persondict["fname"] = (
+                str(namegroups.group(2)).title()
+                + " "
+                + str(namegroups.group(3)).title()
+            )
+        print(str(persondict["fname"]) + " " + str(persondict["lname"]))
+    except AttributeError:
+        raise MalformedOwnerError
+
     return persondict
+
 
 def extract_propertyaddress(property_html):
     propaddrmap = {}
-    PROP_ADDR_SPAN_ID = 'BasicInfo1_lblAddress'
+    PROP_ADDR_SPAN_ID = "BasicInfo1_lblAddress"
     # print(property_html)
-    soup = bs4.BeautifulSoup(property_html, 'lxml')
-    
+    soup = bs4.BeautifulSoup(property_html, "lxml")
+
     # this yeilds something like
     # 471&nbsp;WALNUT  ST<br>PITTSBURGH,&nbsp;PA&nbsp;15238
-    prop_addr_raw = soup.find('span', id=PROP_ADDR_SPAN_ID).text
+    prop_addr_raw = soup.find("span", id=PROP_ADDR_SPAN_ID).text
     scrapedhtml = soup.select("#BasicInfo1_lblAddress")
 
     print("Scraped:" + str(scrapedhtml))
-    soup = bs4.BeautifulSoup(str(scrapedhtml), 'lxml')
-    adrlistraw = soup.span.contents 
+    soup = bs4.BeautifulSoup(str(scrapedhtml), "lxml")
+    adrlistraw = soup.span.contents
     # make sure we have all the parts of the address
 
     if len(adrlistraw) < 3:
         raise MalformedAddressError
 
-    propaddrmap['street'] = re.sub('  ', ' ', adrlistraw[0])
-    print(propaddrmap['street'])
+    propaddrmap["street"] = re.sub("  ", " ", adrlistraw[0])
+    print(propaddrmap["street"])
     # on the city, state, zip line, grab until the comma before the state
-    exp = re.compile('[^,]*')
-    propaddrmap['city'] = exp.search(adrlistraw[2]).group()
-    print("city:" + propaddrmap['city'])
+    exp = re.compile("[^,]*")
+    propaddrmap["city"] = exp.search(adrlistraw[2]).group()
+    print("city:" + propaddrmap["city"])
     # hard-code pa
-    propaddrmap['state']= 'PA'
-    # zip is just the last 5 chars    
-    propaddrmap['zipc'] = adrlistraw[2][-5:]
-    print("Zip:" + propaddrmap['zipc'])
+    propaddrmap["state"] = "PA"
+    # zip is just the last 5 chars
+    propaddrmap["zipc"] = adrlistraw[2][-5:]
+    print("Zip:" + propaddrmap["zipc"])
 
     return propaddrmap
 
+
 def extract_owneraddress(property_html):
-    print('--------- extracting owner address ------------')
+    print("--------- extracting owner address ------------")
     owneraddrmap = {}
     # print(property_html)
-    soup = bs4.BeautifulSoup(property_html, 'lxml')
+    soup = bs4.BeautifulSoup(property_html, "lxml")
     # this yeilds something like
     # 471&nbsp;WALNUT  ST<br>PITTSBURGH,&nbsp;PA&nbsp;15238
     scrapedhtml = soup.select("#lblChangeMail")
-    owneraddrmap['notes_adrdump'] = str(scrapedhtml)
+    owneraddrmap["notes_adrdump"] = str(scrapedhtml)
 
     print("Scraped:" + str(scrapedhtml))
-    soup = bs4.BeautifulSoup(str(scrapedhtml), 'lxml')
-    # this spits out a three-item list. We throw away the <br> which is 
+    soup = bs4.BeautifulSoup(str(scrapedhtml), "lxml")
+    # this spits out a three-item list. We throw away the <br> which is
     # the middle item. The first is the street, the second gets chopped up
-    adrlistraw = soup.span.contents 
+    adrlistraw = soup.span.contents
     # make sure we have all the parts of the address
     if len(adrlistraw) < 3:
         raise MalformedAddressError
 
-    owneraddrmap['street'] = re.sub('  ', ' ', adrlistraw[0])
-    print(owneraddrmap['street'])
+    owneraddrmap["street"] = re.sub("  ", " ", adrlistraw[0])
+    print(owneraddrmap["street"])
     # on the city, state, zip line, grab until the comma before the state
-    exp = re.compile('[^,]*')
-    owneraddrmap['city'] = exp.search(adrlistraw[2]).group()
-    print("city:" + owneraddrmap['city'])
-    exp=re.compile(r',\s*(\w\w)')
-    m = re.search(exp,adrlistraw[2])
-    owneraddrmap['state'] = str(m.group(1))
-    
+    exp = re.compile("[^,]*")
+    owneraddrmap["city"] = exp.search(adrlistraw[2]).group()
+    print("city:" + owneraddrmap["city"])
+    exp = re.compile(r",\s*(\w\w)")
+    m = re.search(exp, adrlistraw[2])
+    owneraddrmap["state"] = str(m.group(1))
+
     # abandoned string slicing approach (too brittle; use regexp)
     # owneraddrmap['state']= adrlistraw[2][-13:-11]
-    print("state:" + owneraddrmap['state'])
-    
+    print("state:" + owneraddrmap["state"])
+
     # owner zips could come in as: 15218 OR 15218- OR 15218-2342
     # just lose the routing numbers and take the first digits until the -
-    exp=re.compile(r'\d+')
+    exp = re.compile(r"\d+")
     m = re.search(exp, adrlistraw[2])
-    owneraddrmap['zipc'] = str(m.group())
+    owneraddrmap["zipc"] = str(m.group())
 
-    # another abandoned string slicing approach: 
+    # another abandoned string slicing approach:
     # also too brittle given range of scraped inputs
     # owneraddrmap['zip'] = adrlistraw[2][-10:]
-    print("zip:" + owneraddrmap['zipc'])
+    print("zip:" + owneraddrmap["zipc"])
 
     return owneraddrmap
 
 
 def extact_owner_name_and_mailing(parcel_id, property_html):
 
-    OWNER_ADDRESS_SPAN_ID = 'lblChangeMail'
+    OWNER_ADDRESS_SPAN_ID = "lblChangeMail"
     addrparts = {}
 
-    soup = bs4.BeautifulSoup(property_html, 'lxml')
-    owner_address_raw = soup.find('span', id=OWNER_ADDRESS_SPAN_ID).text
+    soup = bs4.BeautifulSoup(property_html, "lxml")
+    owner_address_raw = soup.find("span", id=OWNER_ADDRESS_SPAN_ID).text
     # Remove extra spaces
-    addrparts['addr'] = rs.sub('')
+    addrparts["addr"] = rs.sub("")
 
-    owner_address = re.sub(r'\s+', ' ', owner_address.strip())
+    owner_address = re.sub(r"\s+", " ", owner_address.strip())
     # Remove leading spaces before commas
-    owner_address = re.sub(r'\s+,', ',', owner_address)
+    owner_address = re.sub(r"\s+,", ",", owner_address)
 
     return owner_address
 
 
 def extract_propertyusetype(property_html):
-    USE_TYPE_SPAN_ID = 'lblUse'
+    USE_TYPE_SPAN_ID = "lblUse"
 
-    soup = bs4.BeautifulSoup(property_html, 'lxml')
-    usetype = soup.find('span', id=USE_TYPE_SPAN_ID).text
+    soup = bs4.BeautifulSoup(property_html, "lxml")
+    usetype = soup.find("span", id=USE_TYPE_SPAN_ID).text
     # Remove extra spaces
-    usetype = re.sub(r'\s+', ' ', usetype.strip())
+    usetype = re.sub(r"\s+", " ", usetype.strip())
     # Remove leading spaces before commas
-    usetype = str(re.sub(r'\s+,', ',', usetype)).title()
+    usetype = str(re.sub(r"\s+,", ",", usetype)).title()
     return usetype
 
-def extract_class(property_html):
-    CLASS_SPAN_ID = 'lblState'
 
-    soup = bs4.BeautifulSoup(property_html, 'lxml')
-    propclass = soup.find('span', id=CLASS_SPAN_ID).text
+def extract_class(property_html):
+    CLASS_SPAN_ID = "lblState"
+
+    soup = bs4.BeautifulSoup(property_html, "lxml")
+    propclass = soup.find("span", id=CLASS_SPAN_ID).text
     # Remove extra spaces
-    propclass = re.sub(r'\s+', ' ', propclass.strip())
+    propclass = re.sub(r"\s+", " ", propclass.strip())
     # Remove leading spaces before commas
-    propclass = str(re.sub(r'\s+,', ',', propclass)).title()
+    propclass = str(re.sub(r"\s+,", ",", propclass)).title()
     return propclass
 
+
 def extract_ownercode(property_html):
-    OWNER_CODE_SPAN_ID = 'lblOwnerCode'
+    OWNER_CODE_SPAN_ID = "lblOwnerCode"
 
-    soup = bs4.BeautifulSoup(property_html, 'lxml')
-    ownercode = soup.find('span', id=OWNER_CODE_SPAN_ID).text
+    soup = bs4.BeautifulSoup(property_html, "lxml")
+    ownercode = soup.find("span", id=OWNER_CODE_SPAN_ID).text
     # Remove extra spaces
-    ownercode = re.sub(r'\s+', ' ', ownercode.strip())
+    ownercode = re.sub(r"\s+", " ", ownercode.strip())
     # Remove leading spaces before commas
-    ownercode = str(re.sub(r'\s+,', ',', ownercode)).title()
+    ownercode = str(re.sub(r"\s+,", ",", ownercode)).title()
     return ownercode
-
-
 
 
 # def extract_owner_address(parcel_id, property_html):
@@ -545,7 +575,7 @@ def extract_ownercode(property_html):
 
 # Todo: deprecate and replace with log_error_NEW()
 def logerror(parcelid):
-    with open(LOG_FILE, 'a', encoding=CSV_FILE_ENCODING) as outfile:
+    with open(LOG_FILE, "a", encoding=CSV_FILE_ENCODING) as outfile:
         writer = csv.writer(outfile)
         writer.writerow([parcelid])
 
@@ -554,23 +584,23 @@ def log_error_NEW():
     """"""
     pass
 
+
 def logerror_aux(parcelid):
-    with open(LOG_FILE_AUX, 'a', encoding=CSV_FILE_ENCODING) as outfile:
+    with open(LOG_FILE_AUX, "a", encoding=CSV_FILE_ENCODING) as outfile:
         writer = csv.writer(outfile)
         writer.writerow([parcelid])
+
 
 # for debugging and transferability purposes
 def save_properties_as_csv(properties_with_owner_info, output_file):
     fieldnames = None
-    with open(output_file, 'w', encoding=CSV_FILE_ENCODING) as outfile:
+    with open(output_file, "w", encoding=CSV_FILE_ENCODING) as outfile:
         writer = csv.writer(outfile)
         for prop in properties_with_owner_info:
             if fieldnames is None:
                 fieldnames = sorted(prop.keys())
                 writer.writerow(fieldnames)
             writer.writerow([prop[k] for k in fieldnames])
-
-
 
 
 # def store_owner_as_person(parid):
@@ -580,13 +610,13 @@ def save_properties_as_csv(properties_with_owner_info, output_file):
 #     sql_command = """
 
 #         INSERT INTO public.person(
-#             personid, persontype, muni_municode, fname, lname, jobtitle, 
-#             phonecell, phonehome, phonework, email, address_street, address_city, 
-#             address_state, address_zip, notes, lastupdated, expirydate, isactive, 
+#             personid, persontype, muni_municode, fname, lname, jobtitle,
+#             phonecell, phonehome, phonework, email, address_street, address_city,
+#             address_state, address_zip, notes, lastupdated, expirydate, isactive,
 #             isunder18, "humanVerifiedby")
-#         VALUES (DEFAULT, CAST( 'ownercntylookup' AS persontype), %s, ?, ?, ?, 
-#                 ?, ?, ?, ?, ?, ?, 
-#                 ?, ?, ?, ?, ?, ?, 
+#         VALUES (DEFAULT, CAST( 'ownercntylookup' AS persontype), %s, ?, ?, ?,
+#                 ?, ?, ?, ?, ?, ?,
+#                 ?, ?, ?, ?, ?, ?,
 #                 ?, ?);
 
 #         INSERT INTO codeenfevent
@@ -612,19 +642,18 @@ def save_properties_as_csv(properties_with_owner_info, output_file):
 
 
 db_conn = None
+
+
 def get_db_conn():
     global db_conn
     if db_conn is not None:
         return db_conn
     # Todo: Read connection credentials from a secrets.json
     db_conn = psycopg2.connect(
-        database="cogdb",
-        user="sylvia",
-        password="c0d3",
-        host="localhost"
+        database="cogdb", user="sylvia", password="c0d3", host="localhost"
     )
     return db_conn
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
