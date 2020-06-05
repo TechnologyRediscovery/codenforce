@@ -1,30 +1,22 @@
 #!/usr/bin/env python3
 
-# encoding: utf-8
-
 import csv
 import random
 import re
 import time
 import psycopg2
-import itertools
-# import csv_utils
 import requests
 import bs4
+import logging
 from os.path import join
-import argparse
 from copy import deepcopy
 
-CSV_FILE_ENCODING = 'utf-8'
-# global municodemap
-# global current_muni
-# global MUNI_PARCELID_LIST_FILE
-# global muni_idbase_map
-# global ID_BASE
-# global TEST_PARID_FILE
+from _exceptions import MalformedAddressError
+
 
 def main():
     globals_setup()
+    logger_setup()
     insert_property_basetableinfo()
 
 
@@ -39,7 +31,6 @@ def globals_setup():
     current_muni = 'foresthills'
 
     global logger # logger details set in logger_setup()
-
     global LOG_FILE
     LOG_FILE = join('output', current_muni + '_error.log')
 
@@ -99,6 +90,18 @@ def globals_setup():
     person_idbase_map = deepcopy(muni_idbase_map)
 
 
+def logger_setup():
+    logging.basicConfig(
+        handlers=[
+            logging.FileHandler(LOG_FILE),
+            logging.StreamHandler()
+        ],
+        level=logging.WARNING
+    )
+    logger = logging.getLogger(__name__)
+    logger.info("Logger initialized")
+
+
 def get_nextpropertyid(munioffset):
     # consider a range multiplier by municipality to generate starting 
     # at, say 110000 and the next at 120000 which allows for non-overlapping
@@ -134,7 +137,6 @@ def insert_property_basetableinfo():
     # propertyusetype
 
 
-
     insert_sql = """    
         INSERT INTO public.property(
             propertyid, municipality_municode, parid, address, 
@@ -163,9 +165,11 @@ def insert_property_basetableinfo():
         insertmap['parcelid'] = parid
         insertmap['muni'] = municodemap[current_muni]
         try:
-            addrmap = extract_propertyaddress(parid, rawhtml)
-        except Exception:
-            print("ERR malformed address at:" + parid)
+            addrmap = extract_propertyaddress(rawhtml)
+        # TODO: What exception are we looking for?
+        except MalformedAddressError:
+            # Todo: Make sure this actually works. Deprecate logerror func
+            logger.warning("Malformed address at: %s", parid, exc_info=True)
             logerror(parid)
             continue
         insertmap['addr'] = addrmap['street']
@@ -189,10 +193,8 @@ def insert_property_basetableinfo():
         # print('updater id:' + insertmap['updatinguser'])
 
         print('Inserting parcelid data: %s' % (parid))
-        
-        # try:
-        # execute insert on property table
         cursor.execute(insert_sql, insertmap)
+
         # commit core propertytable insert
         db_conn.commit()
         propertycount = propertycount + 1
@@ -218,7 +220,7 @@ def insert_property_basetableinfo():
         # try:
             # create standard unit number 0 for each property in system
             # Todo: Fix later
-        # print("---- Skipping unit zero insert ----")
+
         create_and_insert_unitzero(propid)
         # except:
         #     print('ERROR: unable to create unit zero for property no.'+ str(propid))
@@ -342,46 +344,20 @@ def create_and_insert_unitzero(propertyid):
     print('----- built unit zero -----')
 
 
-# deprecated from Daniel--kept in as a reference
-def add_prop_info(properties):
-    PARCEL_ID_FIELD = 'parcelid'
-    OWNER_NAME_FIELD = 'OwnerName'
-    OWNER_ADDRESS_FIELD = 'OwnerAddress'
-    for prop in properties:
-        assert prop[PARCEL_ID_FIELD]  # Every property must have a parcel id
-        parcel_id = prop[PARCEL_ID_FIELD]
-        print('Processing parcel', parcel_id)
-
-        # Get the html from the county's website
-        property_html = get_county_page_for(parcel_id)
-
-        # Wait between request, just to be nice with the county's site
-        sleep_time = random.random() * 3  # Sleep at most 3 seconds
-        time.sleep(sleep_time)
-        print('sleeping for {:.2f} seconds'.format(sleep_time))
-
-        # Add owner name and address to the property
-        prop[OWNER_NAME_FIELD] = extract_owner_name(parcel_id, property_html)
-        prop[OWNER_ADDRESS_FIELD] = extract_owner_address(
-                parcel_id, property_html)
-        print(prop[OWNER_NAME_FIELD], prop[OWNER_ADDRESS_FIELD])
-
-        yield prop
-
-
-county_info_cache = {}
 def get_county_page_for(parcel_id):
-    if parcel_id in county_info_cache:
-        return county_info_cache[parcel_id]
+    # # Todo: Examine if this line should be deleted
+    # if parcel_id in county_info_cache:
+    #     return county_info_cache[parcel_id]
     COUNTY_REAL_ESTATE_URL = ('http://www2.county.allegheny.pa.us/'
                               'RealEstate/GeneralInfo.aspx?')
     search_parameters = {
         'ParcelID': parcel_id,
         'SearchType': 3,
         'SearchParcel': parcel_id}
-    waittime = random.uniform(0.0,1.0)
-    print("waiting:" + str(waittime))
-    time.sleep(waittime)
+    # # Todo: Why are we pretending to be a human? It takes a lot of time. Let's see if it breaks if we just request data
+    # waittime = random.uniform(0.0,1.0)
+    # print("waiting:" + str(waittime))
+    # time.sleep(waittime)
     try:
         response = requests.get(
                 COUNTY_REAL_ESTATE_URL,
@@ -389,13 +365,15 @@ def get_county_page_for(parcel_id):
                 timeout=5)
         print('Scraping data from county: %s' + parcel_id)
     except requests.exceptions.Timeout:
+        # Todo: Error handaling if this also fails
         # Wait 10 secs and try one more time
         time.sleep(10)
         response = requests.get(
                 COUNTY_REAL_ESTATE_URL,
                 params=search_parameters,
                 timeout=5)
-    county_info_cache[parcel_id] = response.text
+    # Todo: See if county_info_cache is a good thing.
+    # county_info_cache[parcel_id] = response.text
     return response.text
 
 #---------------------------------------------
@@ -439,7 +417,7 @@ def extract_owner_name(property_html):
     
     return persondict
 
-def extract_propertyaddress(parcel_id, property_html):
+def extract_propertyaddress(property_html):
     propaddrmap = {}
     PROP_ADDR_SPAN_ID = 'BasicInfo1_lblAddress'
     # print(property_html)
@@ -455,7 +433,7 @@ def extract_propertyaddress(parcel_id, property_html):
     adrlistraw = soup.span.contents 
     # make sure we have all the parts of the address
     if len(adrlistraw) < 3:
-        raise Exception
+        raise MalformedAddressError
 
     propaddrmap['street'] = re.sub('  ', ' ', adrlistraw[0])
     print(propaddrmap['street'])
@@ -583,10 +561,16 @@ def extract_ownercode(property_html):
 #     owner_address = re.sub(r'\s+,', ',', owner_address)
 #     return owner_address
 
+# Todo: deprecate and replace with log_error_NEW()
 def logerror(parcelid):
     with open(LOG_FILE, 'a', encoding=CSV_FILE_ENCODING) as outfile:
         writer = csv.writer(outfile)
         writer.writerow([parcelid])
+
+
+def log_error_NEW():
+    """"""
+    pass
 
 def logerror_aux(parcelid):
     with open(LOG_FILE_AUX, 'a', encoding=CSV_FILE_ENCODING) as outfile:
