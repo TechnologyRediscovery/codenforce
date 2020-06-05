@@ -1185,17 +1185,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>cEComplianceTimeframeClosingsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CEComplianceTimeframeClosingsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-
-    <managed-bean>
-        <managed-bean-name>cENoticeAcknowledgementsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CENoticeAcknowledgementsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+  
 
     <managed-bean>
         <managed-bean-name>ceCaseWorkflowBB</managed-bean-name>

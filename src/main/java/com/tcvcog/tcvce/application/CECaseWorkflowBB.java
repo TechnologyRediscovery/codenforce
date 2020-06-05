@@ -18,27 +18,17 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
-import com.tcvcog.tcvce.entities.Choice;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -90,21 +80,6 @@ public  class CECaseWorkflowBB
         }
     }
 
-    public void makeChoice(Choice choice, Proposal p){
-        CaseCoordinator cc = getCaseCoordinator();
-        try {
-            if(p instanceof ProposalCECase){
-                cc.evaluateProposal(p, choice, currentCase, getSessionBean().getSessUser());
-                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
-            }
-            
-        } catch (EventException | AuthorizationException | BObStatusException | IntegrationException | ViolationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-            ex.getMessage(), ""));
-        } 
-    }    
     
     /**
      * @return the currentCase's phase
@@ -151,6 +126,11 @@ public  class CECaseWorkflowBB
     public void initiatePhaseOverride(ActionEvent ev) {
         System.out.println("CaseProfileBB.initiatePhaseOverride");
         // do nothing
+    }
+    
+    
+    public void overrideCasePhase(ActionEvent ev){
+        System.out.println("Not implemented yet;");
     }
     
     public String exploreProperty(ActionEvent ev){

@@ -10,7 +10,7 @@
         <title>Manage Occ Period</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../../../restricted/navContainer_restricted.xhtml">
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
                 <f:view id="occperiod-status-view">
                     
@@ -547,13 +547,13 @@
 
                                         <p:selectOneMenu style="width: 300px;" 
                                                          id="occperiod-viewoptionsproposals-solb" 
-                                                         value="#{occPeriodWorkflowBB.selectedProposalsViewOption}" 
+                                                         value="#{workflowBB.selectedProposalsViewOption}" 
                                                          tabindex="10">
 
                                             <p:ajax update="proposals-proposalscroller"                                                           
                                                     immediate="true"/>
                                             <f:selectItems  id="occperiod-viewoptionsproposals-selitems" 
-                                                            value="#{occPeriodWorkflowBB.proposalsViewOptions}" 
+                                                            value="#{workflowBB.proposalsViewOptions}" 
                                                             var="pvo" 
                                                             itemValue="#{pvo}" 
                                                             itemLabel="#{pvo.label}"/>
@@ -566,7 +566,7 @@
                                         <p:dataScroller id="proposals-proposalscroller"
                                                         var="proposal"
                                                         widgetVar="proposals-proposalscroller-var"
-                                                        value="#{occPeriodWorkflowBB.currentOccPeriod.assembleProposalList(occPeriodWorkflowBB.selectedProposalsViewOption)}"
+                                                        value="#{occPeriodWorkflowBB.currentOccPeriod.assembleProposalList(workflowBB.selectedProposalsViewOption)}"
                                                         rowIndexVar="#{proposal.proposalID}">
                                             <div class="outlinedBox">
                                                 <div class="proposal-metadata-container">
@@ -608,11 +608,11 @@
                                                             <h:outputText styleClass="ui-label-inline" 
                                                                           value="Intended for: "  />
                                                             <h:outputText styleClass="data-text" 
-                                                                          value="#{occPeriodWorkflowBB.currentProposal.responderIntended.person.firstName}" />
+                                                                          value="#{workflowBB.currentProposal.responderIntended.person.firstName}" />
                                                             <h:outputText styleClass="data-text" 
                                                                           value=" " />
                                                             <h:outputText styleClass="data-text" 
-                                                                          value="#{occPeriodWorkflowBB.currentProposal.responderIntended.person.lastName}" />
+                                                                          value="#{workflowBB.currentProposal.responderIntended.person.lastName}" />
                                                         </h:panelGroup>
                                                     </h:panelGrid>
                                                 </div>
@@ -1129,21 +1129,12 @@
                                         <h:outputText value="Event rule ID: "/>
                                 </h:outputLabel>
                                 <p:inputText id="eventrules-newruleid-it" type="number"
-                                                 value="#{occPeriodWorkflowBB.formEventRuleIDToAdd}" >
+                                                 value="#{workflowBB.formEventRuleIDToAdd}" >
                                 </p:inputText>
                                 <h:message for="eventrules-newruleid-it" showDetail="false" showSummary="true"  
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 
-                                <p:commandButton    id="eventrules-addnewrulebyid-cb"
-                                                    ajax="true" 
-                                                    styleClass="proposal-choice-button"
-                                                    actionListener="#{occPeriodWorkflowBB.rules_initiateEventRuleCreate}"
-                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                    value="Add rule by ID"
-                                                    icon="fa fa-plus"
-                                                    update="occperiod-proposals-eventrules-datatable
-                                                    occperiod-dialog-proposalmetadata-form-messages 
-                                                    periodmetadata-form-proposalsconfig"/>
+                              
                                 <p:spacer height="5px" />
                                 
                                 <h:outputLabel styleClass="ui-label" for="occperiod-eventruleset-solb">
@@ -1152,12 +1143,12 @@
                                 
                                  <p:selectOneMenu style="width: auto;" 
                                                         id="occperiod-eventruleset-solb" 
-                                                        value="#{occPeriodWorkflowBB.selectedEventRuleSet}" 
+                                                        value="#{workflowConfigBB.selectedEventRuleSet}" 
                                                         tabindex="10">
                                         <f:converter converterId="eventRuleSetConverter" />
                                         <p:ajax />
                                         <f:selectItems  id="occperiod-eventruleset-selitems" 
-                                                        value="#{occPeriodWorkflowBB.eventRuleSetList}" 
+                                                        value="#{workflowConfigBB.eventRuleSetList}" 
                                                         var="rsl" 
                                                         itemValue="#{rsl}" 
                                                         itemLabel="#{rsl.title} (ID: #{rsl.rulseSetID})"/>
@@ -1168,7 +1159,7 @@
                                 <p:commandButton    id="eventrules-button-addruleset"
                                                     ajax="true" 
                                                     styleClass="proposal-choice-button"
-                                                    actionListener="#{occPeriodWorkflowBB.rules_addEventRuleSet(occPeriodWorkflowBB.selectedEventRuleSet)}"
+                                                    actionListener="#{workflowConfigBB.rules_addEventRuleSet(workflowConfigBB.selectedEventRuleSet)}"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                     value="Add rule by set"
                                                     icon="fa fa-plus"
@@ -1177,15 +1168,7 @@
                                                     periodmetadata-form-proposalsconfig"/>
                                 <p:spacer height="5px" />
                                 
-                                <p:commandButton    id="eventrules-addnewrule-cb"
-                                                    ajax="true" 
-                                                    styleClass="proposal-choice-button"
-                                                    actionListener="#{occPeriodWorkflowBB.rules_initiateEventRuleCreate}"
-                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                    value="Create new event rule"
-                                                    oncomplete="PF('occperiod-dialog-addediteventrule-var').show()"
-                                                    icon="fa fa-plus"
-                                                    update="occperiod-dialog-addediteventrule-form"/>
+                               
                                 
                                 <p:spacer height="5px" />
                                 
@@ -1195,13 +1178,13 @@
 
                                 <p:selectOneMenu style="width: 300px;" 
                                                         id="occperiod-viewoptionsrules-solb" 
-                                                        value="#{occPeriodWorkflowBB.selectedRulesViewOption}" 
+                                                        value="#{workflowBB.selectedRulesViewOption}" 
                                                         tabindex="10">
 
                                         <p:ajax update="occperiod-proposals-eventrules-datatable"                                                           
                                                 immediate="true"/>
                                         <f:selectItems  id="occperiod-viewoptionsrules-selitems" 
-                                                        value="#{occPeriodWorkflowBB.rulesViewOptions}" 
+                                                        value="#{workflowBB.rulesViewOptions}" 
                                                         var="rvo" 
                                                         itemValue="#{rvo}" 
                                                         itemLabel="#{rvo.label}"/>
@@ -1214,7 +1197,7 @@
                                     id="occperiod-proposals-eventrules-datatable"
                                     var="rule"
                                     rowKey="#{rule.ruleid}"
-                                    value="#{occPeriodWorkflowBB.currentOccPeriod.assembleEventRuleList(occPeriodWorkflowBB.selectedRulesViewOption)}"
+                                    value="#{occPeriodWorkflowBB.currentOccPeriod.assembleEventRuleList(workflowBB.selectedRulesViewOption)}"
                                     tableStyleClass="primeDataTable"
                                     draggableColumns="true"
                                     expandedRow="false"
@@ -1475,7 +1458,7 @@
                             <h:outputText styleClass="ui-label" value="reason for rejecting proposal" />
 
                             <p:inputText    id="proposal-rejectreason-it"
-                                            value="#{occPeriodWorkflowBB.formProposalRejectionReason}"
+                                            value="#{workflowBB.formProposalRejectionReason}"
                                             required="true"/>
 
                             <p:commandButton    id="proposal-button-reject"

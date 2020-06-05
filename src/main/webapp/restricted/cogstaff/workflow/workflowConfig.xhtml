@@ -70,7 +70,7 @@
                                     <p:commandButton    id="eventrules-editrule-cb"
                                                         ajax="true" 
                                                         styleClass="proposal-choice-button"
-                                                        actionListener="#{occInspectionBB.rules_initiateEventRuleEdit(rule)}"
+                                                        actionListener="#{workflowConfigBB.rules_initiateEventRuleEdit(rule)}"
                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                         value="Edit rule"
                                                         oncomplete="PF('occperiod-dialog-addediteventrule-var').show()"
@@ -591,15 +591,8 @@
                                 </h:form>
 
                             </p:panel>
-
-                         
-
-
                         <!--close main container-->
                     </div>
-
-
-               
 
                 </f:view>
             </ui:define>

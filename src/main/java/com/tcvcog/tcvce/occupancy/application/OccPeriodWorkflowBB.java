@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -49,11 +50,12 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
 
     private OccPeriodDataHeavy currentOccPeriod;
     
+    private PropertyUnit currentPropertyUnit;
+    
     private boolean periodStartDateNull;
     private boolean periodEndDateNull;
     
     private String formNoteText;
-    
     
     private List<OccPeriodType> occPeriodTypeList;
     private OccPeriodType selectedOccPeriodType;
@@ -61,7 +63,9 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
     private List<PropertyUnit> propertyUnitCandidateList;
     private PropertyUnit selectedPropertyUnit;
     
+    private List<User> managerInspectorCandidateList;
     private User selectedManager;
+    
     
     
 
@@ -74,15 +78,22 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
     
     @PostConstruct
     public void initBean(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        // Design pattern: Initialize beans by first checking the session bean's object
+        // store and seeing if it's the right one 
+        
+        currentOccPeriod = getSessionBean().getSessOccPeriod();
         PropertyIntegrator pi = getPropertyIntegrator();
         
         periodEndDateNull = false;
         periodStartDateNull = false;
-        
         occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
         
         try {
-            propertyUnitCandidateList = pi.getPropertyUnitList(getSessionBean().getSessProperty());
+            currentPropertyUnit = pc.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+            // TODO
+            propertyUnitCandidateList = getSessionBean().getSessProperty().getUnitList();
+            
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -104,7 +115,7 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Unable to reload occ period", ""));
         } catch (SearchException ex) {
-            Logger.getLogger(OccPeriodWorkflowBB.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex);
         }
         
     }
@@ -373,5 +384,33 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
      */
     public void setSelectedPropertyUnit(PropertyUnit selectedPropertyUnit) {
         this.selectedPropertyUnit = selectedPropertyUnit;
+    }
+
+    /**
+     * @return the currentPropertyUnit
+     */
+    public PropertyUnit getCurrentPropertyUnit() {
+        return currentPropertyUnit;
+    }
+
+    /**
+     * @param currentPropertyUnit the currentPropertyUnit to set
+     */
+    public void setCurrentPropertyUnit(PropertyUnit currentPropertyUnit) {
+        this.currentPropertyUnit = currentPropertyUnit;
+    }
+
+    /**
+     * @return the managerInspectorCandidateList
+     */
+    public List<User> getManagerInspectorCandidateList() {
+        return managerInspectorCandidateList;
+    }
+
+    /**
+     * @param managerInspectorCandidateList the managerInspectorCandidateList to set
+     */
+    public void setManagerInspectorCandidateList(List<User> managerInspectorCandidateList) {
+        this.managerInspectorCandidateList = managerInspectorCandidateList;
     }
 }

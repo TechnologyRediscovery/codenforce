@@ -185,7 +185,7 @@
                                                             ajax="true"
                                                             value="proposals settings"
                                                             styleClass="noFill button-size-small"
-                                                            actionListener="#{ceCaseWorkflowBB.proposals_initiateViewPropMetadata(proposal)}"
+                                                            actionListener="#{workflowBB.proposals_initiateViewPropMetadata(proposal)}"
                                                             oncomplete="PF('cecase-dialog-proposalmetadata-var').show()"
                                                             icon="fa fa-gears"
                                                             update="cecase-dialog-proposalmetadata-form-messages
@@ -199,13 +199,13 @@
 
                                         <p:selectOneMenu style="width: 300px;" 
                                                          id="cecase-viewoptionsproposals-solb" 
-                                                         value="#{ceCaseWorkflowBB.selectedProposalsViewOption}" 
+                                                         value="#{workflowBB.selectedProposalsViewOption}" 
                                                          tabindex="10">
 
                                             <p:ajax update="proposals-proposalscroller"                                                           
                                                     immediate="true"/>
                                             <f:selectItems  id="cecase-viewoptionsproposals-selitems" 
-                                                            value="#{ceCaseWorkflowBB.proposalsViewOptions}" 
+                                                            value="#{workflowBB.proposalsViewOptions}" 
                                                             var="pvo" 
                                                             itemValue="#{pvo}" 
                                                             itemLabel="#{pvo.label}"/>
@@ -218,7 +218,7 @@
                                         <p:dataScroller id="proposals-proposalscroller"
                                                         var="proposal"
                                                         widgetVar="proposals-proposalscroller-var"
-                                                        value="#{ceCaseWorkflowBB.currentOccPeriod.assembleProposalList(ceCaseWorkflowBB.selectedProposalsViewOption)}"
+                                                        value="#{ceCaseWorkflowBB.currentCase.assembleProposalList(workflowBB.selectedProposalsViewOption)}"
                                                         rowIndexVar="#{proposal.proposalID}">
                                             <div class="outlinedBox">
                                                 <div class="proposal-metadata-container">
@@ -260,11 +260,11 @@
                                                             <h:outputText styleClass="ui-label-inline" 
                                                                           value="Intended for: "  />
                                                             <h:outputText styleClass="data-text" 
-                                                                          value="#{ceCaseWorkflowBB.currentProposal.responderIntended.person.firstName}" />
+                                                                          value="#{workflowBB.currentProposal.responderIntended.person.firstName}" />
                                                             <h:outputText styleClass="data-text" 
                                                                           value=" " />
                                                             <h:outputText styleClass="data-text" 
-                                                                          value="#{ceCaseWorkflowBB.currentProposal.responderIntended.person.lastName}" />
+                                                                          value="#{workflowBB.currentProposal.responderIntended.person.lastName}" />
                                                         </h:panelGroup>
                                                     </h:panelGrid>
                                                 </div>
@@ -278,7 +278,7 @@
                                                     <p:commandButton    id="proposal-choice-button-choose"
                                                                         ajax="true" 
                                                                         styleClass="proposal-choice-button"
-                                                                        actionListener="#{ceCaseWorkflowBB.proposals_makeChoice(choice, proposal)}"
+                                                                        actionListener="#{workflowBB.proposals_makeChoice(choice, proposal)}"
                                                                         disabled="#{!choice.canChoose or !(empty proposal.responseTS)}"
                                                                         value="#{choice.title}"
                                                                         icon="#{choice.icon.fontAwesome}"
