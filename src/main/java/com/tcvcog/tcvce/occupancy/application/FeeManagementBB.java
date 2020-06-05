@@ -137,7 +137,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             if (feeList == null) {
                 feeList = (ArrayList<Fee>) allFees;
             }
-            
+
             try {
                 refreshTypesAndElements();
             } catch (BObStatusException e) {
@@ -279,18 +279,44 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      */
     public void onOccPeriodTypeSelectedButtonChange(OccPeriodType currentType) throws IntegrationException {
 
-        selectedPeriodType = currentType;
-        
-        try {
-            existingFeeList = selectedPeriodType.getPermittedFees();
-            workingFeeList = new ArrayList<>(existingFeeList);
-        } catch (NullPointerException e) {
-            System.out.println("OccPeriodType has no existing permitted fee list, making new ArrayList...");
-            workingFeeList = new ArrayList<>();
+        if (currentFeeSelected == true) {
+
+            selectedPeriodType = currentType;
+
+            try {
+                existingFeeList = selectedPeriodType.getPermittedFees();
+                workingFeeList = new ArrayList<>(existingFeeList);
+            } catch (NullPointerException e) {
+                System.out.println("OccPeriodType has no existing permitted fee list, making new ArrayList...");
+                workingFeeList = new ArrayList<>();
+            }
+            //update the current selected fee list in side panel
+            
+            typeList = new ArrayList<>();
+            typeList.add(selectedPeriodType);
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Occ Period Type: " + selectedPeriodType.getTypeID(), ""));
+
+            // "Select" button wasn't selected
+        } else {
+            //turn to default setting
+            currentFeeSelected = false;
+
+            refreshFeeAssignedList();
+
+            try {
+                refreshTypesAndElements();
+            } catch (BObStatusException ex) {
+                //TODO: Make this try-catch unnecessary
+            }
+            
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Occ Period Type: " + selectedPeriodType.getTypeID(), ""));
         }
 
     }
-    
+
     /**
      * Changing which element is selected and not selected
      *
@@ -299,18 +325,44 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      */
     public void onCodeElementSelectedButtonChange(EnforcableCodeElement currentElement) throws IntegrationException {
 
-        selectedCodeElement = currentElement;
-        
-        try {
+        if (currentFeeSelected == true) {
+
+            selectedCodeElement = currentElement;
+
+            try {
             existingFeeList = selectedCodeElement.getFeeList();
             workingFeeList = new ArrayList<>(existingFeeList);
         } catch (NullPointerException e) {
             System.out.println("EnforcableCodeElement has no existing permitted fee list, making new ArrayList...");
             workingFeeList = new ArrayList<>();
         }
+            //update the current selected fee list in side panel
+            
+            elementList = new ArrayList<>();
+            elementList.add(selectedCodeElement);
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Code Set Element: " + selectedCodeElement.getCodeSetElementID(), ""));
+
+            // "Select" button wasn't selected
+        } else {
+            //turn to default setting
+            currentFeeSelected = false;
+
+            refreshFeeAssignedList();
+
+            try {
+                refreshTypesAndElements();
+            } catch (BObStatusException ex) {
+                //TODO: Make this try-catch unnecessary
+            }
+            
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Code Set Element: " + selectedCodeElement.getCodeSetElementID(), ""));
+        }
 
     }
-    
+
     public String onInsertAssignedFeeButtonChange() {
         if (selectedAssignedFee.getFee() == null) {
             getFacesContext().addMessage(null,
@@ -402,7 +454,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             return "feeManage";
         }
-        
+
         firstSkeleton.setAssignedFeeID(selectedAssignedFee.getAssignedFeeID());
         firstSkeleton.setPaymentList(selectedAssignedFee.getPaymentList());
         firstSkeleton.setMoneyFeeAssigned(selectedAssignedFee.getMoneyFeeAssigned());
@@ -682,7 +734,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-    public void commitPermissionUpdates() throws BObStatusException {
+    public String onUpdatePermissionButtonChange() {
 
         if (existingFeeList == null) {
 
@@ -718,8 +770,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             }
         }
 
-        refreshTypesAndElements();
+        try {
+            refreshTypesAndElements();
+        } catch (BObStatusException ex) {
+            //TODO: Make this try catch not necessary
+        }
 
+        return "feePermissions";
     }
 
     public void insertOrReactivateOccPeriodJoin(Fee workingFee) {
@@ -728,7 +785,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         boolean failed = false;
 
         try {
-            pi.insertFeePeriodTypeJoin(workingFee, lockedPeriodType);
+            pi.insertFeePeriodTypeJoin(workingFee, selectedPeriodType);
         } catch (IntegrationException ex) {
             System.out.println("Failed inserting occperiod fee join, trying to reactivate.");
             failed = true;
@@ -737,7 +794,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         if (failed) {
 
             try {
-                pi.reactivateFeePeriodTypeJoin(workingFee, lockedPeriodType);
+                pi.reactivateFeePeriodTypeJoin(workingFee, selectedPeriodType);
             } catch (IntegrationException ex) {
                 System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
             }
@@ -752,7 +809,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         boolean failed = false;
 
         try {
-            pi.insertFeeCodeElementJoin(workingFee, lockedCodeElement);
+            pi.insertFeeCodeElementJoin(workingFee, selectedCodeElement);
         } catch (IntegrationException ex) {
             System.out.println("Failed inserting code element fee join, trying to reactivate.");
             failed = true;
@@ -761,7 +818,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         if (failed) {
 
             try {
-                pi.reactivateFeeCodeElementJoin(workingFee, lockedCodeElement);
+                pi.reactivateFeeCodeElementJoin(workingFee, selectedCodeElement);
             } catch (IntegrationException ex) {
                 System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
             }
@@ -780,7 +837,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
                 if (existingFee.getOccupancyInspectionFeeID() == workingFee.getOccupancyInspectionFeeID()) {
                     try {
-                        pi.updateFeePeriodTypeJoin(workingFee, lockedPeriodType);
+                        pi.updateFeePeriodTypeJoin(workingFee, selectedPeriodType);
                     } catch (IntegrationException ex) {
                         System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
                     }
@@ -809,7 +866,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
                 if (existingFee.getOccupancyInspectionFeeID() == workingFee.getOccupancyInspectionFeeID()) {
                     try {
-                        pi.updateFeeCodeElementJoin(workingFee, lockedCodeElement);
+                        pi.updateFeeCodeElementJoin(workingFee, selectedCodeElement);
                     } catch (IntegrationException ex) {
                         System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
                     }
@@ -844,7 +901,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             if (notThisFee == workingFeeList.size()) {
 
                 try {
-                    pi.deactivateFeePeriodTypeJoin(existingFee, lockedPeriodType);
+                    pi.deactivateFeePeriodTypeJoin(existingFee, selectedPeriodType);
                 } catch (IntegrationException ex) {
                     System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
                 }
@@ -871,7 +928,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             if (notThisFee == workingFeeList.size()) {
 
                 try {
-                    pi.deactivateFeeCodeElementJoin(existingFee, lockedCodeElement);
+                    pi.deactivateFeeCodeElementJoin(existingFee, selectedCodeElement);
                 } catch (IntegrationException ex) {
                     System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
                 }
@@ -924,13 +981,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
 
             CaseCoordinator cc = getCaseCoordinator();
-            
+
             try {
                 currentCase = cc.assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser().getMyCredential());
-            } catch (IntegrationException  | BObStatusException ex) {
+            } catch (IntegrationException | BObStatusException ex) {
                 getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to prepare your selected CE Case before refreshing the assigned fees list!", ""));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Oops! We encountered a problem trying to prepare your selected CE Case before refreshing the assigned fees list!", ""));
             }
 
             if (currentCase != null) {

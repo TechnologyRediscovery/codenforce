@@ -5,579 +5,658 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
+
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Add Fee</title>
+        <title>Municipality Manager Sample</title>
     </h:head>
-    <h:body>
+
+    <h:body id="feePerManageBody">
+
         <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
-                <div class="mainContainer">
-                    <h:messages id="messages" globalOnly="true" showDetail="true" showSummary="true"
-                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                    </h:messages>
-
-                    <h1>Fee Permissions Tool (dev)</h1>
-                    <p>
-                        <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}">Occupancy period types</p:outputLabel> 
-                        <p:outputLabel rendered="#{feeManagementBB.editingCECase()}">Code Set Elements</p:outputLabel>
-                        only allow certain fees to be used in #{sessionBean.sessMuni.muniName}. Edit those lists here.</p>
-                    <f:view>
-                        <h:form id="chooseOccPeriodTypeForm" rendered="#{feeManagementBB.editingOccPeriod()}">
-                            <h2>Occupancy Period Types</h2>
-                            <p:dataTable
-                                id="occPeriodTypeTable"
-                                var="type"
-                                value="#{feeManagementBB.typeList}"
-                                rowKey="#{type.typeID}"
-                                tableStyleClass="primeDataTable"
-                                rowExpandMode="single"
-                                expandedRow="false"
-                                selectionMode="single"
-                                selection="#{feeManagementBB.selectedPeriodType}"
-                                filteredValue="#{feeManagementBB.filteredTypeList}"
-                                >
-
-                                <p:column width="3%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Exp"/>
-                                    </f:facet>
-                                    <p:rowToggler/>
-                                </p:column>
-
-                                <p:column width="8%">
-                                    <f:facet name="header">
-                                        <h:outputText value="ID" />
-                                    </f:facet>
-                                    <h:outputText value="#{type.typeID}"/>
-                                </p:column>
-
-
-                                <p:column width="10%" sortBy="#{type.title}"
-                                          filterBy="#{type.title}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Type Title" />
-                                    </f:facet>
-                                    <h:outputText value="#{type.title}"/>
-                                </p:column>
-
-                                <p:column width="10%" sortBy="#{type.authorizeduses}"
-                                          filterBy="#{type.authorizeduses}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Authorized Uses" />
-                                    </f:facet>
-                                    <h:outputText value="#{type.authorizeduses}"/>
-                                </p:column>
-
-                                <p:rowExpansion>
-                                    <div class="outlinedBox">
-                                        <h2>Full type listing for type <h:outputText value="#{type.typeID}"/> </h2>
-                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Description"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.description}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Municipality"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.muni.muniName} (ID: #{type.muni.muniCode})"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="User Assignable?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.userassignable ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Permittable?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.permittable ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Start Date Required?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.startdaterequired ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="End Date Required?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.enddaterequired ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Passed Inspection Required?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.passedInspectionRequired ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Passed Inspection Required?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.passedInspectionRequired ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Rental Compatible?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.rentalcompatible ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Commercial?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.commercial ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Active?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.active ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Third Party Inspection Allowed?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.allowthirdpartyinspection ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup rendered="#{type.defaultValidityPeriodDays != 0}">
-                                                <h:outputLabel styleClass="ui-label-inline" value="Default Permit Validity Period"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.defaultValidityPeriodDays} days"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Inspectable?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{type.inspectable ? 'Yes' : 'No'}"/>
-                                                </div>
-                                            </h:panelGroup>
-
-                                        </h:panelGrid>
-                                    </div>
-                                </p:rowExpansion>
-
-                            </p:dataTable>
-                            <p:spacer height="10px"/>
-                            <p:commandButton 
-                                actionListener="#{feeManagementBB.editOccPeriodFees}"
-                                oncomplete="PF('feePermissionsDialogVar').show()"
-                                ajax="true"
-                                update="feePermissionsForm messages"
-                                value="Edit the Fee Permissions of this Occ Period Type" tabindex="2"/>
-
-                        </h:form>    
-
-                        <h:form id="chooseCodeElementForm" rendered="#{feeManagementBB.editingCECase()}">
-                            <h2>Code Set Elements</h2>
-                            <p:dataTable
-                                id="codeElementTable"
-                                var="element"
-                                value="#{feeManagementBB.elementList}"
-                                rowKey="#{element.codeSetElementID}"
-                                tableStyleClass="primeDataTable"
-                                rowExpandMode="single"
-                                expandedRow="false"
-                                selectionMode="single"
-                                selection="#{feeManagementBB.selectedCodeElement}"
-                                filteredValue="#{feeManagementBB.filteredElementList}"
-                                scrollable="true"
-                                scrollHeight="500"
-                                >
-
-                                <p:column width="3%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Expand"/>
-                                    </f:facet>
-                                    <p:rowToggler/>
-                                </p:column>
-
-                                <p:column width="5%" sortBy="#{element.codeSetElementID}">
-                                    <f:facet name="header">
-                                        <h:outputText value="ID#" />
-                                    </f:facet>
-                                    <h:outputText value="#{element.codeSetElementID}"/>
-                                </p:column>
-
-                                <p:column width="5%" sortBy="#{element.codeElement.ordSecTitle}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Section" />
-                                    </f:facet>
-                                    <h:outputText value="#{element.codeElement.ordSecTitle}"/>
-                                </p:column>
-
-                                <p:column width="5%" sortBy="#{element.codeElement.ordSubSecTitle}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Subsection" />
-                                    </f:facet>
-                                    <h:outputText value="#{element.codeElement.ordSubSecTitle}"/>
-                                </p:column>
-
-                                <p:column width="5%" sortBy="#{element.codeElement.guideEntry.category}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Category" />
-                                    </f:facet>
-                                    <h:outputText value="#{element.codeElement.guideEntry.category}"/>
-                                </p:column>
-
-                                <p:column width="5%" sortBy="#{element.codeElement.guideEntry.subCategory}">
-                                    <f:facet name="header">
-                                        <h:outputText value="SubCategory" />
-                                    </f:facet>
-                                    <h:outputText value="#{element.codeElement.guideEntry.subCategory}"/>
-                                </p:column>
-
-                                <p:rowExpansion>
-                                    <div class="outlinedBox">
-                                        <h3>Code element detail:</h3>
-
-                                        <h:outputLabel styleClass="bold" value="Penalty Notes:"/>
-                                        <p:spacer height="10px"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.penaltyNotes}"/>
-                                        </div>
-                                        <p:spacer height="15px"/>
-
-                                        <h:outputLabel styleClass="bold" value="Days to Comply Notes:"/>
-                                        <p:spacer height="10px"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.daysToComplyNotes}"/>
-                                        </div>
-                                        <p:spacer height="15px"/>
-
-                                        <h:outputLabel styleClass="bold" value="Muni-Specific Notes:"/>
-                                        <p:spacer height="10px"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.muniSpecificNotes}"/>
-                                        </div>
-                                        <p:spacer height="15px"/>
-
-                                        <h:outputLabel styleClass="bold" value="Code Element ID:"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.codeElement.elementID}"/>
-                                        </div>
-                                        <p:spacer height="15px"/>
-
-
-                                        <h:outputLabel styleClass="bold" value="Max Penalty:"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.maxPenalty}"/>
-                                        </div>
-
-                                        <h:outputLabel styleClass="bold" value="Min Penalty:"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.minPenalty}"/>
-                                        </div>
-
-                                        <h:outputLabel styleClass="bold" value="Norm Penalty:"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.normPenalty}"/>
-                                        </div>
-                                        <p:spacer height="15px"/>
-
-                                        <h:outputLabel styleClass="bold" value="Norm Days To Comply:"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.normDaysToComply}"/>
-                                        </div>
-
-                                        <h:outputLabel styleClass="bold" value="Days To Comply notes:"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.daysToComplyNotes}"/>
-                                        </div>
-
-                                        <h:outputLabel styleClass="bold" value="Date Created:"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.dateCreated}"/>
-                                        </div>
-                                        <p:spacer height="15px"/>
-
-                                        <h:outputLabel styleClass="bold" value="Chap"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.codeElement.ordchapterNo}"/>
-                                        </div>
-
-                                        <h:outputLabel styleClass="bold" value="Chapter"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.codeElement.ordchapterTitle}"/>
-                                        </div>
-                                        <p:spacer height="15px"/>
-
-                                        <h:outputLabel styleClass="bold" value="Sec"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.codeElement.ordSecNum}"/>
-                                        </div>
-
-                                        <h:outputLabel styleClass="bold" value="SubSec"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.codeElement.ordSubSecNum}"/>
-                                        </div>
-
-                                        <p:spacer height="15px"/>
-
-                                        <h:outputLabel styleClass="bold" value="Technical Text"/>
-                                        <p:spacer height="15px"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.codeElement.ordTechnicalText}"/>
-                                        </div>
-                                        <p:spacer height="15px"/>
-                                        <h:outputLabel styleClass="bold" value="Human friendly text"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.codeElement.ordHumanFriendlyText}"/>
-                                        </div>
-                                        <p:spacer height="15px"/>
-                                        <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.enforcementGuidelines}"/>
-                                        </div>
-                                        <p:spacer height="15px"/>
-                                        <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
-                                        <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.inspectionGuidelines}"/>
-                                        </div>
-                                    </div>
-                                </p:rowExpansion>
-
-                            </p:dataTable>
-                            <p:spacer height="10px"/>
-                            <p:commandButton 
-                                actionListener="#{feeManagementBB.editCodeElementFees}"
-                                oncomplete="PF('feePermissionsDialogVar').show()"
-                                ajax="true"
-                                update="feePermissionsForm messages"
-                                value="Edit the Fee Permissions of this Code Element" tabindex="2"/>
-
-                        </h:form> 
-
-                        <p:dialog id="feePermissionsDialog"
-                                  height="450" width="1000"
-                                  widgetVar="feePermissionsDialogVar"
-                                  closable="true">   
-                            <h:form id="feePermissionsForm">
-                                <h:messages id="messages" globalOnly="true" showDetail="true" showSummary="true"
-                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                </h:messages>
-                                <h2>Edit Fee Permissions for fee ID #<p:outputLabel value="#{feeManagementBB.lockedPeriodType.typeID}"/></h2>
-                                <p>Here you can remove or add permitted fees, and even choose which fees are automatically 
-                                    applied to an Occupancy Period.</p>
-
-
-                                <h:outputLabel value="Currently Permitted Fees:" for="permittedFeeTable"/>
-                                <h:panelGroup>
-                                    <p:dataTable
-                                        id="permittedFeeTable"
-                                        widgetVar="datatable"
-                                        rowIndexVar="rowIndex"
-                                        var="fee"
-                                        value="#{feeManagementBB.workingFeeList}"
-                                        selectionMode="single" tabindex="1"
-                                        selection="#{feeManagementBB.selectedWorkingFee}"
-                                        rowKey="#{fee.occupancyInspectionFeeID}"
-                                        editable="true">                                         
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Fee ID:" />
-                                            </f:facet>
-                                            <p:cellEditor>
-                                                <f:facet name="output"><h:outputText value="#{fee.occupancyInspectionFeeID}" /></f:facet>
-                                                <f:facet name="input"><h:outputText value="#{fee.occupancyInspectionFeeID}" /></f:facet>
-                                            </p:cellEditor>
-                                        </p:column>
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Name:" />
-                                            </f:facet>
-                                            <p:cellEditor>
-                                                <f:facet name="output"><h:outputText value="#{fee.name}" /></f:facet>
-                                                <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
-                                            </p:cellEditor>
-                                        </p:column>
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Amount:" />
-                                            </f:facet>
-                                            <p:cellEditor>
-                                                <f:facet name="output"><h:outputText value="#{fee.amount}" /></f:facet>
-                                                <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
-                                            </p:cellEditor>
-                                        </p:column>
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Effective Date" />
-                                            </f:facet>
-                                            <p:cellEditor>
-                                                <f:facet name="output"><h:outputText value="#{fee.effectiveDate}" /></f:facet>
-                                                <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
-                                            </p:cellEditor>
-                                        </p:column>
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Expire Date" />
-                                            </f:facet>
-                                            <p:cellEditor>
-                                                <f:facet name="output"><h:outputText value="#{fee.expiryDate}" /></f:facet>
-                                                <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
-                                            </p:cellEditor>
-                                        </p:column>
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Autoassign" />
-                                            </f:facet>
-                                            <p:cellEditor>
-                                                <f:facet name="output">
-                                                    <h:outputText value="#{fee.autoAssigned ? 'Yes' : 'No'}" />
-                                                </f:facet>
-                                                <f:facet name="input"> 
-                                                    <h:selectBooleanCheckbox value="#{fee.autoAssigned}"/> 
-                                                </f:facet>
-                                            </p:cellEditor>
-                                        </p:column>
-
-                                        <p:column style="width:40px">
-                                            <f:facet name="header">
-                                                <h:outputText value="Edit?" />
-                                            </f:facet>
-                                            <p:rowEditor/>
-                                        </p:column>
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Remove?" />
-                                            </f:facet>
-                                            <p:commandButton ajax="true" value="Remove" 
-                                                             action="#{feeManagementBB.removePermittedFee(fee)}"
-                                                             update="#{p:component('permittedFeeTable')}
-                                                             feePermissionsForm"/>                                      
-                                        </p:column>
-
-                                    </p:dataTable>
-                                </h:panelGroup>
-
-                                <h:outputLabel value="Fee List:" for="feeFeeTable"/>
-                                <h:panelGroup>
-                                    <p:dataTable
-                                        id="feeFeeTable"
-                                        var="o"
-                                        selectionMode="single"
-                                        selection="#{feeManagementBB.selectedFee}"
-                                        rowKey="#{o.occupancyInspectionFeeID}"
-                                        value="#{feeManagementBB.allFees}"
-                                        tableStyleClass="primeDataTable"
-                                        filteredValue="#{feeManagementBB.filteredFeeList}">
-
-                                        <p:column width="10%">
-                                            <f:facet name="header">
-                                                <h:outputText value="ID" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.occupancyInspectionFeeID}"/>
-                                        </p:column>
-
-                                        <p:column width="25%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Municipality" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.muni.muniName}"/>
-                                        </p:column>
-
-                                        <p:column width="25%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Name" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.name}"/>
-                                        </p:column>
-
-                                        <p:column width="25%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Amount" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.amount}"/>
-                                        </p:column>
-
-                                        <p:column width="25%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Effective Date" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.effectiveDate}"/>
-                                        </p:column>
-
-                                        <p:column width="25%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Expire Date" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.expiryDate}"/>
-                                        </p:column>
-
-                                    </p:dataTable>
-
-                                    <h:message for="feeFeeTable" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-
-                                <p:spacer height="5px"/>
-                                <p:commandButton ajax="true" update="#{p:component('permittedFeeTable')} feePermissionsForm messages"
-                                                 value="Add Selected Fee to Permitted Fees" action="#{feeManagementBB.addFeeToPermittedFees()}" />
-                                <p:spacer height="10px"/>
-                                <p:commandButton ajax="false" 
-                                                 action="#{feeManagementBB.commitPermissionUpdates()}"
-                                                 value="Commit Updates" tabindex="14"/>
-                                <p:commandButton    id="cancel-cb"
-                                                    ajax="true"  tabindex="27"
-                                                    value="Cancel" 
-                                                    icon="fa fa-stop" 
-                                                    immediate="true"
-                                                    onclick="PF('occPeriodFeeAddDialogVar').hide()"
-                                                    />
-
-                            </h:form>
-                        </p:dialog>
-                        <p:spacer height="15px"/>
-                        <p:commandButton    id="feePermissionFinishedButton"
-                                            action="#{feeManagementBB.finishAndRedir()}"
-                                            rendered="#{feeManagementBB.redirected}"
-                                            value="Finish editing permissions and return"
-                                            />
-
-                    </f:view>
-                </div>
+                <f:view >
+
+                    <p:outputPanel id="body-panel">
+                        <h1>Manage Fee Permissions</h1>
+
+                        <h:form id="form-messages-global">
+                            <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
+                        </h:form>
+
+                        <h2>Editing fee permissions for <p:outputLabel value=" #{feeManagementBB.whatDomainFees()}"/></h2>
+                        
+                        <h:form>
+                            <p:commandButton ajax="false"
+                                             action="#{feeManagementBB.finishAndRedir()}"
+                                             value="Finish editing fee permissions and return."
+                                             />
+                        </h:form>
+                        
+                        <div class="mainContainer">
+
+                            <div class ="two-column-page-flex-container">
+
+                                <div class="list-column" >
+
+                                    <h:form id="mode-form">
+
+                                        <p:selectOneButton style="width: 100%; margin-top: 10px ; height: 20px;"
+                                                           value="#{feeManagementBB.currentMode}" 
+                                                           >
+                                            <!-- We don't have Insert or Remove buttons here because we don't insert or remove anything here,
+                                                 we just connect existing fees to existing occ period types or code elements-->
+                                            <f:selectItem itemLabel="LOOKUP" itemValue="Lookup"  />
+                                            <f:selectItem itemLabel="UPDATE" itemValue="Update"  />
+
+                                            <f:ajax render="@all"/>
+
+                                        </p:selectOneButton> 
+
+                                    </h:form>
+
+                                    <p:spacer height="30px"/>
+
+                                    <p:scrollPanel style="height: 550px;" mode="native">
+
+                                        <!-- two forms will be needed since this page needs to set fee permissions for occperiod types and code elements-->
+
+                                        <h:form id="occPeriod-form-side" rendered="#{feeManagementBB.editingOccPeriod()}">
+
+                                            <p:dataTable id="occPeriodTypeTable"
+                                                         var="type"
+                                                         value="#{feeManagementBB.typeList}"
+                                                         tableStyleClass="primeDataTable"
+                                                         rowExpandMode="single"
+                                                         expandedRow="false"
+                                                         >
+
+                                                <p:column headerText="Exp"
+                                                          styleClass="centeredColumnContent">
+                                                    <p:rowToggler/>
+                                                </p:column>
+
+                                                <p:column headerText="ID"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{type.typeID}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Title"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{type.title}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Authorized Uses"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{type.authorizeduses}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Option"
+                                                          styleClass="centeredColumnContent"
+                                                          style="width: 80px"
+                                                          >
+
+                                                    <p:selectBooleanButton onLabel="Deselect" 
+                                                                           offLabel="Select"
+                                                                           styleClass="selectButton" 
+                                                                           value="#{feeManagementBB.currentFeeSelected}"
+                                                                           disabled="#{feeManagementBB.getSelectedButtonActive()}"
+                                                                           >
+
+                                                        <p:ajax update="
+                                                                form-messages-global
+                                                                occPeriod-form-side
+                                                                permissions-panel"
+                                                                listener="#{feeManagementBB.onOccPeriodTypeSelectedButtonChange(type)}"/>
+
+                                                    </p:selectBooleanButton>
+
+                                                </p:column>
+
+                                                <p:rowExpansion>
+                                                    <div class="outlinedBox">
+                                                        <h2>Full type listing for type <h:outputText value="#{type.typeID}"/> </h2>
+                                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Description"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.description}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Municipality"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.muni.muniName} (ID: #{type.muni.muniCode})"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="User Assignable?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.userassignable ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Permittable?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.permittable ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Start Date Required?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.startdaterequired ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="End Date Required?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.enddaterequired ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Passed Inspection Required?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.passedInspectionRequired ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Passed Inspection Required?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.passedInspectionRequired ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Rental Compatible?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.rentalcompatible ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Commercial?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.commercial ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Active?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.active ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Third Party Inspection Allowed?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.allowthirdpartyinspection ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup rendered="#{type.defaultValidityPeriodDays != 0}">
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Default Permit Validity Period"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.defaultValidityPeriodDays} days"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="ui-label-inline" value="Inspectable?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{type.inspectable ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                        </h:panelGrid>
+                                                    </div>
+                                                </p:rowExpansion>
+
+                                            </p:dataTable>
+
+                                            <p:spacer height="10px"/>
+
+                                        </h:form>
+
+                                        <h:form id="CECase-form-side" rendered="#{feeManagementBB.editingCECase()}">
+
+                                            <p:dataTable id="codeElementTable"
+                                                         var="element"
+                                                         value="#{feeManagementBB.elementList}"
+                                                         tableStyleClass="primeDataTable"
+                                                         rowExpandMode="single"
+                                                         expandedRow="false"
+                                                         >
+
+                                                <p:column headerText="Exp"
+                                                          styleClass="centeredColumnContent">
+                                                    <p:rowToggler/>
+                                                </p:column>
+
+                                                <p:column headerText="ID"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{element.codeSetElementID}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Section"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{element.codeElement.ordSecTitle}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Subsection"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{element.codeElement.ordSubSecTitle}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Category"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{element.codeElement.guideEntry.category}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="SubCategory"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{element.codeElement.guideEntry.subCategory}"/>
+
+                                                </p:column>
+
+
+                                                <p:column headerText="Option"
+                                                          styleClass="centeredColumnContent"
+                                                          style="width: 80px"
+                                                          >
+
+                                                    <p:selectBooleanButton onLabel="Deselect" 
+                                                                           offLabel="Select"
+                                                                           styleClass="selectButton" 
+                                                                           value="#{feeManagementBB.currentFeeSelected}"
+                                                                           disabled="#{feeManagementBB.getSelectedButtonActive()}"
+                                                                           >
+
+                                                        <p:ajax update="
+                                                                form-messages-global
+                                                                CECase-form-side
+                                                                permissions-panel"
+                                                                listener="#{feeManagementBB.onCodeElementSelectedButtonChange(element)}"/>
+
+                                                    </p:selectBooleanButton>
+
+                                                </p:column>
+
+
+                                                <p:rowExpansion>
+                                                    <div class="outlinedBox">
+                                                        <h3>Code element detail:</h3>
+
+                                                        <h:outputLabel styleClass="bold" value="Penalty Notes:"/>
+                                                        <p:spacer height="10px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.penaltyNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Days to Comply Notes:"/>
+                                                        <p:spacer height="10px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.daysToComplyNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Muni-Specific Notes:"/>
+                                                        <p:spacer height="10px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.muniSpecificNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Code Element ID:"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.codeElement.elementID}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+
+
+                                                        <h:outputLabel styleClass="bold" value="Max Penalty:"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.maxPenalty}"/>
+                                                        </div>
+
+                                                        <h:outputLabel styleClass="bold" value="Min Penalty:"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.minPenalty}"/>
+                                                        </div>
+
+                                                        <h:outputLabel styleClass="bold" value="Norm Penalty:"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.normPenalty}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Norm Days To Comply:"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.normDaysToComply}"/>
+                                                        </div>
+
+                                                        <h:outputLabel styleClass="bold" value="Days To Comply notes:"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.daysToComplyNotes}"/>
+                                                        </div>
+
+                                                        <h:outputLabel styleClass="bold" value="Date Created:"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.dateCreated}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Chap"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.codeElement.ordchapterNo}"/>
+                                                        </div>
+
+                                                        <h:outputLabel styleClass="bold" value="Chapter"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.codeElement.ordchapterTitle}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Sec"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.codeElement.ordSecNum}"/>
+                                                        </div>
+
+                                                        <h:outputLabel styleClass="bold" value="SubSec"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.codeElement.ordSubSecNum}"/>
+                                                        </div>
+
+                                                        <p:spacer height="15px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Technical Text"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.codeElement.ordTechnicalText}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+                                                        <h:outputLabel styleClass="bold" value="Human friendly text"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.codeElement.ordHumanFriendlyText}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+                                                        <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.enforcementGuidelines}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+                                                        <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.inspectionGuidelines}"/>
+                                                        </div>
+                                                    </div>
+                                                </p:rowExpansion>
+                                            </p:dataTable>
+
+                                            <p:spacer height="10px"/>
+
+                                        </h:form>
+
+                                    </p:scrollPanel>
+
+                                </div>
+
+
+
+                                <div class ="object-column">
+
+                                    <p:outputPanel id = "permissions-panel" >
+
+                                        <!--LookUp Table-->
+                                        <p:panel id="permissions-panel-lookup"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LookUp Panel"
+                                                 rendered="#{feeManagementBB.getActiveLookupMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="permissions-form-lookup">
+
+                                                    <h:outputLabel value="Currently Permitted Fees:" for="permittedFeeTable"/>
+                                                    <h:panelGroup>
+                                                        <p:dataTable
+                                                            id="permittedFeeTableLookUp"
+                                                            widgetVar="datatable"
+                                                            var="fee"
+                                                            value="#{feeManagementBB.workingFeeList}"
+                                                            rowKey="#{fee.occupancyInspectionFeeID}"
+                                                            scrollable="true">                                         
+
+                                                            <p:column headerText="Fee ID:">
+                                                                <h:outputText value="#{fee.occupancyInspectionFeeID}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Name:">
+                                                                <h:outputText value="#{fee.name}"/>
+                                                            </p:column>
+
+                                                            <p:column headerText="Amount:">
+                                                                <h:outputText value="#{fee.amount}"/>
+                                                            </p:column>
+
+                                                            <p:column headerText="Effective Date">
+                                                                <h:outputText value="#{fee.effectiveDate}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Expire Date">
+                                                                <h:outputText value="#{fee.expiryDate}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Autoassign?">
+                                                                <h:outputText value="#{fee.autoAssigned ? 'Yes' : 'No'}" />
+                                                            </p:column>
+
+                                                        </p:dataTable>
+                                                    </h:panelGroup>
+
+                                            </h:form>
+
+                                        </p:panel>
+
+                                        <!--Update Table-->
+                                        <p:panel id="permissions-panel-update"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LookUp Panel"
+                                                 rendered="#{feeManagementBB.getActiveUpdateMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="permissions-form-update">
+
+                                                    <h:panelGroup>
+                                                        <p:dataTable
+                                                            id="permittedFeeTableUpdate"
+                                                            widgetVar="datatable"
+                                                            rowIndexVar="rowIndex"
+                                                            var="fee"
+                                                            value="#{feeManagementBB.workingFeeList}"
+                                                            selectionMode="single" tabindex="1"
+                                                            selection="#{feeManagementBB.selectedWorkingFee}"
+                                                            rowKey="#{fee.occupancyInspectionFeeID}"
+                                                            editable="true" 
+                                                            scrollable="true">                                         
+
+                                                            <p:column headerText="Fee ID">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{fee.occupancyInspectionFeeID}" /></f:facet>
+                                                                    <f:facet name="input"><h:outputText value="#{fee.occupancyInspectionFeeID}" /></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+
+                                                            <p:column headerText="Name">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{fee.name}" /></f:facet>
+                                                                    <f:facet name="input"><h:outputText value="#{fee.name}" /></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+
+                                                            <p:column headerText="Amount">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{fee.amount}" /></f:facet>
+                                                                    <f:facet name="input"><h:outputText value="#{fee.amount}" /></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+
+                                                            <p:column headerText="Effective Date">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{fee.effectiveDate}" /></f:facet>
+                                                                    <f:facet name="input"><h:outputText value="#{fee.effectiveDate}" /></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+
+                                                            <p:column headerText="Expire Date">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{fee.expiryDate}" /></f:facet>
+                                                                    <f:facet name="input"><h:outputText value="#{fee.expiryDate}" /></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+
+                                                            <p:column headerText="Autoassign?" styleClass="centeredColumnContent">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output">
+                                                                        <h:outputText value="#{fee.autoAssigned ? 'Yes' : 'No'}" />
+                                                                    </f:facet>
+                                                                    <f:facet name="input"> 
+                                                                        <p:selectBooleanButton id="feeAutoAssign" onLabel="Yes" offLabel="No" value="#{fee.autoAssigned}"/>
+                                                                    </f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+
+                                                            <p:column headerText="Edit?">
+                                                                <p:rowEditor/>
+                                                            </p:column>
+
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Remove?" />
+                                                                </f:facet>
+                                                                <p:commandButton ajax="true" value="Remove" 
+                                                                                 action="#{feeManagementBB.removePermittedFee(fee)}"
+                                                                                 update="#{p:component('permittedFeeTableUpdate')}
+                                                                                 permissions-form-update
+                                                                                 form-messages-global"/>
+                                                            </p:column>
+
+                                                        </p:dataTable>
+                                                    </h:panelGroup>
+
+                                                    <h:outputLabel value="Fee List:" for="feeFeeTable"/>
+                                                    <h:panelGroup>
+                                                        <p:dataTable
+                                                            id="feeFeeTable"
+                                                            var="o"
+                                                            selectionMode="single"
+                                                            selection="#{feeManagementBB.selectedFee}"
+                                                            rowKey="#{o.occupancyInspectionFeeID}"
+                                                            value="#{feeManagementBB.allFees}"
+                                                            tableStyleClass="primeDataTable"
+                                                            filteredValue="#{feeManagementBB.filteredFeeList}"
+                                                            scrollable="true">
+
+                                                            <p:column headerText="ID">
+                                                                <h:outputText value="#{o.occupancyInspectionFeeID}"/>
+                                                            </p:column>
+
+                                                            <p:column headerText="Municipality">
+                                                                <h:outputText value="#{o.muni.muniName}"/>
+                                                            </p:column>
+
+                                                            <p:column headerText="Name">
+                                                                <h:outputText value="#{o.name}"/>
+                                                            </p:column>
+
+                                                            <p:column headerText="Amount">
+                                                                <h:outputText value="#{o.amount}"/>
+                                                            </p:column>
+
+                                                            <p:column headerText="Effective Date">
+                                                                <h:outputText value="#{o.effectiveDate}"/>
+                                                            </p:column>
+
+                                                            <p:column headerText="Expire Date">
+                                                                <h:outputText value="#{o.expiryDate}"/>
+                                                            </p:column>
+
+                                                        </p:dataTable>
+
+                                                        <h:message for="feeFeeTable" showDetail="false" showSummary="true" 
+                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                    </h:panelGroup>
+
+                                                    <p:spacer height="5px"/>
+                                                    <p:commandButton ajax="true" 
+                                                                     update="#{p:component('permittedFeeTableUpdate')} 
+                                                                             permissions-form-update
+                                                                             form-messages-global"
+                                                                     value="Add Selected Fee to Permitted Fees" action="#{feeManagementBB.addFeeToPermittedFees()}"/>
+
+                                                <p:spacer height="10px" />
+
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{feeManagementBB.onUpdatePermissionButtonChange()}"
+                                                                 value="UPDATE"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                    </p:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </p:outputPanel>
+                </f:view>
             </ui:define>
         </ui:composition>
     </h:body>
