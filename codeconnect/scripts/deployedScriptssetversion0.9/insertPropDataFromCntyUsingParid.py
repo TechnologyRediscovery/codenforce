@@ -178,7 +178,8 @@ def insert_property_basetableinfo():
             insertmap["city"] = addrmap["city"]
             insertmap["state"] = addrmap["state"]
             insertmap["zipcode"] = addrmap["zipc"]
-        except MalformedAddressError:
+        except MalformedAddressError as e:
+            log_error(e, parid)
             insertmap["addr"] = ""
             insertmap["notes"] = "Error when extracting the Address"
             insertmap["city"] = ""
@@ -187,7 +188,8 @@ def insert_property_basetableinfo():
 
         try:
             insertmap["lotandblock"] = extract_lotandblock_fromparid(parid)
-        except MalformedLotAndBlockError:
+        except MalformedLotAndBlockError as e:
+            log_error(e, parid)
             insertmap["lotandblock"] = ''
 
         # None of these methods SHOULD throw an error. If they did, I don't know what the error would be
@@ -211,21 +213,7 @@ def insert_property_basetableinfo():
             connect_person_to_property(propid, personid)
             personcount = personcount + 1
         except MalformedDataError as e:
-            if e.subtype:
-                logger.warning(
-                    "Malformed %s at parcel ID %s: %s could not be parsed",
-                    e.type,
-                    parid,
-                    e.subtype,
-                    exc_info=True
-                )
-            else:
-                logger.warning(
-                    "Malformed %s at parcel ID %s", e.type, parid, exc_info=True
-                )
-
-
-
+            log_error(e, parid)
 
         create_and_insert_unitzero(propid)
 
@@ -255,7 +243,7 @@ def insert_property_basetableinfo():
 
 
 def extract_and_insert_person(rawhtml, personid):
-    # fixed values specific to keys in lookup tables
+        # fixed values specific to keys in lookup tables
 
     db_conn = get_db_conn()
     cursor = db_conn.cursor()
@@ -579,22 +567,26 @@ def extract_ownercode(property_html):
 #     owner_address = re.sub(r'\s+,', ',', owner_address)
 #     return owner_address
 
-# Todo: deprecate and replace with log_error_NEW()
-def logerror(parcelid):
-    with open(LOG_FILE, "a", encoding=CSV_FILE_ENCODING) as outfile:
-        writer = csv.writer(outfile)
-        writer.writerow([parcelid])
+# # Todo: deprecate and replace with log_error_NEW()
+# def logerror(parcelid):
+#     with open(LOG_FILE, "a", encoding=CSV_FILE_ENCODING) as outfile:
+#         writer = csv.writer(outfile)
+#         writer.writerow([parcelid])
 
 
-def log_error_NEW():
-    """"""
-    pass
-
-
-def logerror_aux(parcelid):
-    with open(LOG_FILE_AUX, "a", encoding=CSV_FILE_ENCODING) as outfile:
-        writer = csv.writer(outfile)
-        writer.writerow([parcelid])
+def log_error(error, parcelID):
+    if error.subtype:
+        logger.warning(
+            "Malformed %s at parcel ID %s: %s could not be parsed",
+            error.type,
+            parcelID,
+            error.subtype,
+            exc_info=True
+        )
+    else:
+        logger.warning(
+            "Malformed %s at parcel ID %s", error.type, parcelID, exc_info=True
+        )
 
 
 # for debugging and transferability purposes
@@ -607,44 +599,6 @@ def save_properties_as_csv(properties_with_owner_info, output_file):
                 fieldnames = sorted(prop.keys())
                 writer.writerow(fieldnames)
             writer.writerow([prop[k] for k in fieldnames])
-
-
-# def store_owner_as_person(parid):
-#     db_conn = get_db_conn()
-#     cursor = db_conn.cursor()
-#     # Using hard-coded event type ID: 18, for code enforcement letter type
-#     sql_command = """
-
-#         INSERT INTO public.person(
-#             personid, persontype, muni_municode, fname, lname, jobtitle,
-#             phonecell, phonehome, phonework, email, address_street, address_city,
-#             address_state, address_zip, notes, lastupdated, expirydate, isactive,
-#             isunder18, "humanVerifiedby")
-#         VALUES (DEFAULT, CAST( 'ownercntylookup' AS persontype), %s, ?, ?, ?,
-#                 ?, ?, ?, ?, ?, ?,
-#                 ?, ?, ?, ?, ?, ?,
-#                 ?, ?);
-
-#         INSERT INTO codeenfevent
-#             (eventID, eventDate, eventDescription, letterText,
-#             codeOfficer_officerID, codeEnfCase_caseID, EventTyp_codeEnfEventTypeID)
-#         VALUES (%(eventID)s, %(eventDate)s, %(eventDescription)s,
-#             %(letterText)s, %(codeOfficer_officerID)s, %(codeEnfCase_caseID)s, 18)
-#     """
-#     # Read CSV file with original Access Data
-#     with open(csv_file, 'r') as infile:
-#         reader = csv_utils.UnicodeReader(infile, delimiter=CSV_DELIMITER)
-#         # Get header
-#         header = reader.next()
-#         # Sequence of eventid
-#         get_event_id = itertools.count(start=1)
-#         for row in reader:
-#             # Build a record dict from row and header
-#             record = dict(zip(header, row))
-#             # Assign eventid
-#             record['eventID'] = get_event_id.next()
-#             # Insert the data to the Postgres table
-#             cursor.execute(sql_command, record)
 
 
 db_conn = None

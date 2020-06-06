@@ -4,6 +4,22 @@ error_logger.setLevel(logging.DEBUG)
 
 error_logger.debug('Error logger initialized')
 
+def log_error(error, parcelID):
+    if error.subtype:
+        error_logger.warning(
+            "Malformed %s at parcel ID %s: %s could not be parsed",
+            error.type,
+            parcelID,
+            error.subtype,
+            exc_info=True
+        )
+    else:
+        error_logger.warning(
+            "Malformed %s at parcel ID %s", error.type, parcelID, exc_info=True
+        )
+
+
+
 # Todo: Consider abstract base class implementation
 class MalformedDataError(IndexError):
     """ Base class for errors resulting from Malformed Data """
@@ -34,6 +50,7 @@ class MalformedZipcodeError(MalformedAddressError):
     def __init__(self):
         super().__init__()
         self.subtype = 'zipcode'
+
 
 
 class MalformedLotAndBlockError(MalformedAddressError):
