@@ -11,7 +11,8 @@ import logging
 from os.path import join
 from copy import deepcopy
 
-from _exceptions import MalformedDataError, MalformedAddressError, MalformedOwnerError
+from _exceptions import MalformedDataError, MalformedAddressError, MalformedOwnerError, \
+    MalformedZipcodeError, MalformedStateError, MalformedLotAndBlockError
 
 
 def main():
@@ -166,62 +167,78 @@ def insert_property_basetableinfo():
         # parid comes from the iterated item variable parid
         insertmap["parcelid"] = parid
         insertmap["muni"] = municodemap[current_muni]
+
+
         try:
             addrmap = extract_propertyaddress(
                 rawhtml
-            )  # Potentially raises Malformed Address Error
-
+            )
             insertmap["addr"] = addrmap["street"]
-            insertmap["notes"] = "core data scraped from county site"
+            insertmap["notes"] = "Core data scraped from county site"
             insertmap["city"] = addrmap["city"]
             insertmap["state"] = addrmap["state"]
             insertmap["zipcode"] = addrmap["zipc"]
+        except MalformedAddressError:
+            insertmap["addr"] = ""
+            insertmap["notes"] = "Error when extracting the Address"
+            insertmap["city"] = ""
+            insertmap["state"] = ""
+            insertmap["zipcode"] = ""
+
+        try:
             insertmap["lotandblock"] = extract_lotandblock_fromparid(parid)
-            # print('lob:' + insertmap['lotandblock'])
+        except MalformedLotAndBlockError:
+            insertmap["lotandblock"] = ''
 
-            insertmap["propclass"] = str(extract_class(rawhtml))
-            # print('class:' + insertmap['propclass'])
+        # None of these methods SHOULD throw an error. If they did, I don't know what the error would be
+        insertmap["propclass"] = str(extract_class(rawhtml))
+        insertmap["propertyusetype"] = extract_propertyusetype(rawhtml)
+        insertmap["ownercode"] = extract_ownercode(rawhtml)
+        insertmap["updatinguser"] = str(99)
+        print("Inserting parcelid data: %s" % (parid))
+        cursor.execute(insert_sql, insertmap)
 
-            insertmap["propertyusetype"] = extract_propertyusetype(rawhtml)
-            # print('use:' + insertmap['propertyusetype'])
+        # commit core propertytable insert
+        db_conn.commit()
+        propertycount = propertycount + 1
+        # and sql errors bubbling up from the extraction methods that also commit
+        personid = next(personidgenerator)
 
-            insertmap["ownercode"] = extract_ownercode(rawhtml)
-            # print('owner code:' + insertmap['ownercode'])
-
-            insertmap["updatinguser"] = str(99)
-            # print('updater id:' + insertmap['updatinguser'])
-
-            print("Inserting parcelid data: %s" % (parid))
-            cursor.execute(insert_sql, insertmap)
-
-            # commit core propertytable insert
-            db_conn.commit()
-            propertycount = propertycount + 1
-            # and sql errors bubbling up from the extraction methods that also commit
-            personid = next(personidgenerator)
-
+        try:
             extract_and_insert_person(
-                rawhtml, propid, personid
-            )  # Potentially raises MalformedDataErrors
-
+            rawhtml, personid
+        )
             connect_person_to_property(propid, personid)
             personcount = personcount + 1
-
-            create_and_insert_unitzero(propid)
-            # except:
-            #     print('ERROR: unable to create unit zero for property no.'+ str(propid))
-            #     logerror(parid)
-            #     continue
-
         except MalformedDataError as e:
-            logger.warning("Malformed %s at parcel ID %s", e.type, parid, exc_info=True)
-        finally:
-            print("--------- running totals --------")
-            print("Props inserted: " + str(propertycount))
-            print("Persons inserted: " + str(personcount))
-            print("********** DONE! *************")
+            if e.subtype:
+                logger.warning(
+                    "Malformed %s at parcel ID %s: %s could not be parsed",
+                    e.type,
+                    parid,
+                    e.subtype,
+                    exc_info=True
+                )
+            else:
+                logger.warning(
+                    "Malformed %s at parcel ID %s", e.type, parid, exc_info=True
+                )
 
-        # run insert with sql statement all loaded up
+
+
+
+        create_and_insert_unitzero(propid)
+
+        # except MalformedDataError:
+        #     logger.warning(
+        #         "This code SHOULD be unreachable. If this is in your error logs, "
+        #         "update insertPropDataFromCntyUsingParid.py to catch the try/except earlier."
+        #     )
+        print("--------- running totals --------")
+        print("Props inserted: " + str(propertycount))
+        print("Persons inserted: " + str(personcount))
+        print("********** DONE! *************")
+
     cursor.close()
     db_conn.close()
     print("Count of properties inserted: " + str(propertycount))
@@ -237,7 +254,7 @@ def insert_property_basetableinfo():
 #     print(cursor.fetchone())
 
 
-def extract_and_insert_person(rawhtml, propertyid, personid):
+def extract_and_insert_person(rawhtml, personid):
     # fixed values specific to keys in lookup tables
 
     db_conn = get_db_conn()
@@ -394,8 +411,7 @@ def extract_lotandblock_fromparid(parid):
 
     # Todo: Should this return -1?
     else:
-        print("ERROR: LOB parsing")
-        return ""
+        raise MalformedLotAndBlockError
 
 
 def extract_owner_name(property_html):
@@ -480,7 +496,9 @@ def extract_owneraddress(property_html):
     adrlistraw = soup.span.contents
     # make sure we have all the parts of the address
     if len(adrlistraw) < 3:
+        # Todo: This raises a generic error. Should it be more specific? How would you know what the actual problem is?
         raise MalformedAddressError
+
 
     owneraddrmap["street"] = re.sub("  ", " ", adrlistraw[0])
     print(owneraddrmap["street"])
@@ -490,17 +508,22 @@ def extract_owneraddress(property_html):
     print("city:" + owneraddrmap["city"])
     exp = re.compile(r",\s*(\w\w)")
     m = re.search(exp, adrlistraw[2])
-    owneraddrmap["state"] = str(m.group(1))
+    try:
+        owneraddrmap["state"] = str(m.group(1))
+        print("state:" + owneraddrmap["state"])
+    except AttributeError:
+        raise MalformedStateError
 
-    # abandoned string slicing approach (too brittle; use regexp)
-    # owneraddrmap['state']= adrlistraw[2][-13:-11]
-    print("state:" + owneraddrmap["state"])
 
     # owner zips could come in as: 15218 OR 15218- OR 15218-2342
     # just lose the routing numbers and take the first digits until the -
     exp = re.compile(r"\d+")
     m = re.search(exp, adrlistraw[2])
-    owneraddrmap["zipc"] = str(m.group())
+    try:
+        owneraddrmap["zipc"] = str(m.group())
+    except AttributeError:
+        raise MalformedZipcodeError
+
 
     # another abandoned string slicing approach:
     # also too brittle given range of scraped inputs
@@ -508,23 +531,6 @@ def extract_owneraddress(property_html):
     print("zip:" + owneraddrmap["zipc"])
 
     return owneraddrmap
-
-
-def extact_owner_name_and_mailing(parcel_id, property_html):
-
-    OWNER_ADDRESS_SPAN_ID = "lblChangeMail"
-    addrparts = {}
-
-    soup = bs4.BeautifulSoup(property_html, "lxml")
-    owner_address_raw = soup.find("span", id=OWNER_ADDRESS_SPAN_ID).text
-    # Remove extra spaces
-    addrparts["addr"] = rs.sub("")
-
-    owner_address = re.sub(r"\s+", " ", owner_address.strip())
-    # Remove leading spaces before commas
-    owner_address = re.sub(r"\s+,", ",", owner_address)
-
-    return owner_address
 
 
 def extract_propertyusetype(property_html):
