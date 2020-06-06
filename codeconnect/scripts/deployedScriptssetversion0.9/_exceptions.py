@@ -9,6 +9,7 @@ class MalformedDataError(IndexError):
     """ Base class for errors resulting from Malformed Data """
     pass
 
+
 # ------------------------------
 # Address Errors
 # ------------------------------
@@ -20,22 +21,25 @@ class MalformedAddressError(MalformedDataError):
         self.type = 'address'
         self.subtype = None
 
-
+# Todo: Implement behavior using metaclasses to ensure attributes exist
 class MalformedStateError(MalformedAddressError):
     """ Thrown when the program can't parse State information """
     def __init__(self):
+        super().__init__()
         self.subtype = 'state'
 
 
 class MalformedZipcodeError(MalformedAddressError):
     """ Thrown when the program can't parse zipcode information """
     def __init__(self):
+        super().__init__()
         self.subtype = 'zipcode'
 
 
 class MalformedLotAndBlockError(MalformedAddressError):
     """ Thrown when the program can't parse lot and block information """
     def __init__(self):
+        super().__init__()
         self.subtype = 'lot and block'
 
 
