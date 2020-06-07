@@ -24,6 +24,15 @@
                             <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
                         </h:form>
 
+                        <h:form>
+
+                            <p:commandButton ajax="false"
+                                             action="#{feeManagementBB.finishAndRedir()}"
+                                             value="Finish editing payment types and return."
+                                             />
+
+                        </h:form>
+                        
                         <div class="mainContainer">
 
                             <div class ="two-column-page-flex-container">
