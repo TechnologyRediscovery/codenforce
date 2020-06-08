@@ -18,8 +18,11 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.FeeAssigned;
@@ -29,11 +32,10 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -52,7 +54,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     private PaymentType newSelectedPaymentType;
     private PaymentType newPaymentType;
 
-    private OccPeriod currentOccPeriod;
+    private OccPeriodDataHeavy currentOccPeriod;
     private CECaseDataHeavy currentCase;
     private FeeAssigned selectedAssignedFee;
     private ArrayList<FeeAssigned> feeAssignedList;
@@ -77,7 +79,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         }
 
         currentMode = "Lookup";
-        
+
         selectedPayment = new Payment();
 
         selectedPaymentType = new PaymentType();
@@ -93,54 +95,34 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         boolean paymentSet = false;
 
-        PaymentIntegrator pi = getPaymentIntegrator();
-
         currentDomain = getSessionBean().getFeeManagementDomain();
 
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
 
-            currentOccPeriod = getSessionBean().getSessOccPeriod();
+            OccupancyCoordinator oc = getOccupancyCoordinator();
 
+            try {
+                currentOccPeriod = oc.assembleOccPeriodDataHeavy(getSessionBean().getFeeManagementOccPeriod(), getSessionBean().getSessUser().getMyCredential());
+            } catch (IntegrationException | BObStatusException | SearchException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
+            }
+            
+            feeAssignedList.addAll(currentOccPeriod.getFeeList());
+
+            //Check if we've got a payment the user wants to edit.
             if (getSessionBean().getSessionPayment() != null) {
                 paymentList.add(getSessionBean().getSessionPayment());
                 paymentSet = true;
-                try {
-                    ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
 
-                    for (MoneyOccPeriodFeeAssigned fee : tempList) {
-
-                        FeeAssigned skeleton = fee;
-
-                        skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
-                        skeleton.setDomain(currentDomain);
-                        feeAssignedList.add(skeleton);
-
-                    }
-                } catch (IntegrationException ex) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
-                }
+                //If we don't have a payment already in mind, let's grab the list from the database
             } else if (currentOccPeriod != null) {
 
-                try {
-                    ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-
-                    for (MoneyOccPeriodFeeAssigned fee : tempList) {
-
-                        FeeAssigned skeleton = fee;
-
-                        skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
-                        skeleton.setDomain(currentDomain);
-                        feeAssignedList.add(skeleton);
-                        paymentList.addAll(skeleton.getPaymentList());
-                    }
-                    paymentSet = true;
-                } catch (IntegrationException ex) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
+                for (FeeAssigned fee : feeAssignedList) {
+                    paymentList.addAll(fee.getPaymentList());
                 }
+                paymentSet = true;
 
             }
 
@@ -156,33 +138,16 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                                 "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
             }
 
+            //Check if we've got a payment the user wants to edit.
             if (getSessionBean().getSessionPayment() != null) {
 
+                paymentList.add(getSessionBean().getSessionPayment());
                 paymentSet = true;
-//                try {
-                // TODO NADGIT rewire to use Coordinator
-//                    List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
-                List<MoneyCECaseFeeAssigned> tempList = new ArrayList<>();
+                feeAssignedList.addAll(currentCase.getFeeList());
 
-                for (MoneyCECaseFeeAssigned fee : tempList) {
-
-                    FeeAssigned skeleton = fee;
-
-                    skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
-                    skeleton.setDomain(currentDomain);
-                    feeAssignedList.add(skeleton);
-
-                }
-//                } catch (IntegrationException ex) {
-//                    getFacesContext().addMessage(null,
-//                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                                    "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
-//                }
+                //If we don't have a payment already in mind, let's grab the list from the database
             } else if (currentCase != null) {
 
-//                try {
-                // TODO NADGIT rewire to use Coordinator
-//                    List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
                 feeAssignedList.addAll(currentCase.getFeeList());
 
                 for (FeeAssigned fee : feeAssignedList) {
@@ -192,29 +157,21 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                 }
 
                 paymentSet = true;
-//                } catch (IntegrationException ex) {
-//                    getFacesContext().addMessage(null,
-//                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                                    "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
-//                }
 
             }
 
         }
 
         if (!paymentSet) {
-            try {
-                paymentList = pi.getPaymentList();
-            } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to load payment list",
-                                "This must be corrected by the system administrator"));
-            }
+            PaymentCoordinator pc = getPaymentCoordinator();
+            paymentList = pc.getAllPayments();
+
         }
 
     }
 
+    //BOOKMARK
+    
     /**
      *
      * @param currentMode Lookup, Insert, Update, Remove
@@ -613,8 +570,8 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-public String onUpdatePayTypeButtonChange(){
-    
+    public String onUpdatePayTypeButtonChange() {
+
         PaymentIntegrator pti = getPaymentIntegrator();
         PaymentType pt = selectedPaymentType;
 
@@ -631,10 +588,10 @@ public String onUpdatePayTypeButtonChange(){
         }
 
         return "paymentTypeManage";
-        
+
     }
 
-    public String onInsertPayTypeButtonChange(){
+    public String onInsertPayTypeButtonChange() {
         PaymentType pt = new PaymentType();
         PaymentIntegrator pti = new PaymentIntegrator();
         pt.setPaymentTypeId(selectedPaymentType.getPaymentTypeId());
@@ -652,11 +609,11 @@ public String onUpdatePayTypeButtonChange(){
         }
 
         return "paymentTypeManage";
-        
+
     }
 
-    public String onRemovePayTypeButtonChange(){
-    
+    public String onRemovePayTypeButtonChange() {
+
         PaymentIntegrator pti = getPaymentIntegrator();
         PaymentType pt = selectedPaymentType;
 
@@ -673,9 +630,9 @@ public String onUpdatePayTypeButtonChange(){
         }
 
         return "paymentTypeManage";
-        
+
     }
-    
+
     /**
      * @return the paymentTypeList
      */
@@ -792,11 +749,11 @@ public String onUpdatePayTypeButtonChange(){
         this.currentPaymentSelected = currentPaymentSelected;
     }
 
-    public OccPeriod getCurrentOccPeriod() {
+    public OccPeriodDataHeavy getCurrentOccPeriod() {
         return currentOccPeriod;
     }
 
-    public void setCurrentOccPeriod(OccPeriod currentOccPeriod) {
+    public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
         this.currentOccPeriod = currentOccPeriod;
     }
 

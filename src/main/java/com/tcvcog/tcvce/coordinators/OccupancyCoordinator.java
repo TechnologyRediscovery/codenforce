@@ -79,6 +79,7 @@ import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 
 /**
  * King of all business logic implementation for the entire Occupancy object tree
@@ -159,6 +160,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
+        PaymentIntegrator pai = getPaymentIntegrator();
         WorkflowCoordinator chc = getWorkflowCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         EventCoordinator ec = getEventCoordinator();
@@ -197,8 +199,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             opdh.setInspectionList(inspecInt.getOccInspectionList(opdh));
 
             // FEE AND PAYMENT LIST
-    //        opdh.setPaymentList(pai.getPaymentList(opdh));
-    //        opdh.setFeeList(pai.getFeeAssigned(opdh));
+            opdh.setPaymentListGeneral(pai.getPaymentList(opdh));
+            opdh.setFeeList(pai.getFeeAssigned(opdh));
 
             // PERMIT LIST
             opdh.setPermitList(oi.getOccPermitList(opdh));

@@ -22,17 +22,19 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
-import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 
 /**
  * Implements business logic related to payments.
@@ -97,30 +99,102 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
-            EnforcableCodeElement codeElement = violation.getCodeViolated();
+        EnforcableCodeElement codeElement = violation.getCodeViolated();
 
-            ArrayList<Fee> feeList = (ArrayList<Fee>) codeElement.getFeeList();
+        ArrayList<Fee> feeList = (ArrayList<Fee>) codeElement.getFeeList();
 
-            for (Fee fee : feeList) {
+        for (Fee fee : feeList) {
 
-                if (fee.isAutoAssigned()) {
+            if (fee.isAutoAssigned()) {
 
-                    MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned();
+                MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned();
 
-                    skeleton.setCaseID(cse.getCaseID());
-                    skeleton.setCodeSetElement(codeElement.getCodeSetElementID());
-                    skeleton.setMoneyFeeAssigned(fee.getOccupancyInspectionFeeID());
-                    skeleton.setAssignedBy(getSessionBean().getSessUser());
-                    skeleton.setAssigned(LocalDateTime.now());
-                    skeleton.setLastModified(LocalDateTime.now());
-                    skeleton.setNotes("Automatically assigned");
-                    skeleton.setFee(fee);
+                skeleton.setCaseID(cse.getCaseID());
+                skeleton.setCodeSetElement(codeElement.getCodeSetElementID());
+                skeleton.setMoneyFeeAssigned(fee.getOccupancyInspectionFeeID());
+                skeleton.setAssignedBy(getSessionBean().getSessUser());
+                skeleton.setAssigned(LocalDateTime.now());
+                skeleton.setLastModified(LocalDateTime.now());
+                skeleton.setNotes("Automatically assigned");
+                skeleton.setFee(fee);
 
-                    pi.insertCECaseFee(skeleton);
-
-                }
+                pi.insertCECaseFee(skeleton);
 
             }
+
+        }
+
+    }
+
+    public List<FeeAssigned> getOccPeriodAssignedFees(OccPeriod currentOccPeriod) {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+        ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
+
+        try {
+            ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
+
+            for (MoneyOccPeriodFeeAssigned fee : tempList) {
+
+                FeeAssigned skeleton = fee;
+
+                skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
+                skeleton.setDomain(EventDomainEnum.OCCUPANCY);
+                skeletonHorde.add(skeleton);
+
+            }
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
+            System.out.println("PaymentCoordinator.getOccPeriodAssignedFees | ERROR: " + ex.toString());
+        }
+
+        return skeletonHorde;
+
+    }
+
+    public List<FeeAssigned> getCECaseAssignedFees(CECase currentCase) {
+        PaymentIntegrator pi = getPaymentIntegrator();
+        ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
+
+        try {
+            List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
+
+            for (MoneyCECaseFeeAssigned fee : tempList) {
+
+                FeeAssigned skeleton = fee;
+
+                skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
+                skeleton.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
+                skeletonHorde.add(skeleton);
+
+            }
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
+            System.out.println("PaymentCoordinator.getCECaseAssignedFees | ERROR: " + ex.toString());
+        }
+
+        return skeletonHorde;
+
+    }
+
+    public ArrayList<Payment> getAllPayments() {
+        PaymentIntegrator pi = getPaymentIntegrator();
+        try {
+            return pi.getPaymentList();
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to load payment list",
+                            "This must be corrected by the system administrator"));
+            System.out.println("PaymentCoordinator.getAllPayments | ERROR: " + ex.toString());
+
+        }
+        
+        return new ArrayList<>();
 
     }
 

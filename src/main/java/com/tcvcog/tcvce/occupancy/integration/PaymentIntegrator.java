@@ -599,9 +599,10 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee = new MoneyOccPeriodFeeAssigned(generateFeeAssigned(rs));
 
             fee.setAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
-            fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
             fee.setOccPerAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
+            fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
             fee.setPaymentList(getPaymentList(fee));
+            fee.setDomain(EventDomainEnum.OCCUPANCY);
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error generating OccPeriodFeeAssigned from ResultSet", ex);
@@ -622,9 +623,12 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee = new MoneyCECaseFeeAssigned(generateFeeAssigned(rs));
 
             fee.setCeCaseAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
+            fee.setAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
             fee.setCaseID(rs.getInt("cecase_caseid"));
             fee.setCodeSetElement(rs.getInt("codesetelement_elementid"));
             fee.setPaymentList(getPaymentList(fee));
+            fee.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
+
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error generating CECaseFeeAssigned from ResultSet", ex);
@@ -1449,7 +1453,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    
     //TODO: change this to deactivate payment records instead of deleting them.
     public void deletePayment(Payment payment) throws IntegrationException {
         String query = "DELETE FROM public.moneypayment\n"

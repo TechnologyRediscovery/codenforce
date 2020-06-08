@@ -40,7 +40,7 @@ public class FeeAssigned implements Serializable {
 
     public FeeAssigned() {
     }
-    
+        
     public int getAssignedFeeID() {
         return assignedFeeID;
     }
