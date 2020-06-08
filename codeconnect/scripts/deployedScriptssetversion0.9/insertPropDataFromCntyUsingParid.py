@@ -11,7 +11,7 @@ import logging
 from os.path import join
 from copy import deepcopy
 
-from _exceptions import MalformedDataError, MalformedAddressError, MalformedOwnerError, \
+from _exceptions import MalformedDataError, MalformedGenericAddressError, MalformedOwnerError, \
     MalformedZipcodeError, MalformedStateError, MalformedLotAndBlockError
 
 
@@ -178,7 +178,7 @@ def insert_property_basetableinfo():
             insertmap["city"] = addrmap["city"]
             insertmap["state"] = addrmap["state"]
             insertmap["zipcode"] = addrmap["zipc"]
-        except MalformedAddressError as e:
+        except MalformedGenericAddressError as e:
             log_error(e, parid)
             insertmap["addr"] = ""
             insertmap["notes"] = "Error when extracting the Address"
@@ -450,7 +450,7 @@ def extract_propertyaddress(property_html):
     # make sure we have all the parts of the address
 
     if len(adrlistraw) < 3:
-        raise MalformedAddressError
+        raise MalformedGenericAddressError
 
     propaddrmap["street"] = re.sub("  ", " ", adrlistraw[0])
     print(propaddrmap["street"])
@@ -485,7 +485,7 @@ def extract_owneraddress(property_html):
     # make sure we have all the parts of the address
     if len(adrlistraw) < 3:
         # Todo: This raises a generic error. Should it be more specific? How would you know what the actual problem is?
-        raise MalformedAddressError
+        raise MalformedGenericAddressError
 
 
     owneraddrmap["street"] = re.sub("  ", " ", adrlistraw[0])
