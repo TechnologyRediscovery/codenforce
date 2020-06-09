@@ -39,6 +39,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -186,6 +188,25 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
+    public List<Fee> getFeeList(){
+        
+        PaymentIntegrator pi = getPaymentIntegrator();
+        
+        try {
+            return pi.getFeeTypeList(getSessionBean().getSessMuni());
+        } catch (IntegrationException ex) {
+           getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Oops! We encountered a problem trying to fetch the list of fee templates!", ""));
+            System.out.println(ex.toString());
+        }
+        
+        return new ArrayList<>();
+        
+    }
+    
+    
+    
     public ArrayList<Payment> getAllPayments() {
         PaymentIntegrator pi = getPaymentIntegrator();
         try {

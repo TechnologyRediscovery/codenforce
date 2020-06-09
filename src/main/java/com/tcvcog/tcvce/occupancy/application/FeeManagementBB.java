@@ -18,8 +18,12 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.CodeCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeSet;
@@ -34,6 +38,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -42,6 +47,8 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
@@ -59,7 +66,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private Fee selectedFeeType;
 
     //feeManage.xhtml fields
-    private OccPeriod currentOccPeriod;
+    private OccPeriodDataHeavy currentOccPeriod;
     private CECaseDataHeavy currentCase;
     private Fee selectedFee;
     private ArrayList<Fee> feeList;
@@ -103,7 +110,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     public void initBean() {
         selectedFeeType = new Fee();
 
-        PaymentIntegrator pi = getPaymentIntegrator();
+        PaymentCoordinator pc = getPaymentCoordinator();
 
         selectedAssignedFee = new FeeAssigned();
 
@@ -119,24 +126,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             redirected = true;
 
             if (allFees == null) {
-                try {
-                    allFees = pi.getFeeTypeList(getSessionBean().getSessMuni());
-                } catch (IntegrationException ex) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to fetch the fee list!", ""));
-                }
+
+                    allFees = pc.getFeeList();
+
             }
 
             if (feeList == null) {
                 feeList = (ArrayList<Fee>) allFees;
             }
 
-            try {
                 refreshTypesAndElements();
-            } catch (BObStatusException e) {
-                //TODO: make this try-catch not necessary. Maybe move alot to the coordinator?
-            }
+            
             if (currentCase != null) {
                 violationList = (ArrayList<CodeViolation>) currentCase.getViolationList();
             }
@@ -301,11 +301,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             
             refreshFeeAssignedList();
 
-            try {
                 refreshTypesAndElements();
-            } catch (BObStatusException ex) {
-                //TODO: Make this try-catch unnecessary
-            }
             
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Occ Period Type: " + selectedPeriodType.getTypeID(), ""));
@@ -349,12 +345,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             
             refreshFeeAssignedList();
 
-            try {
                 refreshTypesAndElements();
-            } catch (BObStatusException ex) {
-                //TODO: Make this try-catch unnecessary
-            }
-            
+         
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Code Set Element: " + selectedCodeElement.getCodeSetElementID(), ""));
         }
@@ -387,12 +379,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             //turn to default setting
             currentFeeSelected = false;
             selectedFeeType = new Fee();
-            try {
+
                 refreshTypesAndElements();
-            } catch (BObStatusException ex) {
-                //TODO: Make this try-catch not necessary
-            }
-            
+
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Fee: " + selectedFeeType.getName(), ""));
         }
@@ -775,11 +764,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             }
         }
 
-        try {
             refreshTypesAndElements();
-        } catch (BObStatusException ex) {
-            //TODO: Make this try catch not necessary
-        }
 
         return "feePermissions";
     }
@@ -957,7 +942,16 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
 
-            currentOccPeriod = getSessionBean().getFeeManagementOccPeriod();
+            OccupancyCoordinator oc = getOccupancyCoordinator();
+            
+            try {
+                currentOccPeriod =  oc.assembleOccPeriodDataHeavy(getSessionBean().getFeeManagementOccPeriod(), getSessionBean().getSessUser().getMyCredential());
+            } catch (IntegrationException | BObStatusException | SearchException ex) {
+                System.out.println(ex.toString());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Encountered error while trying to assemble the current Occupancy Period!", "Check server print out..."));
+            }
 
             if (currentOccPeriod != null) {
 
@@ -1020,36 +1014,26 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-    public void refreshTypesAndElements() throws BObStatusException {
+    public void refreshTypesAndElements() {
 
-        OccupancyIntegrator oi = getOccupancyIntegrator();
-        CodeIntegrator ci = getCodeIntegrator();
+        PaymentCoordinator pc = getPaymentCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        CodeCoordinator ec = getCodeCoordinator();
 
-        try {
-            typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessMuni().getProfile().getProfileID());
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Oops! We encountered a problem trying to fetch the OccPeriodType List!", ""));
-        }
+            typeList = (ArrayList<OccPeriodType>) oc.getOccPeriodTypesFromProfileID(getSessionBean().getSessMuni().getProfile().getProfileID());
 
-        try {
-            ArrayList<CodeSet> codeSetList = ci.getCodeSets(getSessionBean().getSessMuni().getMuniCode());
+            ArrayList<CodeSet> codeSetList = (ArrayList<CodeSet>) ec.getCodeSetsFromMuniID(getSessionBean().getSessMuni().getMuniCode());
 
             elementList = new ArrayList<>();
 
             for (CodeSet set : codeSetList) {
 
-                elementList.addAll(ci.getEnforcableCodeElementList(set.getCodeSetID()));
+                elementList.addAll(ec.getCodeElementsFromCodeSetID(set.getCodeSetID()));
 
             }
 
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Oops! We encountered a problem trying to fetch the CodeSetElement List!", ""));
-        }
+            //BOOKMARK
 
         try {
             currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
@@ -1167,11 +1151,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.filteredFeeList = filteredFeeList;
     }
 
-    public OccPeriod getCurrentOccPeriod() {
+    public OccPeriodDataHeavy getCurrentOccPeriod() {
         return currentOccPeriod;
     }
 
-    public void setCurrentOccPeriod(OccPeriod currentOccPeriod) {
+    public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
         this.currentOccPeriod = currentOccPeriod;
     }
 

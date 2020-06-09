@@ -19,12 +19,13 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
+import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeSource;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -69,6 +70,32 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     }
     
   
+    public List<CodeSet> getCodeSetsFromMuniID(int muniCode) {
+        
+        CodeIntegrator integrator = getCodeIntegrator();
+        
+        try {
+            return integrator.getCodeSets(muniCode);
+        } catch (IntegrationException ex) {
+            System.out.println(ex.toString());
+        }
+        
+        return new ArrayList<>();
+        
+    }
     
+    public List<EnforcableCodeElement> getCodeElementsFromCodeSetID(int setID){
+        
+        CodeIntegrator integrator = getCodeIntegrator();
+        
+        try {
+            return integrator.getEnforcableCodeElementList(setID);
+        } catch (IntegrationException ex) {
+            System.out.println(ex.toString());
+        }
+     
+        return new ArrayList<>();
+        
+    }
     
 }
