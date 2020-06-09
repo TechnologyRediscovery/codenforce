@@ -748,7 +748,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(1, period.getPeriodID());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                paymentList.add(generatePayment(rs));
+                paymentList.add(generatePayment(rs, EventDomainEnum.OCCUPANCY));
             }
 
         } catch (SQLException ex) {
@@ -796,7 +796,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(1, fee.getOccPerAssignedFeeID());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Payment p = generatePayment(rs);
+                Payment p = generatePayment(rs, EventDomainEnum.OCCUPANCY);
                 p.setAssignedFeeID(fee.getOccPerAssignedFeeID());
                 p.setDomain(EventDomainEnum.OCCUPANCY);
                 paymentList.add(p);
@@ -856,7 +856,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(1, cse.getCaseID());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                paymentList.add(generatePayment(rs));
+                paymentList.add(generatePayment(rs, EventDomainEnum.CODE_ENFORCEMENT));
             }
 
         } catch (SQLException ex) {
@@ -904,10 +904,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(1, fee.getCeCaseAssignedFeeID());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Payment p = generatePayment(rs);
+                Payment p = generatePayment(rs,EventDomainEnum.CODE_ENFORCEMENT);
                 p.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
-                p.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
-                paymentList.add(p);
 
             }
 
@@ -954,7 +952,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             rs = stmt.executeQuery();
             System.out.println("PaymentIntegrator.getPaymentList | SQL: " + stmt.toString());
             while (rs.next()) {
-                paymentList.add(generatePayment(rs));
+                paymentList.add(generatePayment(rs, null));
             }
 
         } catch (SQLException ex) {
@@ -1001,7 +999,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             rs = stmt.executeQuery();
             System.out.println("PaymentIntegrator.getMostRecentPayment | SQL: " + stmt.toString());
             while (rs.next()) {
-                skeleton = generatePayment(rs);
+                skeleton = generatePayment(rs, null);
             }
 
         } catch (SQLException ex) {
@@ -1488,7 +1486,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
-    private Payment generatePayment(ResultSet rs) throws IntegrationException {
+    private Payment generatePayment(ResultSet rs, EventDomainEnum domain) throws IntegrationException {
         Payment newPayment = new Payment();
 
         PersonIntegrator pi = getPersonIntegrator();
@@ -1526,6 +1524,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             newPayment.setCleared(rs.getBoolean("cleared"));
             newPayment.setNotes(rs.getString("notes"));
             newPayment.setRecordedBy(ui.getUser(rs.getInt("recordedby_userid")));
+            newPayment.setDomain(domain);
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
