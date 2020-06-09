@@ -1,17 +1,15 @@
-import logging
 import inspect
 import sys
 
 # Important Note! Do not create classes in this module that are not Errors, as validate_exceptions uses introspection
 
-error_logger = logging.getLogger(__name__)
-error_logger.setLevel(logging.DEBUG)
 
-error_logger.debug("Error logger initialized")
-
-
+# Todo: Discuss refactoring this into a scraping error?
 class MalformedDataError(IndexError):
-    """ Base class for errors resulting from Malformed Data """
+    """
+    Base class for errors resulting from Malformed Data
+    Error likely raised during scraping
+    """
 
     def __init__(self):
         self.error_code = 0
