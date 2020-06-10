@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
@@ -29,9 +30,9 @@ import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
-import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
@@ -39,9 +40,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.faces.application.FacesMessage;
 
 /**
  * Implements business logic related to payments.
@@ -56,11 +54,6 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
     public PaymentCoordinator() {
     }
 
-    /*
-    public OccPeriod configureOccPeriodFees(OccPeriod op){
-        // look up the set of fees associated with 
-    }
-     */
     /**
      * Container for business logic related to an individual Payment instance
      *
@@ -133,362 +126,272 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public List<FeeAssigned> getOccPeriodAssignedFees(OccPeriod currentOccPeriod) {
+    public void insertAssignedFee(FeeAssigned input, OccPeriod currentOccPeriod, boolean waived) throws IntegrationException, BObStatusException {
+
+        if (input.getFee() == null) {
+            throw new BObStatusException("Please select a fee to assign");
+        }
+
+        if (waived == true) {
+            input.setWaivedBy(getSessionBean().getSessUser());
+        } else {
+            input.setWaivedBy(new User());
+        }
+
+        if (input.getReducedBy() > 0) {
+            input.setReducedByUser(getSessionBean().getSessUser());
+        } else if (input.getReducedBy() < 0) {
+            throw new BObStatusException("You cannot reduce a fee by a negative number.");
+        } else {
+            input.setReducedByUser(new User());
+        }
+
+        MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(input);
+
+        secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
+        secondSkeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+        pi.insertOccPeriodFee(secondSkeleton);
+
+    }
+
+    public void insertAssignedFee(FeeAssigned input, CECase inputCase, CodeViolation violation, boolean waived) throws IntegrationException, BObStatusException {
+
+        if (input.getFee() == null) {
+            throw new BObStatusException("Please select a fee to assign");
+        }
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        if (waived == true) {
+            input.setWaivedBy(getSessionBean().getSessUser());
+        } else {
+            input.setWaivedBy(new User());
+        }
+
+        if (input.getReducedBy() > 0) {
+            input.setReducedByUser(getSessionBean().getSessUser());
+        } else if (input.getReducedBy() < 0) {
+            throw new BObStatusException("You cannot reduce a fee by a negative number.");
+        } else {
+            input.setReducedByUser(new User());
+        }
+
+        MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(input);
+
+        secondSkeleton.setCeCaseAssignedFeeID(input.getAssignedFeeID());
+        secondSkeleton.setCaseID(inputCase.getCaseID());
+        secondSkeleton.setCodeSetElement(violation.getCodeViolated().getCodeSetElementID());
+
+        pi.insertCECaseFee(secondSkeleton);
+
+    }
+
+    public List<FeeAssigned> getOccPeriodAssignedFees(OccPeriod currentOccPeriod) throws IntegrationException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
         ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
 
-        try {
-            ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
+        ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
 
-            for (MoneyOccPeriodFeeAssigned fee : tempList) {
+        for (MoneyOccPeriodFeeAssigned fee : tempList) {
 
-                FeeAssigned skeleton = fee;
+            FeeAssigned skeleton = fee;
 
-                skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
-                skeleton.setDomain(EventDomainEnum.OCCUPANCY);
-                skeletonHorde.add(skeleton);
+            skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
+            skeleton.setDomain(EventDomainEnum.OCCUPANCY);
+            skeletonHorde.add(skeleton);
 
-            }
-        } catch (IntegrationException ex) {
+        }
+        /*} catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
             System.out.println("PaymentCoordinator.getOccPeriodAssignedFees | ERROR: " + ex.toString());
-        }
+        }*/
 
         return skeletonHorde;
 
     }
 
-    public List<FeeAssigned> getCECaseAssignedFees(CECase currentCase) {
+    public List<FeeAssigned> getCECaseAssignedFees(CECase currentCase) throws IntegrationException {
         PaymentIntegrator pi = getPaymentIntegrator();
         ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
 
-        try {
-            List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
+        List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
 
-            for (MoneyCECaseFeeAssigned fee : tempList) {
+        for (MoneyCECaseFeeAssigned fee : tempList) {
 
-                FeeAssigned skeleton = fee;
+            FeeAssigned skeleton = fee;
 
-                skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
-                skeleton.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
-                skeletonHorde.add(skeleton);
+            skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
+            skeleton.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
+            skeletonHorde.add(skeleton);
 
-            }
+        }
+        /*
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
             System.out.println("PaymentCoordinator.getCECaseAssignedFees | ERROR: " + ex.toString());
-        }
+        }*/
 
         return skeletonHorde;
 
     }
 
-    public List<Fee> getFeeList(){
-        
-        PaymentIntegrator pi = getPaymentIntegrator();
-        
-        try {
-            return pi.getFeeTypeList(getSessionBean().getSessMuni());
-        } catch (IntegrationException ex) {
-           getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Oops! We encountered a problem trying to fetch the list of fee templates!", ""));
-            System.out.println(ex.toString());
-        }
-        
-        return new ArrayList<>();
-        
-    }
-    
-    
-    
-    public ArrayList<Payment> getAllPayments() {
-        PaymentIntegrator pi = getPaymentIntegrator();
-        try {
-            return pi.getPaymentList();
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to load payment list",
-                            "This must be corrected by the system administrator"));
-            System.out.println("PaymentCoordinator.getAllPayments | ERROR: " + ex.toString());
+    public List<Fee> getFeeList() throws IntegrationException {
 
-        }
+        PaymentIntegrator pi = getPaymentIntegrator();
 
-        return new ArrayList<>();
+        return pi.getFeeTypeList(getSessionBean().getSessMuni());
 
     }
 
-    public void insertPayment(Payment input, FeeAssigned appliedTo) {
+    public ArrayList<Payment> getAllPayments() throws IntegrationException {
+        PaymentIntegrator pi = getPaymentIntegrator();
+        return pi.getPaymentList();
 
-        boolean failed = false;
+    }
+
+    public void insertPayment(Payment input, FeeAssigned appliedTo) throws BObStatusException, IntegrationException {
 
         input.setRecordedBy(getSessionBean().getSessUser());
-        
+
         if (input.getPayer() == null) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "The Payer's ID is not in our database, please make sure it's correct.", " "));
-            input.setPayer(new Person());
-            failed = true;
+
+            throw new BObStatusException("The Payer's ID is not in our database, please make sure it's correct.");
+
         }
 
         if (input.getAmount() <= 0) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "The amount you entered is not valid.", " "));
-            input.setPayer(new Person());
-            failed = true;
+
+            throw new BObStatusException("The amount you entered is not valid.");
+
         }
 
         if (input.getPaymentType().getPaymentTypeId() == 1
                 && (input.getReferenceNum() == null || input.getReferenceNum().equals(""))) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "A payment by check requires a reference number", " "));
-            input.setPayer(new Person());
-            failed = true;
+
+            throw new BObStatusException("A payment by check requires a reference number.");
+
         }
 
         if (input.getPaymentType().getPaymentTypeId() == 1
                 && (input.getCheckNum() == 0)) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "A payment by check requires a check number.", " "));
-            input.setPayer(new Person());
-            failed = true;
+
+            throw new BObStatusException("A payment by check requires a check number.");
+
         }
 
-        if (failed == false) {
+        PaymentIntegrator pi = getPaymentIntegrator();
 
-            PaymentIntegrator pi = getPaymentIntegrator();
+        pi.insertPayment(input);
+        input = pi.getMostRecentPayment(); //So that the join insert knows what payment to join to
 
-            try {
-                pi.insertPayment(input);
-                input = pi.getMostRecentPayment(); //So that the join insert knows what payment to join to
-
-                if (appliedTo.getDomain() == EventDomainEnum.OCCUPANCY) {
-                    MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned(appliedTo);
-                    pi.insertPaymentPeriodJoin(input, skeleton);
-                } else if (appliedTo.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
-                    MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned(appliedTo);
-                    pi.insertPaymentCaseJoin(input, skeleton);
-                }
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Successfully added payment record to database!", ""));
-            } catch (IntegrationException ex) {
-                System.out.println(ex.toString());
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to add payment record to database, sorry!", "Check server print out..."));
-            }
-
+        if (appliedTo.getDomain() == EventDomainEnum.OCCUPANCY) {
+            MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned(appliedTo);
+            pi.insertPaymentPeriodJoin(input, skeleton);
+        } else if (appliedTo.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
+            MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned(appliedTo);
+            pi.insertPaymentCaseJoin(input, skeleton);
         }
 
     }
 
-    public void updatePayment(Payment input, FeeAssigned appliedTo) {
-
-        boolean failed = false;
+    public void updatePayment(Payment input, FeeAssigned appliedTo) throws BObStatusException, IntegrationException {
 
         if (appliedTo == null) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a fee to assign this payment to.", " "));
-            input.setPayer(new Person());
-            failed = true;
+            throw new BObStatusException("Please select a fee to assign this payment to.");
         }
 
         if (input.getPayer() == null) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "The Payer's ID is not in our database, please make sure it's correct.", " "));
-            input.setPayer(new Person());
-            failed = true;
+            throw new BObStatusException("The Payer's ID is not in our database, please make sure it's correct.");
         }
 
         if (input.getAmount() <= 0) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "The amount you entered is not valid.", " "));
-            input.setPayer(new Person());
-            failed = true;
+            throw new BObStatusException("The amount you entered is not valid.");
         }
 
         if (input.getPaymentType().getPaymentTypeId() == 1
                 && (input.getReferenceNum() == null || input.getReferenceNum().equals(""))) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "A payment by check requires a reference number", " "));
-            input.setPayer(new Person());
-            failed = true;
+            throw new BObStatusException("A payment by check requires a reference number.");
         }
 
         if (input.getPaymentType().getPaymentTypeId() == 1
                 && (input.getCheckNum() == 0)) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "A payment by check requires a check number.", " "));
-            failed = true;
+            throw new BObStatusException("A payment by check requires a check number.");
         }
 
-        if (!failed) {
-            PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
+        PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
 
-            //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes); TODO: ask eric what this should do
-            try {
-                paymentIntegrator.updatePayment(input);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Payment record updated!", ""));
-
-            } catch (IntegrationException ex) {
-                System.out.println(ex.toString());
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to update payment record in database.",
-                                "This must be corrected by the System Administrator"));
-            }
-        }
+        //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes); TODO: ask eric what this should do
+        paymentIntegrator.updatePayment(input);
 
     }
 
-    public void removePayment(Payment input) {
+    public void removePayment(Payment input) throws BObStatusException, IntegrationException {
 
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
         if (input != null) {
-            try {
-                paymentIntegrator.deletePayment(input);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Payment record deleted forever!", ""));
-            } catch (IntegrationException ex) {
-                System.out.println(ex.toString());
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to delete payment record--probably because it is used "
-                                + "somewhere in the database. Sorry.",
-                                "This payment will always be with us."));
-            }
-
+            paymentIntegrator.deletePayment(input);
         } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a payment record from the table to delete", ""));
+            throw new BObStatusException("Please select a payment record from the table to delete.");
         }
+    }
+
+    public String getAddressFromPropUnitID(int propUnitID) throws IntegrationException {
+
+        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyUnit unit = pi.getPropertyUnit(propUnitID);
+        Property prop = pi.getProperty(unit.getPropertyID());
+        return prop.getAddress();
 
     }
 
-    public String getAddressFromPropUnitID(int propUnitID) {
-
-        try {
-            PropertyIntegrator pi = getPropertyIntegrator();
-            PropertyUnit unit = pi.getPropertyUnit(propUnitID);
-            Property prop = pi.getProperty(unit.getPropertyID());
-            return prop.getAddress();
-        } catch (IntegrationException ex) {
-            System.out.println(ex.toString());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to find property address!",
-                            ""));
-        }
-
-        return "";
-
-    }
-
-    public void updatePaymentType(PaymentType input) {
+    public void updatePaymentType(PaymentType input) throws IntegrationException {
 
         PaymentIntegrator pti = getPaymentIntegrator();
 
-        try {
-            pti.updatePaymentType(input);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Payment type updated!", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex.toString());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to update Payment type in database.",
-                            "This must be corrected by the System Administrator"));
-        }
+        pti.updatePaymentType(input);
 
     }
 
-    public void insertPaymentType(PaymentType input) {
+    public void insertPaymentType(PaymentType input) throws IntegrationException {
 
         PaymentIntegrator pti = new PaymentIntegrator();
-        try {
-            pti.insertPaymentType(input);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully added payment type to database!", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex.toString());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to add payment type to database, sorry!", "Check server print out..."));
-        }
+
+        pti.insertPaymentType(input);
 
     }
 
-    public void removePaymentType(PaymentType input) {
+    public void removePaymentType(PaymentType input) throws BObStatusException, IntegrationException {
 
         PaymentIntegrator pti = getPaymentIntegrator();
 
         if (input != null) {
-            try {
-                pti.deletePaymentType(input);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Payment type deleted forever!", ""));
-            } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to delete payment type--probably because it is used "
-                                + "somewhere in the database. Sorry.",
-                                "This payment will always be with us."));
-            }
+
+            pti.deletePaymentType(input);
 
         } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a payment type from the table to delete", ""));
+            throw new BObStatusException("Please select a payment type from the table to delete.");
         }
 
     }
-    
-    public ArrayList<PaymentType> getPaymentTypes() {
-        
-        ArrayList<PaymentType> paymentTypeList = new ArrayList<>();
-        
-        try {
-            PaymentIntegrator pti = getPaymentIntegrator();
-            paymentTypeList = pti.getPaymentTypeList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex.toString());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to load Payment Type",
-                            "This must be corrected by the system administrator"));
-        }
+
+    public ArrayList<PaymentType> getPaymentTypes() throws IntegrationException {
+
+        PaymentIntegrator pti = getPaymentIntegrator();
+        ArrayList<PaymentType> paymentTypeList = pti.getPaymentTypeList();
         if (paymentTypeList != null) {
             return paymentTypeList;
         } else {
             paymentTypeList = new ArrayList();
             return paymentTypeList;
         }
-        
+
     }
-    
-    
 
 }

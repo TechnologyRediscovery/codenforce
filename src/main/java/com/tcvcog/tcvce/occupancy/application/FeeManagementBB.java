@@ -34,21 +34,14 @@ import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
@@ -127,7 +120,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             if (allFees == null) {
 
+                try {
                     allFees = pc.getFeeList();
+                } catch (IntegrationException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Oops! We encountered a problem trying to fetch the list of fee templates!", ""));
+                    System.out.println(ex.toString());
+                }
 
             }
 
@@ -135,8 +135,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 feeList = (ArrayList<Fee>) allFees;
             }
 
-                refreshTypesAndElements();
-            
+            refreshTypesAndElements();
+
             if (currentCase != null) {
                 violationList = (ArrayList<CodeViolation>) currentCase.getViolationList();
             }
@@ -285,7 +285,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 workingFeeList = new ArrayList<>();
             }
             //update the current selected fee list in side panel
-            
+
             typeList = new ArrayList<>();
             typeList.add(selectedPeriodType);
 
@@ -298,11 +298,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             currentFeeSelected = false;
 
             selectedPeriodType = new OccPeriodType();
-            
+
             refreshFeeAssignedList();
 
-                refreshTypesAndElements();
-            
+            refreshTypesAndElements();
+
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Occ Period Type: " + selectedPeriodType.getTypeID(), ""));
         }
@@ -322,14 +322,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             selectedCodeElement = currentElement;
 
             try {
-            existingFeeList = selectedCodeElement.getFeeList();
-            workingFeeList = new ArrayList<>(existingFeeList);
-        } catch (NullPointerException e) {
-            System.out.println("EnforcableCodeElement has no existing permitted fee list, making new ArrayList...");
-            workingFeeList = new ArrayList<>();
-        }
+                existingFeeList = selectedCodeElement.getFeeList();
+                workingFeeList = new ArrayList<>(existingFeeList);
+            } catch (NullPointerException e) {
+                System.out.println("EnforcableCodeElement has no existing permitted fee list, making new ArrayList...");
+                workingFeeList = new ArrayList<>();
+            }
             //update the current selected fee list in side panel
-            
+
             elementList = new ArrayList<>();
             elementList.add(selectedCodeElement);
 
@@ -342,17 +342,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             currentFeeSelected = false;
 
             selectedCodeElement = new EnforcableCodeElement();
-            
+
             refreshFeeAssignedList();
 
-                refreshTypesAndElements();
-         
+            refreshTypesAndElements();
+
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Code Set Element: " + selectedCodeElement.getCodeSetElementID(), ""));
         }
 
     }
-    
+
     /**
      * Changing of which fee is being selected and not being selected
      *
@@ -363,111 +363,72 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         // "Select" button was selected
         if (currentFeeSelected == true) {
-            
+
             //set current selected fee
             selectedFeeType = currentFee;
             //update the current selected fee list in side panel
             feeList = new ArrayList<>();
             feeList.add(currentFee);
-            
-            
+
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Fee: " + selectedFeeType.getName(), ""));
 
-        // "Select" button wasn't selected
+            // "Select" button wasn't selected
         } else {
             //turn to default setting
             currentFeeSelected = false;
             selectedFeeType = new Fee();
 
-                refreshTypesAndElements();
+            refreshTypesAndElements();
 
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Fee: " + selectedFeeType.getName(), ""));
         }
 
     }
-    
+
     public String onInsertAssignedFeeButtonChange() {
-        if (selectedAssignedFee.getFee() == null) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a fee to assign", ""));
-            return "feeManage";
-        }
-
-        FeeAssigned firstSkeleton = new FeeAssigned();
-        PaymentIntegrator pi = getPaymentIntegrator();
-
-        firstSkeleton.setPaymentList(selectedAssignedFee.getPaymentList());
-        firstSkeleton.setMoneyFeeAssigned(selectedAssignedFee.getMoneyFeeAssigned());
-        firstSkeleton.setAssignedBy(getSessionBean().getSessUser());
-        firstSkeleton.setAssigned(LocalDateTime.now());
-        firstSkeleton.setLastModified(LocalDateTime.now());
-        firstSkeleton.setNotes(selectedAssignedFee.getNotes());
-        firstSkeleton.setFee(selectedAssignedFee.getFee());
-
-        if (waived == true) {
-            firstSkeleton.setWaivedBy(getSessionBean().getSessUser());
-        } else {
-            firstSkeleton.setWaivedBy(new User());
-        }
-
-        if (selectedAssignedFee.getReducedBy() != 0) {
-
-            firstSkeleton.setReducedBy(selectedAssignedFee.getReducedBy());
-            firstSkeleton.setReducedByUser(getSessionBean().getSessUser());
-
-        } else if (selectedAssignedFee.getReducedBy() < 0) {
-
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "You cannot reduce a fee by a negative number", ""));
-
-        } else {
-            firstSkeleton.setReducedByUser(new User());
-        }
-
-        if (currentDomain == EventDomainEnum.OCCUPANCY) {
-            MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(firstSkeleton);
-
-            secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
-            secondSkeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
-
-            try {
-                pi.insertOccPeriodFee(secondSkeleton);
-                refreshFeeAssignedList();
+        
+        PaymentCoordinator pc = getPaymentCoordinator();
+        
+        if (currentDomain == EventDomainEnum.OCCUPANCY){
+            
+            try{
+            pc.insertAssignedFee(selectedAssignedFee, currentOccPeriod, waived);
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully added new fee!", ""));
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to add fee to database, sorry!", "Check server print out..."));
-            }
-
-        } else {
-
-            MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(firstSkeleton);
-            MoneyCECaseFeeAssigned caseFormFee = new MoneyCECaseFeeAssigned(selectedAssignedFee);
-
-            secondSkeleton.setCeCaseAssignedFeeID(caseFormFee.getCeCaseAssignedFeeID());
-            secondSkeleton.setCaseID(currentCase.getCaseID());
-            secondSkeleton.setCodeSetElement(selectedViolation.getCodeViolated().getCodeSetElementID());
-
-            try {
-                pi.insertCECaseFee(secondSkeleton);
-                refreshFeeAssignedList();
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to add fee to database, sorry!", "Check server print out..."));
-            }
-
+        } catch (BObStatusException ex) {
+          getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add fee to database, sorry!", "Check server print out..."));
         }
+        } else {
+            try{
+            pc.insertAssignedFee(selectedAssignedFee, currentCase, selectedViolation, waived);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully added new fee!", ""));
+        } catch (BObStatusException ex) {
+          getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add fee to database, sorry!", "Check server print out..."));
+        }
+        }
+        
+        refreshFeeAssignedList();
+        
         return "feeManage";
     }
 
+    //bookmark
+    
     public String onUpdateAssignedFeeButtonChange() {
         FeeAssigned firstSkeleton = new FeeAssigned();
         PaymentIntegrator pi = getPaymentIntegrator();
@@ -608,7 +569,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
         return "feePermissions";
     }
-    
+
     public String goToFeeTypes() {
 
         getSessionBean().getNavStack().pushCurrentPage();
@@ -627,8 +588,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public String onUpdateFeeButtonChange(){
-        
+    public String onUpdateFeeButtonChange() {
+
         OccupancyIntegrator oifi = getOccupancyIntegrator();
         PaymentIntegrator pi = getPaymentIntegrator();
         try {
@@ -639,11 +600,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Occupancy Inspection Fee updated!", ""));
-        
+
         return "feeTypeManage";
     }
 
-    public String onInsertFeeButtonChange(){
+    public String onInsertFeeButtonChange() {
         PaymentIntegrator pi = getPaymentIntegrator();
         try {
             pi.insertOccupancyInspectionFee(selectedFeeType);
@@ -655,7 +616,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                         "Successfully added occupancy inspection fee to database!", ""));
 
         return "feeTypeManage";
-        
+
     }
 
     public void onRemoveFeeButtonChange() {
@@ -764,7 +725,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             }
         }
 
-            refreshTypesAndElements();
+        refreshTypesAndElements();
 
         return "feePermissions";
     }
@@ -943,9 +904,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
 
             OccupancyCoordinator oc = getOccupancyCoordinator();
-            
+
             try {
-                currentOccPeriod =  oc.assembleOccPeriodDataHeavy(getSessionBean().getFeeManagementOccPeriod(), getSessionBean().getSessUser().getMyCredential());
+                currentOccPeriod = oc.assembleOccPeriodDataHeavy(getSessionBean().getFeeManagementOccPeriod(), getSessionBean().getSessUser().getMyCredential());
             } catch (IntegrationException | BObStatusException | SearchException ex) {
                 System.out.println(ex.toString());
                 getFacesContext().addMessage(null,
@@ -1021,19 +982,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         CodeCoordinator ec = getCodeCoordinator();
 
-            typeList = (ArrayList<OccPeriodType>) oc.getOccPeriodTypesFromProfileID(getSessionBean().getSessMuni().getProfile().getProfileID());
+        typeList = (ArrayList<OccPeriodType>) oc.getOccPeriodTypesFromProfileID(getSessionBean().getSessMuni().getProfile().getProfileID());
 
-            ArrayList<CodeSet> codeSetList = (ArrayList<CodeSet>) ec.getCodeSetsFromMuniID(getSessionBean().getSessMuni().getMuniCode());
+        ArrayList<CodeSet> codeSetList = (ArrayList<CodeSet>) ec.getCodeSetsFromMuniID(getSessionBean().getSessMuni().getMuniCode());
 
-            elementList = new ArrayList<>();
+        elementList = new ArrayList<>();
 
-            for (CodeSet set : codeSetList) {
+        for (CodeSet set : codeSetList) {
 
-                elementList.addAll(ec.getCodeElementsFromCodeSetID(set.getCodeSetID()));
+            elementList.addAll(ec.getCodeElementsFromCodeSetID(set.getCodeSetID()));
 
-            }
-
-            //BOOKMARK
+        }
 
         try {
             currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
@@ -1223,26 +1182,19 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.allFees = allFees;
     }
 
-    public Property getOccPeriodProperty() {
-
-        PropertyIntegrator pi = getPropertyIntegrator();
-
-        PropertyUnit unit;
-        Property prop = new Property();
-        try {
-            unit = pi.getPropertyUnit(currentOccPeriod.getPropertyUnitID());
-            prop = pi.getProperty(unit.getPropertyID());
-        } catch (IntegrationException ex) {
-            System.out.println("FeeManagementBB had problems getting the OccPeriodProperty");
-        }
-
-        return prop;
-
-    }
-
     public String getOccPeriodAddress() {
 
-        return getOccPeriodProperty().getAddress();
+        PaymentCoordinator pc = getPaymentCoordinator();
+        try {
+        return pc.getAddressFromPropUnitID(currentOccPeriod.getPropertyUnitID());
+        } catch (IntegrationException ex) {
+            System.out.println(ex.toString());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to find property address!",
+                            ""));
+        }
+        return "";
 
     }
 
