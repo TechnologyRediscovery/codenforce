@@ -34,7 +34,9 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -126,7 +128,16 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public void insertAssignedFee(FeeAssigned input, OccPeriod currentOccPeriod, boolean waived) throws IntegrationException, BObStatusException {
+    /**
+     * Accepts a FeeAssigned object, validates the input to make sure it is
+     * acceptable, sanitizes it, then tosses it back.
+     *
+     * @param input
+     * @param waived Whether or not the fee is waived.
+     * @return
+     * @throws BObStatusException if the input is not acceptable.
+     */
+    public FeeAssigned sanitizeAssignedFee(FeeAssigned input, boolean waived) throws BObStatusException {
 
         if (input.getFee() == null) {
             throw new BObStatusException("Please select a fee to assign");
@@ -145,6 +156,14 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
         } else {
             input.setReducedByUser(new User());
         }
+
+        return input;
+
+    }
+
+    public void insertAssignedFee(FeeAssigned input, OccPeriod currentOccPeriod, boolean waived) throws IntegrationException, BObStatusException {
+
+        input = sanitizeAssignedFee(input, waived);
 
         MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(input);
 
@@ -158,25 +177,9 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     public void insertAssignedFee(FeeAssigned input, CECase inputCase, CodeViolation violation, boolean waived) throws IntegrationException, BObStatusException {
 
-        if (input.getFee() == null) {
-            throw new BObStatusException("Please select a fee to assign");
-        }
+        input = sanitizeAssignedFee(input, waived);
 
         PaymentIntegrator pi = getPaymentIntegrator();
-
-        if (waived == true) {
-            input.setWaivedBy(getSessionBean().getSessUser());
-        } else {
-            input.setWaivedBy(new User());
-        }
-
-        if (input.getReducedBy() > 0) {
-            input.setReducedByUser(getSessionBean().getSessUser());
-        } else if (input.getReducedBy() < 0) {
-            throw new BObStatusException("You cannot reduce a fee by a negative number.");
-        } else {
-            input.setReducedByUser(new User());
-        }
 
         MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(input);
 
@@ -188,7 +191,38 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public List<FeeAssigned> getOccPeriodAssignedFees(OccPeriod currentOccPeriod) throws IntegrationException {
+    public void updateAssignedFee(FeeAssigned input, CECase currentCase, CodeViolation selectedViolation, boolean waived) throws BObStatusException, IntegrationException {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        input = sanitizeAssignedFee(input, waived);
+
+        MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(input);
+
+        secondSkeleton.setCeCaseAssignedFeeID(input.getAssignedFeeID());
+        secondSkeleton.setCaseID(currentCase.getCaseID());
+        secondSkeleton.setCodeSetElement(selectedViolation.getCodeViolated().getCodeSetElementID());
+
+        pi.updateCECaseFee(secondSkeleton);
+
+    }
+
+    public void updateAssignedFee(FeeAssigned input, OccPeriod currentOccPeriod, boolean waived) throws BObStatusException, IntegrationException {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        input = sanitizeAssignedFee(input, waived);
+
+        MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(input);
+
+        secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
+        secondSkeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
+
+        pi.updateOccPeriodFee(secondSkeleton);
+
+    }
+
+    public List<FeeAssigned> getAssignedFees(OccPeriod currentOccPeriod) throws IntegrationException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
         ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
@@ -204,18 +238,12 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
             skeletonHorde.add(skeleton);
 
         }
-        /*} catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
-            System.out.println("PaymentCoordinator.getOccPeriodAssignedFees | ERROR: " + ex.toString());
-        }*/
 
         return skeletonHorde;
 
     }
 
-    public List<FeeAssigned> getCECaseAssignedFees(CECase currentCase) throws IntegrationException {
+    public List<FeeAssigned> getAssignedFees(CECase currentCase) throws IntegrationException {
         PaymentIntegrator pi = getPaymentIntegrator();
         ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
 
@@ -230,15 +258,24 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
             skeletonHorde.add(skeleton);
 
         }
-        /*
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Oops! We encountered a problem trying to fetch the fee assigned list!", ""));
-            System.out.println("PaymentCoordinator.getCECaseAssignedFees | ERROR: " + ex.toString());
-        }*/
 
         return skeletonHorde;
+
+    }
+
+    public void updateFee(Fee input) throws IntegrationException {
+        PaymentIntegrator pi = getPaymentIntegrator();
+        pi.updateOccupancyInspectionFee(input);
+
+    }
+
+    public void insertFee(Fee input) throws IntegrationException {
+        PaymentIntegrator pi = getPaymentIntegrator();
+        pi.deleteOccupancyInspectionFee(input);
+    }
+
+    public void removeFee(Fee input) throws IntegrationException {
+        PaymentIntegrator pi = getPaymentIntegrator();
 
     }
 
@@ -250,58 +287,87 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
+    public List<Fee> getAllFeeTypes() throws IntegrationException {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        ArrayList<Fee> output = pi.getAllFeeTypes();
+
+        if (output == null) {
+            output = new ArrayList<>();
+        }
+
+        return output;
+
+    }
+
+    public void activateFeeJoin(Fee input, OccPeriodType type) throws IntegrationException {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        try {
+            pi.insertFeePeriodTypeJoin(input, type);
+        } catch (IntegrationException ex) {
+            System.out.println("Failed inserting occperiod fee join, trying to reactivate.");
+            pi.reactivateFeePeriodTypeJoin(input, type);
+
+        }
+    }
+
+    public void activateFeeJoin(Fee input, EnforcableCodeElement element) throws IntegrationException {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        try {
+            pi.insertFeeCodeElementJoin(input, element);
+        } catch (IntegrationException ex) {
+            System.out.println("Failed inserting code element fee join, trying to reactivate.");
+            pi.reactivateFeeCodeElementJoin(input, element);
+
+        }
+    }
+
+    public void deactivateFeeJoin(Fee input, OccPeriodType type) throws IntegrationException {
+        PaymentIntegrator pi = getPaymentIntegrator();
+        pi.deactivateFeePeriodTypeJoin(input, type);
+
+    }
+
+    public void deactivateFeeJoin(Fee input, EnforcableCodeElement element) throws IntegrationException {
+        PaymentIntegrator pi = getPaymentIntegrator();
+        pi.deactivateFeeCodeElementJoin(input, element);
+    }
+    
+    public void updateFeeJoin(Fee input, OccPeriodType type) throws IntegrationException {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+        pi.updateFeePeriodTypeJoin(input, type);
+
+    }
+
+    public void updateFeeJoin(Fee input, EnforcableCodeElement element) throws IntegrationException {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+        pi.updateFeeCodeElementJoin(input, element);
+
+    }
+
     public ArrayList<Payment> getAllPayments() throws IntegrationException {
         PaymentIntegrator pi = getPaymentIntegrator();
         return pi.getPaymentList();
 
     }
 
-    public void insertPayment(Payment input, FeeAssigned appliedTo) throws BObStatusException, IntegrationException {
-
-        input.setRecordedBy(getSessionBean().getSessUser());
-
-        if (input.getPayer() == null) {
-
-            throw new BObStatusException("The Payer's ID is not in our database, please make sure it's correct.");
-
-        }
-
-        if (input.getAmount() <= 0) {
-
-            throw new BObStatusException("The amount you entered is not valid.");
-
-        }
-
-        if (input.getPaymentType().getPaymentTypeId() == 1
-                && (input.getReferenceNum() == null || input.getReferenceNum().equals(""))) {
-
-            throw new BObStatusException("A payment by check requires a reference number.");
-
-        }
-
-        if (input.getPaymentType().getPaymentTypeId() == 1
-                && (input.getCheckNum() == 0)) {
-
-            throw new BObStatusException("A payment by check requires a check number.");
-
-        }
-
-        PaymentIntegrator pi = getPaymentIntegrator();
-
-        pi.insertPayment(input);
-        input = pi.getMostRecentPayment(); //So that the join insert knows what payment to join to
-
-        if (appliedTo.getDomain() == EventDomainEnum.OCCUPANCY) {
-            MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned(appliedTo);
-            pi.insertPaymentPeriodJoin(input, skeleton);
-        } else if (appliedTo.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
-            MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned(appliedTo);
-            pi.insertPaymentCaseJoin(input, skeleton);
-        }
-
-    }
-
-    public void updatePayment(Payment input, FeeAssigned appliedTo) throws BObStatusException, IntegrationException {
+    /**
+     * Accepts a payment, validates the input to make sure it is acceptable,
+     * sanitizes it, then tosses it back.
+     *
+     * @param input
+     * @param appliedTo the assigned fee this payment is being applied to.
+     * @return
+     * @throws BObStatusException if the input is not acceptable.
+     */
+    public Payment sanitizePayment(Payment input, FeeAssigned appliedTo) throws BObStatusException {
 
         if (appliedTo == null) {
             throw new BObStatusException("Please select a fee to assign this payment to.");
@@ -325,9 +391,37 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
             throw new BObStatusException("A payment by check requires a check number.");
         }
 
+        return input;
+
+    }
+
+    public void insertPayment(Payment input, FeeAssigned appliedTo) throws BObStatusException, IntegrationException {
+
+        input = sanitizePayment(input, appliedTo);
+
+        input.setRecordedBy(getSessionBean().getSessUser());
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        pi.insertPayment(input);
+        input = pi.getMostRecentPayment(); //So that the join insert knows what payment to join to
+
+        if (appliedTo.getDomain() == EventDomainEnum.OCCUPANCY) {
+            MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned(appliedTo);
+            pi.insertPaymentPeriodJoin(input, skeleton);
+        } else if (appliedTo.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
+            MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned(appliedTo);
+            pi.insertPaymentCaseJoin(input, skeleton);
+        }
+
+    }
+
+    public void updatePayment(Payment input, FeeAssigned appliedTo) throws BObStatusException, IntegrationException {
+
+        input = sanitizePayment(input, appliedTo);
+
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
 
-        //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes); TODO: ask eric what this should do
         paymentIntegrator.updatePayment(input);
 
     }

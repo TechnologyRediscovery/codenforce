@@ -1899,7 +1899,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
-    public ArrayList<Fee> getOccupancyInspectionFeeList() throws IntegrationException {
+    public ArrayList<Fee> getAllFeeTypes() throws IntegrationException {
         String query = "SELECT feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n"
                 + "       notes\n"
                 + "  FROM public.moneyfee";

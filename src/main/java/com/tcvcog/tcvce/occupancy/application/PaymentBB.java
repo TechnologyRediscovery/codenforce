@@ -28,7 +28,6 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
-import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
 import com.tcvcog.tcvce.entities.Person;
@@ -68,7 +67,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     @PostConstruct
     public void initBean() {
-        PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
         if (getSessionBean().getNavStack().peekLastPage() != null) {
 
             refreshFeeAssignedList();
