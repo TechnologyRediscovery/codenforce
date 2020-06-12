@@ -115,7 +115,7 @@
                                 <p:commandButton ajax="false"  icon="fa fa-plus"
                                                  value="Open a new code enforcement case" 
                                                  action="#{propertyCasesBB.exploreCECase(c)}"
-                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                                 disabled="#{!(sessionBean.sessUser.keyCard.hasEnfOfficialPermissions)}"/>
                                 <p:spacer height="10px"/>
                                 <p:dataTable
                                     id="prop-cases-datatable"

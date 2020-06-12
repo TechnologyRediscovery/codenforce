@@ -28,7 +28,7 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.entities.EventCaseHeavy;
+import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
@@ -55,7 +55,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     private DashboardModel mainDash;
     
-    private List<EventCaseHeavy> filteredEventWithCasePropList;
+    private List<EventCnFPropUnitCasePeriodHeavy> filteredEventWithCasePropList;
     private int timelineEventViewDateRange;
     
     private List<ProposalCECase> ceProposalList;
@@ -70,8 +70,8 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean() {
         UserCoordinator uc = getUserCoordinator();
-        currentUser = getSessionBean().getSessionUser();
-        userList = uc.assembleUserListForSearchCriteria();
+        currentUser = getSessionBean().getSessUser();
+        userList = uc.assembleUserListForSearch(getSessionBean().getSessUser());
         
         generateMainDash();
     }
@@ -113,8 +113,8 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         MunicipalityDataHeavy muniComp;
         try {
             muniComp = mi.getMunDataHeavy(selectedMuni.getMuniCode());
-            getSessionBean().setSessionMuni(muniComp);
-            getSessionBean().setSessionCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
+            getSessionBean().setSessMuni(muniComp);
+            getSessionBean().setSessCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
         } catch (IntegrationException ex) {
             FacesContext facesContext = getFacesContext();
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -135,12 +135,18 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
     
     public String switchToUser(){
+        System.out.println("MissionControlBB.switchToUser");
         if(selectedUser != null){
             getSessionBean().setUserForReInit(selectedUser);
-            return "startInitiationProcess";
         } else {
-            return "";
+            getSessionBean().setUserForReInit(getSessionBean().getSessUser());
         }
+        return "sessionReinit";
+    }
+    
+    public String reauthenticate(){
+        System.out.println("MissionControlBB.reauthenticate");
+        return "sessionReinit";
     }
     
    
@@ -163,7 +169,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      * @return the currentMuni
      */
     public Municipality getCurrentMuni() {
-        currentMuni = getSessionBean().getSessionMuni();
+        currentMuni = getSessionBean().getSessMuni();
         return currentMuni;
     }
 
@@ -196,14 +202,14 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredEventWithCasePropList
      */
-    public List<EventCaseHeavy> getFilteredEventWithCasePropList() {
+    public List<EventCnFPropUnitCasePeriodHeavy> getFilteredEventWithCasePropList() {
         return filteredEventWithCasePropList;
     }
 
     /**
      * @param filteredEventWithCasePropList the filteredEventWithCasePropList to set
      */
-    public void setFilteredEventWithCasePropList(ArrayList<EventCaseHeavy> filteredEventWithCasePropList) {
+    public void setFilteredEventWithCasePropList(List<EventCnFPropUnitCasePeriodHeavy> filteredEventWithCasePropList) {
         this.filteredEventWithCasePropList = filteredEventWithCasePropList;
     }
 

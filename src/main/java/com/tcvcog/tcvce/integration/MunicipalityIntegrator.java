@@ -229,6 +229,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         EventIntegrator ei = getEventIntegrator();
         UserIntegrator ui = getUserIntegrator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
+        WorkflowIntegrator wi = getWorkflowIntegrator();
         
         mp.setProfileID(rs.getInt("profileid"));
         mp.setTitle(rs.getString("title"));
@@ -239,7 +240,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mp.setContinuousoccupancybufferdays(rs.getInt("continuousoccupancybufferdays"));
         mp.setMinimumuserranktodeclarerentalintent(rs.getInt("minimumuserranktodeclarerentalintent"));
         
-        mp.setEventRuleSetCE(ei.rules_getEventRuleSet(rs.getInt("profileid")));
+        mp.setEventRuleSetCE(wi.rules_getEventRuleSet(rs.getInt("profileid")));
         mp.setOccPeriodTypeList(oi.getOccPeriodTypeList(rs.getInt("profileid")));
         if(mp.getOccPeriodTypeList() == null){
             mp.setOccPeriodTypeList(new ArrayList<OccPeriodType>());

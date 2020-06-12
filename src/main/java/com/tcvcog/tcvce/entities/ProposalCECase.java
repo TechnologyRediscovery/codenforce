@@ -18,13 +18,10 @@ import java.util.Objects;
 public class ProposalCECase 
         extends Proposal{
     
-  
-    private int ceCaseID;
-    private CECase ceCase;
-    
-  
-     public ProposalCECase(Proposal pr){
+     public ProposalCECase(Proposal pr, int CECaseID){
         
+        this.hostObjectID = CECaseID;
+         
         this.proposalID  = pr.proposalID;
         this.directive = pr.directive;
 
@@ -51,34 +48,6 @@ public class ProposalCECase
         this.proposalRejected = pr.proposalRejected;
 
         this.order = pr.order;
-    }
-
-    /**
-     * @return the ceCaseID
-     */
-    public int getCeCaseID() {
-        return ceCaseID;
-    }
-
-    /**
-     * @return the ceCase
-     */
-    public CECase getCeCase() {
-        return ceCase;
-    }
-
-    /**
-     * @param ceCaseID the ceCaseID to set
-     */
-    public void setCeCaseID(int ceCaseID) {
-        this.ceCaseID = ceCaseID;
-    }
-
-    /**
-     * @param ceCase the ceCase to set
-     */
-    public void setCeCase(CECase ceCase) {
-        this.ceCase = ceCase;
     }
 
   

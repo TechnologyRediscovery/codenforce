@@ -21,13 +21,10 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 
 /**

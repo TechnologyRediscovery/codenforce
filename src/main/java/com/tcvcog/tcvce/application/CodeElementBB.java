@@ -325,7 +325,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the activeCodeSource
      */
     public CodeSource getActiveCodeSource() {
-        activeCodeSource = getSessionBean().getActiveCodeSource();
+        activeCodeSource = getSessionBean().getSessCodeSource();
         return activeCodeSource;
     }
 
@@ -372,7 +372,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
     //xiaohong add
     public void onAddElementToSourceButtonChange() {
         //xiaohogn add
-        activeCodeSource = getSessionBean().getActiveCodeSource();
+        activeCodeSource = getSessionBean().getSessCodeSource();
         newElement.setSource(activeCodeSource);
 
         CodeIntegrator codeIntegrator = getCodeIntegrator();

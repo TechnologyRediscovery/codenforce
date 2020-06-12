@@ -68,7 +68,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean() {
 
-        Property activeProp = getSessionBean().getSessionProperty();
+        Property activeProp = getSessionBean().getSessProperty();
 
         actionList = new ArrayList<>();
         actionList.add(ChangeOrderAction.DoNothing);
@@ -96,7 +96,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         PropertyIntegrator pi = getPropertyIntegrator();
 
         try {
-            setChangedPropList(pi.searchForChangedProperties(getHouseNum(), getStreetName(), getSessionBean().getSessionMuni().getMuniCode()));
+            setChangedPropList(pi.searchForChangedProperties(getHouseNum(), getStreetName(), getSessionBean().getSessMuni().getMuniCode()));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Your search completed with " + getChangedPropList().size() + " results", ""));
@@ -114,13 +114,13 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         PropertyCoordinator pc = getPropertyCoordinator();
         
         try {
-            selectedProperty = pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessionUser().getMyCredential());
+            selectedProperty = pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessUser().getMyCredential());
             existingUnitList = pi.getPropertyUnitList(selectedProperty);
             proposedUnitList = pi.getPropertyUnitChangeList(selectedProperty);
             
-            si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), prop);
+            si.logObjectView_OverwriteDate(getSessionBean().getSessUser(), prop);
             
-            getSessionBean().getSessionPropertyList().add(prop);
+            getSessionBean().getSessPropertyList().add(prop);
 
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
@@ -185,7 +185,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(selectedProperty, getSessionBean().getSessionUser().getMyCredential()));
+            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(selectedProperty, getSessionBean().getSessUser().getMyCredential()));
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
         }

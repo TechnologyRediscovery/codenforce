@@ -40,18 +40,18 @@ public class PropertyCasesBB
      
     @PostConstruct
     public void initBean(){
-        currProp = getSessionBean().getSessionProperty();
+        currProp = getSessionBean().getSessProperty();
         
     }
     
        
     public String exploreCECase(CECaseDataHeavy c){
-        getSessionBean().setSessionCECase(c);
+        getSessionBean().setSessCECase(c);
         return "ceCases";
     }
 
     public String openCECase(PropertyDataHeavy pdh){
-        getSessionBean().setSessionProperty(pdh);
+        getSessionBean().setSessProperty(pdh);
         return "addNewCase";
     }
  

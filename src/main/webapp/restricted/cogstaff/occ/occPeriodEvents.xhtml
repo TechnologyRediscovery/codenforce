@@ -423,7 +423,7 @@
                                     <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Current person list:"/>
                                     <p:selectOneMenu id="person-list-menu" required="false" value="#{occInspectionBB.selectedPerson}">
                                         <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                        <f:selectItems value="#{sessionBean.sessionPersonList}"  var="p" itemValue="#{p}"
+                                        <f:selectItems value="#{sessionBean.sessPersonList}"  var="p" itemValue="#{p}"
                                                        itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
                                         <f:converter converterId="personConverter"/>
                                     </p:selectOneMenu>

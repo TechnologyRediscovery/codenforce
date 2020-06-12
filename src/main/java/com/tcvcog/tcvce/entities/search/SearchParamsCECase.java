@@ -58,14 +58,26 @@ public class        SearchParamsCECase
     // *******************************
     
     // filter CECASE-9
-    private boolean casePhase_ctl;
-    private CasePhaseEnum casePhase_val;
+    private boolean caseStage_ctl;
+    private CaseStageEnum caseStage_val;
     
     // ****** END JAVALAND ONLY ********
     
     
    public SearchParamsCECase(){
        
+   }
+   
+   
+      
+    public SearchParamsCECaseDateFieldsEnum[] getDateFieldList(){
+       SearchParamsCECaseDateFieldsEnum[] fields = SearchParamsCECaseDateFieldsEnum.values();
+       return fields;
+   }
+   
+   public SearchParamsCECaseUserFieldsEnum[] getUserFieldList(){
+       SearchParamsCECaseUserFieldsEnum[] fields = SearchParamsCECaseUserFieldsEnum.values();
+       return fields;
    }
    
     /**
@@ -240,32 +252,32 @@ public class        SearchParamsCECase
 
 
     /**
-     * @return the casePhase_ctl
+     * @return the caseStage_ctl
      */
-    public boolean isCasePhase_ctl() {
-        return casePhase_ctl;
+    public boolean isCaseStage_ctl() {
+        return caseStage_ctl;
     }
 
     /**
-     * @return the casePhase_val
+     * @return the caseStage_val
      */
-    public CasePhaseEnum getCasePhase_val() {
-        return casePhase_val;
+    public CaseStageEnum getCaseStage_val() {
+        return caseStage_val;
     }
 
 
     /**
-     * @param casePhase_ctl the casePhase_ctl to set
+     * @param caseStage_ctl the caseStage_ctl to set
      */
-    public void setCasePhase_ctl(boolean casePhase_ctl) {
-        this.casePhase_ctl = casePhase_ctl;
+    public void setCaseStage_ctl(boolean caseStage_ctl) {
+        this.caseStage_ctl = caseStage_ctl;
     }
 
     /**
-     * @param casePhase_val the casePhase_val to set
+     * @param caseStage_val the caseStage_val to set
      */
-    public void setCasePhase_val(CasePhaseEnum casePhase_val) {
-        this.casePhase_val = casePhase_val;
+    public void setCaseStage_val(CaseStageEnum caseStage_val) {
+        this.caseStage_val = caseStage_val;
     }
 
     /**

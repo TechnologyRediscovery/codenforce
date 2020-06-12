@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.util;
 
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.User;
 
 /**
@@ -18,13 +19,20 @@ public class MessageBuilderParams {
     private String explanation;
     private String newMessageContent;
     private User user;
+    private Credential cred;
 
-    public MessageBuilderParams(String existingContent, String header, String explanation, String newMessageContent, User user) {
+    public MessageBuilderParams(String existingContent, 
+                                String header, 
+                                String explanation, 
+                                String newMessageContent, 
+                                User user,
+                                Credential cr) {
         this.existingContent = existingContent;
         this.header = header;
         this.explanation = explanation;
         this.newMessageContent = newMessageContent;
         this.user = user;
+        this.cred = cr;
     }
     
     public MessageBuilderParams(){
@@ -99,6 +107,20 @@ public class MessageBuilderParams {
      */
     public void setUser(User user) {
         this.user = user;
+    }
+
+    /**
+     * @return the cred
+     */
+    public Credential getCred() {
+        return cred;
+    }
+
+    /**
+     * @param cred the cred to set
+     */
+    public void setCred(Credential cred) {
+        this.cred = cred;
     }
     
 }

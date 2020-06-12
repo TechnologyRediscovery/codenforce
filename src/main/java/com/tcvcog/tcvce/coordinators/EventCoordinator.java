@@ -26,13 +26,10 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
-import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodStatusEnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
-import com.tcvcog.tcvce.integration.ChoiceIntegrator;
+import com.tcvcog.tcvce.integration.WorkflowIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
@@ -44,8 +41,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 
@@ -92,64 +87,76 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             return null;
         }
         EventCnF ev = ei.getEvent(eventID);
-        configureEvent(ev);
+        try {
+            configureEvent(ev);
+        } catch (EventException ex) {
+            System.out.println(ex);
+        }
         return ev;
-    }
-    
-    public EventCaseHeavy getEventCaseHeavy(EventCnF ev) throws EventException, IntegrationException, BObStatusException{
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        if(ev == null) return null;
-        if(ev.getDomain() != EventDomainEnum.CODE_ENFORCEMENT){
-            throw new EventException("Cannot create an EventCaseHeavy from an event not in CE Domain");
-        }
-        
-        EventCaseHeavy ech = new EventCaseHeavy(ev);
-        ech.setCeCase(cc.getCECase(ev.getCeCaseID()));
-        
-        return ech;
-                
-    }
-    
-    public EventPeriodPropUnitHeavy getEventPeriodPropUnitHeavy(EventCnF ev) throws EventException, IntegrationException{
-        PropertyCoordinator pc = getPropertyCoordinator();
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        
-        if(ev == null) return null;
-        if(ev.getDomain() != EventDomainEnum.OCCUPANCY){
-            throw new EventException("Cannot create an EventCaseHeavy from an event not in Occ Domain");
-        }
-        
-        EventPeriodPropUnitHeavy eppuh = new EventPeriodPropUnitHeavy(ev);
-        
-        eppuh.setPeriod(oc.getOccPeriod(ev.getOccPeriodID()));
-        eppuh.setPropUnit(pc.getPropertyUnit(eppuh.getPeriod().getPropertyUnitID()));
-        eppuh.setProp(pc.getProperty(eppuh.getPeriod().getPropertyUnitID()));
-        
-        return eppuh;
-        
     }
     
     
     /**
-     * Utility method for calling configureEvent on all EventCnF objects
-     * in a list passed back from a call to Query events
-     * @param evList
-     * @param user
-     * @param userAuthMuniList
-     * @return
+     * Creates a data-rich subclass of our events that contains a Property object
+     * and Property unit data useful for displaying the event without its parent
+     * object context (i.e. in an activity report)
+     * @param ev
+     * @return the data-rich subclass of EventCnF
+     * @throws EventException
      * @throws IntegrationException 
      */
-    public List<EventCaseHeavy> configureEventBundleList(List<EventCaseHeavy> evList, 
-                                                                        UserAuthorized user) throws IntegrationException{
-        Iterator<EventCaseHeavy> iter = evList.iterator();
-        while(iter.hasNext()){
-            configureEvent(iter.next());
+    public EventCnFPropUnitCasePeriodHeavy assembleEventCnFPropUnitCasePeriodHeavy(EventCnF ev) throws EventException, IntegrationException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(ev == null) return null;
+        EventCnFPropUnitCasePeriodHeavy edh = new EventCnFPropUnitCasePeriodHeavy(ev);
+        if(ev.getDomain() == EventDomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
+            edh.setPeriod(oc.getOccPeriodPropertyUnitHeavy(edh.getOccPeriodID()));
+        } else if(ev.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
+            edh.setCecase(cc.assembleCECasePropertyUnitHeavy(cc.getCECase(edh.getCeCaseID())));
+            // note that a Property object is already inside our CECase base class
+        } else {
+            throw new EventException("Cannot build data heavy event");
+        }
+        return edh;
+    }
+    
+    /**
+     * Utility method for assembling a list of data-heavy events from a List of 
+     * plain old events
+     * @param evList
+     * @return the list of data heavy events, never null
+     * @throws EventException
+     * @throws IntegrationException 
+     */
+    public List<EventCnFPropUnitCasePeriodHeavy> assembleEventCnFPropUnitCasePeriodHeavyList(List<EventCnF> evList) throws EventException, IntegrationException{
+        List<EventCnFPropUnitCasePeriodHeavy> edhList = new ArrayList<>();
+        if(evList != null && !evList.isEmpty() ){
+            for(EventCnF ev: evList){
+                edhList.add(assembleEventCnFPropUnitCasePeriodHeavy(ev));
+            }
+        }
+        return edhList;
+    }
+    
+     /**
+     * Utility for downcasting a list of CECasePropertyUnitDataHeavy 
+     * to the base class
+     * @param evHeavyList
+     * @return 
+     */
+    public List<EventCnF> downcastEventCnFPropertyUnitHeavy(List<EventCnFPropUnitCasePeriodHeavy> evHeavyList){
+        List<EventCnF> evList = new ArrayList<>();
+        if(evHeavyList != null && !evHeavyList.isEmpty()){
+            for(EventCnFPropUnitCasePeriodHeavy e: evHeavyList){
+                evList.add((EventCnF) e);
+            }
+            
         }
         return evList;
     }
-  
-    
     
     /**
      * Called by the EventIntegrator and other getEventCnF methods to set member variables based on business
@@ -160,17 +167,20 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return a nicely configured EventCEEcase
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    private EventCnF configureEvent(EventCnF ev) throws IntegrationException{
+    private EventCnF configureEvent(EventCnF ev) throws IntegrationException, EventException{
         
         // Declare this event as either in the CE or Occ domain with 
         // our hacky little enum thingy
         if(ev != null){
+            if(ev.getCeCaseID() !=0 && ev.getOccPeriodID() != 0 ){
+                throw new EventException("EventCnF cannot have a non-zero CECase and OccPeriod ID");
+            }
             if(ev.getCeCaseID() != 0){
                 ev.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
             } else if(ev.getCeCaseID() != 0){
                 ev.setDomain(EventDomainEnum.OCCUPANCY);
             } else {
-                ev.setDomain(null);
+                throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
         }
        
@@ -383,9 +393,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public List<EventType> getEventTypesAll(){
         List<EventType> typeList = new ArrayList<>();
-        for(EventType et: EventType.values()){
-            typeList.add(et);
-        }
+        typeList.addAll(Arrays.asList(EventType.values()));
         return typeList;
     }
     
@@ -469,7 +477,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //        event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(updateViolationDescr);
         //even descr set by violation coordinator
-        event.setOwner(getSessionBean().getSessionUser());
+        event.setOwner(getSessionBean().getSessUser());
         // disclose to muni from violation coord
         // disclose to public from violation coord
         event.setActive(true);
@@ -553,54 +561,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
   
     
-    /**
-     * A BOB-agnostic event generator given a Proposal object and the Choice that was
-     * selected by the user. 
-     * @param p
-     * @param ch
-     * @param u
-     * @return a configured but not integrated EventCnF superclass. The caller will need to cast it to
- the appropriate subclass and insert it
-     * @throws com.tcvcog.tcvce.domain.BObStatusException 
-     * @throws com.tcvcog.tcvce.domain.IntegrationException 
-     */
-    public EventCnF generateEventDocumentingProposalEvaluation(Proposal p, IFace_Proposable ch, UserAuthorized u) throws BObStatusException, IntegrationException, EventException{
-        EventCnF ev = null;
-        if(ch instanceof ChoiceEventCat){
-            EventCategory ec = initEventCategory(((ChoiceEventCat) ch).getEventCategory().getCategoryID());
-            ev = initEvent(null, ec);
-            
-            ev.setActive(true);
-            ev.setHidden(false);
-            ev.setTimeStart(LocalDateTime.now());
-            ev.setTimeEnd(ev.getTimeStart().plusMinutes(ec.getDefaultdurationmins()));
-            ev.setDiscloseToMunicipality(true);
-            ev.setDiscloseToPublic(false);
-            ev.setOwner(u);
-            ev.setTimestamp(LocalDateTime.now());
-            
-            StringBuilder descBldr = new StringBuilder();
-            descBldr.append("User ");
-            descBldr.append(u.getPerson().getFirstName());
-            descBldr.append(" ");
-            descBldr.append(u.getPerson().getLastName());
-            descBldr.append(" evaluated the proposal titled: '");
-            descBldr.append(p.getDirective().getTitle());
-            descBldr.append("' on ");
-            descBldr.append(getPrettyDateNoTime(p.getResponseTS()));
-            descBldr.append(" and selected choice titled:  '");
-            descBldr.append(ch.getTitle());
-            descBldr.append("'.");
-            
-            ev.setDescription(descBldr.toString());
-            
-        } else {
-            throw new BObStatusException("Generating events for Choice "
-                    + "objects that are not Event triggers is not yet supported. "
-                    + "Thank you in advance for your patience.");
-        }
-        return ev;
-    }
     
     
     /**
@@ -635,7 +595,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //        event.set(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setOwner(getSessionBean().getSessionUser());
+        event.setOwner(getSessionBean().getSessUser());
         event.setActive(true);
         
         cc.attachNewEventToCECase(currentCase, event, null);
@@ -647,436 +607,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     
      
-//    -----------------------------------------------------------
-//    ***************** RULES and WORKFLOWS *********************
-//    -----------------------------------------------------------
-    
-    /**
-     * Calls appropriate Integration method given a CECase or OccPeriod
-     * and generates a configured event rule list.
-     * @param erg
-     * @param cred
-     * @return 
-     */
-    public List<EventRuleImplementation> rules_getEventRuleImpList(IFace_EventRuleGoverned erg, Credential cred){
-        EventIntegrator ei = getEventIntegrator();
-        
-        List<EventRuleImplementation> erl = new ArrayList<>();
-        
-        try {
-            if(erg instanceof CECase){
-                   CECase cse = (CECase) erg;
-                   erl.addAll(ei.rules_getEventRuleImpCECaseList(cse));
-               } else if (erg instanceof OccPeriod){
-                   OccPeriod op = (OccPeriod) erg;
-                   erl.addAll(ei.rules_getEventRuleImpOccPeriodList(op))    ;
-               }
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-
-        return erl;
-
-        
-    }
-    
-    public EventRuleAbstract rules_getEventRuleAbstract(int eraid) throws IntegrationException{
-        EventIntegrator ei = getEventIntegrator();
-        return ei.rules_getEventRuleAbstract(eraid);
-    }
-    
-    /**
-     * Attaches a single event rule to an EventRuleGoverned entity, the type of which is determined
- internally with instanceof checks for OccPeriod and CECaseDataHeavy Objects
-     * 
-     * @param era
-     * @param rg
-     * @param usr
-     * @throws com.tcvcog.tcvce.domain.IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.BObStatusException if an IFaceEventRuleGoverned instances is neither a CECaseDataHeavy or an OccPeriod
-     */
-    public void rules_attachEventRule(EventRuleAbstract era, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, BObStatusException{
-        
-        ChoiceCoordinator cc = getChoiceCoordinator();
-        int freshObjectID = 0;
-        if(rg instanceof OccPeriodDataHeavy){
-                OccPeriodDataHeavy op = (OccPeriodDataHeavy) rg;
-                rules_attachEventRuleAbstractToOccPeriod(era, op, usr);
-                if(freshObjectID != 0 && era.getPromptingDirective() != null){
-                    cc.implementDirective(era.getPromptingDirective(), op, null);
-                    System.out.println("EventCoordinator.rules_attachEventRule | Found not null prompting directive");
-                }
-            } else if (rg instanceof CECaseDataHeavy){ 
-                CECaseDataHeavy cec = (CECaseDataHeavy) rg;
-                rules_attachEventRuleAbstractToCECase(era, cec);
-                if(freshObjectID != 0 && era.getPromptingDirective() != null){
-                    cc.implementDirective(era.getPromptingDirective(), cec, null);
-                }
-            } else {
-                throw new BObStatusException("Cannot attach rule set");
-            }
-    }
-    
-    /**
-     * Returns complete muni dump of the eventrule table
-     * 
-     * @return complete event rule list, including inactive events
-     * @throws IntegrationException 
-     */
-    public List<EventRuleSet> rules_getEventRuleSetList() throws IntegrationException{
-        EventIntegrator ei = getEventIntegrator();
-        return ei.rules_getEventRuleSetList();
-    }  
-    
-    public EventRuleAbstract rules_getInitializedEventRuleAbstract(){
-        EventRuleAbstract era = new EventRuleAbstract();
-        era.setActiveRuleAbstract(true);
-        return era;
-    }
-    
-    public void rules_updateEventRuleAbstract(EventRuleAbstract era) throws IntegrationException{
-        EventIntegrator ei = getEventIntegrator();
-        ei.rules_updateEventRule(era);
-        
-    }
-    
-    /**
-     * Primary entrance point for an EventRuleAbstract instance (not its connection to an Object)
-     * @param era required instance
-     * @param period optional--only if you're attaching to an OccPeriod
-     * @param cse Optional--only if you're attachign to a CECaseDataHeavy
-     * @param connectToBOBRuleList Switch me on in order to 
-     * @param usr 
-     * @return
-     * @throws IntegrationException 
-     */
-    public int rules_createEventRuleAbstract(EventRuleAbstract era, OccPeriodDataHeavy period, CECaseDataHeavy cse, boolean connectToBOBRuleList, UserAuthorized usr) throws IntegrationException{
-        EventIntegrator ei = getEventIntegrator();
-        ChoiceIntegrator ci = getChoiceIntegrator();
-        
-        int freshEventRuleID;
-        if(era.getFormPromptingDirectiveID() != 0){
-            Directive dir = ci.getDirective(era.getFormPromptingDirectiveID());
-            if(dir != null){
-                era.setPromptingDirective(dir);
-                System.out.println("EventCoordinator.rules_createEventRuleAbstract| Found not null directive ID: " + dir.getDirectiveID());
-            }
-        }
-        
-        freshEventRuleID = ei.rules_insertEventRule(era);
-        if(period != null && cse == null){
-            era = ei.rules_getEventRuleAbstract(freshEventRuleID);
-            rules_attachEventRuleAbstractToOccPeriod(era, period, usr);
-            if(connectToBOBRuleList){
-                rules_attachEventRuleAbstractToOccPeriodTypeRuleSet(era, period);
-            }
-        }
-        if(period == null && cse !=null){
-            era = ei.rules_getEventRuleAbstract(freshEventRuleID);
-            if(connectToBOBRuleList){
-                rules_attachEventRuleAbstractToMuniCERuleSet(era, cse);
-            }
-        }
-        
-        System.out.println("EventCoordinator.rules_createEventRuleAbstract | returned ID: " + freshEventRuleID);
-        return freshEventRuleID;
-    }
-    
-    private void rules_attachEventRuleAbstractToOccPeriod(EventRuleAbstract era, OccPeriodDataHeavy period, UserAuthorized usr) throws IntegrationException{
-        
-        EventIntegrator ei = getEventIntegrator();
-        ChoiceCoordinator cc = getChoiceCoordinator();
-        EventRuleOccPeriod erop = new EventRuleOccPeriod(new EventRuleImplementation(era));
-        // avoid inserting and duplicating keys
-        if(ei.rules_getEventRuleOccPeriod(period.getPeriodID(), era.getRuleid()) == null){
-        erop.setAttachedTS(LocalDateTime.now());
-            erop.setOccPeriodID(period.getPeriodID());
-            
-            erop.setLastEvaluatedTS(null);
-            erop.setPassedRuleTS(null);
-            erop.setPassedRuleEvent(null);
-            ei.rules_insertEventRuleOccPeriod(erop);
-        }
-        if(era.getPromptingDirective() != null){
-            cc.implementDirective(era.getPromptingDirective(), period, null);
-            System.out.println("EventCoordinator.rules_attachEventRulAbstractToOccPeriod | directive implemented with ID " + era.getPromptingDirective().getDirectiveID());
-        }
-    }
-    
-    public void rules_attachEventRuleAbstractToOccPeriodTypeRuleSet(EventRuleAbstract era, OccPeriod period) throws IntegrationException{
-        EventIntegrator ei = getEventIntegrator();
-        ei.rules_addEventRuleAbstractToOccPeriodTypeRuleSet(era, period.getType().getBaseRuleSetID());
-    }
-    
-    /**
-     * TODO: Finish my guts!
-     * @param muni to which we want to include the rule. The Municipality's profile will be pulled and its 
-     * @param era 
-     */
-    public void rules_includeEventRuleAbstractInCECaseDefSet(Municipality muni, EventRuleAbstract era){
-        
-    }
-    
-    /**
-     * Takes in an EventRuleSet object which contains a list of EventRuleAbstract objects
- and either an OccPeriod or CECaseDataHeavy and implements those abstract rules 
- on that particular business object
-     * @param ers
-     * @param rg
-     * @param usr
-     * @throws IntegrationException
-     * @throws BObStatusException 
-     */
-    public void rules_attachRuleSet(EventRuleSet ers, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, BObStatusException{
-        for(EventRuleAbstract era: ers.getRuleList()){
-            if(rg instanceof OccPeriodDataHeavy){
-                OccPeriodDataHeavy op = (OccPeriodDataHeavy) rg;
-                rules_attachEventRuleAbstractToOccPeriod(era, op, usr);
-            } else if (rg instanceof CECaseDataHeavy){
-                CECaseDataHeavy cec = (CECaseDataHeavy) rg;
-                rules_attachEventRuleAbstractToCECase(era, cec);
-            } else {
-                throw new BObStatusException("Cannot attach rule set");
-            }
-        }
-        
-    }
-    
-    /**
-     * TODO: Finish my guts
-     * @param era
-     * @param cse 
-     */
-    private void rules_attachEventRuleAbstractToCECase(EventRuleAbstract era, CECaseDataHeavy cse){
-    
-        
-    }
-    
-    /**
-     * TODO: finish my guts
-     * @param era
-     * @param cse 
-     */
-    public void rules_attachEventRuleAbstractToMuniCERuleSet(EventRuleAbstract era, CECaseDataHeavy cse){
-        
-    }
-    
-    public boolean rules_evaluateEventRules(OccPeriodDataHeavy period) throws IntegrationException, BObStatusException, ViolationException{
-        boolean allRulesPassed = true;
-        List<EventRuleImplementation> rlst = period.assembleEventRuleList(ViewOptionsEventRulesEnum.VIEW_ALL);
-        
-        for(EventRuleAbstract era: rlst){
-            if(!rules_evalulateEventRule(period.assembleEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL), era)){
-                allRulesPassed = false;
-                break;
-            }
-        }
-        return allRulesPassed;
-    }
-
-    
-    public boolean rules_evalulateEventRule(List<EventCnF> eventList, EventRuleAbstract rule) throws IntegrationException, BObStatusException, ViolationException {
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        if(eventList == null || rule == null){
-            throw new BObStatusException("EventCoordinator.evaluateEventRule | Null event list or rule");
-        }
-        
-        if (rule.getRequiredEventType() != null){
-            if(!ruleSubcheck_requiredEventType(eventList, rule)){
-                return false;
-            }
-        } 
-        if (rule.getForbiddenEventType() != null){
-            if(!ruleSubcheck_forbiddenEventType(eventList, rule)){
-                return false;
-            }
-        } 
-        if (rule.getRequiredEventCategory() != null){
-            if(!ruleSubcheck_requiredEventCategory(eventList, rule)){
-                return false;
-            }
-        } 
-        if (rule.getForbiddenEventCategory() != null){
-            if(!ruleSubcheck_forbiddenEventCategory(eventList, rule)){
-                return false;
-            }
-        } 
-        return true;
-    }
-    
-    
-    private boolean rules_evalulateEventRule(CECaseDataHeavy cse, EventCnF event) throws IntegrationException, BObStatusException, ViolationException {
-        EventRuleAbstract rule = new EventRuleAbstract();
-        boolean rulePasses = false;
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        if (ruleSubcheck_requiredEventType(cse, rule) 
-                && 
-            ruleSubcheck_forbiddenEventType(cse, rule) 
-                && 
-            ruleSubcheck_requiredEventCategory(cse, rule) 
-                && 
-            ruleSubcheck_forbiddenEventCategory(cse, rule)) {
-                rulePasses = true;
-                cc.processCaseOnEventRulePass(cse, rule);
-        }
-        return rulePasses;
-    }
-    
-    private boolean ruleSubcheck_requiredEventCategory(CECaseDataHeavy cse, EventRuleAbstract rule) {
-        boolean subcheckPasses = true;
-        if (rule.getRequiredEventCategory().getCategoryID() != 0) {
-            subcheckPasses = false;
-            Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
-            while (iter.hasNext()) {
-                EventCnF ev = iter.next();
-                if (ev.getCategory().getCategoryID() == rule.getRequiredEventCategory().getCategoryID()) {
-                    subcheckPasses = true;
-                }
-            }
-        }
-        return subcheckPasses;
-    }
-
-    private boolean ruleSubcheck_forbiddenEventType(CECaseDataHeavy cse, EventRuleAbstract rule) {
-        boolean subcheckPasses = true;
-        Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
-        while (iter.hasNext()) {
-            EventCnF ev = iter.next();
-            if (ev.getCategory().getEventType() == rule.getRequiredEventType()) {
-                subcheckPasses = false;
-            }
-        }
-        return subcheckPasses;
-    }
-
-    private boolean ruleSubcheck_requiredEventType(CECaseDataHeavy cse, EventRuleAbstract rule) {
-        boolean subcheckPasses = true;
-        if (rule.getRequiredEventType() != null) {
-            subcheckPasses = false;
-            Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
-            while (iter.hasNext()) {
-                EventCnF ev = iter.next();
-                if (ev.getCategory().getEventType() == rule.getRequiredEventType()) {
-                    subcheckPasses = true;
-                }
-            }
-        }
-        return subcheckPasses;
-    }
-
-    private boolean ruleSubcheck_forbiddenEventCategory(CECaseDataHeavy cse, EventRuleAbstract rule) {
-        boolean subcheckPasses = true;
-        Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
-        while (iter.hasNext()) {
-            EventCnF ev = iter.next();
-            if (ev.getCategory().getCategoryID() == rule.getRequiredEventCategory().getCategoryID()) {
-                subcheckPasses = false;
-            }
-        }
-        return subcheckPasses;
-    }
-    
-    private boolean ruleSubcheck_requiredEventCategory(List<EventCnF> eventList, EventRuleAbstract rule) {        
-        Iterator<EventCnF> iter = eventList.iterator();
-        while (iter.hasNext()) {
-            EventCnF ev = iter.next();
-            // simplest case: check for matching categories
-            if (ev.getCategory().getCategoryID() == rule.getRequiredEventCategory().getCategoryID()) {
-                return true;
-            }
-            // if we didn't match, perhaps we need to treat the requried category as a threshold
-            // to be applied to an event category's type internal relative order
-            if(rule.getRequiredECThreshold_typeInternalOrder() != 0){
-                if(rule.isRequiredECThreshold_typeInternalOrder_treatAsUpperBound()){
-                    if(ev.getCategory().getRelativeOrderWithinType() <= rule.getRequiredECThreshold_typeInternalOrder()){
-                        return true;
-                    }
-                } else { // treat threshold as a lower bound
-                    if(ev.getCategory().getRelativeOrderWithinType() >= rule.getRequiredECThreshold_typeInternalOrder()){
-                        return true;
-                    }
-                }
-            }
-            // if we didn't pass the rule with type internal ordering as a thresold, check global
-            // ordering thresolds
-            if(rule.getRequiredECThreshold_globalOrder() != 0){
-                if(rule.isRequiredECThreshold_globalOrder_treatAsUpperBound()){
-                    if(ev.getCategory().getRelativeOrderGlobal()<= rule.getRequiredECThreshold_globalOrder()){
-                        return true;
-                    }
-                } else { // treat threshold as a lower bound
-                    if(ev.getCategory().getRelativeOrderGlobal() >= rule.getRequiredECThreshold_globalOrder()){
-                        return true;
-                    }
-                }
-            }
-        }
-        // list did not contain an EventCnF whose category was required or required in a specified range
-        return false;
-    }
-    
-    private boolean ruleSubcheck_forbiddenEventCategory(List<EventCnF> eventList, EventRuleAbstract rule) {
-       Iterator<EventCnF> iter = eventList.iterator();
-        while (iter.hasNext()) {
-            EventCnF ev = iter.next();
-            // simplest case: check for matching categories
-            if (ev.getCategory().getCategoryID() == rule.getForbiddenEventCategory().getCategoryID()) {
-                return false;
-            }
-            // if we didn't match, perhaps we need to treat the requried category as a threshold
-            // to be applied to an event category's type internal relative order
-            if(rule.getForbiddenECThreshold_typeInternalOrder() != 0){
-                if(rule.isForbiddenECThreshold_typeInternalOrder_treatAsUpperBound()){
-                    if(ev.getCategory().getRelativeOrderWithinType() <= rule.getForbiddenECThreshold_typeInternalOrder()){
-                        return false;
-                    }
-                } else { // treat threshold as a lower bound
-                    if(ev.getCategory().getRelativeOrderWithinType() >= rule.getForbiddenECThreshold_typeInternalOrder()){
-                        return false;
-                    }
-                }
-            }
-            // if we didn't pass the rule with type internal ordering as a thresold, check global
-            // ordering thresolds
-            if(rule.getForbiddenECThreshold_globalOrder() != 0){
-                if(rule.isForbiddenECThreshold_globalOrder_treatAsUpperBound()){
-                    if(ev.getCategory().getRelativeOrderGlobal()<= rule.getForbiddenECThreshold_globalOrder()){
-                        return false;
-                    }
-                } else { // treat threshold as a lower bound
-                    if(ev.getCategory().getRelativeOrderGlobal() >= rule.getForbiddenECThreshold_globalOrder()){
-                        return false;
-                    }
-                }
-            }
-        }
-        // list did not contain an EventCnF whose category was required or required in a specified range
-        return true;
-    }
-
-    private boolean ruleSubcheck_requiredEventType(List<EventCnF> eventList, EventRuleAbstract rule) {
-        Iterator<EventCnF> iter = eventList.iterator();
-        while (iter.hasNext()) {
-            EventType evType = iter.next().getCategory().getEventType();
-            if (evType == rule.getRequiredEventType()) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private boolean ruleSubcheck_forbiddenEventType(List<EventCnF> eventList, EventRuleAbstract rule) {
-        Iterator<EventCnF> iter = eventList.iterator();
-        while (iter.hasNext()) {
-            EventType evType = iter.next().getCategory().getEventType();
-            if (evType == rule.getForbiddenEventType()) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     
     

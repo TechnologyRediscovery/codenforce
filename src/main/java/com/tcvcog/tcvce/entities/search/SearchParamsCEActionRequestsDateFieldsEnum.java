@@ -30,7 +30,7 @@ public  enum SearchParamsCEActionRequestsDateFieldsEnum
                                 "submittedtimestamp"), 
     
     SUBMISSION_DOR               ("Date of record",
-                                "dateofrecord"), 
+                                "ceactionrequest.dateofrecord"), 
     
     CASEATTACHMENT_TS           ("Case attachment timestamp", 
                                 "caseattachmenttimestamp");

@@ -168,21 +168,6 @@
                                             <i class="material-icons"><h:outputText value="#{e.category.icon.materialIcon}"/></i>
                                         </p:column>
 
-                                        <p:column width="9%" sortBy="#{e.dateOfRecord}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Date" />
-                                            </f:facet>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{e.dateOfRecordPretty}"/>
-                                            </div>
-                                        </p:column>
-
-                                        <p:column width="4%" sortBy="#{e.eventID}">
-                                            <f:facet name="header">
-                                                <h:outputText value="ID" />
-                                            </f:facet>
-                                            <h:outputText value="#{e.eventID}"/>
-                                        </p:column>
                                         <ui:remove>
                                             <p:column width="8%" sortBy="#{e.category.eventType.label}"
                                                       filterBy="#{e.category.eventType.label}">
@@ -192,6 +177,30 @@
                                                 <h:outputText value="#{e.category.eventType.label}"/>
                                             </p:column>
                                         </ui:remove>
+                                        
+                                        <p:column width="4%" sortBy="#{e.eventID}">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{e.eventID}"/>
+                                        </p:column>
+
+                                      <p:column width="9%" sortBy="#{e.timeStart}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Date" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{e.timeStartPretty}"/>
+                                            </div>
+                                        </p:column>
+                                        <p:column width="9%" sortBy="#{e.timeEnd}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Date" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{e.timeEndPretty}"/>
+                                            </div>
+                                        </p:column>
 
                                         <p:column width="12%" sortBy="#{e.category.eventCategoryTitle}"
                                                   filterBy="#{e.category.eventCategoryTitle}">

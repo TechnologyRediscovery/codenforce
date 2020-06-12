@@ -30,7 +30,7 @@ import javax.faces.convert.FacesConverter;
  * and object types
  * @author echocharliedelta
  */
-@FacesConverter(forClass=CourtEntity.class, value="courtEntityConverter")
+@FacesConverter(value="courtEntityConverter")
 public class CourtEntityConverter extends EntityConverter implements Converter {
     
      @Override

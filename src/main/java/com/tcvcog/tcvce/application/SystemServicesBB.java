@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
@@ -37,6 +38,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -63,13 +65,14 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     private Person bbSessionPerson;
     
     
-    
     // *************************************************************************
     // **               search support 
     // *************************************************************************
     
     private List<User> userListForSearch;
-    
+    private List<Municipality> municipalityListForSearch;
+    private List<Property> propertyListForSearch;
+    private List<Person> personListForSearch;
     
     // *************************************************************************
     // **               improvement suggestions, etc.
@@ -99,12 +102,19 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         System.out.println("SystemServicesBB.initBean");
         UserCoordinator uc = getUserCoordinator();
         
-        bbSessionUser = getSessionBean().getSessionUser();
-        bbSessionMuni = getSessionBean().getSessionMuni();
-        bbSessionProperty = getSessionBean().getSessionProperty();
-        bbSessionPerson = getSessionBean().getSessionPerson();
+        bbSessionUser = getSessionBean().getSessUser();
+        bbSessionMuni = getSessionBean().getSessMuni();
+        bbSessionProperty = getSessionBean().getSessProperty();
+        bbSessionPerson = getSessionBean().getSessPerson();
         
-        userListForSearch = uc.assembleUserListForSearchCriteria();
+        userListForSearch = uc.assembleUserListForSearch(getSessionBean().getSessUser());
+        propertyListForSearch = getSessionBean().getSessPropertyList();
+        personListForSearch = getSessionBean().getSessPersonList();
+        
+        if(bbSessionUser != null){
+            municipalityListForSearch = bbSessionUser.getAuthMuniList();
+        }
+        
         
     }
     
@@ -120,6 +130,11 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     }
     
      
+    /**
+     * Central point of exit for session endings: destroys session key's validity
+     * and redirects user to exit page
+     * @return 
+     */
     public String logout(){
         FacesContext context = getFacesContext();
         HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
@@ -166,7 +181,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
 
         ImprovementSuggestion is = new ImprovementSuggestion();
         
-        is.setSubmitter(getSessionBean().getSessionUser());
+        is.setSubmitter(getSessionBean().getSessUser());
         is.setImprovementTypeID(selectedImprovementType);
         is.setSuggestionText(systemImprovementTicketRText);
         // back to the hard-coded since I couldn't get the resource bundle lookup
@@ -404,6 +419,48 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public List<User> getUserListForSearch() {
         return userListForSearch;
+    }
+
+    /**
+     * @return the municipalityListForSearch
+     */
+    public List<Municipality> getMunicipalityListForSearch() {
+        return municipalityListForSearch;
+    }
+
+    /**
+     * @param municipalityListForSearch the municipalityListForSearch to set
+     */
+    public void setMunicipalityListForSearch(List<Municipality> municipalityListForSearch) {
+        this.municipalityListForSearch = municipalityListForSearch;
+    }
+
+    /**
+     * @return the propertyListForSearch
+     */
+    public List<Property> getPropertyListForSearch() {
+        return propertyListForSearch;
+    }
+
+    /**
+     * @param propertyListForSearch the propertyListForSearch to set
+     */
+    public void setPropertyListForSearch(List<Property> propertyListForSearch) {
+        this.propertyListForSearch = propertyListForSearch;
+    }
+
+    /**
+     * @return the personListForSearch
+     */
+    public List<Person> getPersonListForSearch() {
+        return personListForSearch;
+    }
+
+    /**
+     * @param personListForSearch the personListForSearch to set
+     */
+    public void setPersonListForSearch(List<Person> personListForSearch) {
+        this.personListForSearch = personListForSearch;
     }
 
     

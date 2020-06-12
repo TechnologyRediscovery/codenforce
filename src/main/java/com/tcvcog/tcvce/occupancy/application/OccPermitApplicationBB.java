@@ -97,12 +97,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
         
         // check if we're working with an internal user or the public form
-        if(getSessionBean().getSessionUser() != null){
+        if(getSessionBean().getSessUser() != null){
             
             // internal user procedure
             
-            selectedMuni = getSessionBean().getSessionMuni();
-            Property p = getSessionBean().getSessionProperty();
+            selectedMuni = getSessionBean().getSessMuni();
+            Property p = getSessionBean().getSessProperty();
             workingPropUnits = p.getUnitList();
             
 
@@ -140,8 +140,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                 }
             }
 
-            if (attachedPersons == null && getSessionBean().getSessionOccPermitApplication() != null) {
-                attachedPersons = getSessionBean().getSessionOccPermitApplication().getAttachedPersons();
+            if (attachedPersons == null && getSessionBean().getSessOccPermitApplication() != null) {
+                attachedPersons = getSessionBean().getSessOccPermitApplication().getAttachedPersons();
                 if (attachedPersons == null) {
                     attachedPersons = new ArrayList();
                 }
@@ -150,17 +150,17 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
 
         //I apologize for the ugly code. It is necessary to prevent a null pointer exception. - Nathan
-        if (getSessionBean().getSessionOccPermitApplication() != null
-                && getSessionBean().getSessionOccPermitApplication().getReason() != null
-                && getSessionBean().getSessionOccPermitApplication().getReason().getPersonsRequirement() != null) { 
+        if (getSessionBean().getSessOccPermitApplication() != null
+                && getSessionBean().getSessOccPermitApplication().getReason() != null
+                && getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement() != null) { 
 
-            requiredPersons = getSessionBean().getSessionOccPermitApplication().getReason().getPersonsRequirement().getRequiredPersonTypes();
+            requiredPersons = getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getRequiredPersonTypes();
 
             optAndReqPersons = new ArrayList<>();
 
             optAndReqPersons.addAll(requiredPersons);
 
-            optAndReqPersons.addAll(getSessionBean().getSessionOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes());
+            optAndReqPersons.addAll(getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes());
 
         }
 
@@ -172,14 +172,14 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         PropertyIntegrator pi = getPropertyIntegrator();
         
         OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
-        getSessionBean().setSessionOccPermitApplication(occpermitapp);
+        getSessionBean().setSessOccPermitApplication(occpermitapp);
         
-        getSessionBean().setOccPermitAppActiveProp(pi.getProperty(getSessionBean().getSessionProperty().getPropertyID()));
+        getSessionBean().setOccPermitAppActiveProp(pi.getProperty(getSessionBean().getSessProperty().getPropertyID()));
 
         if (prop.getUnitList().size() == 1) {
             List<PropertyUnit> propertyUnitList = prop.getUnitList();
             getSessionBean().setOccPermitAppActivePropUnit(propertyUnitList.get(0));
-            getSessionBean().getSessionOccPermitApplication().setApplicationPropertyUnit(pu);
+            getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(pu);
         }
         
         
@@ -205,7 +205,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //        getSessionBean().recordSelectedMuni(selectedMuni);
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
-        getSessionBean().setSessionOccPermitApplication(occpermitapp);
+        getSessionBean().setSessOccPermitApplication(occpermitapp);
         return "chooseProperty";
     }
 
@@ -214,7 +214,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void searchForPropertiesSingleMuni() {
         PropertyIntegrator pi = getPropertyIntegrator();
-        Municipality activeMuni = getSessionBean().getSessionMuni();
+        Municipality activeMuni = getSessionBean().getSessMuni();
 
         // TODO: occ beta adapt to new search params
 //        try {
@@ -250,7 +250,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         if (prop.getUnitList().size() == 1) {
             List<PropertyUnit> propertyUnitList = prop.getUnitList();
             getSessionBean().setOccPermitAppActivePropUnit(propertyUnitList.get(0));
-            getSessionBean().getSessionOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
+            getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
         }
     }
 
@@ -324,7 +324,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             if (prop.getUnitList().size() == 1) {
                 List<PropertyUnit> propertyUnitList = prop.getUnitList();
                 getSessionBean().setOccPermitAppActivePropUnit(propertyUnitList.get(0));
-                getSessionBean().getSessionOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
+                getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
             }
             
             try {
@@ -397,7 +397,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         } else {
             unit.setPropertyID(getSessionBean().getOccPermitAppActiveProp().getPropertyID());
             getSessionBean().setOccPermitAppActivePropUnit(unit);
-            getSessionBean().getSessionOccPermitApplication().setApplicationPropertyUnit(unit);
+            getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(unit);
 
             try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
@@ -489,7 +489,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      * @return
      */
     public String storePropertyUnitInfo() {
-        if (getSessionBean().getSessionOccPermitApplication().getApplicationPropertyUnit() == null
+        if (getSessionBean().getSessOccPermitApplication().getApplicationPropertyUnit() == null
                 && getSessionBean().getOccPermitAppActivePropUnit() == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -581,18 +581,18 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public String editPersonInfo(Person person) {
         person.setPersonType(getSessionBean().getOccPermitAppActivePersonType());
-        attachedPersons = getSessionBean().getSessionOccPermitApplication().getAttachedPersons();
+        attachedPersons = getSessionBean().getSessOccPermitApplication().getAttachedPersons();
 
         if (attachedPersons == null) {
             attachedPersons = new ArrayList();
         }
-        getSessionBean().getSessionOccPermitApplication().setAttachedPersons(attachedPersons);
+        getSessionBean().getSessOccPermitApplication().setAttachedPersons(attachedPersons);
         getSessionBean().setActiveAnonPerson(person);
         return "editPerson";
     }
 
     public String addANewPerson() {
-        OccPermitApplication temp = getSessionBean().getSessionOccPermitApplication();
+        OccPermitApplication temp = getSessionBean().getSessOccPermitApplication();
 
         for (Person p : attachedPersons) {
 // todo occbeta
@@ -625,7 +625,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         List<PersonType> required = requiredPersons;
 
-        List<PersonType> optional = getSessionBean().getSessionOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
+        List<PersonType> optional = getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
 
         StringBuilder description = new StringBuilder("It is required that you have these types of people: ");
 
@@ -725,9 +725,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             return "";
         }
 
-        getSessionBean().getSessionOccPermitApplication().setApplicantPerson(applicant);
+        getSessionBean().getSessOccPermitApplication().setApplicantPerson(applicant);
 
-        getSessionBean().getSessionOccPermitApplication().setAttachedPersons(attachedPersons);
+        getSessionBean().getSessOccPermitApplication().setAttachedPersons(attachedPersons);
 
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
@@ -745,9 +745,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         OccupancyIntegrator opi = getOccupancyIntegrator();        
         try {
-            int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getSessionOccPermitApplication());
-            getSessionBean().getSessionOccPermitApplication().setId(applicationId);
-            opi.insertOccPeriodPersons(getSessionBean().getSessionOccPermitApplication());
+            int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getSessOccPermitApplication());
+            getSessionBean().getSessOccPermitApplication().setId(applicationId);
+            opi.insertOccPeriodPersons(getSessionBean().getSessOccPermitApplication());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -763,7 +763,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         PropertyDataHeavy existingProp = new PropertyDataHeavy();
         
-        Person changedby = getSessionBean().getSessionOccPermitApplication().getApplicantPerson();
+        Person changedby = getSessionBean().getSessOccPermitApplication().getApplicantPerson();
 
         // TODO: Occbeta
 
@@ -780,7 +780,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             boolean added = true;
 
-            skeleton.setPropertyID(getSessionBean().getSessionOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
+            skeleton.setPropertyID(getSessionBean().getSessOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
             
             if (changedby.getPersonID() != 0)
             {
@@ -868,7 +868,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             PropertyUnitChangeOrder skeleton = new PropertyUnitChangeOrder();
 
-            skeleton.setPropertyID(getSessionBean().getSessionOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
+            skeleton.setPropertyID(getSessionBean().getSessOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
             
             if (changedby.getPersonID() != 0)
             {

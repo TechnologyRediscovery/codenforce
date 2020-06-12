@@ -32,9 +32,15 @@ import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
-import com.tcvcog.tcvce.integration.*;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.CitationIntegrator;
+import com.tcvcog.tcvce.integration.ViolationIntegrator;
+import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -44,8 +50,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -83,27 +87,29 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param cred
      * @return the CECaseDataHeavy with the action request list ready to roll
      * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public CECaseDataHeavy assembleCECaseDataHeavy(CECase c, Credential cred) throws BObStatusException, IntegrationException{
+    public CECaseDataHeavy assembleCECaseDataHeavy(CECase c, Credential cred) 
+            throws BObStatusException, IntegrationException{
         SearchCoordinator sc = getSearchCoordinator();
-        ChoiceCoordinator chc = getChoiceCoordinator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
         
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
-        CECaseDataHeavy cse = new CECaseDataHeavy(c);
+        CECaseDataHeavy cse = new CECaseDataHeavy(assembleCECasePropertyUnitHeavy(c));
 
         try {
             // EVENT LIST
             QueryEvent qe = sc.initQuery(QueryEventEnum.CECASE, cred);
             qe.getPrimaryParams().setBobID_ctl(true);
             qe.getPrimaryParams().setBobID_val(c.getCaseID());
-            cse.setCompleteEventList(sc.runQuery(qe).getBOBResultList());
+            cse.setCompleteEventList(ec.downcastEventCnFPropertyUnitHeavy(sc.runQuery(qe).getBOBResultList()));
         
             // PROPOSAL LIST
-            cse.setProposalList(chc.getProposalList(cse, cred));
+            cse.setProposalList(wc.getProposalList(cse, cred));
             
             // EVENT RULE LIST
-            cse.setEventRuleList(ec.rules_getEventRuleImpList(cse, cred));
+            cse.setEventRuleList(wc.rules_getEventRuleImpList(cse, cred));
             
             // CEAR LIST
             QueryCEAR qcear = sc.initQuery(QueryCEAREnum.ATTACHED_TO_CECASE, cred);
@@ -134,6 +140,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
     }
     
+    /**
+     * Utility for downcasting a list of CECasePropertyUnitDataHeavy 
+     * to the base class
+     * @param cspudhList
+     * @return 
+     */
+    public List<CECase> downcastCECasePropertyUnitHeavyList(List<CECasePropertyUnitHeavy> cspudhList){
+        List<CECase> cslist = new ArrayList<>();
+        if(cspudhList != null && !cspudhList.isEmpty()){
+            for(CECasePropertyUnitHeavy c: cspudhList){
+                cslist.add((CECase) c);
+            }
+            
+        }
+        return cslist;
+    }
+    
+    
+    /**
+     * Utility for assembling a list of data heavy cases from a list of base class
+     * instances
+     * @param cseList
+     * @param cred
+     * @return 
+     */
     public List<CECaseDataHeavy> getCECaseHeavyList(List<CECase> cseList, Credential cred){
         List<CECaseDataHeavy> heavyList = new ArrayList<>();
         for(CECase cse: cseList){
@@ -148,7 +179,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Primary pathway for retrieving the CECaseDataHeavy data-light 
+     * Primary pathway for retrieving the data-light 
      * superclass CECase. Implements business logic.
      * @param caseID
      * @return
@@ -162,17 +193,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         CECase cse = null;
         try {
             cse = ci.getCECase(caseID);
-            
-            cse.setNoticeList(cvi.novGetList(cse));
-            Collections.sort(cse.getNoticeList());
-            Collections.reverse(cse.getNoticeList());
-            
-            cse.setCitationList(citInt.getCitations(cse));
-            
-            cse.setViolationList(cvi.getCodeViolations(cse.getCaseID()));
-            Collections.sort(cse.getViolationList());
-            
-            cse = configureCECaseStageAndPhase(cse);
+            if(cse != null){
+
+                cse.setNoticeList(cvi.novGetList(cse));
+                Collections.sort(cse.getNoticeList());
+                Collections.reverse(cse.getNoticeList());
+
+                cse.setCitationList(citInt.getCitations(cse));
+
+                cse.setViolationList(cvi.getCodeViolations(cse.getCaseID()));
+                Collections.sort(cse.getViolationList());
+
+                cse = configureCECaseStageAndPhase(cse);
+            }
         } catch (BObStatusException ex) {
             System.out.println(ex);
         }
@@ -180,6 +213,38 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
         
     }
+    
+    /**
+     * Builds a property and propertyUnit heavy subclass of our CECase object
+     * 
+     * @param cse
+     * @return the data-rich subclass with Property and possible PropertyUnit
+     * @throws IntegrationException 
+     */
+    public CECasePropertyUnitHeavy assembleCECasePropertyUnitHeavy(CECase cse) throws IntegrationException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        CECasePropertyUnitHeavy csepuh = null;
+        if(cse != null){
+            csepuh= new CECasePropertyUnitHeavy(cse);
+            csepuh.setProperty(pc.getProperty(cse.getPropertyID()));
+            if(cse.getPropertyUnitID() != 0){
+                csepuh.setPropUnit(pc.getPropertyUnit(cse.getPropertyUnitID()));
+            }
+        }
+        return csepuh;
+    }
+    
+    public List<CECasePropertyUnitHeavy> assembleCECasePropertyUnitHeavyList(List<CECase> cseList) throws IntegrationException{
+        
+        List<CECasePropertyUnitHeavy> cspudhList = new ArrayList<>();
+        if(cseList != null && !cseList.isEmpty()){
+            for(CECase cse: cseList){
+                cspudhList.add(assembleCECasePropertyUnitHeavy(cse));
+            }
+        }
+        return cspudhList;
+    }
+    
     
     public Icon getIconByCasePhase(CasePhaseEnum phase) throws IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
@@ -351,22 +416,23 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return cl;
     }
     
-    public CECaseDataHeavy initCECase(Property p, User u){
-        CECaseDataHeavy newCase = new CECaseDataHeavy();
+    public CECase initCECase(Property p, User u){
+        CECase newCase = new CECase();
         
         int casePCC = generateControlCodeFromTime();
         // caseID set by postgres sequence
         // timestamp set by postgres
         // no closing date, by design of case flow
         newCase.setPublicControlCode(casePCC);
-        newCase.setProperty(p);
+        newCase.setPropertyID(p.getPropertyID());
         newCase.setCaseManager(u);
         
         return newCase;
     }
     
     /**
-     * Primary entry point for code enf cases. Two major pathways exist through this method:
+     * Primary entry point for inserting new code enf cases. 
+     * Two major pathways exist through this method:
      * - creating cases as a result of an action request submission
      * - creating cases from some other source than an action request
      * Depending on the source, an appropriately note-ified case origination event
@@ -441,8 +507,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param caseID can be extracted from the public info bundle
      * @param msg the text of the message the user wants to add to the case 
      * @param messagerName the first and last name of the person submitting the message
-     * Note that this submission info is not YET wired into the actual Person objects
-     * in the system.
+ Note that this submission info is not YET wired into the actual Person objects
+ in the system.
      * @param messagerPhone a simple String rendering of whatever the user types in. Length validation only.
      */
     public void attachPublicMessage(int caseID, String msg, String messagerName, String messagerPhone) throws IntegrationException, BObStatusException, EventException{
@@ -517,12 +583,32 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     } // close method
     
     
-    
+    /**
+     * Pathway for "Evaluating a Proposal" or in other words, making a workflow choice.
+     * The exception list is a beast because so many things happen when such an event occurs.
+     * TODO: Move to WorkflowCoordinator
+     * 
+     * @param proposal
+     * @param chosen
+     * @param ceCase
+     * @param u
+     * @throws EventException
+     * @throws AuthorizationException
+     * @throws BObStatusException
+     * @throws IntegrationException
+     * @throws ViolationException 
+     */
     public void evaluateProposal(   Proposal proposal, 
                                     IFace_Proposable chosen, 
                                     CECaseDataHeavy ceCase, 
-                                    UserAuthorized u) throws EventException, AuthorizationException, BObStatusException, IntegrationException, ViolationException{
-        ChoiceCoordinator cc = getChoiceCoordinator();
+                                    UserAuthorized u) 
+                            throws  EventException, 
+                                    AuthorizationException, 
+                                    BObStatusException, 
+                                    IntegrationException, 
+                                    ViolationException{
+        
+        WorkflowCoordinator cc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
         
@@ -535,7 +621,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             proposal.setChosenChoice(chosen);
             
             // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
-            EventCnF csEv = ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u);
+            EventCnF csEv = cc.generateEventDocumentingProposalEvaluation(ceCase, proposal, chosen, u);
             // insert the event and grab the new ID
             insertedEventID = attachNewEventToCECase(ceCase, csEv, null);
             // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
@@ -554,7 +640,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         EventCnF newEvent = null;
         
         CasePhaseEnum oldCP = cse.getCasePhase();
-        ci.changeCECasePhase(cse);
 //        ec.generateAndInsertPhaseChangeEvent(cse, oldCP, rule);
 //        if(rule.getTriggeredEventCategoryID() != 0){
 //            newEvent = ec.initEvent(cse, ec.initEventCategory(rule.getTriggeredEventCategoryID()));
@@ -645,19 +730,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
      
     private int processClosingEvent(CECaseDataHeavy c, EventCnF e) throws IntegrationException, BObStatusException{
-        CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
         
         CasePhaseEnum closedPhase = CasePhaseEnum.Closed;
         c.setCasePhase(closedPhase);
-        ci.changeCECasePhase(c);
         
         c.setClosingDate(LocalDateTime.now());
-        updateCoreCECaseData(c);
+        updateCECaseMetadata(c);
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
-        e.setOwner(getSessionBean().getSessionUser());
+        e.setOwner(getSessionBean().getSessUser());
         e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         return ei.insertEvent(e);
@@ -838,7 +921,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     * @throws BObStatusException
     * @throws IntegrationException 
     */
-   public void updateCoreCECaseData(CECaseDataHeavy c) throws BObStatusException, IntegrationException{
+   public void updateCECaseMetadata(CECaseDataHeavy c) throws BObStatusException, IntegrationException{
        CaseIntegrator ci = getCaseIntegrator();
        if(c.getClosingDate() != null){
             if(c.getClosingDate().isBefore(c.getOriginationDate())){
@@ -1049,6 +1132,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         UserCoordinator uc = getUserCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         EventCnF tfEvent;
+        PaymentCoordinator pc = getPaymentCoordinator();
         int insertedViolationID;
         int eventID;
         StringBuilder sb = new StringBuilder();
@@ -1066,9 +1150,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("Case: ");
         sb.append(cse.getCaseName());
         sb.append(" at ");
-        sb.append(cse.getProperty().getAddress());
+        sb.append(cc.assembleCECasePropertyUnitHeavy(cse).getProperty().getAddress());
         sb.append("(");
-        sb.append(cse.getProperty().getMuni().getMuniName());
+        sb.append(cc.assembleCECasePropertyUnitHeavy(cse).getProperty().getMuni().getMuniName());
         sb.append(")");
         sb.append("; Violation: ");
         sb.append(cv.getViolatedEnfElement().getCodeElement().getHeaderString());
@@ -1081,6 +1165,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         } else {
             throw new ViolationException("Failed violation verification");
         }
+        
+        pc.insertAutoAssignedFees(cse, cv);
         return insertedViolationID;
     }
     

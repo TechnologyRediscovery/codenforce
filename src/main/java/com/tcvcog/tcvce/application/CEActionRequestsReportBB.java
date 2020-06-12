@@ -29,7 +29,7 @@ public class        CEActionRequestsReportBB
     
     @PostConstruct
     public void initBean(){
-        Report r = getSessionBean().getSessionReport();
+        Report r = getSessionBean().getSessReport();
         if(r instanceof ReportCEARList){
             reportConfig = (ReportCEARList) r;
         }

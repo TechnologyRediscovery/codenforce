@@ -25,10 +25,10 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
+import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
+import com.tcvcog.tcvce.entities.CaseStageEnum;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
-import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -36,8 +36,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -50,17 +48,19 @@ public class CECaseSearchBB
         extends BackingBeanUtils
         implements Serializable {
     
-    private CECase currentCase;
+    private CECasePropertyUnitHeavy currentCase;
     
-    private List<CECase> caseList;
-    private List<CECase> filteredCaseList;
-    private SearchParamsCECase searchParams;
+    private List<CECasePropertyUnitHeavy> caseList;
+    private List<CECasePropertyUnitHeavy> filteredCaseList;
+    private SearchParamsCECase searchParamsSelected;
     
     private List<QueryCECase> queryList;
-    private QueryCECase selectedCECaseQuery;
-    private Query selectedBOBQuery;
+    private QueryCECase querySelected;
+    private boolean appendResultsToList;
     
-    private ArrayList<CECaseDataHeavy> filteredCaseHistoryList;
+    private List<Property> propListForSearch;
+    private CaseStageEnum[] caseStageList;
+    
     
     private ReportConfigCECaseList reportCECaseList;
     
@@ -75,31 +75,43 @@ public class CECaseSearchBB
     public void initBean() {
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
-        UserCoordinator uc = getUserCoordinator();
         
         SessionBean sb = getSessionBean();
-        setCurrentCase(sb.getSessionCECase());
+        currentCase = (sb.getSessCECase());
         
-        setQueryList(sc.buildQueryCECaseList(getSessionBean().getSessionUser().getMyCredential()));
-        setSelectedCECaseQuery(getSessionBean().getQueryCECase());
+        queryList = sc.buildQueryCECaseList(getSessionBean().getSessUser().getMyCredential());
+        querySelected = getSessionBean().getQueryCECase();
         
-        setSearchParams(getSelectedCECaseQuery().getSearchParamsList().get(0));
+        configureParameters();
         
-        if(selectedCECaseQuery.getExecutionTimestamp() == null){
-            try {
-                caseList.addAll(sc.runQuery(getSelectedCECaseQuery()).getBOBResultList());
-            } catch (SearchException ex) {
-                System.out.println(ex);
-            }
-        }
+        caseList = new ArrayList<>();
+        caseList.addAll(sb.getSessCECaseList());
         
-        setCaseList(getSelectedCECaseQuery().getResults());
+        propListForSearch = sb.getSessPropertyList();
+        caseStageList = CaseStageEnum.values();
         
         ReportConfigCECaseList listRpt = getSessionBean().getReportConfigCECaseList();
         if (listRpt != null) {
-            setReportCECaseList(listRpt);
+            reportCECaseList = listRpt;
         } else {
-            setReportCECaseList(cc.getDefaultReportConfigCECaseList());
+            reportCECaseList = cc.getDefaultReportConfigCECaseList();
+        }
+    }
+    
+    /**
+     * Loads the first parameter bundle of a selected query object
+     */
+    private void configureParameters(){
+        if(querySelected != null 
+                && 
+            querySelected.getParamsList() != null 
+                && 
+            !querySelected.getParamsList().isEmpty()){
+            
+            searchParamsSelected = querySelected.getParamsList().get(0);
+            
+        } else {
+            searchParamsSelected = null;
         }
     }
     
@@ -108,28 +120,33 @@ public class CECaseSearchBB
      * the right column (the manage object column) on cECases.xhtml
      *
      * @param c the case to be managed--comes from the data table row button
+     * @return 
      */
-    public void manageCECase(CECaseDataHeavy c) {
+    public String manageCECase(CECase c) {
         SystemIntegrator si = getSystemIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
         
         System.out.println("CaseProfileBB.manageCECase | caseid: " + c.getCaseID());
         try {
-            si.logObjectView_OverwriteDate(getSessionBean().getSessionUser(), c);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        setCurrentCase(c);
-        try {
-            getSessionBean().setSessionCECase(cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessionUser().getMyCredential()));
-            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(c.getProperty(), getSessionBean().getSessionUser().getMyCredential()));
+            si.logObjectView(getSessionBean().getSessUser(), c);
+            
+            getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(
+                            currentCase, 
+                            getSessionBean().getSessUser().getMyCredential()));
+            
+            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(
+                            cc.assembleCECasePropertyUnitHeavy(c).getProperty(), 
+                            getSessionBean().getSessUser().getMyCredential()));
+            
         } catch (BObStatusException | IntegrationException | SearchException ex) {
+            System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Cannot load full case with data.", ""));
-            
         }
+        return "ceCaseWorkflow";
+        
         
     }
     
@@ -145,15 +162,22 @@ public class CECaseSearchBB
     }
     
     
-    
+    /**
+     * Logic block for executing selected query
+     */
     public void executeQuery(){
+        System.out.println("CECaseSearchBB.executeQuery");
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         int listSize = 0;
         
+        if(!appendResultsToList){
+            caseList.clear();
+        }
+        
         try {
-            setCaseList(sc.runQuery(getSelectedCECaseQuery()).getResults());
-            if (getCaseList() != null) {
+            caseList.addAll(sc.runQuery(getQuerySelected()).getResults());
+            if (caseList != null) {
                 listSize = getCaseList().size();
             }
             getFacesContext().addMessage(null,
@@ -167,9 +191,73 @@ public class CECaseSearchBB
         } 
     }
     
+    /**
+     * Convenience method for accessing the size of the CECase List
+     * @return 
+     */
+    public int getCaseListSize(){
+        int s = 0;
+        if(caseList != null && !caseList.isEmpty()){
+            s = caseList.size();
+        }
+        return s;
+            
+    }
     
+    /**
+     * Listener method for requests to load case history
+     * @param ev 
+     */
+    public void loadCECaseHistory(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            caseList.addAll(cc.assembleCECasePropertyUnitHeavyList(cc.assembleCaseHistory(getSessionBean().getSessUser().getMyCredential())));
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Case history loaded", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not load case history, sorry.", ""));
+            
+        }
+    }
     
-
+    /**
+     * Listener method for requests to clear the search results list
+     * @param ev 
+     */
+    public void clearCECaseList(ActionEvent ev){
+        if(caseList != null){
+            caseList.clear();
+        }
+    }
+    
+    /**
+     * Listener method for changes in selected query objects
+     * @param ev 
+     */
+    public void changeQuerySelected(){
+        configureParameters();
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "New query loaded!", ""));
+    }
+    
+    /**
+     * Action listener for query resets
+     * @param ev 
+     */
+    public void resetQuery(ActionEvent ev){
+        SearchCoordinator sc = getSearchCoordinator();
+        queryList = sc.buildQueryCECaseList(getSessionBean().getSessUser().getMyCredential());
+        if(queryList != null && !queryList.isEmpty()){
+            querySelected = queryList.get(0);
+        }
+        configureParameters();
+    }
+    
     
     public void prepareReportCECaseList(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
@@ -185,13 +273,13 @@ public class CECaseSearchBB
     
 
     public String generateReportCECaseList() {
-        getReportCECaseList().setCreator(getSessionBean().getSessionUser());
-        getReportCECaseList().setMuni(getSessionBean().getSessionMuni());
+        getReportCECaseList().setCreator(getSessionBean().getSessUser());
+        getReportCECaseList().setMuni(getSessionBean().getSessMuni());
         getReportCECaseList().setGenerationTimestamp(LocalDateTime.now());
         
         getSessionBean().setReportConfigCECaseList(getReportCECaseList());
         getSessionBean().setReportConfigCECase(null);
-        getSessionBean().setSessionReport(getReportCECaseList());
+        getSessionBean().setSessReport(getReportCECaseList());
         
         return "reportCECaseList";
 
@@ -209,22 +297,22 @@ public class CECaseSearchBB
     /**
      * @return the caseList
      */
-    public List<CECase> getCaseList() {
+    public List<CECasePropertyUnitHeavy> getCaseList() {
         return caseList;
     }
 
     /**
      * @return the filteredCaseList
      */
-    public List<CECase> getFilteredCaseList() {
+    public List<CECasePropertyUnitHeavy> getFilteredCaseList() {
         return filteredCaseList;
     }
 
     /**
-     * @return the searchParams
+     * @return the searchParamsSelected
      */
-    public SearchParamsCECase getSearchParams() {
-        return searchParams;
+    public SearchParamsCECase getSearchParamsSelected() {
+        return searchParamsSelected;
     }
 
     /**
@@ -235,27 +323,10 @@ public class CECaseSearchBB
     }
 
     /**
-     * @return the selectedCECaseQuery
+     * @return the querySelected
      */
-    public QueryCECase getSelectedCECaseQuery() {
-          if(selectedBOBQuery instanceof Query){
-            setSelectedCECaseQuery((QueryCECase) getSelectedBOBQuery());
-        }
-        return selectedCECaseQuery;
-    }
-
-    /**
-     * @return the selectedBOBQuery
-     */
-    public Query getSelectedBOBQuery() {
-        return selectedBOBQuery;
-    }
-
-    /**
-     * @return the filteredCaseHistoryList
-     */
-    public ArrayList<CECaseDataHeavy> getFilteredCaseHistoryList() {
-        return filteredCaseHistoryList;
+    public QueryCECase getQuerySelected() {
+        return querySelected;
     }
 
 
@@ -276,22 +347,22 @@ public class CECaseSearchBB
     /**
      * @param caseList the caseList to set
      */
-    public void setCaseList(List<CECase> caseList) {
+    public void setCaseList(List<CECasePropertyUnitHeavy> caseList) {
         this.caseList = caseList;
     }
 
     /**
      * @param filteredCaseList the filteredCaseList to set
      */
-    public void setFilteredCaseList(List<CECase> filteredCaseList) {
+    public void setFilteredCaseList(List<CECasePropertyUnitHeavy> filteredCaseList) {
         this.filteredCaseList = filteredCaseList;
     }
 
     /**
-     * @param searchParams the searchParams to set
+     * @param searchParamsSelected the searchParamsSelected to set
      */
-    public void setSearchParams(SearchParamsCECase searchParams) {
-        this.searchParams = searchParams;
+    public void setSearchParamsSelected(SearchParamsCECase searchParamsSelected) {
+        this.searchParamsSelected = searchParamsSelected;
     }
 
     /**
@@ -302,24 +373,10 @@ public class CECaseSearchBB
     }
 
     /**
-     * @param selectedCECaseQuery the selectedCECaseQuery to set
+     * @param querySelected the querySelected to set
      */
-    public void setSelectedCECaseQuery(QueryCECase selectedCECaseQuery) {
-        this.selectedCECaseQuery = selectedCECaseQuery;
-    }
-
-    /**
-     * @param selectedBOBQuery the selectedBOBQuery to set
-     */
-    public void setSelectedBOBQuery(Query selectedBOBQuery) {
-        this.selectedBOBQuery = selectedBOBQuery;
-    }
-
-    /**
-     * @param filteredCaseHistoryList the filteredCaseHistoryList to set
-     */
-    public void setFilteredCaseHistoryList(ArrayList<CECaseDataHeavy> filteredCaseHistoryList) {
-        this.filteredCaseHistoryList = filteredCaseHistoryList;
+    public void setQuerySelected(QueryCECase querySelected) {
+        this.querySelected = querySelected;
     }
 
     /**
@@ -329,8 +386,47 @@ public class CECaseSearchBB
         this.reportCECaseList = reportCECaseList;
     }
 
+    /**
+     * @return the appendResultsToList
+     */
+    public boolean isAppendResultsToList() {
+        return appendResultsToList;
+    }
 
-    
+    /**
+     * @param appendResultsToList the appendResultsToList to set
+     */
+    public void setAppendResultsToList(boolean appendResultsToList) {
+        this.appendResultsToList = appendResultsToList;
+    }
+
+    /**
+     * @return the propListForSearch
+     */
+    public List<Property> getPropListForSearch() {
+        return propListForSearch;
+    }
+
+    /**
+     * @param propListForSearch the propListForSearch to set
+     */
+    public void setPropListForSearch(List<Property> propListForSearch) {
+        this.propListForSearch = propListForSearch;
+    }
+
+    /**
+     * @return the caseStageList
+     */
+    public CaseStageEnum[] getCaseStageList() {
+        return caseStageList;
+    }
+
+    /**
+     * @param caseStageList the caseStageList to set
+     */
+    public void setCaseStageList(CaseStageEnum[] caseStageList) {
+        this.caseStageList = caseStageList;
+    }
 
     
 }

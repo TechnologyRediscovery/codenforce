@@ -970,7 +970,7 @@
                                     <p:selectOneMenu id="cecases-criteria-user" required="false"
                                                      value="#{occInspectionBB.selectedInspector}">
                                         <f:selectItem itemLabel="select an inspector..." noSelectionOption="true" />
-                                        <f:selectItems value="#{occInspectionBB.inspectorCandidateList}"  var="u" itemValue="#{u}" 
+                                        <f:selectItems value="#{occInspectionBB.managerInspectorCandidateList}"  var="u" itemValue="#{u}" 
                                                        itemLabel="#{u.person.firstName} #{u.person.lastName} (ID:#{u.username})"/>
                                         <f:converter converterId="userConverter"/>
                                     </p:selectOneMenu>
@@ -1139,55 +1139,7 @@
                     </p:dialog>
                     
                     
-                    <p:dialog   id="occperiod-dialog-notes"
-                                height="300" width="650"
-                                widgetVar="occperiod-dialog-notes-var"
-                                closable="true"
-                                header="notes"
-                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                >
-
-                        <h:form id="occperiod-dialog-notes-form">
-
-                            <h:messages id="occperiod-dialog-notes-messages"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-
-                            <h:panelGrid columns="1"
-                                         columnClasses="gridTd, gridTd">
-
-                                <h:panelGroup>
-                                    <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:editor   id="occperiod-notes-editor"
-                                                value="#{occInspectionBB.formNoteText}"
-                                                controls="bold italic underline strikethrough font size style color
-                                                bullets numbering center undo redo rule link removeformat outdent
-                                                indent link unlink copy cut paste rule alignleft center alignright"
-                                                width="400" required="false"
-                                                height="200"/>
-
-                                    <h:message for="occperiod-checklist-overlay-notes-editor" showDetail="false" showSummary="true"
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                    <p:spacer height="5px" />
-
-                                    <p:commandButton   id="occperiod-dialog-notes-button-addnote"
-                                                       ajax="true" 
-                                                       actionListener="#{occInspectionBB.checklistAction_addNoteToInspectedElement()}"
-                                                       oncomplete="PF('occperiod-dialog-notes-var').hide()"
-                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"                                                                               
-                                                       value="save note"  
-                                                       icon="fa fa-sticky-note-o"
-                                                       update="form-inspecteditems
-                                                       occperiod-inspecteditems-form-messages
-                                                       form-inspecteditems
-                                                       "/>
-                                </h:panelGroup>
-                            </h:panelGrid>
-                        </h:form>
-                    </p:dialog>
-
+                 
                     
                     <p:dialog   id="occinspection-dialog-addspace"
                                 height="500" width="700"

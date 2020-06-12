@@ -48,16 +48,16 @@ public class ViolationSelectElementBB extends BackingBeanUtils implements Serial
     @PostConstruct
     public void initBean(){
         CodeIntegrator integrator = getCodeIntegrator();
-        CodeSet codeSet = getSessionBean().getSessionCodeSet();
+        CodeSet codeSet = getSessionBean().getSessCodeSet();
         
-        currentCodeSet = getSessionBean().getSessionCodeSet();
+        currentCodeSet = getSessionBean().getSessCodeSet();
         
     }
 
     public String useSelectedElement(EnforcableCodeElement ece) {
         CaseCoordinator cc = getCaseCoordinator();
-        CodeViolation cv = cc.generateNewCodeViolation(getSessionBean().getSessionCECase(), ece);
-        getSessionBean().setSessionCodeViolation(cv);
+        CodeViolation cv = cc.generateNewCodeViolation(getSessionBean().getSessCECase(), ece);
+        getSessionBean().setSessCodeViolation(cv);
         return "violationAdd";
 
 

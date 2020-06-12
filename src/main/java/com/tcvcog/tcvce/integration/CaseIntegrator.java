@@ -21,12 +21,11 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -41,7 +40,8 @@ import java.util.List;
  * @author ellen bascomb of apt 31y
  */
 public class CaseIntegrator extends BackingBeanUtils implements Serializable{
-
+    
+    final String ACTIVE_FIELD = "cecase.active";
     /**
      * Creates a new instance of CaseIntegrator
      */
@@ -77,7 +77,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             //*******************************
             // **   MUNI,DATES,USER,ACTIVE  **
             // *******************************
-            params = (SearchParamsCECase) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsCECase.MUNI_DBFIELD);
+            params = (SearchParamsCECase) sc.assembleBObSearchSQL_muniDatesUserActive(
+                                                                params, 
+                                                                SearchParamsCECase.MUNI_DBFIELD,
+                                                                ACTIVE_FIELD);
             
             // *******************************
             // **       1:OPEN/CLOSED       **
@@ -98,7 +101,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     params.appendSQL("AND property_propertyid=? ");
                 } else {
                     params.setProperty_ctl(false);
-                    params.logMessage("PROPERTY: no Property object; prop filter disabled");
+                    params.appendToParamLog("PROPERTY: no Property object; prop filter disabled");
                 }
             }
             
@@ -110,7 +113,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     params.appendSQL("AND propertyunit_unitid=? ");
                 } else {
                     params.setPropertyUnit_ctl(false);
-                    params.logMessage("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
+                    params.appendToParamLog("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
                 }
             }
             
@@ -144,7 +147,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     params.appendSQL("AND personinfocase_personid=? ");
                 } else {
                     params.setPersonInfoCaseID_ctl(false);
-                    params.logMessage("PERSONINFO: no Person object; Person Info case filter disabled");
+                    params.appendToParamLog("PERSONINFO: no Person object; Person Info case filter disabled");
                 }
             }
             
@@ -156,7 +159,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     params.appendSQL("AND bobsource_sourceid=? ");
                 } else {
                     params.setSource_ctl(false);
-                    params.logMessage("SOURCE: no BOb source object; source filter disabled");
+                    params.appendToParamLog("SOURCE: no BOb source object; source filter disabled");
                 }
             }
            
@@ -254,7 +257,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     public CECase getCECase(int ceCaseID) throws IntegrationException, BObStatusException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
             "            login_userid, casename, casephase, originationdate, closingdate, \n" +
-            "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
+            "            creationtimestamp, notes, paccenabled, allowuplinkaccess, active \n" +
             "  FROM public.cecase WHERE caseid = ?;";
         ResultSet rs = null;
         CaseCoordinator cc = getCaseCoordinator();
@@ -300,16 +303,16 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
      private CECase generateCECase(ResultSet rs) throws SQLException, IntegrationException{
-        PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         
         CECase cse = new CECase();
 
         cse.setCaseID(rs.getInt("caseid"));
         cse.setPublicControlCode(rs.getInt("cecasepubliccc"));
-        cse.setProperty(pi.getProperty(rs.getInt("property_propertyid")));
-        cse.setPropertyUnit(null); // change when units are integrated
 
+        cse.setPropertyID(rs.getInt("property_propertyid"));
+        cse.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
+        
         cse.setCaseManager(ui.getUser(rs.getInt("login_userid")));
 
         cse.setCaseName(rs.getString("casename"));
@@ -331,7 +334,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
         cse.setPaccEnabled(rs.getBoolean("paccenabled"));
         cse.setAllowForwardLinkedPublicAccess(rs.getBoolean("allowuplinkaccess"));
-        
+        cse.setActive(rs.getBoolean("active"));
         
 
         return cse;
@@ -393,36 +396,37 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         String query = "INSERT INTO public.cecase(\n" +
                         "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
-                        "            login_userid, casename, casephase, originationdate, closingdate, \n" +
-                        "            notes, creationTimestamp) \n" +
+                        "            login_userid, casename, originationdate, closingdate, \n" +
+                        "            notes, creationTimestamp, active) \n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
-                        "            ?, ?, CAST (? as casephase), ?, ?, \n" +
-                        "            ?, now());";
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, now(), ?);";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         int insertedCaseID = 0;
         CECase freshlyInsertedCase = null;
         Connection con = null;
+        PaymentCoordinator pc = getPaymentCoordinator();
         
         try {
             
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
-            stmt.setInt(2, ceCase.getProperty().getPropertyID());
-            if(ceCase.getPropertyUnit() != null) {
-                stmt.setInt(3, ceCase.getPropertyUnit().getUnitID());
+            stmt.setInt(2, ceCase.getPropertyID());
+            if(ceCase.getPropertyUnitID() != 0) {
+                stmt.setInt(3, ceCase.getPropertyUnitID());
             } else { stmt.setNull(3, java.sql.Types.NULL); }
             
             stmt.setInt(4, ceCase.getCaseManager().getUserID());
             stmt.setString(5, ceCase.getCaseName());
-            stmt.setString(6, ceCase.getCasePhase().toString());
-            stmt.setTimestamp(7, java.sql.Timestamp
+            stmt.setTimestamp(6, java.sql.Timestamp
                     .valueOf(ceCase.getOriginationDate()));
             // closing date
-            stmt.setNull(8, java.sql.Types.NULL); 
+            stmt.setNull(7, java.sql.Types.NULL); 
             
-            stmt.setString(9, ceCase.getNotes());
+            stmt.setString(8, ceCase.getNotes());
+            stmt.setBoolean(9, ceCase.isActive());
             
             System.out.println("CaseIntegrator.insertNewCase| sql: " + stmt.toString());
             
@@ -463,7 +467,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         String query =  "UPDATE public.cecase\n" +
                         "   SET cecasepubliccc=?, \n" +
                         "       casename=?, originationdate=?, closingdate=?, notes=?, \n" +
-                        " paccenabled=?, allowuplinkaccess=? " +
+                        " paccenabled=?, allowuplinkaccess=?, active=? " +
                         " WHERE caseid=?;";
         PreparedStatement stmt = null;
         Connection con = null;
@@ -486,7 +490,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setString(5, ceCase.getNotes());
             stmt.setBoolean(6, ceCase.isPaccEnabled());
             stmt.setBoolean(7, ceCase.isAllowForwardLinkedPublicAccess());
-            stmt.setInt(8, ceCase.getCaseID());
+            stmt.setBoolean(8, ceCase.isActive());
+            
+            stmt.setInt(9, ceCase.getCaseID());
             stmt.execute();
             
             
@@ -506,35 +512,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    /**
-     * The calling method is responsible for setting the new case phase
-     * This is just a plain old update operation. The CaseCoordinator is responsible
-     * for creating a case phase change event for logging purposes
-     * @param ceCase
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void changeCECasePhase(CECaseDataHeavy ceCase) throws IntegrationException{
-        String query = "UPDATE public.cecase\n" +
-                    "   SET casephase= CAST (? AS casephase)\n" +
-                    " WHERE caseid = ?;";
-        Connection con = null;
-        PreparedStatement stmt = null;
-
-         try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, ceCase.getCasePhase().toString());
-            stmt.setInt(2, ceCase.getCaseID());
-            stmt.executeUpdate();
-             
-        } catch (SQLException ex) { 
-             System.out.println(ex.toString());
-             throw new IntegrationException("Error updating case phase", ex);
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
+  
     
     public List<Integer> getCECaseHistoryList(int userID) 
             throws IntegrationException, BObStatusException{

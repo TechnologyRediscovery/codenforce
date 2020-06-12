@@ -46,7 +46,7 @@ public  class       CECaseBlobsBB
     public void initBean() {
         CaseCoordinator caseCoord = getCaseCoordinator();
         SessionBean sb = getSessionBean();
-        currentCase = sb.getSessionCECase();
+        currentCase = sb.getSessCECase();
         
     
     }

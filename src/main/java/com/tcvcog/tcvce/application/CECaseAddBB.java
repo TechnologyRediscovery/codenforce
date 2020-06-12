@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
 import java.io.Serializable;
@@ -39,7 +40,7 @@ import javax.faces.application.FacesMessage;
  *
  * @author ellen bascomb of apt 31y
  */
-public class CaseAddBB extends BackingBeanUtils implements Serializable{
+public class CECaseAddBB extends BackingBeanUtils implements Serializable{
 
     private Property caseProperty;
     private int formPropertyUnitID;
@@ -51,7 +52,7 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
     /**
      * Creates a new instance of CaseAddBB
      */
-    public CaseAddBB() {
+    public CECaseAddBB() {
         formOriginationDate = java.util.Date.from(java.time.LocalDateTime.now()
                 .atZone(ZoneId.systemDefault()).toInstant());
         
@@ -62,18 +63,19 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
         // backing bean will interact with the caseintegrator
         // to enforce business logic concerning cases
         CaseCoordinator cc = getCaseCoordinator();
-        CECaseDataHeavy newCase;
+        CECase newCase;
         // check to see if we have an action request that needs to be connected
         // to this new case
         CEActionRequest cear = getSessionBean().getCeactionRequestForSubmission();
-        newCase = cc.initCECase(caseProperty, getSessionBean().getSessionUser());
+        newCase = cc.initCECase(caseProperty, getSessionBean().getSessUser());
         newCase.setCaseName(formCaseName);
         newCase.setOriginationDate(formOriginationDate.toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         newCase.setNotes(formCaseNotes);
         
         try {
-            cc.insertNewCECase(newCase, getSessionBean().getSessionUser().getMyCredential(), cear);
+            cc.insertNewCECase(newCase, getSessionBean().getSessUser().getMyCredential(), cear);
+            getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(newCase, getSessionBean().getSessUser().getMyCredential()));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully added case to property! Access the case from the list below.", ""));
@@ -98,7 +100,6 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
         }
         
         // stick our new case on the session self for easy access
-        getSessionBean().setSessionCECase(newCase);
         
         //reload page on error
         return "";
@@ -165,7 +166,7 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
      */
     public Property getCaseProperty() {
         
-        caseProperty = getSessionBean().getSessionProperty();
+        caseProperty = getSessionBean().getSessProperty();
         return caseProperty;
     }
 

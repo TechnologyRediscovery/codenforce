@@ -54,7 +54,7 @@ public class PropertyCreateBB
     @PostConstruct
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
-        currProp = getSessionBean().getSessionProperty();
+        currProp = getSessionBean().getSessProperty();
          try {
              setPutList(pi.getPropertyUseTypeList());
          } catch (IntegrationException ex) {
@@ -67,19 +67,19 @@ public class PropertyCreateBB
     
     public void initiatePropertyCreation(ActionEvent ev){
         PropertyCoordinator pc = getPropertyCoordinator();
-        prop = pc.initProperty(getSessionBean().getSessionMuni());
+        prop = pc.initProperty(getSessionBean().getSessMuni());
     }
     
     
     public void insertProp(ActionEvent ev){
         PropertyCoordinator pc = getPropertyCoordinator();
-        UserAuthorized ua = getSessionBean().getSessionUser();
+        UserAuthorized ua = getSessionBean().getSessUser();
         SystemCoordinator sc = getSystemCoordinator();
         int freshID = 0;
         try {
             freshID = pc.addProperty(prop, ua);
             prop = pc.getProperty(freshID); 
-            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(prop, ua.getMyCredential()));
+            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(prop, ua.getMyCredential()));
             sc.logObjectView(ua, prop);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 

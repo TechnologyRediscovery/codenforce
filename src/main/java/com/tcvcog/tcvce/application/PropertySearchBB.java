@@ -29,8 +29,6 @@ import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -65,35 +63,40 @@ public class PropertySearchBB extends BackingBeanUtils{
         PropertyCoordinator pc = getPropertyCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         
-        
-        if(getSessionBean().getSessionPropertyList() == null){
+        if(getSessionBean().getSessPropertyList() == null){
             propList = new ArrayList<>();
         } else {
-            propList = getSessionBean().getSessionPropertyList();
+            propList = getSessionBean().getSessPropertyList();
         }
         appendResultsToList = false;
         
         try {
-            queryList = sc.buildQueryPropertyList(getSessionBean().getSessionUser().getMyCredential());
+            // the list of avail queries is built by the SessionInitializer
+            // and put on the SessionBean for us to get here
+            queryList = getSessionBean().getQueryPropertyList();
             putList = pi.getPropertyUseTypeList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
     
-        querySelected = getSessionBean().getQueryProperty();
+//        querySelected = getSessionBean().getQueryProperty();
+        
         if(querySelected == null && !queryList.isEmpty()){
             querySelected = queryList.get(0);
         }
+        configureParameters();
+        
+    }
+    
+    private void configureParameters(){
         if(querySelected != null 
                 && 
-            querySelected.getParmsList() != null 
+            querySelected.getParamsList() != null 
                 && 
-            !querySelected.getParmsList().isEmpty()){
+            !querySelected.getParamsList().isEmpty()){
             
-            searchParamsSelected = querySelected.getParmsList().get(0);
+            searchParamsSelected = querySelected.getParamsList().get(0);
         }
-        
-        
     }
     
     
@@ -101,12 +104,18 @@ public class PropertySearchBB extends BackingBeanUtils{
         propList.clear();
     }
     
-    
+    /**
+     * Action listener for the user's request to run the query
+     * @param event 
+     */
     public void executeQuery(ActionEvent event){
+        System.out.println("PropertySearchBB.executeQuery | querySelected: " + querySelected.getQueryTitle());
         
         SearchCoordinator sc = getSearchCoordinator();
-        List<Property> pl = null;
+        List<Property> pl;
+        
         try {
+            
             pl = sc.runQuery(querySelected).getBOBResultList();
             if(!appendResultsToList){
                 propList.clear();
@@ -118,29 +127,73 @@ public class PropertySearchBB extends BackingBeanUtils{
                         "Your search completed with " + pl.size() + " results", ""));
             
         } catch (SearchException ex) {
+            System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to complete search! ", ""));
         }
     }
     
+    /**
+     * Listener method for changes in the selected query;
+     * Updates search params and UI updates based on this changed value
+     */
+    public void changeQuerySelected(){
+        System.out.println("PropertySearchBB.changeQuerySelected | querySelected: " + querySelected.getQueryTitle());
+        configureParameters();
+        
+    }
     
-    public void exploreProperty(Property prop){
+    
+    
+    /**
+     * Event listener for resetting a query after it's run
+     * @param event 
+     */
+    public void resetQuery(ActionEvent event){
+        SearchCoordinator sc = getSearchCoordinator();
+        try {
+            //        querySelected = sc.initQuery(querySelected.getQueryName(), getSessionBean().getSessUser().getMyCredential());
+            queryList = sc.buildQueryPropertyList(getSessionBean().getSessUser().getMyCredential());
+            if(queryList != null && !queryList.isEmpty()){
+                querySelected = queryList.get(0);
+            }
+            
+        } catch (IntegrationException ex) {
+             System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to reset search due to error in search coordinator! ", ""));
+        }
+        configureParameters();
+    }
+    
+    
+    
+    /**
+     * Loads a data-heavy subclass of the selected property
+     * @param prop 
+     * @return  
+     */
+    public String exploreProperty(Property prop){
         PropertyCoordinator pc = getPropertyCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
         
         try {
-            getSessionBean().setSessionProperty(pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessionUser().getMyCredential()));
+            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessUser().getMyCredential()));
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Managing property at " + prop.getAddress() , ""));
-            sc.logObjectView(getSessionBean().getSessionUser(), prop);
+            sc.logObjectView(getSessionBean().getSessUser(), prop);
+            return "propertyInfo";
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                         ex.getMessage(), ""));
         } 
+        return "";
+        
     }
     
 

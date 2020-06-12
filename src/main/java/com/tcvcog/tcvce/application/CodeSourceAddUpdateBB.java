@@ -106,7 +106,7 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
      * @return the currentCodeSource
      */
     public CodeSource getCurrentCodeSource() {
-        currentCodeSource = getSessionBean().getActiveCodeSource();
+        currentCodeSource = getSessionBean().getSessCodeSource();
         return currentCodeSource;
     }
 

@@ -18,8 +18,6 @@ import java.io.Serializable;
 public class        SearchParamsOccPeriod 
         extends     SearchParams {
     
-    
-    
     public static final String MUNI_DBFIELD = "property.municipality_municode";
     
     // filter OCC-1
@@ -54,6 +52,18 @@ public class        SearchParamsOccPeriod
     // filter OCC-8
     private boolean person_ctl;
     private Person person_val;
+    
+    
+    public SearchParamsOccPeriodDateFieldsEnum[] getDateFieldList(){
+       SearchParamsOccPeriodDateFieldsEnum[] fields = SearchParamsOccPeriodDateFieldsEnum.values();
+       return fields;
+   }
+   
+   public SearchParamsOccPeriodUserFieldsEnum[] getUserFieldList(){
+       SearchParamsOccPeriodUserFieldsEnum[] fields = SearchParamsOccPeriodUserFieldsEnum.values();
+       return fields;
+   }
+    
     
     /**
      * @return the periodType_ctl

@@ -18,20 +18,40 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.Credential;
+
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
+import com.tcvcog.tcvce.entities.search.QueryEventEnum;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -39,13 +59,14 @@ import java.util.List;
  */
 public class PersonCoordinator extends BackingBeanUtils implements Serializable{
 
-    private PersonType[] personTypes;
+    private final PersonType[] personTypes;
     
     
     /**
      * Creates a new instance of PersonCoordinator
      */
     public PersonCoordinator() {
+        personTypes = PersonType.values();
     }
     
     /**
@@ -59,44 +80,36 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return pi.getPerson(personID);
     }
     
-    
-    /**
-     * Entry point for new Person object requests
-     * @param p
-     * @return
-     * @throws IntegrationException 
-     */
-    public int createPerson(Person p) throws IntegrationException{
-        int newid;
-        PersonIntegrator pi = getPersonIntegrator();
-        newid = pi.insertPerson(p);
-        return newid;
+    public PersonDataHeavy assemblePersonDataHeavy(Person pers, Credential cred){
+        PersonDataHeavy pdh = new PersonDataHeavy(pers, cred);
+        SearchCoordinator sc = getSearchCoordinator();
+        
+        try {
+            QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PERSINFOCASES, cred);
+            qcse.getPrimaryParams().setPersonInfoCaseID_val(pers);
+            pdh.setCaseList(sc.runQuery(qcse).getResults());
+        
+            QueryOccPeriod qop = sc.initQuery(QueryOccPeriodEnum.PERSONS, cred);
+            qop.getPrimaryParams().setPerson_val(pers);
+            pdh.setPeriodList(sc.runQuery(qop).getBOBResultList());
+            
+            QueryProperty qprop = sc.initQuery(QueryPropertyEnum.PERSONS, cred);
+            qprop.getPrimaryParams().setPerson_val(pers);
+            pdh.setPropertyList(sc.runQuery(qprop).getBOBResultList());
+            
+            QueryEvent qe = sc.initQuery(QueryEventEnum.PERSONS, cred);
+            qe.getPrimaryParams().setPerson_val(pers);
+            pdh.setEventList(sc.runQuery(qe).getBOBResultList());
+        
+        } catch (SearchException ex) {
+            System.out.println(ex);
+        }
+        
+        return pdh;
     }
     
+   
     
-    public SearchParamsPerson getDefaultSearchParamsPersons(Municipality m){
-        SearchParamsPerson spp = new SearchParamsPerson();
-        // on the parent class SearchParams
-        spp.setDate_startEnd_ctl(false);
-        spp.setLimitResultCount_ctl(true);
-        spp.setMuni_val(m);
-        
-        // on the subclass SearchParamsPerson
-        spp.setName_first_ctl(true);
-        spp.setName_last_ctl(true);
-        spp.setName_compositeLNameOnly_ctl(false);
-        
-        spp.setPersonType_ctl(false);
-        spp.setEmail_ctl(false);
-        spp.setAddress_streetNum_ctl(false);
-        
-        spp.setVerified_ctl(false);
-        spp.setVerified_val(false);
-        
-        
-        return spp;
-        
-    }
     
     /**
      * Logic intermediary for Updates to the Person listing
@@ -105,20 +118,12 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param updateNotes
      * @throws IntegrationException 
      */
-    public void editPerson(Person p, User u, String updateNotes) throws IntegrationException{
+    public void personEdit(Person p, User u) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
-        StringBuilder sb = new StringBuilder();
-        // create the new note header
-        sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("personRecordUpdateHeader"));
-        sb.append("<br />");
-        sb.append(updateNotes);
-        p.setNotes(appendNoteBlock(p.getNotes(), sb.toString()));
         pi.updatePerson(p);
-        pi.updatePersonNotes(p);
-        
     }
     
-    public Person initPerson(Municipality m){
+    public Person personCreateMakeSkeleton(Municipality m){
         Person newP = new Person();
         newP.setPersonType(PersonType.Public);
         newP.setActive(true);
@@ -133,38 +138,113 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void addNotesToPerson(Person p, User u, String noteToAdd) throws IntegrationException{
+    public int personCreate(Person p, UserAuthorized ua) throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
-        StringBuilder sb = new StringBuilder();
-        // create the general note header
-        sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("personRecordNotesGeneral"));
-        sb.append("<br />");
-        sb.append(noteToAdd);
-        p.setNotes(appendNoteBlock(p.getNotes(), sb.toString()));
+       
+        p.setCreatorUserID(ua.getUserID());
+        p.setCreationTimeStamp(LocalDateTime.now());
+        p.setSource( si.getBOBSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                .getString("bobsourcePersonInternal"))));
+        return pi.insertPerson(p);
+        
+        
+    }
+    
+    
+    /**
+     * Prepares note text from the backing bean and sends Person all ready to
+     * be updated by the Integrator
+     * 
+     * @param p to which the note should be attached
+     * @param u doing the attaching
+     * @param noteToAdd new note text
+     * @throws IntegrationException 
+     */
+    public void addNotesToPerson(Person p, UserAuthorized u, String noteToAdd) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("personRecordNotesGeneral"));
+        mbp.setExistingContent(p.getNotes());
+        mbp.setNewMessageContent(noteToAdd);
+        mbp.setUser(u);
+        mbp.setCred(u.getMyCredential());
+        p.setNotes(sc.appendNoteBlock(mbp));
         pi.updatePerson(p);
         
     }
     
-    private String appendNoteBlock(String previousNotes, String newNotes){
-        StringBuilder sb = new StringBuilder();
-        sb.append(previousNotes);
-        sb.append("<br />**************************************<br />");
-        sb.append("NOTE CREATED BY: ");
-        sb.append(getSessionBean().getSessionUser().getPerson().getFirstName());
-        sb.append(" ");
-        sb.append(getSessionBean().getSessionUser().getPerson().getLastName());
-        sb.append(" (User ID ");
-        sb.append(String.valueOf(getSessionBean().getSessionUser().getUserID()));
-        sb.append(") on ");
-        sb.append(getPrettyDate(LocalDateTime.now()));
-        sb.append(":<br />");
-        sb.append(newNotes);
-        sb.append("<br />");
-        sb.append("**************************************<br />");
-        return sb.toString();
+    /**
+     * Logic holder for pass-through calls to object connection methods on the Integrator
+     * @param person
+     * @param prop
+     * @throws IntegrationException 
+     */
+    public void connectPersonToProperty(Person person, Property prop) throws IntegrationException {
+        PersonIntegrator pi = getPersonIntegrator();
+        pi.connectPersonToProperty(person, prop);
         
     }
     
+    /**
+     * Logic holder for pass-through calls to object connection methods on the Integrator
+     * @param cit
+     * @param pers
+     * @throws IntegrationException 
+     */
+    public void connectPersonToCitation(Citation cit, Person pers) throws IntegrationException {
+        PersonIntegrator pi = getPersonIntegrator();
+        pi.connectPersonToCitation(cit, pers);
+        
+    }
+    
+    /**
+     * Logic holder for pass-through calls to object connection methods on the Integrator
+     * @param cit
+     * @param persList
+     * @throws IntegrationException 
+     */
+    public void connectPersonsToCitation(Citation cit, List<Person> persList) throws IntegrationException {
+        PersonIntegrator pi = getPersonIntegrator();
+        pi.connectPersonsToCitation(cit, persList);
+        
+    }
+    
+    /**
+     * Logic holder for pass-through calls to object connection methods on the Integrator
+     * @param munui
+     * @param p
+     * @throws IntegrationException 
+     */
+    public void connectPersonToMunicipality(Municipality munui, Person p) throws IntegrationException {
+        PersonIntegrator pi = getPersonIntegrator();
+        pi.connectPersonToMunicipality(munui, p);
+            
+    }
+    
+    /**
+     * Logic holder for pass-through calls to object connection methods on the Integrator
+     * @param munuiList
+     * @param p
+     * @throws IntegrationException 
+     */
+    public void connectPersonToMunicipalities(List<Municipality> munuiList, Person p) throws IntegrationException {
+        PersonIntegrator pi = getPersonIntegrator();
+        pi.connectPersonToMunicipalities(munuiList, p);
+        
+    }
+    
+    /**
+     * Logic container method for creating a Ghost from a given Person--which
+     * is a copy of a person at a given time to be used in recreating official documents
+     * with addresses and such, like Citations, NOVs, etc.
+     * @param p of which you would like to create a Ghost
+     * @param u doing the connecting
+     * @return the database identifier of the sent in Person's very own ghost
+     * @throws IntegrationException 
+     */
     public int createChostPerson(Person p, User u) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         int newGhostID = pi.createGhost(p, u);
@@ -172,6 +252,20 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * Logic container for creating a clone of a person, which is an exact copy of 
+     * a Person at a given point in time that is used to safely edit person info 
+     * without allowing certain levels of users access to the primary Person record
+     * from which there is no recovery of core info
+     * 
+     * Ghosts are friendly and invited; clones are an unedesirable manifestation
+     * of the modern biotechnological era
+     * 
+     * @param p of which you would like to create a clone
+     * @param u doing the creating of clone
+     * @return the database identifer of the inputted Person's clone
+     * @throws IntegrationException 
+     */
     public int createClonedPerson(Person p, User u) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         int newCloneID = pi.createClone(p, u);
@@ -195,7 +289,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Intermediary logic unit for configuring histories of Person object views
-     * given an authorization context
+ given an authorization context
      * @param cred
      * @return
      * @throws IntegrationException 
@@ -214,40 +308,29 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     }   
 
     /**
+     * Utility method for dumping PersonType values in an Enum to an array
      * @return the personTypes
      */
     public PersonType[] getPersonTypes() {
-        personTypes = PersonType.values();
+        
         return personTypes;
     }
 
-   
-    /**
-     * Returns SearchParamsPerson object with its member variables set to default values.
-     * @return params
-     */
-    public SearchParamsPerson  getDefaultSearchParamsPersons(){
-        SearchParamsPerson params = new SearchParamsPerson();
-        
-        // superclass parameters
-        params.setMuni_ctl(false);
-        params.setBobID_ctl(false);
-        params.setDate_startEnd_ctl(false);
-        params.setLimitResultCount_ctl(true);
-        
-        // subclass specific parameters
-        params.setName_last_ctl(true);
-        params.setAddress_streetNum_ctl(false);
-        
-        params.setName_first_ctl(false);
-        params.setPhoneNumber_ctl(false);
-        params.setEmail_ctl(false);        
-        params.setAddress_city_ctl(false);
-        params.setAddress_zip_ctl(false);
-        
-        return params;
+   /**
+    * Logic and permissions check for main delete person method on integrator
+    * @param p
+    * @param cred
+    * @throws IntegrationException
+    * @throws AuthorizationException must be sys admin or higher
+    */
+    public void personNuke(Person p, Credential cred) throws IntegrationException, AuthorizationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        if(cred.isHasSysAdminPermissions()){
+            pi.deletePerson(p);
+        } else {
+            throw new AuthorizationException("Must have sys admin permissions or higher to delete");
+        }
     }
-   
     
     
     
@@ -332,5 +415,218 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         return person;
+    }
+    
+    
+    
+    public String dumpPerson(Person p){
+        SystemCoordinator sc = getSystemCoordinator();
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append(Constants.FMT_NOTE_SEP_INTERNAL);
+        sb.append("Field dump of Person ID: ");
+        sb.append(p.getPersonID());
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append("Timestamp: ");
+        sb.append(sc.stampCurrentTimeForNote());
+        sb.append(Constants.FMT_HTML_BREAK);
+        
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getPersonType().getLabel());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getMuniCode());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getMuniName());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        if(p.getSource() != null){
+            sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+            sb.append(p.getSource().getTitle());
+            sb.append(Constants.FMT_HTML_BREAK);
+        }
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getCreatorUserID());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getCreationTimeStamp());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getFirstName());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getLastName());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.isCompositeLastName());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.isBusinessEntity());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getJobTitle());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getPhoneCell());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getPhoneHome());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getPhoneWork());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getEmail());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getAddressStreet());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getAddressCity());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getAddressZip());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getAddressState());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.isUseSeparateMailingAddress());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getMailingAddressStreet());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getMailingAddressThirdLine());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getMailingAddressCity());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getMailingAddressZip());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getMailingAddressState());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getNotes());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getLastUpdated());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getLastUpdatedPretty());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.isCanExpire());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getExpiryDate());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getExpireString());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getExpiryNotes());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.isActive());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getLinkedUserID());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.isUnder18());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getVerifiedByUserID());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.isReferencePerson());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getGhostCreatedDate());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getGhostCreatedDatePretty());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getGhostOf());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getGhostCreatedByUserID());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getCloneCreatedDate());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getCloneCreatedDatePretty());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getCloneOf());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getCloneCreatedByUserID());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getGhostsList());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getCloneList());
+        sb.append(Constants.FMT_HTML_BREAK);
+
+        sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
+        sb.append(p.getMergedList());
+        sb.append(Constants.FMT_HTML_BREAK);
+        
+        return sb.toString();
     }
 }

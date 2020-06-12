@@ -774,7 +774,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             } else if (ob instanceof OccPeriod) {
                 OccPeriod op = (OccPeriod) ob;
 
-                insertSB.append("(login_userid, cecase_caseid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
+                insertSB.append("(login_userid, occperiod_periodid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
                 stmt = con.prepareStatement(insertSB.toString());
 
                 stmt.setInt(1, u.getUserID());

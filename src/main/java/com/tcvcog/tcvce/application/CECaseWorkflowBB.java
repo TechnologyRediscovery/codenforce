@@ -17,21 +17,15 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
-import com.tcvcog.tcvce.entities.Choice;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -51,13 +45,13 @@ public  class CECaseWorkflowBB
 
     private ReportConfigCECase reportCECase;
     
+    private EventCnF selectedEvent;
     
     private CasePhaseEnum nextPhase;
     private CasePhaseEnum[] casePhaseList;
     private CasePhaseEnum selectedCasePhase;
     private CaseStageEnum[] caseStageArray;
 
-    
     private String styleClassStatusIcon;
 
     private String styleClassInvestigation;
@@ -77,7 +71,7 @@ public  class CECaseWorkflowBB
     public void initBean() {
         CaseCoordinator caseCoord = getCaseCoordinator();
         SessionBean sb = getSessionBean();
-        currentCase = sb.getSessionCECase();
+        currentCase = sb.getSessCECase();
         
         ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
         if (rpt != null) {
@@ -86,37 +80,45 @@ public  class CECaseWorkflowBB
         }
     }
 
-    public void makeChoice(Choice choice, Proposal p){
-        CaseCoordinator cc = getCaseCoordinator();
-        try {
-            if(p instanceof ProposalCECase){
-                cc.evaluateProposal(p, choice, currentCase, getSessionBean().getSessionUser());
-                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
-            }
-            
-        } catch (EventException | AuthorizationException | BObStatusException | IntegrationException | ViolationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-            ex.getMessage(), ""));
-        } 
-    }    
-    
-    
-    public String takeNextAction() {
-//        EventCnF e = getEventForTriggeringCasePhaseAdvancement();
-        return "eventAdd";
-    }
-    
-    
-    
-
     
     /**
      * @return the currentCase's phase
      */
     public CasePhaseEnum getCurrentCasePhase() {
         return currentCase.getCasePhase();
+    }
+    
+    public void initiateCaseUpdate(ActionEvent ev){
+        
+    }
+    
+    public void refreshCurrentCase(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
+        } catch (BObStatusException  | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Could not refresh current case", ""));
+        }
+        
+    }
+    
+    public void updateCase(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        try {
+            cc.updateCECaseMetadata(currentCase);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Case metadata updated", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Could not update case metadata, sorry! This error must be corrected by an administrator", ""));
+            
+        }
+        
+        
     }
 
   
@@ -127,28 +129,49 @@ public  class CECaseWorkflowBB
     }
     
     
+    public void overrideCasePhase(ActionEvent ev){
+        System.out.println("Not implemented yet;");
+    }
+    
+    public String exploreProperty(ActionEvent ev){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(currentCase.getProperty(), getSessionBean().getSessUser().getMyCredential()));
+        } catch (IntegrationException |BObStatusException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Could not load property data heavy; reloaded page", ""));
+            return "";
+        }
+        return "propertyInfo";
+        
+    }
+    
+    
     
     public String generateReportCECase() {
         CaseCoordinator cc = getCaseCoordinator();
 
         reportCECase.setCse(currentCase);
 
-        reportCECase.setCreator(getSessionBean().getSessionUser());
-        reportCECase.setMuni(getSessionBean().getSessionMuni());
+        reportCECase.setCreator(getSessionBean().getSessUser());
+        reportCECase.setMuni(getSessionBean().getSessMuni());
         reportCECase.setGenerationTimestamp(LocalDateTime.now());
 
         try {
             reportCECase = cc.transformCECaseForReport(reportCECase);
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Could not generate report, sorry!", ""));
         }
 
         getSessionBean().setReportConfigCECase(reportCECase);
         // this is for use by the report header to have a super class with only
         // the basic info. reportingBB exposes it to the faces page
-        getSessionBean().setSessionReport(reportCECase);
+        getSessionBean().setSessReport(reportCECase);
         // force our reportingBB to choose the right bundle
         getSessionBean().setReportConfigCECaseList(null);
 
@@ -371,6 +394,20 @@ public  class CECaseWorkflowBB
      */
     public void setCaseStageArray(CaseStageEnum[] caseStageArray) {
         this.caseStageArray = caseStageArray;
+    }
+
+    /**
+     * @return the selectedEvent
+     */
+    public EventCnF getSelectedEvent() {
+        return selectedEvent;
+    }
+
+    /**
+     * @param selectedEvent the selectedEvent to set
+     */
+    public void setSelectedEvent(EventCnF selectedEvent) {
+        this.selectedEvent = selectedEvent;
     }
     
     

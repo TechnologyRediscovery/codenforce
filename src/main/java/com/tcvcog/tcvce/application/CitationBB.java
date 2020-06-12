@@ -81,17 +81,17 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         }
         
         
-        Citation c = getSessionBean().getSessionCitation();
+        Citation c = getSessionBean().getSessCitation();
         if(c != null){
             currentCitation = c;
         } else {
-            CECaseDataHeavy ceCase = getSessionBean().getSessionCECase();
+            CECaseDataHeavy ceCase = getSessionBean().getSessCECase();
             currentCitation = new Citation();
             currentCitation.setCeCaseNoLists(ceCase);
             currentCitation.setDateOfRecord(LocalDateTime.now());
-            currentCitation.setUserOwner(getSessionBean().getSessionUser());
+            currentCitation.setUserOwner(getSessionBean().getSessUser());
             currentCitation.setIsActive(true);
-            currentCitation.setOrigin_courtentity(getSessionBean().getSessionMuni().getCourtEntities().get(0));
+            currentCitation.setOrigin_courtentity(getSessionBean().getSessMuni().getCourtEntities().get(0));
             List<CodeViolation> l = new ArrayList<>();
             for(CodeViolation v: ceCase.getViolationList()){
                 if(v.getActualComplianceDate() == null){
@@ -134,7 +134,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         
         Citation c = currentCitation;
-        c.setUserOwner(getSessionBean().getSessionUser());
+        c.setUserOwner(getSessionBean().getSessUser());
         try {
             cc.issueCitation(c);
               

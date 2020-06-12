@@ -1,3 +1,15 @@
+-- ****************************************************************************
+-- First patch post re-braining
+-- 
+-- closed as of January 15
+
+-- RELEASE NOTE: You'll probably need to add a BObSource with an ID of 9 if you got a pre-built
+-- brain from Ellen. 
+-- 
+-- ****************************************************************************
+
+
+
 ALTER TABLE public.actionrqstissuetype RENAME TO ceactionrequestissuetype;
 
 ALTER TABLE public.ceactionrequestissuetype ADD COLUMN intensity_classid INTEGER 

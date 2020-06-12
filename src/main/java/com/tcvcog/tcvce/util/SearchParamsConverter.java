@@ -47,7 +47,7 @@ public class SearchParamsConverter extends EntityConverter implements Converter{
         }
         
         SearchParams sp = (SearchParams) o;
-        String title = sp.getSearchName();  
+        String title = sp.getFilterName();  
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;

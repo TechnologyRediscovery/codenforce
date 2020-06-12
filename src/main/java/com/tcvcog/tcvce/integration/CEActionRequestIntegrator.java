@@ -41,6 +41,10 @@ import java.util.List;
  */
 public class CEActionRequestIntegrator extends BackingBeanUtils implements Serializable {
 
+    
+    final String ACTIVE_FIELD = "ceactionrequest.active";
+    
+    
     //Connection integratorConn;
     /**
      * Creates a new instance of CEActionRequestIntegrator
@@ -167,12 +171,12 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "            issuetype_issuetypeid, actrequestor_requestorid, cecase_caseid, \n"
                 + "            submittedtimestamp, dateofrecord, notataddress, addressofconcern, \n"
                 + "            requestdescription, isurgent, anonymityrequested, coginternalnotes, \n"
-                + "            muniinternalnotes, publicexternalnotes, status_id )\n"
+                + "            muniinternalnotes, publicexternalnotes, status_id, active )\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
                 + "            ?, ?, ?, \n"
                 + "            now(), ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?);");
+                + "            ?, ?, ?, ?);");
 
         Connection con = null;
         PreparedStatement stmt = null;
@@ -210,6 +214,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             stmt.setString(14, actionRequest.getMuniNotes());
             stmt.setString(15, actionRequest.getPublicExternalNotes());
             stmt.setInt(16, Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestInitialStatusCode")));
+            stmt.setBoolean(17, actionRequest.isActive());
+            
 
             stmt.execute();
             
@@ -280,6 +286,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         actionRequest.setMuniNotes(rs.getString("muniinternalnotes"));
         actionRequest.setPublicExternalNotes(rs.getString("publicexternalnotes"));
+        actionRequest.setActive(rs.getBoolean("active"));
+        
         return actionRequest;
     }
 
@@ -335,7 +343,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, \n"
                 + "	muniinternalnotes, publicexternalnotes,\n"
-                + "	actionRqstIssueType.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid \n"
+                + "	actionRqstIssueType.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid, active \n"
                 + "FROM public.ceactionrequest \n"
                 + "     INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid ");
         sb.append("WHERE requestID = ?;");
@@ -754,7 +762,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             // **     MUNI,DATES,USER,ACTIVE    **
             // *********************************** 
            
-            params = (SearchParamsCEActionRequests) sc.assembleBObSearchSQL_muniDatesUserActive(params, SearchParamsCEActionRequests.DBFIELD);
+            params = (SearchParamsCEActionRequests) sc.assembleBObSearchSQL_muniDatesUserActive(
+                                                                            params, 
+                                                                            SearchParamsCEActionRequests.DBFIELD,
+                                                                            ACTIVE_FIELD);
             
             // ****************************
             // **   1.REQUEST STATUS     **
@@ -764,7 +775,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND status_id = ? "); // param 4 without ID search
                 } else {
                     params.setRequestStatus_ctl(false);
-                    params.logMessage("REQUEST STATUS: found null CEActionRequestStatus; status filter turned off; | ");
+                    params.appendToParamLog("REQUEST STATUS: found null CEActionRequestStatus; status filter turned off; | ");
                 }
             }
             
@@ -776,7 +787,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND issuetype_issuetypeid=? "); // param 4 without ID search
                 } else {
                     params.setIssueType_ctl(false);
-                    params.logMessage("ISSUE TYPE: found null CEActionRequestIssueType; issue type filter turned off; | ");
+                    params.appendToParamLog("ISSUE TYPE: found null CEActionRequestIssueType; issue type filter turned off; | ");
                 }
             }
             
@@ -822,7 +833,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND cecase_caseid=? ");
                 } else {
                     params.setCecase_ctl(false);
-                    params.logMessage("CECASE ID: no CECase found; case id filter turned off; | ");
+                    params.appendToParamLog("CECASE ID: no CECase found; case id filter turned off; | ");
                 }
             }
             
@@ -846,7 +857,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND actrequestor_requestorid=? ");
                 } else {
                     params.setRequestorPerson_ctl(false);
-                    params.logMessage("REQUESTING PERSON: no Person object found; person filter turned off; | ");
+                    params.appendToParamLog("REQUESTING PERSON: no Person object found; person filter turned off; | ");
                 }
             }
                 
@@ -859,7 +870,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                     params.appendSQL("AND property.propertyid=? ");
                 } else {
                     params.setRequestorPerson_ctl(false);
-                    params.logMessage("PROPERTY: no Property object found; filter turned off; | ");
+                    params.appendToParamLog("PROPERTY: no Property object found; filter turned off; | ");
                 }
             }
 
@@ -920,8 +931,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }
 
-            params.logMessage("CEActionRequestIntegrator SQL before execution: ");
-            params.logMessage(stmt.toString());
+            params.appendToParamLog("CEActionRequestIntegrator SQL before execution: ");
+            params.appendToParamLog(stmt.toString());
             
             rs = stmt.executeQuery();
             

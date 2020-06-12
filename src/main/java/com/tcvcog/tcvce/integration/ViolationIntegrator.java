@@ -36,11 +36,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Connects the postgres database to java land in all directions.
@@ -713,7 +711,6 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         CodeIntegrator ci = getCodeIntegrator();
         CitationIntegrator citInt = getCitationIntegrator();
         UserIntegrator ui = getUserIntegrator();
-
         
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));

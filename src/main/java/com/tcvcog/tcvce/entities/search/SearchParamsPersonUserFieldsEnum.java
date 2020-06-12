@@ -27,7 +27,7 @@ public enum SearchParamsPersonUserFieldsEnum
         implements IFace_userFieldHolder{
     
     CREATOR                 ("Creator", 
-                            "creator"), 
+                            "person.creator"), 
     
     USERLINK                ("User linking person", 
                             "userlink"), 

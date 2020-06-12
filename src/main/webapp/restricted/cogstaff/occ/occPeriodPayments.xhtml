@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>EnforceIt Title</title>
+        <title>Payments</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
@@ -40,7 +40,7 @@
                                         <p:dataTable
                                             id="feeTable"
                                             var="fee"
-                                            value="#{occInspectionBB}"
+                                            value="#{occInspectionBB.feeList}"
                                             rowKey="#{fee.occPerAssignedFeeID}"
                                             tableStyleClass="primeDataTable"
                                             rowExpandMode="single"
@@ -189,7 +189,7 @@
                                         <p:dataTable
                                             id="paymentTable"
                                             var="payment"
-                                            value="#{occPeriodPaymentsBB.currentOccPeriod.paymentList}"
+                                            value="#{occInspectionBB.paymentList}"
                                             rowKey="#{payment.paymentID}"
                                             tableStyleClass="primeDataTable"
                                             rowExpandMode="single"
@@ -257,18 +257,10 @@
                                                                  columnClasses="gridTd, gridTd, gridTd, gridTd">
 
                                                         <h:panelGroup>
-                                                            <h:outputLabel styleClass="ui-label-inline" value="Inspection ID"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{payment.occupancyInspectionID}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
                                                             <h:outputLabel styleClass="ui-label-inline" value="Assigned Fee ID"/>
                                                             <p:spacer height="15px"/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{payment.assignedFeeID} (#{payment.assignedTo})"/>
+                                                                <h:outputText value="#{payment.assignedFeeID} (#{payment.domain})"/>
                                                             </div>
                                                         </h:panelGroup>
 

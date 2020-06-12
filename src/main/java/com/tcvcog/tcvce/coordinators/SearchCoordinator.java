@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -23,6 +24,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -46,7 +48,7 @@ import javax.annotation.PostConstruct;
  */
 public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
-    private static final RoleType MIN_ROLETYPEFORMULTIMUNI_QUERY = RoleType.CogStaff;
+    private static final RoleType MIN_ROLETYPEFORMULTIMUNI_QUERY = RoleType.SysAdmin;
     private static final int RESULT_COUNT_LIMIT_DEFAULT = 100;
     private static final int FILTER_OFF_DEFVALUE_INT = 0;
     
@@ -87,11 +89,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
         
+        
         if(q == null) return null;
         
         prepareQueryForRun(q);
 
-        List<SearchParamsProperty> paramsList = q.getParmsList();
+        List<SearchParamsProperty> paramsList = q.getParamsList();
         List<Property> propTempList = new ArrayList<>();
         
         for(SearchParamsProperty sp: paramsList){
@@ -103,8 +106,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 } catch (IntegrationException ex) {
                     throw new SearchException(ex);
                 }
-            }
+            // extract log and append to Query-level log
+                
+            q.appendToQueryLog(sp);
             q.addToResults(propTempList);
+        } // close loop over param list
         
         
         postRunConfigureQuery(q);
@@ -123,12 +129,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public QueryPerson runQuery(QueryPerson q) throws SearchException{
         PersonIntegrator pi = getPersonIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
-        
         if(q == null) return null;
         
         prepareQueryForRun(q);
 
-        List<SearchParamsPerson> paramsList = q.getParmsList();
+        List<SearchParamsPerson> paramsList = q.getParamsList();
         List<Person> persTempList = new ArrayList<>();
         
         for(SearchParamsPerson sp: paramsList){
@@ -142,8 +147,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 throw new SearchException(ex);
             }
             q.addToResults(persTempList);
-        }
+            q.appendToQueryLog(sp);
+            
+        } // close for over params
         postRunConfigureQuery(q);
+        
         return q;
     }
      
@@ -154,14 +162,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @throws SearchException 
      */
      public QueryEvent runQuery(QueryEvent q) throws SearchException{
-         EventIntegrator ei = getEventIntegrator();
          EventCoordinator ec = getEventCoordinator();
-         
          if(q == null) return null;
         
         prepareQueryForRun(q);
 
-        List<SearchParamsEvent> paramsList = q.getParmsList();
+        List<SearchParamsEvent> paramsList = q.getParamsList();
         List<EventCnF> evTempList = new ArrayList<>();
         
         for(SearchParamsEvent sp: paramsList){
@@ -177,9 +183,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             } else {
                 runQuery_event_IntegratorCall(sp, evTempList);
             }
-            // add each batch of OccPeriod objects from the SearchParam run to our
-            // ongoing list
-            q.addToResults(evTempList);
+             try {
+                 // add each batch of OccPeriod objects from the SearchParam run to our
+                 // ongoing list
+                 q.addToResults(ec.assembleEventCnFPropUnitCasePeriodHeavyList(evTempList));
+             } catch (EventException | IntegrationException ex) {
+                 System.out.println(ex);
+             }
+            q.appendToQueryLog(sp);
         } // close parameter for
         
         postRunConfigureQuery(q);
@@ -232,20 +243,21 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         prepareQueryForRun(q);
 
-        List<SearchParamsOccPeriod> paramsList = q.getParmsList();
-        List<OccPeriod> periodListTemp = new ArrayList<>();
+        List<SearchParamsOccPeriod> paramsList = q.getParamsList();
+        List<OccPeriodPropertyUnitHeavy> periodListTemp = new ArrayList<>();
         
         for(SearchParamsOccPeriod sp: paramsList){
             periodListTemp.clear();
             for(Integer i: oi.searchForOccPeriods(sp)){
                 try {
-                    periodListTemp.add(oc.getOccPeriod(i));
+                    periodListTemp.add(oc.getOccPeriodPropertyUnitHeavy(i));
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                     throw new SearchException("Integration exception when querying OccPeriods");
                 }
             }
             q.addToResults(periodListTemp);
+            q.appendToQueryLog(sp);
         }
         
         postRunConfigureQuery(q);
@@ -270,37 +282,38 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         prepareQueryForRun(q);
 
-        List<SearchParamsCECase> paramsList = q.getParmsList();
+        List<SearchParamsCECase> paramsList = q.getParamsList();
         List<CECase> caseListTemp = new ArrayList<>();
         
         for(SearchParamsCECase params: paramsList){
             caseListTemp.clear();
-                try {
-                // the integrator will only look at the single muni val, 
-                // so we'll call searchForXXX once for each muni
-                for(Integer i: ci.searchForCECases(params)){
-                    CECase cse = cc.getCECase(i);
-                    // Case Phases only exist in JavaJavaLand, so we'll evaluate the
-                    // search params here before adding the new objects to the
-                    // final query result list
-                    if(params.isCasePhase_ctl() && params.getCasePhase_val() != null){
-                        if(cse.getCasePhase() == params.getCasePhase_val()){
-                            caseListTemp.add(cse);
-                        } else {
-                            // skip adding
-                        }
-                    // if the filter is off, or we don't have an object, add it to the list
-                    } else {
+            try {
+            // the integrator will only look at the single muni val, 
+            // so we'll call searchForXXX once for each muni
+            for(Integer i: ci.searchForCECases(params)){
+                CECase cse = cc.getCECase(i);
+                // Case Phases only exist in JavaJavaLand, so we'll evaluate the
+                // search params here before adding the new objects to the
+                // final query result list
+                if(params.isCaseStage_ctl() && params.getCaseStage_val() != null){
+                    if(cse.getCasePhase().getCaseStage() == params.getCaseStage_val()){
                         caseListTemp.add(cse);
+                    } else {
+                        // skip adding
                     }
+                // if the filter is off, or we don't have an object, add it to the list
+                } else {
+                    caseListTemp.add(cse);
                 }
-                } catch (IntegrationException | BObStatusException ex) {
-                    throw new SearchException("Exception during search: " + ex.toString());
-                }
+            }
+                q.addToResults(cc.assembleCECasePropertyUnitHeavyList(caseListTemp));
+            } catch (IntegrationException | BObStatusException ex) {
+                throw new SearchException("Exception during search: " + ex.toString());
+            }
             // add each batch of OccPeriod objects from the SearchParam run to our
             // ongoing list
-            q.addToResults(caseListTemp);
-        }
+            q.appendToQueryLog(params);
+        } // close for over parameters
         
         postRunConfigureQuery(q);
         
@@ -326,7 +339,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         prepareQueryForRun(q);
 
-        List<SearchParamsCEActionRequests> paramsList = q.getParmsList();
+        List<SearchParamsCEActionRequests> paramsList = q.getParamsList();
         List<CEActionRequest> ceariListTemp = new ArrayList<>();
         
         for(SearchParamsCEActionRequests sp: paramsList){
@@ -339,8 +352,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     System.out.println(ex);
                     throw new SearchException("Integration error when querying CEARS");
                 }
-            }
             q.addToResults(ceariListTemp);
+            q.appendToQueryLog(sp);
+        }
         postRunConfigureQuery(q);
         return q;
     }
@@ -360,23 +374,26 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      */
     public String selectDefaultDateFieldString(SearchParams sp){
         String f = null;
-        if(sp.getDate_field().extractDateFieldString() != null){
-            f = sp.getDate_field().extractDateFieldString();
-        } else {
-            if(sp instanceof SearchParamsProperty){
-                f = SearchParamsPropertyDateFieldsEnum.CREATIONTS.extractDateFieldString();
-            } else if(sp instanceof SearchParamsPerson){
-                f = SearchParamsPersonDateFieldsEnum.CREATED_TS.extractDateFieldString();
-            } else if(sp instanceof SearchParamsEvent){
-                f = SearchParamsEventDateFieldsEnum.CREATED_TS.extractDateFieldString();
-            } else if(sp instanceof SearchParamsOccPeriod){
-                f = SearchParamsOccPeriodDateFieldsEnum.CREATED_TS.extractDateFieldString();
-            } else if(sp instanceof SearchParamsCECase){
-                f = SearchParamsOccPeriodDateFieldsEnum.CREATED_TS.extractDateFieldString();
-            } else if(sp instanceof SearchParamsCEActionRequests){
-                f = SearchParamsCEActionRequestsDateFieldsEnum.SUBMISSION_TS.extractDateFieldString();
+        if(sp != null){
+
+            if(sp.getDate_field() != null && sp.getDate_field().extractDateFieldString() != null){
+                f = sp.getDate_field().extractDateFieldString();
             } else {
-                return null;
+                if(sp instanceof SearchParamsProperty){
+                    f = SearchParamsPropertyDateFieldsEnum.CREATIONTS.extractDateFieldString();
+                } else if(sp instanceof SearchParamsPerson){
+                    f = SearchParamsPersonDateFieldsEnum.CREATED_TS.extractDateFieldString();
+                } else if(sp instanceof SearchParamsEvent){
+                    f = SearchParamsEventDateFieldsEnum.CREATED_TS.extractDateFieldString();
+                } else if(sp instanceof SearchParamsOccPeriod){
+                    f = SearchParamsOccPeriodDateFieldsEnum.CREATED_TS.extractDateFieldString();
+                } else if(sp instanceof SearchParamsCECase){
+                    f = SearchParamsCECaseDateFieldsEnum.ORIGINATIONTS.extractDateFieldString();
+                } else if(sp instanceof SearchParamsCEActionRequests){
+                    f = SearchParamsCEActionRequestsDateFieldsEnum.SUBMISSION_TS.extractDateFieldString();
+                } else {
+                    return null;
+                }
             }
             
         } // close logic for default date field name selection
@@ -392,8 +409,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * BOBs as of the beta: Property, Person, Event, OccPeriod, CECase, and CEActionRequest
      * @param params
      * @param muniDBField
+     * @param activeField
      * @return the configured apram for      */
-    public SearchParams assembleBObSearchSQL_muniDatesUserActive(SearchParams params, String muniDBField){
+    public SearchParams assembleBObSearchSQL_muniDatesUserActive(   SearchParams params, 
+                                                                    String muniDBField,
+                                                                    String activeField){
         
          // ****************************
             // **         MUNI           **
@@ -405,8 +425,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     params.appendSQL("=? ");
                 } else {
                     params.setMuni_ctl(false);
-                    params.logMessage("MUNI: found null Muni value for filter; Muni filter turned off; | ");
-                     
+                    params.appendToParamLog("MUNI: found null Muni value for filter; Muni filter turned off; | ");
                  }
              }
             
@@ -415,7 +434,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             // ****************************
             if (params.isDate_startEnd_ctl()) {
                 params.appendSQL("AND ");
-                params.appendSQL(selectDefaultDateFieldString(params));
+                if(params.getDate_field() != null && params.getDate_field().extractDateFieldString() != null){
+                    params.appendSQL(params.getDate_field().extractDateFieldString());
+                } else {
+                    params.appendSQL(selectDefaultDateFieldString(params));
+                }
                 params.appendSQL(" BETWEEN ? AND ? ");
             } 
 
@@ -430,7 +453,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 } else {
                     // if the parameter wasn't set and a user wasn't passed in, turn off date and note
                     params.setUser_ctl(false);
-                    params.logMessage("USER: found null User object ref; User filter turned off; | ");
+                    params.appendToParamLog("USER: found null User object ref; User filter turned off; | ");
                 }
             }
             
@@ -438,10 +461,16 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             // **         ACTIVE         **
             // **************************** 
             if(params.isActive_ctl()){
+                    params.appendSQL("AND ");
+                    if(activeField == null){
+                        params.appendSQL("active");
+                    } else {
+                        params.appendSQL(activeField);
+                    }
                 if(params.isActive_val()){
-                    params.appendSQL("AND active = TRUE ");
+                    params.appendSQL(" = TRUE ");
                 } else {
-                    params.appendSQL("AND active = FALSE ");
+                    params.appendSQL(" = FALSE ");
                 }
             } 
         
@@ -456,10 +485,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @throws SearchException 
      */
     private void prepareQueryForRun(Query q) throws SearchException{
-       List<SearchParams> plist = q.getParmsList();
+       List<SearchParams> plist = q.getParamsList();
        for(SearchParams params: plist){
            params.setMuni_val(q.getCredential().getGoverningAuthPeriod().getMuni());
-           params.clearSQL();
+//           params.clearSQL();
+//           System.out.println("SearchCoordinator.prepareQueryForRun | SQL: " + params.extractRawSQL());
        }
         q.clearResultList();
         
@@ -509,17 +539,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         List<SearchParams> splst = new ArrayList<>();
         
-        for (Iterator it = q.getParmsList().iterator(); it.hasNext();) {
+        for (Iterator it = q.getParamsList().iterator(); it.hasNext();) {
             SearchParams sp = (SearchParams) it.next();
             // logic could be run here on SPs before adding them to the list to run
             splst.add(sp);
         }
         
         for(SearchParams sp: splst){
-            sp.setMuni_ctl(true);
-            sp.setMuni_val(q.getCredential().getGoverningAuthPeriod().getMuni());
+            // if user doesn't meet rank requirements, override all muni settings and allow only one search
             if(q.getCredential().getGoverningAuthPeriod().getRole().getRank() < MIN_ROLETYPEFORMULTIMUNI_QUERY.getRank()){
-                throw new SearchException(MIN_ROLETYPEFORMULTIMUNI_QUERY.getLabel() + " is required for muli-muni searching");
+                sp.setMuni_ctl(true);
+                sp.setMuni_val(q.getCredential().getGoverningAuthPeriod().getMuni());
             }
         }        
     }
@@ -554,7 +584,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return 
      */
     private Query initQueryFinalizeInit(Query q){
-        for(SearchParams sp: (List<SearchParams>) q.getParmsList()){
+        for(SearchParams sp: (List<SearchParams>) q.getParamsList()){
             
             sp.setMuni_rtMin(RoleType.Developer);
             sp.setMuni_ctl(true);
@@ -598,6 +628,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case HOUSESTREETNUM:
                 paramsList.add(genParams_property_address(params, cred));
                 break;
+            case PERSONS:
+                paramsList.add(genParams_property_persons(params, cred));
+                break;
             case CUSTOM:
                 break;
          }
@@ -633,6 +666,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 paramsList.add(generateParams_person_prop(params, cred));
                 break;
             case OCCPERIOD_PERSONS:
+                paramsList.add(generateParams_persons_occPeriod(params, cred));
+                break;
+            case PERSON_NAME:
+                paramsList.add(generateParams_persons_name(params, cred));
+                break;
                 
          }
          
@@ -667,7 +705,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
              case CECASE:
                  paramsList.add(genParams_event_cecase(params, cred));
                  break;
+             case PERSONS:
+                 paramsList.add(genParams_event_persons(params, cred));
+                 break;
             case CUSTOM:
+                paramsList.add(genParams_event_custom(params, cred));
                 break;
             default:
          }
@@ -693,13 +735,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          switch(qName){
             
             case ALL_PERIODS_IN_MUNI:
-                 
+                paramsList.add(genParams_occPeriod_allPeriodsInMuni(params, cred));
+                break;
             case AUTHWORKINPROGRESS:
                 paramsList.add(generateParams_occPeriod_wip(params, cred));
                 break;
             case RENTAL_ALL:
                 break;
             case RENTAL_REGISTERED:
+                break;
+            case PERSONS:
+                paramsList.add(genParams_occPeriod_persons(params, cred));
                 break;
             case RENTAL_UNREGISTERED:
                 break;
@@ -748,6 +794,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 break;
             case PROPINFOCASES:
                 paramsList.add(genParams_cecase_propInfo(params, cred));
+                break;
+            case PERSINFOCASES:
+                paramsList.add(genParams_ceCase_personinfo(params, cred));
                 break;
             case PACC:
                 paramsList.add(genParams_cecase_pacc(params, cred));
@@ -841,7 +890,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 queryList.add(initQuery(queryTitle, cred));
             }
         }
-        
+        System.out.println("SearchCoordinator.buildQueryPropertyList | returning list of size " + queryList.size());
         return queryList;
     }
     
@@ -875,7 +924,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         List<QueryEvent> queryList = new ArrayList<>();
         for(QueryEventEnum queryTitle: nameArray){
             if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
-                queryList.add(initQuery(queryTitle, cred));
+                QueryEvent qe = initQuery(queryTitle, cred);
+                if(qe.getParamsListSize() != 0){
+                    queryList.add(qe);
+                }
             }
         }
         return queryList;
@@ -886,7 +938,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * Assembles a list of Query objects available to each user given their 
      * Credential object. Calls internal method for verifying rank minimums
      * @param cred
-     * @param m
      * @return 
      */
     public List<QueryOccPeriod> buildQueryOccPeriodList(Credential cred){
@@ -909,10 +960,15 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      */
      public List<QueryCECase> buildQueryCECaseList(Credential cred){
         QueryCECaseEnum[] nameArray = QueryCECaseEnum.values();
+        QueryCECase q;
         List<QueryCECase> queryList = new ArrayList<>();
         for(QueryCECaseEnum queryTitle: nameArray){
             if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
-                queryList.add(initQuery(queryTitle, cred));
+                q = initQuery(queryTitle, cred);
+                // skip adding to query list if it doesn't have a param bundle
+                if(q.getParamsListSize() != 0){
+                    queryList.add(q);    
+                }
             }
         }
         return queryList;
@@ -1080,9 +1136,16 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return params;
     }
     
+    private SearchParamsProperty genParams_property_persons(SearchParamsProperty params, Credential cred){
+        params.setPerson_ctl(true);
+        // downstream injects Person
+        return params;
+    }
+    
+    
     private SearchParamsProperty genParams_property_address(SearchParamsProperty params, Credential cred){
-        params.setSearchName("Lead parameter bundle for property search by address");
-        params.setSearchDescription("search by address");
+        params.setFilterName("Lead parameter bundle for property search by address");
+        params.setFilterDescription("search by address");
         params.setAddress_ctl(true);
 
         return params;
@@ -1090,8 +1153,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     private SearchParamsProperty genParams_property_recentlyUpdated(SearchParamsProperty params, Credential cred){
-        params.setSearchName("Properties updated in the past month");
-        params.setSearchDescription("Applies to properties with any field updated");
+        params.setFilterName("Properties updated in the past month");
+        params.setFilterDescription("Applies to properties with any field updated");
         
         params.setDate_startEnd_ctl(true);
         params.setDate_relativeDates_ctl(true);
@@ -1175,8 +1238,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private SearchParamsPerson generateParams_persons_active(SearchParamsPerson params, Credential cred){
         
         
-        params.setSearchName("Public person types");
-        params.setSearchDescription("All persons declared to be public");
+        params.setFilterName("Public person types");
+        params.setFilterDescription("All persons declared to be public");
         
         params.setDate_startEnd_ctl(true);
         params.setDate_field(SearchParamsPersonDateFieldsEnum.LAST_UPDATED);
@@ -1188,9 +1251,27 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    private SearchParamsPerson generateParams_persons_name(SearchParamsPerson params, Credential cred){
+        params.setFilterName("First and last name filters");
+        params.setName_first_ctl(true);
+        params.setName_last_ctl(true);
+        // downstream responsible for name parts
+        return params;
+    }
+    
+    private SearchParamsPerson generateParams_persons_occPeriod(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Occ period id filter");
+        params.setFilterDescription("Persons whose type is a User");
+        
+        params.setOccPeriod_ctl(true);
+        // user responsible for downstream occ period
+        
+        return params;
+    }
+    
     private SearchParamsPerson generateParams_persons_users(SearchParamsPerson params, Credential cred){
-        params.setSearchName("User Persons");
-        params.setSearchDescription("Persons whose type is a User");
+        params.setFilterName("User Persons");
+        params.setFilterDescription("Persons whose type is a User");
         
         params.setPersonType_ctl(true);
         params.setPersonType_val(PersonType.User);
@@ -1199,8 +1280,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     private SearchParamsPerson generateParams_person_prop(SearchParamsPerson params, Credential cred){
-        params.setSearchName("Persons at property X");
-        params.setSearchDescription("Across all units");
+        params.setFilterName("Persons at property X");
+        params.setFilterDescription("Across all units");
         
         params.setProperty_ctl(true);
         // how do we signal we need downstream data?
@@ -1249,6 +1330,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    
+    public SearchParamsEvent genParams_event_persons(SearchParamsEvent params, Credential cred ){
+        params.setPerson_ctl(true);
+        // downstream injects person
+        return params;
+    }
+    
+    public SearchParamsEvent genParams_event_custom(SearchParamsEvent params, Credential cred ){
+        // downstream injects person
+        return params;
+    }
     
     public SearchParamsEvent genParams_event_occperid(SearchParamsEvent params, Credential cred ){
         params.setEventDomain_ctl(true);
@@ -1330,13 +1422,29 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return params;
     }
     
-  
     
+    private SearchParamsOccPeriod genParams_occPeriod_allPeriodsInMuni(SearchParamsOccPeriod params, Credential cred){
+        params.setFilterName("All periods");
+        params.setFilterDescription("All periods in muni");
+        
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        return params;
+        
+        
+    }
+  
+    private SearchParamsOccPeriod genParams_occPeriod_persons(SearchParamsOccPeriod params, Credential cred){
+        params.setPerson_ctl(true);
+        // user injects Person
+        return params;
+    }
     
     private SearchParamsOccPeriod generateParams_occPeriod_wip(SearchParamsOccPeriod params, Credential cred){
         
-        params.setSearchName("Periods with outstanding inspections");
-        params.setSearchDescription("Inspections have been started by not certified as passed");
+        params.setFilterName("Periods with outstanding inspections");
+        params.setFilterDescription("Inspections have been started by not certified as passed");
         
         params.setInspectionPassed_ctl(true);
         params.setInspectionPassed_val(false);
@@ -1391,9 +1499,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setPacc_val(false);
         
         // filter CECASE-9
-        params.setCasePhase_ctl(false);
-        params.setCasePhase_val(null);
+        params.setCaseStage_ctl(false);
+        params.setCaseStage_val(null);
 
+        return params;
+    }
+    
+    public SearchParamsCECase genParams_ceCase_personinfo(SearchParamsCECase params, Credential cred){
+        params.setPersonInfoCaseID_ctl(true);
+        params.setPersonInfoCase_ctl(true);
+        // downstream puts in a Person
+        
         return params;
     }
     
@@ -1407,15 +1523,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * into the Integrator for case list retrieval
      */
     public SearchParamsCECase getDefaultSearchParams_CECase_allOpen(SearchParamsCECase params, Credential cred){
+        params.setFilterName("All open cases");
+        params.setFilterDescription("All open cases");
         
-        // superclass 
-        params.setMuni_ctl(true);
-        params.setBobID_ctl(false);
-        params.setLimitResultCount_ctl(true);
         
         // subclass specific
-//        params.setOpen_ctl(true);
-//        params.setOpen_val(true);
+        params.setCaseOpen_ctl(true);
+        params.setCaseOpen_val(true);
 //        
 //        params.setDateToSearchCECases("Opening date of record");
 //        params.setUseCaseManager(false);
@@ -1430,7 +1544,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public SearchParamsCECase genParams_cecase_pacc(SearchParamsCECase params, Credential cred){
-        
+        params.setFilterName("PACC only");
+        params.setFilterDescription("PACC only");
         params.setPacc_ctl(true);
         
         return params;
@@ -1438,6 +1553,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public SearchParamsCECase genParams_cecase_propInfo(SearchParamsCECase params, Credential cred){
+        params.setFilterName("Prop info only");
+        params.setFilterDescription("Prop info only");
         
         params.setProperty_ctl(true);
         // downstream must set Property object
@@ -1449,6 +1566,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public SearchParamsCECase getDefaultSearchParams_CasesByProp(SearchParamsCECase params, Credential cred){
+        params.setFilterName("Property only");
+        params.setFilterDescription("Property only");
         
         params.setProperty_ctl(true);
         return params;
@@ -1463,7 +1582,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * into the Integrator for case list retrieval
      */
     public SearchParamsCECase getSearchParams_CECase_closedPast30Days(SearchParamsCECase params, Credential cred){
-        params.setSearchName("CECases closed in past month");
+        params.setFilterName("CECases closed in past month");
 
         params.setDate_startEnd_ctl(true);
         params.setDate_relativeDates_ctl(true);
@@ -1538,7 +1657,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      public SearchParamsCEActionRequests generateParams_CEAR_RequestorCurrentU(SearchParamsCEActionRequests params, Credential cred) throws IntegrationException{
         UserCoordinator uc = getUserCoordinator();
         
-        params.setSearchName("Action requests you've made");
+        params.setFilterName("Action requests you've made");
          
         params.setUser_ctl(true);
         params.setUser_val(uc.getUser(cred.getGoverningAuthPeriod().getUserID()));

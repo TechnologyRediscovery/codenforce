@@ -170,7 +170,7 @@ public class MunicipalityManageSampleBB extends BackingBeanUtils implements Seri
      */
     public List<Municipality> getMuniList() throws IntegrationException {
         MunicipalityCoordinator mc = getMuniCoordinator();
-        return mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessionUser());
+        return mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessUser());
     }
 
     /**

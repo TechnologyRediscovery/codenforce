@@ -18,7 +18,10 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.SessionBean;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
+import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
+import java.util.List;
 import javax.annotation.PostConstruct;
 
 /**
@@ -29,11 +32,20 @@ public  class   OccPeriodPaymentsBB
         extends BackingBeanUtils{
     
     private OccPeriodDataHeavy currentOccPeriod;
+    
+       // payments
+    private List<Payment> filteredPaymentList;
+    private Payment selectedPayment;
+    
+    //fees
+    private List<MoneyOccPeriodFeeAssigned> filteredFeeList;
+    private MoneyOccPeriodFeeAssigned selectedFee;
+    
      
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
-       currentOccPeriod = sb.getSessionOccPeriod();
+       currentOccPeriod = sb.getSessOccPeriod();
        
     }
     
@@ -56,6 +68,62 @@ public  class   OccPeriodPaymentsBB
      */
     public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
         this.currentOccPeriod = currentOccPeriod;
+    }
+
+    /**
+     * @return the filteredPaymentList
+     */
+    public List<Payment> getFilteredPaymentList() {
+        return filteredPaymentList;
+    }
+
+    /**
+     * @return the selectedPayment
+     */
+    public Payment getSelectedPayment() {
+        return selectedPayment;
+    }
+
+    /**
+     * @return the filteredFeeList
+     */
+    public List<MoneyOccPeriodFeeAssigned> getFilteredFeeList() {
+        return filteredFeeList;
+    }
+
+    /**
+     * @return the selectedFee
+     */
+    public MoneyOccPeriodFeeAssigned getSelectedFee() {
+        return selectedFee;
+    }
+
+    /**
+     * @param filteredPaymentList the filteredPaymentList to set
+     */
+    public void setFilteredPaymentList(List<Payment> filteredPaymentList) {
+        this.filteredPaymentList = filteredPaymentList;
+    }
+
+    /**
+     * @param selectedPayment the selectedPayment to set
+     */
+    public void setSelectedPayment(Payment selectedPayment) {
+        this.selectedPayment = selectedPayment;
+    }
+
+    /**
+     * @param filteredFeeList the filteredFeeList to set
+     */
+    public void setFilteredFeeList(List<MoneyOccPeriodFeeAssigned> filteredFeeList) {
+        this.filteredFeeList = filteredFeeList;
+    }
+
+    /**
+     * @param selectedFee the selectedFee to set
+     */
+    public void setSelectedFee(MoneyOccPeriodFeeAssigned selectedFee) {
+        this.selectedFee = selectedFee;
     }
     
 }

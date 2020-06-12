@@ -32,7 +32,7 @@ public  enum SearchParamsCECaseDateFieldsEnum
     ORIGINATION_DOFRECORD       ("Case origination date",
                                 "originationdate"), 
     
-    CLOSE                       ("Period start date", 
+    CLOSE                       ("Case closing date", 
                                 "closingdate");
     
     private final String title;

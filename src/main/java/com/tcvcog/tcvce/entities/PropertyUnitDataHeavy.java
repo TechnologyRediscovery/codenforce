@@ -32,51 +32,32 @@ public class        PropertyUnitDataHeavy
     private String credentialSignature;
     
     
-    /**
-     * Sets superclass member values and stamps Credential signature
-     * @param prop
-     * @param cred 
-     */
-    public PropertyUnitDataHeavy(PropertyUnit prop, Credential cred){
-        this.unitID = prop.getUnitID();
-        this.propertyID = prop.getPropertyID();
-        this.unitNumber = prop.getUnitNumber();
-
-        this.notes = prop.getNotes();
-        this.otherKnownAddress = prop.getOtherKnownAddress();
-
-        this.rentalIntentDateStart = prop.getRentalIntentDateStart();
-        this.rentalIntentDateStop = prop.getRentalIntentDateStop();
-        this.rentalIntentLastUpdatedBy = prop.getRentalIntentLastUpdatedBy();
-        this.rentalNotes = prop.getRentalNotes();
-        this.active = prop.isActive();
-        this.conditionIntensityClassID = prop.getConditionIntensityClassID();
-        this.lastUpdatedTS = prop.getLastUpdatedTS();
-        
-    }
+   
     
     
     /**
      * Pre-Credential Requiring constructor
-     * @deprecated 
      * @param prop 
      */
     public PropertyUnitDataHeavy(PropertyUnit prop){
-        this.unitID = prop.getUnitID();
-        this.propertyID = prop.getPropertyID();
-        this.unitNumber = prop.getUnitNumber();
+        if(prop != null){
 
-        this.notes = prop.getNotes();
-        this.otherKnownAddress = prop.getOtherKnownAddress();
+            this.unitID = prop.getUnitID();
+            this.propertyID = prop.getPropertyID();
+            this.unitNumber = prop.getUnitNumber();
 
-        this.rentalIntentDateStart = prop.getRentalIntentDateStart();
-        this.rentalIntentDateStop = prop.getRentalIntentDateStop();
-        this.rentalIntentLastUpdatedBy = prop.getRentalIntentLastUpdatedBy();
-        this.rentalNotes = prop.getRentalNotes();
-        this.active = prop.isActive();
-        this.conditionIntensityClassID = prop.getConditionIntensityClassID();
-        this.lastUpdatedTS = prop.getLastUpdatedTS();
-        
+            this.notes = prop.getNotes();
+            this.otherKnownAddress = prop.getOtherKnownAddress();
+
+            this.rentalIntentDateStart = prop.getRentalIntentDateStart();
+            this.rentalIntentDateStop = prop.getRentalIntentDateStop();
+            this.rentalIntentLastUpdatedBy = prop.getRentalIntentLastUpdatedBy();
+            this.rentalNotes = prop.getRentalNotes();
+            this.active = prop.isActive();
+            this.conditionIntensityClassID = prop.getConditionIntensityClassID();
+            this.lastUpdatedTS = prop.getLastUpdatedTS();
+
+        }
     }
     
     
@@ -98,6 +79,13 @@ public class        PropertyUnitDataHeavy
      */
     public void setPeriodList(List<OccPeriod> periodList) {
         this.periodList = periodList;
+    }
+
+    /**
+     * @param credentialSignature the credentialSignature to set
+     */
+    public void setCredentialSignature(String credentialSignature) {
+        this.credentialSignature = credentialSignature;
     }
 
     

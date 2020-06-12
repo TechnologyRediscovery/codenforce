@@ -19,16 +19,20 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implements business logic related to payments.
@@ -60,9 +64,8 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public void insertAutoAssignedFees(OccPeriod period, User u) throws IntegrationException {
+    public void insertAutoAssignedFees(OccPeriod period) throws IntegrationException {
 
-        OccupancyIntegrator oi = getOccupancyIntegrator();
         PaymentIntegrator pi = getPaymentIntegrator();
 
         ArrayList<Fee> feeList = (ArrayList<Fee>) pi.getFeeList(period.getType());
@@ -76,17 +79,48 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
                 skeleton.setOccPeriodID(period.getPeriodID());
                 skeleton.setOccPeriodTypeID(period.getType().getTypeID());
                 skeleton.setMoneyFeeAssigned(fee.getOccupancyInspectionFeeID());
-                skeleton.setAssignedBy(getSessionBean().getSessionUser());
+                skeleton.setAssignedBy(getSessionBean().getSessUser());
                 skeleton.setAssigned(LocalDateTime.now());
                 skeleton.setLastModified(LocalDateTime.now());
                 skeleton.setNotes("Automatically assigned");
                 skeleton.setFee(fee);
 
                 pi.insertOccPeriodFee(skeleton);
-                
+
             }
 
         }
+
+    }
+
+    public void insertAutoAssignedFees(CECase cse, CodeViolation violation) throws IntegrationException {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+            EnforcableCodeElement codeElement = violation.getCodeViolated();
+
+            ArrayList<Fee> feeList = (ArrayList<Fee>) codeElement.getFeeList();
+
+            for (Fee fee : feeList) {
+
+                if (fee.isAutoAssigned()) {
+
+                    MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned();
+
+                    skeleton.setCaseID(cse.getCaseID());
+                    skeleton.setCodeSetElement(codeElement.getCodeSetElementID());
+                    skeleton.setMoneyFeeAssigned(fee.getOccupancyInspectionFeeID());
+                    skeleton.setAssignedBy(getSessionBean().getSessUser());
+                    skeleton.setAssigned(LocalDateTime.now());
+                    skeleton.setLastModified(LocalDateTime.now());
+                    skeleton.setNotes("Automatically assigned");
+                    skeleton.setFee(fee);
+
+                    pi.insertCECaseFee(skeleton);
+
+                }
+
+            }
 
     }
 

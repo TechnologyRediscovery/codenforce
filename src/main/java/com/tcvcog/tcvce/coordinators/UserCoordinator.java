@@ -183,10 +183,11 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * given Municipality objects passed into the method.
      * 
      * TODO: Customize list based on muni connections
+     * NOTED in github issues by ECD 25-may-2020
      * 
      * @return An assembled list of users for authorization
      */
-    public List<User> assembleUserListForSearchCriteria(){
+    public List<User> assembleUserListForSearch(User usr){
         // we do nothing with muniList
         UserIntegrator ui = getUserIntegrator();
         
@@ -565,7 +566,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         if(aup.getUserMuniAuthPeriodID() == u.getMyCredential().getGoverningAuthPeriod().getUserMuniAuthPeriodID()){
             throw new AuthorizationException("You are unauthorized to invalidate your current authorization period");
         }
-        aup.setNotes(sc.appendNoteBlock(new MessageBuilderParams(aup.getNotes(), "INVALIDATION OF AUTH PERIOD", "", note, u)));
+        aup.setNotes(sc.appendNoteBlock(new MessageBuilderParams(aup.getNotes(), "INVALIDATION OF AUTH PERIOD", "", note, u, u.getMyCredential())));
         ui.invalidateUserAuthRecord(aup);
         
         // We should be logging this action

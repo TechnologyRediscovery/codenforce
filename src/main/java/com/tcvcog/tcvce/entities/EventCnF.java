@@ -17,7 +17,6 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -63,19 +62,25 @@ public  class       EventCnF
         
         eventID = ev.eventID;
         category = ev.category;
+        
         domain = ev.domain;
         ceCaseID = ev.ceCaseID;
         occPeriodID = ev.occPeriodID;
+        
         timeStart = ev.timeStart;
         timeEnd = ev.timeEnd;
         timestamp = ev.timestamp;
+        
         description = ev.description;
         owner = ev.owner;
+        
         discloseToMunicipality = ev.discloseToMunicipality;
         discloseToPublic = ev.discloseToPublic;
         active = ev.active;
         hidden = ev.hidden;
+        
         notes = ev.notes;
+        
         personList = ev.personList;
         
     }
@@ -224,20 +229,7 @@ public  class       EventCnF
         this.notes = notes;
     }
 
-   
-
-   
-
-
-    /**
-     * @return the timestampPretty
-     */
-    public String getTimestampPretty() {
-        String s = EntityUtils.getPrettyDate(timestamp);
-        return s;
-    }
-
-   
+  
 
     /**
      * @return the personList
@@ -258,7 +250,12 @@ public  class       EventCnF
   
     @Override
     public int compareTo(EventCnF e) {
-        int c = this.timeStart.compareTo(e.timeStart);
+        int c = 0;
+        if(this.timeStart != null && e.timeStart != null){
+             c = this.timeStart.compareTo(e.timeStart);
+        } else if(this.timestamp != null && e.timestamp != null){
+             c = this.timestamp.compareTo(e.timestamp);
+        } 
         return c;
         
     }

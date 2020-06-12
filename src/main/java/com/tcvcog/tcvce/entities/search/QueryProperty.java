@@ -5,12 +5,8 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -62,11 +58,10 @@ public class QueryProperty
     
     
     @Override
-    public int addParams(SearchParams params) {
+    public void addParams(SearchParams params) {
       if(params instanceof SearchParamsProperty){
             searchParamsList.add((SearchParamsProperty) params);
         }
-        return searchParamsList.size();
     }
 
     @Override
@@ -98,7 +93,7 @@ public class QueryProperty
     }
 
     @Override
-    public List<SearchParamsProperty> getParmsList() {
+    public List<SearchParamsProperty> getParamsList() {
         return searchParamsList;
     }
 
@@ -129,6 +124,11 @@ public class QueryProperty
         return hash;
     }
 
+    /**
+     * ECD: I don't think this equals is working at all
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -145,6 +145,17 @@ public class QueryProperty
             return false;
         }
         return true;
+    }
+    
+    /**
+     * Attempt at self-resetting query: doesn't work!
+     * @deprecated 
+     */
+    public void resetQuery(){
+        clearResultList();
+        clearQueryLog();
+        setExecutionTimestamp(null);
+        
     }
 
     

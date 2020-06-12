@@ -20,6 +20,13 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.BOb;
+import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.NavigationItem;
+import com.tcvcog.tcvce.entities.NavigationSubItem;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.application.SessionBean;
+import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.PrintStyle;
@@ -35,6 +42,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -58,6 +66,13 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
 
     }
     
+    /**
+     * Logic pass through method for calls to the system integrator which will
+     * make database inserts recording any exploration of one of our BObs
+     * @param u
+     * @param ob
+     * @throws IntegrationException 
+     */
      public void logObjectView(User u, IFace_Loggable ob) throws IntegrationException {
          SystemIntegrator si = getSystemIntegrator();
          si.logObjectView(u, ob);
@@ -74,7 +89,36 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
          return li.writeLogEntry(entry);
      }
      
-    
+     /**
+      * Generates a rich-text (contains HTML to be NOT escaped) given
+      * various input values
+      * @param objectID
+      * @param BObName
+      * @param formerVal
+      * @param updatedVal
+      * @return 
+      */
+     public String generateFieldUpdateNoteBody( int objectID, 
+                                                String BObName, 
+                                                String formerVal, 
+                                                String updatedVal){
+         StringBuilder sb = new StringBuilder();
+         sb.append(Constants.FMT_HTML_BREAK);
+         sb.append("FIELD UPDATE");
+         sb.append(" of ");
+         sb.append(BObName);
+         sb.append(" ID: ");
+         sb.append(objectID);
+         sb.append(Constants.FMT_HTML_BREAK);
+         sb.append("Prev val: ");
+         sb.append(formerVal);
+         sb.append(Constants.FMT_HTML_BREAK);
+         sb.append("New val: ");
+         sb.append(updatedVal);
+         sb.append(Constants.FMT_HTML_BREAK);
+         return sb.toString();
+         
+     }
     
     /**
      * Skeleton of a system that may be needed to generate and release carefully
@@ -86,11 +130,19 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         // TODO: Finish guts
     }
 
+    /**The official note appending tool of the entire codeNforce system!
+     * Consider all other appendNoteXXX methods scattered about to be rogue
+     * agents, operating without warrant, independent of any meaningful standards 
+     * or oversight
+     * 
+     * @param mbp containing as much information as possible which will be 
+     * formatted into a nice note block
+     * @return the exact text of the new note, with any previous text
+     * included in the message builder params object post-pended to the incoming note
+     */
     public String appendNoteBlock(MessageBuilderParams mbp) {
         StringBuilder sb = new StringBuilder();
-        if (mbp.getExistingContent() != null) {
-            sb.append(mbp.getExistingContent());
-        }
+        
         sb.append(Constants.FMT_HTML_BREAK);
         sb.append(Constants.FMT_NOTE_START);
         if (mbp.getHeader() != null) {
@@ -131,15 +183,66 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         sb.append(mbp.getUser().getUserID());
         sb.append(Constants.FMT_DTYPE_OBJECTID_INLINECLOSED);
 
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append(Constants.FMT_SIGNATURELEAD);
+        if(mbp.getCred() != null){
+            sb.append(mbp.getCred().getSignature());
+        }
+        
+        sb.append(Constants.FMT_HTML_BREAK);
+        
+        if (mbp.getExistingContent() != null) {
+            sb.append(mbp.getExistingContent());
+        }
         return sb.toString();
     }
 
+    /**
+     * Utility method for creating a string of the current date
+     * @return 
+     */
     public String stampCurrentTimeForNote() {
         return getPrettyDate(LocalDateTime.now());
     }
 
+    /**
+     * Adapter method for taking in simple note info, not in Object format
+     * and creating the populated MessageBuilderParams instance required
+     * by the official note appending tool of the entire codeNforce system
+     * @param u
+     * @param noteToAppend
+     * @param existingText
+     * @return 
+     */
     public String formatAndAppendNote(User u, String noteToAppend, String existingText) {
-        return appendNoteBlock(new MessageBuilderParams(existingText, noteToAppend, null, null, u));
+        MessageBuilderParams mbp = new MessageBuilderParams(existingText, 
+                                                            noteToAppend, 
+                                                            null, 
+                                                            null, 
+                                                            u, 
+                                                            null);
+        return appendNoteBlock(mbp);
+
+    }
+    /**
+     * Adapter method for taking in simple note info, not in Object format
+     * and creating the populated MessageBuilderParams instance required
+     * by the official note appending tool of the entire codeNforce system
+     * @param u
+     * @param cred
+     * @param noteToAppend
+     * @param existingText
+     * @return 
+     */
+    public String formatAndAppendNote(User u, Credential cred, String noteToAppend, String existingText) {
+        MessageBuilderParams mbp = new MessageBuilderParams(existingText, 
+                                                            noteToAppend, 
+                                                            null, 
+                                                            null, 
+                                                            u, 
+                                                            cred);
+        
+        return appendNoteBlock(mbp);
 
     }
 
@@ -160,6 +263,25 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         }
         return muniCodeNameMap;
     }
+    
+    /**
+     * Experimental method--decided to let respective Coordinators do this
+     * 
+     * @deprecated 
+     * @param obj
+     * @return 
+     */
+    public String generateFieldDumpString(BOb obj){
+        String dump = obj.toString();
+        PersonCoordinator pc = getPersonCoordinator();
+        
+        if(obj instanceof Person){
+            return pc.dumpPerson((Person) obj);
+        }
+        return dump;
+    }
+    
+
 
     /**
      * @param muniCodeNameMap the muniCodeNameMap to set
@@ -194,18 +316,20 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      */
     //Nav Bar
     //Sub NavItem: Property
-    private final NavigationSubItem propertyInfo = getNavSubItem("Info", "/restricted/cogstaff/prop/propertyInfo.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyUnits = getNavSubItem("Units", "/restricted/cogstaff/prop/propertyUnits.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyEvents = getNavSubItem("Events", "/restricted/cogstaff/prop/propertyEvents.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyPersons = getNavSubItem("Persons", "/restricted/cogstaff/prop/propertyPersons.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyCases = getNavSubItem("Cases", "/restricted/cogstaff/prop/propertyCases.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "/restricted/cogstaff/prop/propertyOccPeriods.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyEvents = getNavSubItem("Events", "/restricted/cogstaff/prop/propertyEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyInfo = getNavSubItem("Info", "/restricted/cogstaff/prop/propertyInfo.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyDocuments = getNavSubItem("Files", "/restricted/cogstaff/prop/propertyFiles.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "/restricted/cogstaff/prop/propertyOccPeriods.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyPersons = getNavSubItem("Persons", "/restricted/cogstaff/prop/propertyPersons.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertySearch = getNavSubItem("Search", "/restricted/cogstaff/prop/propertySearch.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyUnits = getNavSubItem("Units", "/restricted/cogstaff/prop/propertyUnits.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Property
     public List<NavigationSubItem> getPropertyNavList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
+        navList.add(propertySearch);
         navList.add(propertyInfo);
         navList.add(propertyUnits);
         navList.add(propertyCases);
@@ -244,7 +368,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sub NavItem: Occupancy
-    private final NavigationSubItem occPeriodStatus = getNavSubItem("Period Status", "/restricted/cogstaff/occ/occPeriodStatus.xhtml", "fa fa-sign-in", true);
+    private final NavigationSubItem occPeriodStatus = getNavSubItem("Period Status", "/restricted/cogstaff/occ/occPeriodWorkflow.xhtml", "fa fa-sign-in", true);
     private final NavigationSubItem occPermits = getNavSubItem("Permits", "/restricted/cogstaff/occ/occPeriodPermits.xhtml", "fa fa-sign-in", true);
     private final NavigationSubItem occEvents = getNavSubItem("Events", "/restricted/cogstaff/occ/occPeriodEvents.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem occInspections = getNavSubItem("Inspections", "/restricted/cogstaff/occ/occPeriodInspections.xhtml", "fa fa-sign-in", false);
@@ -263,19 +387,27 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sub NavItem: Persons
-    private final NavigationSubItem personParcels = getNavSubItem("Parcels", "", "fa fa-sign-in", false);
-    private final NavigationSubItem personCases = getNavSubItem("Cases", "", "fa fa-sign-in", false);
-    private final NavigationSubItem personEvents = getNavSubItem("Events", "", "fa fa-sign-in", false);
-    private final NavigationSubItem personDocuments = getNavSubItem("Documents", "", "fa fa-sign-in", false);
+    // listed in file order
+    private final NavigationSubItem personCECases = getNavSubItem("CE Cases", "/restricted/cogstaff/person/personCECases.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personEvents = getNavSubItem("Events", "/restricted/cogstaff/person/personEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personInfo = getNavSubItem("Info", "/restricted/cogstaff/person/personInfo.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personOccPeriods = getNavSubItem("Occ periods", "/restricted/cogstaff/person/personOccPeriods.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personProperties = getNavSubItem("Properties", "/restricted/cogstaff/person/personProperties.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personPublic = getNavSubItem("Public", "/restricted/cogstaff/person/personPublic.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personSearch = getNavSubItem("Search", "/restricted/cogstaff/person/personSearch.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Person
+    // listed in display order
     public List<NavigationSubItem> getPersonNavList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
-        navList.add(personParcels);
-        navList.add(personCases);
+        navList.add(personSearch);
+        navList.add(personInfo);
+        navList.add(personProperties);
         navList.add(personEvents);
-        navList.add(personDocuments);
+        navList.add(personOccPeriods);
+        navList.add(personCECases);
+        navList.add(personPublic);
         return navList;
     }
 
@@ -304,7 +436,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             //NavItem: Code Enf
             NavigationItem CEItem = getNavItem("/restricted/cogstaff/ce/ceCaseSearch.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
             //NavItem: Occupancy
-            NavigationItem occItem = getNavItem("/restricted/cogstaff/occ/occPeriodsearch.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
+            NavigationItem occItem = getNavItem("/restricted/cogstaff/occ/occPeriodSearch.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
             //NavItem: Persons
             NavigationItem personItem = getNavItem("/restricted/cogstaff/person/personSearch.xhtml", "Person", "fa fa-female", getPersonNavList());
             //NavItem: Code
@@ -384,15 +516,17 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sidebar Sub Nav Item: Reports
-    private final NavigationSubItem municipalityActivity = getNavSubItem("Municipality Activity", "", "fa fa-sign-in", false);
-    private final NavigationSubItem activeCases = getNavSubItem("Active Cases", "", "fa fa-sign-in", false);
+    private final NavigationSubItem events = getNavSubItem("Event Search", "/restricted/cogstaff/event/eventSearch.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem eventConfig = getNavSubItem("Event Setup", "/restricted/cogstaff/event/eventConfiguration.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem eventRuleConfig = getNavSubItem("Event Rules", "/restricted/cogstaff/event/eventRuleConfiguration.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Reports
     public List<NavigationSubItem> getSidebarReportList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
-        navList.add(municipalityActivity);
-        navList.add(activeCases);
+        navList.add(events);
+        navList.add(eventConfig);
+        navList.add(eventRuleConfig);
         return navList;
     }
 
@@ -430,7 +564,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         try {
             //NavItem: CE
             NavigationItem CEconfigItem = getNavItem("", "Code Enforcement", "fa fa-balance-scale", getSidebarCEConfigList());
-            //NavItem: CE
+            //NavItem: Occ
             NavigationItem OccconfigItem = getNavItem("", "Occupancy", "fa fa-list-alt", getSidebarOccConfigList());
             //NavItem: Code
             NavigationItem codeconfigItem = getNavItem("", "Municipal Code", "fa fa-book", getSidebarCodeConfigList());

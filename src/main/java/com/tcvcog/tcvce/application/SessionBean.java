@@ -46,26 +46,28 @@ public class    SessionBean
     /* >>>                      N User                                    <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
-    private UserAuthorized sessionUser;
+    private UserAuthorized sessUser;
+    private User sessUserQueued;
     private User userForReInit;
     
     private UserMuniAuthPeriod umapRequestedForReInit;
-    private List<UserMuniAuthPeriod> sessionUMAPListValidOnly;
+    private List<UserMuniAuthPeriod> sessUMAPListValidOnly;
     
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                    I Municipality                              <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
-    private MunicipalityDataHeavy sessionMuni;
+    private MunicipalityDataHeavy sessMuni;
+    private Municipality sessMuniQueued;
     
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                   III CodeBook                                 <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
-    private CodeSet sessionCodeSet;
-    private CodeSource activeCodeSource;
+    private CodeSet sessCodeSet;
+    private CodeSource sessCodeSource;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
     private EnforcableCodeElement selectedEnfCodeElement;
     private CodeElement activeCodeElement;
@@ -76,10 +78,11 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    private PropertyDataHeavy sessionProperty;
-    private List<Property> sessionPropertyList;
+    private PropertyDataHeavy sessProperty;
+    private Property sessPropertyQueued;
+    private List<Property> sessPropertyList;
     
-    private PropertyUnit sessionPropertyUnit;
+    private PropertyUnit sessPropertyUnit;
     
     /* >>> QUERY PROPERTY <<< */
     private QueryProperty queryProperty;
@@ -91,8 +94,9 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    private Person sessionPerson;
-    private List<Person> sessionPersonList;
+    private PersonDataHeavy sessPerson;
+    private Person sessPersonQueued;
+    private List<Person> sessPersonList;
     
     
     /* >>> QUERY PERSON <<< */
@@ -106,8 +110,9 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    private List<EventCaseHeavy> sessionEventWithCasePropList;
-    private List<EventCnF> sessionEventList;
+    
+    private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
+    private EventCnF sessEventQueued;
     
     /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
@@ -120,11 +125,12 @@ public class    SessionBean
     /* >>>                  VI OccPeriod                                  <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
-    private OccPeriodDataHeavy sessionOccPeriod;
-    private List<OccPeriod> sessionOccPeriodList;
+    private OccPeriodDataHeavy sessOccPeriod;
+    private OccPeriod sessOccPeriodQueued;
+    private List<OccPeriod> sessOccPeriodList;
     
-    private OccPermit sessionOccPermit;
-    private OccInspection sessionOccInspection;
+    private OccPermit sessOccPermit;
+    private OccInspection sessOccInspection;
     
     /* >>> QUERY OCCPERIOD <<< */
     private QueryOccPeriod queryOccPeriod;
@@ -135,14 +141,15 @@ public class    SessionBean
     /* >>>                  VII CECaseDataHeavy                                    <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
-    private CECaseDataHeavy sessionCECase;
-    private List<CECase> sessionCECaseList;
+    private CECaseDataHeavy sessCECase;
+    private CECase sessCECaseQueued;
+    private List<CECasePropertyUnitHeavy> sessCECaseList;
     
-    private CodeViolation sessionCodeViolation;
-    private List<CodeViolation> sessionViolationList;
+    private CodeViolation sessCodeViolation;
+    private List<CodeViolation> sessViolationList;
     
-    private NoticeOfViolation sessionNotice;
-    private Citation sessionCitation;
+    private NoticeOfViolation sessNotice;
+    private Citation sessCitation;
     
     
     /* >>> QUERY CECASE <<< */
@@ -154,9 +161,9 @@ public class    SessionBean
     /* >>>              VIII CEActionRequest                              <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
-    private List<CEActionRequest> sessionCEARList;
+    private List<CEActionRequest> sessCEARList;
+    private CEActionRequest sessCEAR;
     
-    private CEActionRequest sessionCEAR;
     /* *** Code Enf Action Request Session Shelves ***  */
     private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
@@ -171,7 +178,7 @@ public class    SessionBean
     /* >>>                     VIV OccApp                                 <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
-    private OccPermitApplication sessionOccPermitApplication;
+    private OccPermitApplication sessOccPermitApplication;
     
     private Property occPermitAppActiveProp;
     private Property occPermitAppWorkingProp;
@@ -184,18 +191,21 @@ public class    SessionBean
     /* >>>                        X Payment                               <<< */
     /* >>> -------------------------------------------------------------- <<< */
 
-    private Payment sessionPayment;
+    private Payment sessPayment;
     private String paymentRedirTo;
     
     private OccPeriod feeManagementOccPeriod;
     private String feeRedirTo;
+    private Payment sessionPayment;
     
+    private EventDomainEnum feeManagementDomain;
+    private CECase feeManagementCeCase;
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                         XI Report                              <<< */
     /* >>> -------------------------------------------------------------- <<< */
 
-    private Report sessionReport;
+    private Report sessReport;
     
     private ReportConfigCECase reportConfigCECase;
     private ReportConfigCECaseList reportConfigCECaseList;
@@ -204,15 +214,12 @@ public class    SessionBean
     private ReportConfigOccInspection reportConfigInspection;
     private ReportConfigOccPermit reportConfigOccPermit;
     
-    
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                         XII Blob                                <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
-    private Blob sessionBlob;
+    private Blob sessBlob;
     private List<Blob> blobList;
-    
-    
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                  XIII PublicInfoBundle                          <<< */
@@ -223,7 +230,13 @@ public class    SessionBean
     
     /* *** Public Person Search/Edit Session Shelves *** */
     private Person activeAnonPerson;
+
+  
+    /* *** Blob Upload Session Shelves *** */ 
+
     
+    /* *** Navigation Shelves *** */
+    private NavigationStack navStack;
     
     /**
      * Creates a new instance of getSessionBean()
@@ -236,40 +249,35 @@ public class    SessionBean
     @PostConstruct
     public void initBean(){
         System.out.println("SessionBean.initBean");
+        navStack = new NavigationStack();
     }
 
     /**
-     * @return the sessionProperty
+     * @return the sessProperty
      */
-    public PropertyDataHeavy getSessionProperty() {
-        return sessionProperty;
+    public PropertyDataHeavy getSessProperty() {
+        return sessProperty;
     }
 
     /**
-     * @return the sessionCECase
+     * @return the sessCECase
      */
-    public CECaseDataHeavy getSessionCECase() {
-        return sessionCECase;
+    public CECaseDataHeavy getSessCECase() {
+        return sessCECase;
         
     }
     
-    /**
-     * @return the sessionPerson
-     */
-    public Person getSessionPerson() {
-        return sessionPerson;
-    }
 
    
     /**
-     * @return the sessionNotice
+     * @return the sessNotice
      */
-    public NoticeOfViolation getSessionNotice() {
-        return sessionNotice;
+    public NoticeOfViolation getSessNotice() {
+        return sessNotice;
     }
     
-    public void setSessionCodeSet(CodeSet cs){
-        sessionCodeSet = cs;
+    public void setSessCodeSet(CodeSet cs){
+        sessCodeSet = cs;
     }
 
     
@@ -279,18 +287,18 @@ public class    SessionBean
      * The MuniHeavy stores the active copy of these 
      * @return the activeCodeSet
      */
-    public CodeSet getSessionCodeSet() {
-//        if(sessionMuni != null){
-//            activeCodeSet = sessionMuni.getCodeSet();
+    public CodeSet getSessCodeSet() {
+//        if(sessMuni != null){
+//            activeCodeSet = sessMuni.getCodeSet();
 //        }
-        return sessionCodeSet;
+        return sessCodeSet;
     }
 
     /**
-     * @return the sessionCitation
+     * @return the sessCitation
      */
-    public Citation getSessionCitation() {
-        return sessionCitation;
+    public Citation getSessCitation() {
+        return sessCitation;
     }
 
     /**
@@ -301,17 +309,17 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessionCodeViolation
+     * @return the sessCodeViolation
      */
-    public CodeViolation getSessionCodeViolation() {
-        return sessionCodeViolation;
+    public CodeViolation getSessCodeViolation() {
+        return sessCodeViolation;
     }
 
     /**
-     * @return the sessionViolationList
+     * @return the sessViolationList
      */
-    public List<CodeViolation> getSessionViolationList() {
-        return sessionViolationList;
+    public List<CodeViolation> getSessViolationList() {
+        return sessViolationList;
     }
 
     /**
@@ -322,42 +330,35 @@ public class    SessionBean
     }
 
     /**
-     * @param sessionProperty the sessionProperty to set
+     * @param sessProperty the sessProperty to set
      */
-    public void setSessionProperty(PropertyDataHeavy sessionProperty) {
-        this.sessionProperty = sessionProperty;
+    public void setSessProperty(PropertyDataHeavy sessProperty) {
+        this.sessProperty = sessProperty;
     }
 
     /**
-     * @param sessionCECase the sessionCECase to set
+     * @param sessCECase the sessCECase to set
      */
-    public void setSessionCECase(CECaseDataHeavy sessionCECase) {
-        this.sessionCECase = sessionCECase;
+    public void setSessCECase(CECaseDataHeavy sessCECase) {
+        this.sessCECase = sessCECase;
     }
 
 
-
-    /**
-     * @param sessionPerson the sessionPerson to set
-     */
-    public void setSessionPerson(Person sessionPerson) {
-        this.sessionPerson = sessionPerson;
-    }
 
    
     /**
-     * @param sessionNotice the sessionNotice to set
+     * @param sessNotice the sessNotice to set
      */
-    public void setSessionNotice(NoticeOfViolation sessionNotice) {
-        this.sessionNotice = sessionNotice;
+    public void setSessNotice(NoticeOfViolation sessNotice) {
+        this.sessNotice = sessNotice;
     }
 
 
     /**
-     * @param sessionCitation the sessionCitation to set
+     * @param sessCitation the sessCitation to set
      */
-    public void setSessionCitation(Citation sessionCitation) {
-        this.sessionCitation = sessionCitation;
+    public void setSessCitation(Citation sessCitation) {
+        this.sessCitation = sessCitation;
     }
 
     /**
@@ -368,17 +369,17 @@ public class    SessionBean
     }
 
     /**
-     * @param sessionCodeViolation the sessionCodeViolation to set
+     * @param sessCodeViolation the sessCodeViolation to set
      */
-    public void setSessionCodeViolation(CodeViolation sessionCodeViolation) {
-        this.sessionCodeViolation = sessionCodeViolation;
+    public void setSessCodeViolation(CodeViolation sessCodeViolation) {
+        this.sessCodeViolation = sessCodeViolation;
     }
 
     /**
-     * @param sessionViolationList the sessionViolationList to set
+     * @param sessViolationList the sessViolationList to set
      */
-    public void setSessionViolationList(List<CodeViolation> sessionViolationList) {
-        this.sessionViolationList = sessionViolationList;
+    public void setSessViolationList(List<CodeViolation> sessViolationList) {
+        this.sessViolationList = sessViolationList;
     }
 
     /**
@@ -396,10 +397,10 @@ public class    SessionBean
     }
 
     /**
-     * @return the activeCodeSource
+     * @return the sessCodeSource
      */
-    public CodeSource getActiveCodeSource() {
-        return activeCodeSource;
+    public CodeSource getSessCodeSource() {
+        return sessCodeSource;
     }
 
     /**
@@ -410,24 +411,24 @@ public class    SessionBean
     }
 
     /**
-     * @param activeCodeSource the activeCodeSource to set
+     * @param sessCodeSource the sessCodeSource to set
      */
-    public void setActiveCodeSource(CodeSource activeCodeSource) {
-        this.activeCodeSource = activeCodeSource;
+    public void setSessCodeSource(CodeSource sessCodeSource) {
+        this.sessCodeSource = sessCodeSource;
     }
 
     /**
-     * @return the sessionMuni
+     * @return the sessMuni
      */
-    public MunicipalityDataHeavy getSessionMuni() {
-        return sessionMuni;
+    public MunicipalityDataHeavy getSessMuni() {
+        return sessMuni;
     }
 
     /**
-     * @param sessionMuni the sessionMuni to set
+     * @param sessMuni the sessMuni to set
      */
-    public void setSessionMuni(MunicipalityDataHeavy sessionMuni) {
-        this.sessionMuni = sessionMuni;
+    public void setSessMuni(MunicipalityDataHeavy sessMuni) {
+        this.sessMuni = sessMuni;
     }
 
     /**
@@ -475,37 +476,37 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessionCEARList
+     * @return the sessCEARList
      */
-    public List<CEActionRequest> getSessionCEARList() {
+    public List<CEActionRequest> getSessCEARList() {
         
-        return sessionCEARList;
+        return sessCEARList;
     }
 
     /**
-     * @return the sessionCECaseList
+     * @return the sessCECaseList
      */
-    public List<CECase> getSessionCECaseList() {
-        return sessionCECaseList;
+    public List<CECasePropertyUnitHeavy> getSessCECaseList() {
+        return sessCECaseList;
     }
 
     /**
      * @param qc
      */
-    public void setSessionCEARList(List<CEActionRequest> qc) {
+    public void setSessCEARList(List<CEActionRequest> qc) {
         if(qc != null && qc.size() > 0 ){
             setQueryCEAR(null);
     
-            this.sessionCEARList = qc;
+            this.sessCEARList = qc;
         }
     }
     
 
     /**
-     * @param sessionCECaseList the sessionCECaseList to set
+     * @param sessCECaseList the sessCECaseList to set
      */
-    public void setSessionCECaseList(List<CECase> sessionCECaseList) {
-        this.sessionCECaseList = sessionCECaseList;
+    public void setSessCECaseList(List<CECasePropertyUnitHeavy> sessCECaseList) {
+        this.sessCECaseList = sessCECaseList;
     }
 
     /**
@@ -526,47 +527,33 @@ public class    SessionBean
    
 
     /**
-     * @return the sessionCEAR
+     * @return the sessCEAR
      */
-    public CEActionRequest getSessionCEAR() {
-        return sessionCEAR;
+    public CEActionRequest getSessCEAR() {
+        return sessCEAR;
     }
 
     /**
-     * @param sessionCEAR the sessionCEAR to set
+     * @param sessCEAR the sessCEAR to set
      */
-    public void setSessionCEAR(CEActionRequest sessionCEAR) {
-        this.sessionCEAR = sessionCEAR;
+    public void setSessCEAR(CEActionRequest sessCEAR) {
+        this.sessCEAR = sessCEAR;
     }
 
     /**
-     * @return the sessionUser
+     * @return the sessUser
      */
     
-    public UserAuthorized getSessionUser() {
-        return sessionUser;
+    public UserAuthorized getSessUser() {
+        return sessUser;
     }
 
     /**
-     * @param sessionUser the sessionUser to set
+     * @param sessUser the sessUser to set
      */
     
-    public void setSessionUser(UserAuthorized sessionUser) {
-        this.sessionUser = sessionUser;
-    }
-
-    /**
-     * @return the sessionPersonList
-     */
-    public List<Person> getSessionPersonList() {
-        return sessionPersonList;
-    }
-
-    /**
-     * @param sessionPersonList the sessionPersonList to set
-     */
-    public void setSessionPersonList(List<Person> sessionPersonList) {
-        this.sessionPersonList = sessionPersonList;
+    public void setSessUser(UserAuthorized sessUser) {
+        this.sessUser = sessUser;
     }
 
    
@@ -585,50 +572,36 @@ public class    SessionBean
     }
 
     
-    public OccPermitApplication getSessionOccPermitApplication() {
-        return sessionOccPermitApplication;
+    public OccPermitApplication getSessOccPermitApplication() {
+        return sessOccPermitApplication;
     }
 
-    public void setSessionOccPermitApplication(OccPermitApplication sessionOccPermitApplication) {
-        this.sessionOccPermitApplication = sessionOccPermitApplication;
+    public void setSessOccPermitApplication(OccPermitApplication sessOccPermitApplication) {
+        this.sessOccPermitApplication = sessOccPermitApplication;
     }
 
-    public PropertyUnit getSessionPropertyUnit() {
-        return sessionPropertyUnit;
+    public PropertyUnit getSessPropertyUnit() {
+        return sessPropertyUnit;
     }
 
-    public void setSessionPropertyUnit(PropertyUnit sessionPropertyUnit) {
-        this.sessionPropertyUnit = sessionPropertyUnit;
+    public void setSessPropertyUnit(PropertyUnit sessPropertyUnit) {
+        this.sessPropertyUnit = sessPropertyUnit;
     }
 
   
-    
-    /*
-     * @return the sessionEventWithCasePropList
+
+    /**
+     * @return the sessPropertyList
      */
-    public List<EventCaseHeavy> getSessopmEvemtCaseHeavyList() {
-        return sessionEventWithCasePropList;
+    public List<Property> getSessPropertyList() {
+        return sessPropertyList;
     }
 
     /**
-     * @param sessionEventWithCasePropList the sessionEventWithCasePropList to set
+     * @param sessPropertyList the sessPropertyList to set
      */
-    public void setSessionEventWithCasePropList(List<EventCaseHeavy> sessionEventWithCasePropList) {
-        this.sessionEventWithCasePropList = sessionEventWithCasePropList;
-    }
-
-    /**
-     * @return the sessionPropertyList
-     */
-    public List<Property> getSessionPropertyList() {
-        return sessionPropertyList;
-    }
-
-    /**
-     * @param sessionPropertyList the sessionPropertyList to set
-     */
-    public void setSessionPropertyList(List<Property> sessionPropertyList) {
-        this.sessionPropertyList = sessionPropertyList;
+    public void setSessPropertyList(List<Property> sessPropertyList) {
+        this.sessPropertyList = sessPropertyList;
     }
 
 
@@ -647,17 +620,17 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessionReport
+     * @return the sessReport
      */
-    public Report getSessionReport() {
-        return sessionReport;
+    public Report getSessReport() {
+        return sessReport;
     }
 
     /**
-     * @param sessionReport the sessionReport to set
+     * @param sessReport the sessReport to set
      */
-    public void setSessionReport(Report sessionReport) {
-        this.sessionReport = sessionReport;
+    public void setSessReport(Report sessReport) {
+        this.sessReport = sessReport;
     }
 
     /**
@@ -757,24 +730,24 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessionOccPeriodList
+     * @return the sessOccPeriodList
      */
-    public List<OccPeriod> getSessionOccPeriodList() {
-        return sessionOccPeriodList;
+    public List<OccPeriod> getSessOccPeriodList() {
+        return sessOccPeriodList;
     }
 
     /**
-     * @return the sessionOccInspection
+     * @return the sessOccInspection
      */
-    public OccInspection getSessionOccInspection() {
-        return sessionOccInspection;
+    public OccInspection getSessOccInspection() {
+        return sessOccInspection;
     }
 
     /**
-     * @return the sessionOccPermit
+     * @return the sessOccPermit
      */
-    public OccPermit getSessionOccPermit() {
-        return sessionOccPermit;
+    public OccPermit getSessOccPermit() {
+        return sessOccPermit;
     }
 
   
@@ -787,24 +760,24 @@ public class    SessionBean
     }
 
     /**
-     * @param sessionOccPeriodList the sessionOccPeriodList to set
+     * @param sessOccPeriodList the sessOccPeriodList to set
      */
-    public void setSessionOccPeriodList(List<OccPeriod> sessionOccPeriodList) {
-        this.sessionOccPeriodList = sessionOccPeriodList;
+    public void setSessOccPeriodList(List<OccPeriod> sessOccPeriodList) {
+        this.sessOccPeriodList = sessOccPeriodList;
     }
 
     /**
-     * @param sessionOccInspection the sessionOccInspection to set
+     * @param sessOccInspection the sessOccInspection to set
      */
-    public void setSessionOccInspection(OccInspection sessionOccInspection) {
-        this.sessionOccInspection = sessionOccInspection;
+    public void setSessOccInspection(OccInspection sessOccInspection) {
+        this.sessOccInspection = sessOccInspection;
     }
 
     /**
-     * @param sessionOccPermit the sessionOccPermit to set
+     * @param sessOccPermit the sessOccPermit to set
      */
-    public void setSessionOccPermit(OccPermit sessionOccPermit) {
-        this.sessionOccPermit = sessionOccPermit;
+    public void setSessOccPermit(OccPermit sessOccPermit) {
+        this.sessOccPermit = sessOccPermit;
     }
 
     /**
@@ -976,17 +949,10 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessionPayment
+     * @return the sessPayment
      */
-    public Payment getSessionPayment() {
-        return sessionPayment;
-    }
-
-    /**
-     * @return the paymentRedirTo
-     */
-    public String getPaymentRedirTo() {
-        return paymentRedirTo;
+    public Payment getSessPayment() {
+        return sessPayment;
     }
 
     /**
@@ -1004,19 +970,11 @@ public class    SessionBean
     }
 
     /**
-     * @param sessionPayment the sessionPayment to set
+     * @param sessPayment the sessPayment to set
      */
-    public void setSessionPayment(Payment sessionPayment) {
-        this.sessionPayment = sessionPayment;
+    public void setSessPayment(Payment sessPayment) {
+        this.sessPayment = sessPayment;
     }
-
-    /**
-     * @param paymentRedirTo the paymentRedirTo to set
-     */
-    public void setPaymentRedirTo(String paymentRedirTo) {
-        this.paymentRedirTo = paymentRedirTo;
-    }
-
     /**
      * @param feeManagementOccPeriod the feeManagementOccPeriod to set
      */
@@ -1024,39 +982,56 @@ public class    SessionBean
         this.feeManagementOccPeriod = feeManagementOccPeriod;
     }
 
-    /**
-     * @param feeRedirTo the feeRedirTo to set
-     */
-    public void setFeeRedirTo(String feeRedirTo) {
-        this.feeRedirTo = feeRedirTo;
+    public CECase getFeeManagementCeCase() {
+        return feeManagementCeCase;
+    }
+
+    public void setFeeManagementCeCase(CECase feeManagementCeCase) {
+        this.feeManagementCeCase = feeManagementCeCase;
+    }
+
+    public EventDomainEnum getFeeManagementDomain() {
+        return feeManagementDomain;
+    }
+
+    public void setFeeManagementDomain(EventDomainEnum feeManagementDomain) {
+        this.feeManagementDomain = feeManagementDomain;
+    }
+
+    public NavigationStack getNavStack() {
+        return navStack;
+    }
+
+    public void setNavStack(NavigationStack navStack) {
+        this.navStack = navStack;
     }
 
     /**
-     * @return the sessionBlob
+     * @return the sessBlob
      */
-    public Blob getSessionBlob() {
-        return sessionBlob;
+    public Blob getSessBlob() {
+        return sessBlob;
     }
 
     /**
-     * @param sessionBlob the sessionBlob to set
+     * @param sessBlob the sessBlob to set
      */
-    public void setSessionBlob(Blob sessionBlob) {
-        this.sessionBlob = sessionBlob;
+    public void setSessBlob(Blob sessBlob) {
+        this.sessBlob = sessBlob;
     }
 
     /**
-     * @return the sessionOccPeriod
+     * @return the sessOccPeriod
      */
-    public OccPeriodDataHeavy getSessionOccPeriod() {
-        return sessionOccPeriod;
+    public OccPeriodDataHeavy getSessOccPeriod() {
+        return sessOccPeriod;
     }
 
     /**
-     * @param sessionOccPeriod the sessionOccPeriod to set
+     * @param sessOccPeriod the sessOccPeriod to set
      */
-    public void setSessionOccPeriod(OccPeriodDataHeavy sessionOccPeriod) {
-        this.sessionOccPeriod = sessionOccPeriod;
+    public void setSessOccPeriod(OccPeriodDataHeavy sessOccPeriod) {
+        this.sessOccPeriod = sessOccPeriod;
     }
 
     /**
@@ -1144,31 +1119,185 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessionEventList
+     * @return the sessEventList
      */
-    public List<EventCnF> getSessionEventList() {
-        return sessionEventList;
+    public List<EventCnFPropUnitCasePeriodHeavy> getSessEventList() {
+        return sessEventList;
     }
 
     /**
-     * @param sessionEventList the sessionEventList to set
+     * @param sessEventList the sessEventList to set
      */
-    public void setSessionEventList(List<EventCnF> sessionEventList) {
-        this.sessionEventList = sessionEventList;
+    public void setSessEventList(List<EventCnFPropUnitCasePeriodHeavy> sessEventList) {
+        this.sessEventList = sessEventList;
     }
 
     /**
-     * @return the sessionUMAPListValidOnly
+     * @return the sessUMAPListValidOnly
      */
-    public List<UserMuniAuthPeriod> getSessionUMAPListValidOnly() {
-        return sessionUMAPListValidOnly;
+    public List<UserMuniAuthPeriod> getSessUMAPListValidOnly() {
+        return sessUMAPListValidOnly;
     }
 
     /**
-     * @param sessionUMAPListValidOnly the sessionUMAPListValidOnly to set
+     * @param sessUMAPListValidOnly the sessUMAPListValidOnly to set
      */
-    public void setSessionUMAPListValidOnly(List<UserMuniAuthPeriod> sessionUMAPListValidOnly) {
-        this.sessionUMAPListValidOnly = sessionUMAPListValidOnly;
+    public void setSessUMAPListValidOnly(List<UserMuniAuthPeriod> sessUMAPListValidOnly) {
+        this.sessUMAPListValidOnly = sessUMAPListValidOnly;
+    }
+
+    /**
+     * @return the sessPerson
+     */
+    public PersonDataHeavy getSessPerson() {
+        return sessPerson;
+    }
+
+    /**
+     * @param sessPerson the sessPerson to set
+     */
+    public void setSessPerson(PersonDataHeavy sessPerson) {
+        this.sessPerson = sessPerson;
+    }
+
+    /**
+     * @return the sessPersonQueued
+     */
+    public Person getSessPersonQueued() {
+        return sessPersonQueued;
+    }
+
+    /**
+     * @param sessPersonQueued the sessPersonQueued to set
+     */
+    public void setSessPersonQueued(Person sessPersonQueued) {
+        this.sessPersonQueued = sessPersonQueued;
+    }
+
+    /**
+     * @return the sessPersonList
+     */
+    public List<Person> getSessPersonList() {
+        return sessPersonList;
+    }
+
+    /**
+     * @param sessPersonList the sessPersonList to set
+     */
+    public void setSessPersonList(List<Person> sessPersonList) {
+        this.sessPersonList = sessPersonList;
+    }
+
+    /**
+     * @return the sessUserQueued
+     */
+    public User getSessUserQueued() {
+        return sessUserQueued;
+    }
+
+    /**
+     * @param sessUserQueued the sessUserQueued to set
+     */
+    public void setSessUserQueued(User sessUserQueued) {
+        this.sessUserQueued = sessUserQueued;
+    }
+
+    /**
+     * @return the sessMuniQueued
+     */
+    public Municipality getSessMuniQueued() {
+        return sessMuniQueued;
+    }
+
+    /**
+     * @param sessMuniQueued the sessMuniQueued to set
+     */
+    public void setSessMuniQueued(Municipality sessMuniQueued) {
+        this.sessMuniQueued = sessMuniQueued;
+    }
+
+    /**
+     * @return the sessPropertyQueued
+     */
+    public Property getSessPropertyQueued() {
+        return sessPropertyQueued;
+    }
+
+    /**
+     * @param sessPropertyQueued the sessPropertyQueued to set
+     */
+    public void setSessPropertyQueued(Property sessPropertyQueued) {
+        this.sessPropertyQueued = sessPropertyQueued;
+    }
+
+    /**
+     * @return the sessEventQueued
+     */
+    public EventCnF getSessEventQueued() {
+        return sessEventQueued;
+    }
+
+    /**
+     * @param sessEventQueued the sessEventQueued to set
+     */
+    public void setSessEventQueued(EventCnF sessEventQueued) {
+        this.sessEventQueued = sessEventQueued;
+    }
+
+    /**
+     * @return the sessOccPeriodQueued
+     */
+    public OccPeriod getSessOccPeriodQueued() {
+        return sessOccPeriodQueued;
+    }
+
+    /**
+     * @param sessOccPeriodQueued the sessOccPeriodQueued to set
+     */
+    public void setSessOccPeriodQueued(OccPeriod sessOccPeriodQueued) {
+        this.sessOccPeriodQueued = sessOccPeriodQueued;
+    }
+
+    /**
+     * @return the sessCECaseQueued
+     */
+    public CECase getSessCECaseQueued() {
+        return sessCECaseQueued;
+    }
+
+    /**
+     * @param sessCECaseQueued the sessCECaseQueued to set
+     */
+    public void setSessCECaseQueued(CECase sessCECaseQueued) {
+        this.sessCECaseQueued = sessCECaseQueued;
+    }
+
+    /**
+     * @return the paymentRedirTo
+     */
+    public String getPaymentRedirTo() {
+        return paymentRedirTo;
+    }
+
+    /**
+     * @return the sessionPayment
+     */
+    public Payment getSessionPayment() {
+        return sessionPayment;
+    }
+
+    /**
+     * @param paymentRedirTo the paymentRedirTo to set
+     */
+    public void setPaymentRedirTo(String paymentRedirTo) {
+        this.paymentRedirTo = paymentRedirTo;
+    }
+
+    /**
+     * @param sessionPayment the sessionPayment to set
+     */
+    public void setSessionPayment(Payment sessionPayment) {
+        this.sessionPayment = sessionPayment;
     }
     
     

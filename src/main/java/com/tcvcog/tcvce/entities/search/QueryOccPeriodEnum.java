@@ -39,6 +39,11 @@ public  enum     QueryOccPeriodEnum
                             RoleType.MuniReader, 
                             false),
     
+    PERSONS(                "Occ periods associated with a given Person",
+                            "Must be linked somehow to the OccPeriod directly",
+                            RoleType.MuniReader,
+                            false),
+    
     CUSTOM(                 "Custom", 
                             "Custom", 
                             RoleType.MuniReader, 
