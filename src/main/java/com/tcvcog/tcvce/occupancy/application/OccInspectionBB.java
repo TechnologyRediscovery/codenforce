@@ -121,8 +121,8 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
   
     
      // payments
-    private List<Payment> paymentList;
-    private List<Payment> filteredPaymentList;
+    private List<MoneyOccPeriodFeePayment> paymentList;
+    private List<MoneyOccPeriodFeePayment> filteredPaymentList;
     private Payment selectedPayment;
     
     //fees
@@ -203,11 +203,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
        
         feeList = currentOccPeriod.getFeeList();
-        
-        // TODO NADGIT could you give this a look-see and make sure we've got a unified
-        // approach to payments across CECases and OccPeriods? This may be something
-        // to talk with Eric about
-//        paymentList = currentOccPeriod.getPaymentList();
+        paymentList = currentOccPeriod.getPaymentList();
         
     }
     
@@ -1285,7 +1281,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredPaymentList
      */
-    public List<Payment> getFilteredPaymentList() {
+    public List<MoneyOccPeriodFeePayment> getFilteredPaymentList() {
         return filteredPaymentList;
     }
 
@@ -1310,18 +1306,18 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         return selectedFee;
     }
 
-    public List<Payment> getPaymentList() {
+    public List<MoneyOccPeriodFeePayment> getPaymentList() {
         return paymentList;
     }
 
-    public void setPaymentList(List<Payment> paymentList) {
+    public void setPaymentList(List<MoneyOccPeriodFeePayment> paymentList) {
         this.paymentList = paymentList;
     }
     
     /**
      * @param filteredPaymentList the filteredPaymentList to set
      */
-    public void setFilteredPaymentList(List<Payment> filteredPaymentList) {
+    public void setFilteredPaymentList(List<MoneyOccPeriodFeePayment> filteredPaymentList) {
         this.filteredPaymentList = filteredPaymentList;
     }
 
