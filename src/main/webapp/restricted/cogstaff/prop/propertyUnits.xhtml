@@ -24,15 +24,15 @@
                         </h:form>
 
                         <h1>Property units</h1>
-                        
+
                         <p:panel    id="prop-units-list-panel"
                                     toggleable="true"
                                     widgetVar="prop-units-list-panel-var"
                                     collapsed="false"
                                     header="Unit list">
-                             
+
                             <h:form id="prop-units-list-form" >
-                                
+
                                 <p:commandButton       id="button-editunits"
                                                        ajax="true" 
                                                        actionListener="#{propertyUnitsBB.beginPropertyUnitUpdates}"
@@ -69,7 +69,7 @@
                                         <h:outputText value="#{unit.notes}" />
 
                                         <h4>Occupancy periods</h4>
-                                        
+
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
                                                                ajax="true" 
                                                                actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
@@ -82,7 +82,7 @@
 
                                         <p:spacer height="5px" />
 
-                                        
+
                                         <p:dataScroller
                                             id="scroller-periodlist"
                                             widgetVar="var-scroller-periodlist"
@@ -90,22 +90,22 @@
                                             var="period"
                                             value="#{unit.periodList}"
                                             >                                         
-                                            
-                                            
+
+
                                             <div style="datum">
-                                                
-                                                
+
+
                                                 <h:outputText value="Start Date: " 
                                                               styleClass="ui-label-inline" />
-                                                
+
                                                 <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.startDate)}" 
                                                               styleClass="data-text"/>
                                             </div>
-                                                
+
                                             <div style="datum">
                                                 <h:outputText value="End Date: " 
                                                               styleClass="ui-label-inline" />
-                                                
+
                                                 <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.endDate)}" 
                                                               styleClass="data-text"/>
                                             </div>
@@ -120,25 +120,25 @@
                                                               styleClass="ui-label-inline" />
                                                 <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : PropertyUnitsBB.getPrettyDate(period.authorizedTS)}" />
                                             </div>
-                                                <p:commandButton       id="button-occperiodtable-editperiod"
-                                                                       ajax="false" 
-                                                                       action="#{propertyUnitsBB.manageOccPeriod(period)}"
-                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                       value="manage occupancy period"  
-                                                                       icon="fa fa-edit"/>
+                                            <p:commandButton       id="button-occperiodtable-editperiod"
+                                                                   ajax="false" 
+                                                                   action="#{propertyUnitsBB.manageOccPeriod(period)}"
+                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                   value="manage occupancy period"  
+                                                                   icon="fa fa-edit"/>
                                         </p:dataScroller>
                                     </div>
                                 </p:dataScroller>
-                                
+
                             </h:form>
 
                         </p:panel>
-                        
-                   
-                    <!--close main container-->
+
+
+                        <!--close main container-->
                     </div>
-                    
-   
+
+
                     <p:dialog    id="dialog-unitedit"
                                  height="650" width="900"
                                  widgetVar="dialog-widvar-unitedit"
@@ -182,24 +182,65 @@
                                         </f:facet>
                                     </p:cellEditor>
                                 </p:column>
-
+                                
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="Rental?" />
+                                        <h:outputText value="Rental Intent Date Start:" />
                                     </f:facet>
-
-                                    <ui:remove>
-
-                                        <p:cellEditor>
-                                            <f:facet name="output">
-                                                <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
-                                            </f:facet>
-                                            <f:facet name="input"> 
-                                                <h:selectBooleanCheckbox value="#{unit.rental}"/> 
-                                            </f:facet>
-                                        </p:cellEditor>
-
-                                    </ui:remove>
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{unit.rentalIntentDateStart}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:calendar
+                                                value="#{unit.rentalIntentDateStartUtil}"
+                                                mode="popup"
+                                                showOn="button"
+                                                pattern="EEE, dd MMM, yyyy"
+                                                navigator="true"
+                                                showButtonPanel="true"
+                                                showTodayButton="false"
+                                                required="false"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Unit Intent Date End:" />
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{unit.rentalIntentDateStop}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:calendar
+                                                value="#{unit.rentalIntentDateStopUtil}"
+                                                mode="popup"
+                                                showOn="button"
+                                                pattern="EEE, dd MMM, yyyy"
+                                                navigator="true"
+                                                showButtonPanel="true"
+                                                showTodayButton="false"
+                                                required="false"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Rental Notes:" />
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{unit.rentalNotes}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{unit.rentalNotes}" 
+                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                        </f:facet>
+                                    </p:cellEditor>
                                 </p:column>
 
                                 <p:column>
@@ -301,19 +342,19 @@
                                              oncomplete="PF('dialog-widvar-unitedit').hide()"
                                              icon="fa fa-thumbs-o-up"
                                              update="   prop-units-messages-form
-                                                        prop-units-list-form"
+                                             prop-units-list-form"
                                              value="Save unit list" 
                                              tabindex="3"/>
                         </h:form>
                     </p:dialog>
-                    
-                    
-                    
+
+
+
                     <p:dialog    id="dialog-addoccperiod"
                                  height="400" width="600"
                                  widgetVar="dialog-addoccperiod-var"
                                  closable="true" >
-                        
+
                         <h2>Create new occupancy period</h2>
 
                         <h:form id="dialog-addoccperiod-form">
@@ -321,25 +362,25 @@
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
-                            
-                            
+
+
                             <h:outputLabel styleClass="ui-label" for="som-occperiodtype" value="Occupancy type" />
-                            
-                                <p:selectOneMenu
-                                    id="som-occperiodtype" tabindex="1" required="true"
-                                    value="#{propertyOccPeriodsBB.selectedOccPeriodType}">
-                                            <f:converter converterId="occPeriodTypeConverter"/>
-                                            <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
-                                            <f:selectItems id="si-typelist" 
-                                                           value="#{propertyOccPeriodsBB.occPeriodTypeList}" 
-                                                           var ="opt" 
-                                                           itemValue="#{opt}" 
-                                                           itemLabel="#{opt.title}" />
-                                </p:selectOneMenu>
-                            
+
+                            <p:selectOneMenu
+                                id="som-occperiodtype" tabindex="1" required="true"
+                                value="#{propertyOccPeriodsBB.selectedOccPeriodType}">
+                                <f:converter converterId="occPeriodTypeConverter"/>
+                                <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
+                                <f:selectItems id="si-typelist" 
+                                               value="#{propertyOccPeriodsBB.occPeriodTypeList}" 
+                                               var ="opt" 
+                                               itemValue="#{opt}" 
+                                               itemLabel="#{opt.title}" />
+                            </p:selectOneMenu>
+
                             <p:spacer height="5px" />
-                            
-                             <p:commandButton ajax="true" 
+
+                            <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('dialog-addoccperiod-var').hide()"
                                              tabindex="4"/>
@@ -351,7 +392,7 @@
                                              styleClass="inline-button"
                                              value="Create new period" 
                                              tabindex="3"/>
-                            
+
                         </h:form>
                     </p:dialog>
                 </f:view>
