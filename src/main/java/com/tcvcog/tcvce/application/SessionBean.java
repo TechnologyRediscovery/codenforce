@@ -110,7 +110,7 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    
+    private EventDomainEnum sessEventDomain;
     private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
     private EventCnF sessEventQueued;
     
@@ -1298,6 +1298,20 @@ public class    SessionBean
      */
     public void setSessionPayment(Payment sessionPayment) {
         this.sessionPayment = sessionPayment;
+    }
+
+    /**
+     * @return the sessEventDomain
+     */
+    public EventDomainEnum getSessEventDomain() {
+        return sessEventDomain;
+    }
+
+    /**
+     * @param sessEventDomain the sessEventDomain to set
+     */
+    public void setSessEventDomain(EventDomainEnum sessEventDomain) {
+        this.sessEventDomain = sessEventDomain;
     }
     
     

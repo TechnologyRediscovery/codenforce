@@ -7,36 +7,42 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>CE case events</title>
+        <title>Events</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="cecase-events-view">
+                <f:view id="events-view">
 
                     <div class="mainContainer">
 
-                        <h:form id="cecase-events-messages-form">
-                            <h:messages id="cecase-events-messages"
+                        <h:form id="events-messages-form">
+                            <h:messages id="events-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
 
-                        <h:form id="cecase-events-form">
 
                             <h1>Events</h1>
+                            
+                              <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                     columnClasses="gridTd, gridTd">
+                                  <h:panelGroup id="events-pg-list">
+                                      
+                                  </h:panelGroup>
+                                  <h:panelGroup id="events-pg-add">
+                                      
+                                  </h:panelGroup>
+                              </h:panelGrid>
 
-
-                            <p:panel    id="cecase-events-panel-add"
+                            <p:panel    id="events-panel-table"
                                         toggleable="true"
-                                        widgetVar="cecase-events-panel-add-var"
+                                        widgetVar="events-panel-table-var"
                                         collapsed="false"
-                                        header="Add a new event to CE case">
+                                        header="Events">
 
-
-
-                                <h:form id="insp-events-form-addevent">
+                            <h:form id="events-list-form">
 
                                     <h:panelGrid columns="3" border="0" 
                                                  cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
@@ -119,15 +125,11 @@
                                         </h:panelGroup>
                                     </h:panelGrid>
                                 </h:form>
-
-
-
                             </p:panel>
 
-
-                            <p:panel    id="cecase-events-panel-add"
+                            <p:panel    id="events-panel-add"
                                         toggleable="true"
-                                        widgetVar="cecase-events-panel-add-var"
+                                        widgetVar="events-panel-add-var"
                                         collapsed="false"
                                         header="Add a new event to CE case">
 
@@ -177,7 +179,7 @@
                                                 <h:outputText value="#{e.category.eventType.label}"/>
                                             </p:column>
                                         </ui:remove>
-                                        
+
                                         <p:column width="4%" sortBy="#{e.eventID}">
                                             <f:facet name="header">
                                                 <h:outputText value="ID" />
@@ -185,7 +187,7 @@
                                             <h:outputText value="#{e.eventID}"/>
                                         </p:column>
 
-                                      <p:column width="9%" sortBy="#{e.timeStart}">
+                                        <p:column width="9%" sortBy="#{e.timeStart}">
                                             <f:facet name="header">
                                                 <h:outputText value="Date" />
                                             </f:facet>
@@ -379,7 +381,7 @@
                                         </p:rowExpansion>
 
                                     </p:dataTable>
-                                    
+
                                     <p:spacer height="5px" />
 
                                     <p:inputSwitch id="events-showhidden-sbcb" 
@@ -402,28 +404,98 @@
 
                                 </h:form>
 
-                           
-                        </p:panel>
+
+                            </p:panel>
+
+
+                            <p:dataScroller
+                                id="events-datascroller"
+                                var="e"
+                                value="#{eventCECaseReportBB.reportConfig.BOBQuery.BOBResultList}"
+                                widgetVar="ceevent-ds-var">
+
+                                <div class="event-ds-box-report">
+
+                                    <div class="status-display-container">
+                                        <div class="action-request-icon">
+                                            <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.event.category.icon.materialIcon}"/></i>
+                                        </div>
+                                        <div class="status-display-status-list-container">
+                                            <div class="action-request-header">
+                                                <h:outputText value="#{e.event.category.eventType.label}: #{e.event.category.eventCategoryTitle} "/>
+                                            </div>
+                                            <div class="action-request-subheader">
+                                                <h:panelGrid    columns="2" 
+                                                                cellpadding="5" 
+                                                                footerClass="no-border"
+                                                                columnClasses="event-list-halfwidth, event-list-halfwidth">
+
+                                                    <h:panelGroup>
+                                                        <h:outputText value="Property: " styleClass="bold" />
+                                                        <h:outputText value="#{e.eventCaseBare.property.address} " />
+                                                        <h:outputText value=" (#{e.eventCaseBare.property.muni.muniName}) " />
+                                                        <h:outputText value=" | " styleClass="bold" />
+                                                        <h:outputText value="Prop ID: " styleClass="bold" />
+                                                        <h:outputText value="#{e.eventCaseBare.property.propertyID} " />
+
+                                                        <br />  
+
+                                                        <h:outputText value="Date: " styleClass="bold" />
+                                                        <h:outputText value="#{e.event.dateOfRecordPretty}"/>
+
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputText value="Case stage: " styleClass="bold" />
+                                                        <h:outputText value="#{e.eventCaseBare.caseStage.label} " />
+                                                        <h:outputText value=" | " styleClass="bold" />
+                                                        <h:outputText value="Event ID: " styleClass="bold" />
+                                                        <h:outputText value="#{e.event.eventID} " />
+                                                        <h:outputText value=" | " styleClass="bold" />
+                                                        <h:outputText value="Case ID: " styleClass="bold" />
+                                                        <h:outputText value="#{e.eventCaseBare.caseID} " />
+
+                                                        <br />  
+
+                                                        <h:outputText value="Event Owner: " styleClass="bold" />
+                                                        <h:outputText value="#{e.event.owner.person.firstName} #{e.event.owner.person.lastName}"/>
+                                                        <h:outputText value="   (#{e.event.owner.username})" />
+                                                    </h:panelGroup>
+
+                                                    <f:facet name="footer">
+
+                                                        <div class="rowExpansion">
+                                                            <h:outputText styleClass="bold" value="Description: " />
+                                                            <h:outputText styleClass="weight-normal" 
+                                                                          escape="false"
+                                                                          value="#{e.event.description}"/>
+                                                        </div>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText styleClass="bold" value="Notes: " 
+                                                                          rendered="#{!(empty e.event.notes)}"/>
+                                                            <h:outputText styleClass="weight-normal" 
+                                                                          value="#{e.event.notes}"
+                                                                          escape="false"
+                                                                          rendered="#{!(empty e.event.notes)}"/>
+                                                        </div>
+                                                    </f:facet>
+                                                </h:panelGrid>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:dataScroller>
 
 
 
-                        <!--close main container-->
+                            <!--close main container-->
                     </div>
-                    
-                    
-                    <p:dialog    id="add-event-dialog"
-                                 height="650" width="900"
-                                 widgetVar="add-event-dialog-var"
-                                 closable="true" 
-                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
 
 
-                      
-                            
-                    </p:dialog>
-                    
+
                 </f:view>
-                
+
             </ui:define>
         </ui:composition>
     </h:body>

@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright (C) 2018 Turtle Creek Valley
 Council of Governments, PA
  *
@@ -34,7 +34,8 @@ public enum EventType {
     Custom("Custom"),
     Compliance("Compliance"),
     Citation("Citation"),
-    Occupancy("Occupancy");
+    Occupancy("Occupancy"),
+    PropertyInfoCase("Property Info Case");
 
     private final String label;
 

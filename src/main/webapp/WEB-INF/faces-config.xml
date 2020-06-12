@@ -962,13 +962,13 @@
             <redirect />
         </navigation-case>
         <navigation-case>
-            <from-outcome>eventConfig</from-outcome>
-            <to-view-id>/restricted/cogstaff/event/eventConfiguration.xhtml</to-view-id>
+            <from-outcome>events</from-outcome>
+            <to-view-id>/restricted/cogstaff/event/events.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         <navigation-case>
-            <from-outcome>eventRuleConfig</from-outcome>
-            <to-view-id>/restricted/cogstaff/event/eventRuleConfiguration.xhtml</to-view-id>
+            <from-outcome>eventConfig</from-outcome>
+            <to-view-id>/restricted/cogstaff/event/eventConfiguration.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -1025,12 +1025,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-   
-    <managed-bean>
-        <managed-bean-name>occPeriodEventsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodEventsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+  
     
     <managed-bean>
         <managed-bean-name>occPeriodPersonsBB</managed-bean-name>

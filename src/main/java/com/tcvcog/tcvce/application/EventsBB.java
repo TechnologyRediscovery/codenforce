@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -25,13 +26,19 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
+import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -40,7 +47,12 @@ import javax.faces.event.ActionEvent;
  * @author sylvia
  */
 public class EventsBB extends BackingBeanUtils implements Serializable{
-
+    
+    
+    private EventDomainEnum currentEventDomain;
+    
+    private OccPeriodDataHeavy currentOccPeriod;
+    
     private CECaseDataHeavy currentCase;
     private OccPeriodDataHeavy currentPeriod;
 
@@ -54,11 +66,48 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     private EventType eventTypeSelected;
     private Person selectedPerson;
     
+    private List<EventCnF> filteredEventList;
+    private List<ViewOptionsActiveHiddenListsEnum> eventsViewOptions;
+    private ViewOptionsActiveHiddenListsEnum selectedEventView;
+    private List<EventType> eventTypeListUserAllowed; 
+    private List<EventType> eventTypeListAll;
+    private EventType selectedEventType;
+    private List<EventCategory> eventCategoryListUserAllowed;
+    private List<EventCategory> eventCategoryListAllActive;
+    private EventCategory selectedEventCategory;
+    private List<Person> personCandidateList;
+    
     /**
      * Creates a new instance of EventsBB
      */
     public EventsBB() {
     }
+    
+     @PostConstruct
+    public void initBean() {
+        EventCoordinator ec = getEventCoordinator();
+        
+        SessionBean sb = getSessionBean();
+        setCurrentOccPeriod(sb.getSessOccPeriod());
+         eventsViewOptions = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
+        selectedEventView = ViewOptionsActiveHiddenListsEnum.VIEW_ALL;
+        
+           if(personCandidateList != null){
+            personCandidateList = new ArrayList<>();
+            personCandidateList.addAll(getSessionBean().getSessPersonList());
+        }
+        eventTypeListUserAllowed = ec.getPermittedEventTypesForOcc(getCurrentOccPeriod(), getSessionBean().getSessUser());
+        try {
+            eventCategoryListUserAllowed = ec.loadEventCategoryListUserAllowed(selectedEventType, getSessionBean().getSessUser());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        eventTypeListAll = new ArrayList();
+        eventTypeListAll = ec.getEventTypesAll();
+        
+    }
+    
+    
      /**
      * Called when the user selects their own EventCategory to add to the case
      * and is a pass-through method to the initiateNewEvent method
@@ -68,6 +117,14 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     public void initiateUserChosenEventCreation(ActionEvent ev) {
         initiateNewEvent();
     }
+    
+    
+    
+    public void events_initiateEventEdit(EventCnF ev){
+        currentEvent = ev;
+        System.out.println("OccInspectionBB.events_initiateEventEdit | current event: " + currentEvent.getEventID());
+    }
+    
 
     public void initiateNewEvent() {
         EventCoordinator ec = getEventCoordinator();
@@ -151,6 +208,55 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         // nullify the session's case so that the reload of currentCase
         // no the cecaseProfile.xhtml will trigger a new DB read
     }
+    
+    
+  
+    
+    public void updateEventCategoryList(){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        EventIntegrator ei = getEventIntegrator();
+        try {
+            eventCategoryListUserAllowed = ei.getEventCategoryList(selectedEventType);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Unable to load event category choices, sorry!", ""));
+        }
+    }
+    
+     public void hideEvent(EventCnF event){
+        EventIntegrator ei = getEventIntegrator();
+        event.setHidden(true);
+        try {
+            ei.updateEvent(event);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Success! event ID: " + event.getEventID() + " is now hidden", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not hide event, sorry; this is a system erro", ""));
+        }
+    }
+    
+    public void unHideEvent(EventCnF event){
+        EventIntegrator ei = getEventIntegrator();
+        event.setHidden(false);
+        try {
+            ei.updateEvent(event);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Success! Unhid event ID: " + event.getEventID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                           "Could not unhide event, sorry; this is a system erro", ""));
+        }
+    }
+    
 
    
     public void commitEventEdits(ActionEvent ev) {
@@ -316,6 +422,34 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      */
     public void setSelectedPerson(Person selectedPerson) {
         this.selectedPerson = selectedPerson;
+    }
+
+    /**
+     * @return the currentEventDomain
+     */
+    public EventDomainEnum getCurrentEventDomain() {
+        return currentEventDomain;
+    }
+
+    /**
+     * @param currentEventDomain the currentEventDomain to set
+     */
+    public void setCurrentEventDomain(EventDomainEnum currentEventDomain) {
+        this.currentEventDomain = currentEventDomain;
+    }
+
+    /**
+     * @return the currentOccPeriod
+     */
+    public OccPeriodDataHeavy getCurrentOccPeriod() {
+        return currentOccPeriod;
+    }
+
+    /**
+     * @param currentOccPeriod the currentOccPeriod to set
+     */
+    public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
+        this.currentOccPeriod = currentOccPeriod;
     }
     
     
