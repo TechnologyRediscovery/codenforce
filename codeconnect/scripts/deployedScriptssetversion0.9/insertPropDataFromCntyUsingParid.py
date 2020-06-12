@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import csv
-import random
 import re
 import time
 import psycopg2
@@ -18,7 +17,12 @@ from _exceptions import MalformedDataError, MalformedGenericAddressError, Malfor
 def main():
     globals_setup()
     logger_setup()
-    insert_property_basetableinfo()
+    get_db_conn()
+
+    # Todo: Main should only have functions. How would you refactor this?
+    with db_conn:
+        with cursor:
+            insert_property_basetableinfo()
 
 
 def globals_setup():
@@ -130,8 +134,6 @@ def get_nextparcelid(input_file):
 
 
 def insert_property_basetableinfo():
-    db_conn = get_db_conn()
-    cursor = db_conn.cursor()
     parcelgenerator = get_nextparcelid(PARID_FILE)
     propertyidgenerator = get_nextpropertyid(muni_idbase_map[current_muni])
     personidgenerator = get_nextpersonid(person_idbase_map[current_muni])
@@ -227,8 +229,6 @@ def insert_property_basetableinfo():
         print("Persons inserted: " + str(personcount))
         print("********** DONE! *************")
 
-    cursor.close()
-    db_conn.close()
     print("Count of properties inserted: " + str(propertycount))
     print("Count of persons inserted: " + str(personcount))
 
@@ -243,11 +243,8 @@ def insert_property_basetableinfo():
 
 
 def extract_and_insert_person(rawhtml, personid):
-        # fixed values specific to keys in lookup tables
 
-    db_conn = get_db_conn()
-    cursor = db_conn.cursor()
-
+    # fixed values specific to keys in lookup tables
     notemsg = """In case of confusion, check autmated record entry with raw text from the county database: """
     insert_sql = """
         INSERT INTO public.person(
@@ -309,9 +306,6 @@ def extract_and_insert_person(rawhtml, personid):
 
 
 def connect_person_to_property(propertyid, personid):
-    db_conn = get_db_conn()
-    cursor = db_conn.cursor()
-
     insert_sql = """
         INSERT INTO public.propertyperson(
             property_propertyid, person_personid)
@@ -329,9 +323,6 @@ def connect_person_to_property(propertyid, personid):
 
 
 def create_and_insert_unitzero(propertyid):
-    db_conn = get_db_conn()
-    cursor = db_conn.cursor()
-
     insert_sql = """
         INSERT INTO public.propertyunit(
             unitid, unitnumber, property_propertyid, otherknownaddress, notes, 
@@ -611,7 +602,9 @@ def get_db_conn():
     db_conn = psycopg2.connect(
         database="cogdb", user="sylvia", password="c0d3", host="localhost"
     )
-    return db_conn
+    global cursor
+    cursor = db_conn.cursor()
+    # return db_conn
 
 
 if __name__ == "__main__":
