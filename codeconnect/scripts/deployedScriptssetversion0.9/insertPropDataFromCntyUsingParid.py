@@ -249,7 +249,6 @@ def extract_and_insert_person(rawhtml, personid):
     cursor = db_conn.cursor()
 
     notemsg = """In case of confusion, check autmated record entry with raw text from the county database: """
-
     insert_sql = """
         INSERT INTO public.person(
             personid, persontype, muni_municode, fname, lname, jobtitle, 
