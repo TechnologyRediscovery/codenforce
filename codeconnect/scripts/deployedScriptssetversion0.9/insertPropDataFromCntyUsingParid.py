@@ -17,7 +17,7 @@ from _exceptions import MalformedDataError, MalformedGenericAddressError, Malfor
 def main():
     globals_setup()
     logger_setup()
-    get_db_conn()
+    get_db_conn()   # Sets up even MORE globals ☹️
     insert_property_basetableinfo()
 
 
@@ -104,21 +104,21 @@ def logger_setup():
     logger.info("Logger initialized")
 
 
-def get_nextpropertyid(munioffset):
-    # consider a range multiplier by municipality to generate starting
-    # at, say 110000 and the next at 120000 which allows for non-overlapping
-    # ids for munis with a property count of up to 10000
-    for i in list(
-        range(PROP_ID_BASE + munioffset + BUMP_UP, PROP_ID_BASE + munioffset + 9999)
-    ):
-        yield i
-
-
-def get_nextpersonid(munioffset):
-    for i in list(
-        range(PERSON_ID_BASE + munioffset + BUMP_UP, PERSON_ID_BASE + munioffset + 9999)
-    ):
-        yield i
+# def get_nextpropertyid(munioffset):
+#     # consider a range multiplier by municipality to generate starting
+#     # at, say 110000 and the next at 120000 which allows for non-overlapping
+#     # ids for munis with a property count of up to 10000
+#     for i in list(
+#         range(PROP_ID_BASE + munioffset + BUMP_UP, PROP_ID_BASE + munioffset + 9999)
+#     ):
+#         yield i
+#
+#
+# def get_nextpersonid(munioffset):
+#     for i in list(
+#         range(PERSON_ID_BASE + munioffset + BUMP_UP, PERSON_ID_BASE + munioffset + 9999)
+#     ):
+#         yield i
 
 
 def get_nextparcelid(input_file):
@@ -134,96 +134,46 @@ def insert_property_basetableinfo():
     with db_conn:
         with cursor:
             parcelgenerator = get_nextparcelid(PARID_FILE)
-            propertyidgenerator = get_nextpropertyid(muni_idbase_map[current_muni])
-            personidgenerator = get_nextpersonid(person_idbase_map[current_muni])
+            # Todo: Delete this legacy code.
+            # propertyidgenerator = get_nextpropertyid(muni_idbase_map[current_muni])
+            # personidgenerator = get_nextpersonid(person_idbase_map[current_muni])
 
             # user 99 is the cog robot, Sylvia
             # Todo: Add properly formatted SQL for tables that have moved. For example, propertyusetype
-            insert_sql = """    
-                INSERT INTO public.property(
-                    propertyid, municipality_municode, parid, address, 
-                    notes, addr_city, addr_state, addr_zip,
-                    lotandblock, propclass, ownercode,
-                    lastupdated, lastupdatedby)
-                VALUES (%(propid)s, %(muni)s, %(parcelid)s, %(addr)s, 
-                        %(notes)s, %(city)s, %(state)s, %(zipcode)s,
-                        %(lotandblock)s, %(propclass)s, %(ownercode)s,
-                        now(), %(updatinguser)s);
-        
-            """
-            insertmap = {}
+
+            # Todo: Refactor property insertion into its own function
+
             propertycount = 0
             personcount = 0
             # the main delegator loop
             for parid in parcelgenerator:
                 # go get raw HTML
-                rawhtml = get_county_page_for(parid)
-
-                # load up vars for use in SQL from each of the parse methods
-                insertmap["propid"] = next(propertyidgenerator)
-                propid = insertmap["propid"]
-                print("newid:" + str(propid))
-                # parid comes from the iterated item variable parid
-                insertmap["parcelid"] = parid
-                insertmap["muni"] = municodemap[current_muni]
-
-
-                try:
-                    addrmap = extract_propertyaddress(
-                        rawhtml
-                    )
-                    insertmap["addr"] = addrmap["street"]
-                    insertmap["notes"] = "Core data scraped from county site"
-                    insertmap["city"] = addrmap["city"]
-                    insertmap["state"] = addrmap["state"]
-                    insertmap["zipcode"] = addrmap["zipc"]
-                except MalformedGenericAddressError as e:
-                    log_error(e, parid)
-                    insertmap["addr"] = ""
-                    insertmap["notes"] = "Error when extracting the Address"
-                    insertmap["city"] = ""
-                    insertmap["state"] = ""
-                    insertmap["zipcode"] = ""
-
-                try:
-                    insertmap["lotandblock"] = extract_lotandblock_fromparid(parid)
-                except MalformedLotAndBlockError as e:
-                    log_error(e, parid)
-                    insertmap["lotandblock"] = ''
-
-                # None of these methods SHOULD throw an error. If they did, I don't know what the error would be
-                insertmap["propclass"] = str(extract_class(rawhtml))
-                insertmap["propertyusetype"] = extract_propertyusetype(rawhtml)
-                insertmap["ownercode"] = extract_ownercode(rawhtml)
-                insertmap["updatinguser"] = str(99)
-                print("Inserting parcelid data: %s" % (parid))
-                cursor.execute(insert_sql, insertmap)
-
-                # commit core propertytable insert
-                db_conn.commit()
+                extract_and_insert_property(parid)
                 propertycount = propertycount + 1
                 # and sql errors bubbling up from the extraction methods that also commit
-                personid = next(personidgenerator)
 
-                try:
-                    extract_and_insert_person(
-                    rawhtml, personid
-                )
-                    connect_person_to_property(propid, personid)
-                    personcount = personcount + 1
-                except MalformedDataError as e:
-                    log_error(e, parid)
+                # # # PERSON STUFF STARTS HERE
+                # personid = next(personidgenerator)
+                #
+                # try:
+                #     extract_and_insert_person(
+                #     rawhtml, personid
+                # )
+                #     connect_person_to_property(propid, personid)
+                #     personcount = personcount + 1
+                # except MalformedDataError as e:
+                #     log_error(e, parid)
 
-                create_and_insert_unitzero(propid)
-
-                # except MalformedDataError:
-                #     logger.warning(
-                #         "This code SHOULD be unreachable. If this is in your error logs, "
-                #         "update insertPropDataFromCntyUsingParid.py to catch the try/except earlier."
-                #     )
-                # print("--------- running totals --------")
+                # create_and_insert_unitzero(propid)
+                #
+                # # except MalformedDataError:
+                # #     logger.warning(
+                # #         "This code SHOULD be unreachable. If this is in your error logs, "
+                # #         "update insertPropDataFromCntyUsingParid.py to catch the try/except earlier."
+                # #     )
+                # # print("--------- running totals --------")
                 print("Props inserted: " + str(propertycount))
-                print("Persons inserted: " + str(personcount))
+                # print("Persons inserted: " + str(personcount))
                 print("********** DONE! *************")
 
             print("Total properties inserted: " + str(propertycount))
@@ -237,6 +187,64 @@ def insert_property_basetableinfo():
         #     """
         #     cursor.execute(selectsql)
         #     print(cursor.fetchone())
+
+
+def extract_and_insert_property(parid):
+    insert_sql = """    
+        INSERT INTO public.property(
+            municipality_municode, parid, address, 
+            notes, addr_city, addr_state, addr_zip,
+            lotandblock, propclass, ownercode,
+            lastupdated, lastupdatedby)
+        VALUES (%(muni)s, %(parcelid)s, %(addr)s, 
+                %(notes)s, %(city)s, %(state)s, %(zipcode)s,
+                %(lotandblock)s, %(propclass)s, %(ownercode)s,
+                now(), %(updatinguser)s);
+
+    """
+    insertmap = {}
+    rawhtml = get_county_page_for(parid)
+    # load up vars for use in SQL from each of the parse methods
+    # propid = insertmap["propid"]
+    # print("newid:" + str(propid))
+    # parid comes from the iterated item variable parid
+    insertmap["parcelid"] = parid
+    insertmap["muni"] = municodemap[current_muni]
+
+    try:
+        addrmap = extract_propertyaddress(
+            rawhtml
+        )
+        insertmap["addr"] = addrmap["street"]
+        insertmap["notes"] = "Core data scraped from county site"
+        insertmap["city"] = addrmap["city"]
+        insertmap["state"] = addrmap["state"]
+        insertmap["zipcode"] = addrmap["zipc"]
+    except MalformedGenericAddressError as e:
+        log_error(e, parid)
+        insertmap["addr"] = ""
+        insertmap["notes"] = "Error when extracting the address"
+        insertmap["city"] = ""
+        insertmap["state"] = ""
+        insertmap["zipcode"] = ""
+
+    try:
+        insertmap["lotandblock"] = extract_lotandblock_fromparid(parid)
+    except MalformedLotAndBlockError as e:
+        log_error(e, parid)
+        insertmap["lotandblock"] = ''
+
+    # None of these methods SHOULD throw an error. If they did, I don't know what the error would be
+    insertmap["propclass"] = str(extract_class(rawhtml))
+    insertmap["propertyusetype"] = extract_propertyusetype(rawhtml)
+    insertmap["ownercode"] = extract_ownercode(rawhtml)
+    insertmap["updatinguser"] = str(99)
+    print("Inserting parcelid data: %s" % (parid))
+    cursor.execute(insert_sql, insertmap)
+
+    # commit core propertytable insert
+    db_conn.commit()
+
 
 
 def extract_and_insert_person(rawhtml, personid):
