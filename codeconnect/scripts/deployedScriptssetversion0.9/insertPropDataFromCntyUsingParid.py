@@ -134,11 +134,6 @@ def insert_property_basetableinfo():
     with db_conn:
         with cursor:
             parcelgenerator = get_nextparcelid(PARID_FILE)
-            # Todo: Delete this legacy code.
-            # propertyidgenerator = get_nextpropertyid(muni_idbase_map[current_muni])
-            # personidgenerator = get_nextpersonid(person_idbase_map[current_muni])
-
-            # user 99 is the cog robot, Sylvia
             # Todo: Add properly formatted SQL for tables that have moved. For example, propertyusetype
 
             # Todo: Refactor property insertion into its own function
@@ -147,31 +142,26 @@ def insert_property_basetableinfo():
             personcount = 0
             # the main delegator loop
             for parid in parcelgenerator:
-                # go get raw HTML
-                extract_and_insert_property(parid)
-                propertycount = propertycount + 1
-                # and sql errors bubbling up from the extraction methods that also commit
+                rawhtml = get_county_page_for(parid)
+                property_id = extract_and_insert_property(parid, rawhtml)
+                propertycount += 1
 
-                # # # PERSON STUFF STARTS HERE
-                # personid = next(personidgenerator)
-                #
-                # try:
-                #     extract_and_insert_person(
-                #     rawhtml, personid
-                # )
-                #     connect_person_to_property(propid, personid)
-                #     personcount = personcount + 1
-                # except MalformedDataError as e:
-                #     log_error(e, parid)
+                # # Todo: Should try/except be on the inside of the function like in extract_and_insert_property?
+                try:
+                    person_id = extract_and_insert_person(rawhtml)
+                    connect_person_to_property(property_id, person_id)
+                    personcount += 1
+                except MalformedDataError as e:
+                    log_error(e, parid)
 
-                # create_and_insert_unitzero(propid)
-                #
-                # # except MalformedDataError:
-                # #     logger.warning(
-                # #         "This code SHOULD be unreachable. If this is in your error logs, "
-                # #         "update insertPropDataFromCntyUsingParid.py to catch the try/except earlier."
-                # #     )
-                # # print("--------- running totals --------")
+                create_and_insert_unitzero(property_id)
+
+                # except MalformedDataError:
+                #     logger.warning(
+                #         "This code SHOULD be unreachable. If this is in your error logs, "
+                #         "update insertPropDataFromCntyUsingParid.py to catch the try/except earlier."
+                #     )
+                # print("--------- running totals --------")
                 print("Props inserted: " + str(propertycount))
                 # print("Persons inserted: " + str(personcount))
                 print("********** DONE! *************")
@@ -189,7 +179,11 @@ def insert_property_basetableinfo():
         #     print(cursor.fetchone())
 
 
-def extract_and_insert_property(parid):
+def extract_and_insert_property(parid, rawhtml):
+    """
+    Parses the RawHTML and updates commits a property to the database.
+    Returns the property_id read from the database
+    """
     insert_sql = """    
         INSERT INTO public.property(
             municipality_municode, parid, address, 
@@ -199,11 +193,11 @@ def extract_and_insert_property(parid):
         VALUES (%(muni)s, %(parcelid)s, %(addr)s, 
                 %(notes)s, %(city)s, %(state)s, %(zipcode)s,
                 %(lotandblock)s, %(propclass)s, %(ownercode)s,
-                now(), %(updatinguser)s);
+                now(), %(updatinguser)s)
+        RETURNING propertyid;
 
     """
     insertmap = {}
-    rawhtml = get_county_page_for(parid)
     # load up vars for use in SQL from each of the parse methods
     # propid = insertmap["propid"]
     # print("newid:" + str(propid))
@@ -238,36 +232,37 @@ def extract_and_insert_property(parid):
     insertmap["propclass"] = str(extract_class(rawhtml))
     insertmap["propertyusetype"] = extract_propertyusetype(rawhtml)
     insertmap["ownercode"] = extract_ownercode(rawhtml)
-    insertmap["updatinguser"] = str(99)
+    insertmap["updatinguser"] = str(99)     # user 99 is the cog robot, Sylvia
+
     print("Inserting parcelid data: %s" % (parid))
     cursor.execute(insert_sql, insertmap)
 
     # commit core propertytable insert
     db_conn.commit()
+    return cursor.fetchone()[0] # Returns the property_id
 
 
 
-def extract_and_insert_person(rawhtml, personid):
+def extract_and_insert_person(rawhtml):
 
     # fixed values specific to keys in lookup tables
     notemsg = """In case of confusion, check autmated record entry with raw text from the county database: """
     insert_sql = """
         INSERT INTO public.person(
-            personid, persontype, muni_municode, fname, lname, jobtitle, 
+            persontype, muni_municode, fname, lname, jobtitle, 
             phonecell, phonehome, phonework, email, address_street, address_city, 
             address_state, address_zip, notes, lastupdated, expirydate, isactive, 
             isunder18, humanverifiedby)
-    VALUES (%(personid)s, cast ( 'ownercntylookup' as persontype), 
+    VALUES (cast ( 'ownercntylookup' as persontype), 
             %(muni_municode)s, %(fname)s, %(lname)s, 'Property Owner', 
             NULL, NULL, NULL, NULL, %(address_street)s, %(address_city)s, 
             %(address_state)s, %(address_zip)s, %(notes)s, now(), NULL, TRUE, 
-            FALSE, NULL);
+            FALSE, NULL)
+            RETURNING personid;
     """
     insertmap = {}
 
     # load up vars for use in SQL from each of the parse methods
-    insertmap["personid"] = personid
-    print("personid:" + str(insertmap["personid"]))
     insertmap["muni_municode"] = str(municodemap[current_muni])
 
     ownernamemap = extract_owner_name(rawhtml)  # Potentially raises MalformedOwnerError
@@ -295,19 +290,21 @@ def extract_and_insert_person(rawhtml, personid):
         + insertmap["address_zip"]
     )
 
+    # Todo: Refactor into 2 new columns: raw_name and raw_address
     insertmap["notes"] = (
         notemsg
         + ownernamemap["note_namedump"]
         + " Raw address: "
         + owneraddrmap["notes_adrdump"]
     )
-    print("Inserting person data for id: %s" % (insertmap["personid"]))
+    print("Inserting person data for id: %s" % ownernamemap['fname'])
     print("person notes: " + insertmap["notes"])
 
     cursor.execute(insert_sql, insertmap)
     db_conn.commit()
     print("----- committed person owner -----")
-    # commit core propertytable insert
+    return cursor.fetchone()[0] # Returns the person_id
+
 
 
 def connect_person_to_property(propertyid, personid):
@@ -609,7 +606,6 @@ def get_db_conn():
     )
     global cursor
     cursor = db_conn.cursor()
-    # return db_conn
 
 
 if __name__ == "__main__":
