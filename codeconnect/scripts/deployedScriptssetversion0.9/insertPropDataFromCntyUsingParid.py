@@ -163,7 +163,7 @@ def insert_property_basetableinfo():
                 #     )
                 # print("--------- running totals --------")
                 print("Props inserted: " + str(propertycount))
-                # print("Persons inserted: " + str(personcount))
+                print("Persons inserted: " + str(personcount))
                 print("********** DONE! *************")
 
             print("Total properties inserted: " + str(propertycount))

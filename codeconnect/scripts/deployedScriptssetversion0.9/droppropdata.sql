@@ -7,5 +7,5 @@ delete from propertyunit
     using property
     where propertyunit.property_propertyid = property.propertyid
 	and municipality_municode = 828;
-delete from public.property where municipality_municode = 828;it
+delete from public.property where municipality_municode = 828;
 delete from public.person where muni_municode = 828;
