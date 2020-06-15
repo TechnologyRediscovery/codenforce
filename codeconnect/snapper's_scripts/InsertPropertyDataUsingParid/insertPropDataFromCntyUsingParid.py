@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+"""
+This script is run whenever a new municipality is added to the council of government.
+Modify the globals current_muni and municodemap and the script should do the rest.
+"""
 
 import csv
 import re
@@ -8,7 +11,6 @@ import requests
 import bs4
 import logging
 from os.path import join
-from copy import deepcopy
 
 from _exceptions import MalformedDataError, MalformedGenericAddressError, MalformedOwnerError, \
     MalformedZipcodeError, MalformedStateError, MalformedLotAndBlockError
@@ -17,7 +19,7 @@ from _exceptions import MalformedDataError, MalformedGenericAddressError, Malfor
 def main():
     globals_setup()
     logger_setup()
-    get_db_conn()   # Sets up even MORE globals ☹️
+    get_db_conn() #Sets up global connection️
     insert_property_basetableinfo()
 
 
@@ -44,25 +46,7 @@ def globals_setup():
     global PARID_FILE
     PARID_FILE = join("parcelidlists", current_muni + "_parcelids.csv")
 
-    # use as floor value for all new propertyIDs
-    global PROP_ID_BASE
-    PROP_ID_BASE = 100000
-
-    # floor value for new personIDs
-    global PERSON_ID_BASE
-    PERSON_ID_BASE = 10000
-
-    # used for sliding starting ID up to accommodate a parcelid list adjustment due to errors on pesky parcels
-    # must be manually set if there's an error: start one above the most recently issued ID
-    # this gets added to the base ID in the ID range generation methods
-    global BUMP_UP
-    BUMP_UP = 0
-
-    global county_info_cache
-    county_info_cache = {}
-
-    # Todo: Explain where numbers come from
-    global municodemap
+    global municodemap  # In a perfect world, this would be a single id returned from the database
     municodemap = {
         "chalfant": 814,
         "churchhill": 816,
@@ -74,24 +58,6 @@ def globals_setup():
         "swissvale": 111,
         "foresthills": 828,
     }
-
-    # add these base amounts to the universal base to get starting IDs
-    global muni_idbase_map
-    muni_idbase_map = {
-        "chalfant": 10000,
-        "churchhill": 20000,
-        "eastmckeesport": 30000,
-        "pitcairn": 40000,
-        "wilmerding": 0,
-        "wilkins": 50000,
-        "cogland": 60000,
-        "swissvale": 70000,
-        "foresthills": 110000,
-    }
-
-    # add these base amounts to the universal base to get starting IDs
-    global person_idbase_map
-    person_idbase_map = deepcopy(muni_idbase_map)
 
 
 def logger_setup():
@@ -144,6 +110,7 @@ def insert_property_basetableinfo():
             for parid in parcelgenerator:
                 rawhtml = get_county_page_for(parid)
                 property_id = extract_and_insert_property(parid, rawhtml)
+                create_ce_case(property_id) #Todo: Add custom error
                 propertycount += 1
 
                 # # Todo: Should try/except be on the inside of the function like in extract_and_insert_property?
@@ -241,6 +208,38 @@ def extract_and_insert_property(parid, rawhtml):
     db_conn.commit()
     return cursor.fetchone()[0] # Returns the property_id
 
+
+
+def create_ce_case(property_id):
+    """
+    Inserts a new code enforcement case into the cecase table.
+    """
+    insert_sql = """INSERT INTO public.cecase(
+        caseid, cecasepubliccc, property_propertyid, propertyunit_unitid,
+        login_userid, casename, casephase, originationdate,
+        closingdate, creationtimestamp, notes, paccenabled,
+        allowuplinkaccess, propertyinfocase, personinfocase_personid, bobsource_sourceid,
+        active
+    )
+    VALUES(
+        DEFAULT, 111111, %(propid)s, NULL,
+        %(updater)s, %(casename)s, cast ('LegacyImported' as casephase), now(),
+        now(), now(), %(notes)s, FALSE,
+        NULL, TRUE, NULL, NULL,
+        TRUE
+    )
+    """
+    # Todo: Update casephase as CountySiteImport
+    # TODO: CHECK DEFAULT VALUES WITH ERIC. Should active be true?
+    insertmap = {}
+    insertmap['propid'] = property_id
+    insertmap['updater'] = UPDATING_USER_ID
+    insertmap['casename'] = "Import from county site"
+    # insertmap['casephase'] = 'CountySiteImport'
+    insertmap['notes'] = "Initial case for each property"
+    cursor.execute(insert_sql, insertmap)
+    db_conn.commit()
+    print("---- Created CE Case ----")
 
 
 def extract_and_insert_person(rawhtml):
