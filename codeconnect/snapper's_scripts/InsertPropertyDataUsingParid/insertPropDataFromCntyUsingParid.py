@@ -1,6 +1,8 @@
 """
 This script is run whenever a new municipality is added to the council of government.
 Modify the globals current_muni and municodemap and the script should do the rest.
+
+Todo: Add validation that the database does not contain property from the municode we attempt to insert
 """
 
 import csv
@@ -223,13 +225,13 @@ def create_ce_case(property_id):
     )
     VALUES(
         DEFAULT, 111111, %(propid)s, NULL,
-        %(updater)s, %(casename)s, cast ('LegacyImported' as casephase), now(),
+        %(updater)s, %(casename)s, cast ('Closed' as casephase), now(),
         now(), now(), %(notes)s, FALSE,
         NULL, TRUE, NULL, NULL,
         TRUE
     )
     """
-    # Todo: Update casephase as CountySiteImport
+    # Note: casephase is being deprecated
     # TODO: CHECK DEFAULT VALUES WITH ERIC. Should active be true?
     insertmap = {}
     insertmap['propid'] = property_id
