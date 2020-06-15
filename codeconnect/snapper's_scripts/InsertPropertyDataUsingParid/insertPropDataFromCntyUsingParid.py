@@ -345,9 +345,6 @@ def create_and_insert_unitzero(propertyid):
 
 
 def get_county_page_for(parcel_id):
-    # # Todo: Examine if this line should be deleted
-    # if parcel_id in county_info_cache:
-    #     return county_info_cache[parcel_id]
     COUNTY_REAL_ESTATE_URL = (
         "http://www2.county.allegheny.pa.us/" "RealEstate/GeneralInfo.aspx?"
     )
