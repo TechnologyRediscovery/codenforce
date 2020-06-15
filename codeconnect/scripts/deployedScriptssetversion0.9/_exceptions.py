@@ -1,5 +1,6 @@
 import inspect
 import sys
+import argparse
 
 # Important Note! Do not create classes in this module that are not Errors, as validate_exceptions uses introspection
 
@@ -106,15 +107,13 @@ from collections import defaultdict
 errorcode_lookup = defaultdict(list)
 
 # This loop creates the dictionary.
+# For each exception in the list, an exception object is created and its error_code is read.
+# The error_code is stored as the key in the dict errorcode_lookup, and the exception name is stored as the value.
 for exception in custom_exceptions:
     exception_name = exception[0]
     exception_class = exception[1]
-    # Error codes are added during instance initialization.
-    # Thus, we create an instance of each exception to check its errorcode
-    try:
-        raise exception_class()
-    except Exception as e:
-        errorcode_lookup[e.error_code].append(exception_name)
+    errorcode_lookup[exception_class().error_code].append(exception_name)
+
 
 # Validates that no two errorcodes are the same
 collision_flag = False
@@ -129,3 +128,5 @@ for key in errorcode_lookup:
         collision_flag = True
 if collision_flag:
     raise ValueError
+
+# TODO: Create script to automatically add each errorcode into db
