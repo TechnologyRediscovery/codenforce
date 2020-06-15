@@ -28,7 +28,11 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -42,8 +46,13 @@ public class PropertyUnitsBB
 
     private PropertyDataHeavy currProp;
     private PropertyUnit currPropUnit;
+    private ArrayList<PropertyUnit> unitDisplayList;
+    private ArrayList<PropertyUnitDataHeavy> heavyDisplayList;
 
     private PropertyUnitDataHeavy currPropUnitWithLists;
+    
+    private List<ViewOptionsActiveListsEnum> allViewOptions;
+    private ViewOptionsActiveListsEnum currentViewOption;
 
     /**
      * Creates a new instance of PropertyCreateBB
@@ -54,7 +63,10 @@ public class PropertyUnitsBB
     @PostConstruct
     public void initBean() {
         currProp = getSessionBean().getSessProperty();
-
+        
+        allViewOptions = Arrays.asList(ViewOptionsActiveListsEnum.values());
+        
+        setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
     }
 
     public String goToChanges() {
@@ -83,7 +95,6 @@ public class PropertyUnitsBB
      * @param ev
      */
     public void beginPropertyUnitUpdates(ActionEvent ev) {
-        // do nothing as of beta 0.9
     }
 
     /**
@@ -107,23 +118,6 @@ public class PropertyUnitsBB
 
     }
 
-    public void deactivatePropertyUnit(PropertyUnit pu) {
-        PropertyIntegrator pi = getPropertyIntegrator();
-        pu.setActive(false);
-        try {
-            pi.updatePropertyUnit(pu);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Unit deactivated with ID " + pu.getUnitID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Could not deactivate unit with ID " + pu.getUnitID(), ""));
-        }
-
-    }
-
     /**
      * Finalizes the unit list the user has created so that it can be compared
      * to the existing one in the database.
@@ -135,11 +129,18 @@ public class PropertyUnitsBB
         PropertyCoordinator pc = getPropertyCoordinator();
 
         boolean missingUnitNum = false;
-        boolean duplicateUnitNum = false;
-        int duplicateNums = 0;
-        //The above boolean is a flag to see if there is more than 1 of  Unit Number. The int to the left stores how many of a given number the loop below finds.
-
-        for (PropertyUnit firstUnit : getCurrProp().getUnitList()) {
+        
+        boolean duplicateUnitNum = false;//a flag to see if there is more than 1 of  Unit Number.
+        
+        boolean badUnitNum = false; //an unusable unit number was entered
+        
+        int duplicateNums = 0;//The int to the left stores how many of a given number the loop below finds.
+        
+        int index = 0; //if there is more than one unit and the default unit still exists, then grab the next unit and use it to overwrite the default unit
+        
+        int defaultIndex = -1; //index of the unit we used to overwrite the default unit. Needs to be removed at the end.
+        
+        for (PropertyUnit firstUnit : unitDisplayList) {
             duplicateNums = 0;
 
             // remove any use of the word "unit" in a unit identifier
@@ -150,7 +151,7 @@ public class PropertyUnitsBB
                 break; //break for performance reasons. Can be removed if breaks are not welcome here.
             }
 
-            for (PropertyUnit secondUnit : getCurrProp().getUnitList()) {
+            for (PropertyUnit secondUnit : unitDisplayList) {
                 if (firstUnit.getUnitNumber().compareTo(secondUnit.getUnitNumber()) == 0) {
                     duplicateNums++;
                 }
@@ -160,9 +161,25 @@ public class PropertyUnitsBB
                 duplicateUnitNum = true;
                 break; //break for performance reasons. Can be removed if breaks are not welcome here.
             }
+            
+            index++;
+            
+            if(firstUnit.getUnitNumber().compareTo("-1") == 0){
+                if(firstUnit.getNotes().compareTo("robot-generated unit representing the primary habitable dwelling on a property") != 0){
+                    getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "The unit number -1 is used for default property units. Please use another number or \'-[space]1\'.", ""));
+                    badUnitNum = true;
+                    break;
+                }
+                
+                defaultIndex = index;
+                
+            }
+            
         }
 
-        if (getCurrProp().getUnitList().isEmpty()) {
+        if (unitDisplayList.isEmpty()) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please add at least one unit.", ""));
@@ -177,50 +194,55 @@ public class PropertyUnitsBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Some Units have the same Number", ""));
 
-        } else {
+        } else if (!badUnitNum){
+            
+            if (defaultIndex != -1) {
+                
+                int defaultID = unitDisplayList.get(defaultIndex).getUnitID(); //temporarily stores the unit ID of the default unit so it can be overwritten
+                
+                PropertyUnit overwriteUnit = unitDisplayList.get(defaultIndex + 1);
+                
+                overwriteUnit.setUnitID(defaultID);
+                
+                unitDisplayList.set(defaultIndex, overwriteUnit);
+                
+                unitDisplayList.remove(defaultIndex + 1); // remove the unit used to overwrite the default unit
+                
+            }
+            
+            getCurrProp().setUnitList(unitDisplayList);
+            
             Iterator<PropertyUnit> iter = getCurrProp().getUnitList().iterator();
+            
             while (iter.hasNext()) {
-                PropertyUnit pu = iter.next();
+                PropertyUnit unit = iter.next();
 
                 // decide if we're updating a unit or inserting it based on initial value
                 // newly created units don't have an ID, just a default unit number
-                pu.setPropertyID(getCurrProp().getPropertyID());
+                unit.setPropertyID(getCurrProp().getPropertyID());
 
-                if (pu.getUnitNumber().compareTo("-1") == 0) {
-
-                    pu.setActive(false);
+                if (unit.getUnitID() == 0) {
                     try {
-                        pi.updatePropertyUnit(pu);
-                        getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Deactivated default unit!", ""));
-                    } catch (IntegrationException ex) {
-                        getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        "Failed to deactivate default unit", ""));
-                    }
-                } else if (pu.getUnitID() == 0) {
-                    try {
-                        pi.insertPropertyUnit(pu);
+                        pi.insertPropertyUnit(unit);
 
                         getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Success! Inserted property unit: " + pu.getUnitNumber(), ""));
+                                        "Success! Inserted property unit: " + unit.getUnitNumber(), ""));
                     } catch (IntegrationException ex) {
                         getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        "Could not insert unit with number: " + pu.getUnitNumber(), ""));
+                                        "Could not insert unit with number: " + unit.getUnitNumber(), ""));
                     }
                 } else {
                     try {
-                        pi.updatePropertyUnit(pu);
+                        pi.updatePropertyUnit(unit);
                         getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Success! Updated property unit: " + pu.getUnitNumber(), ""));
+                                        "Success! Updated property unit: " + unit.getUnitNumber(), ""));
                     } catch (IntegrationException ex) {
                         getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        "Could not update unit with number: " + pu.getUnitNumber(), ""));
+                                        "Could not update unit with number: " + unit.getUnitNumber(), ""));
                     }
                 }
             }
@@ -238,7 +260,8 @@ public class PropertyUnitsBB
         }
 
         refreshCurrPropWithLists();
-
+        
+        setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
     } // close method
 
     private void refreshCurrPropWithLists() {
@@ -252,7 +275,7 @@ public class PropertyUnitsBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not update current property with lists | Exception details: " + ex.getMessage(), ""));
         }
-
+        
     }
 
     /**
@@ -297,4 +320,81 @@ public class PropertyUnitsBB
         this.currPropUnitWithLists = currPropUnitWithLists;
     }
 
+    public ArrayList<PropertyUnit> getUnitDisplayList() {
+        return unitDisplayList;
+    }
+
+    public void setUnitDisplayList(ArrayList<PropertyUnit> unitDisplayList) {
+        this.unitDisplayList = unitDisplayList;
+    }
+
+    public ViewOptionsActiveListsEnum getCurrentViewOption() {
+        return currentViewOption;
+    }
+
+    public void setCurrentViewOption(ViewOptionsActiveListsEnum input) {
+        
+        currentViewOption = input;
+
+        unitDisplayList = new ArrayList<>();
+        
+        if(null == currentViewOption){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to set the current view option. Returning to default.", ""));
+            currentViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
+        } else switch (currentViewOption) {
+            case VIEW_ALL:
+                unitDisplayList.addAll(currProp.getUnitList());
+                heavyDisplayList.addAll(currProp.getUnitWithListsList());
+                break;
+                
+            case VIEW_ACTIVE:
+                for (PropertyUnit unit : currProp.getUnitList()){
+                    if (unit.isActive()){
+                        unitDisplayList.add(unit);
+                    }
+                }
+                
+                for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()){
+                    if (unit.isActive()){
+                        heavyDisplayList.add(unit);
+                    }
+                }
+                    
+                break;
+            case VIEW_INACTIVE:
+                for (PropertyUnit unit : currProp.getUnitList()){
+                    if (!unit.isActive()){
+                        unitDisplayList.add(unit);
+                    }
+                }
+                
+                for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()){
+                    if (unit.isActive()){
+                        heavyDisplayList.add(unit);
+                    }
+                }
+                
+                break;
+        }
+        
+    }
+
+    public List<ViewOptionsActiveListsEnum> getAllViewOptions() {
+        return allViewOptions;
+    }
+
+    public void setAllViewOptions(List<ViewOptionsActiveListsEnum> allViewOptions) {
+        this.allViewOptions = allViewOptions;
+    }
+
+    public ArrayList<PropertyUnitDataHeavy> getHeavyDisplayList() {
+        return heavyDisplayList;
+    }
+
+    public void setHeavyDisplayList(ArrayList<PropertyUnitDataHeavy> heavyDisplayList) {
+        this.heavyDisplayList = heavyDisplayList;
+    }
+    
 }

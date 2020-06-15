@@ -33,6 +33,20 @@
 
                             <h:form id="prop-units-list-form" >
 
+                                <p:selectOneMenu style="width: 300px;" 
+                                                 id="prop-unit-list-viewoptions" 
+                                                 value="#{propertyUnitsBB.currentViewOption}">
+
+                                    <p:ajax update="form-unitedit"                                                           
+                                            immediate="true"/>
+
+                                    <f:selectItems  id="prop-units-list-form"
+                                                    value="#{propertyUnitsBB.allViewOptions}"
+                                                    var="vo"
+                                                    itemValue="#{vo}"
+                                                    itemLabel="#{vo.label}"/>
+                                </p:selectOneMenu>
+
                                 <p:commandButton       id="button-editunits"
                                                        ajax="true" 
                                                        actionListener="#{propertyUnitsBB.beginPropertyUnitUpdates}"
@@ -40,7 +54,9 @@
                                                        rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
                                                        value="Edit unit list"  
                                                        icon="fa fa-edit"
-                                                       update="form-unitedit"/>
+                                                       update="form-unitedit
+                                                       prop-units-list-form"
+                                                       />
 
                                 <p:spacer height="5px" />
 
@@ -48,7 +64,7 @@
                                     id="datascroller-propunits"
                                     var="unit"
                                     rowIndexVar="#{unit.unitID}"
-                                    value="#{propertyUnitsBB.currProp.unitWithListsList}"
+                                    value="#{propertyUnitsBB.heavyDisplayList}"
                                     widgetVar="events-requiredactions-ds"
                                     >
 
@@ -65,8 +81,18 @@
 
                                         <p:spacer height="5px" />
 
+                                        <h:outputText value="Rental Intent Dates: " rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+                                        <h:outputText value="#{unit.rentalIntentDateStart} - #{unit.rentalIntentDateStart}" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+
+                                        <p:spacer height="5px" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+
                                         <h:outputText value="Unit Description: " />
                                         <h:outputText value="#{unit.notes}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Active? " />
+                                        <h:outputText value="#{unit.active ? 'Yes' : 'No'}" />
 
                                         <h4>Occupancy periods</h4>
 
@@ -164,10 +190,10 @@
                                 widgetVar="datatable"
                                 rowIndexVar="rowIndex"
                                 var="unit"
-                                value="#{propertyUnitsBB.currProp.unitList}"
+                                value="#{propertyUnitsBB.unitDisplayList}"
                                 tabindex="2"
                                 rowKey="#{unit.unitID}"
-                                editable="true">                                         
+                                editable="true">
 
                                 <p:column>
                                     <f:facet name="header">
@@ -182,7 +208,7 @@
                                         </f:facet>
                                     </p:cellEditor>
                                 </p:column>
-                                
+
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Rental Intent Date Start:" />
@@ -199,12 +225,12 @@
                                                 pattern="EEE, dd MMM, yyyy"
                                                 navigator="true"
                                                 showButtonPanel="true"
-                                                showTodayButton="false"
+                                                showTodayButton="true"
                                                 required="false"/>
                                         </f:facet>
                                     </p:cellEditor>
                                 </p:column>
-                                
+
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Unit Intent Date End:" />
@@ -221,12 +247,12 @@
                                                 pattern="EEE, dd MMM, yyyy"
                                                 navigator="true"
                                                 showButtonPanel="true"
-                                                showTodayButton="false"
+                                                showTodayButton="true"
                                                 required="false"/>
                                         </f:facet>
                                     </p:cellEditor>
                                 </p:column>
-                                
+
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Rental Notes:" />
@@ -270,21 +296,20 @@
                                     <f:facet name="header">
                                         <h:outputText value="Remove?" />
                                     </f:facet>
-                                    <p:commandButton    id="button-editunits-removeunit"
-                                                        ajax="true" 
-                                                        value="Remove" 
-                                                        disabled="#{!(unit.unitID==0)}"
-                                                        action="#{propertyUnitsBB.removePropertyUnitFromEditTable(unit)}"
-                                                        update="#{p:component('table-unitedit')}
-                                                        form-unitedit:messages-properties-editunit"/>                                      
+                                    <ui:remove>
+                                        <p:commandButton    id="button-editunits-removeunit"
+                                                            ajax="true" 
+                                                            value="Remove" 
+                                                            disabled="#{!(unit.unitID==0)}"
+                                                            action="#{propertyUnitsBB.removePropertyUnitFromEditTable(unit)}"
+                                                            update="#{p:component('table-unitedit')}
+                                                            form-unitedit:messages-properties-editunit"/> 
+                                    </ui:remove>
 
-                                    <p:commandButton    id="button-editunits-deactivateunit" 
-                                                        ajax="true" 
-                                                        value="Deactivate" 
-                                                        disabled="#{unit.unitID==0}"
-                                                        action="#{propertyUnitsBB.deactivatePropertyUnit(unit)}"
-                                                        update="#{p:component('table-unitedit')}
-                                                        form-unitedit:messages-properties-editunit"/>                                      
+                                    <p:selectBooleanButton onLabel="Active" offLabel="Deactivated" id="button-editunits-deactivateunit" 
+                                                           value="#{unit.active}" 
+                                                           disabled="#{unit.unitID==0}"
+                                                           />                                      
                                 </p:column>
 
                             </p:dataTable>
@@ -326,10 +351,7 @@
 
                             </script>
 
-                            <p:spacer height="5px"/>
-
-
-                            <p:spacer height="5px"/>
+                            <p:spacer height="10px"/>
 
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
