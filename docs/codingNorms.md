@@ -10,6 +10,11 @@ searchForXXX methods on Integrators should not require any user-level info for a
 #### auditXXX methods
 auditXXX methods are responsible for checking the state of objects after configuration or before key events, like insertions. Their return types should all be void and instead communicate problems by throwing a logically typed Exception subclass containing a useful error message that will eventually get passed all the way back to the user.
 
+### fidelity to scope hierarchy
+#### avoid calling integrators in backign beans scoped to `view` or narrower
+![calling integrator in backing bean](img/designpattern-nonexmple-callingintegratorinbackingbean.png)
+
+
 #### Coordinator versus Integrator method names
 To differentiate between direct database operations that represent the base level function and Coordinator logic controls, the following norms of naming can help make roles clear
 Coordinators createFoo &gt; Integrators updateFoo

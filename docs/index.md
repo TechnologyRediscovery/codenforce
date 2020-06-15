@@ -30,6 +30,7 @@ As technical documentation designed for developers, the primary audience for the
 ### XVIII [Help](ss_help.md)
 ### XVIV [UX](ss_ux.md)
 ### XX [External Data](ss_externaldata.md)
+### XXI [Session](ss_session.md)
 
 ## Legacy doc pages
 
