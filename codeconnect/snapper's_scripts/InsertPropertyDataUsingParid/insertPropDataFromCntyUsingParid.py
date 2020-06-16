@@ -14,7 +14,7 @@ import bs4
 import logging
 from os.path import join
 
-from _exceptions import MalformedDataError, MalformedGenericAddressError, MalformedOwnerError, \
+from Exceptions._exceptions import MalformedDataError, MalformedGenericAddressError, MalformedOwnerError, \
     MalformedZipcodeError, MalformedStateError, MalformedLotAndBlockError
 
 
@@ -247,18 +247,19 @@ def create_ce_case(property_id):
 def extract_and_insert_person(rawhtml):
 
     # fixed values specific to keys in lookup tables
-    notemsg = """In case of confusion, check autmated record entry with raw text from the county database: """
+    notemsg = """In case of confusion, check automated record entry with raw text from the county database: """
     insert_sql = """
         INSERT INTO public.person(
-            persontype, muni_municode, fname, lname, jobtitle, 
-            phonecell, phonehome, phonework, email, address_street, address_city, 
-            address_state, address_zip, notes, lastupdated, expirydate, isactive, 
-            isunder18, humanverifiedby)
-    VALUES (cast ( 'ownercntylookup' as persontype), 
-            %(muni_municode)s, %(fname)s, %(lname)s, 'Property Owner', 
-            NULL, NULL, NULL, NULL, %(address_street)s, %(address_city)s, 
-            %(address_state)s, %(address_zip)s, %(notes)s, now(), NULL, TRUE, 
-            FALSE, NULL)
+            persontype, muni_municode, fname, lname, 
+            jobtitle, phonecell, phonehome, phonework, 
+            email, address_street, address_city, address_state, 
+            address_zip, notes, lastupdated, expirydate, 
+            isactive, isunder18, humanverifiedby)
+    VALUES (cast ( 'ownercntylookup' as persontype), %(muni_municode)s, %(fname)s, %(lname)s, 
+            'Property Owner', NULL, NULL, NULL, 
+            NULL, %(address_street)s, %(address_city)s, %(address_state)s, 
+            %(address_zip)s, %(notes)s, now(), NULL, 
+            TRUE, FALSE, NULL)
             RETURNING personid;
     """
     insertmap = {}

@@ -6,7 +6,11 @@ If the data is different, creates writes an event to the event table
 from collections import namedtuple
 
 from Auxiliary.db_conn import get_cursor
-from Auxiliary.scraping_and_parsing import get_county_property_assessment
+from Auxiliary.scraping_and_parsing import (
+    get_county_property_assessment,
+    extract_owner_name,
+)
+
 
 
 def main():
@@ -49,7 +53,18 @@ def ask_database_for_parcelids(municode=None, muniname=None):
 
 
 def extract_info_from_html(raw_html):
-    pass
+    """
+    Arguments:
+          raw_html: str
+          The raw HTML scraped from the county website
+
+    Returns:
+        Dict
+            A dictionary of information extracted from the HTML
+    """
+    insertmap = {}
+    insertmap['ownername'] = extract_owner_name(raw_html)
+    return insertmap
 
 
 def write_data_to_propertyexternaldata(parsed_data):

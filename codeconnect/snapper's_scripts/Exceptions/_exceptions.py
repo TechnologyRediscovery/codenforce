@@ -1,6 +1,5 @@
 import inspect
 import sys
-import argparse
 
 # Important Note! Do not create classes in this module that are not Errors, as validate_exceptions uses introspection
 
