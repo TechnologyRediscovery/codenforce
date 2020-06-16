@@ -33,128 +33,132 @@
 
                             <h:form id="prop-units-list-form" >
 
-                                <p:selectOneMenu style="width: 300px;" 
+                                <p:outputLabel value="Currently Viewing: "/>
+                                
+                                               <p:selectOneMenu style="width: 300px;" 
                                                  id="prop-unit-list-viewoptions" 
-                                                 value="#{propertyUnitsBB.currentViewOption}">
+                                                 value="#{propertyUnitsBB.currentViewOption}"
+                                                 >
 
-                                    <p:ajax update="form-unitedit"                                                           
-                                            immediate="true"/>
+                                        <p:ajax update="form-unitedit
+                                                datascroller-propunits"/>
 
-                                    <f:selectItems  id="prop-units-list-form"
-                                                    value="#{propertyUnitsBB.allViewOptions}"
-                                                    var="vo"
-                                                    itemValue="#{vo}"
-                                                    itemLabel="#{vo.label}"/>
-                                </p:selectOneMenu>
+                                        <f:selectItems  id="prop-units-list-form"
+                                                        value="#{propertyUnitsBB.allViewOptions}"
+                                                        var="vo"
+                                                        itemValue="#{vo}"
+                                                        itemLabel="#{vo.label}"/>
+                                    </p:selectOneMenu>
 
-                                <p:commandButton       id="button-editunits"
-                                                       ajax="true" 
-                                                       actionListener="#{propertyUnitsBB.beginPropertyUnitUpdates}"
-                                                       oncomplete="PF('dialog-widvar-unitedit').show()"
-                                                       rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
-                                                       value="Edit unit list"  
-                                                       icon="fa fa-edit"
-                                                       update="form-unitedit
-                                                       prop-units-list-form"
-                                                       />
+                                    <p:spacer height="5px" />
 
-                                <p:spacer height="5px" />
+                                    <p:commandButton       id="button-editunits"
+                                                           ajax="true" 
+                                                           actionListener="#{propertyUnitsBB.beginPropertyUnitUpdates}"
+                                                           oncomplete="PF('dialog-widvar-unitedit').show()"
+                                                           rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
+                                                           value="Edit unit list"  
+                                                           icon="fa fa-edit"
+                                                           update="form-unitedit"
+                                                           />
 
-                                <p:dataScroller
-                                    id="datascroller-propunits"
-                                    var="unit"
-                                    rowIndexVar="#{unit.unitID}"
-                                    value="#{propertyUnitsBB.heavyDisplayList}"
-                                    widgetVar="events-requiredactions-ds"
-                                    >
+                                    <p:spacer height="5px" />
 
-                                    <div class="outlinedBox event-ds-box"> 
-                                        <h3>
-                                            <h:outputText value="Unit Number: " />
-                                            <h:outputText value="#{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
-                                        </h3>
+                                    <p:dataScroller
+                                        id="datascroller-propunits"
+                                        var="unit"
+                                        rowIndexVar="#{unit.unitID}"
+                                        value="#{propertyUnitsBB.heavyDisplayList}"
+                                        widgetVar="events-requiredactions-ds"
+                                        >
 
-                                        <p:spacer height="5px" />
+                                        <div class="outlinedBox event-ds-box"> 
+                                            <h3>
+                                                <h:outputText value="Unit Number: " />
+                                                <h:outputText value="#{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
+                                            </h3>
 
-                                        <h:outputText value="Rental intent: " />
-                                        <h:outputText value="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
+                                            <p:spacer height="5px" />
 
-                                        <p:spacer height="5px" />
+                                            <h:outputText value="Rental intent: " />
+                                            <h:outputText value="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
 
-                                        <h:outputText value="Rental Intent Dates: " rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
-                                        <h:outputText value="#{unit.rentalIntentDateStart} - #{unit.rentalIntentDateStart}" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+                                            <p:spacer height="5px" />
 
-                                        <p:spacer height="5px" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+                                            <h:outputText value="Rental Intent Dates: " rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+                                            <h:outputText value="#{unit.rentalIntentDateStart} - #{unit.rentalIntentDateStart}" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
 
-                                        <h:outputText value="Unit Description: " />
-                                        <h:outputText value="#{unit.notes}" />
+                                            <p:spacer height="5px" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
 
-                                        <p:spacer height="5px" />
+                                            <h:outputText value="Unit Description: " />
+                                            <h:outputText value="#{unit.notes}" />
 
-                                        <h:outputText value="Active? " />
-                                        <h:outputText value="#{unit.active ? 'Yes' : 'No'}" />
+                                            <p:spacer height="5px" />
 
-                                        <h4>Occupancy periods</h4>
+                                            <h:outputText value="Active? " />
+                                            <h:outputText value="#{unit.active ? 'Yes' : 'No'}" />
 
-                                        <p:commandButton       id="properties-occperiods-button-addnewperiod"
-                                                               ajax="true" 
-                                                               actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
-                                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                               disabled="#{!propertyUnitsBB.currProp.active}"
-                                                               oncomplete="PF('dialog-addoccperiod-var').show()"
-                                                               value="Add new occupancy period" 
-                                                               update="dialog-addoccperiod-form"
-                                                               icon="fa fa-plus"/>
+                                            <h4>Occupancy periods</h4>
 
-                                        <p:spacer height="5px" />
+                                            <p:commandButton       id="properties-occperiods-button-addnewperiod"
+                                                                   ajax="true" 
+                                                                   actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
+                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                   disabled="#{!propertyUnitsBB.currProp.active}"
+                                                                   oncomplete="PF('dialog-addoccperiod-var').show()"
+                                                                   value="Add new occupancy period" 
+                                                                   update="dialog-addoccperiod-form"
+                                                                   icon="fa fa-plus"/>
 
-
-                                        <p:dataScroller
-                                            id="scroller-periodlist"
-                                            widgetVar="var-scroller-periodlist"
-                                            rowIndexVar="#{period.periodID}"
-                                            var="period"
-                                            value="#{unit.periodList}"
-                                            >                                         
+                                            <p:spacer height="5px" />
 
 
-                                            <div style="datum">
+                                            <p:dataScroller
+                                                id="scroller-periodlist"
+                                                widgetVar="var-scroller-periodlist"
+                                                rowIndexVar="#{period.periodID}"
+                                                var="period"
+                                                value="#{unit.periodList}"
+                                                >                                         
 
 
-                                                <h:outputText value="Start Date: " 
-                                                              styleClass="ui-label-inline" />
+                                                <div style="datum">
 
-                                                <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.startDate)}" 
-                                                              styleClass="data-text"/>
-                                            </div>
 
-                                            <div style="datum">
-                                                <h:outputText value="End Date: " 
-                                                              styleClass="ui-label-inline" />
+                                                    <h:outputText value="Start Date: " 
+                                                                  styleClass="ui-label-inline" />
 
-                                                <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.endDate)}" 
-                                                              styleClass="data-text"/>
-                                            </div>
-                                            <div style="datum">
-                                                <h:outputText value="Type: " 
-                                                              styleClass="ui-label-inline" />
-                                                <h:outputText value="#{period.type.title}" 
-                                                              styleClass="data-text"/>
-                                            </div>
-                                            <div style="datum">
-                                                <h:outputText value="Authorization" 
-                                                              styleClass="ui-label-inline" />
-                                                <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : PropertyUnitsBB.getPrettyDate(period.authorizedTS)}" />
-                                            </div>
-                                            <p:commandButton       id="button-occperiodtable-editperiod"
-                                                                   ajax="false" 
-                                                                   action="#{propertyUnitsBB.manageOccPeriod(period)}"
-                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                   value="manage occupancy period"  
-                                                                   icon="fa fa-edit"/>
-                                        </p:dataScroller>
-                                    </div>
-                                </p:dataScroller>
+                                                    <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.startDate)}" 
+                                                                  styleClass="data-text"/>
+                                                </div>
+
+                                                <div style="datum">
+                                                    <h:outputText value="End Date: " 
+                                                                  styleClass="ui-label-inline" />
+
+                                                    <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.endDate)}" 
+                                                                  styleClass="data-text"/>
+                                                </div>
+                                                <div style="datum">
+                                                    <h:outputText value="Type: " 
+                                                                  styleClass="ui-label-inline" />
+                                                    <h:outputText value="#{period.type.title}" 
+                                                                  styleClass="data-text"/>
+                                                </div>
+                                                <div style="datum">
+                                                    <h:outputText value="Authorization" 
+                                                                  styleClass="ui-label-inline" />
+                                                    <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : PropertyUnitsBB.getPrettyDate(period.authorizedTS)}" />
+                                                </div>
+                                                <p:commandButton       id="button-occperiodtable-editperiod"
+                                                                       ajax="false" 
+                                                                       action="#{propertyUnitsBB.manageOccPeriod(period)}"
+                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                       value="manage occupancy period"  
+                                                                       icon="fa fa-edit"/>
+                                            </p:dataScroller>
+                                        </div>
+                                    </p:dataScroller>
 
                             </h:form>
 
@@ -360,7 +364,7 @@
 
 
                             <p:commandButton ajax="true"
-                                             actionListener="#{propertyUnitsBB.finalizeUnitList}"
+                                             actionListener="#{propertyUnitsBB.finalizeUnitList()}"
                                              oncomplete="PF('dialog-widvar-unitedit').hide()"
                                              icon="fa fa-thumbs-o-up"
                                              update="   prop-units-messages-form

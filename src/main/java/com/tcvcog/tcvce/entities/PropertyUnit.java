@@ -217,6 +217,8 @@ public class    PropertyUnit
     public void setRentalIntentDateStartUtil(Date rentalIntentDateStart) {
         if(rentalIntentDateStart != null){
             this.rentalIntentDateStart = rentalIntentDateStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else {
+            this.rentalIntentDateStart = null;
         }
         
     }
@@ -225,7 +227,11 @@ public class    PropertyUnit
      * @param rentalIntentDateStop the rentalIntentDateStop to set
      */
     public void setRentalIntentDateStopUtil(Date rentalIntentDateStop) {
+        if(rentalIntentDateStop != null){
         this.rentalIntentDateStop = rentalIntentDateStop.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else {
+            this.rentalIntentDateStop = null;
+        }
     }
 
     /**
