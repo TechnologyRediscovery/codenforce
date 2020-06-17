@@ -31,6 +31,8 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -66,21 +68,20 @@ public class PropertyUnitsBB
 
         allViewOptions = Arrays.asList(ViewOptionsActiveListsEnum.values());
 
-        if (currentViewOption ==null){
-        
-        setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
-        
+        if (currentViewOption == null) {
+
+            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ALL);
+
         }
-        
-        
+
     }
 
     public String goToChanges() {
 
         return "unitchanges";
     }
-    
-    public String goToUnitList(){
+
+    public String goToUnitList() {
         return "propertyUnits";
     }
 
@@ -145,10 +146,6 @@ public class PropertyUnitsBB
 
         int duplicateNums = 0;//The int to the left stores how many of a given number the loop below finds.
 
-        int index = 0; //if there is more than one unit and the default unit still exists, then grab the next unit and use it to overwrite the default unit
-
-        int defaultIndex = -1; //index of the unit we used to overwrite the default unit. Needs to be removed at the end.
-
         for (PropertyUnit firstUnit : unitDisplayList) {
             duplicateNums = 0;
 
@@ -171,9 +168,6 @@ public class PropertyUnitsBB
                 break; //break for performance reasons. Can be removed if breaks are not welcome here.
             }
 
-            index++;
-            
-            
             if (firstUnit.getUnitNumber().compareTo("-1") == 0) {
                 if (firstUnit.getNotes() == null || firstUnit.getNotes().compareTo("robot-generated unit representing the primary habitable dwelling on a property") != 0) {
                     getFacesContext().addMessage(null,
@@ -183,29 +177,13 @@ public class PropertyUnitsBB
                     break;
                 }
                 getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Please change the robot-generated unit to reflect what it represents.", ""));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Please change the robot-generated unit to something more meaningful.", ""));
                 badUnitNum = true;
-                    break;
-                
-            }
-            
-/*
-            if (firstUnit.getUnitNumber().compareTo("-1") == 0) {
-                if (firstUnit.getNotes() == null || firstUnit.getNotes().compareTo("robot-generated unit representing the primary habitable dwelling on a property") != 0) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "The unit number -1 is used for default property units. Please use another number or \'-[space]1\'.", ""));
-                    badUnitNum = true;
-                    break;
-                }
-
-                defaultIndex = index;
+                break;
 
             }
 
-            */
-            
         }
 
         if (unitDisplayList.isEmpty()) {
@@ -224,28 +202,6 @@ public class PropertyUnitsBB
                             "Some Units have the same Number", ""));
 
         } else if (!badUnitNum) {
-            /*
-            if (defaultIndex != -1) {
-
-                int defaultID = unitDisplayList.get(defaultIndex).getUnitID(); //temporarily stores the unit ID of the default unit so it can be overwritten
-
-                int overwriteIndex = defaultIndex + 1;
-
-                if (defaultIndex > unitDisplayList.size()) {
-
-                    overwriteIndex = defaultIndex - 1; //if the default unit is the last in the list, get the previous unit instead of the next one.
-
-                }
-
-                PropertyUnit overwriteUnit = unitDisplayList.get(overwriteIndex);
-
-                overwriteUnit.setUnitID(defaultID);
-
-                unitDisplayList.set(defaultIndex, overwriteUnit);
-
-                unitDisplayList.remove(overwriteIndex); // remove the unit used to overwrite the default unit
-
-            }*/
 
             getCurrProp().setUnitList(unitDisplayList);
 
@@ -373,7 +329,7 @@ public class PropertyUnitsBB
         return currentViewOption;
     }
 
-    public String setCurrentViewOption(ViewOptionsActiveListsEnum input) {
+    public void setCurrentViewOption(ViewOptionsActiveListsEnum input) {
 
         currentViewOption = input;
 
@@ -407,7 +363,7 @@ public class PropertyUnitsBB
                     }
 
                     break;
-                    
+
                 case VIEW_INACTIVE:
                     for (PropertyUnit unit : currProp.getUnitList()) {
                         if (!unit.isActive()) {
@@ -423,13 +379,29 @@ public class PropertyUnitsBB
 
                     break;
             }
-        }
 
-        return "propertyUnits";
+            Collections.sort(heavyDisplayList, new Comparator<PropertyUnitDataHeavy>() {
+                @Override
+                public int compare(PropertyUnitDataHeavy unit1, PropertyUnitDataHeavy unit2) {
+
+                    return Boolean.compare(unit2.isActive(), unit1.isActive());
+                }
+
+            });
+        }
         
+        Collections.sort(unitDisplayList, new Comparator<PropertyUnit>() {
+                @Override
+                public int compare(PropertyUnit unit1, PropertyUnit unit2) {
+
+                    return Boolean.compare(unit2.isActive(), unit1.isActive());
+                }
+
+            });
+
     }
 
-    public List<ViewOptionsActiveListsEnum> getAllViewOptions() {
+public List<ViewOptionsActiveListsEnum> getAllViewOptions() {
         return allViewOptions;
     }
 
