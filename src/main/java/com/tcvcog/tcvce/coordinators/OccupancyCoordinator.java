@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -79,6 +80,8 @@ import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
+import java.util.AbstractList;
 
 /**
  * King of all business logic implementation for the entire Occupancy object tree
@@ -159,6 +162,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
+        PaymentIntegrator pai = getPaymentIntegrator();
         WorkflowCoordinator chc = getWorkflowCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         EventCoordinator ec = getEventCoordinator();
@@ -197,8 +201,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             opdh.setInspectionList(inspecInt.getOccInspectionList(opdh));
 
             // FEE AND PAYMENT LIST
-    //        opdh.setPaymentList(pai.getPaymentList(opdh));
-    //        opdh.setFeeList(pai.getFeeAssigned(opdh));
+            opdh.setPaymentListGeneral(pai.getPaymentList(opdh));
+            opdh.setFeeList(pai.getFeeAssigned(opdh));
 
             // PERMIT LIST
             opdh.setPermitList(oi.getOccPermitList(opdh));
@@ -212,6 +216,19 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         } 
         
         return opdh;
+        
+    }
+    
+    public List<OccPeriodType> getOccPeriodTypesFromProfileID(int profileID){
+        
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        List<OccPeriodType> typeList = new ArrayList<>();
+        try {
+        typeList = oi.getOccPeriodTypeList(profileID);
+        } catch (IntegrationException ex) {
+            System.out.println(ex.toString());
+        }
+        return typeList;
         
     }
     

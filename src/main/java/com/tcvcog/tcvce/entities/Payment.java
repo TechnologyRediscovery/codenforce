@@ -75,6 +75,25 @@ public class Payment {
        this.domain = p.getDomain();
        
    }
+   
+   public Payment(MoneyOccPeriodFeePayment p){
+       
+       this.paymentID = p.getPaymentID();
+       this.paymentType = p.getPaymentType();
+       this.dateDeposited = p.getDateDeposited();
+       this.dateReceived = p.getDateReceived();
+       this.amount = p.getAmount();
+       this.payer = p.getPayer();
+       this.referenceNum = p.getReferenceNum();
+       this.checkNum = p.getCheckNum();
+       this.cleared = p.isCleared();
+       this.notes = p.getNotes();
+       this.recordedBy = p.getRecordedBy();
+       this.entryTimestamp = p.getEntryTimestamp();
+       this.assignedFeeID = p.getAssignedFeeID();
+       this.domain = p.getDomain();
+       
+   }
 
     /**
      * @return the dateDeposited
