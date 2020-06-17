@@ -89,21 +89,21 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         
         SessionBean sb = getSessionBean();
         setCurrentOccPeriod(sb.getSessOccPeriod());
-         eventsViewOptions = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
-        selectedEventView = ViewOptionsActiveHiddenListsEnum.VIEW_ALL;
+         setEventsViewOptions(Arrays.asList(ViewOptionsActiveHiddenListsEnum.values()));
+        setSelectedEventView(ViewOptionsActiveHiddenListsEnum.VIEW_ALL);
         
-           if(personCandidateList != null){
-            personCandidateList = new ArrayList<>();
-            personCandidateList.addAll(getSessionBean().getSessPersonList());
+           if(getPersonCandidateList() != null){
+            setPersonCandidateList(new ArrayList<Person>());
+            getPersonCandidateList().addAll(getSessionBean().getSessPersonList());
         }
-        eventTypeListUserAllowed = ec.getPermittedEventTypesForOcc(getCurrentOccPeriod(), getSessionBean().getSessUser());
+        setEventTypeListUserAllowed(ec.getPermittedEventTypesForOcc(getCurrentOccPeriod(), getSessionBean().getSessUser()));
         try {
-            eventCategoryListUserAllowed = ec.loadEventCategoryListUserAllowed(selectedEventType, getSessionBean().getSessUser());
+            setEventCategoryListUserAllowed(ec.loadEventCategoryListUserAllowed(getSelectedEventType(), getSessionBean().getSessUser()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        eventTypeListAll = new ArrayList();
-        eventTypeListAll = ec.getEventTypesAll();
+        setEventTypeListAll((List<EventType>) new ArrayList());
+        setEventTypeListAll(ec.getEventTypesAll());
         
     }
     
@@ -216,7 +216,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         OccupancyCoordinator oc = getOccupancyCoordinator();
         EventIntegrator ei = getEventIntegrator();
         try {
-            eventCategoryListUserAllowed = ei.getEventCategoryList(selectedEventType);
+            setEventCategoryListUserAllowed(ei.getEventCategoryList(getSelectedEventType()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -450,6 +450,146 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      */
     public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
         this.currentOccPeriod = currentOccPeriod;
+    }
+
+    /**
+     * @return the filteredEventList
+     */
+    public List<EventCnF> getFilteredEventList() {
+        return filteredEventList;
+    }
+
+    /**
+     * @return the eventsViewOptions
+     */
+    public List<ViewOptionsActiveHiddenListsEnum> getEventsViewOptions() {
+        return eventsViewOptions;
+    }
+
+    /**
+     * @return the selectedEventView
+     */
+    public ViewOptionsActiveHiddenListsEnum getSelectedEventView() {
+        return selectedEventView;
+    }
+
+    /**
+     * @return the eventTypeListUserAllowed
+     */
+    public List<EventType> getEventTypeListUserAllowed() {
+        return eventTypeListUserAllowed;
+    }
+
+    /**
+     * @return the eventTypeListAll
+     */
+    public List<EventType> getEventTypeListAll() {
+        return eventTypeListAll;
+    }
+
+    /**
+     * @return the selectedEventType
+     */
+    public EventType getSelectedEventType() {
+        return selectedEventType;
+    }
+
+    /**
+     * @return the eventCategoryListUserAllowed
+     */
+    public List<EventCategory> getEventCategoryListUserAllowed() {
+        return eventCategoryListUserAllowed;
+    }
+
+    /**
+     * @return the eventCategoryListAllActive
+     */
+    public List<EventCategory> getEventCategoryListAllActive() {
+        return eventCategoryListAllActive;
+    }
+
+    /**
+     * @return the selectedEventCategory
+     */
+    public EventCategory getSelectedEventCategory() {
+        return selectedEventCategory;
+    }
+
+    /**
+     * @return the personCandidateList
+     */
+    public List<Person> getPersonCandidateList() {
+        return personCandidateList;
+    }
+
+    /**
+     * @param filteredEventList the filteredEventList to set
+     */
+    public void setFilteredEventList(List<EventCnF> filteredEventList) {
+        this.filteredEventList = filteredEventList;
+    }
+
+    /**
+     * @param eventsViewOptions the eventsViewOptions to set
+     */
+    public void setEventsViewOptions(List<ViewOptionsActiveHiddenListsEnum> eventsViewOptions) {
+        this.eventsViewOptions = eventsViewOptions;
+    }
+
+    /**
+     * @param selectedEventView the selectedEventView to set
+     */
+    public void setSelectedEventView(ViewOptionsActiveHiddenListsEnum selectedEventView) {
+        this.selectedEventView = selectedEventView;
+    }
+
+    /**
+     * @param eventTypeListUserAllowed the eventTypeListUserAllowed to set
+     */
+    public void setEventTypeListUserAllowed(List<EventType> eventTypeListUserAllowed) {
+        this.eventTypeListUserAllowed = eventTypeListUserAllowed;
+    }
+
+    /**
+     * @param eventTypeListAll the eventTypeListAll to set
+     */
+    public void setEventTypeListAll(List<EventType> eventTypeListAll) {
+        this.eventTypeListAll = eventTypeListAll;
+    }
+
+    /**
+     * @param selectedEventType the selectedEventType to set
+     */
+    public void setSelectedEventType(EventType selectedEventType) {
+        this.selectedEventType = selectedEventType;
+    }
+
+    /**
+     * @param eventCategoryListUserAllowed the eventCategoryListUserAllowed to set
+     */
+    public void setEventCategoryListUserAllowed(List<EventCategory> eventCategoryListUserAllowed) {
+        this.eventCategoryListUserAllowed = eventCategoryListUserAllowed;
+    }
+
+    /**
+     * @param eventCategoryListAllActive the eventCategoryListAllActive to set
+     */
+    public void setEventCategoryListAllActive(List<EventCategory> eventCategoryListAllActive) {
+        this.eventCategoryListAllActive = eventCategoryListAllActive;
+    }
+
+    /**
+     * @param selectedEventCategory the selectedEventCategory to set
+     */
+    public void setSelectedEventCategory(EventCategory selectedEventCategory) {
+        this.selectedEventCategory = selectedEventCategory;
+    }
+
+    /**
+     * @param personCandidateList the personCandidateList to set
+     */
+    public void setPersonCandidateList(List<Person> personCandidateList) {
+        this.personCandidateList = personCandidateList;
     }
     
     

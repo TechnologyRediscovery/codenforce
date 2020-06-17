@@ -159,17 +159,17 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
             //initialize default current muni profile list
             currentMuniProfileList = mc.getMuniProfilesList();
             //initialize default current user list
-            currentUserList = uc.assembleUserListForSearchCriteria();
+            currentUserList = uc.assembleUserListForSearch(getSessionBean().getSessUser());
             //initialize default current print style list
             currentStyleList = sc.getPrintStyleList();
 
             // NOTE: 
             //initialize default current occperiod list
             currentOccperiodList = new ArrayList<>();
-            currentOccperiodList.add(getSessionBean().getSessionOccPeriod());
+            currentOccperiodList.add(getSessionBean().getSessOccPeriod());
 
             currentPropertyList = new ArrayList<>();
-            currentPropertyList.add(getSessionBean().getSessionProperty());
+            currentPropertyList.add(getSessionBean().getSessProperty());
 
         } catch (AuthorizationException | IntegrationException ex) {
 
@@ -282,7 +282,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
     public String onUpdateButtonChange() {
         MunicipalityCoordinator mc = getMuniCoordinator();
         try {
-            mc.updateMuni(currentMuniDataheavy,getSessionBean().getSessionUser());
+            mc.updateMuni(currentMuniDataheavy,getSessionBean().getSessUser());
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fail To Update Municipality", ""));
         }
@@ -291,7 +291,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
 
     public String onInsertButtonChange() {
         MunicipalityCoordinator mc = getMuniCoordinator();
-        mc.insertMuni(currentMuniDataheavy, getSessionBean().getSessionUser());
+        mc.insertMuni(currentMuniDataheavy, getSessionBean().getSessUser());
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successful Insert New Municipality", ""));
         return "muniManage";
     }
@@ -300,7 +300,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
         currentMuniDataheavy.setActiveInProgram(false);
         MunicipalityCoordinator mc = getMuniCoordinator();
         try {
-            mc.updateMuni(currentMuniDataheavy,getSessionBean().getSessionUser());
+            mc.updateMuni(currentMuniDataheavy,getSessionBean().getSessUser());
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fail To Remove Municipality", ""));
         }
