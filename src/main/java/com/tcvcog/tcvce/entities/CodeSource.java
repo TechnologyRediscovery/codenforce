@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -130,6 +131,56 @@ public class CodeSource implements Serializable{
      */
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
+    }
+    
+    @Override
+    public int hashCode() {
+        int hash = 10;
+        hash = 300 * hash + this.sourceID;
+        hash = 300 * hash + this.sourceYear;
+        hash = 300 * hash + Objects.hashCode(this.sourceName);
+        hash = 300 * hash + Objects.hashCode(this.sourceDescription);
+        hash = 300 * hash + Objects.hashCode(this.URL);
+        hash = 300 * hash + Objects.hashCode(this.sourceNotes);
+        hash = 300 * hash + (this.isActive ? 1 : 0);
+        
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CodeSource other = (CodeSource) obj;
+        if (this.sourceID != other.sourceID) {
+            return false;
+        }
+        if (this.sourceYear != other.sourceYear) {
+            return false;
+        }
+        if (this.isActive != other.isActive) {
+            return false;
+        }
+        if (!Objects.equals(this.sourceName, other.sourceName)) {
+            return false;
+        }
+        if (!Objects.equals(this.sourceDescription, other.sourceDescription)) {
+            return false;
+        }
+        if (!Objects.equals(this.URL, other.URL)) {
+            return false;
+        }
+        if (!Objects.equals(this.sourceNotes, other.sourceNotes)) {
+            return false;
+        }
+        return true;
     }
     
 }

@@ -67,7 +67,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "       enablepublicceactionreqinfo, enablepublicoccpermitapp, enablepublicoccinspectodo, \n" +
                         "       munimanager_userid, office_propertyid, notes, lastupdatedts, \n" +
                         "       lastupdated_userid, primarystaffcontact_userid\n" +
-                        "  FROM public.municipality WHERE municode=?;";
+                        "  FROM public.municipality WHERE municode=? AND activeinprogram = true;";
         ResultSet rs = null;
  
         try {
@@ -105,7 +105,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "       munimanager_userid, office_propertyid, notes, lastupdatedts, \n" +
                         "       lastupdated_userid, primarystaffcontact_userid, defaultoccperiod    \n" +
                         "  FROM public.municipality"
-                      + "  WHERE municode=?;";
+                      + "  WHERE municode=? AND activeinprogram = true;";
         ResultSet rs = null;
  
         try {
@@ -182,7 +182,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             mdh.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
         }
         
-        mdh.setLastUpdaetdBy(ui.getUser(rs.getInt("lastupdated_userid")));
+        mdh.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdated_userid")));
         mdh.setPrimaryStaffContact(ui.getUser(rs.getInt("primarystaffcontact_userid")));
         
         // FIX THIS WHEN WE HAVE STABLE AUTHORIZATION PROCEDURES
@@ -252,7 +252,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     
     public List<Municipality> getMuniList() throws IntegrationException{
         List<Municipality> mList = new ArrayList<>();
-        String query = "SELECT municode FROM municipality;";
+        String query = "SELECT municode FROM municipality WHERE activeinprogram = true;";
         ResultSet rs = null;
         Statement stmt = null;
         Connection con = getPostgresCon();
@@ -324,17 +324,15 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setBoolean(20, muni.isEnablePublicOccInspectionTODOs());
             stmt.setInt(21, muni.getMuniManager().getUserID());
 
-            //stmt.setInt(22, muni.getMuniOfficePropertyId());
-            stmt.setInt(22, 173134);
+            stmt.setInt(22, muni.getMuniOfficePropertyId());
+            
             stmt.setString(23, muni.getNotes());
             // lastupdatedts=now()
-            stmt.setInt(24, muni.getLastUpdaetdBy().getUserID());
+            stmt.setInt(24, muni.getLastUpdatedBy().getUserID());
 
             stmt.setInt(25, muni.getPrimaryStaffContact().getUserID());
             
-            //stmt.setInt(26, muni.getDefaultOccPeriodID());
-            stmt.setInt(26, 1006);
-
+            stmt.setInt(26, muni.getDefaultOccPeriodID());
             
             stmt.setInt(27, muni.getMuniCode());
 
@@ -563,15 +561,13 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setBoolean(21, muni.isEnablePublicOccInspectionTODOs());
 
             stmt.setInt(22, muni.getMuniManager().getUserID());
-            
-            // DO WE NEED office_propertyid IN MUNICIPALITY TABLE?
-            stmt.setInt(23, 173134);
+            stmt.setInt(23, muni.getMuniOfficePropertyId());
             stmt.setString(24, muni.getNotes());
 
             // lastupdatedts=now()
-            stmt.setInt(25, getSessionBean().getSessUser().getUserID());
+            stmt.setInt(25, muni.getLastUpdatedBy().getUserID());
             stmt.setInt(26, muni.getPrimaryStaffContact().getUserID());
-            stmt.setInt(27, 1006);
+            stmt.setInt(27, muni.getDefaultOccPeriodID());
 
             stmt.executeUpdate();
 
