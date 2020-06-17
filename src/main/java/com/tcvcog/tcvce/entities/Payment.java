@@ -18,26 +18,28 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 /**
  *
  * @author Adam Gutonski & Nathan Dietz
  */
 public class Payment {
     
-    private int paymentID;
-    private PaymentType paymentType;
-    private LocalDateTime dateDeposited;
-    private LocalDateTime dateReceived;
-    private double amount;
-    private Person payer;
-    private String referenceNum;
-    private int checkNum;
-    private boolean cleared;
-    private String notes;
-    private User recordedBy;
-    private LocalDateTime entryTimestamp;
-    private int assignedFeeID;
-    private EventDomainEnum domain;
+    protected int paymentID;
+    protected PaymentType paymentType;
+    protected LocalDateTime dateDeposited;
+    protected LocalDateTime dateReceived;
+    protected double amount;
+    protected Person payer;
+    protected String referenceNum;
+    protected int checkNum;
+    protected boolean cleared;
+    protected String notes;
+    protected User recordedBy;
+    protected LocalDateTime entryTimestamp;
+    protected int assignedFeeID;
+    protected EventDomainEnum domain;
     
    public Payment() {
        
@@ -52,6 +54,25 @@ public class Payment {
        paymentType = new PaymentType();
        
        paymentType.setPaymentTypeId(2);
+       
+   }
+   
+   public Payment(MoneyCECaseFeePayment p){
+       
+       this.paymentID = p.getPaymentID();
+       this.paymentType = p.getPaymentType();
+       this.dateDeposited = p.getDateDeposited();
+       this.dateReceived = p.getDateReceived();
+       this.amount = p.getAmount();
+       this.payer = p.getPayer();
+       this.referenceNum = p.getReferenceNum();
+       this.checkNum = p.getCheckNum();
+       this.cleared = p.isCleared();
+       this.notes = p.getNotes();
+       this.recordedBy = p.getRecordedBy();
+       this.entryTimestamp = p.getEntryTimestamp();
+       this.assignedFeeID = p.getAssignedFeeID();
+       this.domain = p.getDomain();
        
    }
 
@@ -83,6 +104,54 @@ public class Payment {
         this.dateReceived = dateReceived;
     }
 
+    /**
+     * @return the dateDeposited
+     */
+    public Date getDateDepositedUtilDate() {
+        Date dateDepositedUtilDate = null;
+        if(dateDeposited != null){
+            
+            dateDepositedUtilDate = Date.from(dateDeposited.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return dateDepositedUtilDate;
+    }
+
+    /**
+     * @param dateDeposited the dateDeposited to set
+     */
+    public void setDateDepositedUtilDate(Date dateDeposited) {
+        
+        if(dateDeposited != null){
+            
+            this.dateDeposited = dateDeposited.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            
+        }
+        
+    }
+
+    /**
+     * @return the dateReceived
+     */
+    public Date getDateReceivedUtilDate() {
+        Date dateReceivedUtilDate = null;
+        if(dateReceived != null){
+            
+            dateReceivedUtilDate = Date.from(dateReceived.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return dateReceivedUtilDate;
+    }
+
+    /**
+     * @param dateReceived the dateReceived to set
+     */
+    public void setDateReceivedUtilDate(Date dateReceived) {
+        if(dateReceived != null){
+            
+            this.dateReceived = dateReceived.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            
+        }
+    }
+    
     /**
      * @return the amount
      */

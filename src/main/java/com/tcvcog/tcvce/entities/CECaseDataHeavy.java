@@ -5,7 +5,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -203,6 +202,7 @@ public class CECaseDataHeavy
     /**
      * @param eventRuleList the eventRuleList to set
      */
+    @Override
     public void setEventRuleList(List<EventRuleImplementation> eventRuleList) {
         this.eventRuleList = eventRuleList;
     }
@@ -361,6 +361,7 @@ public class CECaseDataHeavy
     /**
      * @param proposalList the proposalList to set
      */
+    @Override
     public void setProposalList(List<Proposal> proposalList) {
         this.proposalList = proposalList;
     }
@@ -407,5 +408,21 @@ public class CECaseDataHeavy
     public void setPaymentList(List<MoneyCECaseFeePayment> paymentList) {
         this.paymentList = paymentList;
     }
-
+    
+    /**
+     * Takes the general Payment type and converts it to 
+     * @param paymentList the paymentList to set
+     */
+    public void setPaymentListGeneral(List<Payment> paymentList) {
+        List<MoneyCECaseFeePayment> skeletonHorde = new ArrayList<>();
+        
+        for (Payment p : paymentList) {
+            
+            skeletonHorde.add(new MoneyCECaseFeePayment(p));
+            
+        }
+        
+        this.paymentList = skeletonHorde;
+    }
+    
 }

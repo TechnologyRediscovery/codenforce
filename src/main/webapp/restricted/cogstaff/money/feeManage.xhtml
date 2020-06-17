@@ -5,404 +5,880 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
+
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
         <title>Add Fee</title>
     </h:head>
-    <h:body>
+
+    <h:body id="feeManageBody">
+
         <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
-                <div class="mainContainer">
-                    <h:messages id="messages" globalOnly="true" showDetail="true" showSummary="true"
-                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                    </h:messages>
+                <f:view >
 
-                    <h1>Fee Record Configuration Tool (dev)</h1>
-                    <p>View, create, and manage fees</p>
-                    <f:view>
-                        <h:form id="occPeriodFeeDisplay">
-                            <h2>Recorded 
-                                <p:outputLabel rendered="#{feeManagementBB.redirected}" value="#{feeManagementBB.currentDomain}"/>
-                                Fees 
-                                <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/>
-                                <p:outputLabel rendered="#{feeManagementBB.editingCECase()}" value="At #{feeManagementBB.CECaseAddress}"/>
-                            </h2>
-                            <p:dataTable
-                                id="feeAssignedTable"
-                                var="fee"
-                                value="#{feeManagementBB.feeAssignedList}"
-                                rowKey="#{fee.assignedFeeID}"
-                                tableStyleClass="primeDataTable"
-                                rowExpandMode="single"
-                                expandedRow="false"
-                                selectionMode="single"
-                                selection="#{feeManagementBB.selectedAssignedFee}"
-                                filteredValue="#{feeManagementBB.filteredFeeAssignedList}"
-                                >
+                    <p:outputPanel id="body-panel">
+                        <h1>Fee Record Configuration Tool (dev)</h1>
+                        <p>View, create, and manage fees</p>
 
-                                <p:column width="3%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Exp"/>
-                                    </f:facet>
-                                    <p:rowToggler/>
-                                </p:column>
-                                <p:column width="8%">
-                                    <f:facet name="header">
-                                        <h:outputText value="ID" />
-                                    </f:facet>
-                                    <h:outputText value="#{fee.assignedFeeID}"/>
-                                </p:column>
+                        <h2>Recorded 
+                            <p:outputLabel rendered="#{feeManagementBB.redirected}" value="#{feeManagementBB.currentDomain}"/>
+                            Fees 
+                            <p:outputLabel rendered="#{feeManagementBB.editingOccPeriod()}" value="At #{feeManagementBB.occPeriodAddress}"/>
+                            <p:outputLabel rendered="#{feeManagementBB.editingCECase()}" value="At #{feeManagementBB.CECaseAddress}"/>
+                        </h2>
 
+                        <h:form id="form-messages-global">
+                            <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
+                        </h:form>
 
-                                <p:column width="10%" sortBy="#{fee.fee.name}"
-                                          filterBy="#{fee.fee.name}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Fee Name" />
-                                    </f:facet>
-                                    <h:outputText value="#{fee.fee.name}"/>
-                                </p:column>
+                        <h:form>
 
-                                <p:column width="10%" sortBy="#{fee.fee.amount}"
-                                          filterBy="#{fee.fee.amount}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Amount" />
-                                    </f:facet>
-                                    <h:outputText value="#{fee.fee.amount}"/>
-                                </p:column>
+                            <p:commandButton ajax="false"
+                                             action="#{feeManagementBB.finishAndRedir()}"
+                                             value="Finish editing fee list and return."
+                                             />
+                            <p:commandButton ajax="false"
+                                             action="#{feeManagementBB.goToFeePermissions()}"
+                                             value="Edit fee permissions"
+                                             />
+                            <p:commandButton ajax="false"
+                                             action="#{feeManagementBB.goToFeeTypes()}"
+                                             value="Manage fee types"
+                                             />
 
-                                <p:column width="15%" filterBy="#{fee.fee.effectiveDate}"
-                                          sortBy="#{fee.fee.effectiveDate}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Effective" />
-                                    </f:facet>
-                                    <h:outputText value="#{fee.fee.effectiveDate}"/>
-                                </p:column>
+                        </h:form>
 
-                                <p:column width="15%" filterBy="#{fee.fee.expiryDate}"
-                                          sortBy="#{fee.fee.expiryDate}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Expiry" />
-                                    </f:facet>
-                                    <h:outputText value="#{fee.fee.expiryDate}"/>
-                                </p:column>
-                                <p:rowExpansion>
-                                    <div class="outlinedBox">
-                                        <h2>Full fee listing for fee <h:outputText value="#{fee.assignedFeeID}"/> </h2>
-                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
+                        <div class="mainContainer">
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{fee.fee.notes}"/>
-                                                </div>
-                                            </h:panelGroup>
+                            <div class ="two-column-page-flex-container">
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Assigned By"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
-                                                </div>
-                                            </h:panelGroup>
+                                <div class="list-column" >
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Last Modified"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{fee.lastModified}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                    <h:form id="mode-form">
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="ui-label-inline" value="Other notes"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{fee.notes}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                        <p:selectOneButton style="width: 100%; margin-top: 10px ; height: 20px;"
+                                                           value="#{feeManagementBB.currentMode}" 
+                                                           >
+                                            <f:selectItem itemLabel="LOOKUP" itemValue="Lookup"  />
+                                            <f:selectItem itemLabel="INSERT" itemValue="Insert"  />
+                                            <f:selectItem itemLabel="UPDATE" itemValue="Update"  />
+                                            <f:selectItem itemLabel="WAIVE" itemValue="Remove"  />
 
-                                            <h:panelGroup rendered="#{not empty fee.reducedByUser}">
-                                                <h:outputLabel styleClass="ui-label-inline" value="Amount Reduced By"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="$ #{fee.reducedBy}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                            <f:ajax render="@all"/>
 
-                                            <h:panelGroup rendered="#{not empty fee.reducedByUser}">
-                                                <h:outputLabel styleClass="ui-label-inline" value="Reduced By"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{fee.reducedByUser.person.firstName} #{fee.reducedByUser.person.lastName} (ID: #{fee.reducedByUser.userID}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                        </p:selectOneButton> 
 
-                                            <h:panelGroup rendered="#{not empty fee.waivedBy}">
-                                                <h:outputLabel styleClass="ui-label-inline" value="Waived By"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{fee.waivedBy.person.firstName} #{fee.waivedBy.person.lastName} (ID: #{fee.waivedBy.userID}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                    </h:form>
 
-                                            <ui:remove>
-                                                <h:panelGroup>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <p:commandButton value="Edit this Fee" action="#{occInspectionBB.editOnePayment(payment)}"/>
-                                                    </div>
-                                                </h:panelGroup>
-                                            </ui:remove>
-                                        </h:panelGrid>
-                                    </div>
-                                </p:rowExpansion>
+                                    <p:spacer height="30px"/>
 
-                            </p:dataTable>
-                            <p:spacer height="10px"/>
-                            <p:commandButton 
-                                actionListener="#{feeManagementBB.editSelectedAssignedFee}"
-                                oncomplete="PF('assignedFeeAddDialogVar').show()"
-                                ajax="true"
-                                update="assignedFeeAddForm messages"
-                                value="Update Selected Fee" tabindex="2"/>
-                            <p:commandButton ajax="false" 
-                                             actionListener="#{feeManagementBB.waiveSelectedOccPeriodFee}"
-                                             value="Waive Selected Fee" tabindex="3"/>
-                            <p:commandButton    id="newFeeDialogButton"
-                                                actionListener="#{feeManagementBB.initializeNewAssignedFee(e)}"
-                                                oncomplete="PF('assignedFeeAddDialogVar').show()"
-                                                ajax="true"
-                                                update="assignedFeeAddForm"
-                                                value="Create new Fee"
-                                                icon="fa fa-plus"
-                                                />
-                            <p:commandButton rendered="#{feeManagementBB.redirected}" action="#{feeManagementBB.finishAndRedir()}"
-                                             value="Finish editing fee list and return"/>
-                            <p:spacer height="10px"/>
-                            <p:commandButton    id="feePermissionButton"
-                                                action="#{feeManagementBB.goToFeePermissions()}"
-                                                rendered="#{feeManagementBB.redirected}"
-                                                value="Edit Fees that may be used for #{feeManagementBB.whatDomainFees()}"
-                                                />
-                        </h:form>    
-
-                        <p:dialog id="assignedFeeAddDialog"
-                                  height="450" width="1000"
-                                  widgetVar="assignedFeeAddDialogVar"
-                                  closable="true">   
-                            <h:form id="assignedFeeAddForm">
-                                <h2>Add New Fee</h2>
-                                <p>The more fields you can populate, the better. (Data integrity hangs in the balance.)</p>
-                                <h:panelGrid columns="4" border="0" 
-                                             cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
-                                             footerClass="gridFooter">
-
-                                    <h:outputLabel value="Waived?" for="feeWaived"/>
-                                    <h:panelGroup>    
-                                        <p:inputSwitch id="feeWaived" value="#{feeManagementBB.waived}" 
-                                                       tabindex="13" onLabel="Yes" offLabel="No"/>
-                                        <h:message for="feeWaived" showDetail="true" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <h:outputLabel value="Reduced By:" for="feeReducedBy"/>
-                                    <h:panelGroup>
-                                        <p:inputText id="feeReducedBy" value="#{feeManagementBB.assignedFormFee.reducedBy}" 
-                                                     style="width: 250px;" tabindex="9" required="true" styleClass="inputText"/>
-                                        <h:message for="feeReducedBy" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <h:outputLabel value="Notes:" for="feeNotes"/>
-                                    <h:panelGroup>
-                                        <p:inputText id="feeNotes" value="#{feeManagementBB.assignedFormFee.notes}" 
-                                                     style="width: 250px;" tabindex="10" required="false" styleClass="inputText"/>
-                                        <h:message for="feeNotes" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-                                    <p:spacer height="10px"/>
-                                </h:panelGrid>
-
-                                <h:panelGroup rendered="#{feeManagementBB.editingCECase()}">
-                                    <p:dataTable
-                                        id="feeViolationTable"
-                                        var="v"
-                                        selectionMode="single"
-                                        selection="#{feeManagementBB.selectedViolation}"
-                                        rowKey="#{v.violationID}"
-                                        value="#{feeManagementBB.violationList}"
-                                        tableStyleClass="primeDataTable"
-                                        filteredValue="#{feeManagementBB.filteredViolationList}"
-                                        expandedRow="false"
-                                        rowExpandMode="multiple">
-
-                                        <p:ajax event="rowSelect" update=":assignedFeeAddForm:feeFeeTable" listener="#{feeManagementBB.violationSelected(e)}"/>
-
-                                        <p:column width="2%">
-                                            <p:rowToggler />
-                                        </p:column>
+                                    <p:scrollPanel style="height: 550px; border: none" >
 
 
-                                        <p:column width="4%">
-                                            <i class="material-icons"><h:outputText value="#{v.icon.materialIcon}" /></i>
-                                        </p:column>
+                                        <h:form id="feeManage-form-side">
+
+                                            <p:dataTable id="feeAssignedTable"
+                                                         var="fee"
+                                                         value="#{feeManagementBB.feeAssignedList}"
+                                                         rowKey="#{fee.assignedFeeID}"
+                                                         tableStyleClass="primeDataTable"
+                                                         >
 
 
-                                        <p:column width="6%" sortBy="#{v.status.label}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Status" />
-                                            </f:facet>
-                                            <h:outputText id="violation-status-ot" value="#{v.status.label}"/>
-                                        </p:column>
+                                                <p:column headerText="ID"
+                                                          styleClass="centeredColumnContent">
+                                                    <h:outputText value="#{fee.assignedFeeID}"/>
+                                                </p:column>
 
-                                        <p:column width="12%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Ordinance" />
-                                            </f:facet>
-                                            <div class="rowExpansion">
 
-                                                <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
-                                            </div>
-                                        </p:column>
-                                        <p:column width="10%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Stip Comp Date" />
-                                            </f:facet>
-                                            <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
-                                        </p:column>
-                                        <p:column width="5%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Days left" />
-                                            </f:facet>
-                                            <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+                                                <p:column headerText="Fee Name"
+                                                          styleClass="centeredColumnContent"
+                                                          sortBy="#{fee.fee.name}"
+                                                          filterBy="#{fee.fee.name}">
+                                                    <h:outputText value="#{fee.fee.name}"/>
+                                                </p:column>
 
-                                        </p:column>
 
-                                        <p:rowExpansion>
-                                            <div class="outlinedBox">
-                                                <h:outputLabel styleClass="bold" value="Violation ID: "  />
-                                                <h:outputText  value="#{v.violationID}" />
-                                                <p:spacer height="5px" />
-                                                <h:outputLabel styleClass="bold" value="Ordindance: "  />
-                                                <p:spacer height="5px" />
-                                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.source.sourceName} 
-                                                               (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
-                                                <h:outputText  value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
-                                                <h:outputText  value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
-                                                <p:spacer height="2px" />
+                                                <p:column headerText="Amount"
+                                                          styleClass="centeredColumnContent"
+                                                          sortBy="#{fee.fee.amount}"
+                                                          filterBy="#{fee.fee.amount}">
+                                                    <h:outputText value="#{fee.fee.amount}"/>
+                                                </p:column>
 
-                                                <h:outputText  value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
-                                                <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
-                                                <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                                <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+                                                <p:column styleClass="centeredColumnContent"
+                                                          style="width: 80px">
 
-                                                <p:spacer height="2px" />
+                                                    <p:selectBooleanButton onLabel="Deselect" 
+                                                                           offLabel="Select"
+                                                                           styleClass="selectButton" 
+                                                                           value="#{feeManagementBB.currentFeeSelected}"
+                                                                           disabled="#{feeManagementBB.getSelectedButtonActive()}"
+                                                                           >
 
-                                                <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTd" 
-                                                                rendered="true">
+                                                        <p:ajax update="
+                                                                form-messages-global
+                                                                feeManage-form-side
+                                                                feeManage-panel"
+                                                                listener="#{feeManagementBB.onAssignedFeeSelectedButtonChange(fee)}"/>
+
+                                                    </p:selectBooleanButton>
+
+                                                </p:column>
+
+                                            </p:dataTable>
+
+                                            <p:spacer height="10px"/>
+
+                                        </h:form>
+
+                                    </p:scrollPanel>
+
+                                </div>
+
+
+
+                                <div class ="object-column">
+
+                                    <p:outputPanel id = "feeManage-panel" >
+
+                                        <!--LookUp Table-->
+                                        <p:panel id="feeManage-panel-lookup"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LookUp Panel"
+                                                 rendered="#{feeManagementBB.getActiveLookupMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="feeManage-form-lookup">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
                                                     <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
-                                                        <div class="ord-text">
-                                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                        <p:outputLabel value="ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.assignedFeeID}"/>
                                                         </div>
+                                                        <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
-                                                </h:panelGrid>
-                                                <p:spacer height="5px"/>
-                                                <h:outputLabel styleClass="bold" value="Description of violation: "/>
-                                                <h:outputText styleClass="weight-normal" value="#{v.description}" escape="false" />
-                                                <p:spacer height="5px"/>
-                                                <h:outputLabel styleClass="bold" value="Internal notes: "/>
-                                                <h:outputText styleClass="weight-normal" value="#{v.notes}" escape="false"/>
-                                            </div>
-                                        </p:rowExpansion>
-                                    </p:dataTable>
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Fee Name:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.name}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                    <h:message for="feeViolationTable" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Amount:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.amount}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                <h:outputLabel value="Fee:" for="feeFeeTable"/>
-                                <h:panelGroup>
-                                    <p:dataTable
-                                        id="feeFeeTable"
-                                        var="o"
-                                        selectionMode="single"
-                                        selection="#{feeManagementBB.assignedFormFee.fee}"
-                                        rowKey="#{o.occupancyInspectionFeeID}"
-                                        value="#{feeManagementBB.feeList}"
-                                        tableStyleClass="primeDataTable"
-                                        filteredValue="#{feeManagementBB.filteredFeeList}">
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Effective:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.effectiveDate}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                        <p:column width="10%">
-                                            <f:facet name="header">
-                                                <h:outputText value="ID" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.occupancyInspectionFeeID}"/>
-                                        </p:column>
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Expiry:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.expiryDate}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                        <p:column width="25%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Municipality" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.muni.muniName}"/>
-                                        </p:column>
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Fee Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.notes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                        <p:column width="25%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Name" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.name}"/>
-                                        </p:column>
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Assigned By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.assignedBy.person.firstName} #{feeManagementBB.selectedAssignedFee.assignedBy.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.assignedBy.userID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                        <p:column width="25%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Amount" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.amount}"/>
-                                        </p:column>
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Last Modified:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.lastModified}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                        <p:column width="25%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Effective Date" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.effectiveDate}"/>
-                                        </p:column>
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Other Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.notes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                        <p:column width="25%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Expire Date" />
-                                            </f:facet>
-                                            <h:outputText value="#{o.expiryDate}"/>
-                                        </p:column>
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.reducedByUser}">
+                                                        <p:outputLabel value="Amount Reduced by:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160; $#{feeManagementBB.selectedAssignedFee.reducedBy}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                    </p:dataTable>
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.reducedByUser}">
+                                                        <p:outputLabel value="Reduced By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.reducedByUser.person.firstName} #{feeManagementBB.selectedAssignedFee.reducedByUser.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.reducedByUser.userID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                    <h:message for="feeFeeTable" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Waived?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160; #{feeManagementBB.isSelectedFeeWaived()}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                <p:spacer height="10px"/>
-                                <p:commandButton ajax="false" rendered="#{!feeManagementBB.editing}" 
-                                                 value="Assign Fee" action="#{feeManagementBB.addAssignedFee()}" />
-                                <p:commandButton ajax="false" rendered="#{feeManagementBB.editing}" 
-                                                 actionListener="#{feeManagementBB.commitAssignedFeeUpdates(e)}"
-                                                 value="Commit Updates" tabindex="14"/>
-                                <p:commandButton    id="cancel-cb"
-                                                    ajax="true"  tabindex="27"
-                                                    value="Cancel" 
-                                                    icon="fa fa-stop" 
-                                                    immediate="true"
-                                                    onclick="PF('assignedFeeAddDialogVar').hide()"
-                                                    />
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.waivedBy}">
+                                                        <p:outputLabel value="Waived By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.waivedBy.person.firstName} #{feeManagementBB.selectedAssignedFee.waivedBy.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.waivedBy.userID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                            </h:form>
-                        </p:dialog>
+                                                </p:panelGrid>
 
-                    </f:view>
-                </div>
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Insert Table-->
+                                        <p:panel id="feeManage-panel-insert"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Insert Panel"
+                                                 rendered="#{feeManagementBB.getActiveInsertMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="feeManage-form-insert">
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel value="Fee to assign:"/>
+                                                    <p:spacer height="5px"/>
+
+                                                    <p:dataTable
+                                                        id="feeFeeTable"
+                                                        var="o"
+                                                        selectionMode="single"
+                                                        selection="#{feeManagementBB.selectedAssignedFee.fee}"
+                                                        rowKey="#{o.occupancyInspectionFeeID}"
+                                                        value="#{feeManagementBB.feeList}"
+                                                        tableStyleClass="primeDataTable"
+                                                        filteredValue="#{feeManagementBB.filteredFeeList}">
+
+                                                        <p:column width="10%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="ID" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.occupancyInspectionFeeID}"/>
+                                                        </p:column>
+
+                                                        <p:column width="25%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Municipality" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.muni.muniName}"/>
+                                                        </p:column>
+
+                                                        <p:column width="25%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Name" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.name}"/>
+                                                        </p:column>
+
+                                                        <p:column width="25%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Amount" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.amount}"/>
+                                                        </p:column>
+
+                                                        <p:column width="25%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Effective Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.effectiveDate}"/>
+                                                        </p:column>
+
+                                                        <p:column width="25%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Expire Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.expiryDate}"/>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+                                                    <p:spacer height="10px"/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup rendered="#{feeManagementBB.editingCECase()}">
+                                                    <p:dataTable
+                                                        id="feeViolationTable"
+                                                        var="v"
+                                                        selectionMode="single"
+                                                        selection="#{feeManagementBB.selectedViolation}"
+                                                        rowKey="#{v.violationID}"
+                                                        value="#{feeManagementBB.violationList}"
+                                                        tableStyleClass="primeDataTable"
+                                                        filteredValue="#{feeManagementBB.filteredViolationList}"
+                                                        expandedRow="false"
+                                                        rowExpandMode="multiple">
+
+                                                        <p:ajax event="rowSelect" update=":feeManage-form-insert:feeFeeTable" listener="#{feeManagementBB.violationSelected(e)}"/>
+
+                                                        <p:column width="2%">
+                                                            <p:rowToggler />
+                                                        </p:column>
+
+
+                                                        <p:column width="4%">
+                                                            <i class="material-icons"><h:outputText value="#{v.icon.materialIcon}" /></i>
+                                                        </p:column>
+
+
+                                                        <p:column width="6%" sortBy="#{v.status.label}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Status" />
+                                                            </f:facet>
+                                                            <h:outputText id="violation-status-ot" value="#{v.status.label}"/>
+                                                        </p:column>
+
+                                                        <p:column width="12%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Ordinance" />
+                                                            </f:facet>
+                                                            <div class="rowExpansion">
+
+                                                                <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
+                                                            </div>
+                                                        </p:column>
+                                                        <p:column width="10%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Stip Comp Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                                        </p:column>
+                                                        <p:column width="5%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Days left" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+
+                                                        </p:column>
+
+                                                        <p:rowExpansion>
+                                                            <div class="outlinedBox">
+                                                                <h:outputLabel styleClass="bold" value="Violation ID: "  />
+                                                                <h:outputText  value="#{v.violationID}" />
+                                                                <p:spacer height="5px" />
+                                                                <h:outputLabel styleClass="bold" value="Ordindance: "  />
+                                                                <p:spacer height="5px" />
+                                                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                                                               (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
+                                                                <h:outputText  value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                                                <h:outputText  value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                                                <p:spacer height="2px" />
+
+                                                                <h:outputText  value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
+                                                                <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
+                                                                <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                                                <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+
+                                                                <p:spacer height="2px" />
+
+                                                                <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTd" 
+                                                                                rendered="true">
+                                                                    <h:panelGroup>
+                                                                        <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
+                                                                        <div class="ord-text">
+                                                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                                        </div>
+                                                                    </h:panelGroup>
+
+                                                                </h:panelGrid>
+                                                                <p:spacer height="5px"/>
+                                                                <h:outputLabel styleClass="bold" value="Description of violation: "/>
+                                                                <h:outputText styleClass="weight-normal" value="#{v.description}" escape="false" />
+                                                                <p:spacer height="5px"/>
+                                                                <h:outputLabel styleClass="bold" value="Internal notes: "/>
+                                                                <h:outputText styleClass="weight-normal" value="#{v.notes}" escape="false"/>
+                                                            </div>
+                                                        </p:rowExpansion>
+                                                    </p:dataTable>
+
+                                                    <p:spacer height="10px"/>
+
+                                                    <h:message for="feeViolationTable" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Waived?"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputSwitch id="feeWaived" value="#{feeManagementBB.waived}" 
+                                                                       onLabel="Yes" offLabel="No"/>
+
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Reduce By:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText value="#{feeManagementBB.selectedAssignedFee.reducedBy}"
+                                                                     styleClass="FeeAssignedReadTableInputText"/>
+
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Notes:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText value="#{feeManagementBB.selectedAssignedFee.notes}"
+                                                                     styleClass="FeeAssignedReadTableInputText"/>
+
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Insert Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{feeManagementBB.onInsertAssignedFeeButtonChange()}"
+                                                                 value="INSERT"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Update Table-->
+                                        <p:panel id="feeManage-panel-update"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LookUp Panel"
+                                                 rendered="#{feeManagementBB.getActiveUpdateMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="feeManage-form-update">
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel value="Fee to assign:"/>
+                                                    <p:spacer height="5px"/>
+
+                                                    <p:dataTable
+                                                        id="feeFeeTable"
+                                                        var="o"
+                                                        selectionMode="single"
+                                                        selection="#{feeManagementBB.selectedAssignedFee.fee}"
+                                                        rowKey="#{o.occupancyInspectionFeeID}"
+                                                        value="#{feeManagementBB.feeList}"
+                                                        tableStyleClass="primeDataTable"
+                                                        filteredValue="#{feeManagementBB.filteredFeeList}">
+
+                                                        <p:column width="10%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="ID" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.occupancyInspectionFeeID}"/>
+                                                        </p:column>
+
+                                                        <p:column width="25%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Municipality" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.muni.muniName}"/>
+                                                        </p:column>
+
+                                                        <p:column width="25%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Name" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.name}"/>
+                                                        </p:column>
+
+                                                        <p:column width="25%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Amount" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.amount}"/>
+                                                        </p:column>
+
+                                                        <p:column width="25%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Effective Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.effectiveDate}"/>
+                                                        </p:column>
+
+                                                        <p:column width="25%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Expire Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{o.expiryDate}"/>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+                                                    <p:spacer height="10px"/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup rendered="#{feeManagementBB.editingCECase()}">
+                                                    <p:dataTable
+                                                        id="feeViolationTable"
+                                                        var="v"
+                                                        selectionMode="single"
+                                                        selection="#{feeManagementBB.selectedViolation}"
+                                                        rowKey="#{v.violationID}"
+                                                        value="#{feeManagementBB.violationList}"
+                                                        tableStyleClass="primeDataTable"
+                                                        filteredValue="#{feeManagementBB.filteredViolationList}"
+                                                        expandedRow="false"
+                                                        rowExpandMode="multiple">
+
+                                                        <p:ajax event="rowSelect" update=":feeManage-form-insert:feeFeeTable" listener="#{feeManagementBB.violationSelected(e)}"/>
+
+                                                        <p:column width="2%">
+                                                            <p:rowToggler />
+                                                        </p:column>
+
+
+                                                        <p:column width="4%">
+                                                            <i class="material-icons"><h:outputText value="#{v.icon.materialIcon}" /></i>
+                                                        </p:column>
+
+
+                                                        <p:column width="6%" sortBy="#{v.status.label}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Status" />
+                                                            </f:facet>
+                                                            <h:outputText id="violation-status-ot" value="#{v.status.label}"/>
+                                                        </p:column>
+
+                                                        <p:column width="12%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Ordinance" />
+                                                            </f:facet>
+                                                            <div class="rowExpansion">
+
+                                                                <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
+                                                            </div>
+                                                        </p:column>
+                                                        <p:column width="10%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Stip Comp Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                                        </p:column>
+                                                        <p:column width="5%">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Days left" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+
+                                                        </p:column>
+
+                                                        <p:rowExpansion>
+                                                            <div class="outlinedBox">
+                                                                <h:outputLabel styleClass="bold" value="Violation ID: "  />
+                                                                <h:outputText  value="#{v.violationID}" />
+                                                                <p:spacer height="5px" />
+                                                                <h:outputLabel styleClass="bold" value="Ordindance: "  />
+                                                                <p:spacer height="5px" />
+                                                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                                                               (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
+                                                                <h:outputText  value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                                                <h:outputText  value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                                                <p:spacer height="2px" />
+
+                                                                <h:outputText  value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
+                                                                <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
+                                                                <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                                                <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+
+                                                                <p:spacer height="2px" />
+
+                                                                <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTd" 
+                                                                                rendered="true">
+                                                                    <h:panelGroup>
+                                                                        <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
+                                                                        <div class="ord-text">
+                                                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                                        </div>
+                                                                    </h:panelGroup>
+
+                                                                </h:panelGrid>
+                                                                <p:spacer height="5px"/>
+                                                                <h:outputLabel styleClass="bold" value="Description of violation: "/>
+                                                                <h:outputText styleClass="weight-normal" value="#{v.description}" escape="false" />
+                                                                <p:spacer height="5px"/>
+                                                                <h:outputLabel styleClass="bold" value="Internal notes: "/>
+                                                                <h:outputText styleClass="weight-normal" value="#{v.notes}" escape="false"/>
+                                                            </div>
+                                                        </p:rowExpansion>
+                                                    </p:dataTable>
+
+                                                    <p:spacer height="10px"/>
+
+                                                    <h:message for="feeViolationTable" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Reduce By:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText value="#{feeManagementBB.selectedAssignedFee.reducedBy}"
+                                                                     styleClass="FeeAssignedReadTableInputText"/>
+
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Notes:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText value="#{feeManagementBB.selectedAssignedFee.notes}"
+                                                                     styleClass="FeeAssignedReadTableInputText"/>
+
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Update Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{feeManagementBB.onUpdateAssignedFeeButtonChange()}"
+                                                                 value="UPDATE"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Remove Table-->
+                                        <p:panel id="feeManage-panel-remove"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LookUp Panel"
+                                                 rendered="#{feeManagementBB.getActiveRemoveMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="feeManage-form-remove">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.assignedFeeID}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Fee Name:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.name}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Amount:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.amount}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Effective:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.effectiveDate}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Expiry:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.expiryDate}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Fee Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.fee.notes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Assigned By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.assignedBy.person.firstName} #{feeManagementBB.selectedAssignedFee.assignedBy.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.assignedBy.userID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Last Modified:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.lastModified}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Other Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.notes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.reducedByUser}">
+                                                        <p:outputLabel value="Amount Reduced by:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160; $#{feeManagementBB.selectedAssignedFee.reducedBy}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.reducedByUser}">
+                                                        <p:outputLabel value="Reduced By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.reducedByUser.person.firstName} #{feeManagementBB.selectedAssignedFee.reducedByUser.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.reducedByUser.userID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Waived?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160; #{feeManagementBB.isSelectedFeeWaived()}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup rendered="#{not empty feeManagementBB.selectedAssignedFee.waivedBy}">
+                                                        <p:outputLabel value="Waived By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="FeeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{feeManagementBB.selectedAssignedFee.waivedBy.person.firstName} #{feeManagementBB.selectedAssignedFee.waivedBy.person.lastName} (ID: #{feeManagementBB.selectedAssignedFee.waivedBy.userID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Remove Button (Though this is actually a waive button but it's called remove for consistency)-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{feeManagementBB.onRemoveAssignedFeeButtonChange()}"
+                                                                 value="WAIVE"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                    </p:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </p:outputPanel>
+                </f:view>
             </ui:define>
         </ui:composition>
     </h:body>

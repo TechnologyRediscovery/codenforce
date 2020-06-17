@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.occupancy.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.Fee;
@@ -96,7 +95,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return assignedFees;
     }
 
-    public List<MoneyCECaseFeeAssigned> getFeeAssigned(CECaseDataHeavy cse) throws IntegrationException {
+    public List<MoneyCECaseFeeAssigned> getFeeAssigned(CECase cse) throws IntegrationException {
 
         List<MoneyCECaseFeeAssigned> assignedFees = new ArrayList<>();
 
@@ -465,14 +464,14 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(2, fee.getOccPeriodID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
-            if (fee.getWaivedBy().getUserID() != 0) {
+            if (fee.getWaivedBy() != null) {
                 stmt.setInt(5, fee.getWaivedBy().getUserID());
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
             stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
             stmt.setDouble(7, fee.getReducedBy());
-            if (fee.getReducedByUser().getUserID() != 0) {
+            if (fee.getReducedByUser() != null) {
                 stmt.setInt(8, fee.getReducedByUser().getUserID());
             } else {
                 stmt.setNull(8, java.sql.Types.NULL);
@@ -521,14 +520,14 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(2, fee.getCaseID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
-            if (fee.getWaivedBy().getUserID() != 0) {
+            if (fee.getWaivedBy() != null) {
                 stmt.setInt(5, fee.getWaivedBy().getUserID());
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
             stmt.setTimestamp(6, java.sql.Timestamp.valueOf(fee.getLastModified()));
             stmt.setDouble(7, fee.getReducedBy());
-            if (fee.getReducedByUser().getUserID() != 0) {
+            if (fee.getReducedByUser() != null) {
                 stmt.setInt(8, fee.getReducedByUser().getUserID());
             } else {
                 stmt.setNull(8, java.sql.Types.NULL);
@@ -1450,6 +1449,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+    
+    //TODO: change this to deactivate payment records instead of deleting them.
     public void deletePayment(Payment payment) throws IntegrationException {
         String query = "DELETE FROM public.moneypayment\n"
                 + " WHERE paymentid=?;";

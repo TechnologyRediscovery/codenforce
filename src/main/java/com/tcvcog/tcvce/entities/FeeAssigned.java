@@ -21,10 +21,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- *
  * @author Nathan Dietz
  */
-public class FeeAssigned   implements Serializable {
+public class FeeAssigned implements Serializable {
 
     protected int assignedFeeID;
     protected EventDomainEnum domain;

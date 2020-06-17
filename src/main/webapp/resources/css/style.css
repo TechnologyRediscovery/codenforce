@@ -2062,6 +2062,24 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
 #muniManage-panel .ui-panelgrid .ui-panelgrid-content{
     border: none;
 }                                                             
+
+/* feeManage.xhtml page (shares many rules with muniManage.xhtml) */
+
+.FeeReadTableOutputLabel{
+    width: 100%;
+    border-bottom: 1px black solid;
+    background-color: #F0F0F0;
+    padding-top: 10px;
+}
+.FeeReadTableInputText{
+    width: 100%;
+    padding-top: 10px;
+}
+
+#feeManage-panel .ui-panelgrid .ui-panelgrid-content{
+    border: none;
+} 
+
 /*public*/
 
 .flexing-box-sidebar_new_public{
