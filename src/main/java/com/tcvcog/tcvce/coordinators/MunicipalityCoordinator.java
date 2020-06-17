@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.RoleType;
@@ -123,10 +124,50 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
         return muniList;
     }
 
-    //xiaohong add
+    /**
+     * 
+     * @param muniCode
+     * @return
+     * @throws IntegrationException
+     * @throws AuthorizationException 
+     */
     public MunicipalityDataHeavy getMuniDataHeavyList(int muniCode) throws IntegrationException, AuthorizationException {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         return mi.getMunDataHeavy(muniCode);
     }
+    
+    /**
+     * 
+     * @param muni
+     * @param user 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateMuni(MunicipalityDataHeavy muni, User user) throws IntegrationException{
+        muni.setLastUpdatedBy(user);
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        mi.updateMuniDataHeavy(muni);
+    }
+    /**
+     * 
+     * @param muni
+     * @param user 
+     */
+    public void insertMuni(MunicipalityDataHeavy muni, User user){
+        muni.setLastUpdatedBy(user);
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        mi.insertMuniDataHeavy(muni);
+    }
+    
+    /**
+     * 
+     * @return
+     * @throws IntegrationException 
+     */
+    public ArrayList<MuniProfile> getMuniProfilesList() throws IntegrationException{
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        return mi.getMuniProfileList();
+    }
+    
+    
 
 }
