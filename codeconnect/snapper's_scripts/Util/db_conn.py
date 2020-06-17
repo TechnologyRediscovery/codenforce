@@ -5,7 +5,7 @@ from contextlib import contextmanager
 @ contextmanager
 def get_cursor():
     """
-    Context manager that connects to the database, yeilds a cursor, and automatically closes connections.
+    Context manager that connects to the database, yields a cursor, and automatically closes connections.
 
     Use:
     >>> with get_cursor() as cursor:

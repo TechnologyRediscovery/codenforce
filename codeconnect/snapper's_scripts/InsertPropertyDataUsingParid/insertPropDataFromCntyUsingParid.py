@@ -439,9 +439,9 @@ def extract_propertyaddress(property_html):
     soup = bs4.BeautifulSoup(str(scrapedhtml), "lxml")
     adrlistraw = soup.span.contents
     # make sure we have all the parts of the address
-
     if len(adrlistraw) < 3:
         raise MalformedGenericAddressError
+
 
     propaddrmap["street"] = re.sub("  ", " ", adrlistraw[0])
     print(propaddrmap["street"])
