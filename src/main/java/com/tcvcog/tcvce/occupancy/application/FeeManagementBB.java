@@ -17,23 +17,27 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.CodeCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CodeSet;
+import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
-
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
@@ -46,36 +50,44 @@ import javax.faces.event.ActionEvent;
 @ViewScoped
 public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
-    //feeManage.xhtml fields
+    //feeTypeManage.xhtml fields
     private ArrayList<Fee> existingFeeTypeList;
     private Fee selectedFeeType;
-    private Municipality formMuni;
 
     //feeManage.xhtml fields
-    private OccPeriod currentOccPeriod;
-    private Fee formFee;
+    private OccPeriodDataHeavy currentOccPeriod;
+    private CECaseDataHeavy currentCase;
     private Fee selectedFee;
     private ArrayList<Fee> feeList;
     private ArrayList<Fee> filteredFeeList;
+    private ArrayList<CodeViolation> violationList;
+    private ArrayList<CodeViolation> filteredViolationList;
+    private CodeViolation selectedViolation;
 
-    private MoneyOccPeriodFeeAssigned occPeriodFormFee;
-    private MoneyOccPeriodFeeAssigned selectedOccPeriodFee;
-    private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFeeList;
-    private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList;
+    private FeeAssigned selectedAssignedFee;
+    private ArrayList<FeeAssigned> feeAssignedList;
+    private ArrayList<FeeAssigned> filteredFeeAssignedList;
 
     //feePermissions.xhtml fields
     private ArrayList<OccPeriodType> typeList;
     private ArrayList<OccPeriodType> filteredTypeList;
     private OccPeriodType selectedPeriodType;
-    private OccPeriodType lockedPeriodType;
+
+    private ArrayList<EnforcableCodeElement> elementList;
+    private ArrayList<EnforcableCodeElement> filteredElementList;
+    private EnforcableCodeElement selectedCodeElement;
+
     private List<Fee> existingFeeList;
     private ArrayList<Fee> workingFeeList;
     private Fee selectedWorkingFee;
     private List<Fee> allFees;
 
-    private boolean editing;
-    private String redirTo;
+    //Generalized fields
+    private EventDomainEnum currentDomain;
+    private String currentMode;
     private boolean waived;
+    private boolean redirected;
+    private boolean currentFeeSelected;
 
     /**
      * Creates a new instance of NewJSFManagedBean
@@ -85,292 +97,509 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     @PostConstruct
     public void initBean() {
-        formFee = new Fee();
-        formFee.setEffectiveDate(LocalDateTime.now());
-        formFee.setExpiryDate(LocalDateTime.now());
+        selectedFeeType = new Fee();
 
-        PaymentIntegrator pi = getPaymentIntegrator();
+        PaymentCoordinator pc = getPaymentCoordinator();
 
-        occPeriodFormFee = new MoneyOccPeriodFeeAssigned();
+        selectedAssignedFee = new FeeAssigned();
 
-        if (getSessionBean().getFeeRedirTo() != null) {
-            redirTo = getSessionBean().getFeeRedirTo();
+        currentMode = "Lookup";
 
-            currentOccPeriod = getSessionBean().getFeeManagementOccPeriod();
+        //initialize default select button in list-column: false
+        currentFeeSelected = false;
 
-            if (currentOccPeriod != null) {
+        if (getSessionBean().getNavStack().peekLastPage() != null) {
+
+            refreshFeeAssignedList();
+
+            redirected = true;
+
+            if (allFees == null) {
 
                 try {
-                    occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-                    feeList = (ArrayList<Fee>) currentOccPeriod.getType().getPermittedFees();
+                    allFees = pc.getFeeList();
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to fetch the fee list!", ""));
+                                    "Oops! We encountered a problem trying to fetch the list of fee templates!", ""));
+                    System.out.println(ex.toString());
                 }
 
             }
 
+            if (feeList == null) {
+                feeList = (ArrayList<Fee>) allFees;
+            }
+
+            refreshTypesAndElements();
+
+            if (currentCase != null) {
+                violationList = (ArrayList<CodeViolation>) currentCase.getViolationList();
+            }
+
+        }
+    }
+
+    //check if current mode == Lookup
+    public boolean getActiveLookupMode() {
+        return "Lookup".equals(currentMode);
+    }
+
+    //check if current mode == Insert
+    public boolean getActiveInsertMode() {
+        return "Insert".equals(currentMode);
+    }
+
+    //check if current mode == Update
+    public boolean getActiveUpdateMode() {
+        return "Update".equals(currentMode);
+    }
+
+    //check if current mode == Remove
+    public boolean getActiveRemoveMode() {
+        return "Remove".equals(currentMode);
+    }
+
+    //Select button on side panel can only be used in either Lookup Mode or Update Mode
+    public boolean getSelectedButtonActive() {
+        return !("Lookup".equals(currentMode) || "Update".equals(currentMode) || "Remove".equals(currentMode));
+    }
+
+    /**
+     *
+     * @param currentMode Lookup, Insert, Update, Remove
+     * @throws IntegrationException
+     */
+    public void setCurrentMode(String currentMode) throws IntegrationException {
+
+        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
+        String tempCurMode = this.currentMode;
+        //reset default setting every time the Mode has been selected 
+        currentFeeSelected = false;
+        //check the currentMode == null or not
+        if (currentMode == null) {
+            this.currentMode = tempCurMode;
+        } else {
+            this.currentMode = currentMode;
+        }
+        //create an instance object of fees if current mode == "Insert"
+        if (getActiveInsertMode()) {
+            selectedAssignedFee = new FeeAssigned();
+
+            selectedFee = new Fee();
+        }
+        //show the current mode in p:messages box
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, this.currentMode + " Mode Selected", ""));
+    }
+
+    /**
+     * Changing which fee is selected and not selected
+     *
+     * @param currentFee
+     * @throws IntegrationException
+     */
+    public void onAssignedFeeSelectedButtonChange(FeeAssigned currentFee) throws IntegrationException {
+
+        // "Select" button was selected
+        if (currentFeeSelected == true) {
+
+            //Set the correct domain and create the correct type of Assigned Fee object
+            if (currentDomain == EventDomainEnum.OCCUPANCY) {
+
+                MoneyOccPeriodFeeAssigned skeleton = (MoneyOccPeriodFeeAssigned) currentFee;
+
+                if (selectedAssignedFee != null) {
+                    skeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
+
+                } else {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Please select an assigned fee to update", ""));
+                }
+
+                //set selected fee
+                selectedAssignedFee = skeleton;
+                //update the current selected fee list in side panel
+                feeAssignedList = new ArrayList<>();
+                feeAssignedList.add(skeleton);
+
+            } else {
+
+                MoneyCECaseFeeAssigned skeleton = (MoneyCECaseFeeAssigned) currentFee;
+
+                if (selectedAssignedFee != null) {
+
+                    skeleton.setCaseID(currentCase.getCaseID());
+
+                } else {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Please select an assigned fee to update", ""));
+                }
+
+                //set selected fee
+                selectedAssignedFee = skeleton;
+                //update the current selected fee list in side panel
+                feeAssignedList = new ArrayList<>();
+                feeAssignedList.add(skeleton);
+
+            }
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Assigned Fee: " + selectedAssignedFee.getAssignedFeeID(), ""));
+
+            // "Select" button wasn't selected
+        } else {
+            //turn to default setting
+            currentFeeSelected = false;
+
+            refreshFeeAssignedList();
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Fee: " + selectedAssignedFee.getAssignedFeeID(), ""));
         }
 
-        if (allFees == null) {
+    }
+
+    /**
+     * Changing which type is selected and not selected
+     *
+     * @param currentType
+     * @throws IntegrationException
+     */
+    public void onOccPeriodTypeSelectedButtonChange(OccPeriodType currentType) throws IntegrationException {
+
+        if (currentFeeSelected == true) {
+
+            selectedPeriodType = currentType;
+
             try {
-                allFees = pi.getFeeTypeList(getSessionBean().getSessMuni());
-            } catch (IntegrationException ex) {
+                existingFeeList = selectedPeriodType.getPermittedFees();
+                workingFeeList = new ArrayList<>(existingFeeList);
+            } catch (NullPointerException e) {
+                System.out.println("OccPeriodType has no existing permitted fee list, making new ArrayList...");
+                workingFeeList = new ArrayList<>();
+            }
+            //update the current selected fee list in side panel
+
+            typeList = new ArrayList<>();
+            typeList.add(selectedPeriodType);
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Occ Period Type: " + selectedPeriodType.getTypeID(), ""));
+
+            // "Select" button wasn't selected
+        } else {
+            //turn to default setting
+            currentFeeSelected = false;
+
+            selectedPeriodType = new OccPeriodType();
+
+            refreshFeeAssignedList();
+
+            refreshTypesAndElements();
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Occ Period Type: " + selectedPeriodType.getTypeID(), ""));
+        }
+
+    }
+
+    /**
+     * Changing which element is selected and not selected
+     *
+     * @param currentElement
+     * @throws IntegrationException
+     */
+    public void onCodeElementSelectedButtonChange(EnforcableCodeElement currentElement) throws IntegrationException {
+
+        if (currentFeeSelected == true) {
+
+            selectedCodeElement = currentElement;
+
+            try {
+                existingFeeList = selectedCodeElement.getFeeList();
+                workingFeeList = new ArrayList<>(existingFeeList);
+            } catch (NullPointerException e) {
+                System.out.println("EnforcableCodeElement has no existing permitted fee list, making new ArrayList...");
+                workingFeeList = new ArrayList<>();
+            }
+            //update the current selected fee list in side panel
+
+            elementList = new ArrayList<>();
+            elementList.add(selectedCodeElement);
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Code Set Element: " + selectedCodeElement.getCodeSetElementID(), ""));
+
+            // "Select" button wasn't selected
+        } else {
+            //turn to default setting
+            currentFeeSelected = false;
+
+            selectedCodeElement = new EnforcableCodeElement();
+
+            refreshFeeAssignedList();
+
+            refreshTypesAndElements();
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Code Set Element: " + selectedCodeElement.getCodeSetElementID(), ""));
+        }
+
+    }
+
+    /**
+     * Changing of which fee is being selected and not being selected
+     *
+     * @param currentFee
+     * @throws IntegrationException
+     */
+    public void onFeeSelectedButtonChange(Fee currentFee) throws IntegrationException {
+
+        // "Select" button was selected
+        if (currentFeeSelected == true) {
+
+            //set current selected fee
+            selectedFeeType = currentFee;
+            //update the current selected fee list in side panel
+            feeList = new ArrayList<>();
+            feeList.add(currentFee);
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Fee: " + selectedFeeType.getName(), ""));
+
+            // "Select" button wasn't selected
+        } else {
+            //turn to default setting
+            currentFeeSelected = false;
+            selectedFeeType = new Fee();
+
+            refreshTypesAndElements();
+
+            //Message Noticefication
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Fee: " + selectedFeeType.getName(), ""));
+        }
+
+    }
+
+    public String onInsertAssignedFeeButtonChange() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+
+            try {
+                pc.insertAssignedFee(selectedAssignedFee, currentOccPeriod, waived);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully added new fee!", ""));
+            } catch (BObStatusException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Oops! We encountered a problem trying to fetch the fee list!", ""));
+                                ex.getMessage(), ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to add fee to database, sorry!", "Check server print out..."));
+            }
+        } else {
+            try {
+                pc.insertAssignedFee(selectedAssignedFee, currentCase, selectedViolation, waived);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully added new fee!", ""));
+            } catch (BObStatusException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                ex.getMessage(), ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to add fee to database, sorry!", "Check server print out..."));
             }
         }
 
-        if (feeList == null) {
-            feeList = (ArrayList<Fee>) allFees;
-        }
+        refreshFeeAssignedList();
 
-        if (typeList == null) {
-            OccupancyIntegrator oi = getOccupancyIntegrator();
+        return "feeManage";
+    }
+
+    public String onUpdateAssignedFeeButtonChange() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
             try {
-                typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessMuni().getProfile().getProfileID());
+
+                pc.updateAssignedFee(selectedAssignedFee, currentOccPeriod, waived);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated fee!", ""));
+            } catch (BObStatusException ex) {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+
             } catch (IntegrationException ex) {
+                System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Oops! We encountered a problem trying to fetch the OccPeriodType List!", ""));
+                                "Unable to update fee in database, sorry!", "Check server print out..."));
+
+            }
+        } else {
+
+            try {
+                pc.updateAssignedFee(selectedAssignedFee, currentCase, selectedViolation, waived);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated fee!", ""));
+
+            } catch (BObStatusException ex) {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to update fee in database, sorry!", "Check server print out..."));
+            }
+        }
+        refreshFeeAssignedList();
+        return "feeManage";
+    }
+
+    public String onRemoveAssignedFeeButtonChange() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+
+            try {
+                pc.updateAssignedFee(selectedAssignedFee, currentOccPeriod, true); // set waived to true
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Fee waived!", ""));
+            } catch (BObStatusException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "We encountered a problem while waiving the fee!", ""));
+            }
+        }
+        if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+
+            try {
+                pc.updateAssignedFee(selectedAssignedFee, currentCase, selectedViolation, true); // set waived to true
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Fee waived!", ""));
+            } catch (BObStatusException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "We encountered a problem while waiving the fee!", ""));
             }
         }
 
+        refreshFeeAssignedList();
+
+        return "feeManage";
     }
 
     public String finishAndRedir() {
-        getSessionBean().setFeeRedirTo(null);
 
-        return redirTo;
+        return getSessionBean().getNavStack().popLastPage();
     }
 
     public String goToFeePermissions() {
+
+        if (editingCECase() || editingOccPeriod()) {
+            getSessionBean().setFeeManagementDomain(currentDomain);
+            getSessionBean().getNavStack().pushCurrentPage();
+        }
         return "feePermissions";
     }
 
-    public String deleteSelectedOccPeriodFee(ActionEvent e) {
+    public String goToFeeTypes() {
 
-        PaymentIntegrator pi = getPaymentIntegrator();
+        getSessionBean().getNavStack().pushCurrentPage();
+        return "feeTypeManage";
+    }
 
-        if (selectedOccPeriodFee != null) {
+    public String whatDomainFees() {
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+
+            return "occupancy periods";
+
+        } else {
+
+            return "code enforcement elements";
+        }
+
+    }
+
+    public String onUpdateFeeButtonChange() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        if (getSelectedFeeType() != null) {
+
             try {
-                pi.deleteOccPeriodFee(selectedOccPeriodFee);
-                occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Fee deleted forever!", ""));
+                pc.updateFee(selectedFeeType);
             } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "We encountered a problem while updating the fee!", ""));
                 System.out.println(ex.toString());
             }
 
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Occupancy Inspection Fee updated!", ""));
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a fee from the table to delete", ""));
+                            "Please select an occupancy inspection fee from the table to delete", ""));
         }
-        return "";
+
+        return "feeTypeManage";
     }
 
-    public void editOccPeriodFee(ActionEvent e) {
-        if (selectedOccPeriodFee != null) {
-            occPeriodFormFee.setOccPerAssignedFeeID(selectedOccPeriodFee.getOccPerAssignedFeeID());
-            occPeriodFormFee.setOccPeriodID(selectedOccPeriodFee.getOccPeriodID());
-            occPeriodFormFee.setOccPeriodTypeID(selectedOccPeriodFee.getOccPeriodTypeID());
-            occPeriodFormFee.setPaymentList(selectedOccPeriodFee.getPaymentList());
-            occPeriodFormFee.setMoneyFeeAssigned(selectedOccPeriodFee.getMoneyFeeAssigned());
-            occPeriodFormFee.setAssignedBy(selectedOccPeriodFee.getAssignedBy());
-            occPeriodFormFee.setWaivedBy(selectedOccPeriodFee.getWaivedBy());
-            occPeriodFormFee.setLastModified(selectedOccPeriodFee.getLastModified());
-            occPeriodFormFee.setReducedBy(selectedOccPeriodFee.getReducedBy());
-            occPeriodFormFee.setReducedByUser(selectedOccPeriodFee.getReducedByUser());
-            occPeriodFormFee.setNotes(selectedOccPeriodFee.getNotes());
-            occPeriodFormFee.setFee(selectedOccPeriodFee.getFee());
-            editing = true;
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select an assigned fee to update", ""));
-        }
-
-    }
-
-    public void intializeNewOccPeriodFee(ActionEvent e) {
-
-        editing = false;
-        occPeriodFormFee = new MoneyOccPeriodFeeAssigned();
-
-    }
-
-    public String addOccPeriodFee() {
-        MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned();
-
-        PaymentIntegrator pi = getPaymentIntegrator();
-
-        skeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
-        skeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
-        skeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
-        skeleton.setPaymentList(occPeriodFormFee.getPaymentList());
-        skeleton.setMoneyFeeAssigned(occPeriodFormFee.getMoneyFeeAssigned());
-        skeleton.setAssignedBy(getSessionBean().getSessUser());
-        skeleton.setAssigned(LocalDateTime.now());
-        skeleton.setLastModified(LocalDateTime.now());
-        skeleton.setNotes(occPeriodFormFee.getNotes());
-        skeleton.setFee(occPeriodFormFee.getFee());
-
-        if (waived == true) {
-            skeleton.setWaivedBy(getSessionBean().getSessUser());
-        } else {
-            skeleton.setWaivedBy(new User());
-        }
-
-        if (occPeriodFormFee.getReducedBy() != 0) {
-
-            skeleton.setReducedBy(occPeriodFormFee.getReducedBy());
-            skeleton.setReducedByUser(getSessionBean().getSessUser());
-
-        } else {
-            skeleton.setReducedByUser(new User());
-        }
-
-        try {
-            pi.insertOccPeriodFee(skeleton);
-            occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to add fee to database, sorry!", "Check server print out..."));
-        }
-
-        return "";
-
-    }
-
-    public String commitOccPeriodFeeUpdates(ActionEvent e) {
-        PaymentIntegrator pi = getPaymentIntegrator();
-        MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned();
-
-        skeleton.setOccPerAssignedFeeID(occPeriodFormFee.getOccPerAssignedFeeID());
-        skeleton.setOccPeriodID(occPeriodFormFee.getOccPeriodID());
-        skeleton.setOccPeriodTypeID(occPeriodFormFee.getOccPeriodTypeID());
-        skeleton.setPaymentList(occPeriodFormFee.getPaymentList());
-        skeleton.setMoneyFeeAssigned(occPeriodFormFee.getMoneyFeeAssigned());
-        skeleton.setAssignedBy(getSessionBean().getSessUser());
-        skeleton.setAssigned(LocalDateTime.now());
-        skeleton.setLastModified(LocalDateTime.now());
-        skeleton.setNotes(occPeriodFormFee.getNotes());
-        skeleton.setFee(occPeriodFormFee.getFee());
-
-        if (waived == true) {
-            skeleton.setWaivedBy(getSessionBean().getSessUser());
-        } else {
-            skeleton.setWaivedBy(new User());
-        }
-
-        if (occPeriodFormFee.getReducedBy() != 0) {
-            skeleton.setReducedBy(occPeriodFormFee.getReducedBy());
-            skeleton.setReducedByUser(getSessionBean().getSessUser());
-
-        } else {
-            skeleton.setReducedByUser(new User());
-        }
-
-        try {
-            pi.updateOccPeriodFee(skeleton);
-            occPeriodFeeList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to update fee in database.",
-                            "This must be corrected by the System Administrator"));
-        }
-
-        return "";
-    }
-
-    public void editFeeType(ActionEvent e) {
+    public String onInsertFeeButtonChange() {
+        PaymentCoordinator pc = getPaymentCoordinator();
         if (getSelectedFeeType() != null) {
-            editing = true;
-            formFee.setOccupancyInspectionFeeID(selectedFeeType.getOccupancyInspectionFeeID());
-            formFee.setMuni(selectedFeeType.getMuni());
-            formFee.setName(selectedFeeType.getName());
-            formFee.setAmount(selectedFeeType.getAmount());
-            formFee.setNotes(selectedFeeType.getNotes());
-            /*
-            Have to figure out what to do w/ setting dates...
-            setFormOccupancyInspectionFeeEffDate(formFeeEffDate.toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime());
-             */
+
+            try {
+                pc.insertFee(selectedFeeType);
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "We encountered a problem while inserting the fee!", ""));
+            }
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully added occupancy inspection fee to database!", ""));
+
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select an occupancy inspection fee to update", ""));
+                            "Please select an occupancy inspection fee from the table to delete", ""));
         }
-    }
-
-    public void commitFeeUpdates(ActionEvent e) {
-        OccupancyIntegrator oifi = getOccupancyIntegrator();
-        PaymentIntegrator pi = getPaymentIntegrator();
-        Fee oif = selectedFeeType;
-
-        oif.setMuni(formFee.getMuni());
-        oif.setName(formFee.getName());
-        oif.setAmount(formFee.getAmount());
-        oif.setEffectiveDate(formFee.getEffectiveDate());
-        oif.setExpiryDate(formFee.getExpiryDate());
-        oif.setNotes(formFee.getNotes());
-        try {
-            pi.updateOccupancyInspectionFee(oif);
-            editing = false;
-        } catch (IntegrationException ex) {
-        }
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Occupancy Inspection Fee updated!", ""));
-    }
-
-    public void initializeNewFee(ActionEvent e) {
-
-        editing = false;
-        formFee = new Fee();
-        formFee.setEffectiveDate(LocalDateTime.now());
-        formFee.setExpiryDate(LocalDateTime.now());
-    }
-
-    public String saveNewFeeType() {
-        PaymentIntegrator pi = getPaymentIntegrator();
-        Fee oif = new Fee();
-        oif.setOccupancyInspectionFeeID(formFee.getOccupancyInspectionFeeID());
-        oif.setMuni(getFormMuni());
-        oif.setName(formFee.getName());
-        oif.setAmount(formFee.getAmount());
-        oif.setEffectiveDate(formFee.getEffectiveDate());
-        oif.setExpiryDate(formFee.getExpiryDate());
-        oif.setNotes(formFee.getNotes());
-        try {
-            pi.insertOccupancyInspectionFee(oif);
-        } catch (IntegrationException ex) {
-        }
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Successfully added occupancy inspection fee to database!", ""));
-
-        return "occupancyInspectionFeeManage";
+        return "feeTypeManage";
 
     }
 
-    public void deleteSelectedFee(ActionEvent e) {
-        PaymentIntegrator pi = getPaymentIntegrator();
+    public void onRemoveFeeButtonChange() {
+        PaymentCoordinator pc = getPaymentCoordinator();
 
         if (getSelectedFeeType() != null) {
             try {
-                pi.deleteOccupancyInspectionFee(getSelectedFeeType());
+                pc.removeFee(selectedFeeType);
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Successfully added occupancy inspection fee to database!", ""));
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -387,167 +616,350 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @return the existingFeeTypeList
      */
     public ArrayList<Fee> getFeeTypeList() {
-        PaymentIntegrator pi = getPaymentIntegrator();
+        PaymentCoordinator pc = getPaymentCoordinator();
         try {
-            existingFeeTypeList = pi.getOccupancyInspectionFeeList();
+            existingFeeTypeList = (ArrayList<Fee>) pc.getAllFeeTypes();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        if (existingFeeTypeList != null) {
-            return existingFeeTypeList;
-        } else {
-            existingFeeTypeList = new ArrayList();
-            return existingFeeTypeList;
-        }
-    }
 
-    public void editOccPeriodFees() {
-
-        try {
-            lockedPeriodType = (OccPeriodType) selectedPeriodType.clone();
-        } catch (CloneNotSupportedException ex) {
-            System.out.println("OccPeriodType had a problem cloning. Oops!");
-        }
-
-        try {
-            existingFeeList = lockedPeriodType.getPermittedFees();
-            workingFeeList = new ArrayList<>(existingFeeList);
-        } catch (NullPointerException e) {
-            System.out.println("OccPeriodType has no existing permitted fee list, making new ArrayList...");
-            workingFeeList = new ArrayList<>();
-        }
+        return existingFeeTypeList;
 
     }
 
-    public void removeOccPeriodFee(Fee selectedFee) {
+    public void removePermittedFee(Fee selectedFee) {
         workingFeeList.remove(selectedFee);
     }
 
     public void addFeeToPermittedFees() {
 
-        Iterator itr = workingFeeList.iterator();
-        boolean duplicate = false;
-        Fee test = null;
-        while (itr.hasNext()) {
-            test = (Fee) itr.next();
-            duplicate = test.getOccupancyInspectionFeeID() == selectedFee.getOccupancyInspectionFeeID();
-            if (duplicate) {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "You cannot permit the same fee twice.", ""));
-                break;
-            }
+        if (selectedFee == null) {
 
-        }
-        if (!duplicate) {
-            workingFeeList.add(selectedFee);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a fee to add to the list.", ""));
+
+        } else {
+
+            boolean duplicate = false;
+
+            for (Fee test : workingFeeList) {
+                duplicate = test.getOccupancyInspectionFeeID() == selectedFee.getOccupancyInspectionFeeID();
+                if (duplicate) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "You cannot permit the same fee twice.", ""));
+                    break;
+                }
+
+            }
+            if (!duplicate) {
+                workingFeeList.add(selectedFee);
+            }
         }
     }
 
-    public void commitPermissionUpdates() {
-
-        PaymentIntegrator pi = getPaymentIntegrator();
-
-        boolean failed = false;
+    public String onUpdatePermissionButtonChange() {
 
         if (existingFeeList == null) {
 
             for (Fee workingFee : workingFeeList) {
 
-                failed = false;
-
-                try {
-                    pi.insertFeePeriodTypeJoin(workingFee, lockedPeriodType);
-                } catch (IntegrationException ex) {
-                    System.out.println("Failed inserting occperiod fee join, trying to reactivate.");
-                    failed = true;
+                if (currentDomain == EventDomainEnum.OCCUPANCY) {
+                    insertOrReactivateOccPeriodJoin(workingFee);
+                } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+                    insertOrReactivateCodeElementJoin(workingFee);
                 }
-
-                if (failed) {
-
-                    try {
-                        pi.reactivateFeePeriodTypeJoin(workingFee, lockedPeriodType);
-                    } catch (IntegrationException ex) {
-                        System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
-                    }
-
-                }
-
             }
 
         } else {
 
-            int notThisFee = 0;
+            if (currentDomain == EventDomainEnum.OCCUPANCY) {
 
-            for (Fee existingFee : existingFeeList) {
-                notThisFee = 0;
-                for (Fee workingFee : workingFeeList) {
-                    if (existingFee.getOccupancyInspectionFeeID() != workingFee.getOccupancyInspectionFeeID()) {
-                        notThisFee++;
-                    }
+                scanExistingOccPeriodFeeListWithDeactivate();
 
-                }
+            } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
 
-                if (notThisFee == workingFeeList.size()) {
-
-                    try {
-                        pi.deactivateFeePeriodTypeJoin(existingFee, lockedPeriodType);
-                    } catch (IntegrationException ex) {
-                        System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
-                    }
-
-                }
+                scanExistingCodeElementFeeListWithDeactivate();
 
             }
 
-            for (Fee workingFee : workingFeeList) {
-                notThisFee = 0;
-                failed = false;
-                for (Fee existingFee : existingFeeList) {
+            if (currentDomain == EventDomainEnum.OCCUPANCY) {
 
-                    if (existingFee.getOccupancyInspectionFeeID() == workingFee.getOccupancyInspectionFeeID()) {
-                        try {
-                            pi.updateFeePeriodTypeJoin(workingFee, lockedPeriodType);
-                        } catch (IntegrationException ex) {
-                            System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
-                        }
-                        break;
-                    } else {
-                        notThisFee++;
-                    }
+                scanExistingOccPeriodFeeListWithInsert();
 
-                }
+            } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
 
-                if (notThisFee == existingFeeList.size()) {
-                    try {
-                        pi.insertFeePeriodTypeJoin(workingFee, lockedPeriodType);
-                    } catch (IntegrationException ex) {
-                        System.out.println("Failed inserting occperiod fee join, trying to reactivate.");
-                        failed=true;
-                    }
-
-                }
-                
-                if (failed) {
-
-                    try {
-                        pi.reactivateFeePeriodTypeJoin(workingFee, lockedPeriodType);
-                    } catch (IntegrationException ex) {
-                        System.out.println("FeeManagementBB.commitPermissionUpdates() | Error: " + ex.toString());
-                    }
-
-                }
+                scanExistingCodeElementFeeListWithInsert();
 
             }
         }
-        OccupancyIntegrator oi = getOccupancyIntegrator();
+
+        refreshTypesAndElements();
+
+        return "feePermissions";
+    }
+
+    public void insertOrReactivateOccPeriodJoin(Fee workingFee) {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
         try {
-            typeList = (ArrayList<OccPeriodType>) oi.getOccPeriodTypeList(getSessionBean().getSessMuni().getProfile().getProfileID());
+            pc.activateFeeJoin(workingFee, selectedPeriodType);
         } catch (IntegrationException ex) {
+            System.out.println("FeeManagementBB.insertOrReactivateOccPeriodJoin | Error: " + ex.toString());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Oops! We encountered a problem trying to fetch the OccPeriodType List!", ""));
+                            "You cannot permit the same fee twice.", ""));
         }
+
+    }
+
+    public void insertOrReactivateCodeElementJoin(Fee workingFee) {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        try {
+            pc.activateFeeJoin(workingFee, selectedCodeElement);
+        } catch (IntegrationException ex) {
+            System.out.println("FeeManagementBB.insertOrReactivateCodeElementJoin | Error: " + ex.toString());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "You cannot permit the same fee twice.", ""));
+        }
+
+    }
+
+    public void scanExistingOccPeriodFeeListWithInsert() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        for (Fee workingFee : workingFeeList) {
+            int notThisFee = 0;
+            for (Fee existingFee : existingFeeList) {
+
+                if (existingFee.getOccupancyInspectionFeeID() == workingFee.getOccupancyInspectionFeeID()) {
+                    try {
+                        pc.updateFeeJoin(workingFee, selectedPeriodType);
+                    } catch (IntegrationException ex) {
+                        System.out.println("FeeManagementBB.scanExistingOccPeriodFeeListWithInsert() | Error: " + ex.toString());
+                    }
+                    break;
+                } else {
+                    notThisFee++;
+                }
+
+            }
+
+            if (notThisFee == existingFeeList.size()) {
+                insertOrReactivateOccPeriodJoin(workingFee);
+
+            }
+        }
+
+    }
+
+    public void scanExistingCodeElementFeeListWithInsert() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        for (Fee workingFee : workingFeeList) {
+            int notThisFee = 0;
+            for (Fee existingFee : existingFeeList) {
+
+                if (existingFee.getOccupancyInspectionFeeID() == workingFee.getOccupancyInspectionFeeID()) {
+                    try {
+                        pc.updateFeeJoin(workingFee, selectedCodeElement);
+                    } catch (IntegrationException ex) {
+                        System.out.println("FeeManagementBB.scanExistingCodeElementFeeListWithInsert() | Error: " + ex.toString());
+                    }
+                    break;
+                } else {
+                    notThisFee++;
+                }
+
+            }
+
+            if (notThisFee == existingFeeList.size()) {
+                insertOrReactivateCodeElementJoin(workingFee);
+            }
+
+        }
+
+    }
+
+    public void scanExistingOccPeriodFeeListWithDeactivate() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        for (Fee existingFee : existingFeeList) {
+            int notThisFee = 0;
+            for (Fee workingFee : workingFeeList) {
+                if (existingFee.getOccupancyInspectionFeeID() != workingFee.getOccupancyInspectionFeeID()) {
+                    notThisFee++;
+                }
+
+            }
+
+            if (notThisFee == workingFeeList.size()) {
+
+                try {
+                    pc.deactivateFeeJoin(existingFee, selectedPeriodType);
+                } catch (IntegrationException ex) {
+                    System.out.println("FeeManagementBB.scanExistingOccPeriodFeeListWithDeactivate() | Error: " + ex.toString());
+                }
+
+            }
+
+        }
+
+    }
+
+    public void scanExistingCodeElementFeeListWithDeactivate() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        for (Fee existingFee : existingFeeList) {
+            int notThisFee = 0;
+            for (Fee workingFee : workingFeeList) {
+                if (existingFee.getOccupancyInspectionFeeID() != workingFee.getOccupancyInspectionFeeID()) {
+                    notThisFee++;
+                }
+
+            }
+
+            if (notThisFee == workingFeeList.size()) {
+
+                try {
+                    pc.deactivateFeeJoin(existingFee, selectedCodeElement);
+                } catch (IntegrationException ex) {
+                    System.out.println("FeeManagementBB.scanExistingCodeElementFeeListWithDeactivate() | Error: " + ex.toString());
+                }
+
+            }
+
+        }
+
+    }
+
+    /**
+     * Refreshes the lists of assigned fees, the current Domain, etc.
+     */
+    public void refreshFeeAssignedList() {
+
+        feeAssignedList = new ArrayList<>();
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        currentDomain = getSessionBean().getFeeManagementDomain();
+
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+
+            OccupancyCoordinator oc = getOccupancyCoordinator();
+
+            try {
+                currentOccPeriod = oc.assembleOccPeriodDataHeavy(getSessionBean().getFeeManagementOccPeriod(), getSessionBean().getSessUser().getMyCredential());
+            } catch (BObStatusException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            } catch (IntegrationException | SearchException ex) {
+                System.out.println(ex.toString());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Encountered error while trying to assemble the current Occupancy Period!", "Check server print out..."));
+            }
+
+            if (currentOccPeriod != null) {
+
+                try {
+                    feeAssignedList = (ArrayList<FeeAssigned>) pc.getAssignedFees(currentOccPeriod);
+
+                    feeList = (ArrayList<Fee>) currentOccPeriod.getType().getPermittedFees();
+                } catch (IntegrationException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Oops! We encountered a problem trying to refresh the assigned fees list!", ""));
+                }
+
+            }
+
+        } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+
+            CaseCoordinator cc = getCaseCoordinator();
+
+            try {
+                currentCase = cc.assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser().getMyCredential());
+            } catch (BObStatusException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Oops! We encountered a problem trying to prepare your selected CE Case before refreshing the assigned fees list!", ""));
+            }
+
+            if (currentCase != null) {
+
+                try {
+
+                    feeAssignedList = (ArrayList<FeeAssigned>) pc.getAssignedFees(currentCase);
+                    feeList = new ArrayList<>();
+                } catch (IntegrationException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
+                }
+            }
+        }
+    }
+
+    public void refreshTypesAndElements() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        CodeCoordinator ec = getCodeCoordinator();
+
+        typeList = (ArrayList<OccPeriodType>) oc.getOccPeriodTypesFromProfileID(getSessionBean().getSessMuni().getProfile().getProfileID());
+
+        ArrayList<CodeSet> codeSetList = (ArrayList<CodeSet>) ec.getCodeSetsFromMuniID(getSessionBean().getSessMuni().getMuniCode());
+
+        elementList = new ArrayList<>();
+
+        for (CodeSet set : codeSetList) {
+
+            elementList.addAll(ec.getCodeElementsFromCodeSetID(set.getCodeSetID()));
+
+        }
+
+        try {
+            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
+
+        } catch (BObStatusException ex) {
+            getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println("FeeManagementBB.refreshTypesAndElements() | Error: " + ex.toString());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Oops! We encountered a problem trying to refresh the currentCase!", ""));
+        } catch (NullPointerException ex) {
+
+            System.out.println("FeeManagementBB.refreshTypesAndElements() | Null Pointer Exception when accessing case.");
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "No CE Case is currently selected!", ""));
+
+        }
+
+    }
+
+    public void violationSelected(ActionEvent e) {
+
+        feeList.clear();
+
+        feeList.addAll(selectedViolation.getViolatedEnfElement().getFeeList());
+
     }
 
     /**
@@ -571,126 +983,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.selectedFeeType = selectedFeeType;
     }
 
-    /**
-     * @return the formFeeID
-     */
-    public int getFormFeeID() {
-        return formFee.getOccupancyInspectionFeeID();
-    }
-
-    /**
-     * @param formFeeID the formFeeID to set
-     */
-    public void setFormFeeID(int formFeeID) {
-        this.formFee.setOccupancyInspectionFeeID(formFeeID);
-    }
-
-    /**
-     * @return the formMuni
-     */
-    public Municipality getFormMuni() {
-        return formMuni;
-    }
-
-    /**
-     * @param formMuni the formMuni to set
-     */
-    public void setFormMuni(Municipality formMuni) {
-        this.formMuni = formMuni;
-    }
-
-    /**
-     * @return the formFeeName
-     */
-    public String getFormFeeName() {
-        return formFee.getName();
-    }
-
-    /**
-     * @param formFeeName the formFeeName to set
-     */
-    public void setFormFeeName(String formFeeName) {
-        this.formFee.setName(formFeeName);
-    }
-
-    /**
-     * @return the formFeeAmount
-     */
-    public double getFormFeeAmount() {
-        return formFee.getAmount();
-    }
-
-    /**
-     * @param formFeeAmount the formFeeAmount to set
-     */
-    public void setFormFeeAmount(double formFeeAmount) {
-        this.formFee.setAmount(formFeeAmount);
-    }
-
-    /**
-     * @return the formFeeEffDate
-     */
-    public java.util.Date getFormFeeEffDate() {
-        return java.util.Date.from(formFee.getEffectiveDate()
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
-    }
-
-    /**
-     * @param formFeeEffDate the formFeeEffDate to set
-     */
-    public void setFormFeeEffDate(java.util.Date formFeeEffDate) {
-        this.formFee.setEffectiveDate(
-                LocalDateTime.ofInstant(formFeeEffDate.toInstant(),
-                        ZoneId.systemDefault()));
-    }
-
-    /**
-     * @return the formFeeExpDate
-     */
-    public java.util.Date getFormFeeExpDate() {
-        return java.util.Date.from(formFee.getExpiryDate()
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
-    }
-
-    /**
-     * @param formFeeExpDate the formFeeExpDate to set
-     */
-    public void setFormFeeExpDate(java.util.Date formFeeExpDate) {
-        this.formFee.setExpiryDate(
-                LocalDateTime.ofInstant(formFeeExpDate.toInstant(),
-                        ZoneId.systemDefault()));
-    }
-
-    /**
-     * @return the formFeeNotes
-     */
-    public String getFormFeeNotes() {
-        return formFee.getNotes();
-    }
-
-    /**
-     * @param formFeeNotes the formFeeNotes to set
-     */
-    public void setFormFeeNotes(String formFeeNotes) {
-        this.formFee.setNotes(formFeeNotes);
-    }
-
-    public boolean isEditing() {
-        return editing;
-    }
-
-    public void setEditing(boolean editing) {
-        this.editing = editing;
-    }
-
-    public Fee getFormFee() {
-        return formFee;
-    }
-
-    public void setFormFee(Fee formFee) {
-        this.formFee = formFee;
+    public String getCurrentMode() {
+        return currentMode;
     }
 
     public Fee getSelectedFee() {
@@ -709,44 +1003,36 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.feeList = feeList;
     }
 
-    public MoneyOccPeriodFeeAssigned getOccPeriodFormFee() {
-        return occPeriodFormFee;
+    public ArrayList<CodeViolation> getViolationList() {
+        return violationList;
     }
 
-    public void setOccPeriodFormFee(MoneyOccPeriodFeeAssigned occPeriodFormFee) {
-        this.occPeriodFormFee = occPeriodFormFee;
+    public void setViolationList(ArrayList<CodeViolation> violationList) {
+        this.violationList = violationList;
     }
 
-    public MoneyOccPeriodFeeAssigned getSelectedOccPeriodFee() {
-        return selectedOccPeriodFee;
+    public FeeAssigned getSelectedAssignedFee() {
+        return selectedAssignedFee;
     }
 
-    public void setSelectedOccPeriodFee(MoneyOccPeriodFeeAssigned selectedOccPeriodFee) {
-        this.selectedOccPeriodFee = selectedOccPeriodFee;
+    public void setSelectedAssignedFee(FeeAssigned selectedAssignedFee) {
+        this.selectedAssignedFee = selectedAssignedFee;
     }
 
-    public ArrayList<MoneyOccPeriodFeeAssigned> getOccPeriodFeeList() {
-        return occPeriodFeeList;
+    public ArrayList<FeeAssigned> getFeeAssignedList() {
+        return feeAssignedList;
     }
 
-    public void setOccPeriodFeeList(ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFeeList) {
-        this.occPeriodFeeList = occPeriodFeeList;
+    public void setFeeAssignedList(ArrayList<FeeAssigned> feeAssignedList) {
+        this.feeAssignedList = feeAssignedList;
     }
 
-    public String getRedirTo() {
-        return redirTo;
+    public ArrayList<FeeAssigned> getFilteredFeeAssignedList() {
+        return filteredFeeAssignedList;
     }
 
-    public void setRedirTo(String redirTo) {
-        this.redirTo = redirTo;
-    }
-
-    public ArrayList<MoneyOccPeriodFeeAssigned> getOccPeriodFilteredFeeList() {
-        return occPeriodFilteredFeeList;
-    }
-
-    public void setOccPeriodFilteredFeeList(ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList) {
-        this.occPeriodFilteredFeeList = occPeriodFilteredFeeList;
+    public void setFilteredFeeAssignedList(ArrayList<FeeAssigned> filteredFeeAssignedList) {
+        this.filteredFeeAssignedList = filteredFeeAssignedList;
     }
 
     public boolean isWaived() {
@@ -765,16 +1051,20 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.filteredFeeList = filteredFeeList;
     }
 
-    public OccPeriod getCurrentOccPeriod() {
+    public OccPeriodDataHeavy getCurrentOccPeriod() {
         return currentOccPeriod;
     }
 
-    public void setCurrentOccPeriod(OccPeriod currentOccPeriod) {
+    public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
         this.currentOccPeriod = currentOccPeriod;
     }
 
     public boolean editingOccPeriod() {
-        return (redirTo != null && currentOccPeriod != null);
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
+    }
+
+    public boolean editingCECase() {
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
     }
 
     public ArrayList<OccPeriodType> getTypeList() {
@@ -833,36 +1123,120 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.allFees = allFees;
     }
 
-    public Property getOccPeriodProperty() {
-
-        PropertyIntegrator pi = getPropertyIntegrator();
-
-        String address = "";
-        PropertyUnit unit;
-        Property prop = new Property();
-        try {
-            unit = pi.getPropertyUnit(currentOccPeriod.getPropertyUnitID());
-            prop = pi.getProperty(unit.getPropertyID());
-        } catch (IntegrationException ex) {
-            System.out.println("PaymentBB had problems getting the OccPeriodProperty");
-        }
-
-        return prop;
-  
-    }
-
     public String getOccPeriodAddress() {
 
-        return getOccPeriodProperty().getAddress();
+        PaymentCoordinator pc = getPaymentCoordinator();
+        try {
+            return pc.getAddressFromPropUnitID(currentOccPeriod.getPropertyUnitID());
+        } catch (IntegrationException ex) {
+            System.out.println(ex.toString());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to find property address!",
+                            ""));
+        }
+        return "";
 
     }
 
-    public OccPeriodType getLockedPeriodType() {
-        return lockedPeriodType;
+    /**
+     * This is used by the interface to display the returned value
+     *
+     * @return Whether or not the currently selected fee has been waived
+     */
+    public String isSelectedFeeWaived() {
+
+        if (selectedAssignedFee.getWaivedBy() != null) {
+
+            return "Yes";
+
+        } else {
+
+            return "No";
+        }
+
     }
 
-    public void setLockedPeriodType(OccPeriodType lockedPeriodType) {
-        this.lockedPeriodType = lockedPeriodType;
+    /**
+     *
+     * @return
+     */
+    public String getCECaseAddress() {
+
+        return currentCase.getProperty().getAddress();
+
+    }
+
+    public EventDomainEnum getCurrentDomain() {
+        return currentDomain;
+    }
+
+    public void setCurrentDomain(EventDomainEnum currentDomain) {
+        this.currentDomain = currentDomain;
+    }
+
+    public CECase getCurrentCase() {
+        return currentCase;
+    }
+
+    public void setCurrentCase(CECase currentCase) {
+        this.currentCase = (CECaseDataHeavy) currentCase;
+    }
+
+    public ArrayList<CodeViolation> getFilteredViolationList() {
+        return filteredViolationList;
+    }
+
+    public void setFilteredViolationList(ArrayList<CodeViolation> filteredViolationList) {
+        this.filteredViolationList = filteredViolationList;
+    }
+
+    public CodeViolation getSelectedViolation() {
+        return selectedViolation;
+    }
+
+    public void setSelectedViolation(CodeViolation selectedViolation) {
+        this.selectedViolation = selectedViolation;
+    }
+
+    public ArrayList<EnforcableCodeElement> getElementList() {
+        return elementList;
+    }
+
+    public void setElementList(ArrayList<EnforcableCodeElement> elementList) {
+        this.elementList = elementList;
+    }
+
+    public ArrayList<EnforcableCodeElement> getFilteredElementList() {
+        return filteredElementList;
+    }
+
+    public void setFilteredElementList(ArrayList<EnforcableCodeElement> filteredElementList) {
+        this.filteredElementList = filteredElementList;
+    }
+
+    public EnforcableCodeElement getSelectedCodeElement() {
+        return selectedCodeElement;
+    }
+
+    public void setSelectedCodeElement(EnforcableCodeElement selectedCodeElement) {
+        this.selectedCodeElement = selectedCodeElement;
+    }
+
+    public boolean isRedirected() {
+        return redirected;
+    }
+
+    public void setRedirected(boolean redirected) {
+        this.redirected = redirected;
+    }
+
+    public boolean isCurrentFeeSelected() {
+        return currentFeeSelected;
+    }
+
+    public void setCurrentFeeSelected(boolean currentFeeSelected) {
+        this.currentFeeSelected = currentFeeSelected;
     }
 
 }

@@ -960,4 +960,56 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
+    //xiaohong add
+    public ArrayList<PrintStyle> getPrintStyle() throws IntegrationException {
+
+        String query = "SELECT styleid, description, headerimage_photodocid, headerheight, novtopmargin, \n"
+                + "       novaddresseleftmargin, novaddressetopmargin, browserheadfootenabled, \n"
+                + "       novtexttopmargin\n"
+                + "  FROM public.printstyle;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ArrayList<PrintStyle> styleList = new ArrayList<>();
+        PrintStyle style = null;
+
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                style = generatePrintStyle(rs);
+                if(style != null){
+                    styleList.add(style);
+                }
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to generate icon", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+        return styleList;
+
+    }
 }

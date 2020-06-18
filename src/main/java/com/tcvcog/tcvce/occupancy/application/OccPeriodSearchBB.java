@@ -32,7 +32,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitified;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
@@ -58,8 +58,8 @@ public  class   OccPeriodSearchBB
     private List<Property> propListForSearch;
     protected List<Person> personListForSearch;
    
-    private List<OccPeriodPropertyUnitified> occPeriodList;
-    private List<OccPeriodPropertyUnitified> occPeriodListFiltered;
+    private List<OccPeriodPropertyUnitHeavy> occPeriodList;
+    private List<OccPeriodPropertyUnitHeavy> occPeriodListFiltered;
     private boolean appendResultsToList;
     
     private SearchParamsOccPeriod searchParamsSelected;
@@ -75,7 +75,7 @@ public  class   OccPeriodSearchBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
         try {
-            occPeriodList = oc.getOccPeriodPropertyUnitifiedList(getSessionBean().getSessOccPeriodList());
+            occPeriodList = oc.getOccPeriodPropertyUnitHeavy(getSessionBean().getSessOccPeriodList());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -96,11 +96,11 @@ public  class   OccPeriodSearchBB
     private void configureParameters(){
         if(occPeriodQuerySelected != null 
                 && 
-            occPeriodQuerySelected.getParmsList() != null 
+            occPeriodQuerySelected.getParamsList() != null 
                 && 
-            !occPeriodQuerySelected.getParmsList().isEmpty()){
+            !occPeriodQuerySelected.getParamsList().isEmpty()){
             
-            searchParamsSelected = occPeriodQuerySelected.getParmsList().get(0);
+            searchParamsSelected = occPeriodQuerySelected.getParamsList().get(0);
         } else {
             searchParamsSelected = null;
         }
@@ -147,13 +147,15 @@ public  class   OccPeriodSearchBB
      * @param ev 
      */
     public void clearOccPeriodList(ActionEvent ev){
-        occPeriodList.clear();
+        if(occPeriodList !=  null){
+            occPeriodList.clear();
+        }
     }
     
     public void loadOccPeriodHistory(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            occPeriodList.addAll(oc.getOccPeriodPropertyUnitifiedList(oc.assembleOccPeriodHistoryList(getSessionBean().getSessUser().getMyCredential())));
+            occPeriodList.addAll(oc.getOccPeriodPropertyUnitHeavy(oc.assembleOccPeriodHistoryList(getSessionBean().getSessUser().getMyCredential())));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -186,7 +188,7 @@ public  class   OccPeriodSearchBB
         CaseCoordinator cc = getCaseCoordinator();
         int listSize = 0;
         
-        if(appendResultsToList){
+        if(!appendResultsToList){
             occPeriodList.clear();
         }
         try {
@@ -248,14 +250,14 @@ public  class   OccPeriodSearchBB
     /**
      * @return the occPeriodList
      */
-    public List<OccPeriodPropertyUnitified> getOccPeriodList() {
+    public List<OccPeriodPropertyUnitHeavy> getOccPeriodList() {
         return occPeriodList;
     }
 
     /**
      * @return the occPeriodListFiltered
      */
-    public List<OccPeriodPropertyUnitified> getOccPeriodListFiltered() {
+    public List<OccPeriodPropertyUnitHeavy> getOccPeriodListFiltered() {
         return occPeriodListFiltered;
     }
 
@@ -283,14 +285,14 @@ public  class   OccPeriodSearchBB
     /**
      * @param occPeriodList the occPeriodList to set
      */
-    public void setOccPeriodList(List<OccPeriodPropertyUnitified> occPeriodList) {
+    public void setOccPeriodList(List<OccPeriodPropertyUnitHeavy> occPeriodList) {
         this.occPeriodList = occPeriodList;
     }
 
     /**
      * @param occPeriodListFiltered the occPeriodListFiltered to set
      */
-    public void setOccPeriodListFiltered(List<OccPeriodPropertyUnitified> occPeriodListFiltered) {
+    public void setOccPeriodListFiltered(List<OccPeriodPropertyUnitHeavy> occPeriodListFiltered) {
         this.occPeriodListFiltered = occPeriodListFiltered;
     }
 

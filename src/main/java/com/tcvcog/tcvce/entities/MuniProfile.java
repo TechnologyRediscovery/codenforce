@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -178,4 +179,48 @@ public class MuniProfile {
         this.occPeriodTypeList = occPeriodTypeList;
     }
     
+     @Override
+    public int hashCode() {
+        int hash = 15;
+        hash = 500 * hash + this.profileID;
+        hash = 500 * hash + Objects.hashCode(this.title);
+        hash = 500 * hash + Objects.hashCode(this.description);
+        hash = 500 * hash + Objects.hashCode(this.notes);
+        hash = 500 * hash + this.continuousoccupancybufferdays;
+        hash = 500 * hash + this.minimumuserranktodeclarerentalintent;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MuniProfile other = (MuniProfile) obj;
+        if (this.profileID != other.profileID) {
+            return false;
+        }
+        if (this.continuousoccupancybufferdays != other.continuousoccupancybufferdays) {
+            return false;
+        }
+        if (this.minimumuserranktodeclarerentalintent != other.minimumuserranktodeclarerentalintent) {
+            return false;
+        }
+        if (!Objects.equals(this.title, other.title)) {
+            return false;
+        }
+        if (!Objects.equals(this.description, other.description)) {
+            return false;
+        }
+        if (!Objects.equals(this.notes, other.notes)) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -183,10 +183,11 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * given Municipality objects passed into the method.
      * 
      * TODO: Customize list based on muni connections
+     * NOTED in github issues by ECD 25-may-2020
      * 
      * @return An assembled list of users for authorization
      */
-    public List<User> assembleUserListForSearchCriteria(){
+    public List<User> assembleUserListForSearch(User usr){
         // we do nothing with muniList
         UserIntegrator ui = getUserIntegrator();
         

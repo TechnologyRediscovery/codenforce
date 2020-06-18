@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities.search;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -25,7 +26,7 @@ public class QueryEvent
     private QueryEventEnum queryName;
     
     private List<SearchParamsEvent> searchParamsList;
-    private List<EventCnF> results;
+    private List<EventCnFPropUnitCasePeriodHeavy> results;
     
     public QueryEvent(QueryEventEnum qName, 
                             List<SearchParamsEvent> params,
@@ -41,6 +42,7 @@ public class QueryEvent
     }
 
     
+    @Override
     public List<SearchParamsEvent> getParamsList() {
         return searchParamsList;
     }
@@ -54,7 +56,7 @@ public class QueryEvent
     }
 
     @Override
-    public List<EventCnF> getBOBResultList() {
+    public List<EventCnFPropUnitCasePeriodHeavy> getBOBResultList() {
         return results;
     }
 
@@ -67,10 +69,7 @@ public class QueryEvent
         throw new UnsupportedOperationException("must still deal with Inheritance snafoo");
     }
 
-    @Override
-    public List getParmsList() {
-        return searchParamsList;
-    }
+  
 
     @Override
     public String getQueryTitle() {
@@ -98,16 +97,15 @@ public class QueryEvent
         this.queryName = queryName;
     }
 
-    public void addToResults(List<EventCnF> events) {
+    public void addToResults(List<EventCnFPropUnitCasePeriodHeavy> events) {
         results.addAll(events);
     }
 
     @Override
-    public int addParams(SearchParams params) {
+    public void addParams(SearchParams params) {
          if(params instanceof SearchParamsEvent){
             searchParamsList.add((SearchParamsEvent) params);
         }
-        return searchParamsList.size();
     }
 
     @Override

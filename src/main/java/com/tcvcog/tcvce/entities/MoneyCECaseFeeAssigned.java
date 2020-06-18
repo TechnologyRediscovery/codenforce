@@ -33,6 +33,24 @@ public class MoneyCECaseFeeAssigned extends FeeAssigned{
     public MoneyCECaseFeeAssigned() {
     }
     
+    public MoneyCECaseFeeAssigned(FeeAssigned fee) {
+        
+        this.ceCaseAssignedFeeID = fee.assignedFeeID;
+        this.assignedFeeID = fee.assignedFeeID;
+        this.domain = EventDomainEnum.CODE_ENFORCEMENT;
+        this.paymentList = fee.paymentList;
+        this.moneyFeeAssigned = fee.moneyFeeAssigned;
+        this.assignedBy = fee.assignedBy;
+        this.assigned = fee.assigned;
+        this.waivedBy = fee.waivedBy;
+        this.lastModified = fee.lastModified;
+        this.reducedBy = fee.reducedBy;
+        this.reducedByUser = fee.reducedByUser;
+        this.notes = fee.notes;
+        this.fee = fee.fee;
+        
+    }
+    
     public int getCaseID() {
         return caseID;
     }
@@ -56,7 +74,5 @@ public class MoneyCECaseFeeAssigned extends FeeAssigned{
     public void setCeCaseAssignedFeeID(int ceCaseAssignedFeeID) {
         this.ceCaseAssignedFeeID = ceCaseAssignedFeeID;
     }
-    
-    
     
 }

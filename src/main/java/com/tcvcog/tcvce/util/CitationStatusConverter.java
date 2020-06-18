@@ -32,7 +32,6 @@ public class CitationStatusConverter extends EntityConverter implements Converte
     
      @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
-        System.out.println("CitationStatusConverter| title: " +titleS);
         if(titleS.isEmpty()) {
             return null; 
         }
@@ -42,7 +41,6 @@ public class CitationStatusConverter extends EntityConverter implements Converte
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        System.out.println("CitationStatusConverter.getAsString");
         
         if (o == null){
             return "";

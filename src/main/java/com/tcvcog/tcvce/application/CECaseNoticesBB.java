@@ -63,14 +63,13 @@ public class CECaseNoticesBB
         CaseCoordinator cc = getCaseCoordinator();
             if (!currentCase.getViolationListUnresolved().isEmpty()) {
                 try {
-                    getSessionBean().getSessPropertyList().add(0, currentCase.getProperty());
-                    getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(currentCase.getProperty(), getSessionBean().getSessUser().getMyCredential()));
+                    getSessionBean().getSessPropertyList().add(0, pc.getProperty(currentCase.getPropertyID()));
 //                    positionCurrentCaseAtHeadOfQueue();
                     nov = cc.novGetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni());
                     nov.setCreationBy(getSessionBean().getSessUser());
                     getSessionBean().setSessNotice(nov);
                     return "noticeOfViolationBuilder";
-                } catch (AuthorizationException | IntegrationException | BObStatusException | SearchException ex) {
+                } catch (AuthorizationException | IntegrationException ex) {
                     System.out.println(ex);
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Cannot build new notice", ""));

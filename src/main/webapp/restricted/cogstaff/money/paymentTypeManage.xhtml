@@ -5,129 +5,323 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
+
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Add Payment Type</title>
+        <title>Manage Payment Types</title>
     </h:head>
-    <h:body>
+
+    <h:body id="payTypeManageBody">
+
         <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
-                <div class="mainContainer">
-                    <h:messages id="messages" globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                    </h:messages>
-                            
-                    <h1>Payment Type Configuration Tool</h1>
-                    <p>View, create, and manage  payment types</p>
-                    <f:view>
-                        <h:form id="paymentTypeDisplay">
-                            <h2>Payment Type Details</h2>
-                            <p:dataTable
-                                    id="paymentTypes"
-                                    var="p"
-                                    selectionMode="single"
-                                    selection="#{paymentBB.selectedPaymentType}"
-                                    rowKey="#{p.paymentTypeId}"
-                                    value="#{paymentBB.paymentTypeList}"
-                                    tableStyleClass="primeDataTable"
-                                    tabindex="1">
-                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+                <f:view >
 
-                                    <p:column width="10%">
-                                        <f:facet name="header">
-                                            <h:outputText value="ID" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.paymentTypeId}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="25%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Payment Type" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.paymentTypeTitle}"/>
-                                    </p:column>
-     
-                                </p:dataTable>
-                            <p:spacer height="10px"/>
-                            <p:commandButton ajax="true" update="paymentTypeAddForm messages"
-                                             actionListener="#{paymentBB.editPaymentType}"
-                                             oncomplete="PF('typeAddDialogVar').show()"
-                                             value="Update Selected Payment Type" tabindex="2"/>
-                            <p:commandButton ajax="false" 
-                                             actionListener="#{paymentBB.deleteSelectedPaymentType}"
-                                            value="Nuke Selected Category Forever" tabindex="3"/>
-                            <p:commandButton    id="newTypeDialogButton"
-                                                actionListener="#{paymentBB.initializeNewType}"
-                                                oncomplete="PF('typeAddDialogVar').show()"
-                                                ajax="true"
-                                                update="paymentTypeAddForm"
-                                                value="Create new Payment Type"
-                                                icon="fa fa-plus"
-                                                />
-                            
-                         </h:form>    
-                             
-                             
-                            <!--<p:fieldset legend="Update occupancy inspection "
-                                toggleable="true" collapsed="false" tabindex="4">
-                                    <h:form id="updateCategoryForm">
-                                        <p:spacer height="10px"/>
-                                        <p:outputLabel for="occInsFeeName">
-                                           <h:outputText value="Name:"/>
-                                        </p:outputLabel>
-                                        <p:inputText id="occInsFeeName" value="{feeManagementBB.formOccupancyInspectionFeeName}" 
-                                                 style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
-                                        <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
-                                              warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                    <p:outputPanel id="body-panel">
+                        <h1>Manage Payment Types</h1>
 
-                                        <p:spacer height="20px"/>
-                                        
-                                       
-                                    </h:form>  
-                                </p:fieldset>-->
-                            
-                           <p:dialog id="typeAddDialog"
-                                  height="450" width="1000"
-                                  widgetVar="typeAddDialogVar"
-                                  closable="true">
-                        <h:form id="paymentTypeAddForm">
-                            <h2>Add New Payment Type</h2>
-                            <p>The more fields you can populate, the better. (Data integrity hangs in the balance.)</p>
-                            <h:panelGrid columns="4" border="0" 
-                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
-                                         footerClass="gridFooter">
-
-                                <h:outputLabel value="Payment Type:" for="newOccInsFeeName"/>
-                                <h:panelGroup>
-                                    <p:inputText id="newPaymentType" value="#{paymentBB.formPaymentType.paymentTypeTitle}" 
-                                                 style="width: 250px;" tabindex="6" required="false" styleClass="inputText" maxlength="100"/>
-                                    <h:message for="newPaymentType" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-
-                                <f:facet name="footer">
-                                </f:facet>   
-                                
-                                <p:spacer height="15"/>
-                                
-                            </h:panelGrid>
-                            <p:spacer height="10px"/>
-                            <p:commandButton ajax="false" rendered="#{!paymentBB.editing}"
-                                             value="Add Payment Type" action="#{paymentBB.addPaymentType}" />
-                            <p:commandButton ajax="false" rendered="#{paymentBB.editing}"
-                                             actionListener="#{paymentBB.commitPaymentTypeUpdates}"
-                                                  value="Commit Updates" tabindex="7"/>
-                            <p:commandButton    id="cancel-cb"
-                                                    ajax="true"  tabindex="27"
-                                                    value="Cancel" 
-                                                    icon="fa fa-stop" 
-                                                    immediate="true"
-                                                    onclick="PF('typeAddDialogVar').hide()"
-                                                    />
+                        <h:form id="form-messages-global">
+                            <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
                         </h:form>
-                           </p:dialog>
-                    </f:view>
-                </div>
+
+                        <h:form>
+
+                            <p:commandButton ajax="false"
+                                             action="#{feeManagementBB.finishAndRedir()}"
+                                             value="Finish editing payment types and return."
+                                             />
+
+                        </h:form>
+                        
+                        <div class="mainContainer">
+
+                            <div class ="two-column-page-flex-container">
+
+                                <div class="list-column" >
+
+                                    <h:form id="mode-form">
+
+                                        <p:selectOneButton style="width: 100%; margin-top: 10px ; height: 20px;"
+                                                           value="#{paymentBB.currentMode}" 
+                                                           >
+                                            <f:selectItem itemLabel="LOOKUP" itemValue="Lookup"  />
+                                            <f:selectItem itemLabel="INSERT" itemValue="Insert"  />
+                                            <f:selectItem itemLabel="UPDATE" itemValue="Update"  />
+                                            <f:selectItem itemLabel="REMOVE" itemValue="Remove"  />
+
+                                            <f:ajax render="@all"/>
+
+                                        </p:selectOneButton> 
+
+                                    </h:form>
+
+                                    <p:spacer height="30px"/>
+
+                                    <p:scrollPanel style="height: 550px;" >
+
+                                        <h:form id="payType-form-side">
+
+                                            <p:dataTable id="typeTable"
+                                                         var="type"
+                                                         value="#{paymentBB.paymentTypeList}"
+                                                         tableStyleClass="primeDataTable"
+                                                         >
+
+                                                <p:column headerText="ID"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{type.paymentTypeId}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Payment Type"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{type.paymentTypeTitle}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Option"
+                                                          styleClass="centeredColumnContent"
+                                                          style="width: 80px"
+                                                          >
+
+                                                    <p:selectBooleanButton onLabel="Deselect" 
+                                                                           offLabel="Select"
+                                                                           styleClass="selectButton" 
+                                                                           value="#{paymentBB.currentPaymentSelected}"
+                                                                           disabled="#{paymentBB.getSelectedButtonActive()}"
+                                                                           >
+
+                                                        <p:ajax update="
+                                                                form-messages-global
+                                                                payType-form-side
+                                                                payType-panel"
+                                                                listener="#{paymentBB.onSelectedPayTypeButtonChange(type)}"/>
+
+                                                    </p:selectBooleanButton>
+
+                                                </p:column>
+
+                                            </p:dataTable>
+
+                                            <p:spacer height="10px"/>
+
+                                        </h:form>
+
+                                    </p:scrollPanel>
+
+                                </div>
+
+
+
+                                <div class ="object-column">
+
+                                    <p:outputPanel id = "payType-panel" >
+
+                                        <!--LookUp Table-->
+                                        <p:panel id="payType-panel-lookup"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LookUp Panel"
+                                                 rendered="#{paymentBB.getActiveLookupMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="payType-form-lookup">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="payTypeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{paymentBB.selectedPaymentType.paymentTypeId}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Title:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="payTypeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{paymentBB.selectedPaymentType.paymentTypeTitle}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Insert Table-->
+                                        <p:panel id="payType-panel-insert"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Insert Panel"
+                                                 rendered="#{paymentBB.getActiveInsertMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="payType-form-insert">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="payTypeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{paymentBB.selectedPaymentType.paymentTypeId}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Title:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText value="#{paymentBB.selectedPaymentType.paymentTypeTitle}"
+                                                                     styleClass="payTypeTableInputText"/>
+
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Insert Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{paymentBB.onInsertPayTypeButtonChange()}"
+                                                                 value="INSERT"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Update Table-->
+                                        <p:panel id="payType-panel-update"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LookUp Panel"
+                                                 rendered="#{paymentBB.getActiveUpdateMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="payType-form-update">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="payTypeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{paymentBB.selectedPaymentType.paymentTypeId}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <h:outputLabel value="Title:"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <p:inputText value="#{paymentBB.selectedPaymentType.paymentTypeTitle}"
+                                                                     styleClass="payTypeTableInputText"/>
+
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Update Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{paymentBB.onUpdatePayTypeButtonChange()}"
+                                                                 value="UPDATE"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Remove Table-->
+                                        <p:panel id="payType-panel-remove"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LookUp Panel"
+                                                 rendered="#{paymentBB.getActiveRemoveMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="payType-form-remove">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="payTypeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{paymentBB.selectedPaymentType.paymentTypeId}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Title:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="payTypeReadTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{paymentBB.selectedPaymentType.paymentTypeTitle}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Remove Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{paymentBB.onRemovePayTypeButtonChange()}"
+                                                                 value="Remove"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                    </p:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </p:outputPanel>
+                </f:view>
             </ui:define>
         </ui:composition>
     </h:body>

@@ -7,12 +7,9 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.User;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import com.tcvcog.tcvce.entities.IFace_Openable;
 
 /**
  * Primary Business Object BOB for holding data about Occupancy Periods
@@ -25,6 +22,7 @@ public  class       OccPeriod
     
     protected int periodID;
     protected int propertyUnitID;
+    
     protected OccPeriodType type;
     
     protected OccInspection governingInspection;

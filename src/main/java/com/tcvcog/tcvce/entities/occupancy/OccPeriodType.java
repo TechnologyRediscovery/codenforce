@@ -65,11 +65,9 @@ public class OccPeriodType implements Cloneable {
     private String permitTitle;
     private String permitTitleSub;
 
-    private List<Fee> feeList;
-
     @Override
     public Object clone() throws CloneNotSupportedException {
-        return super.clone(); //To change body of generated methods, choose Tools | Templates.
+        return super.clone();
     }
     
     /**
@@ -182,13 +180,6 @@ public class OccPeriodType implements Cloneable {
      */
     public boolean isCommercial() {
         return commercial;
-    }
-
-    /**
-     * @return the fee
-     */
-    public List<Fee> getFeeList() {
-        return feeList;
     }
 
     /**
@@ -311,13 +302,6 @@ public class OccPeriodType implements Cloneable {
     }
 
     /**
-     * @param fee the fee to set
-     */
-    public void setFeeList(List<Fee> fee) {
-        this.feeList = fee;
-    }
-
-    /**
      * @param requirepersontypeentrycheck the requirepersontypeentrycheck to set
      */
     public void setRequirepersontypeentrycheck(boolean requirepersontypeentrycheck) {
@@ -374,7 +358,7 @@ public class OccPeriodType implements Cloneable {
         hash = 23 * hash + (this.commercial ? 1 : 0);
         hash = 23 * hash + (this.requirepersontypeentrycheck ? 1 : 0);
         hash = 23 * hash + this.defaultValidityPeriodDays;
-        hash = 23 * hash + Objects.hashCode(this.feeList);
+        hash = 23 * hash + Objects.hashCode(this.permittedFees);
         return hash;
     }
 

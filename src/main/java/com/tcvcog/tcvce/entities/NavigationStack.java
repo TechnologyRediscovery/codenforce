@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Technology Rediscovery LLC.
+ * Copyright (C) 2020 Technology Rediscovery LLC.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,22 +16,41 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.util.LinkedList;
+import javax.faces.context.FacesContext;
+
 /**
  *
  * @author Nathan Dietz
  */
-public enum FeeAssignedType {
-    OccPeriod("Occupancy Period"),
-    CECase("CE Case");
+public class NavigationStack {
+
+    private LinkedList<String> viewIDStack;
     
-    private final String label;
+    public NavigationStack() {
+        
+        viewIDStack = new LinkedList<>();
 
-    private FeeAssignedType(String label) {
-        this.label = label;
     }
-
-    public String getLabel() {
-        return label;
+    
+    public void pushCurrentPage(){
+        
+        FacesContext context = FacesContext.getCurrentInstance();
+        
+        viewIDStack.push(context.getViewRoot().getViewId());
+        
+    }
+    
+    public String popLastPage(){
+        
+        return viewIDStack.pop();
+        
+    }
+    
+    public String peekLastPage(){
+        
+        return viewIDStack.peek();
+        
     }
     
 }

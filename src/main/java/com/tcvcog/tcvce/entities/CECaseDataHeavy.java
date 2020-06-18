@@ -5,13 +5,11 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
@@ -21,9 +19,8 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
  * @author Ellen Bascomb
  */
 public class CECaseDataHeavy
-        extends CECase
+        extends CECasePropertyUnitHeavy
         implements Cloneable,
-        IFace_ProposalDriven,
         IFace_EventRuleGoverned,
         IFace_CredentialSigned,
         IFace_Loggable {
@@ -45,9 +42,7 @@ public class CECaseDataHeavy
 
     private String credentialSignature;
 
-    public CECaseDataHeavy() {
-    }
-
+    
     /**
      * Constructor used to create an instance of this object with a CECase
      * without any lists. Transfers the member variables from the incoming
@@ -58,21 +53,10 @@ public class CECaseDataHeavy
      *
      * @param cse
      */
-    public CECaseDataHeavy(CECase cse) {
-        this.caseID = cse.caseID;
-        this.publicControlCode = cse.publicControlCode;
-        this.paccEnabled = cse.paccEnabled;
-        this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
+    public CECaseDataHeavy(CECasePropertyUnitHeavy cse) {
+        super(cse);
         this.property = cse.property;
-        this.propertyUnit = cse.propertyUnit;
-        this.caseManager = cse.caseManager;
-        this.caseName = cse.caseName;
-        this.casePhase = cse.casePhase;
-        this.casePhaseIcon = cse.casePhaseIcon;
-        this.originationDate = cse.originationDate;
-        this.closingDate = cse.closingDate;
-        this.creationTimestamp = cse.creationTimestamp;
-        this.notes = cse.notes;
+        this.propUnit = cse.propUnit;
     }
 
     @Override
@@ -218,6 +202,7 @@ public class CECaseDataHeavy
     /**
      * @param eventRuleList the eventRuleList to set
      */
+    @Override
     public void setEventRuleList(List<EventRuleImplementation> eventRuleList) {
         this.eventRuleList = eventRuleList;
     }
@@ -376,6 +361,7 @@ public class CECaseDataHeavy
     /**
      * @param proposalList the proposalList to set
      */
+    @Override
     public void setProposalList(List<Proposal> proposalList) {
         this.proposalList = proposalList;
     }
@@ -422,5 +408,21 @@ public class CECaseDataHeavy
     public void setPaymentList(List<MoneyCECaseFeePayment> paymentList) {
         this.paymentList = paymentList;
     }
-
+    
+    /**
+     * Takes the general Payment type and converts it to 
+     * @param paymentList the paymentList to set
+     */
+    public void setPaymentListGeneral(List<Payment> paymentList) {
+        List<MoneyCECaseFeePayment> skeletonHorde = new ArrayList<>();
+        
+        for (Payment p : paymentList) {
+            
+            skeletonHorde.add(new MoneyCECaseFeePayment(p));
+            
+        }
+        
+        this.paymentList = skeletonHorde;
+    }
+    
 }

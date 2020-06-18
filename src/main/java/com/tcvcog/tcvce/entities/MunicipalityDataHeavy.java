@@ -59,7 +59,7 @@ public  class       MunicipalityDataHeavy
     private int muniOfficePropertyId;
     private String notes; 
     private LocalDateTime lastUpdatedTS;
-    private User lastUpdaetdBy;
+    private User lastUpdatedBy;
     private User primaryStaffContact;
     
     private List<User> userList;
@@ -69,6 +69,8 @@ public  class       MunicipalityDataHeavy
     private int defaultOccPeriodID;
     
     private String credentialSignature;
+    
+    
     
     
     /**
@@ -93,6 +95,10 @@ public  class       MunicipalityDataHeavy
     public MunicipalityDataHeavy(Municipality m){
         this.muniName = m.getMuniName();
         this.muniCode = m.getMuniCode();
+    }
+    
+    public MunicipalityDataHeavy(){
+        
     }
 
     
@@ -266,10 +272,10 @@ public  class       MunicipalityDataHeavy
     }
 
     /**
-     * @return the lastUpdaetdBy
+     * @return the lastUpdatedBy
      */
-    public User getLastUpdaetdBy() {
-        return lastUpdaetdBy;
+    public User getLastUpdatedBy() {
+        return lastUpdatedBy;
     }
 
     /**
@@ -462,10 +468,10 @@ public  class       MunicipalityDataHeavy
     }
 
     /**
-     * @param lastUpdaetdBy the lastUpdaetdBy to set
+     * @param lastUpdaetdBy the lastUpdatedBy to set
      */
-    public void setLastUpdaetdBy(User lastUpdaetdBy) {
-        this.lastUpdaetdBy = lastUpdaetdBy;
+    public void setLastUpdatedBy(User lastUpdaetdBy) {
+        this.lastUpdatedBy = lastUpdaetdBy;
     }
 
     /**
@@ -522,7 +528,7 @@ public  class       MunicipalityDataHeavy
         hash = 97 * hash + this.muniOfficePropertyId;
         hash = 97 * hash + Objects.hashCode(this.notes);
         hash = 97 * hash + Objects.hashCode(this.lastUpdatedTS);
-        hash = 97 * hash + Objects.hashCode(this.lastUpdaetdBy);
+        hash = 97 * hash + Objects.hashCode(this.lastUpdatedBy);
         hash = 97 * hash + Objects.hashCode(this.primaryStaffContact);
         hash = 97 * hash + Objects.hashCode(this.getUserList());
         hash = 97 * hash + Objects.hashCode(this.courtEntities);
@@ -611,7 +617,7 @@ public  class       MunicipalityDataHeavy
         if (!Objects.equals(this.lastUpdatedTS, other.lastUpdatedTS)) {
             return false;
         }
-        if (!Objects.equals(this.lastUpdaetdBy, other.lastUpdaetdBy)) {
+        if (!Objects.equals(this.lastUpdatedBy, other.lastUpdatedBy)) {
             return false;
         }
         if (!Objects.equals(this.primaryStaffContact, other.primaryStaffContact)) {

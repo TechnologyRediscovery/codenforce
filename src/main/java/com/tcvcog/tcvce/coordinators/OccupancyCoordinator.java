@@ -17,10 +17,37 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.*;
-import com.tcvcog.tcvce.entities.*;
-import com.tcvcog.tcvce.entities.occupancy.*;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.InspectionException;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventRuleSet;
+import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.Proposal;
+import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectableStatus;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionStatusEnum;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
+import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
+import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
@@ -45,11 +72,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodStatusEnum;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
+import java.util.AbstractList;
 
 /**
  * King of all business logic implementation for the entire Occupancy object tree
@@ -99,17 +131,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @return
      * @throws IntegrationException 
      */
-    public OccPeriodPropertyUnitified getOccPeriodPropertyUnitified(int periodid) throws IntegrationException{
+    public OccPeriodPropertyUnitHeavy getOccPeriodPropertyUnitHeavy(int periodid) throws IntegrationException{
         PropertyCoordinator pc = getPropertyCoordinator();
-        OccPeriodPropertyUnitified oppu = new OccPeriodPropertyUnitified(getOccPeriod(periodid));
+        OccPeriodPropertyUnitHeavy oppu = new OccPeriodPropertyUnitHeavy(getOccPeriod(periodid));
         oppu.setPropUnitProp(pc.getPropertyUnitWithProp(oppu.getPropertyUnitID()));
         return oppu;
     }
     
-    public List<OccPeriodPropertyUnitified> getOccPeriodPropertyUnitifiedList(List<OccPeriod> perList) throws IntegrationException{
-        List<OccPeriodPropertyUnitified> oppuList = new ArrayList<>();
+    public List<OccPeriodPropertyUnitHeavy> getOccPeriodPropertyUnitHeavy(List<OccPeriod> perList) throws IntegrationException{
+        List<OccPeriodPropertyUnitHeavy> oppuList = new ArrayList<>();
         for(OccPeriod op: perList){
-            oppuList.add(getOccPeriodPropertyUnitified(op.getPeriodID()));
+            oppuList.add(OccupancyCoordinator.this.getOccPeriodPropertyUnitHeavy(op.getPeriodID()));
         }
         
         return oppuList;
@@ -123,17 +155,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @return
      * @throws IntegrationException 
      */
-    public OccPeriodDataHeavy assembleOccPeriodDataHeavy(OccPeriod per, Credential cred) throws IntegrationException, BObStatusException{
+    public OccPeriodDataHeavy assembleOccPeriodDataHeavy(OccPeriod per, Credential cred) throws IntegrationException, BObStatusException, SearchException{
         if(per == null || cred == null){
             throw new BObStatusException("Cannot assemble an OccPeriod data heavy without base period or Credential");
         }
         
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
-        ChoiceCoordinator chc = getChoiceCoordinator();
+        PaymentIntegrator pai = getPaymentIntegrator();
+        WorkflowCoordinator chc = getWorkflowCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         EventCoordinator ec = getEventCoordinator();
-        
         
         OccPeriodDataHeavy opdh = new OccPeriodDataHeavy(per);
         
@@ -147,30 +179,30 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
             // PERSON LIST
             QueryPerson qp = sc.initQuery(QueryPersonEnum.OCCPERIOD_PERSONS, cred);
-            if(!qp.getParmsList().isEmpty()){
-                qp.getParmsList().get(0).setOccPeriod_val(per);
+            if(!qp.getParamsList().isEmpty()){
+                qp.getParamsList().get(0).setOccPeriod_val(per);
             }
             opdh.setPersonList(sc.runQuery(qp).getBOBResultList());
 
             // EVENT LIST
             QueryEvent qe = sc.initQuery(QueryEventEnum.OCCPERIOD, cred);
-            if(!qe.getParmsList().isEmpty()){
+            if(!qe.getParamsList().isEmpty()){
                 qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
             }
-            opdh.setEventList(qe.getBOBResultList());
+            opdh.setEventList(ec.downcastEventCnFPropertyUnitHeavy(qe.getBOBResultList()));
 
             // PROPOSAL LIST
             opdh.setProposalList(chc.getProposalList(opdh, cred));
             
             // EVENT RULE LIST
-            opdh.setEventRuleList(ec.rules_getEventRuleImpList(opdh, cred));
+            opdh.setEventRuleList(chc.rules_getEventRuleImpList(opdh, cred));
             
             // INSPECTION LIST
             opdh.setInspectionList(inspecInt.getOccInspectionList(opdh));
 
             // FEE AND PAYMENT LIST
-    //        opdh.setPaymentList(pai.getPaymentList(opdh));
-    //        opdh.setFeeList(pai.getFeeAssigned(opdh));
+            opdh.setPaymentListGeneral(pai.getPaymentList(opdh));
+            opdh.setFeeList(pai.getFeeAssigned(opdh));
 
             // PERMIT LIST
             opdh.setPermitList(oi.getOccPermitList(opdh));
@@ -186,6 +218,21 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return opdh;
         
     }
+    
+    public List<OccPeriodType> getOccPeriodTypesFromProfileID(int profileID){
+        
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        List<OccPeriodType> typeList = new ArrayList<>();
+        try {
+        typeList = oi.getOccPeriodTypeList(profileID);
+        } catch (IntegrationException ex) {
+            System.out.println(ex.toString());
+        }
+        return typeList;
+        
+    }
+    
+    
     
     /**
      * Logic container for determining occ period status based on a OPDH
@@ -388,6 +435,16 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oi.updateOccPeriod(period);
     }
 
+    /**
+     * Logic container for checking the basic permissions for authorization of an
+     * occupancy period. An authorized occupancy period is one for which an 
+     * occupancy permit can be issued
+     * @param period
+     * @param u doing the authorizing; must have code officer permissions
+     * @throws AuthorizationException
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
     public void authorizeOccPeriod(OccPeriod period, UserAuthorized u) throws AuthorizationException, BObStatusException, IntegrationException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         if (u.getKeyCard().isHasEnfOfficialPermissions()) {
@@ -867,13 +924,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     public void evaluateProposal(Proposal proposal,
             IFace_Proposable chosen,
-            OccPeriod occPeriod,
             UserAuthorized u) throws    EventException, 
                                         AuthorizationException, 
                                         BObStatusException, 
                                         IntegrationException {
         
-        ChoiceCoordinator cc = getChoiceCoordinator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
         
@@ -881,19 +937,20 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         int insertedEventID = 0;
         
-        if (cc.determineProposalEvaluatability(proposal, chosen, u)) {
+        if (wc.determineProposalEvaluatability(proposal, chosen, u)) {
             // since we can evaluate this proposal with the chosen Proposable, configure members
             proposal.setResponderActual(u);
             proposal.setResponseTS(LocalDateTime.now());
             proposal.setChosenChoice(chosen);
 
+//            TODO ECD: finish proposal infrastructure
             // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
-            propEvent = ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u);
+//            propEvent = wc.generateEventDocumentingProposalEvaluation(proposal, chosen, u);
             // insert the event and grab the new ID
-            insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
+//            insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
             // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
             proposal.setResponseEvent(ec.getEvent(insertedEventID));
-            cc.recordProposalEvaluation(proposal);
+            wc.recordProposalEvaluation(proposal);
         } else {
             throw new BObStatusException("Unable to evaluate proposal due to business rule violation");
         }

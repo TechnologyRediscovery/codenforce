@@ -71,6 +71,8 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     
     private List<User> userListForSearch;
     private List<Municipality> municipalityListForSearch;
+    private List<Property> propertyListForSearch;
+    private List<Person> personListForSearch;
     
     // *************************************************************************
     // **               improvement suggestions, etc.
@@ -105,7 +107,9 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         bbSessionProperty = getSessionBean().getSessProperty();
         bbSessionPerson = getSessionBean().getSessPerson();
         
-        userListForSearch = uc.assembleUserListForSearchCriteria();
+        userListForSearch = uc.assembleUserListForSearch(getSessionBean().getSessUser());
+        propertyListForSearch = getSessionBean().getSessPropertyList();
+        personListForSearch = getSessionBean().getSessPersonList();
         
         if(bbSessionUser != null){
             municipalityListForSearch = bbSessionUser.getAuthMuniList();
@@ -429,6 +433,34 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setMunicipalityListForSearch(List<Municipality> municipalityListForSearch) {
         this.municipalityListForSearch = municipalityListForSearch;
+    }
+
+    /**
+     * @return the propertyListForSearch
+     */
+    public List<Property> getPropertyListForSearch() {
+        return propertyListForSearch;
+    }
+
+    /**
+     * @param propertyListForSearch the propertyListForSearch to set
+     */
+    public void setPropertyListForSearch(List<Property> propertyListForSearch) {
+        this.propertyListForSearch = propertyListForSearch;
+    }
+
+    /**
+     * @return the personListForSearch
+     */
+    public List<Person> getPersonListForSearch() {
+        return personListForSearch;
+    }
+
+    /**
+     * @param personListForSearch the personListForSearch to set
+     */
+    public void setPersonListForSearch(List<Person> personListForSearch) {
+        this.personListForSearch = personListForSearch;
     }
 
     

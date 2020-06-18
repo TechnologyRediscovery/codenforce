@@ -15,9 +15,12 @@ import java.util.Objects;
  * 
  * @author sylvia
  */
-public class Proposal  implements Serializable, Comparable<Proposal> {
+public  class       Proposal  
+        implements  Serializable, 
+                    Comparable<Proposal> {
     
     protected int proposalID ;
+    protected int hostObjectID;
     protected Directive directive;
     
     protected boolean readOnlyCurrentUser;
@@ -44,6 +47,11 @@ public class Proposal  implements Serializable, Comparable<Proposal> {
     
     protected IFace_Proposable chosenChoice;
 
+    
+    public int getHostObjectID(){
+        return hostObjectID;
+    }
+    
     /**
      * @param responderIntended the responderIntended to set
      */

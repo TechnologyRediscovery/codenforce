@@ -21,22 +21,42 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- *
  * @author Nathan Dietz
  */
-public class FeeAssigned   implements Serializable {
+public class FeeAssigned implements Serializable {
 
-    private List<Payment> paymentList;
-    private int moneyFeeAssigned;
-    private User assignedBy;
-    private LocalDateTime assigned;
-    private User waivedBy;
-    private LocalDateTime lastModified;
-    private double reducedBy;
-    private User reducedByUser;
-    private String notes;
-    private Fee fee;
+    protected int assignedFeeID;
+    protected EventDomainEnum domain;
+    protected List<Payment> paymentList;
+    protected int moneyFeeAssigned;
+    protected User assignedBy;
+    protected LocalDateTime assigned;
+    protected User waivedBy;
+    protected LocalDateTime lastModified;
+    protected double reducedBy;
+    protected User reducedByUser;
+    protected String notes;
+    protected Fee fee;
 
+    public FeeAssigned() {
+    }
+        
+    public int getAssignedFeeID() {
+        return assignedFeeID;
+    }
+
+    public void setAssignedFeeID(int assignedFeeID) {
+        this.assignedFeeID = assignedFeeID;
+    }
+
+    public EventDomainEnum getDomain() {
+        return domain;
+    }
+
+    public void setDomain(EventDomainEnum domain) {
+        this.domain = domain;
+    }
+    
     public List<Payment> getPaymentList() {
         return paymentList;
     }

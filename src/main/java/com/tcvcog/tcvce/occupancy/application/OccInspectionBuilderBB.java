@@ -20,7 +20,7 @@ import javax.annotation.PostConstruct;
 
 /**
  *
- * @author Xiaohong
+ * @author Ellen Bascomb
  */
 public class OccInspectionBuilderBB {
     

@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 
 /**
  * A data-rich subclass of EventCnF for use in contexts
@@ -31,14 +32,13 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
  * 
  * @author Ellen Bascomb
  */
-public  class   EventPeriodPropUnitHeavy 
+public  class   EventCnFPropUnitCasePeriodHeavy 
         extends EventCnF{
     
-    protected Property prop;
-    protected PropertyUnit propUnit;
-    protected OccPeriod period;
+    private OccPeriodPropertyUnitHeavy period;
+    private CECasePropertyUnitHeavy cecase;
     
-    public EventPeriodPropUnitHeavy(EventCnF ev){
+    public EventCnFPropUnitCasePeriodHeavy(EventCnF ev){
         this.eventID = ev.getEventID();
         this.category = ev.getCategory();
         
@@ -61,26 +61,38 @@ public  class   EventPeriodPropUnitHeavy
         this.personList = ev.getPersonList();
     }
 
-    /**
-     * @return the prop
-     */
-    public Property getProp() {
-        return prop;
+    public Property getProperty(){
+        Property p = null;
+        switch(domain){
+            case CODE_ENFORCEMENT:
+                if(cecase != null){
+                    p = cecase.getProperty();
+                }
+                break;
+            case OCCUPANCY:
+                if(period != null){
+                    p = period.getPropUnitProp().getProperty();
+                }
+        }
+        return p;
     }
-
-    /**
-     * @param prop the prop to set
-     */
-    public void setProp(Property prop) {
-        this.prop = prop;
+    
+    public PropertyUnit getPropertyUnit(){
+        PropertyUnit pu = null;
+        switch(domain){
+            case OCCUPANCY:
+                if(period != null){
+                    pu = period.getPropUnitProp();
+                }
+                break;
+            case CODE_ENFORCEMENT:
+                if(cecase != null){
+                    pu = cecase.getPropUnit();
+                }
+        }
+        return pu;
     }
-
-    /**
-     * @return the propUnit
-     */
-    public PropertyUnit getPropUnit() {
-        return propUnit;
-    }
+    
 
     /**
      * @return the period
@@ -90,16 +102,23 @@ public  class   EventPeriodPropUnitHeavy
     }
 
     /**
-     * @param propUnit the propUnit to set
+     * @return the cecase
      */
-    public void setPropUnit(PropertyUnit propUnit) {
-        this.propUnit = propUnit;
+    public CECase getCecase() {
+        return cecase;
+    }
+
+    /**
+     * @param cecase the cecase to set
+     */
+    public void setCecase(CECasePropertyUnitHeavy cecase) {
+        this.cecase = cecase;
     }
 
     /**
      * @param period the period to set
      */
-    public void setPeriod(OccPeriod period) {
+    public void setPeriod(OccPeriodPropertyUnitHeavy period) {
         this.period = period;
     }
     

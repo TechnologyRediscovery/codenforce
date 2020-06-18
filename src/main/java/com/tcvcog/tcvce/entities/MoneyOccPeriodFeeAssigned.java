@@ -21,14 +21,31 @@ package com.tcvcog.tcvce.entities;
  * @author Nathan Dietz
  */
 public class MoneyOccPeriodFeeAssigned extends FeeAssigned {
-   
-   private int OccPerAssignedFeeID;
-   private int occPeriodID;
-   private int occPeriodTypeID;
-   
-   public MoneyOccPeriodFeeAssigned() {
-    
-}
+
+    private int occPerAssignedFeeID;
+    private int occPeriodID;
+    private int occPeriodTypeID;
+
+    public MoneyOccPeriodFeeAssigned() {
+    }
+
+    public MoneyOccPeriodFeeAssigned(FeeAssigned fee) {
+
+        this.occPerAssignedFeeID = fee.assignedFeeID;
+        this.assignedFeeID = fee.assignedFeeID;
+        this.domain = EventDomainEnum.OCCUPANCY;
+        this.paymentList = fee.paymentList;
+        this.moneyFeeAssigned = fee.moneyFeeAssigned;
+        this.assignedBy = fee.assignedBy;
+        this.assigned = fee.assigned;
+        this.waivedBy = fee.waivedBy;
+        this.lastModified = fee.lastModified;
+        this.reducedBy = fee.reducedBy;
+        this.reducedByUser = fee.reducedByUser;
+        this.notes = fee.notes;
+        this.fee = fee.fee;
+
+    }
 
     public int getOccPeriodID() {
         return occPeriodID;
@@ -47,13 +64,11 @@ public class MoneyOccPeriodFeeAssigned extends FeeAssigned {
     }
 
     public int getOccPerAssignedFeeID() {
-        return OccPerAssignedFeeID;
+        return occPerAssignedFeeID;
     }
 
-    public void setOccPerAssignedFeeID(int OccPerAssignedFeeID) {
-        this.OccPerAssignedFeeID = OccPerAssignedFeeID;
+    public void setOccPerAssignedFeeID(int occPerAssignedFeeID) {
+        this.occPerAssignedFeeID = occPerAssignedFeeID;
     }
 
-    
-   
 }

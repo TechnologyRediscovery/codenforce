@@ -18,21 +18,37 @@ package com.tcvcog.tcvce.application.interfaces;
 
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
+import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.util.List;
 
 /**
- * Interface to unify communication between Occperiods and CECases
- * which both have EventRule objects which influence their statuses, etc.
+ * Specifies a unified set of behaviors for business objects whose management
+ * is directed by EventRule objects--which in short specify a required or forbidden
+ * type or category of EventCnF
+ * 
+ * For beta launch, these were CECase and OccPeriod objects
+ *  
  * @author sylvia
  */
 public interface IFace_EventRuleGoverned {
+    
     public void setEventList(List<EventCnF> lst);
+
     public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle);
     
     public void setEventRuleList(List<EventRuleImplementation> lst);
+
     public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere);
     
     public boolean isAllRulesPassed();
+     
+    public void setProposalList(List<Proposal> propList);
+    
+    public List<Proposal> assembleProposalList(ViewOptionsProposalsEnum vope); 
+    
+    public boolean isOpen();
+    
 }
