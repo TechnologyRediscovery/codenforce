@@ -1,6 +1,0 @@
-700, 2019.08.31-22:02.58: unmatched_duplicate housesdir: 372-P-90 & 96 Vac Lot
-700, 2019.08.31-22:02.58: unmatched_duplicate housesdir: 373-M-278 Vacant lot
-700, 2019.08.31-22:02.58: unmatched_duplicate housesdir: 3475 William Penn (PepBoy's)
-700, 2019.08.31-22:02.58: unmatched_duplicate housesdir: 3480 William Penn (Auto Zone)
-700, 2019.08.31-22:02.58: unmatched_duplicate housesdir: 817 Thompson Rear
-700, 2019.08.31-22:02.58: unmatched_duplicate housesdir: 434 Highland aka Boone Alley
