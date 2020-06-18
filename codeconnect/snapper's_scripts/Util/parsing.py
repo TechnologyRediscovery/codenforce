@@ -108,9 +108,9 @@ def _extract_address_parts(full_address):
     # make sure we have all the parts of the address
     if len(full_address) != 2:
         raise MalformedGenericAddressError
+    address_map['fulladdress'] = " ".join(full_address)
     address_map['street'] = full_address[0]
     address_map['citystatezip'] = full_address[1]
-    # print(full_address)
 
     # on the city, state, zip line, grab until the comma before the state
     exp = re.compile("[^,]*")

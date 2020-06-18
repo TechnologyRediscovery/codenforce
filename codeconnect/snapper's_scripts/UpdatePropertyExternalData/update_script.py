@@ -8,7 +8,7 @@ from collections import namedtuple
 
 import requests
 
-from Util.db_conn import get_cursor
+from Util.db_conn import get_db_and_cursor
 from Util.parsing import (
     create_general_insertmap,
     create_building_insertmap,
@@ -17,15 +17,16 @@ from Util.parsing import (
 
 
 def main():
-    rows = ask_database_for_parcelids(municode=828)   # Todo: Better naming? It's property and parcel id.
-    for row in rows:
+    with get_db_and_cursor() as db_cursor:
+        rows = ask_database_for_parcelids(municode=828, db_cursor=db_cursor)   # Todo: Better naming? It's property and parcel id.
+        for row in rows:
 
-        html_dict = get_county_property_assessment(row.parcel_id)
-        insert_map = create_insertmap_from_html(html_dict, row.property_id)
-        written_data = write_data_to_propertyexternaldata(insert_map)
-        did_the_data_change = check_if_data_is_different_than_previous(written_data)
-        if did_the_data_change:
-            create_event()
+            html_dict = get_county_property_assessment(row.parcel_id)
+            insert_map = create_insertmap_from_html(html_dict, row.property_id)
+            written_data = write_data_to_propertyexternaldata(insert_map, db_cursor)
+            did_the_data_change = check_if_data_is_different_than_previous(written_data)
+            if did_the_data_change:
+                create_event()
 
 # MAGIC STRINGS
 GENERALINFO = "GeneralInfo"
@@ -72,7 +73,7 @@ def get_county_property_assessment(parcel_id):
     return pages
 
 
-def ask_database_for_parcelids(municode=None, muniname=None):
+def ask_database_for_parcelids(municode=None, muniname=None, db_cursor=None):
     """
     Generator that yields parcel ids from the database
 
@@ -86,14 +87,13 @@ def ask_database_for_parcelids(municode=None, muniname=None):
             A namedtuple containing a property id and the corresponding parcel id
     """
     Row = namedtuple('Row', ['property_id', 'parcel_id'])
-    with get_cursor() as cursor:
-        if municode:
-            select_sql = "SELECT propertyid, parid FROM public.property WHERE municipality_municode = %s"
-        elif muniname:
-            # mild Todo: allow different user inputs so the script can be run easily by code enforcement officers
-            raise NotImplementedError
-        cursor.execute(select_sql, [municode])
-        parcel_ids = cursor.fetchall()
+    if municode:
+        select_sql = "SELECT propertyid, parid FROM public.property WHERE municipality_municode = %s"
+    elif muniname:
+        # mild Todo: allow different user inputs so the script can be run easily by code enforcement officers
+        raise NotImplementedError
+    db_cursor.execute(select_sql, [municode])
+    parcel_ids = db_cursor.fetchall()
 
     for row in parcel_ids:
         yield Row(*row)  # Casts each tuple returned by the cursor to the namedtuple 'Row'
@@ -122,17 +122,19 @@ def create_insertmap_from_html(html_dict, property_id):
     imap.update(tax_map)
 
     imap["prop_id"] = property_id
+    imap["notes"] = None
     print(imap)
     return imap
 
 
-def write_data_to_propertyexternaldata(insert_map):
+def write_data_to_propertyexternaldata(insert_map, db_cursor):
     """
-    Writes data to the table propertyexternaldata. Ran whenever
+    Writes a row to propertyexternaldata, logging every property so changes can be tracked over time.
     ownerphone cannot be found by scraping the county site and are excluded from the insert:
     """
     insert_sql = """
         INSERT INTO public.propertyexternaldata(
+            extdataid,
             property_propertyid, ownername, address_street, address_citystatezip,
             address_city, address_state, address_zip, saleprice,
             saleyear, assessedlandvalue, assessedbuildingvalue, assessmentyear,
@@ -140,9 +142,29 @@ def write_data_to_propertyexternaldata(insert_map):
             taxstatusyear, notes, lastupdated
         )
         VALUES(
-        
-        )
+            DEFAULT,
+            %(prop_id)s, %(ownername)s, %(street)s, %(citystatezip)s,
+            %(city)s, %(state)s, %(zip)s, %(saleprice)s,
+            %(saleyear)s, %(assessedlandvalue)s, %(assessedbuildingvalue)s, %(assessmentyear)s,
+            %(usecode)s, %(livingarea)s, %(condition)s, %(taxstatus)s,
+            %(taxstatusyear)s, %(notes)s, now()
+        );
     """
+    # Testcode to remove all commas. Todo: Make data adhere to schema before we get to this point
+    for key in insert_map:
+        try:
+            insert_map[key] = insert_map[key].replace(",", "")
+        except AttributeError: # 'list object has no attribute 'replace'
+            try:
+                for s in insert_map[key]:
+                    s = s.replace(",", "")
+            except TypeError: # Nonetype
+                continue
+        except TypeError: # Nonetype: (I don't think this code can be reached)
+            continue
+
+    db_cursor.execute(insert_sql, insert_map)
+    db_cursor.commit()
 
 
 def check_if_data_is_different_than_previous(written_data):
