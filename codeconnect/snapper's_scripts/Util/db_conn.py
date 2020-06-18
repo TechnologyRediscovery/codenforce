@@ -49,8 +49,7 @@ def get_db_and_cursor(database="cogdb", user="sylvia", password="c0d3", host="lo
                     except TypeError:  # __class__ assignment only supported for heap types or ModuleType subclasses
                         continue
 
-        db_cursor = CursorAndDB_Conn()
-        yield db_cursor
+        yield CursorAndDB_Conn()
     finally:
         cursor.close()
         db_conn.close()

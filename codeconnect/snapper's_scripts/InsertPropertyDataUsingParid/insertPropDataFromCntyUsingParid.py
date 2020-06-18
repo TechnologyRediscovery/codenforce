@@ -123,7 +123,7 @@ def insert_property_basetableinfo():
                 except MalformedDataError as e:
                     log_error(e, parid)
 
-                create_and_insert_unitzero(property_id)
+                create_and_insert_default_unit(property_id, default_unit=-1)
 
                 # except MalformedDataError:
                 #     logger.warning(
@@ -326,12 +326,12 @@ def connect_person_to_property(propertyid, personid):
     print("----- connected person owner to property -----")
 
 
-def create_and_insert_unitzero(propertyid):
+def create_and_insert_default_unit(propertyid, default_unit=-1):
     insert_sql = """
         INSERT INTO public.propertyunit(
             unitid, unitnumber, property_propertyid, otherknownaddress, notes, 
             rental)
-        VALUES (DEFAULT, '0', %(property_propertyid)s, NULL, 
+        VALUES (DEFAULT, %(default_unit)s, %(property_propertyid)s, NULL, 
             'robot-generated unit representing the primary habitable dwelling on a property', 
             FALSE);
     """
@@ -339,6 +339,7 @@ def create_and_insert_unitzero(propertyid):
 
     # load up vars for use in SQL from each of the parse methods
     insertmap["property_propertyid"] = propertyid
+    insertmap["default_unit"] = default_unit
 
     cursor.execute(insert_sql, insertmap)
     db_conn.commit()
