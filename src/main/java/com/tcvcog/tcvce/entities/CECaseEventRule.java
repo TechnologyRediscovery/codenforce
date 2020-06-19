@@ -30,8 +30,8 @@ public class CECaseEventRule extends EventRuleImplementation{
     public CECaseEventRule(EventRuleImplementation imp){
         super(imp);
         // implementation subclass
-        this.attachedTS = imp.getAttachedTS();
-        this.attachedBy = imp.getAttachedBy();
+        this.implementationTS getImplementationTSchedTS();
+        this.implementedBy = igetImplementedBydBy();
         this.lastEvaluatedTS = imp.getLastEvaluatedTS();
         this.passedRuleTS = imp.getPassedRuleTS();
     }

@@ -50,6 +50,12 @@ public class        EventRuleAbstract
     
     protected boolean activeRuleAbstract;
     protected String notes;
+    
+    protected int userRankMinToConfigure;
+    protected int userRankMinToImplement;
+    protected int userRankMinToWaive;
+    protected int userRankMinToOverride;
+    protected int userRankMinToDeactivate;
 
     /**
      * @return the ruleid
@@ -403,6 +409,76 @@ public class        EventRuleAbstract
      */
     public void setFormPromptingDirectiveID(int formPromptingDirectiveID) {
         this.formPromptingDirectiveID = formPromptingDirectiveID;
+    }
+
+    /**
+     * @return the userRankMinToConfigure
+     */
+    public int getUserRankMinToConfigure() {
+        return userRankMinToConfigure;
+    }
+
+    /**
+     * @return the userRankMinToImplement
+     */
+    public int getUserRankMinToImplement() {
+        return userRankMinToImplement;
+    }
+
+    /**
+     * @return the userRankMinToWaive
+     */
+    public int getUserRankMinToWaive() {
+        return userRankMinToWaive;
+    }
+
+    /**
+     * @return the userRankMinToOverride
+     */
+    public int getUserRankMinToOverride() {
+        return userRankMinToOverride;
+    }
+
+    /**
+     * @return the userRankMinToDeactivate
+     */
+    public int getUserRankMinToDeactivate() {
+        return userRankMinToDeactivate;
+    }
+
+    /**
+     * @param userRankMinToConfigure the userRankMinToConfigure to set
+     */
+    public void setUserRankMinToConfigure(int userRankMinToConfigure) {
+        this.userRankMinToConfigure = userRankMinToConfigure;
+    }
+
+    /**
+     * @param userRankMinToImplement the userRankMinToImplement to set
+     */
+    public void setUserRankMinToImplement(int userRankMinToImplement) {
+        this.userRankMinToImplement = userRankMinToImplement;
+    }
+
+    /**
+     * @param userRankMinToWaive the userRankMinToWaive to set
+     */
+    public void setUserRankMinToWaive(int userRankMinToWaive) {
+        this.userRankMinToWaive = userRankMinToWaive;
+    }
+
+    /**
+     * @param userRankMinToOverride the userRankMinToOverride to set
+     */
+    public void setUserRankMinToOverride(int userRankMinToOverride) {
+        this.userRankMinToOverride = userRankMinToOverride;
+    }
+
+    /**
+     * @param userRankMinToDeactivate the userRankMinToDeactivate to set
+     */
+    public void setUserRankMinToDeactivate(int userRankMinToDeactivate) {
+        this.userRankMinToDeactivate = userRankMinToDeactivate;
     }
 
     

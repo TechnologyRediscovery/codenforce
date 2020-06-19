@@ -581,6 +581,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public User getUser(int userID) throws IntegrationException{
+        if(userID == 0){
+            return null;
+        }
         UserIntegrator ui = getUserIntegrator();
         return ui.getUser(userID);
     }

@@ -32,7 +32,6 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
 import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Proposal;
@@ -56,8 +55,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
- *
+ * Holder of business logic related to event rules and proposals. The EventRule
+ * object specifies a set of tests against a given list of EventCnF objects which 
+ * are implemented in a series of ten or so methods prefixed with 
+ * 
+ * ruleSubcheck_XXXX
+ * 
+ * which all boil down to an EventRule either passing or failing, each outcome 
+ * of which can trigger the creation of EventCnF objects and Directives which 
+ * guide the end user to take appropriate next steps in a given case.
+ * 
+ * The other half of my methods govern the attachment and evaluation of proposals
+ * which consist of one or more possible choices the user can select to indicate
+ * certain conditions exist in the actual casework or actual actions were taken.
+ * 
+ * Since proposals most often result in an EventCnF getting attached to a BOb 
+ * (Choices can also trigger page flows and more!), the evaluation of proposals
+ * often impacts the outcomes of one or more EventRules also associated with the
+ * BOb of concern.
+ * 
+ * With proposals helping the user create events to document casework and 
+ * event rules governing when certain major case events are appropriate (e.g. 
+ * issuing an occupancy permit, or filing a citation with the magistrate), 
+ * codeNforce can pass as not just a database but an entire workflow management
+ * system for code enforcement and occupancy case sequences.
+ * 
+ * 
  * @author sylvia
  */
 public class WorkflowCoordinator extends BackingBeanUtils implements Serializable{
@@ -68,29 +93,19 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     public WorkflowCoordinator() {
     }
     
+    /**
+     * Database object retrieving method for acquiring all Proposals to inject
+     * into our BObs
+     * 
+     * @param erg as of June 2020, these included CECase and OccPeriod objects
+     * @param cred
+     * @return 
+     */
     public List<Proposal> getProposalList(IFace_EventRuleGoverned erg, Credential cred){
-        WorkflowIntegrator ci = getWorkflowIntegrator();
+        WorkflowIntegrator wi = getWorkflowIntegrator();
         List<Proposal> propList = new ArrayList<>();
         
-        try {
-            if(erg instanceof CECase){
-                CECase cse = (CECase) erg;
-                propList.addAll(ci.getProposalList(cse));
-            } else if (erg instanceof OccPeriod){
-                OccPeriod op = (OccPeriod) erg;
-                propList.addAll(ci.getProposalList(op))    ;
-            }
-            
-            if(!propList.isEmpty()){
-                for(Proposal pr: propList){
-                    configureProposal(pr, cred);
-                }
-            }
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
+     
         return propList;
         
     }
@@ -447,10 +462,8 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
             ev.setHidden(false);
             ev.setTimeStart(LocalDateTime.now());
             ev.setTimeEnd(ev.getTimeStart().plusMinutes(ecat.getDefaultdurationmins()));
-            ev.setDiscloseToMunicipality(true);
-            ev.setDiscloseToPublic(false);
-            ev.setOwner(u);
-            ev.setTimestamp(LocalDateTime.now());
+            ev.setUserCreator(u);
+            ev.setCreationts(LocalDateTime.now());
             StringBuilder descBldr = new StringBuilder();
             descBldr.append("User ");
             descBldr.append(u.getPerson().getFirstName());
@@ -488,7 +501,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
             try {
                 if (erg instanceof CECase) {
                     CECase cse = (CECase) erg;
-                    imp.addAll(wi.rules_getEventRuleImpCECaseList(cse));
+                    imp.addAll(wi.rules_getEventRuleImplemention(cse));
                 } else if (erg instanceof OccPeriod) {
                     OccPeriod op = (OccPeriod) erg;
                     imp.addAll(wi.rules_getEventRuleImpOccPeriodList(op));
@@ -601,7 +614,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         EventRuleOccPeriod erop = new EventRuleOccPeriod(new EventRuleImplementation(era));
         // avoid inserting and duplicating keys
         if (wi.rules_getEventRuleOccPeriod(period.getPeriodID(), era.getRuleid()) == null) {
-            erop.setAttachedTS(LocalDateTime.now());
+            erop.setImplementationTS(LocalDateTime.now());
             erop.setOccPeriodID(period.getPeriodID());
             erop.setLastEvaluatedTS(null);
             erop.setPassedRuleTS(null);

@@ -146,7 +146,7 @@ public class CECaseViolationsBB
         try {
             getSelectedViolation().setComplianceUser(getSessionBean().getSessUser());
             e = ec.generateViolationComplianceEvent(getSelectedViolation());
-            e.setOwner(getSessionBean().getSessUser());
+            e.setUserCreator(getSessionBean().getSessUser());
             e.setTimeStart(LocalDateTime.now());
             cv.setActualComplianceDate(LocalDateTime.now());
             cc.recordCompliance(cv, getSessionBean().getSessUser());

@@ -37,7 +37,7 @@
                                     id="occperiod-proposals-eventrules-datatable"
                                     var="rule"
                                     rowKey="#{rule.ruleid}"
-                                    value="#{proposalEventRuleConfigBB.eventRuleList}"
+                                    value="#{workflowConfigBB.eventRuleList}"
                                     tableStyleClass="primeDataTable"
                                     draggableColumns="true"
                                     expandedRow="false"
@@ -269,7 +269,7 @@
                                                 <h:outputText styleClass="ui-label" value="Rule title:"/>
                                             </h:outputLabel>
                                             <p:spacer height="3px"/>
-                                            <p:inputText id="rule-title-it" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.title}" 
+                                            <p:inputText id="rule-title-it" value="#{workflowConfigBB.currentEventRuleAbstract.title}" 
                                                          style="width: 200px;" tabindex="3" required="true" styleClass="inputText"/>
                                             <h:message    id="rule-title-msg"
                                                           for="rule-title-it" 
@@ -282,7 +282,7 @@
                                                 <h:outputText styleClass="ui-label" 
                                                               value="Rule description" />
                                             </h:outputLabel>
-                                            <p:inputText id="rule-desc-it" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.description}" 
+                                            <p:inputText id="rule-desc-it" value="#{workflowConfigBB.currentEventRuleAbstract.description}" 
                                                          style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
                                             <h:message    id="rule-descr-msg"
                                                           for="rule-descr-it" 
@@ -302,11 +302,11 @@
                                                 <h:outputText styleClass="ui-label" value="Required event type"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-reqet" required="false" 
-                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredEventType}" 
+                                                             value="#{workflowConfigBB.currentEventRuleAbstract.requiredEventType}" 
                                                              tabindex="3"
                                                              styleClass="full-width">
                                                 <f:selectItem itemLabel="Select an event type..." itemDisabled="true" noSelectionOption="true"/>
-                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
+                                                <f:selectItems value="#{workflowConfigBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
                                             </p:selectOneMenu>
                                             <h:message for="rule-lb-reqet" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -317,12 +317,12 @@
                                                 <h:outputText styleClass="ui-label" value="Required event category"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-reqcat" required="false" 
-                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredEventCategory}" 
+                                                             value="#{workflowConfigBB.currentEventRuleAbstract.requiredEventCategory}" 
                                                              tabindex="3"
                                                              styleClass="full-width">
                                                 <f:converter converterId="eventCategoryConverter" />
                                                 <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
-                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventCategoryListAllActive}" 
+                                                <f:selectItems value="#{workflowConfigBB.eventCategoryListAllActive}" 
                                                                var="ec" 
                                                                itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
                                             </p:selectOneMenu>
@@ -333,7 +333,7 @@
                                                            value="Req cat thresold (internal to type)" 
                                                            for="rule-it-reqec-thres-typeint"/>
                                             <p:spacer height="3px"/>
-                                            <p:inputText id="rule-it-reqec-thres-typeint" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder}" 
+                                            <p:inputText id="rule-it-reqec-thres-typeint" value="#{workflowConfigBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder}" 
                                                          style="width: 20px;" 
                                                          tabindex="3" 
                                                          required="false" 
@@ -349,7 +349,7 @@
                                                            value="upper bound? (uncheck = lower bound)" 
                                                            for="rule-reqrec-thres-global-upperbound-switch"/>
                                             <p:selectBooleanCheckbox id="rule-req-thres-typeint-upperbound-switch"
-                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder_treatAsUpperBound}" />
 
                                             <h:outputLabel styleClass="ui-label" 
                                                            value="Req cat thresold (global order)" 
@@ -357,7 +357,7 @@
 
                                             <p:spacer height="3px"/>
 
-                                            <p:inputText id="rule-it-reqec-thres-global" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredECThreshold_globalOrder}" 
+                                            <p:inputText id="rule-it-reqec-thres-global" value="#{workflowConfigBB.currentEventRuleAbstract.requiredECThreshold_globalOrder}" 
                                                          style="width: 20px;" 
                                                          tabindex="3" 
                                                          required="false" 
@@ -373,7 +373,7 @@
                                                            value="upper bound? (uncheck = lower bound)" 
                                                            for="rule-reqrec-thres-global-upperbound-switch"/>
                                             <p:selectBooleanCheckbox id="rule-reqrec-thres-global-upperbound-switch"
-                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.requiredECThreshold_globalOrder_treatAsUpperBound}" />
+                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.requiredECThreshold_globalOrder_treatAsUpperBound}" />
                                         </h:panelGroup>    
 
 
@@ -383,11 +383,11 @@
                                                 <h:outputText value="Forbidden event type"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-forbiddenet" required="false" 
-                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenEventType}" 
+                                                             value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenEventType}" 
                                                              tabindex="3"
                                                              styleClass="full-width">
                                                 <f:selectItem itemLabel="Select an event type..." itemDisabled="true" noSelectionOption="true"/>
-                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
+                                                <f:selectItems value="#{workflowConfigBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
                                             </p:selectOneMenu>
                                             <h:message for="rule-lb-forbiddenet" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -398,12 +398,12 @@
                                                 <h:outputText value="Forbidden event category"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-forcat" required="false" 
-                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenEventCategory}" 
+                                                             value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenEventCategory}" 
                                                              tabindex="3"
                                                              styleClass="full-width">
                                                 <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
                                                 <f:converter converterId="eventCategoryConverter" />
-                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventCategoryListAllActive}" 
+                                                <f:selectItems value="#{workflowConfigBB.eventCategoryListAllActive}" 
                                                                var="ec" itemLabel="#{ec.eventCategoryTitle}  (ID: #{ec.categoryID})" />
                                             </p:selectOneMenu>
                                             <h:message for="rule-lb-forcat" showDetail="false" showSummary="true" 
@@ -417,7 +417,7 @@
 
                                             <p:spacer height="3px"/>
 
-                                            <p:inputText id="rule-it-forec-thres-typeint" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder}" 
+                                            <p:inputText id="rule-it-forec-thres-typeint" value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder}" 
                                                          style="width: 20px;" 
                                                          tabindex="3" 
                                                          required="false" 
@@ -433,13 +433,13 @@
                                                            value="upper bound? (uncheck = lower bound)" 
                                                            for="rule-forec-thres-typeint-upperbound-switch"/>
                                             <p:selectBooleanCheckbox id="rule-forec-thres-typeint-upperbound-switch"
-                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound}" />
 
                                             <h:outputLabel styleClass="ui-label" 
                                                            value="Forbidden cat thresold (global order)" 
                                                            for="rule-it-forec-thres-global"/>
                                             <p:spacer height="3px"/>
-                                            <p:inputText id="rule-it-forec-thres-global" value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder}" 
+                                            <p:inputText id="rule-it-forec-thres-global" value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder}" 
                                                          style="width: 20px;" 
                                                          tabindex="3" 
                                                          required="false" 
@@ -455,7 +455,7 @@
                                                            value="upper bound? (uncheck = lower bound)" 
                                                            for="rule-forec-thres-global-upperbound-switch"/>
                                             <p:selectBooleanCheckbox id="rule-forec-thres-global-upperbound-switch"
-                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder_treatAsUpperBound}" />
+                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder_treatAsUpperBound}" />
 
                                         </h:panelGroup>    
 
@@ -466,7 +466,7 @@
                                                            value="Required pass for entity close" 
                                                            for="rule-req-switch"/>
                                             <p:selectBooleanCheckbox id="rule-req-switch"
-                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.mandatoryRulePassRequiredToCloseEntity}" />
+                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.mandatoryRulePassRequiredToCloseEntity}" />
 
                                             <p:spacer height="5px" />
 
@@ -474,7 +474,7 @@
                                                            value="Inactivate on entity close" 
                                                            for="rule-inactivate-switch"/>
                                             <p:selectBooleanCheckbox id="rule-inactivate-switch"
-                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.inactivateRuleOnEntityClose}" />
+                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.inactivateRuleOnEntityClose}" />
 
                                             <p:spacer height="5px" />
 
@@ -482,7 +482,7 @@
                                                            value="Active?" 
                                                            for="rule-active-switch"/>
                                             <p:selectBooleanCheckbox id="rule-active-switch"
-                                                                     value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.activeRuleAbstract}" />
+                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.activeRuleAbstract}" />
 
                                             <p:spacer height="3px"/>
 
@@ -490,7 +490,7 @@
                                                            value="Propmpting directive ID" 
                                                            for="rule-promptprop"/>
                                             <p:inputText id="rule-promptprop" 
-                                                         value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.formPromptingDirectiveID}" 
+                                                         value="#{workflowConfigBB.currentEventRuleAbstract.formPromptingDirectiveID}" 
                                                          style="width: 20px;" 
                                                          tabindex="3" 
                                                          required="false" 
@@ -512,7 +512,7 @@
                                                            for="rule-notes"/>
                                             <p:spacer height="3px"/>
                                             <p:inputTextarea id="rule-notes" 
-                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.notes}" 
+                                                             value="#{workflowConfigBB.currentEventRuleAbstract.notes}" 
                                                              style="width: 100%; height: 50px;" 
                                                              tabindex="3" 
                                                              required="false" 
@@ -529,12 +529,12 @@
                                                 <h:outputText value="Event category triggered on rule pass"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-triggeredcatonpass" required="false" 
-                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.triggeredECOnRulePass}" 
+                                                             value="#{workflowConfigBB.currentEventRuleAbstract.triggeredECOnRulePass}" 
                                                              styleClass="full-width"
                                                              tabindex="3">
                                                 <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
                                                 <f:converter converterId="eventCategoryConverter" />
-                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventCategoryListAllActive}" 
+                                                <f:selectItems value="#{workflowConfigBB.eventCategoryListAllActive}" 
                                                                var="ec" 
                                                                itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
                                             </p:selectOneMenu>
@@ -547,12 +547,12 @@
                                                 <h:outputText value="Event category triggered on rule fail"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-triggeredcatonfail" required="false" 
-                                                             value="#{proposalEventRuleConfigBB.currentEventRuleAbstract.triggeredECOnRuleFail}" 
+                                                             value="#{workflowConfigBB.currentEventRuleAbstract.triggeredECOnRuleFail}" 
                                                              tabindex="3" 
                                                              styleClass="full-width">
                                                 <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
                                                 <f:converter converterId="eventCategoryConverter" />
-                                                <f:selectItems value="#{proposalEventRuleConfigBB.eventCategoryListAllActive}" 
+                                                <f:selectItems value="#{workflowConfigBB.eventCategoryListAllActive}" 
                                                                var="ec" itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
                                             </p:selectOneMenu>
                                             <h:message for="rule-lb-triggeredcatonfail" showDetail="false" showSummary="true" 
@@ -568,10 +568,10 @@
 
                                     <p:commandButton    id="addediteventrule-button-addrule"
                                                         ajax="true" 
-                                                        actionListener="#{proposalEventRuleConfigBB.rules_commitEventRuleCreate}"
+                                                        actionListener="#{workflowConfigBB.rules_commitEventRuleCreate}"
                                                         value="create new rule" icon="fa fa-plus"
                                                         disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                        rendered="#{proposalEventRuleConfigBB.currentEventRuleAbstract.ruleid == 0}"
+                                                        rendered="#{workflowConfigBB.currentEventRuleAbstract.ruleid == 0}"
                                                         oncomplete="PF('occperiod-dialog-addediteventrule-var').hide()"
                                                         update="occperiod-dialog-proposalmetadata-form-messages
                                                         periodmetadata-form-proposalsconfig
@@ -579,10 +579,10 @@
 
                                     <p:commandButton    id="addediteventrule-button-editrule"
                                                         ajax="true" 
-                                                        actionListener="#{proposalEventRuleConfigBB.rules_commitEventRuleEdits}"
+                                                        actionListener="#{workflowConfigBB.rules_commitEventRuleEdits}"
                                                         value="update rule" icon="fa fa-edit"
                                                         disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                        rendered="#{proposalEventRuleConfigBB.currentEventRuleAbstract.ruleid != 0}"
+                                                        rendered="#{workflowConfigBB.currentEventRuleAbstract.ruleid != 0}"
                                                         oncomplete="PF('occperiod-dialog-addediteventrule-var').hide()"
                                                         update="occperiod-dialog-proposalmetadata-form-messages
                                                         periodmetadata-form-proposalsconfig

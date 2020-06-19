@@ -41,6 +41,7 @@ public  class   EventCnFPropUnitCasePeriodHeavy
     public EventCnFPropUnitCasePeriodHeavy(EventCnF ev){
         this.eventID = ev.getEventID();
         this.category = ev.getCategory();
+        this.description = ev.getDescription();
         
         this.domain = ev.getDomain();
         this.ceCaseID = ev.getCeCaseID();
@@ -48,15 +49,18 @@ public  class   EventCnFPropUnitCasePeriodHeavy
 
         this.timeStart = ev.getTimeStart();
         this.timeEnd = ev.getTimeEnd();
-        this.timestamp = ev.getTimestamp();
-        this.description = ev.getDescription();
         
-        this.owner = ev.getOwner();
-        this.discloseToMunicipality = ev.isDiscloseToMunicipality(); 
-        this.discloseToPublic = ev.isDiscloseToPublic();
+        this.userCreator = ev.getUserCreator();
+        this.creationts = ev.getCreationts();
+        
+        this.lastUpdatedBy = ev.getLastUpdatedBy();
+        this.lastUpdatedTS = ev.getLastUpdatedTS();
+        
+        this.userTarget = ev.getUserTarget();
+        
         this.active = ev.isActive();
-        
         this.hidden = ev.isHidden();
+        
         this.notes = ev.getNotes();
         this.personList = ev.getPersonList();
     }

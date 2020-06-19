@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -434,10 +435,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @param personList
      * @throws IntegrationException 
      */
-    public void eventPersonsConnect(EventCnF ev, List<Person> personList) throws IntegrationException {
+    public void eventPersonConnect(EventCnF ev, List<Person> personList) throws IntegrationException {
         ListIterator li = personList.listIterator();
         while (li.hasNext()) {
-            eventPersonConnect(ev, (Person) li.next());
+            PersonIntegrator.this.eventPersonConnect(ev, (Person) li.next());
         }
     }
 
@@ -472,6 +473,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * Drops all event-person connections  from eventperson
      * @param ev 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public void eventPersonClear(EventCnF ev) throws IntegrationException{
         String query = "DELETE FROM eventperson WHERE ceevent_eventid = ?;";
@@ -494,6 +496,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         
     }
+    
+  
     
     
     
@@ -732,11 +736,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<Person> getPersonList(EventCnF ev) throws IntegrationException {
+    public List<Integer> eventPersonAssembleList(EventCnF ev) throws IntegrationException {
         Connection con = getPostgresCon();
+        
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        List<Person> list = new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
 
         try {
             String s = "SELECT person_personid FROM public.eventperson WHERE ceevent_eventid = ?;";
@@ -746,8 +751,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Person pers = getPerson(rs.getInt("person_personid"));
-                list.add(pers);
+                list.add(rs.getInt("person_personid"));
             }
 
         } catch (SQLException ex) {
@@ -922,7 +926,17 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     
     
-    public ArrayList<Person> getOccPermitAppPersons(int applicationID) throws IntegrationException{
+    /**
+     * TODO: Adjust the Person object assembly chain of calls to reflect the
+     * revised approach used in assembling Person objects for EventCnF objects:
+     * So in this case, OccupancyCoordinator should ask this method for a List
+     * of Person IDs as a List&lt;Integer&gt; and then this Coordinator can turn around
+     * and ask the PersonCoordinator to build a List&lt;Person&gt; from a List&lt;Integer&gt;
+     * @param applicationID
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Person> getOccPermitAppPersons(int applicationID) throws IntegrationException{
         String query = "SELECT person_personid FROM occpermitapplicationperson WHERE permitapp_applicationid = ?";
         Connection con = null;
         PreparedStatement stmt = null;
@@ -937,6 +951,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             while (rs.next()){
                 personIDs.add(rs.getInt("person_personid"));
             }
+            
             persons = PersonIntegrator.this.getPersonList(personIDs);
             
             

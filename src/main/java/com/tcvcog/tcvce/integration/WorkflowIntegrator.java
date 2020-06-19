@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
@@ -31,9 +32,7 @@ import com.tcvcog.tcvce.entities.ChoiceEventRule;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
-import com.tcvcog.tcvce.entities.EventRuleCECase;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
 import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.ProposalCECase;
@@ -49,6 +48,7 @@ import java.util.List;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * A Choice is given to the user in a Directive and can take one of the
@@ -391,7 +391,6 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             } else {
                 stmt.setNull(10, java.sql.Types.NULL);
             }
-            
             
             stmt.setBoolean(11, prop.isActive());
             stmt.setString(12, prop.getNotes());
@@ -747,15 +746,17 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
         ResultSet rs = null;
 
         try {
-            String s = "SELECT ruleid, title, description, requiredeventtype, forbiddeneventtype, \n" +
-                        "       requiredeventcat_catid, requiredeventcatthresholdtypeintorder, \n" +
-                        "       requiredeventcatupperboundtypeintorder, requiredeventcatthresholdglobalorder, \n" +
+            String s =  "SELECT ruleid, title, description, requiredeventtype, forbiddeneventtype, \n" +
+                        "       requiredeventcat_catid, requiredeventcatupperboundtypeintorder, \n" +
                         "       requiredeventcatupperboundglobalorder, forbiddeneventcat_catid, \n" +
-                        "       forbiddeneventcatthresholdtypeintorder, forbiddeneventcatupperboundtypeintorder, \n" +
-                        "       forbiddeneventcatthresholdglobalorder, forbiddeneventcatupperboundglobalorder, \n" +
-                        "       mandatorypassreqtocloseentity, autoremoveonentityclose, promptingdirective_directiveid, \n" +
-                        "       triggeredeventcatonpass, triggeredeventcatonfail, active, notes\n" +
-                        "  FROM public.eventrule WHERE ruleid=?;";
+                        "       forbiddeneventcatupperboundtypeintorder, forbiddeneventcatupperboundglobalorder, \n" +
+                        "       mandatorypassreqtocloseentity, autoremoveonentityclose, triggeredeventcatonpass, \n" +
+                        "       triggeredeventcatonfail, active, notes, requiredeventcatthresholdtypeintorder, \n" +
+                        "       forbiddeneventcatthresholdtypeintorder, requiredeventcatthresholdglobalorder, \n" +
+                        "       forbiddeneventcatthresholdglobalorder, promptingdirective_directiveid, \n" +
+                        "       userrankmintoconfigure, userrankmintoimplement, userrankmintowaive, \n" +
+                        "       userrankmintooverride, userrankmintodeactivate\n" +
+                        "  FROM public.eventrule;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, ruleid);
 
@@ -829,6 +830,12 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
         }
         evRule.setActiveRuleAbstract(rs.getBoolean("active"));
         evRule.setNotes(rs.getString("notes"));
+        
+        evRule.setUserRankMinToConfigure(rs.getInt("userrankmintoconfigure"));
+        evRule.setUserRankMinToImplement(rs.getInt("userrankmintoimplement"));
+        evRule.setUserRankMinToWaive(rs.getInt("userrankmintowaive"));
+        evRule.setUserRankMinToOverride(rs.getInt("userrankmintooverride"));
+        evRule.setUserRankMinToDeactivate(rs.getInt("userrankmintodeactivate"));
         
         return evRule;
     }
@@ -949,54 +956,137 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
         return s;
     }
     
-    public List<EventRuleCECase> rules_getEventRuleImpCECaseList(CECase cse) throws IntegrationException{
+    public EventRuleImplementation rules_getEventRuleImplemention(int implid) throws IntegrationException{
         EventRuleImplementation ruleImp = null;
-        List<EventRuleCECase> ruleList = new ArrayList<>();
-        String query =  "   SELECT cecase_caseid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
-                        "       lastevaluatedts, passedrulets, passedrule_eventid, active \n" +
-                        "  FROM public.eventruleimpl WHERE cecase_caseid=?;";
+        
+        String query =  "SELECT erimplid, eventrule_ruleid, cecase_caseid, occperiod_periodid, \n" +
+                        "       implts, implby_userid, lastevaluatedts, passedrulets, triggeredevent_eventid, \n" +
+                        "       waivedts, waivedby_userid, passoverridets, passoverrideby_userid, \n" +
+                        "       deacts, deacby_userid, notes\n" +
+                        "  FROM public.eventruleimpl WHERE erimplid=?;";
+        
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, cse.getCaseID());
+            stmt.setInt(1, implid);
             rs = stmt.executeQuery();
+            
             while (rs.next()) {
                 ruleImp = rules_generateEventRuleImplementation(rs);
-                ruleList.add(rules_generateEventRuleCECase(rs, ruleImp));
                 
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot generate list of event rules", ex);
+            throw new IntegrationException("Cannot generate event rule implementation", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return ruleList;
+        return ruleImp;
         
     }
     
-      public List<EventRuleOccPeriod> rules_getEventRuleImpOccPeriodList(OccPeriod op) throws IntegrationException{
+    /**
+     * Extracts values for a single record and injects into mem vars on our
+     * EventRuleImplementation beast
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private EventRuleImplementation rules_generateEventRuleImplementation(ResultSet rs) throws SQLException, IntegrationException{
+        UserCoordinator uc = getUserCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        
+        // create our imp by passing an EventRuleAbstract into the constructor for 
+        // EventRuleImplementation
+        EventRuleImplementation impl = new EventRuleImplementation(rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
+        
+        // The WorkflowCoordinator's configureEventRuleImplementation will
+        // set the EventDomain based on which of these is nonzero
+        impl.setCeCaseID(rs.getInt("cecase_caseid"));
+        impl.setOccPeriodID(rs.getInt("occperiod_periodid"));
+        
+        impl.setImplementationTS(rs.getTimestamp("attachedts").toLocalDateTime());
+        impl.setImplementedBy(uc.getUser(rs.getInt("implby_userid")));
+        
+        if(rs.getTimestamp("lastevaluatedts") != null){
+            impl.setLastEvaluatedTS(rs.getTimestamp("lastevaluatedts").toLocalDateTime());
+        } 
+        
+        if(rs.getTimestamp("passedrulets") != null){
+            impl.setLastEvaluatedTS(rs.getTimestamp("passedrulets").toLocalDateTime());
+        } 
+        
+        if(rs.getInt("triggeredevent_eventid") != 0){
+            impl.setTriggeredEvent(ec.getEvent(rs.getInt("triggeredevent_eventid")));
+        }
+        
+        if(rs.getInt("triggeredevent_eventid") != 0){
+            impl.setTriggeredEvent(ec.getEvent(rs.getInt("triggeredevent_eventid")));
+        }
+        
+        if(rs.getTimestamp("waivedts") != null){
+            impl.setWaivedTS(rs.getTimestamp("waivedts").toLocalDateTime());
+        }
+        impl.setWaivedBy(uc.getUser(rs.getInt("waivedby_userid")));
+        
+        if(rs.getTimestamp("passoverridets") != null){
+            impl.setPassOverrideTS(rs.getTimestamp("passoverridets").toLocalDateTime());
+        }
+        impl.setPassOverrideBy(uc.getUser(rs.getInt("passoverrideby_userid")));
+        
+        if(rs.getTimestamp("deacts") != null){
+            impl.setDeactivatedTS(rs.getTimestamp("deacts").toLocalDateTime());
+        }
+        impl.setDeactivatedBy(uc.getUser(rs.getInt("deacby_userid")));
+        
+        impl.setNotes(rs.getString("notes"));
+       
+       return impl;
+    }
+    
+    /**
+     * Used by the WorkflowCoordinator to build the rule list for a given 
+     * CECase or OccPeriod. 
+     * @param erg as of June 2020 implementers include CECase and OccPeriod
+     * @return a simple list of IDs. Up to the caller to turn them into Objects
+     * that are property configured
+     * @throws IntegrationException 
+     */
+    public List<Integer> rules_getEventRuleImplementationList(IFace_EventRuleGoverned erg) throws IntegrationException{
         EventRuleImplementation ruleImp;
-        List<EventRuleOccPeriod> ruleList = new ArrayList<>();
-        String query = "SELECT occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
-                        "       lastevaluatedts, passedrulets, passedrule_eventid, active \n" +
-                        "  FROM public.occperiodeventrule WHERE occperiod_periodid=?;";
+        List<Integer> implList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT erimplid FROM public.eventruleimpl WHERE ");
+        
+        switch(erg.discloseEventDomain()){
+            case CODE_ENFORCEMENT:
+                sb.append("cecase_caseid=?;");
+                break;
+            case OCCUPANCY:
+                sb.append("occperiod_periodid=?;");
+                break;
+            default:
+                sb.append("cecase_caseid=?");
+        }
+        
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, op.getPeriodID());
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, erg.getBObID());
+            
             rs = stmt.executeQuery();
+            
             while (rs.next()) {
-                ruleImp = rules_generateEventRuleImplementation(rs);
-                ruleList.add(rules_generateEventRuleOccPeriod(rs, ruleImp));
+                implList.add(rs.getInt("erimplid"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -1007,53 +1097,39 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return ruleList;
+        return implList;
     }
+   
     
-    private EventRuleCECase rules_generateEventRuleCECase(ResultSet rs, EventRuleImplementation imp) 
-            throws SQLException, IntegrationException{
-        EventCoordinator ec = getEventCoordinator();
-        EventRuleCECase evRule = new EventRuleCECase(imp);
-        evRule.setCeCaseID(rs.getInt("cecase_caseid"));
-        evRule.setPassedRuleEvent(ec.getEvent(rs.getInt("passedrule_eventid")));
-        return evRule;
-        
-    }
-    
-    private EventRuleImplementation rules_generateEventRuleImplementation(ResultSet rs) throws SQLException, IntegrationException{
-        UserIntegrator ui = getUserIntegrator();
-        
-        EventRuleImplementation ruleImp = new EventRuleImplementation(rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
-        ruleImp.setAttachedTS(rs.getTimestamp("attachedts").toLocalDateTime());
-        ruleImp.setAttachedBy(ui.getUser(rs.getInt("attachedby_userid")));
-        if(rs.getTimestamp("lastevaluatedts") != null){
-            ruleImp.setLastEvaluatedTS(rs.getTimestamp("lastevaluatedts").toLocalDateTime());
-        } 
-       ruleImp.setAttachedBy(ui.getUser(rs.getInt("attachedby_userid")));
-       
-       
-       return ruleImp;
-    }
-    
-      public int rules_insertEventRule(EventRuleAbstract evrua) throws IntegrationException {
+    /**
+     * Entryway for new EventRuleAbstracts into the DB
+     * @param evrua
+     * @return the most recently issued event rule ID
+     * @throws IntegrationException 
+     */
+    public int rules_insertEventRule(EventRuleAbstract evrua) throws IntegrationException {
 
         String query = "INSERT INTO public.eventrule(\n" +
-                        "            ruleid, title, description, requiredeventtype, forbiddeneventtype, \n" + // 1-4
-                        "            requiredeventcat_catid, requiredeventcatupperboundtypeintorder, \n" + //5-6
-                        "            requiredeventcatupperboundglobalorder, forbiddeneventcat_catid, \n" + //7-8
-                        "            forbiddeneventcatupperboundtypeintorder, forbiddeneventcatupperboundglobalorder, \n" + //9-10
-                        "            mandatorypassreqtocloseentity, autoremoveonentityclose, promptingdirective_directiveid, \n" + //11-13
-                        "            triggeredeventcatonpass, triggeredeventcatonfail, active, notes, \n" + //14-17
-                        "            requiredeventcatthresholdtypeintorder, forbiddeneventcatthresholdtypeintorder, \n" + //18-19
-                        "            requiredeventcatthresholdglobalorder, forbiddeneventcatthresholdglobalorder)\n" + // 20-21
+                        "            ruleid, title, description, requiredeventtype, forbiddeneventtype, \n" +
+                        "            requiredeventcat_catid, requiredeventcatupperboundtypeintorder, \n" +
+                        "            requiredeventcatupperboundglobalorder, forbiddeneventcat_catid, \n" +
+                        "            forbiddeneventcatupperboundtypeintorder, forbiddeneventcatupperboundglobalorder, \n" +
+                        "            mandatorypassreqtocloseentity, autoremoveonentityclose, triggeredeventcatonpass, \n" +
+                        "            triggeredeventcatonfail, active, notes, requiredeventcatthresholdtypeintorder, \n" +
+                        "            forbiddeneventcatthresholdtypeintorder, requiredeventcatthresholdglobalorder, \n" +
+                        "            forbiddeneventcatthresholdglobalorder, promptingdirective_directiveid, \n" +
+                        "            userrankmintoconfigure, userrankmintoimplement, userrankmintowaive, \n" +
+                        "            userrankmintooverride, userrankmintodeactivate)\n" +
                         "    VALUES (DEFAULT, ?, ?, CAST (? AS eventtype), CAST (? AS eventtype), \n" + 
-                        "            ?, ?, \n" + //5-6
-                        "            ?, ?, \n" + //7-8
                         "            ?, ?, \n" +
+                        "            ?, ?, \n" + // 7-8
+                        "            ?, ?, \n" + //9-10
+                        "            ?, ?, ?, \n" + // 11 mand -13 trigg
+                        "            ?, ?, ?, ?, \n" + // 14 - trigcatfail - 17 reqtypintorder
+                        "            ?, ?, \n" + // 18-forbidthrestypeint, 19-reqeventcatethresglobal
+                        "            ?, ?, \n" + //20-forbideventcatglobal, 21-directive
                         "            ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, \n" +
-                        "            ?, ?);";
+                        "            ?, ?)";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -1081,44 +1157,50 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
                 stmt.setNull(5, java.sql.Types.NULL);
             }
             stmt.setBoolean(6, evrua.isRequiredECThreshold_typeInternalOrder_treatAsUpperBound());
+            
             stmt.setBoolean(7, evrua.isRequiredECThreshold_globalOrder_treatAsUpperBound());
-            
-            
             if(evrua.getForbiddenEventCategory() != null){
                 stmt.setInt(8, evrua.getForbiddenEventCategory().getCategoryID());
             } else {
                 stmt.setNull(8, java.sql.Types.NULL);
             }
+            
             stmt.setBoolean(9, evrua.isForbiddenECThreshold_typeInternalOrder_treatAsUpperBound());
             stmt.setBoolean(10, evrua.isForbiddenECThreshold_globalOrder_treatAsUpperBound());
             
             stmt.setBoolean(11, evrua.isMandatoryRulePassRequiredToCloseEntity());
             stmt.setBoolean(12, evrua.isInactivateRuleOnEntityClose());
-            if(evrua.getPromptingDirective()!= null){
-                stmt.setInt(13, evrua.getPromptingDirective().getDirectiveID());
+            if(evrua.getTriggeredECOnRulePass() != null){
+                stmt.setInt(13, evrua.getTriggeredECOnRulePass().getCategoryID());
             } else {
                 stmt.setNull(13, java.sql.Types.NULL);
             }
+
             
-            if(evrua.getTriggeredECOnRulePass() != null){
-                stmt.setInt(14, evrua.getTriggeredECOnRulePass().getCategoryID());
+            if(evrua.getTriggeredECOnRuleFail() != null){
+                stmt.setInt(14, evrua.getTriggeredECOnRuleFail().getCategoryID());
             } else {
                 stmt.setNull(14, java.sql.Types.NULL);
             }
+            stmt.setBoolean(15, evrua.isActiveRuleAbstract());
+            stmt.setString(16, evrua.getNotes());
+            stmt.setInt(17, evrua.getRequiredECThreshold_typeInternalOrder());
             
-            if(evrua.getTriggeredECOnRuleFail() != null){
-                stmt.setInt(15, evrua.getTriggeredECOnRuleFail().getCategoryID());
+            stmt.setInt(18, evrua.getForbiddenECThreshold_typeInternalOrder());
+            stmt.setInt(19, evrua.getRequiredECThreshold_globalOrder());
+            
+            stmt.setInt(20, evrua.getForbiddenECThreshold_globalOrder());            
+            if(evrua.getPromptingDirective()!= null){
+                stmt.setInt(21, evrua.getPromptingDirective().getDirectiveID());
             } else {
-                stmt.setNull(15, java.sql.Types.NULL);
+                stmt.setNull(21, java.sql.Types.NULL);
             }
-            stmt.setBoolean(16, evrua.isActiveRuleAbstract());
-            stmt.setString(17, evrua.getNotes());
-
-            stmt.setInt(18, evrua.getRequiredECThreshold_typeInternalOrder());
-            stmt.setInt(19, evrua.getForbiddenECThreshold_typeInternalOrder());
             
-            stmt.setInt(20, evrua.getRequiredECThreshold_globalOrder());
-            stmt.setInt(21, evrua.getForbiddenECThreshold_globalOrder());
+            stmt.setInt(22, evrua.getUserRankMinToConfigure());
+            stmt.setInt(23, evrua.getUserRankMinToImplement());
+            stmt.setInt(24, evrua.getUserRankMinToWaive());
+            stmt.setInt(25, evrua.getUserRankMinToOverride());
+            stmt.setInt(26, evrua.getUserRankMinToDeactivate());
             
             stmt.execute();
             
@@ -1141,8 +1223,15 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
         
         return freshRuleID;
        
-    } // close method
-      public void rules_updateEventRule(EventRuleAbstract evrua) throws IntegrationException {
+    } 
+    
+    /**
+     * Implements SQL UPDATE on EventRuleAbstract objects
+     * 
+     * @param evrua
+     * @throws IntegrationException 
+     */
+    public void rules_updateEventRule(EventRuleAbstract evrua) throws IntegrationException {
 
         String query = "UPDATE public.eventrule\n" +
                     "   SET title=?, description=?, requiredeventtype=CAST (? AS eventtype), forbiddeneventtype= CAST (? AS eventtype), \n" +
@@ -1153,7 +1242,8 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
                     "       triggeredeventcatonpass=?, triggeredeventcatonfail=?, active=?, \n" +
                     "       notes=?, requiredeventcatthresholdtypeintorder=?, forbiddeneventcatthresholdtypeintorder=?, \n" +
                     "       requiredeventcatthresholdglobalorder=?, forbiddeneventcatthresholdglobalorder=?\n" +
-                    " WHERE ruleid=?;";
+                    "       userrankmintoconfigure=?, userrankmintoimplement=?, userrankmintowaive=?, \n" +
+                    "       userrankmintooverride=?, userrankmintodeactivate=? WHERE ruleid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -1218,7 +1308,13 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(20, evrua.getRequiredECThreshold_globalOrder());
             stmt.setInt(21, evrua.getForbiddenECThreshold_globalOrder());
             
-            stmt.setInt(22, evrua.getRuleid());
+            stmt.setInt(22, evrua.getUserRankMinToConfigure());
+            stmt.setInt(23, evrua.getUserRankMinToImplement());
+            stmt.setInt(24, evrua.getUserRankMinToWaive());
+            stmt.setInt(25, evrua.getUserRankMinToOverride());
+            stmt.setInt(26, evrua.getUserRankMinToDeactivate());
+
+            stmt.setInt(27, evrua.getRuleid());
             
             stmt.executeUpdate();
 
@@ -1232,54 +1328,8 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
         } // close finally
     } // close method
       
-    public void rules_insertEventRuleOccPeriod(EventRuleOccPeriod erop) throws IntegrationException{
-        UserCoordinator uc = getUserCoordinator();
-        
-        String query = "INSERT INTO public.occperiodeventrule(\n" +
-                        "            occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
-                        "            lastevaluatedts, passedrulets, passedrule_eventid, active)\n" +
-                        "    VALUES (?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?);";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, erop.getOccPeriodID());
-            stmt.setInt(2, erop.getRuleid());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            if(erop.getAttachedBy() != null){
-                stmt.setInt(4, erop.getAttachedBy().getUserID());
-            } else {
-                stmt.setInt(4, uc.getUserRobot().getUserID());
-             
-            }
-            
-            // last evaluated TS
-            stmt.setNull(5, java.sql.Types.NULL);
-            
-            // passed rule TS
-            stmt.setNull(6, java.sql.Types.NULL);
-            
-            if(erop.getPassedRuleEvent() != null){
-                stmt.setInt(7, erop.getPassedRuleEvent().getEventID());
-            } else {
-                stmt.setNull(7, java.sql.Types.NULL);
-            }
-            
-            stmt.setBoolean(8, erop.isActiveRuleAbstract());
-            
-            stmt.execute();
-            System.out.println("EventIntegrator.rules_insertEventRuleOccPeriod | inserted rule on OccPeriod ID " + erop.getOccPeriodID());
-            
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot insert a new event rule occ period into the system", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
+    
+  
     
     public void rules_addEventRuleAbstractToOccPeriodTypeRuleSet(EventRuleAbstract era, int eventRuleSetID) throws IntegrationException{
         
@@ -1320,8 +1370,8 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(1, erop.getOccPeriodID());
             stmt.setInt(2, erop.getRuleid());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            if(erop.getAttachedBy() != null){
-                stmt.setInt(4, erop.getAttachedBy().getUserID());
+            if(erop.getImplementedBy() != null){
+                stmt.setInt(4, erop.getImplementedBy().getUserID());
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
@@ -1360,8 +1410,8 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(1, ercec.getCeCaseID());
             stmt.setInt(2, ercec.getRuleid());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            if(ercec.getAttachedBy() != null){
-                stmt.setInt(4, ercec.getAttachedBy().getUserID());
+            if(ercec.getImplementedBy() != null){
+                stmt.setInt(4, ercec.getImplementedBy().getUserID());
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
@@ -1402,8 +1452,8 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(1, ercec.getCeCaseID());
             stmt.setInt(2, ercec.getRuleid());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            if(ercec.getAttachedBy() != null){
-                stmt.setInt(4, ercec.getAttachedBy().getUserID());
+            if(ercec.getImplementedBy() != null){
+                stmt.setInt(4, ercec.getImplementedBy().getUserID());
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }

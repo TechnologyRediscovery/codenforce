@@ -495,7 +495,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationEvent.setNotes(sb.toString());
             
         }
-            originationEvent.setOwner(us);
+            originationEvent.setUserCreator(us);
             attachNewEventToCECase(assembleCECaseDataHeavy(getCECase(freshID), cred), originationEvent, null);
     }
     
@@ -740,7 +740,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
-        e.setOwner(getSessionBean().getSessUser());
+        e.setUserCreator(getSessionBean().getSessUser());
         e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         return ei.insertEvent(e);
@@ -821,7 +821,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
         noticeEvent.setDescription(queuedNoticeEventNotes);
-        noticeEvent.setOwner(user);
+        noticeEvent.setUserCreator(user);
         noticeEvent.setDiscloseToMunicipality(true);
         noticeEvent.setDiscloseToPublic(true);
         ArrayList<Person> al = new ArrayList();
@@ -1143,7 +1143,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 //        EventCategory eventCat = ec.initEventCategory(113);
         tfEvent = ec.initEvent(cse, eventCat);
         tfEvent.setTimeStart(cv.getStipulatedComplianceDate());
-        tfEvent.setOwner(cse.getCaseManager());
+        tfEvent.setUserCreator(cse.getCaseManager());
         
         sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
                         .getString("complianceTimeframeEndEventDesc"));

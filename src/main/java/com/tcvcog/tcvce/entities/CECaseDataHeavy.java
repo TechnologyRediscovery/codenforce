@@ -64,6 +64,20 @@ public class CECaseDataHeavy
     public String getCredentialSignature() {
         return credentialSignature;
     }
+    
+    
+    @Override
+    public EventDomainEnum discloseEventDomain() {
+        return EventDomainEnum.CODE_ENFORCEMENT;
+    }
+    
+    
+    @Override
+    public int getBObID() {
+        return caseID;
+    }
+
+
 
     /**
      *

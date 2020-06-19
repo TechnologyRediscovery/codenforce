@@ -65,9 +65,53 @@ ALTER TABLE public.eventcategory ALTER COLUMN userrankminimumtoupdate SET DEFAUL
 
 ALTER TABLE public.eventcategory RENAME COLUMN notifycasemonitors TO notifymonitors;
 ALTER TABLE public.event RENAME COLUMN activeevent TO active;
+
+-- Event rules and such overhaul
+DROP TABLE public.eventruleimpl CASCADE;
+
+
+ALTER TABLE public.eventrule ADD COLUMN userrankmintoconfigure INTEGER DEFAULT 3;
+ALTER TABLE public.eventrule ADD COLUMN userrankmintoimplement INTEGER DEFAULT 3;
+ALTER TABLE public.eventrule ADD COLUMN userrankmintowaive INTEGER DEFAULT 3;
+ALTER TABLE public.eventrule ADD COLUMN userrankmintooverride INTEGER DEFAULT 3;
+ALTER TABLE public.eventrule ADD COLUMN userrankmintodeactivate INTEGER DEFAULT 3;
+
+
+CREATE SEQUENCE IF NOT EXISTS eventruleimpl_impid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;
+
+
+CREATE TABLE public.eventruleimpl
+(
+	erimplid			INTEGER NOT NULL DEFAULT nextval('eventruleimpl_impid_seq') CONSTRAINT erimplid_pk PRIMARY KEY,
+	eventrule_ruleid 	INTEGER NOT NULL,
+	cecase_caseid 		INTEGER CONSTRAINT erimpl_caseid_fk REFERENCES cecase (caseid),
+	occperiod_periodid  INTEGER CONSTRAINT erimpl_occperiodid_fk REFERENCES occperiod (periodid),
+	implts 				TIMESTAMP WITH TIME ZONE,
+	implby_userid		INTEGER CONSTRAINT erimpl_implby_userid_fk REFERENCES login (userid),
+	lastevaluatedts 	TIMESTAMP WITH TIME ZONE,
+	passedrulets 		TIMESTAMP WITH TIME ZONE,
+	triggeredevent_eventid INTEGER CONSTRAINT erimpl_triggeredevent_eventid_FK REFERENCES event (eventid),
+	waivedts			TIMESTAMP WITH TIME ZONE,
+	waivedby_userid 	INTEGER CONSTRAINT erimpl_waivedby_userid_fk REFERENCES login (userid),
+	passoverridets			TIMESTAMP WITH TIME ZONE,
+	passoverrideby_userid 	INTEGER CONSTRAINT erimpl_passoverrideby_userid_fk REFERENCES login (userid),
+	deacts			TIMESTAMP WITH TIME ZONE,
+	deacby_userid 	INTEGER CONSTRAINT erimpl_deacby_userid_fk REFERENCES login (userid),
+	notes 			TEXT
+);
+
+
+
+
+
+
 --- RUN LOCALLY UP TO HERE
 
-ALTER TABLE public.eventperson ADD COLUMN roledescr TEXT;
 
 
 

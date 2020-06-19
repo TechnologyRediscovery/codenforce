@@ -170,10 +170,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     private EventCnF configureEvent(EventCnF ev) throws IntegrationException, EventException{
+        PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
+        
+        if(ev == null){
+            return null;
+        }
         
         // Declare this event as either in the CE or Occ domain with 
         // our hacky little enum thingy
-        if(ev != null){
             if(ev.getCeCaseID() !=0 && ev.getOccPeriodID() != 0 ){
                 throw new EventException("EventCnF cannot have a non-zero CECase and OccPeriod ID");
             }
@@ -184,19 +189,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             } else {
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
-        }
        
-        // begin configuring the event proposals assocaited with this event
-        // remember: event proposals are specified in an EventCategory object
-        // but when we build an EventCnF object, the ProposalImplementation lives on the EventCnF itself
-        // 
-//        if(ev.getCategory().getDirective() != null){
-//            TODO: OccBeta
-//            Proposal imp = ei.getProposalImplAssociatedWithEvent(ev);
-//            imp.setCurrentUserCanEvaluateProposal(determineCanUserEvaluateProposal(ev, user, userAuthMuniList));
-//            ev.setEventProposalImplementation(imp);
-//        }
-//        ev.setPersonList(pi.getPersonOccPeriodList(ev));
+        ev.setPersonList(pc.getPersonList(pi.eventPersonAssembleList(ev)));
         
         return ev;
     }
@@ -222,8 +216,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Business rule aware pathway to update fields on EventCnF objects
- When updating Person links, this method clears all previous connections
- and rebuilds the mapping from scratch on each update.
+     * When updating Person links, this method clears all previous connections
+     * and rebuilds the mapping from scratch on each update.
      * 
      * @param ev
      * @throws IntegrationException 
@@ -236,7 +230,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         auditEvent(ev);
         ei.updateEvent(ev);
         pi.eventPersonClear(ev);
-        pi.eventPersonsConnect(ev, ev.getPersonList());
+        pi.eventPersonConnect(ev, ev.getPersonList());
         
     }
     
@@ -249,20 +243,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void deleteEvent(EventCnF ev, UserAuthorized u) throws AuthorizationException{
-        EventIntegrator ei = getEventIntegrator();
-        try {
-            if(u.getMyCredential().isHasDeveloperPermissions()){
-                ei.deleteEvent(ev);
-            } else {
-                throw new AuthorizationException("Must have sys admin permissions "
-                        + "to delete event; marking an event as inactive is like deleting it");
-            }
-        } catch (IntegrationException ex) {
-
-        }
-    }
-  
+   
     /**
      * Core coordinator method called by all other classes who want to 
      * create their own event. Restricts the event type based on current
@@ -563,7 +544,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //        event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(updateViolationDescr);
         //even descr set by violation coordinator
-        event.setOwner(getSessionBean().getSessUser());
+        event.setUserCreator(getSessionBean().getSessUser());
         // disclose to muni from violation coord
         // disclose to public from violation coord
         event.setActive(true);
@@ -592,9 +573,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
 //        event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
-        event.setOwner(uc.getUserRobot());
-        event.setDiscloseToMunicipality(true);
-        event.setDiscloseToPublic(true);
+        event.setUserCreator(uc.getUserRobot());
         event.setActive(true);
         event.setHidden(false);
         event.setNotes("Event created by a public user");
@@ -622,8 +601,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 Constants.EVENT_CATEGORY_BUNDLE).getString("complianceEvent"))));
         e.setDescription("Compliance with municipal code achieved");
         e.setActive(true);
-        e.setDiscloseToMunicipality(true);
-        e.setDiscloseToPublic(true);
         
         StringBuilder sb = new StringBuilder();
         sb.append("Compliance with the following code violations was observed:");
@@ -681,7 +658,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //        event.set(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setOwner(getSessionBean().getSessUser());
+        event.setUserCreator(getSessionBean().getSessUser());
         event.setActive(true);
         
         cc.attachNewEventToCECase(currentCase, event, null);

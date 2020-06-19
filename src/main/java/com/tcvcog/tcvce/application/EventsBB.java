@@ -213,7 +213,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
 
         // category is already set from initialization sequence
         currentEvent.setCeCaseID(getCurrentCase().getCaseID());
-        currentEvent.setOwner(getSessionBean().getSessUser());
+        currentEvent.setUserCreator(getSessionBean().getSessUser());
         try {
         
          

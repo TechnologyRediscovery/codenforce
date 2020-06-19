@@ -677,11 +677,11 @@
                                                 <h:outputText value="#{e.propertyUnit.unitNumber}"/>
                                             </p:column>
 
-                                            <p:column width="11%" sortBy="#{e.timestamp}">
+                                            <p:column width="11%" sortBy="#{e.creationts}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Date" />
                                                 </f:facet>
-                                                <h:outputText value="#{eventSearchBB.getPrettyDateNoTime(e.timestamp)}"/>
+                                                <h:outputText value="#{eventSearchBB.getPrettyDateNoTime(e.creationts)}"/>
                                             </p:column>
 
                                             <p:column width="10%"
@@ -711,13 +711,13 @@
                                                 <h:outputText value="#{e.category.eventCategoryTitle}"/>
                                             </p:column>
                                             <p:column width="10%" 
-                                                      filterBy="#{e.owner.person.lastName}"
-                                                      sortBy="#{e.owner.person.lastName}"
+                                                      filterBy="#{e.creator.person.lastName}"
+                                                      sortBy="#{e.creator.person.lastName}"
                                                       style="word-wrap: normal;">
                                                 <f:facet name="header">
                                                     <h:outputText value="Creator" />
                                                 </f:facet>
-                                                <h:outputText value="#{e.owner.person.lastName}"/>
+                                                <h:outputText value="#{e.creator.person.lastName}"/>
                                             </p:column>
                                             <p:column width="20%" style="word-wrap: normal;">
                                                 <f:facet name="header">
@@ -766,7 +766,7 @@
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="Creation time stamp"/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.timestamp}"/>
+                                                                <h:outputText value="#{e.creationts}"/>
                                                             </div>
                                                         </h:panelGroup>
                                                         <h:panelGroup>
