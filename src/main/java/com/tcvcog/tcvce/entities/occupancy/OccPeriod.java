@@ -18,7 +18,8 @@ import java.time.ZoneId;
  */
 public  class       OccPeriod 
         extends     OccPeriodPublic  
-        implements  IFace_Loggable{
+        implements  IFace_Loggable,
+                    Comparable<OccPeriod>{
     
     protected int periodID;
     protected int propertyUnitID;
@@ -55,6 +56,19 @@ public  class       OccPeriod
     
     protected boolean active;
     
+    
+    
+    @Override
+    public int compareTo(OccPeriod op) {
+        int c = 0;
+        if(this.startDate != null && op.getStartDate() != null){
+             c = this.startDate.compareTo(op.startDate);
+        } else if(this.createdTS != null && op.createdTS != null){
+             c = this.createdTS.compareTo(op.createdTS);
+        } 
+        return c;
+        
+    }
    
     
     /**
@@ -399,4 +413,5 @@ public  class       OccPeriod
     public void setActive(boolean active) {
         this.active = active;
     }
+
 }

@@ -49,6 +49,8 @@ public class EventCategory implements Serializable {
     
     private String hostEventDescriptionSuggestedText;
     
+    private boolean active;
+    
     /**
      * @return the eventType
      */
@@ -302,6 +304,20 @@ public class EventCategory implements Serializable {
      */
     public void setDefaultdurationmins(int defaultdurationmins) {
         this.defaultdurationmins = defaultdurationmins;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     

@@ -231,7 +231,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             return opdh;
         }
         
+        
+        
+        
+        // TODO: Write logic for occperiod status
         opdh.setStatus(OccPeriodStatusEnum.UNKNOWN);
+        
         
         return opdh;
     }

@@ -176,7 +176,6 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
             //Message Noticefication
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Municipality Page Unsuccessfully Initialized", ""));
-
         }
     }
 

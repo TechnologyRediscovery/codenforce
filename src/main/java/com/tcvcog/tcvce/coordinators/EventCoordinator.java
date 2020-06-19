@@ -43,6 +43,8 @@ import java.util.Iterator;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -177,7 +179,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             }
             if(ev.getCeCaseID() != 0){
                 ev.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
-            } else if(ev.getCeCaseID() != 0){
+            } else if(ev.getOccPeriodID() != 0){
                 ev.setDomain(EventDomainEnum.OCCUPANCY);
             } else {
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
@@ -323,10 +325,18 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     
 //    --------------------------------------------------------------------------
-//    ***************************** SEARCH *************************************
+//    ***************************** SEARCH AND VIEW *************************************
 //    --------------------------------------------------------------------------
-    
-    
+   
+    /**
+     * Logic container for choosing a sensible event view enum value
+     * @param ua
+     * @return 
+     */
+   
+    public ViewOptionsActiveHiddenListsEnum determineDefaultEventView(UserAuthorized ua){
+        return ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN;
+    }
     
     
       
@@ -347,6 +357,44 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //    ************************* EVENT CATEGORIES *******************************
 //    --------------------------------------------------------------------------
     
+    
+    /**
+     * Entry point for logic components that select which EventType objects
+     * and later, event cats, the user can see on a given load of the events 
+     * viewer. This logic will review what our event domain is, the thing
+     * onto which we might be attaching events (which as of Jun 2020 are CECase
+     * objects or OccPeriod objects), and the attacher
+     * @param domain
+     * @param erg which will be interrogated for is open/closed status
+     * @param ua doing potential creation of an event
+     * @return 
+     */
+    public List<EventType> determinePermittedEventTypes(    EventDomainEnum domain, 
+                                                            IFace_EventRuleGoverned erg, 
+                                                            UserAuthorized ua){
+        List<EventType> typeList = new ArrayList<>();
+        
+        // implement logic based on event domain and check for sensible matches
+        switch(domain){
+            case CODE_ENFORCEMENT:
+                if(erg instanceof CECaseDataHeavy){
+                    typeList.addAll(determinePermittedEventTypesForCECase((CECaseDataHeavy) erg, ua));
+                }
+                break;
+            case OCCUPANCY:
+                if(erg instanceof OccPeriodDataHeavy){
+                    typeList.addAll(determinePermittedEventTypesForOcc((OccPeriodDataHeavy) erg, ua));
+                }
+                break;
+            case UNIVERSAL:
+                typeList.add(EventType.Custom);
+                typeList.add(EventType.Meeting);
+                typeList.add(EventType.Communication);
+                break;
+            default:
+        }
+        return typeList;
+    }
      /**
      * Implements business rules for determining which event types are allowed
  to be attached to the given CECaseDataHeavy based on the case's phase and the
@@ -359,7 +407,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param u the User doing the attaching
      * @return allowed EventTypes for attaching to the given case
      */
-    public List<EventType> getPermittedEventTypesForCECase(CECaseDataHeavy c, UserAuthorized u) {
+    public List<EventType> determinePermittedEventTypesForCECase(CECaseDataHeavy c, UserAuthorized u) {
         List<EventType> typeList = new ArrayList<>();
         RoleType role = u.getRole();
         if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
@@ -375,7 +423,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public List<EventType> getPermittedEventTypesForOcc(OccPeriod period, UserAuthorized u) {
+    public List<EventType> determinePermittedEventTypesForOcc(OccPeriod period, UserAuthorized u) {
         List<EventType> typeList = new ArrayList<>();
         RoleType role = u.getRole();
         if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
@@ -428,23 +476,61 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return ec;
     }
   
-    
-    public List<EventCategory> getEventCategoryListActive() throws IntegrationException{
+    /**
+     * Utility method for iterating over the event cat list and only
+     * passing on active ones
+     * @param catList
+     * @return
+     */
+    public List<EventCategory> assembleEventCategoryListActiveOnly(List<EventCategory> catList) {
         EventIntegrator ei = getEventIntegrator();
-        List<EventCategory> catList = ei.getEventCategoryList();
+        List<EventCategory> catListActiveOnly = new ArrayList<>();
         for(EventCategory cat: catList){
-            // TODO: remove inactive EventCategories
-            // TODO: add active flag in DB and int methods
+            if(cat.isActive()){
+                catListActiveOnly.add(cat);
+            }
         }
-        return catList;
+        return catListActiveOnly;
     }
     
-      
-    public List<EventCategory> loadEventCategoryListUserAllowed(EventType et, UserAuthorized u) throws IntegrationException{
+    
+    /**
+     * Logic container for choosing which event categories to allow the user
+     * to use for event creation UI
+     * @param et
+     * @param u
+     * @return 
+     */
+    public List<EventCategory> determinePermittedEventCategories(EventType et, UserAuthorized u) {
         EventIntegrator ei = getEventIntegrator();
-        // TODO: add logic for only allowing certain event cats based on user needs
-        return ei.getEventCategoryList(et);
+        List<EventCategory> rawCats = new ArrayList<>();
+        List<EventCategory> allowedCats = new ArrayList<>();
+        if(et == null){
+            return allowedCats;
+        }
+        try {
+            rawCats.addAll(ei.getEventCategoryList(et));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         
+        for(EventCategory cat: rawCats){
+            boolean include = false;
+            if(cat.isActive()){
+                if(u != null && u.getKeyCard() != null){
+                    if(u.getKeyCard().isHasMuniStaffPermissions() 
+                        && cat.isUserdeployable() 
+                        && cat.isMunideployable()){
+                            include = true;
+                        
+                    } 
+                } 
+            }
+            if(include){
+                allowedCats.add(cat);
+            }
+        }
+        return allowedCats;
     }
     
     

@@ -47,6 +47,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -184,6 +185,21 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         return pudh;
         
+    }
+    
+    /**
+     * Logic container for choosing a property info case
+     * @param pdh
+     * @return 
+     */
+    public CECase determineGoverningPropertyInfoCase(PropertyDataHeavy pdh){
+        CECaseDataHeavy chosenCECase = null;
+        List<CECaseDataHeavy> cseList = pdh.getPropInfoCaseList();
+        if(cseList != null && !cseList.isEmpty()){
+            Collections.sort(cseList);
+            chosenCECase = cseList.get(0);
+        }
+        return chosenCECase;
     }
     
     

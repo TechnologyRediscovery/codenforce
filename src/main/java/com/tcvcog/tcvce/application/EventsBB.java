@@ -16,9 +16,12 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -43,68 +46,109 @@ import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
- *
+ * The cornerstone backing bean for the grand unified event (GUE) subsystem:
+ * displays and allows the user to manipulate EventCnF objects for either
+ * CECase objects or OccPeriod objects--our two workflow-enabled BObs
  * @author sylvia
  */
 public class EventsBB extends BackingBeanUtils implements Serializable{
     
-    
     private EventDomainEnum currentEventDomain;
     
-    private OccPeriodDataHeavy currentOccPeriod;
+    private IFace_EventRuleGoverned currentERGBOb;
     
-    private CECaseDataHeavy currentCase;
-    private OccPeriodDataHeavy currentPeriod;
-
     private EventCnF currentEvent;
-    private EventCnF triggeringEventForProposal;
     
-    private List<EventCategory> eventCategoryList;
+    private List<EventCnF> eventList;
+    private List<EventCnF> filteredEventList;
+    
+    private List<ViewOptionsActiveHiddenListsEnum> eventsViewOptionsCandidates;
+    private ViewOptionsActiveHiddenListsEnum selectedEventView;
+    
+    private List<EventType> eventTypeCandidates;
+    private EventType eventTypeSelected;
+    
+    private List<EventCategory> eventCategoryCandidates;
     private EventCategory eventCategorySelected;
     
-    private List<EventType> eventTypeList;
-    private EventType eventTypeSelected;
-    private Person selectedPerson;
+    // used during event edits
+    private List<Person> personCandidates;
+    private Person personSelected;
     
-    private List<EventCnF> filteredEventList;
-    private List<ViewOptionsActiveHiddenListsEnum> eventsViewOptions;
-    private ViewOptionsActiveHiddenListsEnum selectedEventView;
-    private List<EventType> eventTypeListUserAllowed; 
-    private List<EventType> eventTypeListAll;
-    private EventType selectedEventType;
-    private List<EventCategory> eventCategoryListUserAllowed;
-    private List<EventCategory> eventCategoryListAllActive;
-    private EventCategory selectedEventCategory;
-    private List<Person> personCandidateList;
+    // unknown use
+    private EventCnF triggeringEventForProposal;
     
+    
+  
     /**
      * Creates a new instance of EventsBB
      */
     public EventsBB() {
     }
     
-     @PostConstruct
+    /**
+     * We've got to setup this bean to work with either event domain: OccPeriod
+     * or CECase, which we'll get by asking the session bean what it is set to. If
+     * the SessionBean isn't clear on the matter, implement some basic logic 
+     * to choose and tell the user
+     * 
+     * We'll also setup possible new events based on the status of the 
+     * active workflow-enabled BOb
+     * 
+     */
+    @PostConstruct
     public void initBean() {
         EventCoordinator ec = getEventCoordinator();
-        
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         SessionBean sb = getSessionBean();
-        setCurrentOccPeriod(sb.getSessOccPeriod());
-         setEventsViewOptions(Arrays.asList(ViewOptionsActiveHiddenListsEnum.values()));
-        setSelectedEventView(ViewOptionsActiveHiddenListsEnum.VIEW_ALL);
         
-           if(getPersonCandidateList() != null){
-            setPersonCandidateList(new ArrayList<Person>());
-            getPersonCandidateList().addAll(getSessionBean().getSessPersonList());
-        }
-        setEventTypeListUserAllowed(ec.getPermittedEventTypesForOcc(getCurrentOccPeriod(), getSessionBean().getSessUser()));
-        try {
-            setEventCategoryListUserAllowed(ec.loadEventCategoryListUserAllowed(getSelectedEventType(), getSessionBean().getSessUser()));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        setEventTypeListAll((List<EventType>) new ArrayList());
-        setEventTypeListAll(ec.getEventTypesAll());
+        eventsViewOptionsCandidates = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
         
+        selectedEventView = ec.determineDefaultEventView(sb.getSessUser());
+        
+        eventList = new ArrayList<>();
+        
+        // Based on who sent us to this page, we'll load in either the CECase or OccPeriod
+        // on the SessionBean
+        EventDomainEnum domain = sb.getSessEventDomain();
+        switch(domain){
+            case CODE_ENFORCEMENT:
+                currentERGBOb = sb.getSessCECase();
+                // in this case our ERGBob is a CECase
+                eventList.addAll(currentERGBOb.assembleEventList(selectedEventView));
+                break;
+            case OCCUPANCY:
+                currentERGBOb = sb.getSessOccPeriod();
+                // in this case our ERGBOb is an OccPeriod
+                eventList.addAll(currentERGBOb.assembleEventList(selectedEventView));
+                break;
+            case UNIVERSAL:
+                // We'll just grab all the events on the session and load up
+                // the muni property info
+                eventList.addAll(sb.getSessEventList());
+                // ask the Prop Coor to figure out a sensible ERG when we're viewing
+                // an arbitrary event list
+                currentERGBOb = (IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH());
+                break;
+            // "Shouldn't happen"
+            default:
+                eventList.addAll(sb.getSessEventList());
+                currentERGBOb = (IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH());
+                
+        }
+        
+        personCandidates = new ArrayList<>();
+        personCandidates.addAll(getSessionBean().getSessPersonList());
+        
+        eventTypeCandidates = ec.determinePermittedEventTypes(domain, currentERGBOb, sb.getSessUser());
+        eventCategoryCandidates = new ArrayList<>();
+        if(eventTypeCandidates != null && !eventTypeCandidates.isEmpty()){
+            eventTypeSelected = eventTypeCandidates.get(0);
+            eventCategoryCandidates = ec.determinePermittedEventCategories(eventTypeSelected, sb.getSessUser());
+        }
+        
+
     }
     
     
@@ -119,21 +163,25 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
     
     
-    
-    public void events_initiateEventEdit(EventCnF ev){
+    /**
+     * Listener method for starting event edits
+     * @param ev 
+     */
+    public void initiateEventEdit(EventCnF ev){
         currentEvent = ev;
-        System.out.println("OccInspectionBB.events_initiateEventEdit | current event: " + currentEvent.getEventID());
     }
     
 
+    /**
+     * Logic container for setting up new event which will be displayed 
+     * in the overlay window for the User
+     */
     public void initiateNewEvent() {
         EventCoordinator ec = getEventCoordinator();
         
         EventCnF ev = null;
         if (getEventCategorySelected() != null) {
-
             try {
-                
                 ev = ec.initEvent(getCurrentCase(), getEventCategorySelected());
                 ev.setDiscloseToMunicipality(true);
                 ev.setDiscloseToPublic(false);
@@ -211,17 +259,14 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     
     
   
-    
-    public void updateEventCategoryList(){
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        EventIntegrator ei = getEventIntegrator();
-        try {
-            setEventCategoryListUserAllowed(ei.getEventCategoryList(getSelectedEventType()));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Unable to load event category choices, sorry!", ""));
+    /**
+     * Listener method for changes in EventType selected by User
+     */
+    public void refreshAvailableEventCategories(){
+        EventCoordinator ec = getEventCoordinator();
+        if(eventTypeSelected != null){
+            eventCategoryCandidates.clear();
+            eventCategoryCandidates.addAll(ec.determinePermittedEventCategories(eventTypeSelected, getSessionBean().getSessUser()));
         }
     }
     
@@ -258,28 +303,35 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
     
 
-   
-    public void commitEventEdits(ActionEvent ev) {
+    /**
+     * Listener pass through method for finalizing event edits
+     * @param ev 
+     */
+    public void finalizeEventUpdateListener(ActionEvent ev){
+        finalizeEventUpdate();
+    }
+    
+    /**
+     * Event update processing
+     */
+    public void finalizeEventUpdate() {
         EventCoordinator ec = getEventCoordinator();
-//        currentCase.getEventList().remove(selectedEvent);
         try {
             ec.editEvent(currentEvent);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Event udpated!", ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Please select one or more people to attach to this event",
-                    "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        } catch (EventException ex) {
-            Logger.getLogger(EventSearchBB.class.getName()).log(Level.SEVERE, null, ex);
-        }
+                    ex.getMessage(),
+                    ""));
+        } 
 
     }
 
     public void queueSelectedPerson(ActionEvent ev) {
-        if (getSelectedPerson() != null) {
-            currentEvent.getPersonList().add(getSelectedPerson());
+        if (getPersonSelected() != null) {
+            currentEvent.getPersonList().add(getPersonSelected());
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -298,25 +350,12 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         currentEvent = ev;
     }
 
-    /**
-     * @return the currentCase
-     */
-    public CECaseDataHeavy getCurrentCase() {
-        return currentCase;
-    }
 
     /**
-     * @return the currentPeriod
+     * @return the eventCategoryCandidates
      */
-    public OccPeriodDataHeavy getCurrentPeriod() {
-        return currentPeriod;
-    }
-
-    /**
-     * @return the eventCategoryList
-     */
-    public List<EventCategory> getEventCategoryList() {
-        return eventCategoryList;
+    public List<EventCategory> getEventCategoryCandidates() {
+        return eventCategoryCandidates;
     }
 
     /**
@@ -327,10 +366,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the eventTypeList
+     * @return the eventTypeCandidates
      */
-    public List<EventType> getEventTypeList() {
-        return eventTypeList;
+    public List<EventType> getEventTypeCandidates() {
+        return eventTypeCandidates;
     }
 
     /**
@@ -341,24 +380,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param currentCase the currentCase to set
+     * @param eventCategoryCandidates the eventCategoryCandidates to set
      */
-    public void setCurrentCase(CECaseDataHeavy currentCase) {
-        this.currentCase = currentCase;
-    }
-
-    /**
-     * @param currentPeriod the currentPeriod to set
-     */
-    public void setCurrentPeriod(OccPeriodDataHeavy currentPeriod) {
-        this.currentPeriod = currentPeriod;
-    }
-
-    /**
-     * @param eventCategoryList the eventCategoryList to set
-     */
-    public void setEventCategoryList(List<EventCategory> eventCategoryList) {
-        this.eventCategoryList = eventCategoryList;
+    public void setEventCategoryCandidates(List<EventCategory> eventCategoryCandidates) {
+        this.eventCategoryCandidates = eventCategoryCandidates;
     }
 
     /**
@@ -369,10 +394,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param eventTypeList the eventTypeList to set
+     * @param eventTypeCandidates the eventTypeCandidates to set
      */
-    public void setEventTypeList(List<EventType> eventTypeList) {
-        this.eventTypeList = eventTypeList;
+    public void setEventTypeCandidates(List<EventType> eventTypeCandidates) {
+        this.eventTypeCandidates = eventTypeCandidates;
     }
 
     /**
@@ -411,17 +436,17 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the selectedPerson
+     * @return the personSelected
      */
-    public Person getSelectedPerson() {
-        return selectedPerson;
+    public Person getPersonSelected() {
+        return personSelected;
     }
 
     /**
-     * @param selectedPerson the selectedPerson to set
+     * @param personSelected the personSelected to set
      */
-    public void setSelectedPerson(Person selectedPerson) {
-        this.selectedPerson = selectedPerson;
+    public void setPersonSelected(Person personSelected) {
+        this.personSelected = personSelected;
     }
 
     /**
@@ -438,19 +463,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         this.currentEventDomain = currentEventDomain;
     }
 
-    /**
-     * @return the currentOccPeriod
-     */
-    public OccPeriodDataHeavy getCurrentOccPeriod() {
-        return currentOccPeriod;
-    }
-
-    /**
-     * @param currentOccPeriod the currentOccPeriod to set
-     */
-    public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
-        this.currentOccPeriod = currentOccPeriod;
-    }
 
     /**
      * @return the filteredEventList
@@ -460,10 +472,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the eventsViewOptions
+     * @return the eventsViewOptionsCandidates
      */
-    public List<ViewOptionsActiveHiddenListsEnum> getEventsViewOptions() {
-        return eventsViewOptions;
+    public List<ViewOptionsActiveHiddenListsEnum> getEventsViewOptionsCandidates() {
+        return eventsViewOptionsCandidates;
     }
 
     /**
@@ -473,53 +485,12 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         return selectedEventView;
     }
 
-    /**
-     * @return the eventTypeListUserAllowed
-     */
-    public List<EventType> getEventTypeListUserAllowed() {
-        return eventTypeListUserAllowed;
-    }
 
     /**
-     * @return the eventTypeListAll
+     * @return the personCandidates
      */
-    public List<EventType> getEventTypeListAll() {
-        return eventTypeListAll;
-    }
-
-    /**
-     * @return the selectedEventType
-     */
-    public EventType getSelectedEventType() {
-        return selectedEventType;
-    }
-
-    /**
-     * @return the eventCategoryListUserAllowed
-     */
-    public List<EventCategory> getEventCategoryListUserAllowed() {
-        return eventCategoryListUserAllowed;
-    }
-
-    /**
-     * @return the eventCategoryListAllActive
-     */
-    public List<EventCategory> getEventCategoryListAllActive() {
-        return eventCategoryListAllActive;
-    }
-
-    /**
-     * @return the selectedEventCategory
-     */
-    public EventCategory getSelectedEventCategory() {
-        return selectedEventCategory;
-    }
-
-    /**
-     * @return the personCandidateList
-     */
-    public List<Person> getPersonCandidateList() {
-        return personCandidateList;
+    public List<Person> getPersonCandidates() {
+        return personCandidates;
     }
 
     /**
@@ -530,10 +501,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param eventsViewOptions the eventsViewOptions to set
+     * @param eventsViewOptionsCandidates the eventsViewOptionsCandidates to set
      */
-    public void setEventsViewOptions(List<ViewOptionsActiveHiddenListsEnum> eventsViewOptions) {
-        this.eventsViewOptions = eventsViewOptions;
+    public void setEventsViewOptionsCandidates(List<ViewOptionsActiveHiddenListsEnum> eventsViewOptionsCandidates) {
+        this.eventsViewOptionsCandidates = eventsViewOptionsCandidates;
     }
 
     /**
@@ -543,53 +514,40 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         this.selectedEventView = selectedEventView;
     }
 
+
     /**
-     * @param eventTypeListUserAllowed the eventTypeListUserAllowed to set
+     * @param personCandidates the personCandidates to set
      */
-    public void setEventTypeListUserAllowed(List<EventType> eventTypeListUserAllowed) {
-        this.eventTypeListUserAllowed = eventTypeListUserAllowed;
+    public void setPersonCandidates(List<Person> personCandidates) {
+        this.personCandidates = personCandidates;
     }
 
     /**
-     * @param eventTypeListAll the eventTypeListAll to set
+     * @return the currentERGBOb
      */
-    public void setEventTypeListAll(List<EventType> eventTypeListAll) {
-        this.eventTypeListAll = eventTypeListAll;
+    public IFace_EventRuleGoverned getCurrentERGBOb() {
+        return currentERGBOb;
     }
 
     /**
-     * @param selectedEventType the selectedEventType to set
+     * @param currentERGBOb the currentERGBOb to set
      */
-    public void setSelectedEventType(EventType selectedEventType) {
-        this.selectedEventType = selectedEventType;
+    public void setCurrentERGBOb(IFace_EventRuleGoverned currentERGBOb) {
+        this.currentERGBOb = currentERGBOb;
     }
 
     /**
-     * @param eventCategoryListUserAllowed the eventCategoryListUserAllowed to set
+     * @return the eventList
      */
-    public void setEventCategoryListUserAllowed(List<EventCategory> eventCategoryListUserAllowed) {
-        this.eventCategoryListUserAllowed = eventCategoryListUserAllowed;
+    public List<EventCnF> getEventList() {
+        return eventList;
     }
 
     /**
-     * @param eventCategoryListAllActive the eventCategoryListAllActive to set
+     * @param eventList the eventList to set
      */
-    public void setEventCategoryListAllActive(List<EventCategory> eventCategoryListAllActive) {
-        this.eventCategoryListAllActive = eventCategoryListAllActive;
-    }
-
-    /**
-     * @param selectedEventCategory the selectedEventCategory to set
-     */
-    public void setSelectedEventCategory(EventCategory selectedEventCategory) {
-        this.selectedEventCategory = selectedEventCategory;
-    }
-
-    /**
-     * @param personCandidateList the personCandidateList to set
-     */
-    public void setPersonCandidateList(List<Person> personCandidateList) {
-        this.personCandidateList = personCandidateList;
+    public void setEventList(List<EventCnF> eventList) {
+        this.eventList = eventList;
     }
     
     

@@ -17,11 +17,15 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -99,6 +103,15 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
         }
         return null;
     }
+    
+    public IFace_EventRuleGoverned determineERG(MunicipalityDataHeavy mdh){
+        // first, choose a property info case if we have one
+        List<CECasePropertyUnitHeavy> cecaseList = new ArrayList<>();
+        cecaseList = mdh.getMuniPropertyDH().getCeCaseList();
+        
+    
+    }
+            
 
     /**
      * !!SECURITY CRITICAL!! Implements logic to generate the authorized list of

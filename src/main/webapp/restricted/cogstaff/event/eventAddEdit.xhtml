@@ -204,7 +204,7 @@
 
                                 <h:panelGroup>
                                     <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Current person list:"/>
-                                    <p:selectOneMenu id="person-list-menu" required="false" value="#{eventsBB.selectedPerson}">
+                                    <p:selectOneMenu id="person-list-menu" required="false" value="#{eventsBB.personSelected}">
                                         <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
                                         <f:selectItems value="#{sessionBean.sessPersonList}"  var="p" itemValue="#{p}" 
                                                        itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
@@ -247,7 +247,7 @@
                                                  case-profile-messages-form:case-profile-messages-global
                                                  events-datascroller-form"/>
 
-                                <p:commandButton ajax="true" actionListener="#{eventsBB.commitEventEdits}"
+                                <p:commandButton ajax="true" actionListener="#{eventsBB.finalizeEventUpdate}"
                                                  value="Edit event" icon="fa fa-edit"
                                                  disabled="#{eventsBB.currentEvent.eventID == 0}"
                                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"

@@ -89,7 +89,7 @@ public class EventSearchBB
         
         eventTypeList = ec.getEventTypesAll();
         try {
-            eventCategoryList = ec.getEventCategoryListActive();
+            eventCategoryList = ec.assembleEventCategoryListActiveOnly();
             putList = pi.getPropertyUseTypeList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
