@@ -137,7 +137,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      * 
      * @param mbp containing as much information as possible which will be 
      * formatted into a nice note block
-     * @return the exact text of the new note, with any previous text
+     * @return the exact text of the new note in HTML, with any previous text
      * included in the message builder params object post-pended to the incoming note
      */
     public String appendNoteBlock(MessageBuilderParams mbp) {

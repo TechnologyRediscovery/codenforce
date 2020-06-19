@@ -179,7 +179,7 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
          }
          
         try {
-            oc.updateOccPeriod(currentOccPeriod, u);
+            oc.editOccPeriod(currentOccPeriod, u);
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Successfully udpated field status!", ""));
@@ -227,7 +227,7 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
         }
         
         try {
-            oc.updateOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
+            oc.editOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Update successful on OccPeriod ID: " + currentOccPeriod.getPeriodID(), ""));

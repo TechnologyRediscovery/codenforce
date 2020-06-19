@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
@@ -98,21 +99,23 @@ public class WorkflowBB extends BackingBeanUtils implements Serializable{
             ex.getMessage(), ""));
         }
     }
-    
+
+    /**
+     * Primary entry point for initiating the cascade of impacts from making a choice
+     * @param choice
+     * @param p 
+     */
     public void proposals_makeChoice(Choice choice, Proposal p){
         WorkflowCoordinator wc = getWorkflowCoordinator();
-        OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            if(p instanceof ProposalOccPeriod){
-                oc.evaluateProposal(p, choice, getSessionBean().getSessUser());
+                wc.evaluateProposal(p, choice, currentERG, getSessionBean().getSessUser());
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
-            }
-            
-        } catch (EventException | AuthorizationException | BObStatusException | IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-            ex.getMessage(), ""));
+                
+            } catch (EventException | AuthorizationException | BObStatusException | IntegrationException | ViolationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                ex.getMessage(), ""));
         }
     }    
     

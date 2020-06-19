@@ -146,6 +146,13 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         }
     }
     
+    /**
+     * Iterates over the Choices inside a given Proposal and flips switches
+     * on them based on the permissions held by the credential param
+     * @param proposal
+     * @param cred
+     * @return 
+     */
     public Proposal configureChoiceList(Proposal proposal, Credential cred){
         if(proposal != null && cred != null){
             if(proposal.getDirective().getChoiceList() != null){
@@ -159,6 +166,12 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         return proposal;
     }
     
+    /**
+     * Internal logic container for setting up an individual choice
+     * @param choice
+     * @param cred
+     * @return 
+     */
     private IFace_Proposable configureChoice(IFace_Proposable choice, Credential cred){
         if(choice != null && cred != null){
             choice.setHidden(true);
@@ -178,6 +191,64 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         return choice;
     }
     
+    
+       /**
+     * Pathway for "Evaluating a Proposal" or in other words, making a workflow choice.
+     * The exception list is a beast because so many things happen when such an event occurs.
+     
+     * 
+     * @param proposal
+     * @param chosen
+     * @param erg
+     * @param ua
+     * @throws EventException
+     * @throws AuthorizationException
+     * @throws BObStatusException
+     * @throws IntegrationException
+     * @throws ViolationException 
+     */
+    public void evaluateProposal(   Proposal proposal, 
+                                    IFace_Proposable chosen, 
+                                    IFace_EventRuleGoverned erg, 
+                                    UserAuthorized ua) 
+                            throws  EventException, 
+                                    AuthorizationException, 
+                                    BObStatusException, 
+                                    IntegrationException, 
+                                    ViolationException {
+        
+        WorkflowCoordinator wc = getWorkflowCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        
+        
+        EventCnF propEvent = null;
+        int insertedEventID = 0;
+        if(wc.determineProposalEvaluatability(proposal, chosen, ua)){
+            // since we can evaluate this proposal with the chosen Proposable, configure members
+            proposal.setResponderActual(ua);
+            proposal.setResponseTS(LocalDateTime.now());
+            proposal.setChosenChoice(chosen);
+            
+            // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
+            EventCnF ev = wc.generateEventDocumentingProposalEvaluation(erg, proposal, chosen, ua);
+            // insert the event and grab the new ID
+            insertedEventID = ec.(ceCase, ev, null);
+            // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
+            proposal.setResponseEvent(ec.getEvent(insertedEventID));
+            wc.recordProposalEvaluation(proposal);
+        } else {
+            throw new BObStatusException("Unable to evaluate proposal due to business rule violation");
+        }
+    }
+    
+    /**
+     * Logic container for checking if a User can actually make the desired choice
+     * Called by 
+     * @param proposal
+     * @param chosen
+     * @param u
+     * @return 
+     */
     public boolean determineProposalEvaluatability( Proposal proposal,
                                                     IFace_Proposable chosen, 
                                                     User u){
@@ -443,23 +514,31 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
      * @param p
      * @param ch
      * @param u
-     * @return a configured but not integrated EventCnF superclass. The caller will need to cast it to
-    the appropriate subclass and insert it
+     * @return a configured but not integrated EventCnF. The EventDomain is set before return
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.EventException
      */
-    public EventCnF generateEventDocumentingProposalEvaluation(IFace_EventRuleGoverned erg, Proposal p, IFace_Proposable ch, UserAuthorized u) 
-            throws BObStatusException, IntegrationException, EventException {
-        EventCnF ev = null;
+    public EventCnF generateEventDocumentingProposalEvaluation( IFace_EventRuleGoverned erg, 
+                                                                Proposal p, 
+                                                                IFace_Proposable ch, 
+                                                                UserAuthorized u) 
+                                                        throws  BObStatusException, 
+                                                                IntegrationException, 
+                                                                EventException {
         EventCoordinator ec = getEventCoordinator();
+        
+        EventCnF ev = null;
+        
         if (ch instanceof ChoiceEventCat) {
             EventCategory ecat = ec.initEventCategory(((ChoiceEventCat) ch).getEventCategory().getCategoryID());
             
             // TODO: Finish this
-            ev = ec.initEvent(null, ecat);
+            ev = ec.initEvent(erg, ecat);
+            
             ev.setActive(true);
             ev.setHidden(false);
+            
             ev.setTimeStart(LocalDateTime.now());
             ev.setTimeEnd(ev.getTimeStart().plusMinutes(ecat.getDefaultdurationmins()));
             ev.setUserCreator(u);
@@ -469,6 +548,9 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
             descBldr.append(u.getPerson().getFirstName());
             descBldr.append(" ");
             descBldr.append(u.getPerson().getLastName());
+            descBldr.append("(");
+            descBldr.append(u.getUsername());
+            descBldr.append(") ");
             descBldr.append(" evaluated the proposal titled: '");
             descBldr.append(p.getDirective().getTitle());
             descBldr.append("' on ");
@@ -646,7 +728,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
                 implementDirective(era.getPromptingDirective(), op, null);
                 System.out.println("EventCoordinator.rules_attachEventRule | Found not null prompting directive");
             }
-        } else if (rg instanceof CECaseDataHeavy) {
+        } else if (rg instanceof CECaseD ataHeavy) {
             CECaseDataHeavy cec = (CECaseDataHeavy) rg;
             rules_attachEventRuleAbstractToCECase(era, cec);
             if (freshObjectID != 0 && era.getPromptingDirective() != null) {

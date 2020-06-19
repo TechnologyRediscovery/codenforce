@@ -756,7 +756,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
                         "       forbiddeneventcatthresholdglobalorder, promptingdirective_directiveid, \n" +
                         "       userrankmintoconfigure, userrankmintoimplement, userrankmintowaive, \n" +
                         "       userrankmintooverride, userrankmintodeactivate\n" +
-                        "  FROM public.eventrule;";
+                        "  FROM public.eventrule WHERE ruleid=?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, ruleid);
 
@@ -840,6 +840,15 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
         return evRule;
     }
     
+    /**
+     * EventRules are grouped by sets, which are mantained in the DB with 
+     * m:m tables so we can get a list of EventRules by setID and attach that
+     * entire bundle to a BOb
+     * 
+     * @param ruleSetID
+     * @return
+     * @throws IntegrationException 
+     */
     public List<EventRuleAbstract> rules_getEventRuleList(int ruleSetID) throws IntegrationException{
         List<EventRuleAbstract> list = new ArrayList<>();
         String query = "SELECT eventrule_ruleid\n" +

@@ -43,6 +43,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -141,6 +142,153 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             }
         }
         return edhList;
+    }
+    
+    /**
+     * I Create new EventCnF objects!
+     * The only public method for creating a new event on an ERG. My guts will
+     * call a bunch of methods in related coordinators to trigger appropriate
+     * workflow actions.
+     * 
+     * @param ev with only user-supplied data inserted; I'll fill in unified stuff
+     * like eventcreator and such
+     * @param erg as of June 2020 V.0.9 implementers are CECase and OccPeriod objects
+     * @param ua
+     * @return A list of freshly inserted events, all freshly extracted from the DB
+     * so what's in this list is what's in the DB. The head of the list is the
+     * event that was passed into this method
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public List<EventCnF> addEvent(     EventCnF ev, 
+                                        IFace_EventRuleGoverned erg, 
+                                        UserAuthorized ua) 
+            
+                throws      BObStatusException, EventException, IntegrationException{
+        
+        CaseCoordinator cc = getCaseCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        EventIntegrator ei = getEventIntegrator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        int freshEventID = 0;
+        
+        if(ev == null || erg == null || ua == null){
+            throw new BObStatusException("Cannot process event with incomplete args");
+            
+        }
+        
+        // *************************
+        // Connect to the mother BOb
+        // *************************
+        if(erg instanceof OccPeriodDataHeavy){
+            ev.setOccPeriodID(erg.getBObID());
+        } else if (erg instanceof CECaseDataHeavy){
+            ev.setCeCaseID(erg.getBObID());
+        } else {
+            throw new EventException("The class of the IFace_EventRuleGoverned"
+                    + " passed to addEvent is not yet supported. Only data heavy "
+                    + "cases and occ periods are supported in v.0.9");
+        }
+        
+        // *************
+        // TIME AUDITING
+        // *************
+        
+        LocalDateTime now = LocalDateTime.now();
+        
+        // check and adjust start/end times
+        if(ev.getTimeStart() == null){
+            ev.setTimeStart(now);
+        }
+        
+        // compute default end time in case we need it
+        LocalDateTime timeEndComputed = ev.getTimeStart().plusMinutes(ev.getCategory().getDefaultdurationmins());
+
+        MessageBuilderParams mbp;
+        
+        // deal with no end time
+        if(ev.getTimeEnd() == null){
+            ev.setTimeEnd(timeEndComputed);
+     
+            mbp = new MessageBuilderParams();
+            mbp.setExistingContent(ev.getNotes());
+            mbp.setHeader("Auto-edit of event details");
+            mbp.setUser(ua);
+            mbp.setCred(ua.getMyCredential());
+            mbp.setExplanation("No end time was specified on incoming event so " +
+                    "an end time was computed using the event category's default duration");
+            ev.setNotes(sc.appendNoteBlock(mbp));
+        }
+        
+        // Deal with non-chronological start and end times
+        if(ev.getTimeEnd().isBefore(ev.getTimeStart())){
+            ev.setTimeEnd(timeEndComputed);
+            mbp = new MessageBuilderParams();
+            mbp.setExistingContent(ev.getNotes());
+            mbp.setHeader("Auto-edit of event details");
+            mbp.setUser(ua);
+            mbp.setCred(ua.getMyCredential());
+            mbp.setExplanation("The end time of the incoming event cannot occur "
+                    + "before the start time; They must be in forward chrono order;"
+                    + "A new end time was automatically computed using the event category's"
+                    + "default duration");
+            ev.setNotes(sc.appendNoteBlock(mbp));
+        }
+        
+        // ****************
+        // Event essentials
+        // ****************
+        ev.setUserCreator(ua);
+        ev.setCreationts(now);
+        ev.setLastUpdatedBy(ua);
+        ev.setLastUpdatedTS(now);
+        
+        ev.setActive(true);
+        ev.setHidden(false);
+        
+        // **********************************
+        // Allow domain coordinators to check
+        // **********************************
+        
+        List<EventCnF> evsToAddQu = new ArrayList<>();
+        
+        // position our primary event at the head of the list
+        evsToAddQu.add(ev);
+        // then let the other domain folks add to this stack if needed
+        
+        
+        addEvent_processStack(evsToAddQu);
+        
+        
+        return evsToAddQu;
+    }
+    
+    /**
+     * I Iterate over a List of events that works like a Queue in that I'll
+     * insert one after the other but stop if any of them don't make it in.
+     * 
+     * @param qu
+     * @return
+     * @throws IntegrationException 
+     */
+    private List<EventCnF> addEvent_processStack(List<EventCnF> qu) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        List<EventCnF> doneList = new ArrayList<>();
+        if(qu != null && !qu.isEmpty()){
+            for(EventCnF ev: qu){
+                int id = ei.insertEvent(ev);
+                if(id != 0){
+                    doneList.add(getEvent(id));
+                } else {
+                    break;
+                }
+            }
+        }
+        
+        return doneList;
+        
+        
     }
     
      /**
@@ -549,7 +697,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // disclose to public from violation coord
         event.setActive(true);
         
-        cc.attachNewEventToCECase(ceCase, event, null);
+        cc.addEvent_processForCECaseDomain(ceCase, event, null);
     }
     
       /**
@@ -661,7 +809,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setUserCreator(getSessionBean().getSessUser());
         event.setActive(true);
         
-        cc.attachNewEventToCECase(currentCase, event, null);
+        cc.addEvent_processForCECaseDomain(currentCase, event, null);
         
         getFacesContext().addMessage(null,
             new FacesMessage(FacesMessage.SEVERITY_INFO, 

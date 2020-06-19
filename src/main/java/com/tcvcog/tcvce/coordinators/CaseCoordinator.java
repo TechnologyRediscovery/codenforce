@@ -496,7 +496,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             
         }
             originationEvent.setUserCreator(us);
-            attachNewEventToCECase(assembleCECaseDataHeavy(getCECase(freshID), cred), originationEvent, null);
+            addEvent_processForCECaseDomain(assembleCECaseDataHeavy(getCECase(freshID), cred), originationEvent, null);
     }
     
     /**
@@ -528,7 +528,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
         
     /**
-     * Primary event life cycle control method which is called
+     * For inter-coordinator use only! Not called by backing beans.
+     * Primary event life cycle control method which is called by EventCoordinator
      * each time an event is added to a code enf case. The primary business
      * logic related to which events can be attached to a case at any
      * given case phase is implemented in this coordinator method.
@@ -537,34 +538,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * and delegate further processing to event-type specific methods
      * also found in this coordinator
      * 
+     * @param evList
      * @param cse the case to which the event should be added
      * @param ev the event to add to the case also included in this call
-     * @param viol the CodeViolation object associated with this event, can be null
      * @return 
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.ViolationException
+     * @throws com.tcvcog.tcvce.domain.EventException
      */
-    public int attachNewEventToCECase(CECaseDataHeavy cse, EventCnF ev, CodeViolation viol) 
+    protected List<EventCnF> addEvent_processForCECaseDomain(
+                                    List<EventCnF> evList, 
+                                    CECaseDataHeavy cse, 
+                                    EventCnF ev) 
             throws BObStatusException, IntegrationException, ViolationException, EventException{
         EventType eventType = ev.getCategory().getEventType();
         EventIntegrator ei = getEventIntegrator();
-        int insertedEventID = 0;
-        
-//        if(e.getCategory().getCasePhaseChangeRule() != null){
-//            evalulateCasePhaseChangeRule(c, e);
-//        }
         
         switch(eventType){
             case Action:
                 System.out.println("CaseCoordinator.attachNewEventToCECase: action case");
-                insertedEventID = ei.insertEvent(ev);
                 break;
             case Compliance:
                 if(viol != null){
                     System.out.println("CaseCoordinator.attachNewEventToCECase: compliance inside if");
                     viol.setActualComplianceDate(ev.getTimeStart());
-                    insertedEventID = ei.insertEvent(ev);
                     checkForFullComplianceAndCloseCaseIfTriggered(cse);
                 } else {
                     throw new BObStatusException("no violation was included with this compliance event");
@@ -577,61 +575,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             default:
                 System.out.println("CaseCoordinator.attachNewEventToCECase: default case");
                 ev.setCeCaseID(cse.getCaseID());
-                insertedEventID = ei.insertEvent(ev);
         } // close switch
-        return insertedEventID;
+        return ev;
     } // close method
     
     
-    /**
-     * Pathway for "Evaluating a Proposal" or in other words, making a workflow choice.
-     * The exception list is a beast because so many things happen when such an event occurs.
-     * TODO: Move to WorkflowCoordinator
-     * 
-     * @param proposal
-     * @param chosen
-     * @param ceCase
-     * @param u
-     * @throws EventException
-     * @throws AuthorizationException
-     * @throws BObStatusException
-     * @throws IntegrationException
-     * @throws ViolationException 
-     */
-    public void evaluateProposal(   Proposal proposal, 
-                                    IFace_Proposable chosen, 
-                                    CECaseDataHeavy ceCase, 
-                                    UserAuthorized u) 
-                            throws  EventException, 
-                                    AuthorizationException, 
-                                    BObStatusException, 
-                                    IntegrationException, 
-                                    ViolationException{
-        
-        WorkflowCoordinator cc = getWorkflowCoordinator();
-        EventCoordinator ec = getEventCoordinator();
-        EventIntegrator ei = getEventIntegrator();
-        
-        EventCnF propEvent = null;
-        int insertedEventID = 0;
-        if(cc.determineProposalEvaluatability(proposal, chosen, u)){
-            // since we can evaluate this proposal with the chosen Proposable, configure members
-            proposal.setResponderActual(u);
-            proposal.setResponseTS(LocalDateTime.now());
-            proposal.setChosenChoice(chosen);
-            
-            // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
-            EventCnF csEv = cc.generateEventDocumentingProposalEvaluation(ceCase, proposal, chosen, u);
-            // insert the event and grab the new ID
-            insertedEventID = attachNewEventToCECase(ceCase, csEv, null);
-            // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
-            proposal.setResponseEvent(ec.getEvent(insertedEventID));
-            cc.recordProposalEvaluation(proposal);
-        } else {
-            throw new BObStatusException("Unable to evaluate proposal due to business rule violation");
-        }
-    }
-    
+ 
     
     protected void processCaseOnEventRulePass(CECaseDataHeavy cse, EventRuleAbstract rule) 
             throws IntegrationException, BObStatusException, ViolationException{
@@ -644,7 +593,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 //        if(rule.getTriggeredEventCategoryID() != 0){
 //            newEvent = ec.initEvent(cse, ec.initEventCategory(rule.getTriggeredEventCategoryID()));
 //            
-//            attachNewEventToCECase(cse, newEvent, null);
+//            addEvent_processForCECaseDomain(cse, newEvent, null);
 //            System.out.println("CaseCoordinator.processCaseOnEventRulePass "  + newEvent.getCategory().getEventCategoryTitle());
 //        }
 //        
@@ -723,7 +672,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         if (complianceWithAllViolations){
             complianceClosingEvent = ec.initEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("closingAfterFullCompliance"))));
-            attachNewEventToCECase(c, complianceClosingEvent, null);
+            addEvent_processForCECaseDomain(c, complianceClosingEvent, null);
             
         } // close if
         
@@ -822,12 +771,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
         noticeEvent.setDescription(queuedNoticeEventNotes);
         noticeEvent.setUserCreator(user);
-        noticeEvent.setDiscloseToMunicipality(true);
-        noticeEvent.setDiscloseToPublic(true);
         ArrayList<Person> al = new ArrayList();
         al.add(nov.getRecipient());
         noticeEvent.setPersonList(al);
-        attachNewEventToCECase(c, noticeEvent, null);
+        addEvent_processForCECaseDomain(c, noticeEvent, null);
     }
     
     public int novInsertNotice(NoticeOfViolation nov, CECaseDataHeavy cse, User usr) throws IntegrationException{
@@ -1070,10 +1017,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             // toss out inactive events unless user wants them
             if(!ev.isActive()&& !rptCse.isIncludeInactiveEvents()) continue;
             // toss out events only available internally to the muni users unless user wants them
-            if(!ev.isDiscloseToMunicipality() && !rptCse.isIncludeMunicipalityDiclosedEvents()) continue;
-            // toss out officer only events unless the user wants them
-            if((!ev.isDiscloseToMunicipality() && !ev.isDiscloseToPublic()) 
-                    && !rptCse.isIncludeOfficerOnlyEvents()) continue;
             evList.add(ev);
        }
        rptCse.setEventListForReport(evList);
@@ -1159,7 +1102,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         tfEvent.setDescription(sb.toString());
         
         if(verifyCodeViolationAttributes(cse, cv)){
-            eventID = cc.attachNewEventToCECase(cse, tfEvent, cv);
+            eventID = cc.addEvent_processForCECaseDomain(cse, tfEvent, cv);
             cv.setComplianceTimeframeEventID(eventID);
             insertedViolationID = vi.insertCodeViolation(cv);
         } else {

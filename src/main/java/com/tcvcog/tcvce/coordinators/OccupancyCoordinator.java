@@ -626,7 +626,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
-    public int insertNewOccPeriod(OccPeriod op, UserAuthorized u) 
+    public int addOccPeriod(OccPeriod op, UserAuthorized u) 
             throws  IntegrationException, 
                     InspectionException, 
                     EventException,
@@ -803,11 +803,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     /**
      * Logic pass through method for updates on the OccPeriod
      * @param period
-     * @param u
+     * @param ua
      * @throws IntegrationException
      * @throws BObStatusException if the OccPeriod is authorized
      */
-    public void updateOccPeriod(OccPeriod period, User u) throws IntegrationException, BObStatusException {
+    public void editOccPeriod(OccPeriod period, UserAuthorized ua) throws IntegrationException, BObStatusException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
 
         if(period.getAuthorizedTS() != null){
@@ -935,7 +935,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
 //            propEvent = wc.generateEventDocumentingProposalEvaluation(proposal, chosen, u);
             // insert the event and grab the new ID
-//            insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
+//            insertedEventID = addEvent_processForOccDomain(occPeriod, propEvent, u);
             // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
             proposal.setResponseEvent(ec.getEvent(insertedEventID));
             wc.recordProposalEvaluation(proposal);
@@ -944,20 +944,24 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
     }
 
-    public int attachNewEventToOccPeriod(OccPeriod period, EventCnF ev, User u) throws IntegrationException {
-        EventIntegrator ei = getEventIntegrator();
+    /**
+     * For inter-coordinator processing only! I get called by the EvCoor
+     * during EventCnF insertion
+     * 
+     * @param evList
+     * @param period
+     * @param ua
+     * @return a reference to the same list that was passed in with any additional
+     * events added to the queue for insertion by the EventCoordinator
+     * @throws IntegrationException 
+     */
+    protected List<EventCnF> addEvent_processForOccDomain(List<EventCnF> evList, OccPeriod period, UserAuthorized ua) throws IntegrationException {
+        // No guts yet!
         
-        EventCnF oe = new EventCnF();
-        oe.setOccPeriodID(period.getPeriodID());
-        int insertedEventID = ei.insertEvent(oe);
-        return insertedEventID;
+        return evList;
     }
 
-    public void editOccEvent(EventCnF ev) throws IntegrationException {
-        EventIntegrator ei = getEventIntegrator();
-        ei.updateEvent(ev);
-    }
-
+   
     //adding xiaohong Checklistbuilder
     //check
     public List<OccChecklistTemplate> getOccChecklistTemplatelist() throws IntegrationException {

@@ -200,9 +200,9 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     /**
      * All Code Enforcement case events are funneled through this method which
      * has to carry out a number of checks based on the type of event being
-     * created. The event is then passed to the attachNewEventToCECase on the
-     * CaseCoordinator who will do some more checking about the event before
-     * writing it to the DB
+     * created. The event is then passed to the addEvent_processForCECaseDomain on the
+ CaseCoordinator who will do some more checking about the event before
+ writing it to the DB
      *
      * @param ev unused
      * @throws ViolationException
@@ -221,9 +221,9 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
             // only the compliance events need to pass in another object--the violation
             // otherwise just the case and the event go to the coordinator
             if (currentEvent.getCategory().getEventType() == EventType.Compliance) {
-//                currentEvent.setEventID(cc.attachNewEventToCECase(getCurrentCase(), currentEvent, selectedViolation));
+//                currentEvent.setEventID(cc.addEvent_processForCECaseDomain(getCurrentCase(), currentEvent, selectedViolation));
             } else {
-                currentEvent.setEventID(cc.attachNewEventToCECase(getCurrentCase(), currentEvent, null));
+                currentEvent.setEventID(cc.addEvent_processForCECaseDomain(getCurrentCase(), currentEvent, null));
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,

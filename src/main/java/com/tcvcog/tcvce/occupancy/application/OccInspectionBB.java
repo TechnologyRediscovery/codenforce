@@ -771,7 +771,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
          }
          
         try {
-            oc.updateOccPeriod(currentOccPeriod, u);
+            oc.editOccPeriod(currentOccPeriod, u);
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Successfully udpated field status!", ""));
