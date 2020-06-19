@@ -31,7 +31,6 @@ import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
@@ -40,9 +39,7 @@ import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
 import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -50,8 +47,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -115,7 +110,6 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * Logic intermediary for Updates to the Person listing
      * @param p
      * @param u
-     * @param updateNotes
      * @throws IntegrationException 
      */
     public void personEdit(Person p, User u) throws IntegrationException{
@@ -306,6 +300,23 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         }
         return pl;
     }   
+    
+    /**
+     *
+     * @param idNumList A list of person IDs from the database.
+     * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<Person> assemblePersonList(List<Integer> idNumList) throws IntegrationException{
+        
+        ArrayList<Person> skeletonHorde = new ArrayList<>();
+        PersonIntegrator pi = getPersonIntegrator();
+        
+        for (int idNum : idNumList){
+            skeletonHorde.add(pi.getPerson(idNum));
+        }
+        return skeletonHorde;
+    }
 
     /**
      * Utility method for dumping PersonType values in an Enum to an array

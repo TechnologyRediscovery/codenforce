@@ -46,16 +46,12 @@ import com.tcvcog.tcvce.integration.WorkflowIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Iterator;
-import com.tcvcog.tcvce.entities.IFace_Openable;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  *
  * @author sylvia

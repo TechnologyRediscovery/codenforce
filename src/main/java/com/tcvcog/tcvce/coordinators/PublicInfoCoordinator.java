@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
@@ -40,8 +41,10 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @return a linked list of info bundles from any source
      * @throws IntegrationException created by any of the interrogated integrator
      * classes that look for public info.
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public List<PublicInfoBundle> getPublicInfoBundles(int pacc) throws IntegrationException, BObStatusException{
+    public List<PublicInfoBundle> getPublicInfoBundles(int pacc) throws IntegrationException, BObStatusException, SearchException{
         
         CaseIntegrator caseInt = getCaseIntegrator();
         List<CEActionRequest> requestList;
@@ -89,7 +92,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return infoBundleList;
     }
     
-    private PublicInfoBundleCECase extractPublicInfo(CECase cse) throws IntegrationException{
+    private PublicInfoBundleCECase extractPublicInfo(CECase cse) throws IntegrationException, SearchException{
         CaseCoordinator cc = getCaseCoordinator();
         CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse, getSessionBean().getSessUser().getMyCredential());
         

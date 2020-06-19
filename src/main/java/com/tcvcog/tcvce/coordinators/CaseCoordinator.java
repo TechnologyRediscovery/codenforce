@@ -103,11 +103,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CECaseDataHeavy cse = new CECaseDataHeavy(assembleCECasePropertyUnitHeavy(c, cred));
 
         try {
-            // EVENT LIST
-            QueryEvent qe = sc.initQuery(QueryEventEnum.CECASE, cred);
-            qe.getPrimaryParams().setBobID_ctl(true);
-            qe.getPrimaryParams().setBobID_val(c.getCaseID());
-            cse.setCompleteEventList(ec.downcastEventCnFPropertyUnitHeavy(sc.runQuery(qe).getBOBResultList()));
 
             // PROPOSAL LIST
             cse.setProposalList(wc.getProposalList(cse, cred));
@@ -133,14 +128,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        cse.setShowHiddenEvents(false);
-        cse.setShowInactiveEvents(false);
-
-        Collections.sort(cse.getVisibleEventList());
-        Collections.reverse(cse.getVisibleEventList());
-
-        // optionally sorted events based on action
-        // requests
         return cse;
     }
 
@@ -248,6 +235,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             csepuh.setShowHiddenEvents(false);
             csepuh.setShowInactiveEvents(false);
 
+            // optionally sorted events based on action
+            // requests
             Collections.sort(csepuh.getVisibleEventList());
             Collections.reverse(csepuh.getVisibleEventList());
         }

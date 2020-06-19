@@ -49,6 +49,10 @@ public class CECaseDataHeavy
         super(cse);
         this.property = cse.property;
         this.propUnit = cse.propUnit;
+        this.showHiddenEvents = cse.isShowHiddenEvents();
+        this.showInactiveEvents = cse.isShowInactiveEvents();
+        this.eventList = cse.getEventList();
+        this.completeEventList = cse.getCompleteEventList();
     }
 
     @Override
