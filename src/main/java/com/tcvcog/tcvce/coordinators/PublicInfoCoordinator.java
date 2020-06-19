@@ -10,14 +10,11 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
-import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
@@ -78,10 +75,10 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         // now go and get CECaseDataHeavy bundles and add them to the list
         
 //        QueryCECase qc = sc.initQuery(QueryCECaseEnum.PACC, cred);
-        
+//     
 //        List<CECase> caseList = 
 //        System.out.println("PublicInfoCoordinator.getPublicInfoBundles | num CE cases found: " + caseList.size());;
-        
+//      
 //        for(CECase c: caseList){
 //            // let the extraction method deal with all the assembly logic
 //            // and access control issues
@@ -94,7 +91,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     
     private PublicInfoBundleCECase extractPublicInfo(CECase cse) throws IntegrationException{
         CaseCoordinator cc = getCaseCoordinator();
-        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse);
+        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse, getSessionBean().getSessUser().getMyCredential());
         
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
         
@@ -121,18 +118,16 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setCaseManagerName(sb.toString());
             pib.setCaseManagerContact(c.getCaseManager().getPerson().getPhoneWork());
             
-            
             pib.setPublicEventList(new ArrayList<EventCnF>());
-            // TODO: Finish me
-//            for(EventCnF ev: c.getVisibleEventList()){
-//                if(ev.isDiscloseToPublic()){
-//                    pib.getPublicEventList().add(ev);
-//                }
-//            }
-//            
-//            pib.setCountViolations(c.getViolationList().size());
-//            pib.setCountNoticeLetters(c.getNoticeList().size());
-//            pib.setCountCitations(c.getCitationList().size());
+            for(EventCnF ev: c.getVisibleEventList()){
+                if(ev.isDiscloseToPublic()){
+                    pib.getPublicEventList().add(ev);
+                }
+            }
+            
+            pib.setCountViolations(c.getViolationList().size());
+            pib.setCountNoticeLetters(c.getNoticeList().size());
+            pib.setCountCitations(c.getCitationList().size());
             pib.setShowDetailsPageButton(true);
             pib.setShowAddMessageButton(false);
             

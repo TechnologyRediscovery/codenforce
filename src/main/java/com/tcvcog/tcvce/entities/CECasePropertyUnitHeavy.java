@@ -16,46 +16,55 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  *
  * @author sylvia
  */
-public  class   CECasePropertyUnitHeavy
-        extends CECase{
-    
+public class CECasePropertyUnitHeavy
+        extends CECase {
+
     protected Property property;
     protected PropertyUnit propUnit;
-    
-      public CECasePropertyUnitHeavy(CECase cse) {
+    protected boolean showHiddenEvents;
+    protected boolean showInactiveEvents;
+    protected List<EventCnF> eventList;
+    protected List<EventCnF> completeEventList;
+
+    public CECasePropertyUnitHeavy(CECase cse) {
         this.caseID = cse.caseID;
         this.publicControlCode = cse.publicControlCode;
         this.paccEnabled = cse.paccEnabled;
-        
+
         this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
-        
+
         this.propertyID = cse.propertyID;
         this.propertyUnitID = cse.propertyUnitID;
-        
+
         this.caseManager = cse.caseManager;
         this.caseName = cse.caseName;
-        
+
         this.casePhase = cse.casePhase;
         this.casePhaseIcon = cse.casePhaseIcon;
-        
+
         this.originationDate = cse.originationDate;
         this.closingDate = cse.closingDate;
         this.creationTimestamp = cse.creationTimestamp;
-        
+
         this.notes = cse.notes;
-        
+
         this.source = cse.source;
-        
+
         this.citationList = cse.citationList;
         this.noticeList = cse.noticeList;
         this.violationList = cse.violationList;
-        
+       
         this.active = cse.active;
-        
+
     }
 
     /**
@@ -85,5 +94,107 @@ public  class   CECasePropertyUnitHeavy
     public void setPropUnit(PropertyUnit propUnit) {
         this.propUnit = propUnit;
     }
+
+    /**
+     * Implements logic to check each event for hidden status and inactive
+     * status and based on the value of the showHiddenEvents and
+     * showInactiveEvents flags, add the event from the complete list to the
+     * visible list
+     *
+     * @return the visibleEventList
+     */
+    public List<EventCnF> getVisibleEventList() {
+        List<EventCnF> visEventList = new ArrayList<>();
+        for (EventCnF ev : completeEventList) {
+            if (!ev.isActive() && !showInactiveEvents) {
+                continue;
+            }
+            if (ev.isHidden() && !showHiddenEvents) {
+                continue;
+            }
+            visEventList.add(ev);
+        } // close for   
+        return visEventList;
+    }
+
+    /**
+     * @return the activeEventList
+     */
+    public List<EventCnF> getActiveEventList() {
+        List<EventCnF> actEvList = new ArrayList<>();
+        Iterator<EventCnF> iter = completeEventList.iterator();
+        while (iter.hasNext()) {
+            EventCnF ev = iter.next();
+            if (ev.isActive()) {
+                actEvList.add(ev);
+            }
+        }
+        return actEvList;
+    }
     
+    public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
+        List<EventCnF> visEventList = new ArrayList<>();
+        if (eventList != null) {
+            for (EventCnF ev : eventList) {
+                switch (voahle) {
+                    case VIEW_ACTIVE_HIDDEN:
+                        if (ev.isActive()
+                                && ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if (ev.isActive()
+                                && !ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ALL:
+                        visEventList.add(ev);
+                        break;
+                    case VIEW_INACTIVE:
+                        if (!ev.isActive()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    default:
+                        visEventList.add(ev);
+                } // close switch
+            } // close for   
+        } // close null check
+        return visEventList;
+    }
+
+    public boolean isShowHiddenEvents() {
+        return showHiddenEvents;
+    }
+
+    public void setShowHiddenEvents(boolean showHiddenEvents) {
+        this.showHiddenEvents = showHiddenEvents;
+    }
+
+    public boolean isShowInactiveEvents() {
+        return showInactiveEvents;
+    }
+
+    public void setShowInactiveEvents(boolean showInactiveEvents) {
+        this.showInactiveEvents = showInactiveEvents;
+    }
+
+    public List<EventCnF> getCompleteEventList() {
+        return completeEventList;
+    }
+
+    public void setCompleteEventList(List<EventCnF> completeEventList) {
+        this.completeEventList = completeEventList;
+    }
+
+    public List<EventCnF> getEventList() {
+        return eventList;
+    }
+
+    public void setEventList(List<EventCnF> eventList) {
+        this.eventList = eventList;
+    }
+
 }

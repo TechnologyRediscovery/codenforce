@@ -6,7 +6,6 @@
 package com.tcvcog.tcvce.entities;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
@@ -25,14 +24,8 @@ public class CECaseDataHeavy
         IFace_CredentialSigned,
         IFace_Loggable {
 
-
-    private boolean showHiddenEvents;
-    private boolean showInactiveEvents;
-    private List<EventCnF> completeEventList;
-
     // accessed through methods specified in the interfaces
     private List<Proposal> proposalList;
-    private List<EventCnF> eventList;
     private List<EventRuleImplementation> eventRuleList;
 
     private List<CEActionRequest> ceActionRequestList;
@@ -42,7 +35,6 @@ public class CECaseDataHeavy
 
     private String credentialSignature;
 
-    
     /**
      * Constructor used to create an instance of this object with a CECase
      * without any lists. Transfers the member variables from the incoming
@@ -206,46 +198,6 @@ public class CECaseDataHeavy
     public void setEventRuleList(List<EventRuleImplementation> eventRuleList) {
         this.eventRuleList = eventRuleList;
     }
-    /**
-     * @return the violationList
-     */
-    /**
-     * @param violationList the violationList to set
-     */
-
-    /**
-     * Implements logic to check each event for hidden status and inactive
-     * status and based on the value of the showHiddenEvents and
-     * showInactiveEvents flags, add the event from the complete list to the
-     * visible list
-     *
-     * @return the visibleEventList
-     */
-    public List<EventCnF> getVisibleEventList() {
-        List<EventCnF> visEventList = new ArrayList<>();
-        for (EventCnF ev : completeEventList) {
-            if (!ev.isActive() && !showInactiveEvents) {
-                continue;
-            }
-            if (ev.isHidden() && !showHiddenEvents) {
-                continue;
-            }
-            visEventList.add(ev);
-        } // close for   
-        return visEventList;
-    }
-    /**
-     * @return the citationList
-     */
-    /**
-     * @param citationList the citationList to set
-     */
-    /**
-     * @return the noticeList
-     */
-    /**
-     * @param noticeList the noticeList to set
-     */
 
     /**
      * @return the ceActionRequestList
@@ -295,63 +247,6 @@ public class CECaseDataHeavy
     }
 
     /**
-     * @return the completeEventList
-     */
-    public List<EventCnF> getCompleteEventList() {
-        return completeEventList;
-    }
-
-    /**
-     * @param completeEventList the completeEventList to set
-     */
-    public void setCompleteEventList(List<EventCnF> completeEventList) {
-        this.completeEventList = completeEventList;
-    }
-
-    /**
-     * @return the showInactiveEvents
-     */
-    public boolean isShowInactiveEvents() {
-        return showInactiveEvents;
-    }
-
-    /**
-     * @param showInactiveEvents the showInactiveEvents to set
-     */
-    public void setShowInactiveEvents(boolean showInactiveEvents) {
-        this.showInactiveEvents = showInactiveEvents;
-    }
-
-    /**
-     * @return the showHiddenEvents
-     */
-    public boolean isShowHiddenEvents() {
-        return showHiddenEvents;
-    }
-
-    /**
-     * @param showHiddenEvents the showHiddenEvents to set
-     */
-    public void setShowHiddenEvents(boolean showHiddenEvents) {
-        this.showHiddenEvents = showHiddenEvents;
-    }
-
-    /**
-     * @return the activeEventList
-     */
-    public List<EventCnF> getActiveEventList() {
-        List<EventCnF> actEvList = new ArrayList<>();
-        Iterator<EventCnF> iter = completeEventList.iterator();
-        while (iter.hasNext()) {
-            EventCnF ev = iter.next();
-            if (ev.isActive()) {
-                actEvList.add(ev);
-            }
-        }
-        return actEvList;
-    }
-
-    /**
      * @return the proposalList
      */
     public List<Proposal> getProposalList() {
@@ -364,21 +259,6 @@ public class CECaseDataHeavy
     @Override
     public void setProposalList(List<Proposal> proposalList) {
         this.proposalList = proposalList;
-    }
-
-    /**
-     * @return the eventList
-     */
-    public List<EventCnF> getEventList() {
-        return eventList;
-    }
-
-    /**
-     * @param eventList the eventList to set
-     */
-    @Override
-    public void setEventList(List<EventCnF> eventList) {
-        this.eventList = eventList;
     }
 
     /**
@@ -408,21 +288,22 @@ public class CECaseDataHeavy
     public void setPaymentList(List<MoneyCECaseFeePayment> paymentList) {
         this.paymentList = paymentList;
     }
-    
+
     /**
-     * Takes the general Payment type and converts it to 
+     * Takes the general Payment type and converts it to
+     *
      * @param paymentList the paymentList to set
      */
     public void setPaymentListGeneral(List<Payment> paymentList) {
         List<MoneyCECaseFeePayment> skeletonHorde = new ArrayList<>();
-        
+
         for (Payment p : paymentList) {
-            
+
             skeletonHorde.add(new MoneyCECaseFeePayment(p));
-            
+
         }
-        
+
         this.paymentList = skeletonHorde;
     }
-    
+
 }

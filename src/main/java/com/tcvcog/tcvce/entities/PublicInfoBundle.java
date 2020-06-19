@@ -5,8 +5,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.time.LocalDateTime;
-
 /**
  *
  * @author sylvia
