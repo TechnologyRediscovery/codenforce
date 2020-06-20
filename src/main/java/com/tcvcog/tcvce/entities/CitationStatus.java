@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
+ * Represents the current state of a Citation
  * @author ellen bascomb of apt 31y
  */
 public class CitationStatus extends Status {

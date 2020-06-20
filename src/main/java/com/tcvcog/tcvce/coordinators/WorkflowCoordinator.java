@@ -23,51 +23,32 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.ChoiceEventCat;
-import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Directive;
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventRuleAbstract;
-import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.EventRuleSet;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.ProposalCECase;
-import com.tcvcog.tcvce.entities.ProposalOccPeriod;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.integration.WorkflowIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Iterator;
-import com.tcvcog.tcvce.entities.IFace_Openable;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Holder of business logic related to event rules and proposals. The EventRule
  * object specifies a set of tests against a given list of EventCnF objects which 
- * are implemented in a series of ten or so methods prefixed with 
- * 
- * ruleSubcheck_XXXX
- * 
+ * are implemented in a series of ten or so methods prefixed with <br>
+ * <br>
+ * ruleSubcheck_XXXX<br>
+ * <br>
  * which all boil down to an EventRule either passing or failing, each outcome 
  * of which can trigger the creation of EventCnF objects and Directives which 
- * guide the end user to take appropriate next steps in a given case.
+ * guide the end user to take appropriate next steps in a given case.<br>
  * 
- * The other half of my methods govern the attachment and evaluation of proposals
+ * <br>The other half of my methods govern the attachment and evaluation of proposals
  * which consist of one or more possible choices the user can select to indicate
  * certain conditions exist in the actual casework or actual actions were taken.
  * 
@@ -92,6 +73,12 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
      */
     public WorkflowCoordinator() {
     }
+    
+    
+    // *************************************************************************
+    // *                 DIRECTIVES AND PROPOSALS                              *
+    // *************************************************************************
+    
     
     /**
      * Database object retrieving method for acquiring all Proposals to inject
@@ -192,7 +179,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     }
     
     
-       /**
+   /**
      * Pathway for "Evaluating a Proposal" or in other words, making a workflow choice.
      * The exception list is a beast because so many things happen when such an event occurs.
      
@@ -370,6 +357,57 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         p.setProposalRejected(false);
         ci.updateProposal(p);
     }
+    
+    // *************************************************************************
+    // *                     EVENT RULES : EVALUATION                          *
+    // *************************************************************************
+    
+    public boolean rules_evalulateEventRule(List<EventCnF> eventList, EventRuleAbstract rule) throws IntegrationException, BObStatusException{
+        
+        if (eventList == null || rule == null) {
+            throw new BObStatusException("EventCoordinator.evaluateEventRule | Null event list or rule");
+        }
+        if (rule.getRequiredEventType() != null) {
+            if (!ruleSubcheck_requiredEventType(eventList, rule)) {
+                return false;
+            }
+        }
+        if (rule.getForbiddenEventType() != null) {
+            if (!ruleSubcheck_forbiddenEventType(eventList, rule)) {
+                return false;
+            }
+        }
+        if (rule.getRequiredEventCategory() != null) {
+            if (!ruleSubcheck_requiredEventCategory(eventList, rule)) {
+                return false;
+            }
+        }
+        if (rule.getForbiddenEventCategory() != null) {
+            if (!ruleSubcheck_forbiddenEventCategory(eventList, rule)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean rules_evalulateEventRule(CECaseDataHeavy cse, EventCnF event) throws BObStatusException {
+        EventRuleAbstract rule = new EventRuleAbstract();
+        boolean rulePasses = false;
+        CaseCoordinator cc = getCaseCoordinator();
+        if (    ruleSubcheck_requiredEventType(cse, rule) 
+             && ruleSubcheck_forbiddenEventType(cse, rule) 
+             && ruleSubcheck_requiredEventCategory(cse, rule) 
+             && ruleSubcheck_forbiddenEventCategory(cse, rule)
+            ) {
+                rulePasses = true;
+                try {
+                    cc.processCaseOnEventRulePass(cse, rule);
+                } catch (ViolationException | IntegrationException ex) {
+                    System.out.println(ex);
+                }
+        }
+        return rulePasses;
+    }
 
     public void rules_updateEventRuleAbstract(EventRuleAbstract era) throws IntegrationException {
         WorkflowIntegrator wi = getWorkflowIntegrator();
@@ -454,58 +492,70 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         // list did not contain an EventCnF whose category was required or required in a specified range
         return false;
     }
+     private boolean ruleSubcheck_forbiddenEventCategory(CECaseDataHeavy cse, EventRuleAbstract rule) {
+        boolean subcheckPasses = true;
+        Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
+        while (iter.hasNext()) {
+            EventCnF ev = iter.next();
+            if (ev.getCategory().getCategoryID() == rule.getRequiredEventCategory().getCategoryID()) {
+                subcheckPasses = false;
+            }
+        }
+        return subcheckPasses;
+    }
+
+    private boolean ruleSubcheck_forbiddenEventCategory(List<EventCnF> eventList, EventRuleAbstract rule) {
+        Iterator<EventCnF> iter = eventList.iterator();
+        while (iter.hasNext()) {
+            EventCnF ev = iter.next();
+            // simplest case: check for matching categories
+            if (ev.getCategory().getCategoryID() == rule.getForbiddenEventCategory().getCategoryID()) {
+                return false;
+            }
+            // if we didn't match, perhaps we need to treat the requried category as a threshold
+            // to be applied to an event category's type internal relative order
+            if (rule.getForbiddenECThreshold_typeInternalOrder() != 0) {
+                if (rule.isForbiddenECThreshold_typeInternalOrder_treatAsUpperBound()) {
+                    if (ev.getCategory().getRelativeOrderWithinType() <= rule.getForbiddenECThreshold_typeInternalOrder()) {
+                        return false;
+                    }
+                } else {
+                    // treat threshold as a lower bound
+                    if (ev.getCategory().getRelativeOrderWithinType() >= rule.getForbiddenECThreshold_typeInternalOrder()) {
+                        return false;
+                    }
+                }
+            }
+            // if we didn't pass the rule with type internal ordering as a thresold, check global
+            // ordering thresolds
+            if (rule.getForbiddenECThreshold_globalOrder() != 0) {
+                if (rule.isForbiddenECThreshold_globalOrder_treatAsUpperBound()) {
+                    if (ev.getCategory().getRelativeOrderGlobal() <= rule.getForbiddenECThreshold_globalOrder()) {
+                        return false;
+                    }
+                } else {
+                    // treat threshold as a lower bound
+                    if (ev.getCategory().getRelativeOrderGlobal() >= rule.getForbiddenECThreshold_globalOrder()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        // list did not contain an EventCnF whose category was required or required in a specified range
+        return true;
+    }
+
+    
+    // *************************************************************************
+    // *                   EVENT RULES : ADMIN                                 *
+    // *************************************************************************
+    
 
     public EventRuleAbstract rules_getEventRuleAbstract(int eraid) throws IntegrationException {
         WorkflowIntegrator wi = getWorkflowIntegrator();
         return wi.rules_getEventRuleAbstract(eraid);
     }
 
-    public boolean rules_evalulateEventRule(List<EventCnF> eventList, EventRuleAbstract rule) throws IntegrationException, BObStatusException{
-        
-        if (eventList == null || rule == null) {
-            throw new BObStatusException("EventCoordinator.evaluateEventRule | Null event list or rule");
-        }
-        if (rule.getRequiredEventType() != null) {
-            if (!ruleSubcheck_requiredEventType(eventList, rule)) {
-                return false;
-            }
-        }
-        if (rule.getForbiddenEventType() != null) {
-            if (!ruleSubcheck_forbiddenEventType(eventList, rule)) {
-                return false;
-            }
-        }
-        if (rule.getRequiredEventCategory() != null) {
-            if (!ruleSubcheck_requiredEventCategory(eventList, rule)) {
-                return false;
-            }
-        }
-        if (rule.getForbiddenEventCategory() != null) {
-            if (!ruleSubcheck_forbiddenEventCategory(eventList, rule)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean rules_evalulateEventRule(CECaseDataHeavy cse, EventCnF event) throws BObStatusException {
-        EventRuleAbstract rule = new EventRuleAbstract();
-        boolean rulePasses = false;
-        CaseCoordinator cc = getCaseCoordinator();
-        if (    ruleSubcheck_requiredEventType(cse, rule) 
-             && ruleSubcheck_forbiddenEventType(cse, rule) 
-             && ruleSubcheck_requiredEventCategory(cse, rule) 
-             && ruleSubcheck_forbiddenEventCategory(cse, rule)
-            ) {
-                rulePasses = true;
-                try {
-                    cc.processCaseOnEventRulePass(cse, rule);
-                } catch (ViolationException | IntegrationException ex) {
-                    System.out.println(ex);
-                }
-        }
-        return rulePasses;
-    }
 
     /**
      * A BOB-agnostic event generator given a Proposal object and the Choice that was
@@ -567,9 +617,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         return ev;
     }
 
-    //    -----------------------------------------------------------
-    //    ***************** RULES and WORKFLOWS *********************
-    //    -----------------------------------------------------------
+
     /**
      * Calls appropriate Integration method given a CECase or OccPeriod
      * and generates a configured event rule list.
@@ -618,59 +666,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         }
     }
 
-    private boolean ruleSubcheck_forbiddenEventCategory(CECaseDataHeavy cse, EventRuleAbstract rule) {
-        boolean subcheckPasses = true;
-        Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
-        while (iter.hasNext()) {
-            EventCnF ev = iter.next();
-            if (ev.getCategory().getCategoryID() == rule.getRequiredEventCategory().getCategoryID()) {
-                subcheckPasses = false;
-            }
-        }
-        return subcheckPasses;
-    }
-
-    private boolean ruleSubcheck_forbiddenEventCategory(List<EventCnF> eventList, EventRuleAbstract rule) {
-        Iterator<EventCnF> iter = eventList.iterator();
-        while (iter.hasNext()) {
-            EventCnF ev = iter.next();
-            // simplest case: check for matching categories
-            if (ev.getCategory().getCategoryID() == rule.getForbiddenEventCategory().getCategoryID()) {
-                return false;
-            }
-            // if we didn't match, perhaps we need to treat the requried category as a threshold
-            // to be applied to an event category's type internal relative order
-            if (rule.getForbiddenECThreshold_typeInternalOrder() != 0) {
-                if (rule.isForbiddenECThreshold_typeInternalOrder_treatAsUpperBound()) {
-                    if (ev.getCategory().getRelativeOrderWithinType() <= rule.getForbiddenECThreshold_typeInternalOrder()) {
-                        return false;
-                    }
-                } else {
-                    // treat threshold as a lower bound
-                    if (ev.getCategory().getRelativeOrderWithinType() >= rule.getForbiddenECThreshold_typeInternalOrder()) {
-                        return false;
-                    }
-                }
-            }
-            // if we didn't pass the rule with type internal ordering as a thresold, check global
-            // ordering thresolds
-            if (rule.getForbiddenECThreshold_globalOrder() != 0) {
-                if (rule.isForbiddenECThreshold_globalOrder_treatAsUpperBound()) {
-                    if (ev.getCategory().getRelativeOrderGlobal() <= rule.getForbiddenECThreshold_globalOrder()) {
-                        return false;
-                    }
-                } else {
-                    // treat threshold as a lower bound
-                    if (ev.getCategory().getRelativeOrderGlobal() >= rule.getForbiddenECThreshold_globalOrder()) {
-                        return false;
-                    }
-                }
-            }
-        }
-        // list did not contain an EventCnF whose category was required or required in a specified range
-        return true;
-    }
-
+   
     /**
      * Returns complete  dump of the eventrule table
      *
@@ -728,7 +724,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
                 implementDirective(era.getPromptingDirective(), op, null);
                 System.out.println("EventCoordinator.rules_attachEventRule | Found not null prompting directive");
             }
-        } else if (rg instanceof CECaseD ataHeavy) {
+        } else if (rg instanceof CECaseDataHeavy) {
             CECaseDataHeavy cec = (CECaseDataHeavy) rg;
             rules_attachEventRuleAbstractToCECase(era, cec);
             if (freshObjectID != 0 && era.getPromptingDirective() != null) {

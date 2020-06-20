@@ -28,7 +28,7 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.TextBlock;
-import com.tcvcog.tcvce.integration.ViolationIntegrator;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -241,14 +241,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * @return the textBlockListByMuni
      */
     public List<TextBlock> getBlockList() {
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        CaseIntegrator ci = getCaseIntegrator();
         Municipality m = getSessionBean().getSessMuni();
         if(blockList == null){
             try {
                 if(showTextBlocksAllMuni){
-                    blockList = cvi.getAllTextBlocks();
+                    blockList = ci.getAllTextBlocks();
                 } else {
-                    blockList = cvi.getTextBlocks(m);
+                    blockList = ci.getTextBlocks(m);
                 }
             } catch (IntegrationException ex) {
                 System.out.println(ex);

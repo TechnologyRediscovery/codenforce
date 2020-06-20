@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 
- /**s 
+ /**
  * @author Eric Darsow
  */
 public class EventCategory implements Serializable {

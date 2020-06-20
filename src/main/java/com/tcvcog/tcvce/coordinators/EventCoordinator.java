@@ -529,8 +529,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
  to be attached to the given CECaseDataHeavy based on the case's phase and the
  user's permissions in the system.
      *
-     * Used for displaying the appropriate event types to the user on the
-     * cecases.xhtml page
      *
      * @param c the CECaseDataHeavy on which the event would be attached
      * @param u the User doing the attaching

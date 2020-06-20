@@ -20,32 +20,39 @@ public class CodeViolationDisplayable extends CodeViolation {
     
     public CodeViolationDisplayable(CodeViolation cv){
         this.violationID = cv.violationID;
-        this.ceCaseID = cv.ceCaseID;
-        this.penalty = cv.penalty;
-        
-        this.leagacyImport = cv.leagacyImport;
-        this.complianceTimeframeEventID = cv.complianceTimeframeEventID;
-
         this.violatedEnfElement = cv.violatedEnfElement;
-        this.icon = cv.icon;
-        this.blobIDList = cv.blobIDList;
-        this.citationIDList = cv.citationIDList;
-        this.complianceUser = cv.complianceUser;
-        this.compTimeFrameComplianceEvent = cv.compTimeFrameComplianceEvent;
-
+        this.ceCaseID = cv.ceCaseID;
         this.status = cv.status;
+        this.active = cv.active;
+        this.icon = cv.icon;
         this.ageLeadText = cv.ageLeadText;
+        this.penalty = cv.penalty;
         this.description = cv.description;
         this.notes = cv.notes;
+        this.dateOfCitation = cv.dateOfCitation;
+        this.dateOfCitationPretty = cv.dateOfCitationPretty;
+        this.citationIDList = cv.citationIDList;
         this.citationListAsString = cv.citationListAsString;
-
-        this.stipulatedComplianceDate = cv.stipulatedComplianceDate;
+        this.noticeIDList = cv.noticeIDList;
+        this.noticeIDListAsString = cv.noticeIDListAsString;
         this.dateOfRecord = cv.dateOfRecord;
+        this.dateOfRecordUtilDate = cv.dateOfRecordUtilDate;
+        this.dateOfRecordPretty = cv.dateOfRecordPretty;
         this.creationTS = cv.creationTS;
+        this.creationTSPretty = cv.creationTSPretty;
         this.createdBy = cv.createdBy;
-        
+        this.stipulatedComplianceDate = cv.stipulatedComplianceDate;
         this.actualComplianceDate = cv.actualComplianceDate;
+        this.leagacyImport = cv.leagacyImport;
+        this.blobIDList = cv.blobIDList;
+        this.photoList = cv.photoList;
         this.complianceTimeStamp = cv.complianceTimeStamp;
+        this.complianceUser = cv.complianceUser;
+        this.complianceTFExpiryPropID = cv.complianceTFExpiryPropID;
+        this.complianceTFExpiryProp = cv.complianceTFExpiryProp;
+        this.severityIntensityClassID = cv.severityIntensityClassID;
+        this.lastUpdatedTS = cv.lastUpdatedTS;
+        this.lastUpdatedUser = cv.lastUpdatedUser;
 
     }
 

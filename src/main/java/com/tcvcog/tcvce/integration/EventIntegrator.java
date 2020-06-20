@@ -73,7 +73,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
         String query = "SELECT eventid, category_catid, cecase_caseid, creationts, eventdescription, \n" +
                         "       creator_userid, active, notes, occperiod_periodid, timestart, \n" +
-                        "       timeend, lastupdatedby_userid, lastupdatedts, target_userid\n" +
+                        "       timeend, lastupdatedby_userid, lastupdatedts \n" +
                         "  FROM public.event WHERE eventid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -149,7 +149,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
         
-        ev.setUserTarget(uc.getUser(rs.getInt("target_userid")));
         ev.setActive(rs.getBoolean("activeevent"));
         ev.setNotes(rs.getString("notes"));
         
@@ -223,10 +222,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         String query = "INSERT INTO public.event(\n" +
                         "            eventid, category_catid, cecase_caseid, creationts, eventdescription, \n" +
                         "            creator_userid, active, notes, occperiod_periodid, timestart, \n" +
-                        "            timeend, lastupdatedby_userid, lastupdatedts, target_userid)\n" +
+                        "            timeend, lastupdatedby_userid, lastupdatedts)\n" +
                         "    VALUES (DEFAULT, ?, ?, now(), ?, \n" +
                         "            ?, ?, ?, ?, ?, \n" +
-                        "            ?, ?, now(), ?);"; 
+                        "            ?, ?, now());"; 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -280,12 +279,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(10, java.sql.Types.NULL);
             }
             
-            if(event.getUserTarget() != null){
-                stmt.setInt(11, event.getUserTarget().getUserID());
-            } else {
-                stmt.setNull(11, java.sql.Types.NULL);
-            }
-            
             stmt.execute();
 
             String retrievalQuery = "SELECT currval('ceevent_eventID_seq');";
@@ -329,7 +322,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         sb.append("UPDATE public.event\n");
         sb.append("   SET category_catid=?, cecase_caseid=?, eventdescription=?, \n");
         sb.append("       creator_userid=?, active=?, notes=?, occperiod_periodid=?, timestart=?, \n" );
-        sb.append("       timeend=?, lastupdatedby_userid=?, lastupdatedts=now(), target_userid=?\n" );
+        sb.append("       timeend=?, lastupdatedby_userid=?, lastupdatedts=now() \n" );
         sb.append(" WHERE eventid=?;");
 
         // TO DO: finish clearing view confirmation
@@ -385,11 +378,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(10, java.sql.Types.NULL);
             }
             
-            if(event.getUserTarget() != null){
-                stmt.setInt(11, event.getUserTarget().getUserID());
-            } else {
-                stmt.setNull(11, java.sql.Types.NULL);
-            }
+            stmt.setInt(11, event.getEventID());
             
             stmt.executeUpdate();
             

@@ -54,8 +54,6 @@ public  class       EventCnF
     protected User lastUpdatedBy;
     protected LocalDateTime lastUpdatedTS;
     
-    protected User userTarget;
-   
     protected boolean active;
     
     /**
@@ -89,8 +87,6 @@ public  class       EventCnF
         
         this.lastUpdatedBy = ev.lastUpdatedBy;
         this.lastUpdatedTS = ev.lastUpdatedTS;
-        
-        this.userTarget = ev.userTarget;
         
         this.active = ev.active;
         this.hidden = ev.hidden;
@@ -401,19 +397,7 @@ public  class       EventCnF
         }
     }
 
-    /**
-     * @return the userTarget
-     */
-    public User getUserTarget() {
-        return userTarget;
-    }
-
-    /**
-     * @param userTarget the userTarget to set
-     */
-    public void setUserTarget(User userTarget) {
-        this.userTarget = userTarget;
-    }
+    
 
     /**
      * @return the lastUpdatedBy

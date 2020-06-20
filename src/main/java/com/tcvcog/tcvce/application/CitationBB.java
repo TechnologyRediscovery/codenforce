@@ -25,7 +25,7 @@ import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CourtEntity;
-import com.tcvcog.tcvce.integration.CitationIntegrator;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -65,11 +65,11 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        CitationIntegrator citInt = getCitationIntegrator();
+        CaseIntegrator ci = getCaseIntegrator();
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         
         try {
-            citationStatusList = citInt.getCitationStatusList();
+            citationStatusList = ci.getCitationStatusList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

@@ -1147,12 +1147,6 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>violationIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.ViolationIntegrator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-
-    <managed-bean>
         <managed-bean-name>violationAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ViolationAddBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>

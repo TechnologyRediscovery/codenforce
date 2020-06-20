@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
@@ -39,10 +40,10 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
     
     public void linkBlobToCodeViolation() {
         BlobIntegrator bi = getBlobIntegrator();
-        ViolationIntegrator vi = getCodeViolationIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
         
         try{
-            vi.getCodeViolation(codeViolationID);
+            cc.getCodeViolation(codeViolationID);
             System.out.println("linkBlobBB.linkBlobToCodeViolation | retrieved code violation");  //TESTING
         }catch(IntegrationException e){
             getFacesContext().addMessage(null,

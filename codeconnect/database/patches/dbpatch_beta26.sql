@@ -58,8 +58,6 @@ ALTER TABLE public.event RENAME COLUMN owner_userid TO creator_userid;
 ALTER TABLE public.event ADD COLUMN lastupdatedby_userid INTEGER CONSTRAINT event_createdby_userid_fk REFERENCES login (userid);
 ALTER TABLE public.event ADD COLUMN lastupdatedts TIMESTAMP WITH TIME ZONE;
 
-ALTER TABLE public.event ADD COLUMN target_userid INTEGER CONSTRAINT event_target_userid_fk REFERENCES login (userid);
-
 ALTER TABLE public.eventcategory ADD COLUMN userrankminimumtoupdate INTEGER;
 ALTER TABLE public.eventcategory ALTER COLUMN userrankminimumtoupdate SET DEFAULT 3;
 
@@ -105,8 +103,11 @@ CREATE TABLE public.eventruleimpl
 	notes 			TEXT
 );
 
+ALTER TABLE public.codeviolation DROP COLUMN compliancetfevent;
 
-
+ALTER TABLE public.codeviolation ADD COLUMN compliancetfexpiry_proposalid INTEGER 
+	CONSTRAINT codeviolation_tfexpiry_proposalid_fk 
+	REFERENCES choiceproposal (proposalid);
 
 
 
