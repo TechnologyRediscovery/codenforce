@@ -35,6 +35,7 @@ import java.util.List;
  * @author sylvia
  */
 public interface IFace_EventRuleGoverned {
+    
     public EventDomainEnum discloseEventDomain();
     
     public int getBObID();

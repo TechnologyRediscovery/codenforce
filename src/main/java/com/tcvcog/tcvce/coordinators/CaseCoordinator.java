@@ -446,7 +446,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws BObStatusException
      * @throws ViolationException 
      */
-    public void insertNewCECase(CECase newCase, Credential cred, CEActionRequest cear) throws IntegrationException, BObStatusException, ViolationException, EventException{
+    public void insertNewCECase(CECase newCase, UserAuthorized ua, CEActionRequest cear) throws IntegrationException, BObStatusException, ViolationException, EventException{
         
         CaseIntegrator ci = getCaseIntegrator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
@@ -454,19 +454,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         EventCategory originationCategory;
         EventCnF originationEvent;
         UserCoordinator uc = getUserCoordinator();
-        User us = uc.getUser(cred.getGoverningAuthPeriod().getUserID());
         
         
         
         // the integrator returns to us a CECaseDataHeavy with the correct ID after it has
         // been written into the DB
         int freshID = ci.insertNewCECase(newCase);
-        CECaseDataHeavy cedh = assembleCECaseDataHeavy(newCase, cred);
+        CECaseDataHeavy cedh = assembleCECaseDataHeavy(newCase, ua.getMyCredential());
         
 
         // If we were passed in an action request, connect it to the new case we just made
         if(cear != null){
-            ceari.connectActionRequestToCECase(cear.getRequestID(), freshID,us.getUserID());
+            ceari.connectActionRequestToCECase(cear.getRequestID(), freshID,ua.getUserID());
             originationCategory = ec.initEventCategory(
                     Integer.parseInt(getResourceBundle(
                     Constants.EVENT_CATEGORY_BUNDLE).getString("originiationByActionRequest")));
@@ -496,8 +495,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationEvent.setNotes(sb.toString());
             
         }
-            originationEvent.setUserCreator(us);
-            addEvent_processForCECaseDomain(assembleCECaseDataHeavy(getCECase(freshID), cred), originationEvent, null);
+            originationEvent.setUserCreator(ua);
+            
+            ec.addEvent(originationEvent, cedh, ua);
     }
     
    /**
@@ -708,6 +708,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                                     EventException{
         EventType eventType = ev.getCategory().getEventType();
         EventIntegrator ei = getEventIntegrator();
+        if(evList == null || cse == null || ev == null){
+            throw new BObStatusException("Null argument to addEvent_ceCaseDomain");
+        }
         
         switch(eventType){
             case Action:
@@ -716,7 +719,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                
                 break;
             case Closing:
-                insertedEventID = processClosingEvent(cse, ev);
+//                insertedEventID = processClosingEvent(cse, ev);
                 break;
             default:
                 ev.setCeCaseID(cse.getCaseID());
@@ -789,6 +792,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
    
      /**
       * Logic intermediary event for creating events documenting a CECase's closure
+      * 
       * @param c
       * @param e
       * @return
@@ -880,13 +884,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * NOV is ready to send - And coordinate creating an event to document this
      * @param c
      * @param nov
-     * @param user
+     * @param ua
      * @throws BObStatusException
      * @throws IntegrationException
      * @throws EventException
      * @throws ViolationException 
      */
-    public void novLockAndQueue(CECaseDataHeavy c, NoticeOfViolation nov, User user) 
+    public void novLockAndQueue(CECaseDataHeavy c, NoticeOfViolation nov, UserAuthorized ua) 
             throws BObStatusException, IntegrationException, EventException, ViolationException{
         
         CaseIntegrator ci = getCaseIntegrator();
@@ -895,25 +899,26 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         PersonIntegrator pi = getPersonIntegrator();
         
         if(nov.getLockedAndqueuedTS() == null){
-            int ghostID = pc.createChostPerson(nov.getRecipient(), user);
+            int ghostID = pc.createChostPerson(nov.getRecipient(), ua);
             nov.setRecipient(pi.getPerson(ghostID));
             nov.setLockedAndqueuedTS(LocalDateTime.now());
-            nov.setLockedAndQueuedBy(user);
+            nov.setLockedAndQueuedBy(ua);
             ci.novLockAndQueueForMailing(nov);
             System.out.println("CaseCoordinator.novLockAndQueue | NOV locked in integrator");
         } else {
             throw new BObStatusException("Notice is already locked and queued for sending");
         }
         
+        
         EventCnF noticeEvent = evCoord.initEvent(c, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
         noticeEvent.setDescription(queuedNoticeEventNotes);
-        noticeEvent.setUserCreator(user);
+        noticeEvent.setUserCreator(ua);
         ArrayList<Person> al = new ArrayList();
         al.add(nov.getRecipient());
         noticeEvent.setPersonList(al);
-        addEvent_processForCECaseDomain(c, noticeEvent, null);
+        evCoord.addEvent(noticeEvent, c, ua);
     }
     
     /**
@@ -1173,7 +1178,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws BObStatusException
      * @throws ViolationException 
      */
-    private void checkForFullComplianceAndCloseCaseIfTriggered(CECaseDataHeavy c) 
+    private void checkForFullComplianceAndCloseCaseIfTriggered(CECaseDataHeavy c, UserAuthorized ua) 
             throws IntegrationException, BObStatusException, ViolationException, EventException{
         
         EventCoordinator ec = getEventCoordinator();
@@ -1203,7 +1208,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         if (complianceWithAllViolations){
             complianceClosingEvent = ec.initEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("closingAfterFullCompliance"))));
-            addEvent_processForCECaseDomain(c, complianceClosingEvent, null);
+            ec.addEvent(complianceClosingEvent, c, ua);
             
         } // close if
         
@@ -1258,6 +1263,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         int insertedViolationID;
         int eventID;
         StringBuilder sb = new StringBuilder();
+        
         
         EventCategory eventCat = ec.initEventCategory(
                                 Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)

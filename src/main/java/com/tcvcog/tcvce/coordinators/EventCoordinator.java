@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
-import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -29,23 +28,17 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.integration.WorkflowIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import javax.faces.application.FacesMessage;
-import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -158,12 +151,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * so what's in this list is what's in the DB. The head of the list is the
      * event that was passed into this method
      * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.EventException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public List<EventCnF> addEvent(     EventCnF ev, 
                                         IFace_EventRuleGoverned erg, 
                                         UserAuthorized ua) 
-            
-                throws      BObStatusException, EventException, IntegrationException{
+                            throws      BObStatusException, 
+                                        EventException, 
+                                        IntegrationException{
         
         CaseCoordinator cc = getCaseCoordinator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -583,7 +579,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public EventCategory initEventCategory(){
         EventCategory ec =  new EventCategory();
-        ec.setUserdeployable(true);
         ec.setHidable(true);
         // TODO: finishing autoconfiguring these 
         return ec;

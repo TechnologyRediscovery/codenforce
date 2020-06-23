@@ -103,11 +103,6 @@ public  class       PropertyDataHeavy
         this.active = prop.isActive();
         this.nonAddressable = prop.isNonAddressable();
         
-        
-        
-        
-        
-        
     }
     
 

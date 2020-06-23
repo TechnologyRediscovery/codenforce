@@ -12,7 +12,6 @@ import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
