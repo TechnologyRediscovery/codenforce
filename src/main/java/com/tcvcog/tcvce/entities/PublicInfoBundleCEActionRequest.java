@@ -6,6 +6,8 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 
@@ -17,9 +19,7 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
     //*******Action request case public data********
     //************************************************
     
-    // these get moved over directly
-    private int requestID;
-    private CEActionRequestStatus requestStatus;
+    private CEActionRequest bundledRequest;
     
     // Strings built from CEActinoRequest objects
     private String actionRequestorFLname;
@@ -27,11 +27,35 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
     private String caseLinkStatus;
     private boolean linkedToCase;
     
-    private String formattedSubmittedTimeStamp;
-    private String requestDescription;
-    
-    private String publicExternalNotes;
 
+    public void setBundledRequest(CEActionRequest input) {
+        
+        setMuni(input.getMuni());
+        setPacc(input.getRequestPublicCC());
+        
+        actionRequestorFLname = input.getRequestor().getFirstName() + " " + input.getRequestor().getLastName();
+        input.setRequestor(new Person());
+        
+        input.setRequestProperty(new Property());
+        input.setMuniCode(0);
+        input.setCaseID(0);
+        input.setCaseAttachmentTimeStamp(LocalDateTime.MIN);
+        input.setCaseAttachmentUser(new User());
+        input.setSubmittedTimeStamp(LocalDateTime.MIN);
+        input.setDateOfRecord(LocalDateTime.MIN);
+        input.setDaysSinceDateOfRecord(0);
+        input.setDateOfRecordUtilDate(new Date());
+        input.setIsAtKnownAddress(false);
+        input.setCogInternalNotes("*****");
+        input.setMuniNotes("*****");
+        
+        bundledRequest = input;
+    }
+
+    public CEActionRequest getBundledRequest() {
+        return bundledRequest;
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -71,7 +95,7 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         sb.append("<span class=\"bold\">");
         sb.append("Action Request Status: ");
         sb.append("</span>");
-        sb.append(requestStatus.statusTitle);
+        sb.append(bundledRequest.getRequestStatus().getStatusTitle());
         sb.append("<br />");
         
         
@@ -112,13 +136,13 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         sb.append("<span class=\"bold\">");
         sb.append("Request ID number: ");
         sb.append("</span>");
-        sb.append(requestID);
+        sb.append(bundledRequest.getRequestID());
         sb.append("<br />");
         
         sb.append("<span class=\"bold\">");
         sb.append("Submission date: ");
         sb.append("</span>");
-        sb.append(formattedSubmittedTimeStamp);
+        sb.append(bundledRequest.getFormattedSubmittedTimeStamp());
         sb.append("<br />");
         
         
@@ -143,13 +167,13 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         sb.append("<span class=\"bold\">");
         sb.append("Request description: ");
         sb.append("</span>");
-        sb.append(requestDescription);
+        sb.append(bundledRequest.getRequestDescription());
         sb.append("<br />");
         
         sb.append("<span class=\"bold\">");
         sb.append("Public notes: ");
         sb.append("</span>");
-        sb.append(publicExternalNotes);
+        sb.append(bundledRequest.getPublicExternalNotes());
         sb.append("<br />");
         
         sb.append("</p>");
@@ -167,23 +191,6 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
 //                + ", formattedSubmittedTimeStamp=" + formattedSubmittedTimeStamp 
 //                + ", requestDescription=" + requestDescription 
 //                + ", publicExternalNotes=" + publicExternalNotes + '}';
-    }
-    
-    
-
-    /**
-     * @return the requestID
-     */
-    public int getRequestID() {
-        return requestID;
-    }
-
-
-    /**
-     * @return the requestStatus
-     */
-    public CEActionRequestStatus getRequestStatus() {
-        return requestStatus;
     }
 
     /**
@@ -208,41 +215,6 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
     }
 
     /**
-     * @return the formattedSubmittedTimeStamp
-     */
-    public String getFormattedSubmittedTimeStamp() {
-        return formattedSubmittedTimeStamp;
-    }
-
-    /**
-     * @return the requestDescription
-     */
-    public String getRequestDescription() {
-        return requestDescription;
-    }
-
-    /**
-     * @return the publicExternalNotes
-     */
-    public String getPublicExternalNotes() {
-        return publicExternalNotes;
-    }
-
-    /**
-     * @param requestID the requestID to set
-     */
-    public void setRequestID(int requestID) {
-        this.requestID = requestID;
-    }
-
-    /**
-     * @param requestStatus the requestStatus to set
-     */
-    public void setRequestStatus(CEActionRequestStatus requestStatus) {
-        this.requestStatus = requestStatus;
-    }
-
-    /**
      * @param actionRequestorFLname the actionRequestorFLname to set
      */
     public void setActionRequestorFLname(String actionRequestorFLname) {
@@ -261,27 +233,6 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
      */
     public void setCaseLinkStatus(String caseLinkStatus) {
         this.caseLinkStatus = caseLinkStatus;
-    }
-
-    /**
-     * @param formattedSubmittedTimeStamp the formattedSubmittedTimeStamp to set
-     */
-    public void setFormattedSubmittedTimeStamp(String formattedSubmittedTimeStamp) {
-        this.formattedSubmittedTimeStamp = formattedSubmittedTimeStamp;
-    }
-
-    /**
-     * @param requestDescription the requestDescription to set
-     */
-    public void setRequestDescription(String requestDescription) {
-        this.requestDescription = requestDescription;
-    }
-
-    /**
-     * @param publicExternalNotes the publicExternalNotes to set
-     */
-    public void setPublicExternalNotes(String publicExternalNotes) {
-        this.publicExternalNotes = publicExternalNotes;
     }
 
     /**

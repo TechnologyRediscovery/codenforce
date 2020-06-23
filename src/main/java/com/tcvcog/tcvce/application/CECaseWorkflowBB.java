@@ -96,7 +96,7 @@ public  class CECaseWorkflowBB
         CaseCoordinator cc = getCaseCoordinator();
         try {
             currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
-        } catch (BObStatusException  | IntegrationException ex) {
+        } catch (BObStatusException  | IntegrationException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 "Could not refresh current case", ""));

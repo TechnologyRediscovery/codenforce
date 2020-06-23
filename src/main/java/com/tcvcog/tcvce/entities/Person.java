@@ -17,8 +17,6 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;

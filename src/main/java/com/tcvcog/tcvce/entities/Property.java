@@ -7,11 +7,8 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
-import com.tcvcog.tcvce.entities.occupancy.OccPermit;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -11,8 +11,6 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -40,7 +38,7 @@ public class PIBCECaseBB extends BackingBeanUtils implements Serializable {
     public void attachMessageToCase(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.attachPublicMessage(activePIBCECase.getCaseID(), messagerName, messagerName, messagerPhone);
+            cc.attachPublicMessage(activePIBCECase.getBundledCase().getCaseID(), messagerName, messagerName, messagerPhone);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Successfully added message to csae. Please re-search using your access control code to see your event appear in the list", ""));

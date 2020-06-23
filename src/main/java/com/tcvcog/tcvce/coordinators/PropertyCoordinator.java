@@ -207,7 +207,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         try {
             //review all case mems and set app ones for info case
             cc.insertNewCECase(cse, cred, null);
-        } catch (IntegrationException | BObStatusException | ViolationException | EventException ex) {
+        } catch (IntegrationException | BObStatusException | ViolationException | EventException | SearchException ex) {
             System.out.println(ex);
         }
         return p;
