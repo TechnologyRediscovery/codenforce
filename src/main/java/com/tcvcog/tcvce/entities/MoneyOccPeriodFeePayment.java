@@ -27,7 +27,6 @@ package com.tcvcog.tcvce.entities;
 public  class   MoneyOccPeriodFeePayment 
         extends Payment{
 
-    private int paymentID;
     private int occPeriodAssignedFeeID;
     
     public MoneyOccPeriodFeePayment() {
@@ -35,7 +34,6 @@ public  class   MoneyOccPeriodFeePayment
 
     public MoneyOccPeriodFeePayment(Payment p){
         this.occPeriodAssignedFeeID = p.getAssignedFeeID();
-        this.paymentID = p.getPaymentID();
         this.paymentID = p.getPaymentID();
         this.paymentType = p.getPaymentType();
         this.dateDeposited = p.getDateDeposited();
@@ -53,14 +51,6 @@ public  class   MoneyOccPeriodFeePayment
         
     }
     
-    public int getPaymentID() {
-        return paymentID;
-    }
-
-    public void setPaymentID(int paymentID) {
-        this.paymentID = paymentID;
-    }
-
     public int getOccPeriodAssignedFeeID() {
         return occPeriodAssignedFeeID;
     }

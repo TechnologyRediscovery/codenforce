@@ -18,8 +18,11 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
+import com.tcvcog.tcvce.entities.PublicInfoBundleOccPeriod;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
 import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
@@ -189,9 +192,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledPerson(input);
 
             pib.setTypeName("Person");
-            
+
             pib.setDateOfRecord(getPrettyDate(input.getCreationTimeStamp()));
-            
+
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
         } else {
@@ -203,89 +206,203 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
     }
-    
-    public PublicInfoBundleProperty extractPublicInfo(Property input){
+
+    public PublicInfoBundleProperty extractPublicInfo(Property input) {
         PublicInfoBundleProperty pib = new PublicInfoBundleProperty();
-        
+
+        //Again, no PACC enabled field. Perhaps this will be a good enough filter for now?
+        if (!input.isActive()) {
+
+            pib.setBundledProperty(input);
+
+            pib.setTypeName("Property");
+
+            pib.setDateOfRecord(getPrettyDate(input.getCreationTS()));
+
+            pib.setAddressAssociated(true);
+
+            pib.setPropertyAddress(input.getAddress());
+
+            pib.setMuni(input.getMuni());
+
+            pib.setShowAddMessageButton(false);
+            pib.setShowDetailsPageButton(true);
+        } else {
+            pib.setBundledProperty(new Property());
+            pib.setPaccStatusMessage("A public information bundle was found but public "
+                    + "access was switched off by a code officer. Please contact your municipal office. ");
+
+        }
+
         return pib;
     }
-    
+
+    public PublicInfoBundleOccPeriod extractPublicInfo(OccPeriod input) throws IntegrationException, BObStatusException, SearchException {
+        PublicInfoBundleOccPeriod pib = new PublicInfoBundleOccPeriod();
+
+        //Again, no PACC enabled field. Perhaps this will be a good enough filter for now?
+        if (!input.isActive()) {
+            OccupancyCoordinator oc = getOccupancyCoordinator();
+            OccPeriodDataHeavy heavy = oc.assembleOccPeriodDataHeavy(input, getSessionBean().getSessUser().getMyCredential());
+
+            pib.setBundledPeriod(input);
+
+            pib.setTypeName("OccPeriod");
+
+            ArrayList<PublicInfoBundlePerson> bundledPersons = new ArrayList<>();
+
+            for (Person skeleton : heavy.getPersonList()) {
+
+                bundledPersons.add(extractPublicInfo(skeleton));
+
+            }
+
+            pib.setPersonList(bundledPersons);
+
+            pib.setInspectionList(heavy.getInspectionList());
+            pib.setFeeList(heavy.getFeeList());
+            pib.setPaymentList(heavy.getPaymentList());
+
+            pib.setShowAddMessageButton(false);
+            pib.setShowDetailsPageButton(true);
+        } else {
+            pib.setBundledPeriod(new OccPeriod());
+            pib.setPaccStatusMessage("A public information bundle was found but public "
+                    + "access was switched off by a code officer. Please contact your municipal office. ");
+
+        }
+
+        return pib;
+    }
+
     /**
-     *Converts a bundled person to an unbundled person by fetching the original from the database
-     * then seeing if any of the fields on the bundled version have been changed and bringing them over.
-     * Some fields are not checked for changes because the public should not be able to change them anyway.
+     * Converts a bundled property to an unbundled property. TODO: see if this
+     * needs to be updated.
+     *
+     * @param input
+     * @return
+     */
+    public Property export(PublicInfoBundleProperty input) {
+
+        return input.getBundledProperty();
+
+    }
+
+    /**
+     * Converts a bundled OccPeriod to an unbundled OccPeriod
+     *
+     * @param input
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.SearchException
+     * @return
+     */
+    public OccPeriodDataHeavy export(PublicInfoBundleOccPeriod input) throws IntegrationException, BObStatusException, SearchException {
+
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+
+        OccPeriod unbundled = input.getBundledPeriod();
+
+        OccPeriodDataHeavy exportable = oc.assembleOccPeriodDataHeavy(unbundled, getSessionBean().getSessUser().getMyCredential());
+
+        ArrayList<Person> skeletonHorde = new ArrayList<>();
+
+        for (PublicInfoBundlePerson bundle : input.getPersonList()) {
+
+            skeletonHorde.add(export(bundle));
+
+        }
+
+        exportable.setPersonList(skeletonHorde);
+
+        exportable.setInspectionList(input.getInspectionList());
+
+        exportable.setFeeList(input.getFeeList());
+
+        exportable.setPaymentList(input.getPaymentList());
+
+        return exportable;
+
+    }
+
+    /**
+     * Converts a bundled person to an unbundled person by fetching the original
+     * from the database then seeing if any of the fields on the bundled version
+     * have been changed and bringing them over. Some fields are not checked for
+     * changes because the public should not be able to change them anyway.
+     *
      * @param input
      * @return
      * @throws IntegrationException
      */
-    public Person export(PublicInfoBundlePerson input) throws IntegrationException{
+    public Person export(PublicInfoBundlePerson input) throws IntegrationException {
         PersonCoordinator pc = getPersonCoordinator();
         Person unbundled = input.getBundledPerson();
-        
+
         Person exportable = pc.getPerson(unbundled.getPersonID());
-        
+
         //fields are anonymized by being overwritten with asterisks. If these fields no longer contain asterisks,
         //then the field has been edited by the user.
-        if(!unbundled.getFirstName().contains("*")){
+        if (!unbundled.getFirstName().contains("*")) {
             exportable.setFirstName(unbundled.getFirstName());
         }
-        
-        if(!unbundled.getLastName().contains("*")){
+
+        if (!unbundled.getLastName().contains("*")) {
             exportable.setLastName(unbundled.getLastName());
         }
-        
-        if(!unbundled.getPhoneCell().contains("*")){
+
+        if (!unbundled.getPhoneCell().contains("*")) {
             exportable.setPhoneCell(unbundled.getPhoneCell());
         }
-        
-        if(!unbundled.getPhoneHome().contains("*")){
+
+        if (!unbundled.getPhoneHome().contains("*")) {
             exportable.setPhoneHome(unbundled.getPhoneHome());
         }
-        
-        if(!unbundled.getPhoneWork().contains("*")){
+
+        if (!unbundled.getPhoneWork().contains("*")) {
             exportable.setPhoneWork(unbundled.getPhoneWork());
         }
-        
-        if(!unbundled.getEmail().contains("*")){
+
+        if (!unbundled.getEmail().contains("*")) {
             exportable.setEmail(unbundled.getEmail());
         }
-        
-        if(!unbundled.getAddressStreet().contains("*")){
+
+        if (!unbundled.getAddressStreet().contains("*")) {
             exportable.setAddressStreet(unbundled.getAddressStreet());
         }
-        
-        if(!unbundled.getAddressCity().contains("*")){
+
+        if (!unbundled.getAddressCity().contains("*")) {
             exportable.setAddressCity(unbundled.getAddressCity());
         }
-        
-        if(!unbundled.getAddressZip().contains("*")){
+
+        if (!unbundled.getAddressZip().contains("*")) {
             exportable.setAddressZip(unbundled.getAddressZip());
         }
-        
-        if(!unbundled.getAddressState().contains("*")){
+
+        if (!unbundled.getAddressState().contains("*")) {
             exportable.setAddressState(unbundled.getAddressState());
         }
-        
-        if(!unbundled.getMailingAddressStreet().contains("*")){
+
+        if (!unbundled.getMailingAddressStreet().contains("*")) {
             exportable.setMailingAddressStreet(unbundled.getMailingAddressStreet());
         }
-        
-        if(!unbundled.getMailingAddressThirdLine().contains("*")){
+
+        if (!unbundled.getMailingAddressThirdLine().contains("*")) {
             exportable.setMailingAddressThirdLine(unbundled.getMailingAddressThirdLine());
         }
-        
-        if(!unbundled.getMailingAddressCity().contains("*")){
+
+        if (!unbundled.getMailingAddressCity().contains("*")) {
             exportable.setMailingAddressCity(unbundled.getMailingAddressCity());
         }
-        
-        if(!unbundled.getMailingAddressZip().contains("*")){
+
+        if (!unbundled.getMailingAddressZip().contains("*")) {
             exportable.setMailingAddressZip(unbundled.getMailingAddressZip());
         }
-        
-        if(!unbundled.getMailingAddressState().contains("*")){
+
+        if (!unbundled.getMailingAddressState().contains("*")) {
             exportable.setMailingAddressState(unbundled.getMailingAddressState());
         }
-        
+
         return exportable;
     }
 

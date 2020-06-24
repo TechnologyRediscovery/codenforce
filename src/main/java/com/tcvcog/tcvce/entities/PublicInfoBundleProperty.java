@@ -16,7 +16,10 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  *
@@ -27,9 +30,49 @@ public class PublicInfoBundleProperty extends PublicInfoBundle implements Serial
     private Property bundledProperty;
 
     public void setBundledProperty(Property input) {
+        
+        input.setMuniCode(0);
+        input.setNotes("*****");
+        
+        input.setCreationTS(LocalDateTime.MIN);
+        input.setLastUpdatedTS(LocalDateTime.MIN);
+        input.setLastUpdatedBy(new User());
+        input.setLocationDescriptor(new OccLocationDescriptor());
+        
+        input.setBobSource(new BOBSource());
+        input.setUnfitDateStart(LocalDateTime.MIN);
+        input.setUnfitDateStop(LocalDateTime.MIN);
+        input.setUnfitBy(new User());
+        
+        input.setAbandonedDateStart(LocalDateTime.MIN);
+        input.setAbandonedDateStop(LocalDateTime.MIN);
+        input.setAbandonedDateUtilStart(new Date());
+        input.setAbandonedDateUtilStop(new Date());
+        input.setAbandonedBy(new User());
+        
+        input.setVacantDateStart(LocalDateTime.MIN);
+        input.setVacantDateStop(LocalDateTime.MIN);
+        input.setVacantBy(new User());
+        input.setCondition(new IntensityClass());
+        
+        input.setLandBankProspect(new IntensityClass());
+        input.setLandBankHeld(false);
+        input.setNonAddressable(false);
+        
+        input.setSaleYear(0);
+        input.setSalePrice(0);
+        input.setLandValue(0);
+        input.setBuildingValue(0);
+        input.setAssessmentYear(0);
+        input.setYearBuilt(0);
+        input.setLivingArea(0);
+        input.setTaxStatus(false);
+        input.setTaxYear(0);
+        
         bundledProperty = input;
     }
     
+    @Override
     public String toString(){
         
         

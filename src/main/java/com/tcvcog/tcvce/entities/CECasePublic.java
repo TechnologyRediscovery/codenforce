@@ -26,4 +26,6 @@ public class        CECasePublic
        extends      BOb 
        implements   Serializable{
     
+    //TODO: Decide what should be public
+    
 }
