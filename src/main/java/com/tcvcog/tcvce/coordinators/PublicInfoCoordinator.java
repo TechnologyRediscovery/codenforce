@@ -13,18 +13,27 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
+import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
+import com.tcvcog.tcvce.entities.PublicInfoBundleFeeAssigned;
+import com.tcvcog.tcvce.entities.PublicInfoBundleOccInspection;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccPeriod;
+import com.tcvcog.tcvce.entities.PublicInfoBundlePayment;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
 import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -233,12 +242,28 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 bundledPersons.add(extractPublicInfo(skeleton));
 
             }
+            
+            ArrayList<PublicInfoBundleOccInspection> bundledInspections= new ArrayList<>();
+
+            for (OccInspection skeleton : (List<OccInspection>) heavy.getInspectionList()) {
+
+                bundledInspections.add(extractPublicInfo(skeleton));
+
+            }
+            
+            ArrayList<PublicInfoBundleFeeAssigned> bundledFees= new ArrayList<>();
+
+            for (FeeAssigned skeleton : heavy.getFeeList()) {
+
+                bundledFees.add(extractPublicInfo(skeleton));
+
+            }
 
             pib.setPersonList(bundledPersons);
 
-            pib.setInspectionList(heavy.getInspectionList());
-            pib.setFeeList(heavy.getFeeList());
-            pib.setPaymentList(heavy.getPaymentList());
+            pib.setInspectionList(bundledInspections);
+            pib.setFeeList(bundledFees);
+            pib.setPaymentList();
 
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
@@ -251,7 +276,95 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
     }
+    
+    public PublicInfoBundleOccInspection extractPublicInfo(OccInspection input) throws IntegrationException, BObStatusException, SearchException {
+        PublicInfoBundleOccInspection pib = new PublicInfoBundleOccInspection();
 
+        if (input.isEnablePacc()) {
+
+            pib.setBundledInspection(input);
+
+            pib.setThirdPartyInspector(extractPublicInfo(input.getThirdPartyInspector()));
+            
+            pib.setTypeName("OccInspection");
+            pib.setPaccStatusMessage("Public access enabled");
+            
+            pib.setShowAddMessageButton(false);
+            pib.setShowDetailsPageButton(true);
+        } else {
+            pib.setBundledInspection(new OccInspection());
+            pib.setPaccStatusMessage("A public information bundle was found but public "
+                    + "access was switched off by a code officer. Please contact your municipal office. ");
+
+        }
+
+        return pib;
+    }
+    
+    public PublicInfoBundleFeeAssigned extractPublicInfo(FeeAssigned input) throws IntegrationException, BObStatusException, SearchException {
+        PublicInfoBundleFeeAssigned pib = new PublicInfoBundleFeeAssigned();
+
+            pib.setBundledFee(input);
+            
+            pib.setTypeName("FeeAssigned");
+            pib.setPaccStatusMessage("Public access enabled");
+            
+            pib.setShowAddMessageButton(false);
+            pib.setShowDetailsPageButton(true);
+        
+        return pib;
+    }
+
+    
+    /**
+     * Converts a bundled FeeAssigned to an unbundled FeeAssigned.
+     * 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @param input
+     * @return
+
+     */
+    public FeeAssigned export(PublicInfoBundleFeeAssigned input) throws IntegrationException {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+        
+        FeeAssigned unbundled = input.getBundledFee();
+        //FeeAssigned exportable = pi.getFeeAssigned(); TODO: write method to get feeAssigned from ID
+        
+       ArrayList<Payment> skeletonHorde = new ArrayList<>();
+        
+        for(PublicInfoBundlePayment bundle : input.getPaymentList()) {
+            
+            skeletonHorde.add(export(bundle));
+            
+        }
+        
+        unbundled.setPaymentList(skeletonHorde);
+        
+        return unbundled; //should be exportable once that field is ready.
+
+    }
+    /**
+     * Converts a bundled OccInspection to an unbundled OccInspection.
+     * 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @param input
+     * @return
+
+     */
+    public OccInspection export(PublicInfoBundleOccInspection input) throws IntegrationException {
+
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        
+        OccInspection unbundled = input.getBundledInspection();
+        //OccInspection exportable = TODO: Figure out how to get an occinspection from the DB
+        
+        unbundled.setThirdPartyInspector(export(input.getThirdPartyInspector()));
+        
+        return unbundled; //should be exportable once that field is ready.
+
+    }
+    
     /**
      * Converts a bundled property to an unbundled property. TODO: see if this
      * needs to be updated. When this JavaDoc was written, checking for changes was not necessary.
@@ -283,7 +396,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         exportable.setPropclass(unbundled.getPropclass());
         exportable.setUseType(unbundled.getUseType());
         
-        return input.getBundledProperty();
+        return exportable;
 
     }
 
@@ -312,11 +425,27 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         }
 
+        ArrayList<OccInspection> inspectionHorde = new ArrayList<>();
+        
+        for(PublicInfoBundleOccInspection bundle : input.getInspectionList()) {
+            
+            inspectionHorde.add(export(bundle));
+            
+        }
+        
+        ArrayList<MoneyOccPeriodFeeAssigned> feeHorde = new ArrayList<>();
+        
+        for(PublicInfoBundleFeeAssigned bundle : input.getFeeList()) {
+            
+            feeHorde.add((MoneyOccPeriodFeeAssigned) export(bundle));
+            
+        }
+        
         exportable.setPersonList(skeletonHorde);
 
-        exportable.setInspectionList(input.getInspectionList());
+        exportable.setInspectionList(inspectionHorde);
 
-        exportable.setFeeList(input.getFeeList());
+        exportable.setFeeList(feeHorde);
 
         exportable.setPaymentList(input.getPaymentList());
 

@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -31,9 +30,9 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle implements Seria
     
     private OccPeriod bundledPeriod;
     private List<PublicInfoBundlePerson> personList;
-    private List<OccInspection> inspectionList; //TODO: Make bundle
-    private List<MoneyOccPeriodFeeAssigned> feeList; //TODO: Make bundle
-    private List<MoneyOccPeriodFeePayment> paymentList; //TODO: Make bundle
+    private List<PublicInfoBundleOccInspection> inspectionList;
+    private List<PublicInfoBundleFeeAssigned> feeList; //TODO: Make bundle
+    private List<PublicInfoBundlePayment> paymentList; //TODO: Make bundle
     
     public void setBundledPeriod(OccPeriod input) {
         
@@ -73,27 +72,27 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle implements Seria
         this.personList = personList;
     }
 
-    public List<OccInspection> getInspectionList() {
+    public List<PublicInfoBundleOccInspection> getInspectionList() {
         return inspectionList;
     }
 
-    public void setInspectionList(List<OccInspection> inspectionList) {
+    public void setInspectionList(List<PublicInfoBundleOccInspection> inspectionList) {
         this.inspectionList = inspectionList;
     }
 
-    public List<MoneyOccPeriodFeeAssigned> getFeeList() {
+    public List<PublicInfoBundleFeeAssigned> getFeeList() {
         return feeList;
     }
 
-    public void setFeeList(List<MoneyOccPeriodFeeAssigned> feeList) {
+    public void setFeeList(List<PublicInfoBundleFeeAssigned> feeList) {
         this.feeList = feeList;
     }
 
-    public List<MoneyOccPeriodFeePayment> getPaymentList() {
+    public List<PublicInfoBundlePayment> getPaymentList() {
         return paymentList;
     }
 
-    public void setPaymentList(List<MoneyOccPeriodFeePayment> paymentList) {
+    public void setPaymentList(List<PublicInfoBundlePayment> paymentList) {
         this.paymentList = paymentList;
     }
     
