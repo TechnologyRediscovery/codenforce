@@ -118,6 +118,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             }
 
             pib.setShowAddMessageButton(false);
+            pib.setPaccStatusMessage("Public access enabled");
 
         } else {
 
@@ -144,26 +145,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setBundledRequest(req);
             pib.setPaccStatusMessage("Public access enabled");
-            pib.setAddressAssociated(!req.getNotAtAddress());
-            if (!req.getNotAtAddress()) {
-                pib.setPropertyAddress(req.getRequestProperty().getAddress());
-            }
-
-            // there's no case manager to attach to an unlinked action request
-            // TODO: populate from text file
+            
             pib.setTypeName("Code enforcement action request");
 
-            pib.setActionRequestorFLname(req.getRequestor().getFirstName()
-                    + " " + req.getRequestor().getLastName());
-
-//            pib.setIssueTypeString(req.getIssueTypeString());
-            if (req.getCaseID() == 0) {
-                pib.setCaseLinkStatus("Request not linked to a code enforcement case");
-                pib.setLinkedToCase(false);
-            } else {
-                pib.setCaseLinkStatus("Connected to case ID " + String.valueOf(req.getCaseID()));
-                pib.setLinkedToCase(true);
-            }
 
             pib.setShowAddMessageButton(true);
             pib.setShowDetailsPageButton(false);
@@ -192,8 +176,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledPerson(input);
 
             pib.setTypeName("Person");
-
-            pib.setDateOfRecord(getPrettyDate(input.getCreationTimeStamp()));
+            pib.setPaccStatusMessage("Public access enabled");
 
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
@@ -216,14 +199,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledProperty(input);
 
             pib.setTypeName("Property");
-
-            pib.setDateOfRecord(getPrettyDate(input.getCreationTS()));
-
-            pib.setAddressAssociated(true);
-
-            pib.setPropertyAddress(input.getAddress());
-
-            pib.setMuni(input.getMuni());
+            pib.setPaccStatusMessage("Public access enabled");
 
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
@@ -248,6 +224,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledPeriod(input);
 
             pib.setTypeName("OccPeriod");
+            pib.setPaccStatusMessage("Public access enabled");
 
             ArrayList<PublicInfoBundlePerson> bundledPersons = new ArrayList<>();
 
@@ -277,13 +254,35 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
     /**
      * Converts a bundled property to an unbundled property. TODO: see if this
-     * needs to be updated.
-     *
+     * needs to be updated. When this JavaDoc was written, checking for changes was not necessary.
+     * 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @param input
      * @return
-     */
-    public Property export(PublicInfoBundleProperty input) {
 
+     */
+    public Property export(PublicInfoBundleProperty input) throws IntegrationException {
+
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        Property unbundled = input.getBundledProperty();
+        Property exportable = pc.getProperty(unbundled.getPropertyID());
+        
+        exportable.setAddress(unbundled.getAddress());
+        exportable.setStatus(unbundled.getStatus());
+        exportable.setMuni(unbundled.getMuni());
+        exportable.setParID(unbundled.getParID());
+        exportable.setLotAndBlock(unbundled.getLotAndBlock());
+        exportable.setUseGroup(unbundled.getUseGroup());
+        exportable.setConstructionType(unbundled.getConstructionType());
+        exportable.setCountyCode(unbundled.getCountyCode());
+        exportable.setAddress_city(unbundled.getAddress_city());
+        exportable.setAddress_state(unbundled.getAddress_state());
+        exportable.setAddress_zip(unbundled.getAddress_zip());
+        exportable.setOwnerCode(unbundled.getOwnerCode());
+        exportable.setPropclass(unbundled.getPropclass());
+        exportable.setUseType(unbundled.getUseType());
+        
         return input.getBundledProperty();
 
     }

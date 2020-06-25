@@ -37,8 +37,6 @@ public class PublicInfoBundlePerson extends PublicInfoBundle implements Serializ
         
         input.setCreationTimeStamp(LocalDateTime.MIN);
         
-        input.setBusinessEntity(false);
-        
         input.setJobTitle("*****");
         
         input.setUseSeparateMailingAddress(false);
@@ -82,9 +80,7 @@ public class PublicInfoBundlePerson extends PublicInfoBundle implements Serializ
     
     @Override
     public String toString(){
-        StringBuilder sb = new StringBuilder();
-        //TODO: Figure out what to do here - not sure if we are still doing the html thing
-        return sb.toString();
+        return this.getClass().getName() + bundledPerson.getPersonID();
     }
     
     public Person getBundledPerson() {

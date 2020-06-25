@@ -31,6 +31,11 @@ public class PublicInfoBundleProperty extends PublicInfoBundle implements Serial
 
     public void setBundledProperty(Property input) {
         
+        
+        setMuni(input.getMuni());
+        setPropertyAddress(input.getAddress());
+        setAddressAssociated(!input.isNonAddressable());
+        
         input.setMuniCode(0);
         input.setNotes("*****");
         
@@ -55,10 +60,6 @@ public class PublicInfoBundleProperty extends PublicInfoBundle implements Serial
         input.setVacantBy(new User());
         input.setCondition(new IntensityClass());
         
-        input.setLandBankProspect(new IntensityClass());
-        input.setLandBankHeld(false);
-        input.setNonAddressable(false);
-        
         input.setSaleYear(0);
         input.setSalePrice(0);
         input.setLandValue(0);
@@ -75,8 +76,7 @@ public class PublicInfoBundleProperty extends PublicInfoBundle implements Serial
     @Override
     public String toString(){
         
-        
-        return "";
+        return this.getClass().getName() + bundledProperty.getPropertyID();
     }
 
     public Property getBundledProperty() {

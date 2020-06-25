@@ -29,12 +29,11 @@ import java.util.List;
 public class PublicInfoBundleOccPeriod extends PublicInfoBundle implements Serializable {
 
     
-    //TODO: check to see what fields need to be here, and if we need to make public info bundles of them.
     private OccPeriod bundledPeriod;
     private List<PublicInfoBundlePerson> personList;
-    private List<OccInspection> inspectionList;
-    private List<MoneyOccPeriodFeeAssigned> feeList;
-    private List<MoneyOccPeriodFeePayment> paymentList;
+    private List<OccInspection> inspectionList; //TODO: Make bundle
+    private List<MoneyOccPeriodFeeAssigned> feeList; //TODO: Make bundle
+    private List<MoneyOccPeriodFeePayment> paymentList; //TODO: Make bundle
     
     public void setBundledPeriod(OccPeriod input) {
         
@@ -51,10 +50,6 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle implements Seria
         input.setStartDateCertifiedBy(new User());
         input.setEndDateCertifiedTS(LocalDateTime.MIN);
         input.setEndDateCertifiedBy(new User());
-        
-        input.setAuthorizedTS(LocalDateTime.MIN);
-        input.setAuthorizedBy(new User());
-        
         input.setNotes("*****");
         
         bundledPeriod = input;
@@ -63,7 +58,7 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle implements Seria
     @Override
     public String toString() {
 
-        return "";
+        return this.getClass().getName() + bundledPeriod.getPeriodID();
     }
 
     public OccPeriod getBundledPeriod() {

@@ -32,7 +32,11 @@ public abstract class PublicInfoBundle {
 
     
     @Override
-    public abstract String toString();
+    public String toString(){
+        
+        return this.getClass().getName();
+        
+    }
     
     /**
      * @return the addressAssociated
