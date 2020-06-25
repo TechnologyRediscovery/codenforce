@@ -18,6 +18,8 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -126,9 +128,6 @@ public class    PropertyUnit
     public String getOtherKnownAddress() {
         return otherKnownAddress;
     }
-
-
-    /**
   
    
     /**
@@ -152,6 +151,31 @@ public class    PropertyUnit
         return rentalIntentLastUpdatedBy;
     }
 
+     /**
+     * @return the rentalIntentDateStart
+     */
+    public Date getRentalIntentDateStartUtil() {
+        Date rentalIntentDateStartUtil = null;
+        if(rentalIntentDateStart != null){
+            rentalIntentDateStartUtil = Date.from(rentalIntentDateStart.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        
+        return rentalIntentDateStartUtil;
+    }
+
+    /**
+     * @return the rentalIntentDateStop
+     */
+    public Date getRentalIntentDateStopUtil() {
+        Date rentalIntentDateStopUtil = null;
+        if(rentalIntentDateStart != null){
+            rentalIntentDateStopUtil = Date.from(rentalIntentDateStop.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        
+        return rentalIntentDateStopUtil;
+        
+    }
+    
     /**
      * @return the rentalNotes
      */
@@ -185,6 +209,29 @@ public class    PropertyUnit
      */
     public void setRentalIntentDateStop(LocalDateTime rentalIntentDateStop) {
         this.rentalIntentDateStop = rentalIntentDateStop;
+    }
+    
+    /**
+     * @param rentalIntentDateStart the rentalIntentDateStart to set
+     */
+    public void setRentalIntentDateStartUtil(Date rentalIntentDateStart) {
+        if(rentalIntentDateStart != null){
+            this.rentalIntentDateStart = rentalIntentDateStart.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else {
+            this.rentalIntentDateStart = null;
+        }
+        
+    }
+
+    /**
+     * @param rentalIntentDateStop the rentalIntentDateStop to set
+     */
+    public void setRentalIntentDateStopUtil(Date rentalIntentDateStop) {
+        if(rentalIntentDateStop != null){
+        this.rentalIntentDateStop = rentalIntentDateStop.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else {
+            this.rentalIntentDateStop = null;
+        }
     }
 
     /**

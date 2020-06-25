@@ -1077,23 +1077,64 @@
                                     </p:cellEditor>
                                 </p:column>
 
+                                    <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Rental Intent Date Start:" />
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{unit.rentalIntentDateStart}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:calendar
+                                                value="#{unit.rentalIntentDateStart}"
+                                                mode="popup"
+                                                showOn="button"
+                                                pattern="EEE, dd MMM, yyyy"
+                                                navigator="true"
+                                                showButtonPanel="true"
+                                                showTodayButton="false"
+                                                required="false"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="Rental?" />
+                                        <h:outputText value="Unit Intent Date End:" />
                                     </f:facet>
-
-                                    <ui:remove>
-
-                                        <p:cellEditor>
-                                            <f:facet name="output">
-                                                <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
-                                            </f:facet>
-                                            <f:facet name="input"> 
-                                                <h:selectBooleanCheckbox value="#{unit.rental}"/> 
-                                            </f:facet>
-                                        </p:cellEditor>
-
-                                    </ui:remove>
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{unit.rentalIntentDateStop}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:calendar
+                                                value="#{unit.rentalIntentDateStop}"
+                                                mode="popup"
+                                                showOn="button"
+                                                pattern="EEE, dd MMM, yyyy"
+                                                navigator="true"
+                                                showButtonPanel="true"
+                                                showTodayButton="false"
+                                                required="false"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Rental Notes:" />
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{unit.rentalNotes}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{unit.rentalNotes}" 
+                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                        </f:facet>
+                                    </p:cellEditor>
                                 </p:column>
 
                                 <p:column>

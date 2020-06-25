@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Person info</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="pers-info-view">
+
+                    <div class="mainContainer">
+
+                        <!--Global Messages-->
+                        <h:form id="pers-info-messages-form">
+                            <p:messages id="pers-info-messages" globalOnly="true" showDetail="true" showSummary="true" />
+                        </h:form>
+
+                        <p:panel id="pers-info-panel"
+                                 toggleable="true"
+                                 widgetVar="pers-info-panel-var"
+                                 collapsed="false"
+                                 header="Person Information">
+
+                            <h:form id="selected-person-info-form">
+
+                                <!--Grid CSS From Primefaces-->
+                                <div class="ui-g data-container">
+
+                                    <!--Data Table Header (e.g. User Name)-->
+                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
+                                        <h:outputLabel styleClass="data_table_header" 
+                                                       value="Table Header" />
+                                    </div>
+
+                                    <!--Data Table Edit Button-->
+                                    <div class="ui-g-12 ui-md-3 ui-lg-3 data_field">
+                                        <p:commandButton styleClass="data_edit_button"
+                                                         value="Edit" 
+                                                         ajax="true"
+                                                         oncomplete="PF('example-dialog-var').show()"
+                                                         update="edit-dialog-form"
+                                                         />
+                                    </div>
+
+                                    <!--Data Field Label And Value-->
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Sample Label"/>
+                                        <h:outputText styleClass="data_field_value" value="Sample Value"/>
+                                    </div>
+
+                                    <!--Data Field Label And Value-->
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Sample Label"/>
+                                        <h:outputText styleClass="data_field_value" value="Sample Value"/>
+                                    </div>
+
+                                    <!--Data Field Label And Value-->
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Sample Label"/>
+                                        <h:outputText styleClass="data_field_value" value="Sample Value"/>
+                                    </div>
+
+                                    <!--Data Field Label And Value-->
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Sample Label"/>
+                                        <h:outputText styleClass="data_field_value" value="Sample Value"/>
+                                    </div>
+
+                                    <!--Data Field Label And Value-->
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Sample Label"/>
+                                        <h:outputText styleClass="data_field_value" value="Sample Value"/>
+                                    </div>
+
+                                </div>
+
+                            </h:form>
+
+                        </p:panel>
+
+                    </div>
+
+                    <!--Edit Dialog-->
+                    <p:dialog header="Edit"
+                              id="example-dialog"
+                              height="550px" width="50%"
+                              widgetVar="example-dialog-var"
+                              closable="true" 
+                              resizable="false"
+                              responsive="true"
+                              modal="true"
+                              >
+
+                        <h:form id="edit-dialog-form">
+
+                            <!--Grid CSS From Primefaces-->
+                            <div class="ui-g data-container">
+
+                                <!--Edit Dialog Table Header (e.g. Person Name | Last Updated Time)-->
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                    <h:outputLabel styleClass="data_table_header" value="PERSON: #{personInfoBB.currPerson.firstName} #{personInfoBB.currPerson.lastName} | ID: #{personInfoBB.currPerson.personID}" />
+                                    <p>This record was last updated on: <h:outputText id="pers-form-lastupdated" value="#{personInfoBB.workingPerson.lastUpdatedPretty}"/></p>
+                                </div>
+
+                                <!--Global Messages Within Edit Dialog-->
+                                <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
+
+                                <!--Edit Dialog Select Boolean Check Box-->
+                                <div class="ui-g-12 ui-md-12 ui-lg-4 data_field">
+                                    <h:outputLabel styleClass="data_field_label" value="Sample?" for="sample-checkbox"/>
+                                    <p:selectBooleanCheckbox id="sample-checkbox" 
+                                                             value="#{personInfoBB.workingPerson.active}" 
+                                                             tabindex="1"
+                                                             />
+                                    <p:message for="sample-checkbox" showDetail="false" showSummary="true" style="width: 100%"/>
+                                </div>
+
+                                <!--Edit Dialog Input text-->
+                                <div class="ui-g-12 ui-md-12 ui-lg-4 data_field">
+                                    <h:outputLabel styleClass="data_field_label" value="Sample" for="sample-inputtext"/>
+                                    <p:inputText id="sample-inputtext" 
+                                                 required="true"
+                                                 value="#{personInfoBB.workingPerson.firstName}" 
+                                                 tabindex="2"
+                                                 />
+                                    <p:message for="sample-inputtext" showDetail="false" showSummary="true" style="width: 100%"/>
+                                </div>
+
+                                <!--Edit Dialog calendar-->
+                                <div class="ui-g-12 ui-md-12 ui-lg-4 data_field">
+                                    <h:outputLabel styleClass="data_field_label" value="Expiry Date" for="sample-calendar"/>
+                                    <p:calendar id="sample-calendar"
+                                                mode="popup"  
+                                                pattern="EEE, dd MMM, yyyy"
+                                                navigator="true" 
+                                                timeInput="true" 
+                                                showHour="false" 
+                                                showMinute="false" 
+                                                showSecond="false" 
+                                                showMillisec="false"
+                                                showButtonPanel="true" 
+                                                showTodayButton="false"
+                                                required="false"
+                                                value="#{personInfoBB.workingPerson.expiryDateUtilDate}"
+                                                tabindex="3" 
+                                                />
+
+                                    <p:message for="sample-calendar" showDetail="false" showSummary="true" style="width: 100%"/>
+                                </div>
+
+                            </div>
+
+                            <!--Edit Dialog button-->
+                            <p:commandButton id="cancel-cb"
+                                             ajax="true"  
+                                             tabindex="27"
+                                             value="Cancel" 
+                                             immediate="true"
+                                             onclick="PF('example-dialog-var').hide()"
+                                             />
+
+                            <p:commandButton id="new-person-cb" 
+                                             ajax="false"
+                                             value="Update" 
+                                             oncomplete="PF('example-dialog-var').hide()"
+                                             />
+                        </h:form>
+
+                    </p:dialog>
+
+                </f:view>
+
+            </ui:define>
+
+        </ui:composition>
+
+    </h:body>
+
+</html>
+
+
