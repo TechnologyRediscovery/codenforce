@@ -235,7 +235,7 @@
                                                  value="Cancel" icon="fa fa-stop" 
                                                  onclick="PF('add-event-dialog-var').hide()"/>
 
-                                <p:commandButton ajax="true" actionListener="#{eventsBB.attachEventToCase}"
+                                <p:commandButton ajax="true" actionListener="#{eventsBB.enactEvent}"
                                                  value="Create new event" icon="fa fa-plus"
                                                  oncomplete="PF('add-event-dialog-var').hide()"
                                                  disabled="#{!(eventsBB.currentEvent.eventID == 0)}"

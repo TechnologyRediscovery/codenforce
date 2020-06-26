@@ -20,27 +20,23 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
-import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -54,9 +50,7 @@ import javax.faces.event.ActionEvent;
 public class EventsBB extends BackingBeanUtils implements Serializable{
     
     private EventDomainEnum currentEventDomain;
-    
     private IFace_EventRuleGoverned currentERGBOb;
-    
     private EventCnF currentEvent;
     
     private List<EventCnF> eventList;
@@ -65,20 +59,16 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     private List<ViewOptionsActiveHiddenListsEnum> eventsViewOptionsCandidates;
     private ViewOptionsActiveHiddenListsEnum selectedEventView;
     
+    protected Map<EventType, List<EventCategory>> typeCatMap;
+    
     private List<EventType> eventTypeCandidates;
     private EventType eventTypeSelected;
     
     private List<EventCategory> eventCategoryCandidates;
     private EventCategory eventCategorySelected;
     
-    // used during event edits
     private List<Person> personCandidates;
     private Person personSelected;
-    
-    // unknown use
-    private EventCnF triggeringEventForProposal;
-    
-    
   
     /**
      * Creates a new instance of EventsBB
@@ -104,7 +94,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         SessionBean sb = getSessionBean();
         
         eventsViewOptionsCandidates = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
-        
         selectedEventView = ec.determineDefaultEventView(sb.getSessUser());
         
         eventList = new ArrayList<>();
@@ -135,25 +124,25 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
             default:
                 eventList.addAll(sb.getSessEventList());
                 currentERGBOb = (IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH());
-                
         }
         
         personCandidates = new ArrayList<>();
         personCandidates.addAll(getSessionBean().getSessPersonList());
         
-        eventTypeCandidates = ec.determinePermittedEventTypes(domain, currentERGBOb, sb.getSessUser());
+        typeCatMap = ec.assembleEventTypeCatMap_toEnact(currentEventDomain, currentERGBOb, getSessionBean().getSessUser());
+        
+        eventTypeCandidates = new ArrayList<>(typeCatMap.keySet());
         eventCategoryCandidates = new ArrayList<>();
+        
         if(eventTypeCandidates != null && !eventTypeCandidates.isEmpty()){
             eventTypeSelected = eventTypeCandidates.get(0);
-            eventCategoryCandidates = ec.determinePermittedEventCategories(eventTypeSelected, sb.getSessUser());
+            eventCategoryCandidates = typeCatMap.get(eventTypeSelected) ;
         }
-        
-
     }
     
     
      /**
-     * Called when the user selects their own EventCategory to add to the case
+     * Actionlistener Called when the user selects their own EventCategory to add to the case
      * and is a pass-through method to the initiateNewEvent method
      *
      * @param ev
@@ -180,11 +169,21 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         EventCoordinator ec = getEventCoordinator();
         
         EventCnF ev = null;
-        if (getEventCategorySelected() != null) {
+        if (eventTypeSelected != null && eventCategorySelected != null ) {
+            
             try {
-                ev = ec.initEvent(getCurrentCase(), getEventCategorySelected());
-                ev.setDiscloseToMunicipality(true);
-                ev.setDiscloseToPublic(false);
+                ev = ec.initEvent(currentERGBOb, getEventCategorySelected());
+                ev.setCategory(eventCategorySelected);
+                switch(currentEventDomain){
+                    case CODE_ENFORCEMENT:
+                        ev.setCeCaseID(currentERGBOb.getBObID());
+                        break;
+                    case OCCUPANCY:
+                        ev.setOccPeriodID(currentERGBOb.getBObID());
+                        break;
+                }
+                ev.setUserCreator(getSessionBean().getSessUser());
+                
             } catch (BObStatusException | EventException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -195,56 +194,42 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select an event category to create a new event.", ""));
         }
+        currentEvent = ev;
     }
 
     /**
      * All Code Enforcement case events are funneled through this method which
      * has to carry out a number of checks based on the type of event being
      * created. The event is then passed to the addEvent_processForCECaseDomain on the
- CaseCoordinator who will do some more checking about the event before
- writing it to the DB
+     * CaseCoordinator who will do some more checking about the event before
+     * writing it to the DB
      *
      * @param ev unused
      * @throws ViolationException
      */
-    public void attachEventToCase(ActionEvent ev) throws ViolationException {
+    public void addNewEvent(ActionEvent ev) throws ViolationException {
         EventCoordinator ec = getEventCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
-
+        List<EventCnF> evDoneList = null;
+            
         // category is already set from initialization sequence
-        currentEvent.setCeCaseID(getCurrentCase().getCaseID());
-        currentEvent.setUserCreator(getSessionBean().getSessUser());
+
         try {
-        
-         
-            // main entry point for handing the new event off to the CaseCoordinator
-            // only the compliance events need to pass in another object--the violation
-            // otherwise just the case and the event go to the coordinator
-            if (currentEvent.getCategory().getEventType() == EventType.Compliance) {
-//                currentEvent.setEventID(cc.addEvent_processForCECaseDomain(getCurrentCase(), currentEvent, selectedViolation));
-            } else {
-                currentEvent.setEventID(cc.addEvent_processForCECaseDomain(getCurrentCase(), currentEvent, null));
-            }
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully logged event with an ID " + currentEvent.getEventID(), ""));
+            
+            evDoneList = ec.addEvent(currentEvent, currentERGBOb, getSessionBean().getSessUser());
 
-            // now update the triggering event with the newly inserted event's ID
-            // (We saved the triggering event when the take action button was clicked, before the event
-            // add dialog was displayed and event-specific data is entered by the user
-            if (getTriggeringEventForProposal() != null) {
-//                triggeringEventForProposal.getEventProposalImplementation().setResponseEvent(selectedEvent);
-//                triggeringEventForProposal.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
-//                ec.logResponseToActionRequest(triggeringEventForProposal);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Updated triggering event ID + "
-                                + getTriggeringEventForProposal().getEventID()
-                                + " with response info!", ""));
-                // reset our holding var since we're done processing the event
-                setTriggeringEventForProposal(null);
+            if(evDoneList != null && !evDoneList.isEmpty()){
+                for(EventCnF evt: evDoneList){
+                    
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                    "Successfully logged event with an ID " + evt.getEventID() + " ", ""));
+                }
+                currentEvent = evDoneList.get(0);
+
             }
 
+    
         } catch (IntegrationException | BObStatusException | EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -256,8 +241,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         // nullify the session's case so that the reload of currentCase
         // no the cecaseProfile.xhtml will trigger a new DB read
     }
-    
-    
   
     /**
      * Listener method for changes in EventType selected by User
@@ -266,10 +249,18 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         EventCoordinator ec = getEventCoordinator();
         if(eventTypeSelected != null){
             eventCategoryCandidates.clear();
-            eventCategoryCandidates.addAll(ec.determinePermittedEventCategories(eventTypeSelected, getSessionBean().getSessUser()));
+            eventCategoryCandidates.addAll(typeCatMap.get(eventTypeSelected));
         }
     }
     
+    /**
+     * Toggles the hidden property on an EventCnF object to true
+     * Remember: Hidden/notHidden is a JavaLand property only
+     * for the decluttering of lists of events and has no
+     * reflected field in the database
+     * 
+     * @param event 
+     */
      public void hideEvent(EventCnF event){
         EventIntegrator ei = getEventIntegrator();
         event.setHidden(true);
@@ -286,6 +277,13 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+     /**
+      * Toggles the hidden property on the given event object to false
+      * Remember: Hidden/notHidden is a JavaLand property only
+      * for the decluttering of lists of events and has no
+      * reflected field in the database
+      * @param event 
+      */
     public void unHideEvent(EventCnF event){
         EventIntegrator ei = getEventIntegrator();
         event.setHidden(false);
@@ -329,9 +327,13 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
 
     }
 
+    /**
+     * Listener method for adding the selected person to a queue
+     * @param ev 
+     */
     public void queueSelectedPerson(ActionEvent ev) {
         if (getPersonSelected() != null) {
-            currentEvent.getPersonList().add(getPersonSelected());
+            currentEvent.getPersonList().add(personSelected);
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -421,19 +423,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         this.currentEvent = currentEvent;
     }
 
-    /**
-     * @return the triggeringEventForProposal
-     */
-    public EventCnF getTriggeringEventForProposal() {
-        return triggeringEventForProposal;
-    }
-
-    /**
-     * @param triggeringEventForProposal the triggeringEventForProposal to set
-     */
-    public void setTriggeringEventForProposal(EventCnF triggeringEventForProposal) {
-        this.triggeringEventForProposal = triggeringEventForProposal;
-    }
+    
 
     /**
      * @return the personSelected
@@ -549,7 +539,5 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     public void setEventList(List<EventCnF> eventList) {
         this.eventList = eventList;
     }
-    
-    
 
 }

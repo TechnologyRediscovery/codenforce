@@ -30,11 +30,8 @@ public class CodeViolationDisplayable extends CodeViolation {
         this.description = cv.description;
         this.notes = cv.notes;
         this.dateOfCitation = cv.dateOfCitation;
-        this.dateOfCitationPretty = cv.dateOfCitationPretty;
         this.citationIDList = cv.citationIDList;
-        this.citationListAsString = cv.citationListAsString;
         this.noticeIDList = cv.noticeIDList;
-        this.noticeIDListAsString = cv.noticeIDListAsString;
         this.dateOfRecord = cv.dateOfRecord;
         this.dateOfRecordUtilDate = cv.dateOfRecordUtilDate;
         this.dateOfRecordPretty = cv.dateOfRecordPretty;

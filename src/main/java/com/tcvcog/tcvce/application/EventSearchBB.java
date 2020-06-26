@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -34,6 +35,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -66,14 +68,15 @@ public class EventSearchBB
     
     private ReportConfigCEEventList reportConfig;
     
-    private List<PropertyUseType> putList;
+    private List<PropertyUseType> propUseTypeList;
+    protected Map<EventType, List<EventCategory>> typeCatMap;
     
     
     @PostConstruct
     public void initBean() {
         EventCoordinator ec = getEventCoordinator();
         SessionBean sb = getSessionBean();
-        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
        
         queryList = sc.buildQueryEventList(getSessionBean().getSessUser().getMyCredential());
@@ -87,13 +90,12 @@ public class EventSearchBB
             eventList = new ArrayList<>();
         }
         
-        eventTypeList = ec.getEventTypesAll();
-        try {
-            eventCategoryList = ec.assembleEventCategoryListActiveOnly();
-            putList = pi.getPropertyUseTypeList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+        typeCatMap = ec.assembleEventTypeCatMap_toView(getSessionBean().getSessUser());
+        
+        eventTypeList = new ArrayList(getTypeCatMap().keySet());
+        eventCategoryList = typeCatMap.get(eventTypeList.get(0));
+        
+        propUseTypeList = pc.getPropertyUseTypeList();
         
         setAppendResultsToList(false);
         
@@ -229,7 +231,7 @@ public class EventSearchBB
        if(eventList != null && eventList.size() > 0){
            
             EventCoordinator ec = getEventCoordinator();
-            reportConfig = ec.getDefaultReportConfigCEEventList();
+            reportConfig = ec.initDefaultReportConfigEventList();
             reportConfig.setMuni(getSessionBean().getSessMuni());
             reportConfig.setCreator(getSessionBean().getSessUser());
             if(querySelected != null){
@@ -493,17 +495,31 @@ public class EventSearchBB
     }
 
     /**
-     * @return the putList
+     * @return the propUseTypeList
      */
-    public List<PropertyUseType> getPutList() {
-        return putList;
+    public List<PropertyUseType> getPropUseTypeList() {
+        return propUseTypeList;
     }
 
     /**
-     * @param putList the putList to set
+     * @param propUseTypeList the propUseTypeList to set
      */
-    public void setPutList(List<PropertyUseType> putList) {
-        this.putList = putList;
+    public void setPropUseTypeList(List<PropertyUseType> propUseTypeList) {
+        this.propUseTypeList = propUseTypeList;
+    }
+
+    /**
+     * @return the typeCatMap
+     */
+    public Map<EventType, List<EventCategory>> getTypeCatMap() {
+        return typeCatMap;
+    }
+
+    /**
+     * @param typeCatMap the typeCatMap to set
+     */
+    public void setTypeCatMap(Map<EventType, List<EventCategory>> typeCatMap) {
+        this.typeCatMap = typeCatMap;
     }
     
 }

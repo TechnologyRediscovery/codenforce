@@ -23,7 +23,6 @@ import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.ChoiceEventCat;
 import com.tcvcog.tcvce.entities.Directive;
@@ -48,7 +47,6 @@ import java.util.List;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 /**
  * A Choice is given to the user in a Directive and can take one of the
@@ -331,7 +329,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             prop.setGeneratingEvent(ec.getEvent(rs.getInt("generatingevent_eventid")));
         }
         if(rs.getInt("responseevent_eventid") != 0){
-            prop.setResponseEvent(ec.getEvent(rs.getInt("responseevent_eventid")));
+            prop.setEvaluationEvent(ec.getEvent(rs.getInt("responseevent_eventid")));
         }
                
         prop.setInitiator(uc.getUser(rs.getInt("initiator_userid")));
@@ -427,10 +425,10 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
                 stmt.setNull(9, java.sql.Types.NULL);
             }
             
-            ev = prop.getResponseEvent();
+            ev = prop.getEvaluationEvent();
             
             if(ev != null){
-                stmt.setInt(10, prop.getResponseEvent().getEventID());
+                stmt.setInt(10, prop.getEvaluationEvent().getEventID());
             } else {
                 stmt.setNull(10, java.sql.Types.NULL);
             }
@@ -442,7 +440,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             ev = prop.getGeneratingEvent();
             
             if(ev != null){
-                stmt.setInt(14, prop.getResponseEvent().getEventID());
+                stmt.setInt(14, prop.getEvaluationEvent().getEventID());
             } else {
                 stmt.setNull(14, java.sql.Types.NULL);
             }
@@ -675,7 +673,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
                 stmt.setInt(4, pop.getHostObjectID());
             } 
             
-            stmt.setInt(5, p.getResponseEvent().getEventID());
+            stmt.setInt(5, p.getEvaluationEvent().getEventID());
 //            stmt.setBoolean(6, p.isHidden());
             stmt.setInt(6, p.getProposalID());
             
@@ -755,9 +753,9 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             } else {
                 stmt.setNull(9, java.sql.Types.NULL);
             }
-            ev = prop.getResponseEvent();
+            ev = prop.getEvaluationEvent();
             if(ev != null){
-                stmt.setInt(10, prop.getResponseEvent().getEventID());
+                stmt.setInt(10, prop.getEvaluationEvent().getEventID());
                 stmt.setNull(15, java.sql.Types.NULL);
             }
             stmt.setBoolean(11, prop.isActive());

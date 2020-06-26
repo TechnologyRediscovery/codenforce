@@ -56,8 +56,6 @@ public  class   EventCnFPropUnitCasePeriodHeavy
         this.lastUpdatedBy = ev.getLastUpdatedBy();
         this.lastUpdatedTS = ev.getLastUpdatedTS();
         
-        this.userTarget = ev.getUserTarget();
-        
         this.active = ev.isActive();
         this.hidden = ev.isHidden();
         

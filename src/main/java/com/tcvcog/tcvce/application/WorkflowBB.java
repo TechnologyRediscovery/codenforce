@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
@@ -25,6 +26,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Choice;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
@@ -34,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import org.omg.CORBA.CurrentHolder;
 
 /**
  *
@@ -107,18 +110,37 @@ public class WorkflowBB extends BackingBeanUtils implements Serializable{
      */
     public void proposals_makeChoice(Choice choice, Proposal p){
         WorkflowCoordinator wc = getWorkflowCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        List<EventCnF> evDoneList = null;
+        StringBuilder sb = new StringBuilder();
+        
         try {
-                wc.evaluateProposal(p, choice, currentERG, getSessionBean().getSessUser());
-                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
-                
-            } catch (EventException | AuthorizationException | BObStatusException | IntegrationException | ViolationException ex) {
+            evDoneList = wc.evaluateProposal(p, choice, currentERG, getSessionBean().getSessUser());
+            if(evDoneList != null && !evDoneList.isEmpty()){
+                sb.append("Upon ");
+                sb.append(String.valueOf(p.getProposalID()));
+                sb.append(" the following events were added to ");
+                sb.append(currentERG.discloseEventDomain().getTitle());
+                sb.append(" With ID: " );
+                sb.append(currentERG.getBObID());
+                sb.append(": ");
+            }
+            sb.append(ec.buildEventInfoMessage(evDoneList));
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                sb.toString(), ""));
+            } catch (BObStatusException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 ex.getMessage(), ""));
         }
     }    
     
+    /**
+     * Passes the task of removing previous proposal evaluation to the
+     * WorkflowCoordinator
+     * @param p 
+     */
     public void proposals_clearProposal(Proposal p){
         WorkflowCoordinator cc = getWorkflowCoordinator();
          System.out.println("OccInspectionBB.clearChoice");

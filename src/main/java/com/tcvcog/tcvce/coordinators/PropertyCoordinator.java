@@ -36,6 +36,7 @@ import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
+import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
@@ -208,22 +209,22 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * Logic container for checking the existence of a property info case on a given property and 
      * if none exists creating one.
      * @param p
-     * @param cred
+     * @param ua
      * @return 
      */
-    public PropertyDataHeavy configurePDHInfoCase(PropertyDataHeavy p, Credential cred){
+    public PropertyDataHeavy configurePDHInfoCase(PropertyDataHeavy p, UserAuthorized ua){
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CECase cse = null;
         try {
-            cse = cc.initCECase(p, uc.getUser(cred.getGoverningAuthPeriod().getUserID()));
+            cse = cc.initCECase(p, uc.getUser(ua.getKeyCard().getGoverningAuthPeriod().getUserID()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        //review all case mems and set app ones for info case
         try {
-            //review all case mems and set app ones for info case
-            cc.insertNewCECase(cse, cred, null);
-        } catch (IntegrationException | BObStatusException | ViolationException | EventException ex) {
+            cc.insertNewCECase(cse, ua, null);
+        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
             System.out.println(ex);
         }
         return p;
@@ -346,17 +347,46 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
     }
     
+    /**
+     * Logic intermediary for retrieval of a PropertyUnit by id
+     * @param unitID
+     * @return
+     * @throws IntegrationException 
+     */
     public PropertyUnit getPropertyUnit(int unitID) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnit(unitID);
         
     }
     
+    
+    /**
+     * Utility method for extracting a Property from a Unit id
+     * @param unitID
+     * @return
+     * @throws IntegrationException 
+     */
     public Property getPropertyByPropUnitID(int unitID) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnitWithProp(unitID).getProperty();
     }
     
+    /**
+     * Logic intermediary for extracting a complete list of PropertyUseType
+     * objects from the DB
+     * @return 
+     */
+    public List<PropertyUseType> getPropertyUseTypeList(){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        List<PropertyUseType> putList = null;
+        try {
+            putList = pi.getPropertyUseTypeList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        return putList;
+    }
     
     /**
      * Implements a cascade of logic to determine a best suited startup property

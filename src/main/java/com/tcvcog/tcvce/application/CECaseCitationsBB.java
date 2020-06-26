@@ -68,23 +68,6 @@ public class CECaseCitationsBB
         return "citationEdit";
     }
 
-    public String deleteCitation() {
-        if (getSelectedCitation() != null) {
-            CaseCoordinator cc = getCaseCoordinator();
-            try {
-                cc.deleteCitation(getSelectedCitation());
-            } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to delete citation, sorry: "
-                                + "probably because it is linked to another DB entity", ""));
-                System.out.println(ex);
-            }
-        }
-        return "";
-    }
-
-
 
     /**
      * @return the currentCase

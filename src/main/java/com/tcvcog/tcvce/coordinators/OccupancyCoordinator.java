@@ -28,7 +28,6 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
@@ -78,7 +77,6 @@ import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
 
 /**
  * King of all business logic implementation for the entire Occupancy object tree
@@ -910,39 +908,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oii.updateInspectedSpaceElement(oise);
     }
 
-    public void evaluateProposal(Proposal proposal,
-            IFace_Proposable chosen,
-            UserAuthorized u) throws    EventException, 
-                                        AuthorizationException, 
-                                        BObStatusException, 
-                                        IntegrationException {
-        
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        EventCoordinator ec = getEventCoordinator();
-        EventIntegrator ei = getEventIntegrator();
-        
-        EventCnF propEvent = null;
-        
-        int insertedEventID = 0;
-        
-        if (wc.determineProposalEvaluatability(proposal, chosen, u)) {
-            // since we can evaluate this proposal with the chosen Proposable, configure members
-            proposal.setResponderActual(u);
-            proposal.setResponseTS(LocalDateTime.now());
-            proposal.setChosenChoice(chosen);
-
-//            TODO ECD: finish proposal infrastructure
-            // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
-//            propEvent = wc.generateEventDocumentingProposalEvaluation(proposal, chosen, u);
-            // insert the event and grab the new ID
-//            insertedEventID = addEvent_processForOccDomain(occPeriod, propEvent, u);
-            // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
-            proposal.setResponseEvent(ec.getEvent(insertedEventID));
-            wc.recordProposalEvaluation(proposal);
-        } else {
-            throw new BObStatusException("Unable to evaluate proposal due to business rule violation");
-        }
-    }
+  
 
     /**
      * For inter-coordinator processing only! I get called by the EvCoor

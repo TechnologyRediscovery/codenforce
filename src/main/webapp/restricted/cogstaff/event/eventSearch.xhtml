@@ -399,7 +399,7 @@
                                                                         disabled="#{!eventSearchBB.searchParamsSelected.propertyUseType_ctl}">
                                                         <f:selectItem   itemLabel="select a use type..." noSelectionOption="true" itemDisabled="true"/>
                                                         <f:selectItems  id="event-search-filter-usetype-items" 
-                                                                        value="#{eventSearchBB.putList}" 
+                                                                        value="#{eventSearchBB.propUseTypeList}" 
                                                                         var="put" itemValue="#{put}" itemLabel="#{put.name}" />
                                                         <f:converter    converterId="propertyUseTypeConverter"/>
                                                     </p:selectOneMenu>

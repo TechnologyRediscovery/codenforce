@@ -32,9 +32,6 @@ public class        PropertyUnitDataHeavy
     private String credentialSignature;
     
     
-   
-    
-    
     /**
      * Pre-Credential Requiring constructor
      * @param prop 

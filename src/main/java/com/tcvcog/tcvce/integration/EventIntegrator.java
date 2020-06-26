@@ -100,10 +100,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
       /**
+       * 
+       * Generator method for EventCnF objects
      * Legacy note: [Zanda was trippin when he wrote this!]
      * ....And when he revised it for occbeta! 
      *
-     * @param rs
+     * @param rs containing all fields in the event table
      * @param premadeEvent used by event creatino pathways that involve instantiation 
      * at other locations -- somewhat hacky and consider unifying
      * @return
@@ -155,6 +157,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ev;
     }
     
+    /**
+     * Builds a List of EventCnF objects given an ERG, which in June 2020 were
+     * only CECase and OccPeriod objects
+     * @param erg
+     * @return
+     * @throws IntegrationException 
+     */
      public List<EventCnF> getEventList(IFace_EventRuleGoverned erg) throws IntegrationException{
         
      StringBuilder queryStub = new StringBuilder("SELECT eventid FROM public.event WHERE ");
@@ -315,6 +324,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
 
 
+    /**
+     * Updates a record in the event table
+     * @param event
+     * @throws IntegrationException 
+     */
     public void updateEvent(EventCnF event) throws IntegrationException {
         if(event == null) return;
         PersonIntegrator pi = getPersonIntegrator();
@@ -797,6 +811,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return categoryList;
     }
 
+    /**
+     * Creates a new record in the eventcategory table
+     * @param ec
+     * @throws IntegrationException 
+     */
     public void insertEventCategory(EventCategory ec) throws IntegrationException {
 
         String query = "INSERT INTO public.eventcategory(\n" +
@@ -854,6 +873,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
 
+    /**
+     * Updates a singel record in the eventcategory table
+     * @param ec
+     * @throws IntegrationException 
+     */
     public void updateEventCategory(EventCategory ec) throws IntegrationException {
 
         String query =  "UPDATE public.eventcategory\n" +
@@ -910,6 +934,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
 
+    /**
+     * Nukes a single record in the eventcategory table
+     * @param ec
+     * @throws IntegrationException 
+     */
     public void deleteEventCategory(EventCategory ec) throws IntegrationException {
         String query = "DELETE FROM public.eventcategory\n"
                 + " WHERE categoryid = ?;";

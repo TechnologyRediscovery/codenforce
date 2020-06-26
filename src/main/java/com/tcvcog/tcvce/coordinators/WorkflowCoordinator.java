@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Iterator;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.util.ArrayList;
@@ -183,62 +184,183 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     
    /**
      * Pathway for "Evaluating a Proposal" or in other words, making a workflow choice.
-     * The exception list is a beast because so many things happen when such an event occurs.
-     
+     * The exception list is a beast because so many components of the system are impacted
+     * by an event creation.
      * 
-     * @param proposal
-     * @param chosen
-     * @param erg
-     * @param ua
-     * @throws EventException
-     * @throws AuthorizationException
+     * @param proposal containing the chosen choice
+     * @param chosen this method will double check that no funny business is going on
+     * namely a choice is trying to be made that's not in the Proposal
+     * @param erg the parent ERG
+     * @param ua doing the choosing
+     * @return all EventCnFs that are ADDED to the parent ERG during evaluation
+     * which could be more than 1 since the mother ERG will be refreshed
+     * and all rules re-evaluated for each triggered EventCnF, all of which happen
+     * before this method returns
      * @throws BObStatusException
-     * @throws IntegrationException
-     * @throws ViolationException 
      */
-    public void evaluateProposal(   Proposal proposal, 
-                                    IFace_Proposable chosen, 
-                                    IFace_EventRuleGoverned erg, 
-                                    UserAuthorized ua) 
-                            throws  EventException, 
-                                    AuthorizationException, 
-                                    BObStatusException, 
-                                    IntegrationException, 
-                                    ViolationException {
+    public List<EventCnF> evaluateProposal(     Proposal proposal, 
+                                                IFace_Proposable chosen, 
+                                                IFace_EventRuleGoverned erg, 
+                                                UserAuthorized ua) 
+                                        throws  BObStatusException {
         
         WorkflowCoordinator wc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
+        WorkflowIntegrator wi = getWorkflowIntegrator();
         
+        List<EventCnF> propEvDoneList = new ArrayList<>();
         
-        EventCnF propEvent = null;
-        int insertedEventID = 0;
-        if(wc.determineProposalEvaluatability(proposal, chosen, ua)){
-            // since we can evaluate this proposal with the chosen Proposable, configure members
-            proposal.setResponderActual(ua);
-            proposal.setResponseTS(LocalDateTime.now());
-            proposal.setChosenChoice(chosen);
-            
-            // ask the EventCoord for a nicely formed EventCnF, which we cast to EventCnF
-            EventCnF ev = wc.generateEventDocumentingProposalEvaluation(erg, proposal, chosen, ua);
-            // insert the event and grab the new ID
-            insertedEventID = ec.(ceCase, ev);
-            // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
-            proposal.setResponseEvent(ec.getEvent(insertedEventID));
-            wc.recordProposalEvaluation(proposal);
-        } else {
-            throw new BObStatusException("Unable to evaluate proposal due to business rule violation");
-        }
+        try {
+            if(wc.determineProposalEvaluatability(proposal, chosen, ua)){
+                // farm out processing to internal methods based on subtype of chosen
+                if(chosen instanceof ChoiceEventCat){
+                    ChoiceEventCat cec = (ChoiceEventCat) chosen;
+                    propEvDoneList.addAll(processChoice(erg, proposal, cec, ua));
+                } else if (chosen instanceof ChoiceEventRule){
+                    ChoiceEventRule cer = (ChoiceEventRule) chosen;
+                    propEvDoneList.addAll(processChoice(erg, proposal, cer, ua));
+                }
+                // since we can evaluate this proposal with the chosen Proposable, configure members
+                proposal.setResponderActual(ua);
+                proposal.setResponseTS(LocalDateTime.now());
+                proposal.setChosenChoice(chosen);
+
+                // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
+                List<EventCnF> tmpEvList = evaluateProposal_recordEvaluation(proposal, chosen, erg, ua);
+                
+                if(tmpEvList != null && !tmpEvList.isEmpty()){
+                    proposal.setEvaluationEvent(tmpEvList.get(0));
+                } else {
+                    proposal.setEvaluationEvent(null);
+                }
+                propEvDoneList.addAll(tmpEvList);
+                
+                // now that the proposal has been evaluated, no need to see it
+                // but in reality, it will be marked hidden by the config method 
+                // on BOb relaod, so this is just for consistency's sake
+                proposal.setHidden(true);
+                wi.recordProposalEvaluation(proposal);
+            } else {
+                throw new BObStatusException("Unable to evaluate proposal due to business rule violation");
+            }
+        } catch (IntegrationException | EventException ex) {
+            throw new BObStatusException(ex.getMessage());
+        } 
+        return propEvDoneList;
+    }
+    
+    private List<EventCnF> evaluateProposal_recordEvaluation( Proposal proposal, 
+                                                        IFace_Proposable chosen, 
+                                                        IFace_EventRuleGoverned erg, 
+                                                        UserAuthorized ua) 
+                                            throws      IntegrationException, 
+                                                        BObStatusException, 
+                                                        EventException {
+        
+        EventCoordinator ec = getEventCoordinator();
+        EventCnF ev = null;
+        EventCategory workflowCat = ec.getEventCategory(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                    .getString("actionRequestPublicUserPersonSourceID")));
+        
+        ev = ec.initEvent(erg, workflowCat);
+
+        ev.setActive(true);
+        ev.setHidden(false);
+
+        ev.setTimeStart(LocalDateTime.now());
+        ev.setTimeEnd(ev.getTimeStart().plusMinutes(workflowCat.getDefaultdurationmins()));
+        ev.setUserCreator(ua);
+        ev.setCreationts(LocalDateTime.now());
+        StringBuilder descBldr = new StringBuilder();
+        descBldr.append("User ");
+        descBldr.append(ua.getPerson().getFirstName());
+        descBldr.append(" ");
+        descBldr.append(ua.getPerson().getLastName());
+        descBldr.append("(");
+        descBldr.append(ua.getUsername());
+        descBldr.append(") ");
+        descBldr.append(" evaluated the proposal titled: '");
+        descBldr.append(proposal.getDirective().getTitle());
+        descBldr.append("' on ");
+        descBldr.append(getPrettyDateNoTime(proposal.getResponseTS()));
+        descBldr.append(" and selected choice titled:  '");
+        descBldr.append(chosen.getTitle());
+        descBldr.append("'.");
+        ev.setDescription(descBldr.toString());
+        return ec.addEvent(ev, erg, ua);
     }
     
     /**
+     * Internal logic intermediary for implementing the EventRuleAbstract object
+     * associated with a given Proposal evaluation instance
+     * @param erg
+     * @param p
+     * @param ch
+     * @param ua
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    private List<EventCnF> processChoice(  IFace_EventRuleGoverned erg,
+                                    Proposal p,
+                                    ChoiceEventRule ch,
+                                    UserAuthorized ua) throws IntegrationException, BObStatusException{
+        if(ch.getRule() != null){
+            rules_attachEventRule(ch.getRule(), erg, ua);
+        }
+        
+        return null;
+    }
+
+    /**
+     * A BOB-flexible event generator given a Proposal object and the Choice that was
+     * selected by the user.
+     * @param erg
+     * @param p
+     * @param ch
+     * @param u
+     * @return a configured but not integrated EventCnF. The EventDomain is set before return
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.EventException
+     */
+    private List<EventCnF> processChoice(   IFace_EventRuleGoverned erg, 
+                                            Proposal p, 
+                                            ChoiceEventCat ch, 
+                                            UserAuthorized u) 
+                                    throws  BObStatusException, 
+                                            IntegrationException, 
+                                            EventException {
+        EventCoordinator ec = getEventCoordinator();
+        
+        EventCnF ev = null;
+        
+        
+        if (ch instanceof ChoiceEventCat) {
+            EventCategory ecat = ec.initEventCategory(ch.getEventCategory().getCategoryID());
+            ev = ec.initEvent(erg, ecat);
+            ev.setDescription(ch.getEventCategory().getHostEventDescriptionSuggestedText());
+                   
+        } else {
+            throw new BObStatusException("Generating events for Choice " 
+                    + "objects that are not Event triggers is not yet supported. " 
+                    + "Thank you in advance for your patience.");
+        }
+        return ec.addEvent(ev, erg, u);
+    }
+
+    
+    /**
      * Logic container for checking if a User can actually make the desired choice
+     * which includes checking to make sure the chosen object is an option inside
+     * the passed in Proposal object
      * 
      * @param proposal
      * @param chosen
      * @param u
      * @return 
      */
-    public boolean determineProposalEvaluatability( Proposal proposal,
+    private boolean determineProposalEvaluatability( Proposal proposal,
                                                     IFace_Proposable chosen, 
                                                     User u){
         if(proposal == null || chosen == null || u== null){
@@ -265,19 +387,6 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     }
     
     /**
-     * Logic container for marking a proposal as having been evaluated
-     * TODO: MOVE logic here
-     * 
-     * @param p
-     * @throws IntegrationException 
-     */
-    public void recordProposalEvaluation(Proposal p) throws IntegrationException{
-        WorkflowIntegrator ci = getWorkflowIntegrator();
-        p.setHidden(true);
-        ci.recordProposalEvaluation(p);
-    }
-    
-    /**
      * Takes in a Directive object and an OccPeriod or CECaseDataHeavy and 
      * implements that directive by assigning it via a Proposal given sensible initial values
      * @param dir Extracted from the EventCnF to be implemented
@@ -287,6 +396,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
      */
     public void implementDirective(Directive dir, IFace_EventRuleGoverned erg, EventCnF ev) 
             throws IntegrationException{
+        
         WorkflowIntegrator wi = getWorkflowIntegrator();
         Proposal pr = new Proposal();
         pr.setDirective(dir);
@@ -295,6 +405,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
             pr.setActivatesOn(LocalDateTime.now());
             pr.setHidden(false);
             pr.setProposalRejected(false);
+            // TODO: implement some logic here for order assignment
             pr.setOrder(0);
         } else {
             return;
@@ -370,7 +481,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         }
         p.setResponseTS(null);
         p.setResponderActual(null);
-        p.setResponseEvent(null);
+        p.setEvaluationEvent(null);
         p.setProposalRejected(false);
         ci.updateProposal(p);
     }
@@ -586,67 +697,9 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         WorkflowIntegrator wi = getWorkflowIntegrator();
         wi.rules_updateEventRule(era);
     }
-
-    /**
-     * A BOB-agnostic event generator given a Proposal object and the Choice that was
-     * selected by the user.
-     * @param erg
-     * @param p
-     * @param ch
-     * @param u
-     * @return a configured but not integrated EventCnF. The EventDomain is set before return
-     * @throws com.tcvcog.tcvce.domain.BObStatusException
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     * @throws com.tcvcog.tcvce.domain.EventException
-     */
-    public EventCnF generateEventDocumentingProposalEvaluation( IFace_EventRuleGoverned erg, 
-                                                                Proposal p, 
-                                                                IFace_Proposable ch, 
-                                                                UserAuthorized u) 
-                                                        throws  BObStatusException, 
-                                                                IntegrationException, 
-                                                                EventException {
-        EventCoordinator ec = getEventCoordinator();
-        
-        EventCnF ev = null;
-        
-        if (ch instanceof ChoiceEventCat) {
-            EventCategory ecat = ec.initEventCategory(((ChoiceEventCat) ch).getEventCategory().getCategoryID());
-            
-            // TODO: Finish this
-            ev = ec.initEvent(erg, ecat);
-            
-            ev.setActive(true);
-            ev.setHidden(false);
-            
-            ev.setTimeStart(LocalDateTime.now());
-            ev.setTimeEnd(ev.getTimeStart().plusMinutes(ecat.getDefaultdurationmins()));
-            ev.setUserCreator(u);
-            ev.setCreationts(LocalDateTime.now());
-            StringBuilder descBldr = new StringBuilder();
-            descBldr.append("User ");
-            descBldr.append(u.getPerson().getFirstName());
-            descBldr.append(" ");
-            descBldr.append(u.getPerson().getLastName());
-            descBldr.append("(");
-            descBldr.append(u.getUsername());
-            descBldr.append(") ");
-            descBldr.append(" evaluated the proposal titled: '");
-            descBldr.append(p.getDirective().getTitle());
-            descBldr.append("' on ");
-            descBldr.append(getPrettyDateNoTime(p.getResponseTS()));
-            descBldr.append(" and selected choice titled:  '");
-            descBldr.append(ch.getTitle());
-            descBldr.append("'.");
-            ev.setDescription(descBldr.toString());
-        } else {
-            throw new BObStatusException("Generating events for Choice " 
-                    + "objects that are not Event triggers is not yet supported. " 
-                    + "Thank you in advance for your patience.");
-        }
-        return ev;
-    }
-
+    
+    
+    
 
     /**
      * Calls appropriate Integration method given a CECase or OccPeriod
@@ -771,12 +824,17 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
             throw new BObStatusException("No valid instance of EventRuleGoverned found");
         }
         
-        wi.im;
+        // send down to integrator
+        wi.implementEventRule(erimpl, erg);
         
+        // EventRules can be added to the case as a result of a choice
+        // that is proposed to the user by a Proposal which itself
+        // is attached to the BOb through the implementation of a directive
         if (era.getPromptingDirective() != null) {
-            implementDirective(era.getPromptingDirective(), period, null);
+            implementDirective(era.getPromptingDirective(), erg,  null);
             System.out.println("EventCoordinator.rules_attachEventRulAbstractToOccPeriod | directive implemented with ID " + era.getPromptingDirective().getDirectiveID());
         }
+        
     }
 
     /**

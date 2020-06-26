@@ -440,7 +440,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * is built and attached to the case that was just created.
      * 
      * @param newCase
-     * @param cred
+     * @param ua
      * @param cear
      * @throws IntegrationException
      * @throws BObStatusException
@@ -1287,8 +1287,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         tfEvent.setDescription(sb.toString());
         
         if(verifyCodeViolationAttributes(cse, cv)){
-            eventID = cc.addEvent_processForCECaseDomain(cse, tfEvent, cv);
-            cv.setComplianceTimeframeEventID(eventID);
             insertedViolationID = ci.insertCodeViolation(cv);
         } else {
             throw new ViolationException("Failed violation verification");

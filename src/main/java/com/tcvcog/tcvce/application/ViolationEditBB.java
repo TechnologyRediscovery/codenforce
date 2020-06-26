@@ -81,8 +81,6 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
 
             // load up edit event data
             event.setNotes(formEventNotes);
-            event.setDiscloseToMunicipality(formDiscloseToMuni);
-            event.setDiscloseToPublic(formDiscloseToPublic);
 
             MessageBuilderParams mcc = new MessageBuilderParams();
             mcc.setExistingContent(currentViolation.getNotes());
@@ -94,8 +92,10 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
              cc.updateCodeViolation(currentCase, currentViolation, getSessionBean().getSessUser());
              
              // if update succeeds without throwing an error, then generate an
-             // update violation event
-             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
+            // update violation event
+            // TODO: Rewire this to work with new event processing cycle
+            
+//             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
              
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 

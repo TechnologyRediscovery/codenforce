@@ -44,14 +44,6 @@ public  class       CodeViolation
     protected String description;
     protected String notes;
     
-    protected LocalDateTime dateOfCitation;
-    protected String dateOfCitationPretty;
-    
-    protected List<Integer> citationIDList;
-    protected String citationListAsString;
-    
-    protected List<Integer> noticeIDList;
-    protected String noticeIDListAsString;
  
     protected LocalDateTime dateOfRecord;
     protected java.util.Date dateOfRecordUtilDate;
@@ -60,6 +52,10 @@ public  class       CodeViolation
     protected LocalDateTime creationTS;
     protected String creationTSPretty;
     protected User createdBy;
+    
+    protected LocalDateTime dateOfCitation;
+    protected List<Integer> citationIDList;
+    protected List<Integer> noticeIDList;
     
     protected LocalDateTime stipulatedComplianceDate;
     protected LocalDateTime actualComplianceDate;
@@ -289,16 +285,11 @@ public  class       CodeViolation
      * @return the citationListAsString
      */
     public String getCitationListAsString() {
-       
-        return citationListAsString;
+        String s = "Inject during configuration";
+        return s;
     }
 
-    /**
-     * @param citationListAsString the citationListAsString to set
-     */
-    public void setCitationListAsString(String citationListAsString) {
-        this.citationListAsString = citationListAsString;
-    }
+   
 
    
 
@@ -306,8 +297,8 @@ public  class       CodeViolation
      * @return the dateOfCitationPretty
      */
     public String getDateOfCitationPretty() {
-        dateOfCitationPretty = EntityUtils.getPrettyDate(dateOfCitation);
-        return dateOfCitationPretty;
+        String s = EntityUtils.getPrettyDate(dateOfCitation);
+        return s;
     }
 
     /**
@@ -341,12 +332,6 @@ public  class       CodeViolation
         return EntityUtils.getPrettyDate(actualComplianceDate);
     }
 
-    /**
-     * @param dateOfCitationPretty the dateOfCitationPretty to set
-     */
-    public void setDateOfCitationPretty(String dateOfCitationPretty) {
-        this.dateOfCitationPretty = dateOfCitationPretty;
-    }
 
     /**
      * @param dateOfRecordPretty the dateOfRecordPretty to set
@@ -452,9 +437,7 @@ public  class       CodeViolation
         hash = 53 * hash + Objects.hashCode(this.description);
         hash = 53 * hash + Objects.hashCode(this.notes);
         hash = 53 * hash + Objects.hashCode(this.dateOfCitation);
-        hash = 53 * hash + Objects.hashCode(this.dateOfCitationPretty);
         hash = 53 * hash + Objects.hashCode(this.citationIDList);
-        hash = 53 * hash + Objects.hashCode(this.citationListAsString);
         hash = 53 * hash + Objects.hashCode(this.dateOfRecord);
         hash = 53 * hash + Objects.hashCode(this.dateOfRecordPretty);
         hash = 53 * hash + Objects.hashCode(this.creationTS);
@@ -539,7 +522,8 @@ public  class       CodeViolation
      * @return the noticeIDListAsString
      */
     public String getNoticeIDListAsString() {
-        return noticeIDListAsString;
+        String s = "TODO: Wire up to coordinator";
+        return s;
     }
 
     /**
@@ -579,12 +563,6 @@ public  class       CodeViolation
         this.noticeIDList = noticeIDList;
     }
 
-    /**
-     * @param noticeIDListAsString the noticeIDListAsString to set
-     */
-    public void setNoticeIDListAsString(String noticeIDListAsString) {
-        this.noticeIDListAsString = noticeIDListAsString;
-    }
 
     /**
      * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set

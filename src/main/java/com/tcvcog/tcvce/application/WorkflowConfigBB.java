@@ -69,11 +69,7 @@ public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
         EventCoordinator ec = getEventCoordinator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
         eventTypeListAll = ec.getEventTypesAll();
-        try {
-            eventCategoryListAllActive = ec.assembleEventCategoryListActiveOnly();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+        eventCategoryListAllActive = ec.assembleEventCategoryListActiveOnly(ec.getEventCategoryList());
         
         try {
             setEventRuleSetList(wc.rules_getEventRuleSetList());

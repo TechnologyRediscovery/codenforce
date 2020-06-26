@@ -108,8 +108,11 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
         // first, choose a property info case if we have one
         List<CECasePropertyUnitHeavy> cecaseList = new ArrayList<>();
         cecaseList = mdh.getMuniPropertyDH().getCeCaseList();
-        
-    
+        if(cecaseList != null && !cecaseList.isEmpty()){
+            return (IFace_EventRuleGoverned) cecaseList.get(0);
+            
+        }
+        return null;
     }
             
 

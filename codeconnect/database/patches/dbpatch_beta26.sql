@@ -109,6 +109,37 @@ ALTER TABLE public.codeviolation ADD COLUMN compliancetfexpiry_proposalid INTEGE
 	CONSTRAINT codeviolation_tfexpiry_proposalid_fk 
 	REFERENCES choiceproposal (proposalid);
 
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+--
+--
+--
+-- NOTE NOTE NOTE: THIS STATEMENT MUST BE RUN INDEPENDENTLY AT THE START OF THE SCRIPT
+-- ALTER TYPE eventtype ADD VALUE IF NOT EXISTS 'Workflow'; 
+--
+--
+--
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+
+
+INSERT INTO public.eventcategory(
+            categoryid, categorytype, title, description, notifymonitors, 
+            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, 
+            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, 
+            active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
+    VALUES (222, 'Workflow'::eventtype, 'Workflow choice made', 'Documents a user selecting or the auto-selection of a choice in a proposal', FALSE, 
+            TRUE, NULL, 0, 0, 
+            NULL, NULL, 1, 
+            TRUE, 7, 3, 7);
+
 
 
 --- RUN LOCALLY UP TO HERE
