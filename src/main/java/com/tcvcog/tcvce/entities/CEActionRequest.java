@@ -156,7 +156,7 @@ public class CEActionRequest implements Serializable{
     }
     
     public boolean getNotAtAddress(){
-        return isAtKnownAddress;
+        return !isAtKnownAddress;
     }
 
   

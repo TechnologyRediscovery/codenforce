@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2020 Technology Rediscovery LLC.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tcvcog.tcvce.coordinators;
 
@@ -15,6 +26,7 @@ import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
@@ -32,6 +44,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
@@ -41,7 +54,7 @@ import java.util.List;
 
 /**
  *
- * @author sylvia
+ * @author Nathan Dietz
  */
 public class PublicInfoCoordinator extends BackingBeanUtils implements Serializable {
 
@@ -53,7 +66,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
     /**
      * The primary entry point for getting PACC data for any relevant object
-     * type
+     * type TODO: UPDATE TO INCLUDE NEW BUNDLES
      *
      * @param pacc the entered control code from the user
      * @return a linked list of info bundles from any source
@@ -117,8 +130,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (c.isPaccEnabled()) {
             pib.setBundledCase(cse);
-            pib.setPropertyAddress(c.getProperty().getAddress());
-
+            if (c.getProperty() == null || c.getProperty().isNonAddressable()) {
+                pib.setAddressAssociated(false);
+            } else {
+                pib.setAddressAssociated(true);
+                pib.setPropertyAddress(c.getProperty().getAddress());
+            }
             pib.setPublicEventList(new ArrayList<EventCnF>());
             for (EventCnF ev : c.getVisibleEventList()) {
                 if (ev.isDiscloseToPublic()) {
@@ -152,11 +169,14 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (req.isPaccEnabled()) {
 
+            pib.setRequestor(extractPublicInfo(req.getRequestor()));
+
+            pib.setRequestProperty(extractPublicInfo(req.getRequestProperty()));
+
             pib.setBundledRequest(req);
             pib.setPaccStatusMessage("Public access enabled");
-            
-            pib.setTypeName("Code enforcement action request");
 
+            pib.setTypeName("Code enforcement action request");
 
             pib.setShowAddMessageButton(true);
             pib.setShowDetailsPageButton(false);
@@ -169,6 +189,35 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
 
+    }
+
+    public PublicInfoBundlePayment extractPublicInfo(Payment input) {
+
+        PublicInfoBundlePayment pib = new PublicInfoBundlePayment();
+        //the Paymentobject does not have a PACC Enabled field
+        //if (!input.isPaccEnabled()) {
+
+        PersonCoordinator pc = getPersonCoordinator();
+
+        Person skeleton = pc.anonymizePersonData(input.getPayer());
+
+        pib.setPayer(extractPublicInfo(skeleton));
+
+        pib.setBundledPayment(input);
+
+        pib.setTypeName("Payment");
+        pib.setPaccStatusMessage("Public access enabled");
+
+        pib.setShowAddMessageButton(false);
+        pib.setShowDetailsPageButton(true);
+        /*} else {
+            pib.setBundledPerson(new Person());
+            pib.setPaccStatusMessage("A public information bundle was found but public "
+                    + "access was switched off by a code officer. Please contact your municipal office. ");
+
+        }*/
+
+        return pib;
     }
 
     public PublicInfoBundlePerson extractPublicInfo(Person input) {
@@ -242,16 +291,16 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 bundledPersons.add(extractPublicInfo(skeleton));
 
             }
-            
-            ArrayList<PublicInfoBundleOccInspection> bundledInspections= new ArrayList<>();
+
+            ArrayList<PublicInfoBundleOccInspection> bundledInspections = new ArrayList<>();
 
             for (OccInspection skeleton : (List<OccInspection>) heavy.getInspectionList()) {
 
                 bundledInspections.add(extractPublicInfo(skeleton));
 
             }
-            
-            ArrayList<PublicInfoBundleFeeAssigned> bundledFees= new ArrayList<>();
+
+            ArrayList<PublicInfoBundleFeeAssigned> bundledFees = new ArrayList<>();
 
             for (FeeAssigned skeleton : heavy.getFeeList()) {
 
@@ -259,11 +308,18 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             }
 
-            pib.setPersonList(bundledPersons);
+            ArrayList<PublicInfoBundlePayment> bundledPayments = new ArrayList<>();
 
+            for (Payment skeleton : heavy.getPaymentList()) {
+
+                bundledPayments.add(extractPublicInfo(skeleton));
+
+            }
+
+            pib.setPersonList(bundledPersons);
             pib.setInspectionList(bundledInspections);
             pib.setFeeList(bundledFees);
-            pib.setPaymentList();
+            pib.setPaymentList(bundledPayments);
 
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
@@ -276,19 +332,17 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
     }
-    
-    public PublicInfoBundleOccInspection extractPublicInfo(OccInspection input) throws IntegrationException, BObStatusException, SearchException {
+
+    public PublicInfoBundleOccInspection extractPublicInfo(OccInspection input) {
         PublicInfoBundleOccInspection pib = new PublicInfoBundleOccInspection();
 
         if (input.isEnablePacc()) {
 
             pib.setBundledInspection(input);
 
-            pib.setThirdPartyInspector(extractPublicInfo(input.getThirdPartyInspector()));
-            
             pib.setTypeName("OccInspection");
             pib.setPaccStatusMessage("Public access enabled");
-            
+
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
         } else {
@@ -300,87 +354,123 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
     }
-    
-    public PublicInfoBundleFeeAssigned extractPublicInfo(FeeAssigned input) throws IntegrationException, BObStatusException, SearchException {
+
+    public PublicInfoBundleFeeAssigned extractPublicInfo(FeeAssigned input) {
         PublicInfoBundleFeeAssigned pib = new PublicInfoBundleFeeAssigned();
 
-            pib.setBundledFee(input);
-            
-            pib.setTypeName("FeeAssigned");
-            pib.setPaccStatusMessage("Public access enabled");
-            
-            pib.setShowAddMessageButton(false);
-            pib.setShowDetailsPageButton(true);
-        
+        pib.setBundledFee(input);
+
+        pib.setTypeName("FeeAssigned");
+        pib.setPaccStatusMessage("Public access enabled");
+
+        pib.setShowAddMessageButton(false);
+        pib.setShowDetailsPageButton(true);
+
         return pib;
     }
 
-    
     /**
-     * Converts a bundled FeeAssigned to an unbundled FeeAssigned.
-     * 
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * Converts a bundled Payment to an unbundled Payment.
+     *
      * @param input
      * @return
-
+     *
      */
-    public FeeAssigned export(PublicInfoBundleFeeAssigned input) throws IntegrationException {
+    public Payment export(PublicInfoBundlePayment input) {
 
         PaymentIntegrator pi = getPaymentIntegrator();
-        
-        FeeAssigned unbundled = input.getBundledFee();
-        //FeeAssigned exportable = pi.getFeeAssigned(); TODO: write method to get feeAssigned from ID
-        
-       ArrayList<Payment> skeletonHorde = new ArrayList<>();
-        
-        for(PublicInfoBundlePayment bundle : input.getPaymentList()) {
-            
-            skeletonHorde.add(export(bundle));
-            
-        }
-        
-        unbundled.setPaymentList(skeletonHorde);
-        
-        return unbundled; //should be exportable once that field is ready.
 
+        Payment unbundled = input.getBundledPayment();
+
+        try {
+            //Checks to see if payment is new. 
+            //If the get method throws an error, the payment probably doesn't exist
+            Payment exportable = pi.getPayment(unbundled.getPaymentID());
+            if (!unbundled.getNotes().contains("*")) {
+                exportable.setNotes(unbundled.getNotes());
+            }
+            exportable.setDomain(unbundled.getDomain());
+            return exportable;
+        } catch (IntegrationException ex) {
+            System.out.println("Exporting payment failed. Assuming exported payment is new, and could not be found in DB.");
+            System.out.println("But here's the error message, just in case: " + ex.toString());
+            return unbundled;
+        }
     }
+
+    /**
+     * Converts a bundled FeeAssigned to an unbundled FeeAssigned.
+     *
+     * @param input
+     * @return
+     *
+     */
+    public FeeAssigned export(PublicInfoBundleFeeAssigned input) {
+
+        PaymentIntegrator pi = getPaymentIntegrator();
+
+        FeeAssigned unbundled = input.getBundledFee();
+        FeeAssigned exportable = new FeeAssigned();
+
+        try {
+
+            exportable = pi.getFeeAssigned(unbundled.getAssignedFeeID(), unbundled.getDomain());
+
+        } catch (IntegrationException ex) {
+            System.out.println("Exporting payment failed. Assuming exported payment is new, and could not be found in DB.");
+            System.out.println("But here's the error message, just in case: " + ex.toString());
+            exportable = unbundled;
+
+        }
+        ArrayList<Payment> skeletonHorde = new ArrayList<>();
+
+        for (PublicInfoBundlePayment bundle : input.getPaymentList()) {
+            skeletonHorde.add(export(bundle));
+        }
+        exportable.setPaymentList(skeletonHorde);
+        return unbundled;
+    }
+/*
     /**
      * Converts a bundled OccInspection to an unbundled OccInspection.
-     * 
+     *
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @param input
      * @return
-
+     *
      */
     public OccInspection export(PublicInfoBundleOccInspection input) throws IntegrationException {
 
-        OccupancyIntegrator oi = getOccupancyIntegrator();
-        
+        OccInspectionIntegrator oi = getOccInspectionIntegrator();
         OccInspection unbundled = input.getBundledInspection();
-        //OccInspection exportable = TODO: Figure out how to get an occinspection from the DB
-        
-        unbundled.setThirdPartyInspector(export(input.getThirdPartyInspector()));
-        
-        return unbundled; //should be exportable once that field is ready.
+        try {
 
+            return oi.getOccInspection(unbundled.getInspectionID());
+
+        } catch (IntegrationException ex) {
+            System.out.println("Exporting payment failed. Assuming exported payment is new, and could not be found in DB.");
+            System.out.println("But here's the error message, just in case: " + ex.toString());
+            return unbundled;
+        }
     }
-    
+
     /**
      * Converts a bundled property to an unbundled property. TODO: see if this
-     * needs to be updated. When this JavaDoc was written, checking for changes was not necessary.
-     * 
+     * needs to be updated. When this JavaDoc was written, checking for changes
+     * was not necessary.
+     *
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @param input
      * @return
-
+     *
      */
     public Property export(PublicInfoBundleProperty input) throws IntegrationException {
 
         PropertyCoordinator pc = getPropertyCoordinator();
-        
+
         Property unbundled = input.getBundledProperty();
         Property exportable = pc.getProperty(unbundled.getPropertyID());
-        
+
         exportable.setAddress(unbundled.getAddress());
         exportable.setStatus(unbundled.getStatus());
         exportable.setMuni(unbundled.getMuni());
@@ -395,7 +485,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         exportable.setOwnerCode(unbundled.getOwnerCode());
         exportable.setPropclass(unbundled.getPropclass());
         exportable.setUseType(unbundled.getUseType());
-        
+
         return exportable;
 
     }
@@ -426,28 +516,42 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         }
 
         ArrayList<OccInspection> inspectionHorde = new ArrayList<>();
-        
-        for(PublicInfoBundleOccInspection bundle : input.getInspectionList()) {
-            
+
+        for (PublicInfoBundleOccInspection bundle : input.getInspectionList()) {
+
             inspectionHorde.add(export(bundle));
-            
+
         }
-        
+
         ArrayList<MoneyOccPeriodFeeAssigned> feeHorde = new ArrayList<>();
-        
-        for(PublicInfoBundleFeeAssigned bundle : input.getFeeList()) {
-            
-            feeHorde.add((MoneyOccPeriodFeeAssigned) export(bundle));
-            
+
+        for (PublicInfoBundleFeeAssigned bundle : input.getFeeList()) {
+
+            MoneyOccPeriodFeeAssigned temp = new MoneyOccPeriodFeeAssigned(export(bundle));
+
+            temp.setOccPeriodID(exportable.getPeriodID());
+
+            temp.setOccPeriodTypeID(exportable.getType().getTypeID());
+
+            feeHorde.add(temp);
+
         }
-        
+
+        ArrayList<MoneyOccPeriodFeePayment> paymentHorde = new ArrayList<>();
+
+        for (PublicInfoBundlePayment bundle : input.getPaymentList()) {
+
+            paymentHorde.add(new MoneyOccPeriodFeePayment(export(bundle)));
+
+        }
+
         exportable.setPersonList(skeletonHorde);
 
         exportable.setInspectionList(inspectionHorde);
 
         exportable.setFeeList(feeHorde);
 
-        exportable.setPaymentList(input.getPaymentList());
+        exportable.setPaymentList(paymentHorde);
 
         return exportable;
 

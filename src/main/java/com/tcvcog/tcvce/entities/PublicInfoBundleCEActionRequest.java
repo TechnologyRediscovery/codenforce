@@ -6,8 +6,6 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * 
@@ -20,6 +18,8 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
     //************************************************
     
     private CEActionRequest bundledRequest;
+    private PublicInfoBundlePerson requestor;
+    private PublicInfoBundleProperty requestProperty;
     
 
     public void setBundledRequest(CEActionRequest input) {
@@ -27,13 +27,18 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         setMuni(input.getMuni());
         setPacc(input.getRequestPublicCC());
         setAddressAssociated(!input.getNotAtAddress());
-        if (!input.getNotAtAddress()) {
+        if (input.getNotAtAddress() || 
+                    input.getRequestProperty() == null || 
+                    input.getRequestProperty().isNonAddressable()) {
+                setAddressAssociated(false);
+            } else {
+                setAddressAssociated(true);
                 setPropertyAddress(input.getRequestProperty().getAddress());
             }
         
-        input.setRequestor(new Person()); //TODO: Make bundled person
+        input.setRequestor(new Person());
         
-        input.setRequestProperty(new Property()); //TODO: Make bundled property
+        input.setRequestProperty(new Property());
         input.setMuniCode(0);
         input.setCaseAttachmentUser(new User());
         input.setCogInternalNotes("*****");
@@ -51,4 +56,20 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         return this.getClass().getName() + bundledRequest.getRequestID();
     }
 
+    public PublicInfoBundlePerson getRequestor() {
+        return requestor;
+    }
+
+    public void setRequestor(PublicInfoBundlePerson requestor) {
+        this.requestor = requestor;
+    }
+
+    public PublicInfoBundleProperty getRequestProperty() {
+        return requestProperty;
+    }
+
+    public void setRequestProperty(PublicInfoBundleProperty requestProperty) {
+        this.requestProperty = requestProperty;
+    }
+    
 }

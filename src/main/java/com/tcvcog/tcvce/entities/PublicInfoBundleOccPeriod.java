@@ -31,8 +31,8 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle implements Seria
     private OccPeriod bundledPeriod;
     private List<PublicInfoBundlePerson> personList;
     private List<PublicInfoBundleOccInspection> inspectionList;
-    private List<PublicInfoBundleFeeAssigned> feeList; //TODO: Make bundle
-    private List<PublicInfoBundlePayment> paymentList; //TODO: Make bundle
+    private List<PublicInfoBundleFeeAssigned> feeList;
+    private List<PublicInfoBundlePayment> paymentList;
     
     public void setBundledPeriod(OccPeriod input) {
         

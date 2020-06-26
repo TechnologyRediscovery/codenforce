@@ -36,39 +36,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<h2>");
-        sb.append("Code Enforcement Case");
-        sb.append("</h2>");
-        sb.append("<p>");
-
-        sb.append("<span class=\"bold\">");
-        sb.append("Public access code: ");
-        sb.append("</span>");
-        sb.append(getPacc());
-        sb.append("<br />");
-
-        sb.append("<span class=\"bold\">");
-        sb.append("Property Address: ");
-        sb.append("</span>");
-        sb.append(getPropertyAddress());
-        sb.append("<br />");
-
-        sb.append("<span class=\"bold\">");
-        sb.append("Case opening date: ");
-        sb.append("</span>");
-        sb.append(bundledCase.getOriginiationDatePretty());
-        sb.append("<br />");
-
-        sb.append("<span class=\"bold\">");
-        sb.append("Case closing date: ");
-        sb.append("</span>");
-        sb.append(bundledCase.getClosingDatePretty());
-        sb.append("<br />");
-
-        sb.append("</p>");
-        return sb.toString();
-
+    return this.getClass().getName() + bundledCase.getCaseID();
     }
 
     @Override
@@ -129,9 +97,9 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
         input.setPropertyUnitID(0);
         input.setNotes("*****");
         input.setSource(new BOBSource());
-
+        
         setPacc(input.getPublicControlCode());
-
+        
         if (input.getCaseManager() != null && input.getCaseManager().getPerson() != null) {
             StringBuilder sb = new StringBuilder();
             sb.append(input.getCaseManager().getPerson().getFirstName());

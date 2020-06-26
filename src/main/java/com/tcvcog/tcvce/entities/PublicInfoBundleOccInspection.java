@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 public class PublicInfoBundleOccInspection extends PublicInfoBundle implements Serializable {
     
     private OccInspection bundledInspection;
-    private PublicInfoBundlePerson thirdPartyInspector;
     
     public void setBundledInspection(OccInspection input) {
         
@@ -57,14 +56,6 @@ public class PublicInfoBundleOccInspection extends PublicInfoBundle implements S
 
     public OccInspection getBundledInspection() {
         return bundledInspection;
-    }
-
-    public PublicInfoBundlePerson getThirdPartyInspector() {
-        return thirdPartyInspector;
-    }
-
-    public void setThirdPartyInspector(PublicInfoBundlePerson thirdPartyInspector) {
-        this.thirdPartyInspector = thirdPartyInspector;
     }
     
 }
