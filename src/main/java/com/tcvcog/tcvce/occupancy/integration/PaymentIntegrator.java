@@ -62,7 +62,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             case CODE_ENFORCEMENT:
                 query = "SELECT * FROM moneycecasefeeassigned WHERE cecaseassignedfeeid = ?;";
                 break;
-                
+
             default:
                 throw new IntegrationException("A domain must be specified to retrieve an assigned fee by ID. UNIVERSAL is not acceptable.");
 
@@ -76,8 +76,21 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(1, feeID);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                skeleton = generateFeeAssigned(rs);
-                skeleton.setDomain(selectedDomain);
+
+                switch (selectedDomain) {
+
+                    case OCCUPANCY:
+                        skeleton = generateOccPeriodFeeAssigned(rs);
+                        break;
+
+                    case CODE_ENFORCEMENT:
+                        skeleton = generateCECaseFeeAssigned(rs);
+                        break;
+
+                    default:
+                        throw new IntegrationException("A domain must be specified to retrieve an assigned fee by ID. UNIVERSAL is not acceptable.");
+
+                }
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
