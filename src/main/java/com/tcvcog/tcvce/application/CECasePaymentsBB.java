@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
@@ -39,8 +40,7 @@ public  class       CECasePaymentsBB
     
     @PostConstruct
     public void initBean() {
-        SessionBean sb = getSessionBean();
-        currentCase = sb.getSessCECase();
+        currentCase = getSessionBean().getSessCECase();
        
     }
     /**
@@ -50,27 +50,31 @@ public  class       CECasePaymentsBB
     }
 
        
-     public String editOccPeriodPayments(){
-         getSessionBean().setSessCECase(currentCase);
-         getSessionBean().setPaymentRedirTo("inspection");
+     public String editCECasePayments(){
+         
+         getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
+         getSessionBean().setFeeManagementCeCase(currentCase);
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "payments";
      }
      
      public String editOnePayment(Payment thisPayment){
+         
+         getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
          getSessionBean().setSessPayment(thisPayment);
-         getSessionBean().setPaymentRedirTo("inspection");
+         getSessionBean().getNavStack().pushCurrentPage();
          
          return "payments";
      }
      
-     public String editOccPeriodFees(){
+     public String editCECaseFees(){
          
-         getSessionBean().setSessCECase(currentCase);
-//         TODO: Check with NADGIT on this one
-//         getSessionBean().setFeeRedirTo("inspection");
+         getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
+         getSessionBean().setFeeManagementCeCase(currentCase);
+         getSessionBean().getNavStack().pushCurrentPage();
          
-         return "editFees";
+         return "feeManage";
      }
      
     

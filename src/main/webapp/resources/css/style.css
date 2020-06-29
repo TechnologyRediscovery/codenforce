@@ -1758,7 +1758,7 @@ tr.caseOpen{
         border-top: 0px solid #E6E7E8;
         border-bottom: 1px solid #E6E7E8;
     }
-    
+
 }
 
 /* Top nav bar */
@@ -2006,8 +2006,7 @@ tr.caseOpen{
     cursor: pointer;
 }
 
-
-/*Primeface styling*/
+/* ****************** PRIMEFACE STYLING RESETING *******************/
 
 body .ui-panel .ui-panel-titlebar{
     background-color: #6C6D70;
@@ -2022,6 +2021,13 @@ body .ui-messages .ui-messages-info{
     background-color: #99C221;
 }
 
+body .ui-selectonemenu{
+    width: 100%;
+}
+
+body .ui-inputfield{
+    width: 100%;
+}
 
 /*button*/
 
@@ -2062,6 +2068,24 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
 #muniManage-panel .ui-panelgrid .ui-panelgrid-content{
     border: none;
 }                                                             
+
+/* feeManage.xhtml page (shares many rules with muniManage.xhtml) */
+
+.FeeReadTableOutputLabel{
+    width: 100%;
+    border-bottom: 1px black solid;
+    background-color: #F0F0F0;
+    padding-top: 10px;
+}
+.FeeReadTableInputText{
+    width: 100%;
+    padding-top: 10px;
+}
+
+#feeManage-panel .ui-panelgrid .ui-panelgrid-content{
+    border: none;
+} 
+
 /*public*/
 
 .flexing-box-sidebar_new_public{
@@ -2118,3 +2142,40 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
     padding: 7px;
     width: 1100px;
 }
+
+
+/* ************* UI PATTERN FOR DATA LABEL AND VALUE ***************/
+
+.data-container{
+    padding-top: 10px;
+    padding-bottom: 30px;
+}
+
+.data_table_header{
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.data_edit_button{
+    min-width: 120px;
+    float:right;
+    padding: 5px;
+}
+
+.data_field{
+    border-bottom: 1px solid #CECECE; 
+    min-height: 80px;
+}
+
+.data_field_label{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #6C6D70;
+    display: block;
+}
+
+.data_field_value{
+    font-weight: bold;
+    display: block;
+}
+

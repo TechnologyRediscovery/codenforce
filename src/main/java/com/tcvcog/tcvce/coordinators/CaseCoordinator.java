@@ -38,6 +38,7 @@ import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -99,6 +100,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         SearchCoordinator sc = getSearchCoordinator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
+        PaymentIntegrator pi = getPaymentIntegrator();
         
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
         CECaseDataHeavy cse = new CECaseDataHeavy(assembleCECasePropertyUnitHeavy(c));
@@ -128,10 +130,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         
-        //TODO NADGIT - integrate Fee functionality
-//        cse.setFeeList(new ArrayList<MoneyCECaseFeeAssigned>());
-//        cse.setPaymentList(new ArrayList<MoneyCECaseFeePayment>());
-//        
+        try{
+        cse.setFeeList(pi.getFeeAssigned(c));
+        
+        cse.setPaymentListGeneral(pi.getPaymentList(c));
+        } catch(IntegrationException ex){
+            System.out.println(ex);
+        }
         cse.setShowHiddenEvents(false);
         cse.setShowInactiveEvents(false);
         

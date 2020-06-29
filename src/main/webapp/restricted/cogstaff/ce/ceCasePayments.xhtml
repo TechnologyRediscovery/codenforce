@@ -16,24 +16,20 @@
 
                     <div class="mainContainer">
 
-                        <h:form id="cecase-payments-messages-form">
-                            <h:messages id="cecase-payments-messages"
-                                        globalOnly="true" showDetail="true" showSummary="true"
+                        <h:form>
+                            <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
-
-                        <h:form id="cecase-payments-form">
-                            
                             
                                 <p:panel id="cecase-payments-fees-panel"
                                          toggleable="true"
                                          collapsed="false"
-                                         header="Assigned Fees"
+                                         header="Fees"
                                          rendered="true">
 
 
-                                    <h:form id="occperiod-fees-form">
+                                    <h:form id="cecase-fees-form">
 
                                         <p:dataTable
                                             id="feeTable"
@@ -166,7 +162,7 @@
                                             </p:rowExpansion>
 
                                         </p:dataTable>
-                                        <p:commandButton value="Edit this Fee list" action="#{cECasePaymentsBB.editOccPeriodFees()}"/>
+                                        <p:commandButton value="Edit this Fee list" action="#{cECasePaymentsBB.editCECaseFees()}"/>
                                     </h:form>
                                 </p:panel>
 
@@ -176,8 +172,8 @@
                                          header="Payments"
                                          rendered="true">
 
-                                    <h:form id="cecase-payments-messages-form">
-                                        <h:messages id="cecase-payments-messages-form" globalOnly="true" showDetail="true" showSummary="true"
+                                    <h:form>
+                                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                         </h:messages>
                                     </h:form>
@@ -255,18 +251,10 @@
                                                                  columnClasses="gridTd, gridTd, gridTd, gridTd">
 
                                                         <h:panelGroup>
-                                                            <h:outputLabel styleClass="ui-label-inline" value="Inspection ID"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{payment.occupancyInspectionID}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
                                                             <h:outputLabel styleClass="ui-label-inline" value="Assigned Fee ID"/>
                                                             <p:spacer height="15px"/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{payment.assignedFeeID} (#{payment.assignedTo})"/>
+                                                                <h:outputText value="#{payment.assignedFeeID} (#{payment.domain})"/>
                                                             </div>
                                                         </h:panelGroup>
 
@@ -372,11 +360,10 @@
 
                                         </p:dataTable>
 
-                                        <p:commandButton value="Edit this payment list" action="#{cECasePaymentsBB.editOccPeriodPayments()}"/>
+                                        <p:commandButton value="Edit this payment list" action="#{cECasePaymentsBB.editCECasePayments()}"/>
 
                                     </h:form>
                                 </p:panel>
-
                     <!--close main container-->
                     </div>
                 </f:view>

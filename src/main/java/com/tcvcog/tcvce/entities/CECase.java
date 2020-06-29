@@ -56,9 +56,6 @@ public class        CECase
     protected List<CodeViolation> violationList;
     
     protected boolean active;
-
-    private List<Payment> paymentList;
-    private List<MoneyCECaseFeeAssigned> feeList;
     
     public CECase(){
     }

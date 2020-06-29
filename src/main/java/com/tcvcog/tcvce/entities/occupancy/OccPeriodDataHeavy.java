@@ -21,7 +21,6 @@ import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
 import com.tcvcog.tcvce.entities.IFace_Openable;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
@@ -318,6 +317,22 @@ public  class       OccPeriodDataHeavy
     public void setPaymentList(List<MoneyOccPeriodFeePayment> paymentList) {
         this.paymentList = paymentList;
     }
+    
+    /**
+     * Takes the general Payment type and converts it to 
+     * @param paymentList the paymentList to set
+     */
+    public void setPaymentListGeneral(List<Payment> paymentList) {
+        List<MoneyOccPeriodFeePayment> skeletonHorde = new ArrayList<>();
+        
+        for (Payment p : paymentList) {
+            
+            skeletonHorde.add(new MoneyOccPeriodFeePayment(p));
+            
+        }
+        
+        this.paymentList = skeletonHorde;
+    }
 
     /**
      * @return the applicationList
@@ -429,6 +444,7 @@ public  class       OccPeriodDataHeavy
     /**
      * @return the credentialSignature
      */
+    @Override
     public String getCredentialSignature() {
         return credentialSignature;
     }
