@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -143,7 +144,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
         CodeCoordinator cc = getCodeCoordinator();
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
-
+        
         try {
 
             //initialize default selecte button in list-column: false
@@ -153,7 +154,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
             //initialize default current MunicipalityDataHeavy object in terms of current session muni
             currentMuniDataheavy = mc.getMuniDataHeavyList(getSessionBean().getSessMuni().getMuniCode());
             //initialize default current code set list 
-            currentCodeSetList = cc.retrieveAllcodeSet();
+            currentCodeSetList = cc.getCodeSetListComplete();
             //initialize default current code source list
             currentCodeSourceList = cc.retrieveAllCodeSources();
             //initialize default current muni profile list

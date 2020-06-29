@@ -54,6 +54,20 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         return s;
     }
     
+    /**
+     * Extracts a complete list of code sets from DB for configuration
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<CodeSet> getCodeSetListComplete() throws IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        List<CodeSet> setList = new ArrayList<>();
+        
+        setList = ci.getCodeSets();
+        return setList;
+        
+    }
+    
     public ArrayList<CodeSource> retrieveAllCodeSources() throws IntegrationException{
         CodeIntegrator integrator = getCodeIntegrator();
         ArrayList<CodeSource> sources = integrator.getCompleteCodeSourceList();
