@@ -77,8 +77,30 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public Person getPerson(int personID) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
-        return pi.getPerson(personID);
+        
+        if(personID == 0){
+            return null;
+        }
+        
+        return configurePerson(pi.getPerson(personID));
     }
+    
+    /**
+     * Utility method for building a list of Persons given a list of IDs
+     * @param pidList
+     * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<Person> getPersonList(List<Integer> pidList) throws IntegrationException{
+        List<Person> pList = new ArrayList<>();
+        if(pidList != null && !pidList.isEmpty()){
+            for(Integer i: pidList){
+                pList.add(getPerson(i));
+            }
+        }
+        return pList;
+    }
+    
     
     public PersonDataHeavy assemblePersonDataHeavy(Person pers, Credential cred){
         PersonDataHeavy pdh = new PersonDataHeavy(pers, cred);
@@ -108,6 +130,16 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return pdh;
     }
     
+    /**
+     * Logic container for Person object assembly
+     * @param p
+     * @return 
+     */
+    private Person configurePerson(Person p){
+        // check stuff, build stuff
+        return p;
+        
+    }
    
     
     

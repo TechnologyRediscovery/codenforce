@@ -36,6 +36,7 @@ import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
+import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
@@ -47,6 +48,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -187,28 +189,45 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return pudh;
 
     }
-
+    
+    /**
+     * Logic container for choosing a property info case
+     * @param pdh
+     * @return 
+     */
+    public CECase determineGoverningPropertyInfoCase(PropertyDataHeavy pdh){
+        CECaseDataHeavy chosenCECase = null;
+        List<CECaseDataHeavy> cseList = pdh.getPropInfoCaseList();
+        if(cseList != null && !cseList.isEmpty()){
+            Collections.sort(cseList);
+            chosenCECase = cseList.get(0);
+        }
+        return chosenCECase;
+    }
+    
+    
+    
     /**
      * Logic container for checking the existence of a property info case on a
      * given property and if none exists creating one.
      *
      * @param p
-     * @param cred
-     * @return
+     * @param ua
+     * @return 
      */
-    public PropertyDataHeavy configurePDHInfoCase(PropertyDataHeavy p, Credential cred) {
+    public PropertyDataHeavy configurePDHInfoCase(PropertyDataHeavy p, UserAuthorized ua){
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CECase cse = null;
         try {
-            cse = cc.initCECase(p, uc.getUser(cred.getGoverningAuthPeriod().getUserID()));
+            cse = cc.initCECase(p, uc.getUser(ua.getKeyCard().getGoverningAuthPeriod().getUserID()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        //review all case mems and set app ones for info case
         try {
-            //review all case mems and set app ones for info case
-            cc.insertNewCECase(cse, cred, null);
-        } catch (IntegrationException | BObStatusException | ViolationException | EventException ex) {
+            cc.insertNewCECase(cse, ua, null);
+        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
             System.out.println(ex);
         }
         return p;
@@ -334,18 +353,41 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return configureProperty(pi.getProperty(propID));
 
     }
-
-    public PropertyUnit getPropertyUnit(int unitID) throws IntegrationException {
+    
+    /**
+     * Logic intermediary for retrieval of a PropertyUnit by id
+     * @param unitID
+     * @return
+     * @throws IntegrationException 
+     */
+    public PropertyUnit getPropertyUnit(int unitID) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnit(unitID);
 
     }
+    
+    /**
+     * Logic intermediary for extracting a complete list of PropertyUseType
+     * objects from the DB
+     * @return 
+     */
+    public List<PropertyUseType> getPropertyUseTypeList(){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        List<PropertyUseType> putList = null;
+        try {
+            putList = pi.getPropertyUseTypeList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        return putList;
+    }
+    
 
     public Property getPropertyByPropUnitID(int unitID) throws IntegrationException {
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnitWithProp(unitID).getProperty();
     }
-
     /**
      * Implements a cascade of logic to determine a best suited startup property
      * for a given session. When a user has no Property history, it extracts the

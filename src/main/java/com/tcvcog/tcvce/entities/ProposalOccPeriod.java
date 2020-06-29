@@ -36,7 +36,7 @@ public class ProposalOccPeriod extends Proposal {
         this.hidden = pr.hidden;
 
         this.generatingEvent = pr.generatingEvent;
-        this.responseEvent = pr.responseEvent;
+        this.evaluationEvent = pr.evaluationEvent;
 
         this.notes = pr.notes;
         this.proposalRejected = pr.proposalRejected;

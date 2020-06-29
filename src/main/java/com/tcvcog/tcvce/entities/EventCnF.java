@@ -32,23 +32,34 @@ public  class       EventCnF
     
     protected int eventID;
     protected EventCategory category;
+    protected String description;
     
+    /**
+     * Indicates to clients which BOb identifier to use
+     * Alternatively, one could have only one field for the ID
+     * and use Domain to control what we do with that ID
+     * But that seemed to likely lead to more confusion since the DB
+     * has two columns, since each is keyed differently
+     */
     protected EventDomainEnum domain;
     protected int ceCaseID;
     protected int occPeriodID;
     
     protected LocalDateTime timeStart;
     protected LocalDateTime timeEnd;
-    protected LocalDateTime timestamp;
     
-    protected String description;
-    protected User owner;
+    protected User userCreator;
+    protected LocalDateTime creationts;
     
-    protected boolean discloseToMunicipality; 
-    protected boolean discloseToPublic;
+    protected User lastUpdatedBy;
+    protected LocalDateTime lastUpdatedTS;
+    
     protected boolean active;
-    protected boolean hidden;
     
+    /**
+     * Only for use in JavaLand; no DB col for hiding
+     */
+    protected boolean hidden;
     protected String notes;
     
     protected List<Person> personList;
@@ -60,29 +71,29 @@ public  class       EventCnF
     
     public EventCnF(EventCnF ev){
         
-        eventID = ev.eventID;
-        category = ev.category;
+        this.eventID = ev.eventID;
+        this.category = ev.category;
+        this.description = ev.description;
         
-        domain = ev.domain;
-        ceCaseID = ev.ceCaseID;
-        occPeriodID = ev.occPeriodID;
+        this.domain = ev.domain;
+        this.ceCaseID = ev.ceCaseID;
+        this.occPeriodID = ev.occPeriodID;
         
-        timeStart = ev.timeStart;
-        timeEnd = ev.timeEnd;
-        timestamp = ev.timestamp;
+        this.timeStart = ev.timeStart;
+        this.timeEnd = ev.timeEnd;
         
-        description = ev.description;
-        owner = ev.owner;
+        this.userCreator = ev.userCreator;
+        this.creationts = ev.creationts;
         
-        discloseToMunicipality = ev.discloseToMunicipality;
-        discloseToPublic = ev.discloseToPublic;
-        active = ev.active;
-        hidden = ev.hidden;
+        this.lastUpdatedBy = ev.lastUpdatedBy;
+        this.lastUpdatedTS = ev.lastUpdatedTS;
         
-        notes = ev.notes;
+        this.active = ev.active;
+        this.hidden = ev.hidden;
         
-        personList = ev.personList;
+        this.notes = ev.notes;
         
+        this.personList = ev.personList;
     }
     
     
@@ -102,10 +113,10 @@ public  class       EventCnF
 
    
     /**
-     * @return the timestamp
+     * @return the creationts
      */
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public LocalDateTime getCreationts() {
+        return creationts;
     }
 
     /**
@@ -116,25 +127,13 @@ public  class       EventCnF
     }
 
     /**
-     * @return the owner
+     * @return the userCreator
      */
-    public User getOwner() {
-        return owner;
+    public User getUserCreator() {
+        return userCreator;
     }
 
-    /**
-     * @return the discloseToMunicipality
-     */
-    public boolean isDiscloseToMunicipality() {
-        return discloseToMunicipality;
-    }
-
-    /**
-     * @return the discloseToPublic
-     */
-    public boolean isDiscloseToPublic() {
-        return discloseToPublic;
-    }
+ 
 
     /**
      * @return the active
@@ -174,10 +173,10 @@ public  class       EventCnF
 
     
     /**
-     * @param timestamp the timestamp to set
+     * @param creationts the creationts to set
      */
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public void setCreationts(LocalDateTime creationts) {
+        this.creationts = creationts;
     }
 
     /**
@@ -188,26 +187,13 @@ public  class       EventCnF
     }
 
     /**
-     * @param owner the owner to set
+     * @param userCreator the userCreator to set
      */
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setUserCreator(User userCreator) {
+        this.userCreator = userCreator;
     }
 
-    /**
-     * @param discloseToMunicipality the discloseToMunicipality to set
-     */
-    public void setDiscloseToMunicipality(boolean discloseToMunicipality) {
-        this.discloseToMunicipality = discloseToMunicipality;
-    }
-
-    /**
-     * @param discloseToPublic the discloseToPublic to set
-     */
-    public void setDiscloseToPublic(boolean discloseToPublic) {
-        this.discloseToPublic = discloseToPublic;
-    }
-
+   
     /**
      * @param active the active to set
      */
@@ -253,8 +239,8 @@ public  class       EventCnF
         int c = 0;
         if(this.timeStart != null && e.timeStart != null){
              c = this.timeStart.compareTo(e.timeStart);
-        } else if(this.timestamp != null && e.timestamp != null){
-             c = this.timestamp.compareTo(e.timestamp);
+        } else if(this.creationts != null && e.creationts != null){
+             c = this.creationts.compareTo(e.creationts);
         } 
         return c;
         
@@ -265,11 +251,9 @@ public  class       EventCnF
         int hash = 5;
         hash = 97 * hash + this.eventID;
         hash = 97 * hash + Objects.hashCode(this.category);
-        hash = 97 * hash + Objects.hashCode(this.timestamp);
+        hash = 97 * hash + Objects.hashCode(this.creationts);
         hash = 97 * hash + Objects.hashCode(this.description);
-        hash = 97 * hash + Objects.hashCode(this.owner);
-        hash = 97 * hash + (this.discloseToMunicipality ? 1 : 0);
-        hash = 97 * hash + (this.discloseToPublic ? 1 : 0);
+        hash = 97 * hash + Objects.hashCode(this.userCreator);
         hash = 97 * hash + (this.active ? 1 : 0);
         hash = 97 * hash + (this.hidden ? 1 : 0);
         hash = 97 * hash + Objects.hashCode(this.notes);
@@ -411,6 +395,36 @@ public  class       EventCnF
         if(teud != null){
             teud.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
+    }
+
+    
+
+    /**
+     * @return the lastUpdatedBy
+     */
+    public User getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    /**
+     * @return the lastUpdatedTS
+     */
+    public LocalDateTime getLastUpdatedTS() {
+        return lastUpdatedTS;
+    }
+
+    /**
+     * @param lastUpdatedBy the lastUpdatedBy to set
+     */
+    public void setLastUpdatedBy(User lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    /**
+     * @param lastUpdatedTS the lastUpdatedTS to set
+     */
+    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
+        this.lastUpdatedTS = lastUpdatedTS;
     }
 
 

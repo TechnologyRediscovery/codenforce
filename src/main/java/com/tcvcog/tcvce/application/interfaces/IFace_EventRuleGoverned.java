@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.application.interfaces;
 
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
@@ -34,6 +35,10 @@ import java.util.List;
  * @author sylvia
  */
 public interface IFace_EventRuleGoverned {
+    
+    public EventDomainEnum discloseEventDomain();
+    
+    public int getBObID();
     
     public void setEventList(List<EventCnF> lst);
 

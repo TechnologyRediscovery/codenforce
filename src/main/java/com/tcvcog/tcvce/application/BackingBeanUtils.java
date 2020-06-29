@@ -39,9 +39,7 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.WorkflowIntegrator;
-import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -104,8 +102,6 @@ public class        BackingBeanUtils
     private EventCoordinator eventCoordinator;
     private EventIntegrator eventIntegrator;
     
-    private ViolationIntegrator codeViolationIntegrator;
-    private CitationIntegrator citationIntegrator;
     private CourtEntityIntegrator courtEntityIntegrator;
     
     private PropertyIntegrator propertyIntegrator;
@@ -496,25 +492,6 @@ public class        BackingBeanUtils
     
     
 
-    /**
-     * @return the codeViolationIntegrator
-     */
-    public ViolationIntegrator getCodeViolationIntegrator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{codeViolationIntegrator}", ViolationIntegrator.class);
-        codeViolationIntegrator = (ViolationIntegrator) ve.getValue(context.getELContext());
-        
-        return codeViolationIntegrator;
-    }
-
-    /**
-     * @param codeViolationIntegrator the codeViolationIntegrator to set
-     */
-    public void setCodeViolationIntegrator(ViolationIntegrator codeViolationIntegrator) {
-        this.codeViolationIntegrator = codeViolationIntegrator;
-    }
-
    
    
     /**
@@ -564,27 +541,6 @@ public class        BackingBeanUtils
         this.paymentIntegrator = paymentIntegrator;
     }
 
-    
-
-    /**
-     * @return the citationIntegrator
-     */
-    public CitationIntegrator getCitationIntegrator() {
-        
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{citationIntegrator}", CitationIntegrator.class);
-        citationIntegrator = (CitationIntegrator) ve.getValue(context.getELContext());
-        
-        return citationIntegrator;
-    }
-
-    /**
-     * @param citationIntegrator the citationIntegrator to set
-     */
-    public void setCitationIntegrator(CitationIntegrator citationIntegrator) {
-        this.citationIntegrator = citationIntegrator;
-    }
 
     /**
      * @return the occInspectionIntegrator

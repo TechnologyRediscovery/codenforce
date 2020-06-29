@@ -30,7 +30,6 @@ import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,14 +75,18 @@ public class CECaseViolationsBB
         return "violationSelectElement";
     }
       
+    /**
+     * Attempts to deactivate a code violation
+     * @param cv 
+     */
     public void removeViolation(CodeViolation cv){
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.deleteViolation(cv);
+            cc.deactivateCodeViolation(cv, getSessionBean().getSessUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Violation id " + cv.getViolationID() + " removed from case!", ""));
             
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     ex.getMessage(), ""));
@@ -94,31 +97,21 @@ public class CECaseViolationsBB
     }
     
     
-    public void deleteViolation(ActionEvent e) {
-        CaseCoordinator cc = getCaseCoordinator();
-
-        try {
-            cc.deleteViolation(selectedViolations.get(0));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Unable to delete selected violation",
-                        "It has probably been added to a Notice of Violation"
-                                + "already and cannot be removed."));
-        }
-    }
-    
-    
+    /**
+     * TODO: Fix this ; logged in github issue
+     * Attempts to change the DB link between a code violation and a code element
+     * @param ae
+     * @throws BObStatusException 
+     */
     public void updateViolationsCodeBookLink(ActionEvent ae) throws BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
+        CodeIntegrator ci = getCodeIntegrator();
+        
         try {
-            ViolationIntegrator cvi = getCodeViolationIntegrator();
-            CodeIntegrator ci = getCodeIntegrator();
             EnforcableCodeElement ece = ci.getEnforcableCodeElement(newViolationCodeBookEleID);
             if (ece != null) {
                 selectedViolation.setViolatedEnfElement(ece);
-                cvi.updateCodeViolation(selectedViolation);
+//                cc.updateCodeViolation(selectedViolation);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Success: Updated Violation with new CodeBook linking", ""));
@@ -146,7 +139,7 @@ public class CECaseViolationsBB
         try {
             getSelectedViolation().setComplianceUser(getSessionBean().getSessUser());
             e = ec.generateViolationComplianceEvent(getSelectedViolation());
-            e.setOwner(getSessionBean().getSessUser());
+            e.setUserCreator(getSessionBean().getSessUser());
             e.setTimeStart(LocalDateTime.now());
             cv.setActualComplianceDate(LocalDateTime.now());
             cc.recordCompliance(cv, getSessionBean().getSessUser());

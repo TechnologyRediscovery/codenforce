@@ -75,8 +75,6 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                   III Property                                 <<< */
     /* >>> -------------------------------------------------------------- <<< */
-    
-    
     private PropertyDataHeavy sessProperty;
     private Property sessPropertyQueued;
     private List<Property> sessPropertyList;
@@ -109,15 +107,13 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    
+    private EventDomainEnum sessEventDomain;
     private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
     private EventCnF sessEventQueued;
     
     /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
     private List<QueryEvent> queryEventList;
-    
-    
     
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -167,7 +163,6 @@ public class    SessionBean
     private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
-    
     
     // --- QUERY CEAR ---
     private QueryCEAR queryCEAR;
@@ -1297,6 +1292,20 @@ public class    SessionBean
      */
     public void setSessionPayment(Payment sessionPayment) {
         this.sessionPayment = sessionPayment;
+    }
+
+    /**
+     * @return the sessEventDomain
+     */
+    public EventDomainEnum getSessEventDomain() {
+        return sessEventDomain;
+    }
+
+    /**
+     * @param sessEventDomain the sessEventDomain to set
+     */
+    public void setSessEventDomain(EventDomainEnum sessEventDomain) {
+        this.sessEventDomain = sessEventDomain;
     }
     
     

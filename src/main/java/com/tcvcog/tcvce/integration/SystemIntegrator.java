@@ -212,39 +212,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
 
-    /**
-     *
-     * @param casephase
-     * @return
-     * @throws IntegrationException
-     */
-    public Icon getIcon(CasePhaseEnum casephase) throws IntegrationException {
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT iconid ");
-        sb.append("FROM public.cecasestatusicon WHERE status=?::casephase;");
-        Icon i = null;
-
-        try {
-            stmt = con.prepareStatement(sb.toString());
-            stmt.setString(1, casephase.toString());
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                i = getIcon(rs.getInt("iconid"));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to generate icon", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return i;
-
-    }
+   
 
     public List<Icon> getIconList() throws IntegrationException {
         Connection con = getPostgresCon();

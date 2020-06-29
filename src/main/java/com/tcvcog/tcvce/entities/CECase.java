@@ -19,7 +19,8 @@ public class        CECase
         extends     CECasePublic
         implements  IFace_Openable,
                     Cloneable,
-                    IFace_Loggable{
+                    IFace_Loggable,
+                    Comparable<CECase>{
     
     protected int caseID;
     protected int publicControlCode;
@@ -81,7 +82,13 @@ public class        CECase
     
       @Override
     public boolean isOpen() {
-        return this.casePhase.isCaseOpen();
+        if(this.casePhase != null){
+            return this.casePhase.isCaseOpen();
+        } else if (this.getClosingDate() != null){
+            return true;
+        } else {
+            return false;
+        }
     }
 
   
@@ -280,6 +287,21 @@ public class        CECase
     public void setCasePhaseIcon(Icon casePhaseIcon) {
         this.casePhaseIcon = casePhaseIcon;
     }
+    
+    
+    @Override
+    public int compareTo(CECase cse) {
+         
+        int c = 0;
+        if(this.originationDate != null && cse.getOriginationDate() != null){
+             c = this.originationDate.compareTo(cse.getOriginationDate());
+        } else if(this.creationTimestamp != null && cse.creationTimestamp != null){
+             c = this.creationTimestamp.compareTo(cse.creationTimestamp);
+        } 
+        return c;
+        
+    }
+
 
     @Override
     public int hashCode() {

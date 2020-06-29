@@ -36,6 +36,7 @@ public  class       CodeViolation
     protected int ceCaseID;
        
     protected ViolationStatusEnum status;
+    protected boolean active;
     protected Icon icon;
     protected String ageLeadText;
     
@@ -43,14 +44,6 @@ public  class       CodeViolation
     protected String description;
     protected String notes;
     
-    protected LocalDateTime dateOfCitation;
-    protected String dateOfCitationPretty;
-    
-    protected List<Integer> citationIDList;
-    protected String citationListAsString;
-    
-    protected List<Integer> noticeIDList;
-    protected String noticeIDListAsString;
  
     protected LocalDateTime dateOfRecord;
     protected java.util.Date dateOfRecordUtilDate;
@@ -58,25 +51,30 @@ public  class       CodeViolation
     
     protected LocalDateTime creationTS;
     protected String creationTSPretty;
-    
     protected User createdBy;
     
-    protected LocalDateTime stipulatedComplianceDate;
+    protected LocalDateTime dateOfCitation;
+    protected List<Integer> citationIDList;
+    protected List<Integer> noticeIDList;
     
+    protected LocalDateTime stipulatedComplianceDate;
     protected LocalDateTime actualComplianceDate;
     
     protected boolean leagacyImport;
-    
     protected List<Integer> blobIDList;
+    protected List<Integer> photoList;
     
     protected LocalDateTime complianceTimeStamp;
     protected User complianceUser;
-    protected EventCnF compTimeFrameComplianceEvent;
-    protected int complianceTimeframeEventID;
     
-    protected List<Integer> photoList;
+    protected int complianceTFExpiryPropID;
+    protected Proposal complianceTFExpiryProp;
     
-    private int severityIntensityClassID;
+    protected int severityIntensityClassID;
+    
+    protected LocalDateTime lastUpdatedTS;
+    protected User lastUpdatedUser;
+    
     
     
      /**
@@ -287,16 +285,11 @@ public  class       CodeViolation
      * @return the citationListAsString
      */
     public String getCitationListAsString() {
-       
-        return citationListAsString;
+        String s = "Inject during configuration";
+        return s;
     }
 
-    /**
-     * @param citationListAsString the citationListAsString to set
-     */
-    public void setCitationListAsString(String citationListAsString) {
-        this.citationListAsString = citationListAsString;
-    }
+   
 
    
 
@@ -304,8 +297,8 @@ public  class       CodeViolation
      * @return the dateOfCitationPretty
      */
     public String getDateOfCitationPretty() {
-        dateOfCitationPretty = EntityUtils.getPrettyDate(dateOfCitation);
-        return dateOfCitationPretty;
+        String s = EntityUtils.getPrettyDate(dateOfCitation);
+        return s;
     }
 
     /**
@@ -339,12 +332,6 @@ public  class       CodeViolation
         return EntityUtils.getPrettyDate(actualComplianceDate);
     }
 
-    /**
-     * @param dateOfCitationPretty the dateOfCitationPretty to set
-     */
-    public void setDateOfCitationPretty(String dateOfCitationPretty) {
-        this.dateOfCitationPretty = dateOfCitationPretty;
-    }
 
     /**
      * @param dateOfRecordPretty the dateOfRecordPretty to set
@@ -397,12 +384,7 @@ public  class       CodeViolation
         return complianceUser;
     }
 
-    /**
-     * @return the compTimeFrameComplianceEvent
-     */
-    public EventCnF getCompTimeFrameComplianceEvent() {
-        return compTimeFrameComplianceEvent;
-    }
+   
 
     /**
      * @param leagacyImport the leagacyImport to set
@@ -425,26 +407,7 @@ public  class       CodeViolation
         this.complianceUser = complianceUser;
     }
 
-    /**
-     * @param compTimeFrameComplianceEvent the compTimeFrameComplianceEvent to set
-     */
-    public void setCompTimeFrameComplianceEvent(EventCnF compTimeFrameComplianceEvent) {
-        this.compTimeFrameComplianceEvent = compTimeFrameComplianceEvent;
-    }
-
-    /**
-     * @return the complianceTimeframeEventID
-     */
-    public int getComplianceTimeframeEventID() {
-        return complianceTimeframeEventID;
-    }
-
-    /**
-     * @param complianceTimeframeEventID the complianceTimeframeEventID to set
-     */
-    public void setComplianceTimeframeEventID(int complianceTimeframeEventID) {
-        this.complianceTimeframeEventID = complianceTimeframeEventID;
-    }
+    
     
     /**
      * Violations can print themselves on a single line
@@ -474,9 +437,7 @@ public  class       CodeViolation
         hash = 53 * hash + Objects.hashCode(this.description);
         hash = 53 * hash + Objects.hashCode(this.notes);
         hash = 53 * hash + Objects.hashCode(this.dateOfCitation);
-        hash = 53 * hash + Objects.hashCode(this.dateOfCitationPretty);
         hash = 53 * hash + Objects.hashCode(this.citationIDList);
-        hash = 53 * hash + Objects.hashCode(this.citationListAsString);
         hash = 53 * hash + Objects.hashCode(this.dateOfRecord);
         hash = 53 * hash + Objects.hashCode(this.dateOfRecordPretty);
         hash = 53 * hash + Objects.hashCode(this.creationTS);
@@ -486,8 +447,6 @@ public  class       CodeViolation
         hash = 53 * hash + (this.leagacyImport ? 1 : 0);
         hash = 53 * hash + Objects.hashCode(this.complianceTimeStamp);
         hash = 53 * hash + Objects.hashCode(this.complianceUser);
-        hash = 53 * hash + Objects.hashCode(this.compTimeFrameComplianceEvent);
-        hash = 53 * hash + this.complianceTimeframeEventID;
         hash = 53 * hash + Objects.hashCode(this.blobIDList);
         return hash;
     }
@@ -563,7 +522,8 @@ public  class       CodeViolation
      * @return the noticeIDListAsString
      */
     public String getNoticeIDListAsString() {
-        return noticeIDListAsString;
+        String s = "TODO: Wire up to coordinator";
+        return s;
     }
 
     /**
@@ -603,12 +563,6 @@ public  class       CodeViolation
         this.noticeIDList = noticeIDList;
     }
 
-    /**
-     * @param noticeIDListAsString the noticeIDListAsString to set
-     */
-    public void setNoticeIDListAsString(String noticeIDListAsString) {
-        this.noticeIDListAsString = noticeIDListAsString;
-    }
 
     /**
      * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
@@ -664,6 +618,90 @@ public  class       CodeViolation
      */
     public void setSeverityIntensityClassID(int severityIntensityClassID) {
         this.severityIntensityClassID = severityIntensityClassID;
+    }
+
+    /**
+     * @return the complianceTFExpiryPropID
+     */
+    public int getComplianceTFExpiryPropID() {
+        return complianceTFExpiryPropID;
+    }
+
+    /**
+     * @return the complianceTFExpiryProp
+     */
+    public Proposal getComplianceTFExpiryProp() {
+        return complianceTFExpiryProp;
+    }
+
+    /**
+     * @return the photoList
+     */
+    public List<Integer> getPhotoList() {
+        return photoList;
+    }
+
+    /**
+     * @param complianceTFExpiryPropID the complianceTFExpiryPropID to set
+     */
+    public void setComplianceTFExpiryPropID(int complianceTFExpiryPropID) {
+        this.complianceTFExpiryPropID = complianceTFExpiryPropID;
+    }
+
+    /**
+     * @param complianceTFExpiryProp the complianceTFExpiryProp to set
+     */
+    public void setComplianceTFExpiryProp(Proposal complianceTFExpiryProp) {
+        this.complianceTFExpiryProp = complianceTFExpiryProp;
+    }
+
+    /**
+     * @param photoList the photoList to set
+     */
+    public void setPhotoList(List<Integer> photoList) {
+        this.photoList = photoList;
+    }
+
+    /**
+     * @return the lastUpdatedTS
+     */
+    public LocalDateTime getLastUpdatedTS() {
+        return lastUpdatedTS;
+    }
+
+    /**
+     * @return the lastUpdatedUser
+     */
+    public User getLastUpdatedUser() {
+        return lastUpdatedUser;
+    }
+
+    /**
+     * @param lastUpdatedTS the lastUpdatedTS to set
+     */
+    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
+        this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    /**
+     * @param lastUpdatedUser the lastUpdatedUser to set
+     */
+    public void setLastUpdatedUser(User lastUpdatedUser) {
+        this.lastUpdatedUser = lastUpdatedUser;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
    

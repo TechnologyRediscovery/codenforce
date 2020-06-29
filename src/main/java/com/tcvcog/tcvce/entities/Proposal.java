@@ -38,7 +38,7 @@ public  class       Proposal
     
     protected int generatingEventID;
     protected EventCnF generatingEvent;
-    protected EventCnF responseEvent;
+    protected EventCnF evaluationEvent;
 
     protected String notes;
     protected boolean proposalRejected;
@@ -268,10 +268,10 @@ public  class       Proposal
     }
 
     /**
-     * @return the responseEvent
+     * @return the evaluationEvent
      */
-    public EventCnF getResponseEvent() {
-        return responseEvent;
+    public EventCnF getEvaluationEvent() {
+        return evaluationEvent;
     }
 
     /**
@@ -289,10 +289,10 @@ public  class       Proposal
     }
 
     /**
-     * @param responseEvent the responseEvent to set
+     * @param evaluationEvent the evaluationEvent to set
      */
-    public void setResponseEvent(EventCnF responseEvent) {
-        this.responseEvent = responseEvent;
+    public void setEvaluationEvent(EventCnF evaluationEvent) {
+        this.evaluationEvent = evaluationEvent;
     }
 
     /**
@@ -340,7 +340,7 @@ public  class       Proposal
         hash = 47 * hash + (this.active ? 1 : 0);
         hash = 47 * hash + (this.hidden ? 1 : 0);
         hash = 47 * hash + Objects.hashCode(this.generatingEvent);
-        hash = 47 * hash + Objects.hashCode(this.responseEvent);
+        hash = 47 * hash + Objects.hashCode(this.evaluationEvent);
         hash = 47 * hash + Objects.hashCode(this.notes);
         hash = 47 * hash + (this.proposalRejected ? 1 : 0);
         hash = 47 * hash + this.order;

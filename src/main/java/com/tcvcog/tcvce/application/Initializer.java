@@ -33,9 +33,7 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.WorkflowIntegrator;
-import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -135,12 +133,6 @@ public class Initializer implements ServletContextListener{
         
         PublicInfoCoordinator picor = new PublicInfoCoordinator();
         servletContext.setAttribute("publicInfoCoordinator", picor);
-        
-        ViolationIntegrator cvi = new ViolationIntegrator();
-        servletContext.setAttribute("codeViolationIntegrator", cvi);
-        
-        CitationIntegrator citint = new CitationIntegrator();
-        servletContext.setAttribute("citationIntegrator", citint);
         
         CourtEntityIntegrator cei = new CourtEntityIntegrator();
         servletContext.setAttribute("courtEntityIntegrator", cei);

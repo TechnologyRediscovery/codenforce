@@ -23,41 +23,50 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.ChoiceEventCat;
-import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Directive;
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventRuleAbstract;
-import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
-import com.tcvcog.tcvce.entities.EventRuleSet;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.ProposalCECase;
-import com.tcvcog.tcvce.entities.ProposalOccPeriod;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.integration.WorkflowIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Iterator;
-import com.tcvcog.tcvce.entities.IFace_Openable;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
- *
+ * Holder of business logic related to event rules and proposals. The EventRule
+ * object specifies a set of tests against a given list of EventCnF objects which 
+ * are implemented in a series of ten or so methods prefixed with <br>
+ * <br>
+ * ruleSubcheck_XXXX<br>
+ * <br>
+ * which all boil down to an EventRule either passing or failing, each outcome 
+ * of which can trigger the creation of EventCnF objects and Directives which 
+ * guide the end user to take appropriate next steps in a given case.<br>
+ * 
+ * <br>The other half of my methods govern the attachment and evaluation of proposals
+ * which consist of one or more possible choices the user can select to indicate
+ * certain conditions exist in the actual casework or actual actions were taken.
+ * 
+ * Since proposals most often result in an EventCnF getting attached to a BOb 
+ * (Choices can also trigger page flows and more!), the evaluation of proposals
+ * often impacts the outcomes of one or more EventRules also associated with the
+ * BOb of concern.
+ * 
+ * With proposals helping the user create events to document casework and 
+ * event rules governing when certain major case events are appropriate (e.g. 
+ * issuing an occupancy permit, or filing a citation with the magistrate), 
+ * codeNforce can pass as not just a database but an entire workflow management
+ * system for code enforcement and occupancy case sequences.
+ * 
+ * 
  * @author sylvia
  */
 public class WorkflowCoordinator extends BackingBeanUtils implements Serializable{
@@ -68,29 +77,25 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     public WorkflowCoordinator() {
     }
     
+    
+    // *************************************************************************
+    // *                 DIRECTIVES AND PROPOSALS                              *
+    // *************************************************************************
+    
+    
+    /**
+     * Database object retrieving method for acquiring all Proposals to inject
+     * into our BObs
+     * 
+     * @param erg as of June 2020, these included CECase and OccPeriod objects
+     * @param cred
+     * @return 
+     */
     public List<Proposal> getProposalList(IFace_EventRuleGoverned erg, Credential cred){
-        WorkflowIntegrator ci = getWorkflowIntegrator();
+        WorkflowIntegrator wi = getWorkflowIntegrator();
         List<Proposal> propList = new ArrayList<>();
         
-        try {
-            if(erg instanceof CECase){
-                CECase cse = (CECase) erg;
-                propList.addAll(ci.getProposalList(cse));
-            } else if (erg instanceof OccPeriod){
-                OccPeriod op = (OccPeriod) erg;
-                propList.addAll(ci.getProposalList(op))    ;
-            }
-            
-            if(!propList.isEmpty()){
-                for(Proposal pr: propList){
-                    configureProposal(pr, cred);
-                }
-            }
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
+     
         return propList;
         
     }
@@ -131,6 +136,13 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         }
     }
     
+    /**
+     * Iterates over the Choices inside a given Proposal and flips switches
+     * on them based on the permissions held by the credential param
+     * @param proposal
+     * @param cred
+     * @return 
+     */
     public Proposal configureChoiceList(Proposal proposal, Credential cred){
         if(proposal != null && cred != null){
             if(proposal.getDirective().getChoiceList() != null){
@@ -144,6 +156,12 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         return proposal;
     }
     
+    /**
+     * Internal logic container for setting up an individual choice
+     * @param choice
+     * @param cred
+     * @return 
+     */
     private IFace_Proposable configureChoice(IFace_Proposable choice, Credential cred){
         if(choice != null && cred != null){
             choice.setHidden(true);
@@ -163,7 +181,186 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         return choice;
     }
     
-    public boolean determineProposalEvaluatability( Proposal proposal,
+    
+   /**
+     * Pathway for "Evaluating a Proposal" or in other words, making a workflow choice.
+     * The exception list is a beast because so many components of the system are impacted
+     * by an event creation.
+     * 
+     * @param proposal containing the chosen choice
+     * @param chosen this method will double check that no funny business is going on
+     * namely a choice is trying to be made that's not in the Proposal
+     * @param erg the parent ERG
+     * @param ua doing the choosing
+     * @return all EventCnFs that are ADDED to the parent ERG during evaluation
+     * which could be more than 1 since the mother ERG will be refreshed
+     * and all rules re-evaluated for each triggered EventCnF, all of which happen
+     * before this method returns
+     * @throws BObStatusException
+     */
+    public List<EventCnF> evaluateProposal(     Proposal proposal, 
+                                                IFace_Proposable chosen, 
+                                                IFace_EventRuleGoverned erg, 
+                                                UserAuthorized ua) 
+                                        throws  BObStatusException {
+        
+        WorkflowCoordinator wc = getWorkflowCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        
+        List<EventCnF> propEvDoneList = new ArrayList<>();
+        
+        try {
+            if(wc.determineProposalEvaluatability(proposal, chosen, ua)){
+                // farm out processing to internal methods based on subtype of chosen
+                if(chosen instanceof ChoiceEventCat){
+                    ChoiceEventCat cec = (ChoiceEventCat) chosen;
+                    propEvDoneList.addAll(processChoice(erg, proposal, cec, ua));
+                } else if (chosen instanceof ChoiceEventRule){
+                    ChoiceEventRule cer = (ChoiceEventRule) chosen;
+                    propEvDoneList.addAll(processChoice(erg, proposal, cer, ua));
+                }
+                // since we can evaluate this proposal with the chosen Proposable, configure members
+                proposal.setResponderActual(ua);
+                proposal.setResponseTS(LocalDateTime.now());
+                proposal.setChosenChoice(chosen);
+
+                // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
+                List<EventCnF> tmpEvList = evaluateProposal_recordEvaluation(proposal, chosen, erg, ua);
+                
+                if(tmpEvList != null && !tmpEvList.isEmpty()){
+                    proposal.setEvaluationEvent(tmpEvList.get(0));
+                } else {
+                    proposal.setEvaluationEvent(null);
+                }
+                propEvDoneList.addAll(tmpEvList);
+                
+                // now that the proposal has been evaluated, no need to see it
+                // but in reality, it will be marked hidden by the config method 
+                // on BOb relaod, so this is just for consistency's sake
+                proposal.setHidden(true);
+                wi.recordProposalEvaluation(proposal);
+            } else {
+                throw new BObStatusException("Unable to evaluate proposal due to business rule violation");
+            }
+        } catch (IntegrationException | EventException ex) {
+            throw new BObStatusException(ex.getMessage());
+        } 
+        return propEvDoneList;
+    }
+    
+    private List<EventCnF> evaluateProposal_recordEvaluation( Proposal proposal, 
+                                                        IFace_Proposable chosen, 
+                                                        IFace_EventRuleGoverned erg, 
+                                                        UserAuthorized ua) 
+                                            throws      IntegrationException, 
+                                                        BObStatusException, 
+                                                        EventException {
+        
+        EventCoordinator ec = getEventCoordinator();
+        EventCnF ev = null;
+        EventCategory workflowCat = ec.getEventCategory(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                    .getString("actionRequestPublicUserPersonSourceID")));
+        
+        ev = ec.initEvent(erg, workflowCat);
+
+        ev.setActive(true);
+        ev.setHidden(false);
+
+        ev.setTimeStart(LocalDateTime.now());
+        ev.setTimeEnd(ev.getTimeStart().plusMinutes(workflowCat.getDefaultdurationmins()));
+        ev.setUserCreator(ua);
+        ev.setCreationts(LocalDateTime.now());
+        StringBuilder descBldr = new StringBuilder();
+        descBldr.append("User ");
+        descBldr.append(ua.getPerson().getFirstName());
+        descBldr.append(" ");
+        descBldr.append(ua.getPerson().getLastName());
+        descBldr.append("(");
+        descBldr.append(ua.getUsername());
+        descBldr.append(") ");
+        descBldr.append(" evaluated the proposal titled: '");
+        descBldr.append(proposal.getDirective().getTitle());
+        descBldr.append("' on ");
+        descBldr.append(getPrettyDateNoTime(proposal.getResponseTS()));
+        descBldr.append(" and selected choice titled:  '");
+        descBldr.append(chosen.getTitle());
+        descBldr.append("'.");
+        ev.setDescription(descBldr.toString());
+        return ec.addEvent(ev, erg, ua);
+    }
+    
+    /**
+     * Internal logic intermediary for implementing the EventRuleAbstract object
+     * associated with a given Proposal evaluation instance
+     * @param erg
+     * @param p
+     * @param ch
+     * @param ua
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    private List<EventCnF> processChoice(  IFace_EventRuleGoverned erg,
+                                    Proposal p,
+                                    ChoiceEventRule ch,
+                                    UserAuthorized ua) throws IntegrationException, BObStatusException{
+        if(ch.getRule() != null){
+            rules_attachEventRule(ch.getRule(), erg, ua);
+        }
+        
+        return null;
+    }
+
+    /**
+     * A BOB-flexible event generator given a Proposal object and the Choice that was
+     * selected by the user.
+     * @param erg
+     * @param p
+     * @param ch
+     * @param u
+     * @return a configured but not integrated EventCnF. The EventDomain is set before return
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.EventException
+     */
+    private List<EventCnF> processChoice(   IFace_EventRuleGoverned erg, 
+                                            Proposal p, 
+                                            ChoiceEventCat ch, 
+                                            UserAuthorized u) 
+                                    throws  BObStatusException, 
+                                            IntegrationException, 
+                                            EventException {
+        EventCoordinator ec = getEventCoordinator();
+        
+        EventCnF ev = null;
+        
+        
+        if (ch instanceof ChoiceEventCat) {
+            EventCategory ecat = ec.initEventCategory(ch.getEventCategory().getCategoryID());
+            ev = ec.initEvent(erg, ecat);
+            ev.setDescription(ch.getEventCategory().getHostEventDescriptionSuggestedText());
+                   
+        } else {
+            throw new BObStatusException("Generating events for Choice " 
+                    + "objects that are not Event triggers is not yet supported. " 
+                    + "Thank you in advance for your patience.");
+        }
+        return ec.addEvent(ev, erg, u);
+    }
+
+    
+    /**
+     * Logic container for checking if a User can actually make the desired choice
+     * which includes checking to make sure the chosen object is an option inside
+     * the passed in Proposal object
+     * 
+     * @param proposal
+     * @param chosen
+     * @param u
+     * @return 
+     */
+    private boolean determineProposalEvaluatability( Proposal proposal,
                                                     IFace_Proposable chosen, 
                                                     User u){
         if(proposal == null || chosen == null || u== null){
@@ -189,12 +386,6 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         return true;
     }
     
-    public void recordProposalEvaluation(Proposal p) throws IntegrationException{
-        WorkflowIntegrator ci = getWorkflowIntegrator();
-        p.setHidden(true);
-        ci.recordProposalEvaluation(p);
-    }
-    
     /**
      * Takes in a Directive object and an OccPeriod or CECaseDataHeavy and 
      * implements that directive by assigning it via a Proposal given sensible initial values
@@ -205,6 +396,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
      */
     public void implementDirective(Directive dir, IFace_EventRuleGoverned erg, EventCnF ev) 
             throws IntegrationException{
+        
         WorkflowIntegrator wi = getWorkflowIntegrator();
         Proposal pr = new Proposal();
         pr.setDirective(dir);
@@ -213,6 +405,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
             pr.setActivatesOn(LocalDateTime.now());
             pr.setHidden(false);
             pr.setProposalRejected(false);
+            // TODO: implement some logic here for order assignment
             pr.setOrder(0);
         } else {
             return;
@@ -273,6 +466,14 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         }
     }
     
+    /**
+     * Logic container for setting proper fields on a Proposal to clear its
+     * previsou evaluation
+     * @param p
+     * @param u
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
     public void clearProposalEvaluation(Proposal p, UserAuthorized u) throws IntegrationException, BObStatusException{
         WorkflowIntegrator ci = getWorkflowIntegrator();
         if(p.isReadOnlyCurrentUser()){
@@ -280,28 +481,63 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         }
         p.setResponseTS(null);
         p.setResponderActual(null);
-        p.setResponseEvent(null);
+        p.setEvaluationEvent(null);
         p.setProposalRejected(false);
         ci.updateProposal(p);
     }
-
-    public void rules_updateEventRuleAbstract(EventRuleAbstract era) throws IntegrationException {
-        WorkflowIntegrator wi = getWorkflowIntegrator();
-        wi.rules_updateEventRule(era);
-    }
-
-    private boolean ruleSubcheck_forbiddenEventType(CECaseDataHeavy cse, EventRuleAbstract rule) {
-        boolean subcheckPasses = true;
-        Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
-        while (iter.hasNext()) {
-            EventCnF ev = iter.next();
-            if (ev.getCategory().getEventType() == rule.getRequiredEventType()) {
-                subcheckPasses = false;
+    
+    // *************************************************************************
+    // *                     EVENT RULES : EVALUATION                          *
+    // *************************************************************************
+    
+    
+    
+    /**
+     * Breaks a given event rule down and farms out checks for each of its subrules
+     * and returns an overall pass/fail determination based on those determinations
+     * @param eventList
+     * @param rule
+     * @return pass/fail determination on the overall even rule
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public boolean rules_evalulateEventRule(List<EventCnF> eventList, EventRuleAbstract rule) throws IntegrationException, BObStatusException{
+        
+        if (eventList == null || rule == null) {
+            throw new BObStatusException("EventCoordinator.evaluateEventRule | Null event list or rule");
+        }
+        if (rule.getRequiredEventType() != null) {
+            if (!ruleSubcheck_requiredEventType(eventList, rule)) {
+                return false;
             }
         }
-        return subcheckPasses;
+        if (rule.getForbiddenEventType() != null) {
+            if (!ruleSubcheck_forbiddenEventType(eventList, rule)) {
+                return false;
+            }
+        }
+        if (rule.getRequiredEventCategory() != null) {
+            if (!ruleSubcheck_requiredEventCategory(eventList, rule)) {
+                return false;
+            }
+        }
+        if (rule.getForbiddenEventCategory() != null) {
+            if (!ruleSubcheck_forbiddenEventCategory(eventList, rule)) {
+                return false;
+            }
+        }
+        return true;
     }
 
+    
+    /**
+     * Evaluates a given list of EventCnF objects for the presence of an EventCnF
+     * that CANNOT be in the list for passage of the EventCnF rule
+     * 
+     * @param eventList
+     * @param rule
+     * @return a pass/fail determination for this component of the EventRule
+     */
     private boolean ruleSubcheck_forbiddenEventType(List<EventCnF> eventList, EventRuleAbstract rule) {
         Iterator<EventCnF> iter = eventList.iterator();
         while (iter.hasNext()) {
@@ -312,22 +548,35 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         }
         return true;
     }
-
-    private boolean ruleSubcheck_requiredEventCategory(CECaseDataHeavy cse, EventRuleAbstract rule) {
-        boolean subcheckPasses = true;
-        if (rule.getRequiredEventCategory().getCategoryID() != 0) {
-            subcheckPasses = false;
-            Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
-            while (iter.hasNext()) {
-                EventCnF ev = iter.next();
-                if (ev.getCategory().getCategoryID() == rule.getRequiredEventCategory().getCategoryID()) {
-                    subcheckPasses = true;
-                }
+    
+      
+    /**
+     * Evaluates a given list of EventCnF objects for the presence of a required
+     * EventType for the passing of the EventRule
+     * @param eventList
+     * @param rule
+     * @return a pass/fail determination for this component of the EventRule
+     */
+    private boolean ruleSubcheck_requiredEventType(List<EventCnF> eventList, EventRuleAbstract rule) {
+        Iterator<EventCnF> iter = eventList.iterator();
+        while (iter.hasNext()) {
+            EventType evType = iter.next().getCategory().getEventType();
+            if (evType == rule.getRequiredEventType()) {
+                return true;
             }
         }
-        return subcheckPasses;
+        return false;
     }
 
+  
+/**
+ * Evaluates a given List of EventCnF objects to make sure it contains an instance
+ * of a required EventCategory for passage of the rule
+ * 
+ * @param eventList
+ * @param rule
+ * @return a pass/fail determination for this component of the EventRule
+ */
     private boolean ruleSubcheck_requiredEventCategory(List<EventCnF> eventList, EventRuleAbstract rule) {
         Iterator<EventCnF> iter = eventList.iterator();
         while (iter.hasNext()) {
@@ -368,173 +617,16 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         // list did not contain an EventCnF whose category was required or required in a specified range
         return false;
     }
-
-    public EventRuleAbstract rules_getEventRuleAbstract(int eraid) throws IntegrationException {
-        WorkflowIntegrator wi = getWorkflowIntegrator();
-        return wi.rules_getEventRuleAbstract(eraid);
-    }
-
-    public boolean rules_evalulateEventRule(List<EventCnF> eventList, EventRuleAbstract rule) throws IntegrationException, BObStatusException{
-        
-        if (eventList == null || rule == null) {
-            throw new BObStatusException("EventCoordinator.evaluateEventRule | Null event list or rule");
-        }
-        if (rule.getRequiredEventType() != null) {
-            if (!ruleSubcheck_requiredEventType(eventList, rule)) {
-                return false;
-            }
-        }
-        if (rule.getForbiddenEventType() != null) {
-            if (!ruleSubcheck_forbiddenEventType(eventList, rule)) {
-                return false;
-            }
-        }
-        if (rule.getRequiredEventCategory() != null) {
-            if (!ruleSubcheck_requiredEventCategory(eventList, rule)) {
-                return false;
-            }
-        }
-        if (rule.getForbiddenEventCategory() != null) {
-            if (!ruleSubcheck_forbiddenEventCategory(eventList, rule)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean rules_evalulateEventRule(CECaseDataHeavy cse, EventCnF event) throws BObStatusException {
-        EventRuleAbstract rule = new EventRuleAbstract();
-        boolean rulePasses = false;
-        CaseCoordinator cc = getCaseCoordinator();
-        if (    ruleSubcheck_requiredEventType(cse, rule) 
-             && ruleSubcheck_forbiddenEventType(cse, rule) 
-             && ruleSubcheck_requiredEventCategory(cse, rule) 
-             && ruleSubcheck_forbiddenEventCategory(cse, rule)
-            ) {
-                rulePasses = true;
-                try {
-                    cc.processCaseOnEventRulePass(cse, rule);
-                } catch (ViolationException | IntegrationException ex) {
-                    System.out.println(ex);
-                }
-        }
-        return rulePasses;
-    }
+    
+  
 
     /**
-     * A BOB-agnostic event generator given a Proposal object and the Choice that was
-     * selected by the user.
-     * @param erg
-     * @param p
-     * @param ch
-     * @param u
-     * @return a configured but not integrated EventCnF superclass. The caller will need to cast it to
-    the appropriate subclass and insert it
-     * @throws com.tcvcog.tcvce.domain.BObStatusException
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     * @throws com.tcvcog.tcvce.domain.EventException
+     * Evaluates a given List of EventCnF objects to see if it contains an event
+     * that cannot exist in that List for the EventRule to pass
+     * @param eventList
+     * @param rule
+     * @return a pass/fail determination for the forbidden event category
      */
-    public EventCnF generateEventDocumentingProposalEvaluation(IFace_EventRuleGoverned erg, Proposal p, IFace_Proposable ch, UserAuthorized u) 
-            throws BObStatusException, IntegrationException, EventException {
-        EventCnF ev = null;
-        EventCoordinator ec = getEventCoordinator();
-        if (ch instanceof ChoiceEventCat) {
-            EventCategory ecat = ec.initEventCategory(((ChoiceEventCat) ch).getEventCategory().getCategoryID());
-            
-            // TODO: Finish this
-            ev = ec.initEvent(null, ecat);
-            ev.setActive(true);
-            ev.setHidden(false);
-            ev.setTimeStart(LocalDateTime.now());
-            ev.setTimeEnd(ev.getTimeStart().plusMinutes(ecat.getDefaultdurationmins()));
-            ev.setDiscloseToMunicipality(true);
-            ev.setDiscloseToPublic(false);
-            ev.setOwner(u);
-            ev.setTimestamp(LocalDateTime.now());
-            StringBuilder descBldr = new StringBuilder();
-            descBldr.append("User ");
-            descBldr.append(u.getPerson().getFirstName());
-            descBldr.append(" ");
-            descBldr.append(u.getPerson().getLastName());
-            descBldr.append(" evaluated the proposal titled: '");
-            descBldr.append(p.getDirective().getTitle());
-            descBldr.append("' on ");
-            descBldr.append(getPrettyDateNoTime(p.getResponseTS()));
-            descBldr.append(" and selected choice titled:  '");
-            descBldr.append(ch.getTitle());
-            descBldr.append("'.");
-            ev.setDescription(descBldr.toString());
-        } else {
-            throw new BObStatusException("Generating events for Choice " 
-                    + "objects that are not Event triggers is not yet supported. " 
-                    + "Thank you in advance for your patience.");
-        }
-        return ev;
-    }
-
-    //    -----------------------------------------------------------
-    //    ***************** RULES and WORKFLOWS *********************
-    //    -----------------------------------------------------------
-    /**
-     * Calls appropriate Integration method given a CECase or OccPeriod
-     * and generates a configured event rule list.
-     * @param erg
-     * @param cred
-     * @return
-     */
-    public List<EventRuleImplementation> rules_getEventRuleImpList(IFace_EventRuleGoverned erg, Credential cred) {
-        WorkflowIntegrator wi = getWorkflowIntegrator();
-        List<EventRuleImplementation> imp = new ArrayList<>();
-            try {
-                if (erg instanceof CECase) {
-                    CECase cse = (CECase) erg;
-                    imp.addAll(wi.rules_getEventRuleImpCECaseList(cse));
-                } else if (erg instanceof OccPeriod) {
-                    OccPeriod op = (OccPeriod) erg;
-                    imp.addAll(wi.rules_getEventRuleImpOccPeriodList(op));
-                }
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
-        return imp;
-    }
-
-    /**
-     * Takes in an EventRuleSet object which contains a list of EventRuleAbstract objects
-    and either an OccPeriod or CECaseDataHeavy and implements those abstract rules
-    on that particular business object
-     * @param ers
-     * @param rg
-     * @param usr
-     * @throws IntegrationException
-     * @throws BObStatusException
-     */
-    public void rules_attachRuleSet(EventRuleSet ers, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, BObStatusException {
-        for (EventRuleAbstract era : ers.getRuleList()) {
-            if (rg instanceof OccPeriodDataHeavy) {
-                OccPeriodDataHeavy op = (OccPeriodDataHeavy) rg;
-                rules_attachEventRuleAbstractToOccPeriod(era, op, usr);
-            } else if (rg instanceof CECaseDataHeavy) {
-                CECaseDataHeavy cec = (CECaseDataHeavy) rg;
-                rules_attachEventRuleAbstractToCECase(era, cec);
-            } else {
-                throw new BObStatusException("Cannot attach rule set");
-            }
-        }
-    }
-
-    private boolean ruleSubcheck_forbiddenEventCategory(CECaseDataHeavy cse, EventRuleAbstract rule) {
-        boolean subcheckPasses = true;
-        Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
-        while (iter.hasNext()) {
-            EventCnF ev = iter.next();
-            if (ev.getCategory().getCategoryID() == rule.getRequiredEventCategory().getCategoryID()) {
-                subcheckPasses = false;
-            }
-        }
-        return subcheckPasses;
-    }
-
     private boolean ruleSubcheck_forbiddenEventCategory(List<EventCnF> eventList, EventRuleAbstract rule) {
         Iterator<EventCnF> iter = eventList.iterator();
         while (iter.hasNext()) {
@@ -576,8 +668,85 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         return true;
     }
 
+    
+    
+    // *************************************************************************
+    // *                   EVENT RULES : ADMIN                                 *
+    // *************************************************************************
+    
+/**
+ * Logic intermediary for retrieval of EventRuleAbstract Objects from the DB
+ * @param eraid
+ * @return
+ * @throws IntegrationException 
+ */
+    public EventRuleAbstract rules_getEventRuleAbstract(int eraid) throws IntegrationException {
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        return wi.rules_getEventRuleAbstract(eraid);
+    }
+
     /**
-     * Returns complete  dump of the eventrule table
+     * Logic intermediary for updates to to an EventRule's specifications in the
+     * DB. Remember, an EventRuleAbstract species a rule that could be but is not
+     * yet attached to a given CECase or OccPeriod
+     * 
+     * @param era
+     * @throws IntegrationException 
+     */
+    public void rules_updateEventRuleAbstract(EventRuleAbstract era) throws IntegrationException {
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        wi.rules_updateEventRule(era);
+    }
+    
+    
+    
+
+    /**
+     * Calls appropriate Integration method given a CECase or OccPeriod
+     * and generates a configured event rule list.
+     * @param erg
+     * @param cred
+     * @return
+     */
+    public List<EventRuleImplementation> rules_getEventRuleImpList(IFace_EventRuleGoverned erg, Credential cred) throws IntegrationException {
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        List<EventRuleImplementation> impList = new ArrayList<>();
+        List<Integer> impIDs = wi.rules_getEventRuleImplementationList(erg);
+        if(impIDs != null && !impIDs.isEmpty()){
+            for(Integer i: impIDs){
+                impList.add(wi.rules_getEventRuleImplemention(i));
+            }
+        }
+        return impList;
+    }
+
+    /**
+     * Takes in an EventRuleSet object which contains a list of EventRuleAbstract objects
+    and either an OccPeriod or CECaseDataHeavy and implements those abstract rules
+    on that particular business object
+     * @param ers
+     * @param rg
+     * @param usr
+     * @throws IntegrationException
+     * @throws BObStatusException
+     */
+    public void rules_attachRuleSet(EventRuleSet ers, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, BObStatusException {
+        for (EventRuleAbstract era : ers.getRuleList()) {
+            if (rg instanceof OccPeriodDataHeavy) {
+                OccPeriodDataHeavy op = (OccPeriodDataHeavy) rg;
+                rules_attachEventRuleAbstractToOccPeriod(era, op, usr);
+            } else if (rg instanceof CECaseDataHeavy) {
+                CECaseDataHeavy cec = (CECaseDataHeavy) rg;
+                rules_attachEventRuleAbstractToCECase(era, cec);
+            } else {
+                throw new BObStatusException("Cannot attach rule set");
+            }
+        }
+    }
+
+   
+    /**
+     * Returns complete  dump of the eventrule table for configuration purposes
      *
      * @return complete event rule list, including inactive events
      * @throws IntegrationException
@@ -595,53 +764,77 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     private void rules_attachEventRuleAbstractToCECase(EventRuleAbstract era, CECaseDataHeavy cse) {
     }
 
-    private void rules_attachEventRuleAbstractToOccPeriod(EventRuleAbstract era, OccPeriodDataHeavy period, UserAuthorized usr) throws IntegrationException {
+    /**
+     * Internal method for taking in an ERA and creating an Implemented Event Rule
+     * on an Occuapancy Period
+     * @param era
+     * @param period
+     * @param usr
+     * @throws IntegrationException 
+     */
+    private void rules_attachEventRuleAbstractToOccPeriod(  EventRuleAbstract era, 
+                                                            OccPeriodDataHeavy period, 
+                                                            UserAuthorized usr) 
+                                                throws      IntegrationException {
         
-        WorkflowIntegrator wi = getWorkflowIntegrator();
-        EventRuleOccPeriod erop = new EventRuleOccPeriod(new EventRuleImplementation(era));
-        // avoid inserting and duplicating keys
-        if (wi.rules_getEventRuleOccPeriod(period.getPeriodID(), era.getRuleid()) == null) {
-            erop.setAttachedTS(LocalDateTime.now());
-            erop.setOccPeriodID(period.getPeriodID());
-            erop.setLastEvaluatedTS(null);
-            erop.setPassedRuleTS(null);
-            erop.setPassedRuleEvent(null);
-            wi.rules_insertEventRuleOccPeriod(erop);
+    }
+    
+    private int checkForExistingERImp(EventRuleAbstract era, IFace_EventRuleGoverned erg){
+        List<EventRuleImplementation> erimpList = erg.assembleEventRuleList(ViewOptionsEventRulesEnum.VIEW_ALL);
+        int existingERImpID = 0;
+        if(erimpList != null && !erimpList.isEmpty()){
+            for(EventRuleImplementation erimp: erimpList){
+                if(erimp.getRuleid() == era.getRuleid()){
+                    existingERImpID = erimp.getImplementationID();
+                }
+            }
         }
-        if (era.getPromptingDirective() != null) {
-            implementDirective(era.getPromptingDirective(), period, null);
-            System.out.println("EventCoordinator.rules_attachEventRulAbstractToOccPeriod | directive implemented with ID " + era.getPromptingDirective().getDirectiveID());
-        }
+        return existingERImpID;
     }
 
     /**
      * Attaches a single event rule to an EventRuleGoverned entity, the type of which is determined
-    internally with instanceof checks for OccPeriod and CECaseDataHeavy Objects
+     * internally with instanceof checks for OccPeriod and CECaseDataHeavy Objects
      *
      * @param era
-     * @param rg
+     * @param erg
      * @param usr
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException if an IFaceEventRuleGoverned instances is neither a CECaseDataHeavy or an OccPeriod
      */
-    public void rules_attachEventRule(EventRuleAbstract era, IFace_EventRuleGoverned rg, UserAuthorized usr) throws IntegrationException, BObStatusException {
+    public void rules_attachEventRule(EventRuleAbstract era, IFace_EventRuleGoverned erg, UserAuthorized usr) throws IntegrationException, BObStatusException {
         int freshObjectID = 0;
-        if (rg instanceof OccPeriodDataHeavy) {
-            OccPeriodDataHeavy op = (OccPeriodDataHeavy) rg;
-            rules_attachEventRuleAbstractToOccPeriod(era, op, usr);
-            if (freshObjectID != 0 && era.getPromptingDirective() != null) {
-                implementDirective(era.getPromptingDirective(), op, null);
-                System.out.println("EventCoordinator.rules_attachEventRule | Found not null prompting directive");
-            }
-        } else if (rg instanceof CECaseDataHeavy) {
-            CECaseDataHeavy cec = (CECaseDataHeavy) rg;
-            rules_attachEventRuleAbstractToCECase(era, cec);
-            if (freshObjectID != 0 && era.getPromptingDirective() != null) {
-                implementDirective(era.getPromptingDirective(), cec, null);
-            }
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        EventRuleImplementation erimpl = new EventRuleImplementation(era);
+        // avoid inserting and duplicating keys
+        int exer = checkForExistingERImp(era, erg);
+        if (exer != 0) {
+            erimpl.setImplementationTS(LocalDateTime.now());
+            erimpl.setLastEvaluatedTS(null);
+            erimpl.setPassedRuleTS(null);
         } else {
-            throw new BObStatusException("Cannot attach rule set");
+            throw new BObStatusException("Cannot attach Event Rule because it's already implemented in Impl ID " + String.valueOf(exer));
         }
+                
+        if (erg instanceof OccPeriodDataHeavy) {
+            erimpl.setOccPeriodID(erg.getBObID());
+        } else if (erg instanceof CECaseDataHeavy) {
+            erimpl.setCeCaseID(erg.getBObID());
+        } else {
+            throw new BObStatusException("No valid instance of EventRuleGoverned found");
+        }
+        
+        // send down to integrator
+        wi.implementEventRule(erimpl, erg);
+        
+        // EventRules can be added to the case as a result of a choice
+        // that is proposed to the user by a Proposal which itself
+        // is attached to the BOb through the implementation of a directive
+        if (era.getPromptingDirective() != null) {
+            implementDirective(era.getPromptingDirective(), erg,  null);
+            System.out.println("EventCoordinator.rules_attachEventRulAbstractToOccPeriod | directive implemented with ID " + era.getPromptingDirective().getDirectiveID());
+        }
+        
     }
 
     /**
@@ -660,55 +853,32 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     public void rules_attachEventRuleAbstractToMuniCERuleSet(EventRuleAbstract era, CECaseDataHeavy cse) {
     }
 
-    private boolean ruleSubcheck_requiredEventType(CECaseDataHeavy cse, EventRuleAbstract rule) {
-        boolean subcheckPasses = true;
-        if (rule.getRequiredEventType() != null) {
-            subcheckPasses = false;
-            Iterator<EventCnF> iter = cse.getVisibleEventList().iterator();
-            while (iter.hasNext()) {
-                EventCnF ev = iter.next();
-                if (ev.getCategory().getEventType() == rule.getRequiredEventType()) {
-                    subcheckPasses = true;
-                }
-            }
-        }
-        return subcheckPasses;
-    }
-
-    private boolean ruleSubcheck_requiredEventType(List<EventCnF> eventList, EventRuleAbstract rule) {
-        Iterator<EventCnF> iter = eventList.iterator();
-        while (iter.hasNext()) {
-            EventType evType = iter.next().getCategory().getEventType();
-            if (evType == rule.getRequiredEventType()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    
+    /**
+     * Logic pass through method for including a given EventRuleAbstract to the
+     * RuleSet indicated in the RuleSet inside the given OccPeriod
+     * 
+     * @param era
+     * @param period the OccPeriod whose type is mapped to the desired
+     * RuleSet in which the client wishes to attach the given EventRuleAbstract
+     * @throws IntegrationException 
+     */
     public void rules_attachEventRuleAbstractToOccPeriodTypeRuleSet(EventRuleAbstract era, OccPeriod period) throws IntegrationException {
         WorkflowIntegrator wi = getWorkflowIntegrator();
-        wi.rules_addEventRuleAbstractToOccPeriodTypeRuleSet(era, period.getType().getBaseRuleSetID());
+        wi.rules_addEventRuleAbstractToRuleSet(era, period.getType().getBaseRuleSetID());
     }
 
+    /**
+     * Generator method for EventRuleAbstracts; sets sensible initial values
+     * @return an ERA ready for user config and then insertion in the DB
+     */
     public EventRuleAbstract rules_getInitializedEventRuleAbstract() {
         EventRuleAbstract era = new EventRuleAbstract();
         era.setActiveRuleAbstract(true);
         return era;
     }
 
-    public boolean rules_evaluateEventRules(OccPeriodDataHeavy period) throws IntegrationException, BObStatusException, ViolationException {
-        boolean allRulesPassed = true;
-        List<EventRuleImplementation> rlst = period.assembleEventRuleList(ViewOptionsEventRulesEnum.VIEW_ALL);
-        for (EventRuleAbstract era : rlst) {
-            if (!rules_evalulateEventRule(period.assembleEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL), era)) {
-                allRulesPassed = false;
-                break;
-            }
-        }
-        return allRulesPassed;
-    }
-
+  
     /**
      * Primary entrance point for an EventRuleAbstract instance (not its connection to an Object)
      * @param era required instance
@@ -746,4 +916,5 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         System.out.println("EventCoordinator.rules_createEventRuleAbstract | returned ID: " + freshEventRuleID);
         return freshEventRuleID;
     }
+    
 }

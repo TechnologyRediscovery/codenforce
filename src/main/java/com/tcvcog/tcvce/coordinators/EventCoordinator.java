@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017 Turtle Creek Valley
-Council of Governments, PA
+ * Council of Governments, PA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
-import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -29,20 +28,21 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.integration.WorkflowIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import javax.faces.application.FacesMessage;
-import com.tcvcog.tcvce.entities.IFace_Proposable;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -69,11 +69,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    
 //    --------------------------------------------------------------------------
 //    *************************** EVENT MAIN ***********************************
 //    --------------------------------------------------------------------------
-    
     
     /**
      * Primary access point for events by ID
@@ -96,6 +94,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
+    
     /**
      * Creates a data-rich subclass of our events that contains a Property object
      * and Property unit data useful for displaying the event without its parent
@@ -105,8 +104,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws EventException
      * @throws IntegrationException 
      */
-    public EventCnFPropUnitCasePeriodHeavy assembleEventCnFPropUnitCasePeriodHeavy(EventCnF ev) throws EventException, IntegrationException{
-        PropertyCoordinator pc = getPropertyCoordinator();
+    public EventCnFPropUnitCasePeriodHeavy assembleEventCnFPropUnitCasePeriodHeavy(EventCnF ev) 
+                           throws EventException, IntegrationException{
+
         OccupancyCoordinator oc = getOccupancyCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         
@@ -131,7 +131,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws EventException
      * @throws IntegrationException 
      */
-    public List<EventCnFPropUnitCasePeriodHeavy> assembleEventCnFPropUnitCasePeriodHeavyList(List<EventCnF> evList) throws EventException, IntegrationException{
+    public List<EventCnFPropUnitCasePeriodHeavy> assembleEventCnFPropUnitCasePeriodHeavyList(List<EventCnF> evList) 
+            throws EventException, IntegrationException{
         List<EventCnFPropUnitCasePeriodHeavy> edhList = new ArrayList<>();
         if(evList != null && !evList.isEmpty() ){
             for(EventCnF ev: evList){
@@ -139,6 +140,162 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             }
         }
         return edhList;
+    }
+    
+    /**
+     * I Create new EventCnF objects!
+     * The only public method for creating a new event on an ERG. My guts will
+     * call a bunch of methods in related coordinators to trigger appropriate
+     * workflow actions.
+     * 
+     * @param ev with only user-supplied data inserted; I'll fill in unified stuff
+     * like eventcreator and such
+     * @param erg as of June 2020 V.0.9 implementers are CECase and OccPeriod objects
+     * @param ua
+     * @return A list of freshly inserted events, all freshly extracted from the DB
+     * so what's in this list is what's in the DB. The head of the list is the
+     * event that was passed into this method
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.EventException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<EventCnF> addEvent(     EventCnF ev, 
+                                        IFace_EventRuleGoverned erg, 
+                                        UserAuthorized ua) 
+                            throws      BObStatusException, 
+                                        EventException, 
+                                        IntegrationException{
+        
+        if(ev == null || erg == null || ua == null){
+            throw new BObStatusException("Cannot process event with incomplete args");
+        }
+        
+        // *************************
+        // Connect to the mother BOb
+        // *************************
+        if(erg instanceof OccPeriodDataHeavy){
+            ev.setOccPeriodID(erg.getBObID());
+        } else if (erg instanceof CECaseDataHeavy){
+            ev.setCeCaseID(erg.getBObID());
+        } else {
+            throw new EventException("The class of the IFace_EventRuleGoverned"
+                    + " passed to addEvent is not yet supported. Only data heavy "
+                    + "cases and occ periods are supported in v.0.9");
+        }
+        
+        configureEventTimes(ev, ua);
+        
+        LocalDateTime now = LocalDateTime.now();
+        
+        // ****************
+        // Event essentials
+        // ****************
+        ev.setUserCreator(ua);
+        ev.setCreationts(now);
+        ev.setLastUpdatedBy(ua);
+        ev.setLastUpdatedTS(now);
+        
+        ev.setActive(true);
+        ev.setHidden(false);
+        
+        // **********************************
+        // Allow domain coordinators to check
+        // **********************************
+        
+        List<EventCnF> evsToAddQu = new ArrayList<>();
+        
+        // position our primary event at the head of the list
+        evsToAddQu.add(ev);
+        // then let the other domain folks add to this stack if needed
+        
+        addEvent_processStack(evsToAddQu);
+        
+        return evsToAddQu;
+        
+    }
+    
+    /**
+     * Internal method for checking and tweaking if necessary the time stamps
+     * on event objects
+     * 
+     * @param ev
+     * @param ua 
+     */
+    private void configureEventTimes(EventCnF ev, UserAuthorized ua){
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        // *************
+        // TIME AUDITING
+        // *************
+        
+        LocalDateTime now = LocalDateTime.now();
+        
+        // check and adjust start/end times
+        if(ev.getTimeStart() == null){
+            ev.setTimeStart(now);
+        }
+        
+        // compute default end time in case we need it
+        LocalDateTime timeEndComputed = ev.getTimeStart().plusMinutes(ev.getCategory().getDefaultdurationmins());
+
+        MessageBuilderParams mbp;
+        
+        // deal with no end time
+        if(ev.getTimeEnd() == null){
+            ev.setTimeEnd(timeEndComputed);
+     
+            mbp = new MessageBuilderParams();
+            mbp.setExistingContent(ev.getNotes());
+            mbp.setHeader("Auto-edit of event details");
+            mbp.setUser(ua);
+            mbp.setCred(ua.getMyCredential());
+            mbp.setExplanation("No end time was specified on incoming event so " +
+                    "an end time was computed using the event category's default duration");
+            ev.setNotes(sc.appendNoteBlock(mbp));
+        }
+        
+        // Deal with non-chronological start and end times
+        if(ev.getTimeEnd().isBefore(ev.getTimeStart())){
+            ev.setTimeEnd(timeEndComputed);
+            mbp = new MessageBuilderParams();
+            mbp.setExistingContent(ev.getNotes());
+            mbp.setHeader("Auto-edit of event details");
+            mbp.setUser(ua);
+            mbp.setCred(ua.getMyCredential());
+            mbp.setExplanation("The end time of the incoming event cannot occur "
+                    + "before the start time; They must be in forward chrono order;"
+                    + "A new end time was automatically computed using the event category's"
+                    + "default duration");
+            ev.setNotes(sc.appendNoteBlock(mbp));
+        }
+        
+    }
+    
+    
+    /**
+     * I Iterate over a List of events that works like a Queue in that I'll
+     * insert one after the other but stop if any of them don't make it into DB.
+     * 
+     * @param qu
+     * @return
+     * @throws IntegrationException 
+     */
+    private List<EventCnF> addEvent_processStack(List<EventCnF> qu) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        List<EventCnF> doneList = new ArrayList<>();
+        if(qu != null && !qu.isEmpty()){
+            for(EventCnF ev: qu){
+                int id = ei.insertEvent(ev);
+                if(id != 0){
+                    doneList.add(getEvent(id));
+                } else {
+                    break;
+                }
+            }
+        }
+        
+        return doneList;
+        
     }
     
      /**
@@ -168,33 +325,27 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     private EventCnF configureEvent(EventCnF ev) throws IntegrationException, EventException{
+        PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
+        
+        if(ev == null){
+            return null;
+        }
         
         // Declare this event as either in the CE or Occ domain with 
         // our hacky little enum thingy
-        if(ev != null){
             if(ev.getCeCaseID() !=0 && ev.getOccPeriodID() != 0 ){
                 throw new EventException("EventCnF cannot have a non-zero CECase and OccPeriod ID");
             }
             if(ev.getCeCaseID() != 0){
                 ev.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
-            } else if(ev.getCeCaseID() != 0){
+            } else if(ev.getOccPeriodID() != 0){
                 ev.setDomain(EventDomainEnum.OCCUPANCY);
             } else {
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
-        }
        
-        // begin configuring the event proposals assocaited with this event
-        // remember: event proposals are specified in an EventCategory object
-        // but when we build an EventCnF object, the ProposalImplementation lives on the EventCnF itself
-        // 
-//        if(ev.getCategory().getDirective() != null){
-//            TODO: OccBeta
-//            Proposal imp = ei.getProposalImplAssociatedWithEvent(ev);
-//            imp.setCurrentUserCanEvaluateProposal(determineCanUserEvaluateProposal(ev, user, userAuthMuniList));
-//            ev.setEventProposalImplementation(imp);
-//        }
-//        ev.setPersonList(pi.getPersonOccPeriodList(ev));
+        ev.setPersonList(pc.getPersonList(pi.eventPersonAssembleList(ev)));
         
         return ev;
     }
@@ -206,7 +357,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param ev
      * @throws com.tcvcog.tcvce.domain.EventException
      */
-    public void auditEvent(EventCnF ev) throws EventException{
+    private void auditEvent(EventCnF ev) throws EventException{
         if(ev.getTimeStart() == null){
             throw new EventException("Events must have a start time");
         }
@@ -220,8 +371,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Business rule aware pathway to update fields on EventCnF objects
- When updating Person links, this method clears all previous connections
- and rebuilds the mapping from scratch on each update.
+     * When updating Person links, this method clears all previous connections
+     * and rebuilds the mapping from scratch on each update.
      * 
      * @param ev
      * @throws IntegrationException 
@@ -234,7 +385,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         auditEvent(ev);
         ei.updateEvent(ev);
         pi.eventPersonClear(ev);
-        pi.eventPersonsConnect(ev, ev.getPersonList());
+        pi.eventPersonConnect(ev, ev.getPersonList());
         
     }
     
@@ -247,20 +398,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void deleteEvent(EventCnF ev, UserAuthorized u) throws AuthorizationException{
-        EventIntegrator ei = getEventIntegrator();
-        try {
-            if(u.getMyCredential().isHasDeveloperPermissions()){
-                ei.deleteEvent(ev);
-            } else {
-                throw new AuthorizationException("Must have sys admin permissions "
-                        + "to delete event; marking an event as inactive is like deleting it");
-            }
-        } catch (IntegrationException ex) {
-
-        }
-    }
-  
+   
     /**
      * Core coordinator method called by all other classes who want to 
      * create their own event. Restricts the event type based on current
@@ -272,6 +410,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param ec the type of event to attach to the case
      * @return an initialized event with basic properties set
      * @throws BObStatusException thrown if the case is in an improper state for proposed event
+     * @throws com.tcvcog.tcvce.domain.EventException
      */
     public EventCnF initEvent(IFace_EventRuleGoverned erg, EventCategory ec) throws BObStatusException, EventException{
         
@@ -306,9 +445,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             }
         }
         
-        auditEvent(e);
-        
-        // Long-term TODO: check against permitted event types
         e.setCategory(ec);
         
         e.setTimeStart(LocalDateTime.now());
@@ -321,16 +457,43 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
+    public String buildEventInfoMessage(List<EventCnF> evDoneList){
+        StringBuilder sb = new StringBuilder();
+            for(EventCnF evZ: evDoneList){
+                sb = new StringBuilder();
+
+                sb.append(evZ.getCategory().getEventType().getLabel());
+                sb.append(": ");
+                sb.append(evZ.getCategory().getEventCategoryTitle());
+                sb.append(" (");
+                sb.append(evZ.getCategory().getEventCategoryDesc());
+                sb.append(") ");
+            }
+        return sb.toString();
+    }
+    
     
 //    --------------------------------------------------------------------------
-//    ***************************** SEARCH *************************************
+//    ***************************** SEARCH AND VIEW *************************************
 //    --------------------------------------------------------------------------
-    
-    
+   
+    /**
+     * Logic container for choosing a sensible event view enum value
+     * @param ua
+     * @return 
+     */
+   
+    public ViewOptionsActiveHiddenListsEnum determineDefaultEventView(UserAuthorized ua){
+        return ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN;
+    }
     
     
       
-    public ReportConfigCEEventList getDefaultReportConfigCEEventList(){
+    /**
+     * Generator method for the EventCnF object
+     * @return 
+     */
+    public ReportConfigCEEventList initDefaultReportConfigEventList(){
         SearchCoordinator sc = getSearchCoordinator();
         ReportConfigCEEventList config = new ReportConfigCEEventList();
         config.setIncludeAttachedPersons(true);
@@ -343,23 +506,145 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return config;
     }
     
+    
+    
 //    --------------------------------------------------------------------------
 //    ************************* EVENT CATEGORIES *******************************
 //    --------------------------------------------------------------------------
     
+    
+    /**
+     * Logic intermediary retrieval method for EventCategories
+     * @param catID
+     * @return
+     * @throws IntegrationException 
+     */
+    public EventCategory getEventCategory(int catID) throws IntegrationException{
+        
+        EventIntegrator ei = getEventIntegrator();
+        return ei.getEventCategory(catID);
+    }
+    
+    /**
+     * Assembles a subset of EventType and EventCategory objects for 
+     * viewing by a given user; based on the rank of the User passed in
+     * @param ua
+     * @return 
+     */
+    public Map<EventType, List<EventCategory>> assembleEventTypeCatMap_toView(UserAuthorized ua){
+       Map<EventType, List<EventCategory>> typeCatMap = new HashMap<>();
+       List<EventType> typeList = new ArrayList();
+       typeList.addAll(Arrays.asList(EventType.values()));
+       if(typeList != null && !typeList.isEmpty()){
+           for(EventType typ: typeList){
+               try {
+                   typeCatMap.put(typ, determinePermittedEventCategories_toView(typ, ua));
+               } catch (IntegrationException ex) {
+                   System.out.println(ex);
+               }
+           }
+       }
+       
+       return typeCatMap;
+    }
+    
+    
+    /**
+     * Internal method for selecting only EventCategories that the given UserAuthorized
+     * is allowed to view
+     * @param et
+     * @param ua
+     * @return
+     * @throws IntegrationException 
+     */
+    private List<EventCategory> determinePermittedEventCategories_toView(EventType et, UserAuthorized ua) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        List<EventCategory> catList = ei.getEventCategoryList(et);
+        List<EventCategory> allowedCats = new ArrayList<>();
+        if(catList != null &&!catList.isEmpty()){
+            for(EventCategory ec: catList){
+                if(ec.getUserRankMinimumToView() >= ua.getMyCredential().getGoverningAuthPeriod().getRole().getRank()){
+                    allowedCats.add(ec);
+                }
+            }
+        }
+        return allowedCats;
+    }
+    
+    
+    
+    
+    /**
+     * Creates a Mapping of EventTypes and permitted EventCategories for enacting 
+     * and event
+     * @param domain
+     * @param erg
+     * @param ua
+     * @return 
+     */
+    public Map<EventType, List<EventCategory>> assembleEventTypeCatMap_toEnact(
+                                                EventDomainEnum domain,
+                                                IFace_EventRuleGoverned erg, 
+                                                UserAuthorized ua){
+       Map<EventType, List<EventCategory>> typeCatMap = new HashMap<>();
+       List<EventType> typeList = determinePermittedEventTypes(domain, erg, ua);
+       if(typeList != null && !typeList.isEmpty()){
+           for(EventType typ: typeList){
+               typeCatMap.put(typ, determinePermittedEventCategories(typ, ua));
+           }
+       }
+       return typeCatMap;
+    }
+    
+    /**
+     * Entry point for logic components that select which EventType objects
+     * and later, event cats, the user can see on a given load of the events 
+     * viewer. This logic will review what our event domain is, the thing
+     * onto which we might be attaching events (which as of Jun 2020 are CECase
+     * objects or OccPeriod objects), and the attacher
+     * @param domain
+     * @param erg which will be interrogated for is open/closed status
+     * @param ua doing potential creation of an event
+     * @return 
+     */
+    public List<EventType> determinePermittedEventTypes(    EventDomainEnum domain, 
+                                                            IFace_EventRuleGoverned erg, 
+                                                            UserAuthorized ua){
+        List<EventType> typeList = new ArrayList<>();
+        
+        // implement logic based on event domain and check for sensible matches
+        switch(domain){
+            case CODE_ENFORCEMENT:
+                if(erg instanceof CECaseDataHeavy){
+                    typeList.addAll(determinePermittedEventTypesForCECase((CECaseDataHeavy) erg, ua));
+                }
+                break;
+            case OCCUPANCY:
+                if(erg instanceof OccPeriodDataHeavy){
+                    typeList.addAll(determinePermittedEventTypesForOcc((OccPeriodDataHeavy) erg, ua));
+                }
+                break;
+            case UNIVERSAL:
+                typeList.add(EventType.Custom);
+                typeList.add(EventType.Meeting);
+                typeList.add(EventType.Communication);
+                break;
+            default:
+        }
+        return typeList;
+    }
+    
+    
      /**
      * Implements business rules for determining which event types are allowed
- to be attached to the given CECaseDataHeavy based on the case's phase and the
- user's permissions in the system.
-     *
-     * Used for displaying the appropriate event types to the user on the
-     * cecases.xhtml page
+     * to be attached to the given CECaseDataHeavy based on the case's phase and the
+     * user's permissions in the system.
      *
      * @param c the CECaseDataHeavy on which the event would be attached
      * @param u the User doing the attaching
      * @return allowed EventTypes for attaching to the given case
      */
-    public List<EventType> getPermittedEventTypesForCECase(CECaseDataHeavy c, UserAuthorized u) {
+    private List<EventType> determinePermittedEventTypesForCECase(CECaseDataHeavy c, UserAuthorized u) {
         List<EventType> typeList = new ArrayList<>();
         RoleType role = u.getRole();
         if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
@@ -375,7 +660,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public List<EventType> getPermittedEventTypesForOcc(OccPeriod period, UserAuthorized u) {
+    /**
+     * Business rule logic container for choosing permitted eventTypes
+     * @param period
+     * @param u
+     * @return 
+     */
+    private List<EventType> determinePermittedEventTypesForOcc(OccPeriod period, UserAuthorized u) {
         List<EventType> typeList = new ArrayList<>();
         RoleType role = u.getRole();
         if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
@@ -391,6 +682,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return typeList;
     }
     
+    /**
+     * Logic intermediary for extracting all EventTypes in the system
+     * @return 
+     */
     public List<EventType> getEventTypesAll(){
         List<EventType> typeList = new ArrayList<>();
         typeList.addAll(Arrays.asList(EventType.values()));
@@ -408,7 +703,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public EventCategory initEventCategory(){
         EventCategory ec =  new EventCategory();
-        ec.setUserdeployable(true);
         ec.setHidable(true);
         // TODO: finishing autoconfiguring these 
         return ec;
@@ -428,23 +722,71 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return ec;
     }
   
-    
-    public List<EventCategory> getEventCategoryListActive() throws IntegrationException{
+    public List<EventCategory> getEventCategoryList(){
         EventIntegrator ei = getEventIntegrator();
-        List<EventCategory> catList = ei.getEventCategoryList();
-        for(EventCategory cat: catList){
-            // TODO: remove inactive EventCategories
-            // TODO: add active flag in DB and int methods
+        try {
+            return ei.getEventCategoryList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
         }
-        return catList;
+        return null;
     }
     
-      
-    public List<EventCategory> loadEventCategoryListUserAllowed(EventType et, UserAuthorized u) throws IntegrationException{
+    /**
+     * Utility method for iterating over the event cat list and only
+     * passing on active ones
+     * @param catList
+     * @return
+     */
+    public List<EventCategory> assembleEventCategoryListActiveOnly(List<EventCategory> catList) {
         EventIntegrator ei = getEventIntegrator();
-        // TODO: add logic for only allowing certain event cats based on user needs
-        return ei.getEventCategoryList(et);
+        List<EventCategory> catListActiveOnly = new ArrayList<>();
+        for(EventCategory cat: catList){
+            if(cat.isActive()){
+                catListActiveOnly.add(cat);
+            }
+        }
+        return catListActiveOnly;
+    }
+    
+    
+    /**
+     * Logic container for choosing which event categories to allow the user
+     * to use for event creation UI. Used to build a mapping of EventTypes and categories
+     * 
+     * @param et
+     * @param u
+     * @return 
+     */
+    public List<EventCategory> determinePermittedEventCategories(EventType et, UserAuthorized u) {
+        EventIntegrator ei = getEventIntegrator();
+        List<EventCategory> rawCats = new ArrayList<>();
+        List<EventCategory> allowedCats = new ArrayList<>();
+        if(et == null){
+            return allowedCats;
+        }
+        try {
+            rawCats.addAll(ei.getEventCategoryList(et));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         
+        for(EventCategory cat: rawCats){
+            boolean include = false;
+            if(cat.isActive()){
+                if(u != null && u.getKeyCard() != null){
+                    // ensure that the user's rank is at least what is required 
+                    // to enact an event of this Category
+                    if(u.getKeyCard().getGoverningAuthPeriod().getRole().getRank() >= cat.getUserRankMinimumToEnact()){
+                            include = true;
+                    } 
+                }       
+            }
+            if(include){
+                allowedCats.add(cat);
+            }
+        }
+        return allowedCats;
     }
     
     
@@ -460,12 +802,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param ceCase the CECaseDataHeavy whose violation was updated
      * @param cv the code violation being updated
      * @param event An initialized event
+     * @param ua
      * @throws IntegrationException bubbled up from the integrator
      * @throws EventException 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
-    public void generateAndInsertCodeViolationUpdateEvent(CECaseDataHeavy ceCase, CodeViolation cv, EventCnF event) 
+    public void generateAndInsertCodeViolationUpdateEvent(CECaseDataHeavy ceCase, CodeViolation cv, EventCnF event, UserAuthorized ua) 
             throws IntegrationException, EventException, BObStatusException, ViolationException{
         EventIntegrator ei = getEventIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -477,12 +820,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //        event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(updateViolationDescr);
         //even descr set by violation coordinator
-        event.setOwner(getSessionBean().getSessUser());
+        event.setUserCreator(getSessionBean().getSessUser());
         // disclose to muni from violation coord
         // disclose to public from violation coord
         event.setActive(true);
+        addEvent(event, ceCase, ua);
         
-        cc.attachNewEventToCECase(ceCase, event, null);
+        
     }
     
       /**
@@ -506,9 +850,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
 //        event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
-        event.setOwner(uc.getUserRobot());
-        event.setDiscloseToMunicipality(true);
-        event.setDiscloseToPublic(true);
+        event.setUserCreator(uc.getUserRobot());
         event.setActive(true);
         event.setHidden(false);
         event.setNotes("Event created by a public user");
@@ -536,8 +878,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 Constants.EVENT_CATEGORY_BUNDLE).getString("complianceEvent"))));
         e.setDescription("Compliance with municipal code achieved");
         e.setActive(true);
-        e.setDiscloseToMunicipality(true);
-        e.setDiscloseToPublic(true);
         
         StringBuilder sb = new StringBuilder();
         sb.append("Compliance with the following code violations was observed:");
@@ -595,10 +935,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //        event.set(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setOwner(getSessionBean().getSessUser());
+        event.setUserCreator(getSessionBean().getSessUser());
         event.setActive(true);
         
-        cc.attachNewEventToCECase(currentCase, event, null);
+//        cc.addEvent_processForCECaseDomain(currentCase, event, null);
         
         getFacesContext().addMessage(null,
             new FacesMessage(FacesMessage.SEVERITY_INFO, 

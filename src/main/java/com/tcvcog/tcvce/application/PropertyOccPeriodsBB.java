@@ -77,7 +77,7 @@ public class PropertyOccPeriodsBB
                 setCurrOccPeriod(oc.initOccPeriod(getCurrProp(), getCurrPropUnit(), getSelectedOccPeriodType(), getSessionBean().getSessUser(), getSessionBean().getSessMuni()));
                 getCurrOccPeriod().setType(getSelectedOccPeriodType());
                 int newID = 0;
-                newID = oc.insertNewOccPeriod(getCurrOccPeriod(), getSessionBean().getSessUser());
+                newID = oc.addOccPeriod(getCurrOccPeriod(), getSessionBean().getSessUser());
                 getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessUser().getMyCredential()));
             } else {
                 getFacesContext().addMessage(null,

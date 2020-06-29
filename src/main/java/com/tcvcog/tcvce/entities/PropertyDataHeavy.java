@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * 
- * @author ellen bascomb
+ * @author ellen bascomb of apartment 31Y
  */
 public  class       PropertyDataHeavy 
         extends     Property 
@@ -45,7 +45,6 @@ public  class       PropertyDataHeavy
     private List<Integer> blobList;
     
     private String credentialSignature;
-    
     
     public PropertyDataHeavy(){
         
@@ -103,11 +102,6 @@ public  class       PropertyDataHeavy
         this.LandBankHeld = prop.isLandBankHeld();
         this.active = prop.isActive();
         this.nonAddressable = prop.isNonAddressable();
-        
-        
-        
-        
-        
         
     }
     

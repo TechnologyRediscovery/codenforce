@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.TextBlock;
-import com.tcvcog.tcvce.integration.ViolationIntegrator;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,10 +54,10 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     }
     
     public String updateTextBlock(){
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        CaseIntegrator ci = getCaseIntegrator();
         if(selectedBlock != null){
             try {
-                cvi.updateTextBlock(selectedBlock);
+                ci.updateTextBlock(selectedBlock);
                  getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,  
                             "Success! Updated text block id " + selectedBlock.getBlockID(), ""));
@@ -78,14 +78,14 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     }
     
     public String addNewTextBlock(){
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        CaseIntegrator ci = getCaseIntegrator();
         TextBlock newBlock = new TextBlock();
         newBlock.setMuni(formMuni);
         newBlock.setTextBlockCategoryID(formCategoryID);
         newBlock.setTextBlockName(formBlockName);
         newBlock.setTextBlockText(formBlockText);
         try {
-            cvi.insertTextBlock(newBlock);
+            ci.insertTextBlock(newBlock);
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO,  
                        "Success! Added a new text block named " + formBlockName + "to the db!", ""));
@@ -100,10 +100,10 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     }
     
     public String nukeTextBlock(){
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        CaseIntegrator ci = getCaseIntegrator();
         if(selectedBlock != null){
             try {
-                cvi.deleteTextBlock(selectedBlock);
+                ci.deleteTextBlock(selectedBlock);
                  getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,  
                             "Success! Nuked block id " + selectedBlock.getBlockID(), ""));
@@ -124,10 +124,10 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
      * @return the blockList
      */
     public List<TextBlock> getBlockList() {
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        CaseIntegrator ci = getCaseIntegrator();
         if(blockList == null){
             try {
-                blockList = cvi.getAllTextBlocks();
+                blockList = ci.getAllTextBlocks();
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
@@ -156,9 +156,9 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
      * @return the categoryList
      */
     public HashMap<String, Integer> getCategoryList() {
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        CaseIntegrator ci = getCaseIntegrator();
         try {
-            categoryList = cvi.getTextBlockCategoryMap();
+            categoryList = ci.getTextBlockCategoryMap();
             System.out.println("TextBlockBB.getCategoryMap | isempty: " + categoryList.isEmpty());
         } catch (IntegrationException ex) {
             System.out.println(ex);

@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright (C) 2018 Turtle Creek Valley
 Council of Governments, PA
  *
@@ -22,27 +22,50 @@ package com.tcvcog.tcvce.entities;
  * @author ellen bascomb of apt 31y
  */
 public enum EventType {
-    Origination("Case Origination"),
-    Action("Officer Action"),
-    CaseAdmin("Case Admin"),
-    PhaseChange("Case Phase Change"),
-    Closing("Case Closing"),
-    Timeline("Case Timeline"),
-    Communication("Communication"),
-    Meeting("Meeting"),
-    Notice("Notice"),
-    Custom("Custom"),
-    Compliance("Compliance"),
-    Citation("Citation"),
-    Occupancy("Occupancy");
+    Origination("Case Origination", 5, 1),
+    Action("Officer Action", 5, 1),
+    CaseAdmin("Case Admin", 3, 2),
+    PhaseChange("Case Phase Change", 5, 1),
+    Closing("Case Closing", 5, 1),
+    Timeline("Case Timeline", 4, 3),
+    Communication("Communication", 5, 2),
+    Meeting("Meeting", 3, 3),
+    Notice("Notice", 3, 3),
+    Custom("Custom", 3, 3),
+    Compliance("Compliance", 5, 3),
+    Citation("Citation", 5, 3),
+    Occupancy("Occupancy", 5, 3),
+    PropertyInfoCase("Property Info Case", 3, 3);
 
     private final String label;
+    protected final int userRankMinimumToEnact;
+    protected final int userRankMinimumToView;
 
-    private EventType(String label) {
+    private EventType(String label, int enactMin, int viewMin) {
         this.label = label;
+        this.userRankMinimumToEnact = enactMin;
+        this.userRankMinimumToView = viewMin;
     }
 
     public String getLabel() {
         return label;
     }
+
+    /**
+     * @return the userRankMinimumToEnact
+     */
+    public int getUserRankMinimumToEnact() {
+        return userRankMinimumToEnact;
+    }
+
+    /**
+     * @return the userRankMinimumToView
+     */
+    public int getUserRankMinimumToView() {
+        return userRankMinimumToView;
+    }
+    
+    
+    
+    
 }

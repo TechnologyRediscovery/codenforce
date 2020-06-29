@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
 import com.tcvcog.tcvce.entities.IFace_Openable;
@@ -163,7 +164,18 @@ public  class       OccPeriodDataHeavy
         this.notes = opLight.notes;
 
     }
+    
+    @Override
+    public EventDomainEnum discloseEventDomain() {
+        return EventDomainEnum.OCCUPANCY;
+    }
+    
+     @Override
+    public int getBObID() {
+        return periodID;
+    }
 
+    
     @Override
     public void setEventRuleList(List<EventRuleImplementation> lst) {
         eventRuleList = lst;
@@ -472,5 +484,8 @@ public  class       OccPeriodDataHeavy
     public List<PersonOccPeriod> getPersonListApplicants(){
         return personListApplicants;
     }
+
+   
+   
     
 }

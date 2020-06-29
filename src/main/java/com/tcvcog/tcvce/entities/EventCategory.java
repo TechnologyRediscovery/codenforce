@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 
- /**s 
+ /**
  * @author Eric Darsow
  */
 public class EventCategory implements Serializable {
@@ -31,23 +31,22 @@ public class EventCategory implements Serializable {
     private String eventCategoryTitle;
     private String eventCategoryDesc;
     
-    private boolean userdeployable;
-    private boolean munideployable;
-    private boolean publicdeployable;
-    
-    private boolean notifycasemonitors;
-    protected int defaultdurationmins;
-    
-    private Directive directive;
-    
+    private boolean notifymonitors;
     private boolean hidable;
     
     private Icon icon;
     
     private int relativeOrderWithinType;
     private int relativeOrderGlobal;
-    
     private String hostEventDescriptionSuggestedText;
+    
+    private Directive directive;
+    private int defaultdurationmins;
+    private boolean active;
+    
+    private int userRankMinimumToEnact;
+    private int userRankMinimumToView;
+    private int userRankMinimumToUpdate;
     
     /**
      * @return the eventType
@@ -142,33 +141,13 @@ public class EventCategory implements Serializable {
         return true;
     }
 
-    /**
-     * @return the userdeployable
-     */
-    public boolean isUserdeployable() {
-        return userdeployable;
-    }
-
-    /**
-     * @return the munideployable
-     */
-    public boolean isMunideployable() {
-        return munideployable;
-    }
-
-    /**
-     * @return the publicdeployable
-     */
-    public boolean isPublicdeployable() {
-        return publicdeployable;
-    }
 
    
     /**
-     * @return the notifycasemonitors
+     * @return the notifymonitors
      */
-    public boolean isNotifycasemonitors() {
-        return notifycasemonitors;
+    public boolean isNotifymonitors() {
+        return notifymonitors;
     }
 
    
@@ -180,33 +159,13 @@ public class EventCategory implements Serializable {
         return hidable;
     }
 
-    /**
-     * @param userdeployable the userdeployable to set
-     */
-    public void setUserdeployable(boolean userdeployable) {
-        this.userdeployable = userdeployable;
-    }
-
-    /**
-     * @param munideployable the munideployable to set
-     */
-    public void setMunideployable(boolean munideployable) {
-        this.munideployable = munideployable;
-    }
-
-    /**
-     * @param publicdeployable the publicdeployable to set
-     */
-    public void setPublicdeployable(boolean publicdeployable) {
-        this.publicdeployable = publicdeployable;
-    }
-
+   
    
     /**
-     * @param notifycasemonitors the notifycasemonitors to set
+     * @param notifymonitors the notifymonitors to set
      */
-    public void setNotifycasemonitors(boolean notifycasemonitors) {
-        this.notifycasemonitors = notifycasemonitors;
+    public void setNotifymonitors(boolean notifymonitors) {
+        this.notifymonitors = notifymonitors;
     }
 
     
@@ -302,6 +261,62 @@ public class EventCategory implements Serializable {
      */
     public void setDefaultdurationmins(int defaultdurationmins) {
         this.defaultdurationmins = defaultdurationmins;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    /**
+     * @return the userRankMinimumToEnact
+     */
+    public int getUserRankMinimumToEnact() {
+        return userRankMinimumToEnact;
+    }
+
+    /**
+     * @return the userRankMinimumToView
+     */
+    public int getUserRankMinimumToView() {
+        return userRankMinimumToView;
+    }
+
+    /**
+     * @return the userRankMinimumToUpdate
+     */
+    public int getUserRankMinimumToUpdate() {
+        return userRankMinimumToUpdate;
+    }
+
+    /**
+     * @param userRankMinimumToEnact the userRankMinimumToEnact to set
+     */
+    public void setUserRankMinimumToEnact(int userRankMinimumToEnact) {
+        this.userRankMinimumToEnact = userRankMinimumToEnact;
+    }
+
+    /**
+     * @param userRankMinimumToView the userRankMinimumToView to set
+     */
+    public void setUserRankMinimumToView(int userRankMinimumToView) {
+        this.userRankMinimumToView = userRankMinimumToView;
+    }
+
+    /**
+     * @param userRankMinimumToUpdate the userRankMinimumToUpdate to set
+     */
+    public void setUserRankMinimumToUpdate(int userRankMinimumToUpdate) {
+        this.userRankMinimumToUpdate = userRankMinimumToUpdate;
     }
 
     

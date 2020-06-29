@@ -130,7 +130,7 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
          
          System.out.println("OccInspectionBB.certifuyOccPeriodField | field: " + field + " | mode: " + certifymode);
          
-         User u = getSessionBean().getSessUser();
+         UserAuthorized u = getSessionBean().getSessUser();
          LocalDateTime now = LocalDateTime.now();
          
          switch(field){
@@ -179,14 +179,16 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
          }
          
         try {
-            oc.updateOccPeriod(currentOccPeriod, u);
-             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Successfully udpated field status!", ""));
+            oc.editOccPeriod(currentOccPeriod, u);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully udpated field status!", ""));
         } catch (IntegrationException | BObStatusException ex) {
-             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                ex.getMessage(), ""));
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+            System.out.println(ex);
+            
         }
         reloadCurrentOccPeriodDataHeavy();
          
@@ -227,7 +229,7 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
         }
         
         try {
-            oc.updateOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
+            oc.editOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Update successful on OccPeriod ID: " + currentOccPeriod.getPeriodID(), ""));
