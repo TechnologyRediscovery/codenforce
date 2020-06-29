@@ -1,10 +1,33 @@
 -- ****************************************************************************
 -- PATCH 26
 -- 
--- 
+-- Mostly event subsystem overhaul changes;
+-- DON'T FORGET TO MANUALLY RUN THE ALTER TYPE .... STATEMENT IN THE COMMENT
+-- BLOCK DIRECTLY BELOW THIS HEADER MESSAGE
 -- 
 -- 
 -- ****************************************************************************
+
+
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+--
+--
+--
+-- NOTE NOTE NOTE: THIS STATEMENT MUST BE RUN INDEPENDENTLY AT THE START OF THE SCRIPT
+-- ALTER TYPE eventtype ADD VALUE IF NOT EXISTS 'Workflow'; 
+--
+--
+--
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
+-- **********************************************************************
 
 ALTER TABLE occperiod ADD COLUMN active boolean DEFAULT true;
 ALTER TABLE ceactionrequest ADD COLUMN active boolean DEFAULT true;
@@ -109,25 +132,6 @@ ALTER TABLE public.codeviolation ADD COLUMN compliancetfexpiry_proposalid INTEGE
 	CONSTRAINT codeviolation_tfexpiry_proposalid_fk 
 	REFERENCES choiceproposal (proposalid);
 
--- **********************************************************************
--- **********************************************************************
--- **********************************************************************
--- **********************************************************************
---
---
---
--- NOTE NOTE NOTE: THIS STATEMENT MUST BE RUN INDEPENDENTLY AT THE START OF THE SCRIPT
--- ALTER TYPE eventtype ADD VALUE IF NOT EXISTS 'Workflow'; 
---
---
---
--- **********************************************************************
--- **********************************************************************
--- **********************************************************************
--- **********************************************************************
--- **********************************************************************
--- **********************************************************************
--- **********************************************************************
 
 
 INSERT INTO public.eventcategory(
@@ -142,11 +146,8 @@ INSERT INTO public.eventcategory(
 
 
 
---- RUN LOCALLY UP TO HERE
-
-
 
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (26, 'database/patches/dbpatch_beta26.sql', NULL, 'ecd', 'various changes');
+    VALUES (26, 'database/patches/dbpatch_beta26.sql', '29-JUN-2020', 'ecd', 'various changes');
