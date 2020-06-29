@@ -744,7 +744,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param rs
      * @return
      * @throws SQLException
-     * @throws IntegrationException 
+     * @throws IntegrationException ////////////////////////////
      */
     private CodeViolation generateCodeViolationFromRS(ResultSet rs) throws SQLException, IntegrationException {
 
@@ -771,8 +771,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
                 
                 
-        if (!(rs.getTimestamp("actualcompliancdate") == null)) {
-            v.setActualComplianceDate(rs.getTimestamp("actualcompliancdate").toInstant()
+        if (!(rs.getTimestamp("actualcompliancedate") == null)) {
+            v.setActualComplianceDate(rs.getTimestamp("actualcompliancedate").toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime());
 
         }
@@ -801,7 +801,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public CodeViolation getCodeViolation(int violationID) throws IntegrationException {
-        String query = "SELECT violationid FROM public.codeviolation WHERE violationid = ?";
+        String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n" +
+                        "       entrytimestamp, stipulatedcompliancedate, actualcompliancedate, \n" +
+                        "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
+                        "       complianceuser, severity_classid, createdby, compliancetfexpiry_proposalid, \n" +
+                        "       lastupdatedts, lastupdated_userid, active\n" +
+                        "  FROM public.codeviolation WHERE violationid = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;

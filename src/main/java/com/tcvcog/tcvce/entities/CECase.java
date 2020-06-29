@@ -85,7 +85,13 @@ public class        CECase
     
       @Override
     public boolean isOpen() {
-        return this.casePhase.isCaseOpen();
+        if(this.casePhase != null){
+            return this.casePhase.isCaseOpen();
+        } else if (this.getClosingDate() != null){
+            return true;
+        } else {
+            return false;
+        }
     }
 
   

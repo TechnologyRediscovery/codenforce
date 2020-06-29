@@ -671,7 +671,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                         "       hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, \n" +
                         "       hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, \n" +
                         "       active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate\n" +
-                        "  FROM public.eventcategory;";
+                        "  FROM public.eventcategory WHERE categoryid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -719,7 +719,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ec.setEventCategoryTitle(rs.getString("title"));
         ec.setEventCategoryDesc(rs.getString("description"));
 
-        ec.setNotifymonitors(rs.getBoolean("notifycasemonitors"));
+        ec.setNotifymonitors(rs.getBoolean("notifymonitors"));
         ec.setHidable(rs.getBoolean("hidable"));
         
         if(rs.getInt("icon_iconid") != 0){
