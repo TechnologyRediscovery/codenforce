@@ -51,3 +51,16 @@ As technical documentation designed for developers, the primary audience for the
 [Property unit management mini-project](property-unit-mini-project.md)
 
 ![CodeConnect system components](img/ccoverview.jpg)
+
+## Writing documentation
+All developer documentation is written in markdown and exists on the mater branch directory called `docs` Since we are not actively working on the master branch, follow these steps
+1. Create a new directory on your computer and clone down this entire repo a second time.
+2. Open a new terminal window and navigate into this repo, and checkout the `master` branch (which is no longer the default branch, the default branch is `recovered`)
+3. Open sublime >> open folder >> choose this new second repo which is where you'll write the documentation and push like normal, but this time to the master branch
+4. Create one or more pages with an `.md` ending inside this directory structure to store your validation rules
+5. You  must commit your local changes and push them up to master to see the markdown rendered into html by the markdown engine on the github server
+6. When your page is ready, create a link to it on the `index.md` main page so others can see it
+
+## accessing the documentation
+The documentation root is at 
+https://technologyrediscovery.github.io/codenforce/

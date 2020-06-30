@@ -1,22 +1,17 @@
 # Subsystem V Events
 
-&lt;- [home](index.md)
+&lt; [home](index.md)
 
-## Contents
+## Definitions
+An event represents a happening of any kind pertaining to a number of business objects including:
 
+* Code Enforcement Case `CECase`
+* Occupancy Periods `OccPeriod`
+* Property (Events on properties are stored in special code enforcement cases called property info cases)
 
+## Components
+Events are stored in the `event` table in the DB and the `EventCnF` object in Java Land. They are composite objects and contain a number of children, the most important is their `EventCategory` child, which itself is categorized using the `EventType` enum.
 
-## Modules
-Grand Unified Event GUE EventCnF
-EventCategory
-EventRule
-Choice
-Directive
+## Processing
+The `EventCorodinator` is responsible for routing all event-related actions, including creating and editing events. As a new event is processed the `EventCoordinator` will give other applicable coordinators the chance to examine the event being created and tweak its fields or values, add an additional event to the list of events to be committed. 
 
-
-
-## Design notes (rough, mostly raw material for formal documentation taken from code)
-begin configuring the event proposals assocaited with this event
-// remember: event proposals are specified in an EventCategory object
-// but when we build an EventCnF object, the ProposalImplementation lives on the EventCnF itself
-// 
