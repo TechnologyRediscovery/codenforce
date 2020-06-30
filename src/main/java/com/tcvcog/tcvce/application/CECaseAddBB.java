@@ -22,18 +22,14 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
 import java.io.Serializable;
-import java.sql.Time;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -93,9 +89,7 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable{
                                     + "I couldn't do that, though, sorry..", 
                             "Best try again or note the error and complain to Eric."));
             System.out.println(ex);
-        } catch (ViolationException ex) {
-            System.out.println(ex);
-        } catch (EventException ex) {
+        } catch (ViolationException | EventException |SearchException ex) {
             System.out.println(ex);
         }
         

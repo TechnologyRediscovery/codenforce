@@ -14,16 +14,11 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -38,8 +33,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**

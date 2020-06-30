@@ -28,8 +28,6 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -152,7 +150,7 @@ public class CECaseNoticesBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to delete this notice of violation, "
                             + "probably because it has been sent already", ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
 
@@ -189,7 +187,7 @@ public class CECaseNoticesBB
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID()
                             + " has been marked as returned on today's date", ""));
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }

@@ -18,7 +18,6 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.CodeSource;
-import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
 import java.util.List;
 import java.util.Objects;

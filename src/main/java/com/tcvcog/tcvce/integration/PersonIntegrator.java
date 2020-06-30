@@ -23,7 +23,6 @@ import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
@@ -32,8 +31,6 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.search.QueryPerson;
-import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -924,25 +921,18 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
 
-    
-    
     /**
-     * TODO: Adjust the Person object assembly chain of calls to reflect the
-     * revised approach used in assembling Person objects for EventCnF objects:
-     * So in this case, OccupancyCoordinator should ask this method for a List
-     * of Person IDs as a List&lt;Integer&gt; and then this Coordinator can turn around
-     * and ask the PersonCoordinator to build a List&lt;Person&gt; from a List&lt;Integer&gt;
+     *
      * @param applicationID
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
-    public List<Person> getOccPermitAppPersons(int applicationID) throws IntegrationException{
+    public ArrayList<Integer> getOccPermitAppPersons(int applicationID) throws IntegrationException{
         String query = "SELECT person_personid FROM occpermitapplicationperson WHERE permitapp_applicationid = ?";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;        
         ArrayList<Integer> personIDs = new ArrayList();
-        ArrayList<Person> persons = new ArrayList();
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
@@ -952,15 +942,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 personIDs.add(rs.getInt("person_personid"));
             }
             
-            persons = PersonIntegrator.this.getPersonList(personIDs);
-            
-            
         } catch (SQLException ex) {
             throw new IntegrationException("PersonIntegrator.getOccPermitAppPersons | Unable to "
                     + "retrieve person(s) for given applicationID ", ex);
         }
         
-        return persons;
+        return personIDs;
     }
 
     public void updatePersonNotes(Person p) throws IntegrationException {

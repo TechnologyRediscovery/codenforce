@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
@@ -41,8 +42,6 @@ import javax.faces.application.FacesMessage;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -103,9 +102,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return the data-rich subclass of EventCnF
      * @throws EventException
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.SearchException 
      */
     public EventCnFPropUnitCasePeriodHeavy assembleEventCnFPropUnitCasePeriodHeavy(EventCnF ev) 
-                           throws EventException, IntegrationException{
+                           throws EventException, IntegrationException, SearchException{
 
         OccupancyCoordinator oc = getOccupancyCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -115,7 +115,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(ev.getDomain() == EventDomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
             edh.setPeriod(oc.getOccPeriodPropertyUnitHeavy(edh.getOccPeriodID()));
         } else if(ev.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
-            edh.setCecase(cc.assembleCECasePropertyUnitHeavy(cc.getCECase(edh.getCeCaseID())));
+            edh.setCecase(cc.assembleCECasePropertyUnitHeavy(cc.getCECase(edh.getCeCaseID()), getSessionBean().getSessUser().getMyCredential()));
             // note that a Property object is already inside our CECase base class
         } else {
             throw new EventException("Cannot build data heavy event");
@@ -130,9 +130,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return the list of data heavy events, never null
      * @throws EventException
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.SearchException 
      */
     public List<EventCnFPropUnitCasePeriodHeavy> assembleEventCnFPropUnitCasePeriodHeavyList(List<EventCnF> evList) 
-            throws EventException, IntegrationException{
+            throws EventException, IntegrationException, SearchException{
         List<EventCnFPropUnitCasePeriodHeavy> edhList = new ArrayList<>();
         if(evList != null && !evList.isEmpty() ){
             for(EventCnF ev: evList){

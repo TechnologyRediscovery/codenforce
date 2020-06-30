@@ -215,7 +215,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param ua
      * @return 
      */
-    public PropertyDataHeavy configurePDHInfoCase(PropertyDataHeavy p, UserAuthorized ua){
+    public PropertyDataHeavy configurePDHInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException{
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CECase cse = null;

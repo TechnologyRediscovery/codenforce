@@ -22,7 +22,6 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
@@ -33,12 +32,9 @@ import java.util.Iterator;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Holder of business logic related to event rules and proposals. The EventRule

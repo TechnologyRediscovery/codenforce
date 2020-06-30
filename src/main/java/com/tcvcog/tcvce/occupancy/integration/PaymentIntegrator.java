@@ -49,6 +49,78 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+    public FeeAssigned getFeeAssigned(int feeID, EventDomainEnum selectedDomain) throws IntegrationException {
+
+        String query = "";
+        FeeAssigned skeleton = new FeeAssigned();
+        switch (selectedDomain) {
+
+            case OCCUPANCY:
+                query = "SELECT * FROM moneyoccperiodfeeassigned WHERE moneyoccperassignedfeeid = ?;";
+                break;
+
+            case CODE_ENFORCEMENT:
+                query = "SELECT * FROM moneycecasefeeassigned WHERE cecaseassignedfeeid = ?;";
+                break;
+
+            default:
+                throw new IntegrationException("A domain must be specified to retrieve an assigned fee by ID. UNIVERSAL is not acceptable.");
+
+        }
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, feeID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+
+                switch (selectedDomain) {
+
+                    case OCCUPANCY:
+                        skeleton = generateOccPeriodFeeAssigned(rs);
+                        break;
+
+                    case CODE_ENFORCEMENT:
+                        skeleton = generateCECaseFeeAssigned(rs);
+                        break;
+
+                    default:
+                        throw new IntegrationException("A domain must be specified to retrieve an assigned fee by ID. UNIVERSAL is not acceptable.");
+
+                }
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.getFeeAssigned | Unable to retrieve fees according to feeAssigned ID", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+
+        return skeleton;
+    }
+
     public List<MoneyOccPeriodFeeAssigned> getFeeAssigned(OccPeriod period) throws IntegrationException {
 
         List<MoneyOccPeriodFeeAssigned> assignedFees = new ArrayList<>();
@@ -724,6 +796,60 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     /**
+     * Uses the ID num of a payment to get the full payment.
+     *
+     * @param paymentID
+     * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public Payment getPayment(int paymentID) throws IntegrationException {
+
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
+                + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
+                + "recordedby_userid, entrytimestamp\n"
+                + "FROM public.moneypayment\n"
+                + "WHERE paymentid = ?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        Payment skeleton = new Payment();
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, paymentID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                skeleton = generatePayment(rs, EventDomainEnum.UNIVERSAL); //The domain will need to be set by whoever calls this method.
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Payment from ID", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return skeleton;
+    }
+
+    /**
      * Extracts the ID of the given OccPerioda and uses this to grab all
      * relevant payments from the db associated with this Occperiod
      *
@@ -904,7 +1030,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(1, fee.getCeCaseAssignedFeeID());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Payment p = generatePayment(rs,EventDomainEnum.CODE_ENFORCEMENT);
+                Payment p = generatePayment(rs, EventDomainEnum.CODE_ENFORCEMENT);
                 p.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
 
             }

@@ -61,7 +61,7 @@ INSERT INTO public.eventcategory(
 -- WATCH OUT FOR ONES FROM SNAPPERS
 
 ALTER TABLE eventcategory ADD COLUMN active BOOLEAN DEFAULT true;
-ALTER TABLE eventcategory SET active = TRUE;
+UPDATE eventcategory SET active = true;
 
 ALTER TABLE public.eventcategory ADD COLUMN userrankminimumtoenact INTEGER;
 ALTER TABLE public.eventcategory ALTER COLUMN userrankminimumtoenact SET DEFAULT 3;

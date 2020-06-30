@@ -40,7 +40,6 @@ import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
@@ -51,8 +50,6 @@ import com.tcvcog.tcvce.util.SubSysEnum;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -153,7 +150,6 @@ public  class       SessionInitializer
      * 
      * @param umap
      * @return nav string
-     * @throws BObStatusException
      * @throws IntegrationException 
      */
     public String configureSession(UserMuniAuthPeriod umap) {
@@ -599,7 +595,7 @@ public  class       SessionInitializer
                 sb.setSessCECase(cc.assembleCECaseDataHeavy(sb.getSessCECaseList().get(0), cred));
             }
             
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             throw new SessionException("Error assembling session CECase list from history", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
         }

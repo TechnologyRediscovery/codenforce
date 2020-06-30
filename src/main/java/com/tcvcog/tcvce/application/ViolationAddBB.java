@@ -18,32 +18,23 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
-import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.Photograph;
 //import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.event.FileUploadEvent;
@@ -115,7 +106,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
                             "Success! Violation added.", ""));
              getSessionBean().getSessionBean().setSessCECase(currentCase);
             return "ceCases";
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | SearchException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -152,7 +143,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
             return "violationPhotos";
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | SearchException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 

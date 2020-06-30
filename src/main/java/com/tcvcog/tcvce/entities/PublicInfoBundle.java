@@ -5,8 +5,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.time.LocalDateTime;
-
 /**
  *
  * @author sylvia
@@ -22,7 +20,7 @@ public abstract class PublicInfoBundle {
     private String typeName;
     private String dateOfRecord; 
     
-    // some info bundles like an action request may not be assocaited with a
+    // some info bundles like an action request may not be associated with a
     // specific Property object. Most are, however, and the String rep of its 
     // address will be stored here
     private boolean addressAssociated;
@@ -34,7 +32,11 @@ public abstract class PublicInfoBundle {
 
     
     @Override
-    public abstract String toString();
+    public String toString(){
+        
+        return this.getClass().getName();
+        
+    }
     
     /**
      * @return the addressAssociated

@@ -138,7 +138,10 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
             try {
                 currentCase = cc.assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser().getMyCredential());
-            } catch (IntegrationException | BObStatusException ex) {
+            } catch (SearchException | BObStatusException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            } catch (IntegrationException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -317,9 +320,9 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         try {
             pc.updatePayment(selectedPayment, selectedAssignedFee);
-                    getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Payment record updated!", ""));
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Payment record updated!", ""));
         } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -341,7 +344,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         try {
             pc.removePayment(selectedPayment);
-             getFacesContext().addMessage(null,
+            getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Payment record deleted forever!", ""));
         } catch (BObStatusException ex) {

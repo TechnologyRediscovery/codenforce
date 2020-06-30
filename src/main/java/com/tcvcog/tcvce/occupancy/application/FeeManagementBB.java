@@ -889,7 +889,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             try {
                 currentCase = cc.assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser().getMyCredential());
-            } catch (BObStatusException ex) {
+            } catch (BObStatusException | SearchException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
             } catch (IntegrationException ex) {
@@ -935,7 +935,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         try {
             currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
 
-        } catch (BObStatusException ex) {
+        } catch (BObStatusException | SearchException ex) {
             getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         } catch (IntegrationException ex) {

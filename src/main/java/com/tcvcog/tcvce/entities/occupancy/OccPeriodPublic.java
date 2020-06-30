@@ -17,7 +17,6 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BOb;
-import com.tcvcog.tcvce.entities.IFace_Openable;
 
 /**
  *
@@ -25,5 +24,7 @@ import com.tcvcog.tcvce.entities.IFace_Openable;
  */
 public abstract class OccPeriodPublic
                 extends BOb {
+    
+    //TODO: Decide what to put here or if it should even exist
     
 }
