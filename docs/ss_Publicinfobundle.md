@@ -17,7 +17,10 @@ A PACC is a public access control code that allows for retrieval of information 
 ## Design goals (unfinished components)
 1. Track each use of each PACC as an event on an associated object; e.g. when somebody views the status of a code enforcement case against their neighbor, the internal user should see an EventCnF appear on that case's internal event history
 
+## PublicInfoBundles as a wrapper class
+In our newest approach, we are going to use PublicInfoBundles as a wrapper class that contains a filtered BOb that can be viewed or edited by a public user!
 
+![Diagram explaining the ](img/PublicInfoBundleEcosystem.png "Open this image in a new tab if it's too small to read!")
 
 
 
