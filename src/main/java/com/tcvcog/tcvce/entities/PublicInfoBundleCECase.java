@@ -23,7 +23,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     private CECase bundledCase;
     private boolean paccEnabled;
 
-    private List<EventCnF> publicEventList;
+    private List<PublicInfoBundleEventCnF> publicEventList;
 
     private LocalDateTime mostRecentLoggedEvent;
 
@@ -197,7 +197,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @return the publicEventList
      */
-    public List<EventCnF> getPublicEventList() {
+    public List<PublicInfoBundleEventCnF> getPublicEventList() {
         return publicEventList;
     }
 
@@ -211,7 +211,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @param publicEventList the publicEventList to set
      */
-    public void setPublicEventList(List<EventCnF> publicEventList) {
+    public void setPublicEventList(List<PublicInfoBundleEventCnF> publicEventList) {
         this.publicEventList = publicEventList;
     }
 
