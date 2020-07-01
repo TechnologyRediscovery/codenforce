@@ -17,7 +17,9 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -30,6 +32,8 @@ import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
@@ -39,13 +43,13 @@ import com.tcvcog.tcvce.entities.PublicInfoBundleOccPeriod;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePayment;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
 import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
+import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -369,6 +373,30 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
     }
+    
+    public PublicInfoBundlePropertyUnit extractPublicInfo(PropertyUnit input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
+        PublicInfoBundlePropertyUnit pib = new PublicInfoBundlePropertyUnit();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        PropertyUnitDataHeavy heavyUnit = pc.getPropertyUnitWithLists(input, getSessionBean().getSessUser().getMyCredential());
+        
+        ArrayList<PublicInfoBundleOccPeriod> periodHorde = new ArrayList<>();
+        
+        for (OccPeriod period : heavyUnit.getPeriodList()){
+            periodHorde.add(extractPublicInfo(period));
+        }
+        
+        pib.setPeriodList(periodHorde);
+        pib.setBundledUnit(input);
+
+        pib.setTypeName("PropertyUnit");
+        pib.setPaccStatusMessage("Public access enabled");
+
+        pib.setShowAddMessageButton(false);
+        pib.setShowDetailsPageButton(true);
+
+        return pib;
+    }
 
     /**
      * Converts a bundled Payment to an unbundled Payment.
@@ -429,9 +457,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             skeletonHorde.add(export(bundle));
         }
         exportable.setPaymentList(skeletonHorde);
-        return unbundled;
+        return exportable;
     }
-/*
+    
     /**
      * Converts a bundled OccInspection to an unbundled OccInspection.
      *

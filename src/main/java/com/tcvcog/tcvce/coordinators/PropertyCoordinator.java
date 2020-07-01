@@ -29,10 +29,8 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
-import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
@@ -52,8 +50,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -153,6 +149,26 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             }
         }
         return puwll;
+    }
+    
+    /**
+     *
+     * @param propUnit
+     * @param cred
+     * @return
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public PropertyUnitDataHeavy getPropertyUnitWithLists(PropertyUnit propUnit, Credential cred) throws IntegrationException, EventException, EventException, AuthorizationException, BObStatusException {
+        PropertyIntegrator pi = getPropertyIntegrator();
+            try {
+                return configurePropertyUnitDataHeavy(pi.getPropertyUnitWithLists(propUnit.getUnitID()), cred);
+            } catch (ViolationException ex) {
+                System.out.println(ex);
+            }
+            return new PropertyUnitDataHeavy(propUnit); //just in case something goes horribly wrong
     }
 
     /**
