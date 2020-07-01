@@ -23,6 +23,8 @@ In our newest approach, we are going to use PublicInfoBundles as a wrapper class
 ![Diagram explaining the ](img/PublicInfoBundleEcosystem.png "Open this image in a new tab if it's too small to read!")
 
 
+The wrapper class also contains bundles that might be useful to the user viewing their public data. For instance, a PublicInfoBundleFeeAssigned has a list of PublicInfoBundlePayment objects. When converting a FeeAssigned object to a PublicInfoBundleFeeAssigned, each Payment in the list of Payments on the FeeAssigned is individually converted and added to the list of PublicInfoBundlePayments on the PublicInfoBundleFeeAssigned. The original Payment list is then cleared.
 
+When exporting the PublicInfoBundleFeeAssigned back into a FeeAssigned object, the reverse is done: The bundled FeeAssigned object is checked for changes, and any fields that were not changed or were cleared are filled in using a copy of the entry currently in the database. Then, the each PublicInfoBundlePayment in the PublicInfoBundlePayment list is individually exported, and this exported list of Payment objects is set on the FeeAssigned object.
 
-
+One thing to keep in mind is that many export methods return the data heavy form of an object in order to preserve all the various lists the public user might have changed. Since these methods are designed export individual objects to check for changes, this shouldn't be an issue, but exporting object en masse could lead to lapses in performance.
