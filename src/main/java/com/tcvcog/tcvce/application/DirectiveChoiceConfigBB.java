@@ -155,22 +155,22 @@ public class DirectiveChoiceConfigBB extends BackingBeanUtils implements Seriali
      * Initialize the whole page into default setting
      */
     public void defaultSetting() {
-        try {
-            //initialize default selecte button in list-column: false
-            currentDirectiveSelected = false;
-            //initialize default current basic muni list
-            directiveList = getDirectiveList();
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Municipality Page Unsuccessfully Initialized", ""));
-        }
+        //initialize default selecte button in list-column: false
+        currentDirectiveSelected = false;
+        //initialize default current basic muni list
+        directiveList = fetchDirectiveList();
     }
     
     
     private List<Directive> fetchDirectiveList(){
         WorkflowCoordinator wc = getWorkflowCoordinator();
         List<Directive> dlist = new ArrayList<>();
-        dlist = wc.getd
+        try {
+            wc.getDirectiveListForConfig(getSessionBean().getSessUser());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return dlist;
         
     }
 
@@ -262,62 +262,6 @@ public class DirectiveChoiceConfigBB extends BackingBeanUtils implements Seriali
                 ex.getMessage(), ""));
         }
     }
-    
-    public void rules_commitEventRuleCreate(ActionEvent ev){
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        int freshEventRuleID;
-        try {
-            freshEventRuleID = wc.rules_createEventRuleAbstract(currentEventRuleAbstract, getCurrentOccPeriod(), 
-                                                                null, isIncludeEventRuleInCurrentOccPeriodTemplate(),
-                                                                getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "New event rule added with ID " + freshEventRuleID, ""));
-            System.out.println("OccInspectionBB.commiteventRuleCreate");
-            reloadCurrentOccPeriodDataHeavy();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                ex.getMessage(), ""));
-        }
-    }
-    
-    
-    public void rules_addEventRuleByID(ActionEvent ev){
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        try {
-            EventRuleAbstract era = wc.rules_getEventRuleAbstract(getFormEventRuleIDToAdd());
-            wc.rules_attachEventRule(era, getCurrentOccPeriod(), getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Success! added rule to occ period", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                ex.getMessage(), ""));
-            
-        } 
-    }
-    
-    public void rules_addEventRuleSet(EventRuleSet ers){
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        try {
-            wc.rules_attachRuleSet(ers, getCurrentOccPeriod(), getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Success! added rule set to occ period", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                ex.getMessage(), ""));
-            
-        }
-        
-    }
-    
     
   
    

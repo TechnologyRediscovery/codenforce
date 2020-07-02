@@ -119,18 +119,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
             municipalityListForSearch = bbSessionUser.getAuthMuniList();
         }
         
-        // Load possible page modes
-        // Thank you to Chen&Chen for designing this system
-        pageModeOptions = new ArrayList<>();
-        List<PageModeEnum> modesPossible = Arrays.asList(PageModeEnum.values());
-        if(modesPossible != null && !modesPossible.isEmpty()){
-            for(PageModeEnum pm: modesPossible){
-                // only allow users to see modes for which they are authorized
-                if(pm.getMinUserRankToEnable() <= bbSessionUser.getKeyCard().getGoverningAuthPeriod().getRole().getRank()){
-                    pageModeOptions.add(pm);
-                }
-            }
-        }
+       
     }
     
     public String closeRS(){

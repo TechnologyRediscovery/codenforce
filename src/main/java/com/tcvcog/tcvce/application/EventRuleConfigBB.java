@@ -51,7 +51,9 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
     
     // New from Chen&Chen
     
+    
     private PageModeEnum currentMode;
+    private List<PageModeEnum> pageModes;
     private boolean currentRuleSelected;
     
     private EventRuleAbstract currentEventRuleAbstract;
@@ -78,8 +80,6 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         
     @PostConstruct
     public void initBean(){
-        EventCoordinator ec = getEventCoordinator();
-        WorkflowCoordinator wc = getWorkflowCoordinator();
         // new from Chen & Chen
          //initialize default current mode : Lookup
         currentMode = PageModeEnum.LOOKUP;
@@ -95,9 +95,9 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             ex.getMessage(), ""));
         }
+        pageModes = getSessionBean().assemblePermittedPageModes();
         
     }
-    
 
     public PageModeEnum getCurrentMode() {
         return currentMode;
@@ -170,6 +170,7 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Insert Municipality", ""));
         //reminder: set muniManageSample in faces-config.xml
         //return to muniManage_sample.xhtml page
+        rules_commitEventRuleCreate();
         return "";
     }
 
@@ -178,6 +179,7 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Update Municipality", ""));
         //reminder: set muniManageSample in faces-config.xml
         //return to muniManage_sample.xhtml page
+        rules_commitEventRuleEdits();
         return "";
     }
 
@@ -186,6 +188,7 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Remove Municipality", ""));
         //reminder: set muniManageSample in faces-config.xml
         //return to muniManage_sample.xhtml page
+        rules_commitEventRuleRemove();
         return "";
     }
 
@@ -195,8 +198,6 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
      * @param era
      */
     public void onObjectSelectButtonChange(EventRuleAbstract era){
-        
-          MunicipalityCoordinator mc = getMuniCoordinator();
 
         // "Select" button was selected
         if (currentRuleSelected == true) {
@@ -223,7 +224,7 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void rules_commitEventRuleEdits(ActionEvent ev){
+    public void rules_commitEventRuleEdits(){
         WorkflowCoordinator wc = getWorkflowCoordinator();
         try {
             wc.rules_updateEventRuleAbstract(currentEventRuleAbstract);
@@ -237,11 +238,11 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         }
     }
     
-    public void rules_commitEventRuleCreate(ActionEvent ev){
+    public void rules_commitEventRuleCreate(){
         WorkflowCoordinator wc = getWorkflowCoordinator();
         int freshEventRuleID;
         try {
-            freshEventRuleID = wc.rules_createEventRuleAbstract(currentEventRuleAbstract);
+            freshEventRuleID = wc.rules_createEventRuleAbstract(currentEventRuleAbstract, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "New event rule added with ID " + freshEventRuleID, ""));
@@ -254,39 +255,19 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         }
     }
     
-    
-    public void rules_addEventRuleByID(ActionEvent ev){
+    public void rules_commitEventRuleRemove(){
         WorkflowCoordinator wc = getWorkflowCoordinator();
         try {
-            EventRuleAbstract era = wc.rules_getEventRuleAbstract(getFormEventRuleIDToAdd());
-            wc.rules_attachEventRule(era, getCurrentOccPeriod(), getSessionBean().getSessUser());
+            wc.rules_removeEventRuleAbstract(currentEventRuleAbstract, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Success! added rule to occ period", ""));
-        } catch (IntegrationException | BObStatusException ex) {
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Event rule Updated with ID " + currentEventRuleAbstract.getRuleid(), ""));
+        } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 ex.getMessage(), ""));
-            
-        } 
-    }
-    
-    public void rules_addEventRuleSet(EventRuleSet ers){
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        try {
-            wc.rules_attachRuleSet(ers, getCurrentOccPeriod(), getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Success! added rule set to occ period", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                ex.getMessage(), ""));
-            
         }
-        
     }
     
     
@@ -433,6 +414,20 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
      */
     public void setEventRuleListFiltered(List<EventRuleAbstract> eventRuleListFiltered) {
         this.eventRuleListFiltered = eventRuleListFiltered;
+    }
+
+    /**
+     * @return the pageModes
+     */
+    public List<PageModeEnum> getPageModes() {
+        return pageModes;
+    }
+
+    /**
+     * @param pageModes the pageModes to set
+     */
+    public void setPageModes(List<PageModeEnum> pageModes) {
+        this.pageModes = pageModes;
     }
 
   

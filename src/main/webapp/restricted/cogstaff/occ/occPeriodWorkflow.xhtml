@@ -974,7 +974,283 @@
                                                 <p:spacer height="5px" />
 
                                                 <h:outputText styleClass="ui-label-inline" 
-                                                              value="hidden: " />
+                                                              value="hid
+                        <h:form id="proposaleventrule-config-form">
+
+                            <h1>Proposal and event rule configuration</h1>
+                            
+                            <p:panel    id="proposaleventrule-choose-panel"
+                                        toggleable="true"
+                                        widgetVar="proposaleventrule-choose-panel-var"
+                                        collapsed="false"
+                                        header="Choose event rule">
+                                
+                                 <p:dataTable
+                                    id="occperiod-proposals-eventrules-datatable"
+                                    var="rule"
+                                    rowKey="#{rule.ruleid}"
+                                    value="#{eventRuleConfigBB.eventRuleList}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableColumns="true"
+                                    expandedRow="false"
+                                    rowExpandMode="multiple"
+                                    resizableColumns="true">
+
+                                      <p:column width="3%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Exp"/>
+                                            </f:facet>
+                                            <p:rowToggler/>
+                                        </p:column>
+
+                                     <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                         <h:outputText value="#{rule.ruleid}"/>
+                                    </p:column>
+
+                                     <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Title" />
+                                        </f:facet>
+                                         <h:outputText value="#{rule.title}"/>
+                                    </p:column>
+
+                                    <p:rowExpansion>
+                                        
+                                    <p:commandButton    id="eventrules-editrule-cb"
+                                                        ajax="true" 
+                                                        styleClass="proposal-choice-button"
+                                                        actionListener="#{eventRuleConfigBB.rules_initiateEventRuleEdit(rule)}"
+                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                        value="Edit rule"
+                                                        oncomplete="PF('occperiod-dialog-addediteventrule-var').show()"
+                                                        icon="fa fa-plus"
+                                                        update="occperiod-dialog-addediteventrule-form"/>
+                                    
+                                    <p:spacer height="5px" />
+
+                                          <h:panelGrid    id="eventrules-grid" 
+                                                            columns="2" 
+                                                            columnClasses="td-dense" 
+                                                            rendered="true">
+                                                <h:panelGroup>
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Rule ID: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.ruleid}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Title:  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.title}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Description: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.description}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Required event type: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.requiredEventType) ? rule.requiredEventType.label : ''}" />
+
+                                                    <p:spacer height="5px" />
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Forbidden event type: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.forbiddenEventType) ? rule.forbiddenEventType.label : ''}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Required event category:  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.requiredEventCategory) 
+                                                                           ? rule.requiredEventCategory.eventCategoryTitle 
+                                                                                + 'ID: ' 
+                                                                                + rule.requiredEventCategory.categoryID  
+                                                                           : '' }" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Forbidden event category:  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.forbiddenEventCategory) 
+                                                                           ? rule.forbiddenEventCategory.eventCategoryTitle 
+                                                                                + 'ID: ' 
+                                                                                + rule.forbiddenEventCategory.categoryID  
+                                                                            : '' }" />
+                                                </h:panelGroup>
+                                              <h:panelGroup>
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Req EC type-internal order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_typeInternalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Required EC Type-internal order thresold upper bound? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Required EC global order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_globalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Required EC global order thresold upper bound?  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.requiredECThreshold_globalOrder_treatAsUpperBound}" />
+
+                                              </h:panelGroup>
+                                              <h:panelGroup>
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Req EC type-internal order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_typeInternalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Required EC Type-internal order thresold upper bound? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Required EC global order thresold? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_globalOrder}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Required EC global order thresold upper bound?  "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.forbiddenECThreshold_globalOrder_treatAsUpperBound}" />
+
+                                              </h:panelGroup>
+
+                                              <h:panelGroup>
+
+                                                  <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Mondatory rule pass required for BOB close?"  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.mandatoryRulePassRequiredToCloseEntity}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Inactivate rule on BOB close?"  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.inactivateRuleOnEntityClose}" />
+
+                                                    <p:spacer height="5px" />
+
+
+                                                  <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Triggered EC On pass: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.triggeredECOnRulePass) ? rule.triggeredECOnRulePass.categoryID : ''}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Triggered EC On fail: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty rule.triggeredECOnRuleFail) ? rule.triggeredECOnRuleFail.categoryID : ''}" />
+
+                                              </h:panelGroup>
+                                              <h:panelGroup>
+
+                                                  <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Active? "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.activeRuleAbstract}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                  <h:outputText styleClass="data_field_label-inline" 
+                                                                  value="Notes: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{rule.notes}" escape="false" />
+                                              </h:panelGroup>
+                                          </h:panelGrid>
+                                    </p:rowExpansion>
+                                </p:dataTab
+                                
+                                
+                                
+                                
+                            </p:panel>
+                            
+                            <p:panel    id="proposaleventrule-config-panel"
+                                        toggleable="true"
+                                        widgetVar="proposaleventrule-config-panel-var"
+                                        collapsed="false"
+                                        header="Event rule explorer">
+
+                                <h:form id="occperiod-dialog-addediteventrule-form">
+
+                                    <h2>Add and edit event rules</h2>
+
+                                    <h:panelGrid    id="eventrule-create-grid" 
+                                                    columns="2" 
+                                                    columnClasses="gridTD, gridTD" 
+                                                    rendered="true">
+
+                                     
+                                    </h:panelGrid>
+
+                                    <p:spacer height="5px" />
+
+                                    <p:spacer height="5px" />
+
+                                    <p:commandButton    id="addediteventrule-button-addrule"
+                                                        ajax="true" 
+                                                        actionListener="#{eventRuleConfigBB.rules_commitEventRuleCreate}"
+                                                        value="create new rule" icon="fa fa-plus"
+                                                        disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{eventRuleConfigBB.currentEventRuleAbstract.ruleid == 0}"
+                                                        oncomplete="PF('occperiod-dialog-addediteventrule-var').hide()"
+                                                        update="occperiod-dialog-proposalmetadata-form-messages
+                                                        periodmetadata-form-proposalsconfig
+                                                        occperiod-propoals-eventrules-form"/>
+
+                                    <p:commandButton    id="addediteventrule-button-editrule"
+                                                        ajax="true" 
+                                                        actionListener="#{eventRuleConfigBB.rules_commitEventRuleEdits}"
+                                                        value="update rule" icon="fa fa-edit"
+                                                        disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{eventRuleConfigBB.currentEventRuleAbstract.ruleid != 0}"
+                                                        oncomplete="PF('occperiod-dialog-addediteventrule-var').hide()"
+                                                        update="occperiod-dialog-proposalmetadata-form-messages
+                                                        periodmetadata-form-proposalsconfig
+                                                        occperiod-propoals-eventrules-form"/>
+
+                                </h:form>
+
+                            </p:panel>
+                        <!--close main container-->
+                    </div>
+den: " />
                                                 <h:outputText styleClass="data-text" 
                                                               value="#{pr.directive.hidden}" />
 

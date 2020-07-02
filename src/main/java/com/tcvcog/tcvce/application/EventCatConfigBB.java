@@ -45,8 +45,6 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
      
     private EventType[] eventTypeList;
     
-  
-    
     
     public EventCatConfigBB() {
     }
@@ -80,14 +78,6 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
     
     public void editSelectedEventCategory(ActionEvent e){
         if(getSelectedEventCategory() != null){
-            setFormEventType(getSelectedEventCategory().getEventType());
-            setFormEventCategoryTitle(getSelectedEventCategory().getEventCategoryTitle());
-            setFormEventCategoryDescr(getSelectedEventCategory().getEventCategoryDesc());
-            setFormCatIcon(selectedEventCategory.getIcon());
-            
-//            setFormRequestable(selectedEventCategory.isRequestable());
-            setFormNotifycasemonitors(selectedEventCategory.isNotifymonitors());
-            setFormHidable(selectedEventCategory.isHidable());
             
         } else {
            getFacesContext().addMessage(null,
@@ -102,22 +92,12 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
        EventCategory ec = new EventCategory();
        
        ec.setCategoryID(getSelectedEventCategory().getCategoryID());
-       ec.setEventType(getFormEventType());
-       ec.setEventCategoryTitle(getFormEventCategoryTitle());
-       ec.setEventCategoryDesc(getFormEventCategoryDescr());
-       ec.setIcon(formCatIcon);
-       
-//        ec.setRequestable(formRequestable);
-        ec.setNotifymonitors(formNotifycasemonitors);
-        ec.setHidable(formHidable);
         
         try {
             ei.updateEventCategory(ec);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Event category updated!", ""));
-            setFormEventCategoryTitle("");
-            setFormEventCategoryDescr("");
         } catch (IntegrationException ex) {
            getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -131,22 +111,12 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
         EventIntegrator ei = getEventIntegrator();
         EventCategory ec = new EventCategory();
         
-        ec.setEventType(getNewFormSelectedEventType());
-        ec.setEventCategoryTitle(getNewFormEventCategoryTitle());
-        ec.setEventCategoryDesc(getNewFormEventCategoryDescr());
-        ec.setIcon(newFormCatIcon);
-        
-//        ec.setRequestable(newFormRequestable);
-        ec.setNotifymonitors(newFormNotifycasemonitors);
-        ec.setHidable(newFormHidable);
         
         try {
             ei.insertEventCategory(ec);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Event category added!", ""));
-            setNewFormEventCategoryTitle("");
-            setNewFormEventCategoryDescr("");
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -204,30 +174,7 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
         return eventTypeList;
     }
 
-    /**
-     * @return the formEventType
-     */
-    public EventType getFormEventType() {
-        return formEventType;
-    }
-
-    /**
-     * @return the formEventCategoryTitle
-     */
-    public String getFormEventCategoryTitle() {
-        return formEventCategoryTitle;
-    }
-
-    /**
-     * @return the formEventCategoryDescr
-     */
-    public String getFormEventCategoryDescr() {
-        return formEventCategoryDescr;
-    }
-
-    /**
-     * @param selectedEventCategory the selectedEventCategory to set
-     */
+ 
     public void setSelectedEventCategory(EventCategory selectedEventCategory) {
         this.selectedEventCategory = selectedEventCategory;
     }
@@ -248,274 +195,7 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
         this.eventTypeList = eventTypeList;
     }
 
-    /**
-     * @param formEventType the formEventType to set
-     */
-    public void setFormEventType(EventType formEventType) {
-        this.formEventType = formEventType;
-    }
-
-    /**
-     * @param formEventCategoryTitle the formEventCategoryTitle to set
-     */
-    public void setFormEventCategoryTitle(String formEventCategoryTitle) {
-        this.formEventCategoryTitle = formEventCategoryTitle;
-    }
-
-    /**
-     * @param formEventCategoryDescr the formEventCategoryDescr to set
-     */
-    public void setFormEventCategoryDescr(String formEventCategoryDescr) {
-        this.formEventCategoryDescr = formEventCategoryDescr;
-    }
-
-    /**
-     * @return the newFormSelectedEventType
-     */
-    public EventType getNewFormSelectedEventType() {
-        return newFormSelectedEventType;
-    }
-
-    /**
-     * @return the newFormEventCategoryTitle
-     */
-    public String getNewFormEventCategoryTitle() {
-        return newFormEventCategoryTitle;
-    }
-
-    /**
-     * @return the newFormEventCategoryDescr
-     */
-    public String getNewFormEventCategoryDescr() {
-        return newFormEventCategoryDescr;
-    }
-
-    /**
-     * @param newFormSelectedEventType the newFormSelectedEventType to set
-     */
-    public void setNewFormSelectedEventType(EventType newFormSelectedEventType) {
-        this.newFormSelectedEventType = newFormSelectedEventType;
-    }
-
-    /**
-     * @param newFormEventCategoryTitle the newFormEventCategoryTitle to set
-     */
-    public void setNewFormEventCategoryTitle(String newFormEventCategoryTitle) {
-        this.newFormEventCategoryTitle = newFormEventCategoryTitle;
-    }
-
-    /**
-     * @param newFormEventCategoryDescr the newFormEventCategoryDescr to set
-     */
-    public void setNewFormEventCategoryDescr(String newFormEventCategoryDescr) {
-        this.newFormEventCategoryDescr = newFormEventCategoryDescr;
-    }
-
-    /**
-     * @return the formUserdeployable
-     */
-    public boolean isFormUserdeployable() {
-        return formUserdeployable;
-    }
-
-    /**
-     * @return the formMunideployable
-     */
-    public boolean isFormMunideployable() {
-        return formMunideployable;
-    }
-
-    /**
-     * @return the formPublicdeployable
-     */
-    public boolean isFormPublicdeployable() {
-        return formPublicdeployable;
-    }
-
-    /**
-     * @return the formRequestable
-     */
-    public boolean isFormRequestable() {
-        return formRequestable;
-    }
-
-    /**
-     * @return the formNotifycasemonitors
-     */
-    public boolean isFormNotifycasemonitors() {
-        return formNotifycasemonitors;
-    }
-
-    
-
-    /**
-     * @return the formHidable
-     */
-    public boolean isFormHidable() {
-        return formHidable;
-    }
-
-    /**
-     * @return the newFormUserdeployable
-     */
-    public boolean isNewFormUserdeployable() {
-        return newFormUserdeployable;
-    }
-
-    /**
-     * @return the newFormMunideployable
-     */
-    public boolean isNewFormMunideployable() {
-        return newFormMunideployable;
-    }
-
-    /**
-     * @return the newFormPublicdeployable
-     */
-    public boolean isNewFormPublicdeployable() {
-        return newFormPublicdeployable;
-    }
-
-    /**
-     * @return the newFormRequestable
-     */
-    public boolean isNewFormRequestable() {
-        return newFormRequestable;
-    }
-
-    /**
-     * @return the newFormNotifycasemonitors
-     */
-    public boolean isNewFormNotifycasemonitors() {
-        return newFormNotifycasemonitors;
-    }
-
    
-
-    /**
-     * @return the newFormHidable
-     */
-    public boolean isNewFormHidable() {
-        return newFormHidable;
-    }
-
-
-    /**
-     * @param formUserdeployable the formUserdeployable to set
-     */
-    public void setFormUserdeployable(boolean formUserdeployable) {
-        this.formUserdeployable = formUserdeployable;
-    }
-
-    /**
-     * @param formMunideployable the formMunideployable to set
-     */
-    public void setFormMunideployable(boolean formMunideployable) {
-        this.formMunideployable = formMunideployable;
-    }
-
-    /**
-     * @param formPublicdeployable the formPublicdeployable to set
-     */
-    public void setFormPublicdeployable(boolean formPublicdeployable) {
-        this.formPublicdeployable = formPublicdeployable;
-    }
-
-    /**
-     * @param formRequestable the formRequestable to set
-     */
-    public void setFormRequestable(boolean formRequestable) {
-        this.formRequestable = formRequestable;
-    }
-
-    /**
-     * @param formNotifycasemonitors the formNotifycasemonitors to set
-     */
-    public void setFormNotifycasemonitors(boolean formNotifycasemonitors) {
-        this.formNotifycasemonitors = formNotifycasemonitors;
-    }
-
-   
-
-    /**
-     * @param formHidable the formHidable to set
-     */
-    public void setFormHidable(boolean formHidable) {
-        this.formHidable = formHidable;
-    }
-
-    /**
-     * @param newFormUserdeployable the newFormUserdeployable to set
-     */
-    public void setNewFormUserdeployable(boolean newFormUserdeployable) {
-        this.newFormUserdeployable = newFormUserdeployable;
-    }
-
-    /**
-     * @param newFormMunideployable the newFormMunideployable to set
-     */
-    public void setNewFormMunideployable(boolean newFormMunideployable) {
-        this.newFormMunideployable = newFormMunideployable;
-    }
-
-    /**
-     * @param newFormPublicdeployable the newFormPublicdeployable to set
-     */
-    public void setNewFormPublicdeployable(boolean newFormPublicdeployable) {
-        this.newFormPublicdeployable = newFormPublicdeployable;
-    }
-
-    /**
-     * @param newFormRequestable the newFormRequestable to set
-     */
-    public void setNewFormRequestable(boolean newFormRequestable) {
-        this.newFormRequestable = newFormRequestable;
-    }
-
-    /**
-     * @param newFormNotifycasemonitors the newFormNotifycasemonitors to set
-     */
-    public void setNewFormNotifycasemonitors(boolean newFormNotifycasemonitors) {
-        this.newFormNotifycasemonitors = newFormNotifycasemonitors;
-    }
-
-    
-
-    /**
-     * @param newFormHidable the newFormHidable to set
-     */
-    public void setNewFormHidable(boolean newFormHidable) {
-        this.newFormHidable = newFormHidable;
-    }
-
-    /**
-     * @return the formCatIcon
-     */
-    public Icon getFormCatIcon() {
-        return formCatIcon;
-    }
-
-    /**
-     * @param formCatIcon the formCatIcon to set
-     */
-    public void setFormCatIcon(Icon formCatIcon) {
-        this.formCatIcon = formCatIcon;
-    }
-
-    /**
-     * @return the newFormCatIcon
-     */
-    public Icon getNewFormCatIcon() {
-        return newFormCatIcon;
-    }
-
-    /**
-     * @param newFormCatIcon the newFormCatIcon to set
-     */
-    public void setNewFormCatIcon(Icon newFormCatIcon) {
-        this.newFormCatIcon = newFormCatIcon;
-    }
-
     /**
      * @return the iconList
      */

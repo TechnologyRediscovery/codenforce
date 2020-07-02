@@ -765,7 +765,22 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         wi.rules_updateEventRule(era);
     }
     
-    
+    /**
+     * Checks User's rank and, if allowed, toggles EventRuleAbstract's active 
+     * flag to false and sends update to the DB
+     * @param era to deactivate
+     * @param ua doing the deactivating
+     * @throws IntegrationException 
+     */
+    public void rules_removeEventRuleAbstract(EventRuleAbstract era, UserAuthorized ua) throws IntegrationException{
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        
+        if(era.getUserRankMinToDeactivate() <= ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank()){
+            era.setActiveRuleAbstract(false);
+            wi.rules_updateEventRule(era);
+        }
+        
+    }
     
 
     /**
