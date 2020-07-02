@@ -16,6 +16,14 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.UserAuthorized;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.context.ExternalContext;
 
 /**
@@ -24,11 +32,25 @@ import javax.faces.context.ExternalContext;
  */
 public class LoginBB extends BackingBeanUtils {
 
+    private UserAuthorized publicUA;
     /**
      * Creates a new instance of LoginBB
      */
     public LoginBB() {
     }
+    
+         
+    @PostConstruct
+    public void initBean(){
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            publicUA = uc.getPublicUserAuthorized();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+    }
+    
     
      public String loginToMissionControl(){
          System.out.println("LoginBB.loginToMissionControl");
@@ -42,6 +64,20 @@ public class LoginBB extends BackingBeanUtils {
         return "startInitiationProcess";
 //           return "testInit";
            
+    }
+
+    /**
+     * @return the publicUA
+     */
+    public UserAuthorized getPublicUA() {
+        return publicUA;
+    }
+
+    /**
+     * @param publicUA the publicUA to set
+     */
+    public void setPublicUA(UserAuthorized publicUA) {
+        this.publicUA = publicUA;
     }
     
 }
