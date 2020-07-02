@@ -109,7 +109,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to retrieve action request", ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.updateActionRequest | Integration Error: Unable to retrieve action request", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -126,10 +126,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	dateofrecord, addressofconcern, \n"
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, status_id, caseattachmenttimestamp, \n"
-                + "	muniinternalnotes, publicexternalnotes, paccenabled, caseattachment_userid, \n"
-                + "	actionRqstIssueType.typeName AS typename\n"
+                + "	muniinternalnotes, publicexternalnotes, paccenabled, caseattachment_userid, ceactionrequest.active, \n"
+                + "	ceactionrequestissuetype.typeName AS typename\n"
                 + "	FROM public.ceactionrequest \n"
-                + "		INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid"
+                + "		INNER JOIN ceactionrequestissuetype ON ceactionrequest.issuetype_issuetypeid = ceactionrequestissuetype.issuetypeid"
                 + " WHERE requestpubliccc= ?;";
 
         // for degugging
@@ -142,7 +142,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             con = getPostgresCon();
             stmt = con.prepareStatement(q);
             stmt.setInt(1, controlCode);
-            System.out.println("CEActionRequestorIntegrator.getActionRequestByControlCode | SQL: " + stmt.toString());
+            System.out.println("CEActionRequestorIntegrator.getCEActionRequestByControlCode | SQL: " + stmt.toString());
             // Retrieve action data from postgres
             rs = stmt.executeQuery();
 
@@ -153,7 +153,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             }
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequestByControlCode | Integration Error: Unable to retrieve action request", ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.getCEActionRequestByControlCode | Integration Error: Unable to retrieve action request", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -343,9 +343,9 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, \n"
                 + "	muniinternalnotes, publicexternalnotes,\n"
-                + "	actionRqstIssueType.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid, active \n"
+                + "	ceactionrequestissuetype.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid, active \n"
                 + "FROM public.ceactionrequest \n"
-                + "     INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid ");
+                + "     INNER JOIN ceactionrequestissuetype ON ceactionrequest.issuetype_issuetypeid = ceactionrequestissuetype.issuetypeid ");
         sb.append("WHERE requestID = ?;");
 
 //        
@@ -356,7 +356,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 //                "       requestdescription, isurgent, anonymityrequested, coginternalnotes, \n" +
 //                "       muniinternalnotes, publicexternalnotes, status_id, caseattachmenttimestamp, \n" +
 //                "       paccenabled, caseattachment_userid\n"
-//                + "	FROM public.ceactionrequest INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid ");
+//                + "	FROM public.ceactionrequest INNER JOIN ceactionrequestissuetype ON ceactionrequest.issuetype_issuetypeid = ceactionrequestissuetype.issuetypeid ");
 //        sb.append(" WHERE requestid = ?;");
 
         // for degugging

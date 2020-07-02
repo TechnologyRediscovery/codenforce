@@ -31,7 +31,7 @@
                                 
                                 <p:commandButton ajax="false" tabindex="1"
                                                  id="ceactionrequest-requestasyourself-cb"
-                                                 value="Request as yourself: #{sessionBean.sessionUser.person.firstName} #{sessionBean.sessionUser.person.lastName} (user ID #{sessionBean.sessionUser.userID})" 
+                                                 value="Request as yourself: #{sessionBean.sessUser.person.firstName} #{sessionBean.sessUser.person.lastName} (user ID #{sessionBean.sessUser.userID})" 
                                                  action="#{cEActionRequestSubmitBB.requestActionAsFacesUser}"
                                                  />    
                                 
@@ -43,7 +43,7 @@
                                     <f:selectItem itemValue="2" itemLabel="Request action on behalf of a person connected to the property of concern: 
                                                   #{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/>
                                     <f:selectItem itemValue="3" itemLabel="Add new person (enter details in form below)"/>
-                                    <p:ajax         listener="#{cEActionRequestSubmitBB.changeActionRequestorAssignmentMethod}"
+                                    <p:ajax         listener="#{cEActionRequestSubmitBB.changeActionRequestorAssignment}"
                                                     update="person-list-menu
                                                     requestCEActionFlowFormRequestorDetails
                                                     ceactionrequest-confirmexistingperson-cb"/>
@@ -83,9 +83,9 @@
                                 <p:selectOneMenu id="recent-person-list-menu" 
                                                  required="false" tabindex="2"
                                                  value="#{cEActionRequestSubmitBB.currentPerson}"
-                                                 disabled="#{sessionBean.sessionPropertyList.size() == 0}">
+                                                 disabled="#{sessionBean.sessPropertyList.size() == 0}">
                                     <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                    <f:selectItems value="#{sessionBean.sessionPersonList}"  var="p" itemValue="#{p}" 
+                                    <f:selectItems value="#{sessionBean.sessPersonList}"  var="p" itemValue="#{p}" 
                                                    itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
                                     <f:converter converterId="personConverter"/>
                                     

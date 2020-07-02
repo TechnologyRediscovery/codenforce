@@ -48,6 +48,7 @@ import com.tcvcog.tcvce.entities.PublicInfoBundlePayment;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
 import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
@@ -131,7 +132,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 //        }
         return infoBundleList;
     }
-
+    
     /**
      * Bundles a CECase into a PublicInfoBundleCECase by stripping out its
      * private information.

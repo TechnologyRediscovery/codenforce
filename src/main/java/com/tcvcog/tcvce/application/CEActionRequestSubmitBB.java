@@ -21,9 +21,6 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
@@ -46,7 +43,6 @@ import com.tcvcog.tcvce.util.Constants;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -62,6 +58,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     // for request lookup
     
     private CEActionRequest currentRequest;
+    private CEActionRequest requestForSubmission;
     
     private Person currentPerson;
     private int actionRequestorAssignmentMethod;
@@ -151,6 +148,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     
     
     public void changePropertyPersonsDropDown(){
+        
+    }
+    
+    public void changeActionRequestorAssignment(){
         
     }
     
@@ -581,7 +582,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     /**
      * @return the propList
      */
-    public ArrayList getPropList() {
+    public ArrayList<Property> getPropList() {
         return propList;
     }
 
@@ -595,7 +596,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     /**
      * @param propList the propList to set
      */
-    public void setPropList(ArrayList propList) {
+    public void setPropList(ArrayList<Property> propList) {
         this.propList = propList;
     }
 
@@ -766,4 +767,14 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public void setSkeleton(Person skeleton) {
         this.skeleton = skeleton;
     }
+
+    public CEActionRequest getRequestForSubmission() {
+        return requestForSubmission;
+    }
+
+    public void setRequestForSubmission(CEActionRequest requestForSubmission) {
+        this.requestForSubmission = requestForSubmission;
+    }
+    
+    
 }

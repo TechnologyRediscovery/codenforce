@@ -24,18 +24,18 @@
 
 
             <ui:define name="content">
-                
-                
-                        <h:messages id="pibMessages" globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
+
+
+                <h:messages id="pibMessages" globalOnly="true" showDetail="true" showSummary="true"
+                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                </h:messages>
 
 
 
                 <f:view>
                     <h:form id="publicInfobundleForm">
 
-                        <h1>Public information listing for Code Enforcement Case ID: <h:outputText value="#{pIBCECaseBB.activePIBCECase.caseID}"/> </h1>
+                        <h1>Public information listing for Code Enforcement Case ID: <h:outputText value="#{pIBCECaseBB.activePIBCECase.bundledCase.caseID}"/> </h1>
 
 
                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
@@ -44,7 +44,7 @@
                             <h:panelGroup>
                                 <h:outputLabel styleClass="bold" value="Case ID:" />
                                 <div class="rowExpansion">
-                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.caseID}"/>
+                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.bundledCase.caseID}"/>
                                 </div>
                             </h:panelGroup>
 
@@ -66,7 +66,7 @@
                             <h:panelGroup>
                                 <h:outputLabel styleClass="bold" value="Phase:" />
                                 <div class="rowExpansion">
-                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.casePhase.label}"/>
+                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.bundledCase.casePhase.label}"/>
                                 </div>
                             </h:panelGroup>
 
@@ -74,14 +74,14 @@
                                 <h:outputLabel styleClass="bold" value="Opening Date:"/>
                                 <p:spacer height="5px"/>
                                 <div class="rowExpansion" style="leftalign">
-                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.originiationDatePretty}"/>
+                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.bundledCase.originiationDatePretty}"/>
                                 </div>
                             </h:panelGroup>
 
                             <h:panelGroup>
                                 <h:outputLabel styleClass="bold" value="Closing Date:" />
                                 <div class="rowExpansion">
-                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.closingDatePretty}"/>
+                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.bundledCase.closingDatePretty}"/>
                                 </div>
                             </h:panelGroup>
 
@@ -119,178 +119,166 @@
                                     <h:outputText value="#{pIBCECaseBB.activePIBCECase.countCitations}"/>
                                 </div>
                             </h:panelGroup>
-                            
-                        </h:panelGrid>
-                            <p:spacer height="15px"/>
-                            
-                            <h2>Communication options</h2>
-                            
-                            
-                                <p:commandButton value="Send message to case manager"
-                                                 oncomplete="PF('messageDialog').show()"
-                                                 ajax="true"/>
-                            
-                            
-                        
-                                <p:confirmDialog message="Type your message to the code enforcement staff in the box below." 
-                                                      severity="info" widgetVar="messageDialog">
 
-                                    <h:form id="messageForm">
-                                        
-                                        
-                                        <h:outputText value="You are attaching a note to case ID #{pIBCECaseBB.activePIBCECase.caseID}"/>
-                                        
-                                        <p:spacer height="15px"/>
-                                        <p:outputLabel for="msgerName" value="First and last name:"/>
-                                        <p:spacer height="5px"/>
-                                        <p:inputText id="msgerName" style="width: 300px;" value="#{pIBCECaseBB.messagerName}"/>
-                                        
-                                        <p:spacer height="15px"/>
-                                        <p:outputLabel for="msgerPhone" value="Phone number:"/>
-                                        <p:spacer height="5px"/>
-                                        <p:inputText id="msgerPhone" style="width: 300px;" value="#{pIBCECaseBB.messagerPhone}"/>
-                                        
-                                        <p:spacer height="15px"/>
-                                        <p:outputLabel for="messageta" value="Case message:"/>
-                                        <p:spacer height="5px"/>
-                                        <p:inputTextarea id="messageta" style="width: 600px; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
-                                        <p:spacer height="15px"/>
-                                        
-                                        <p:commandButton ajax="true" actionListener="#{pIBCECaseBB.attachMessageToCase}"
-                                                         value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
-                                                         update="pibMessages"/>
-                                        <p>Messages submitted through this portal become part of the permanent case record<br />
-                                        and are included in documents prepared for town councils and magistrates. </p>
-                                    </h:form>
-                                    </p:confirmDialog>
-                                
-                        
-                            
-                            
-                            
-                            <h2>Case event history</h2>
-                            <p>This table lists individual case actions and notes related to the case management process. 
-                                Click the little arrow in the left most column to view detailed info about each event. 
-                                Note that not all case events are released to this public portal. For additional information, 
+                        </h:panelGrid>
+                        <p:spacer height="15px"/>
+
+                        <h2>Communication options</h2>
+
+
+                        <p:commandButton value="Send message to case manager"
+                                         oncomplete="PF('messageDialog').show()"
+                                         ajax="true"/>
+
+
+
+                        <p:confirmDialog message="Type your message to the code enforcement staff in the box below." 
+                                         severity="info" widgetVar="messageDialog">
+
+                            <h:form id="messageForm">
+
+
+                                <h:outputText value="You are attaching a note to case ID #{pIBCECaseBB.activePIBCECase.bundledCase.caseID}"/>
+
+                                <p:spacer height="15px"/>
+                                <p:outputLabel for="msgerName" value="First and last name:"/>
+                                <p:spacer height="5px"/>
+                                <p:inputText id="msgerName" style="width: 300px;" value="#{pIBCECaseBB.messagerName}"/>
+
+                                <p:spacer height="15px"/>
+                                <p:outputLabel for="msgerPhone" value="Phone number:"/>
+                                <p:spacer height="5px"/>
+                                <p:inputText id="msgerPhone" style="width: 300px;" value="#{pIBCECaseBB.messagerPhone}"/>
+
+                                <p:spacer height="15px"/>
+                                <p:outputLabel for="messageta" value="Case message:"/>
+                                <p:spacer height="5px"/>
+                                <p:inputTextarea id="messageta" style="width: 600px; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                <p:spacer height="15px"/>
+
+                                <p:commandButton ajax="true" actionListener="#{pIBCECaseBB.attachMessageToCase}"
+                                                 value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
+                                                 update="pibMessages"/>
+                                <p>Messages submitted through this portal become part of the permanent case record<br />
+                                    and are included in documents prepared for town councils and magistrates. </p>
+                            </h:form>
+                        </p:confirmDialog>
+
+
+
+
+
+                        <h2>Case event history</h2>
+                        <p>This table lists individual case actions and notes related to the case management process. 
+                            Click the little arrow in the left most column to view detailed info about each event. 
+                            Note that not all case events are released to this public portal. For additional information, 
                             please contact your municipality.</p>
 
+                        <p:dataTable
+                            id="caseEventTable"
+                            var="e"
+                            rowKey="#{e.bundledEvent.eventID}"
+                            value="#{pIBCECaseBB.activePIBCECase.publicEventList}"
+                            tableStyleClass="primeDataTable"
+                            resizableColumns="true"
+                            rowExpandMode="multiple"
+                            expandedRow="false"
+                            widgetVar="casePublicEventTable"
+                            >
+                            <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
-                        
-                        
-                                    <p:dataTable
-                                        id="caseEventTable"
-                                        var="e"
-                                        rowKey="#{e.eventID}"
-                                        value="#{pIBCECaseBB.activePIBCECase.publicEventList}"
-                                        tableStyleClass="primeDataTable"
-                                        resizableColumns="true"
-                                        rowExpandMode="multiple"
-                                        expandedRow="false"
-                                        widgetVar="casePublicEventTable"
-                                        >
-                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+                            <p:column width="3%" exportable="false">
+                                <f:facet name="header">
+                                    <h:outputText value="Expand"/>
+                                </f:facet>
+                                <p:rowToggler/>
+                            </p:column>
 
-                                        <p:column width="3%" exportable="false">
-                                            <f:facet name="header">
-                                                <h:outputText value="Expand"/>
-                                            </f:facet>
-                                            <p:rowToggler/>
-                                        </p:column>
-
-                                        <p:column width="11%" sortBy="#{e.dateOfRecord}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Date" />
-                                            </f:facet>
-                                            <h:outputText value="#{e.dateOfRecordPretty}"/>
-                                        </p:column>
+                            <p:column width="11%" sortBy="#{e.dateOfRecord}">
+                                <f:facet name="header">
+                                    <h:outputText value="Date" />
+                                </f:facet>
+                                <h:outputText value="#{e.dateOfRecord}"/>
+                            </p:column>
 
 
-                                        <p:column width="10%" sortBy="#{e.category.eventCategoryTitle}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Category" />
-                                            </f:facet>
-                                            <h:outputText value="#{e.category.eventCategoryTitle}"/>
-                                        </p:column>
-                                        
-                                        <p:column width="5%"
-                                                  sortBy="#{e.owner.person.lastName}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Creator name" />
-                                            </f:facet>
-                                            <h:outputText value="#{e.owner.person.lastName}"/>
-                                        </p:column>
-                                        
-                                        <p:column width="20%" style="word-wrap: normal;">
-                                            <f:facet name="header">
-                                                <h:outputText value="Description" />
-                                            </f:facet>
+                            <p:column width="10%" sortBy="#{e.bundledEvent.domain.title}">
+                                <f:facet name="header">
+                                    <h:outputText value="Domain" />
+                                </f:facet>
+                                <h:outputText value="#{e.bundledEvent.domain.title}"/>
+                            </p:column>
+
+                            <p:rowExpansion>
+
+                                <div class="outlinedBox">
+                                    <h2>Event ID: <h:outputText value="#{e.bundledEvent.eventID}"/> </h2>
+                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                        <ui:remove>
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Description" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.bundledEvent.eventDescription}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                        </ui:remove>
+                                        <h:panelGroup>
+                                            <h:outputText styleClass="bold" value="Event Start"/>
                                             <div class="rowExpansion">
-                                                <h:outputText value="#{e.eventDescription}" escape="false"/>
+                                                <h:outputText value="#{e.bundledEvent.timeStart}"/>
                                             </div>
-                                        </p:column>
-                                        
-                                        <p:rowExpansion>
-
-                                            <div class="outlinedBox">
-                                                <h2>Event ID: <h:outputText value="#{e.eventID}"/> </h2>
-                                                <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
-                                                    
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Description" />
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.eventDescription}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Creation time stamp"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.eventTimeStamp}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Active Event?"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.activeEvent}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-                                                    
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.requireRequestedEventInsert}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-                                                    
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="View confirmed by"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.responderActual.LName}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-                                                    
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="View confirmed at"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.responseTimestamp}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-                                                    
-                                                    
-
-                                                    <f:facet name="footer" class="leftalign">
-                                                        <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion" style="text-align: left">
-                                                            <h:outputText escape="false" value="#{e.notes}"/>
-                                                        </div>
-                                                    </f:facet>
-
-                                                </h:panelGrid>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <h:outputText styleClass="bold" value="Event Stop"/>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{e.bundledEvent.timeStop}"/>
                                             </div>
-                                        </p:rowExpansion>
-                                    </p:dataTable>
-                                    
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <h:outputText styleClass="bold" value="Active Event?"/>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{e.bundledEvent.active}"/>
+                                            </div>
+                                        </h:panelGroup>
+                                        <ui:remove>
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.requireRequestedEventInsert}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="View confirmed by"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.responderActual.LName}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="View confirmed at"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.responseTimestamp}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+
+
+                                            <f:facet name="footer" class="leftalign">
+                                                <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion" style="text-align: left">
+                                                    <h:outputText escape="false" value="#{e.notes}"/>
+                                                </div>
+                                            </f:facet>
+
+                                        </ui:remove>
+                                    </h:panelGrid>
+                                </div>
+                            </p:rowExpansion>
+                        </p:dataTable>
+
 
 
 
