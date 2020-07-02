@@ -37,7 +37,7 @@ import javax.faces.event.ActionEvent;
  *
  * @author ellen bascomb of apt 31y
  */
-public class EventCECaseConfigurationBB extends BackingBeanUtils implements Serializable{
+public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
 
     private EventCategory selectedEventCategory;
     private List<EventCategory> eventCategoryList;
@@ -45,32 +45,10 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
      
     private EventType[] eventTypeList;
     
-    private EventType formEventType;
-    private String formEventCategoryTitle;
-    private String formEventCategoryDescr;
-    private Icon formCatIcon;
-    
-    private boolean formUserdeployable;
-    private boolean formMunideployable;
-    private boolean formPublicdeployable;
-    private boolean formRequestable;
-    private boolean formNotifycasemonitors;
-    private boolean formHidable;
-    
-    private EventType newFormSelectedEventType;
-    private String newFormEventCategoryTitle;
-    private String newFormEventCategoryDescr;
-    private Icon newFormCatIcon;
-    
-    private boolean newFormUserdeployable;
-    private boolean newFormMunideployable;
-    private boolean newFormPublicdeployable;
-    private boolean newFormRequestable;
-    private boolean newFormNotifycasemonitors;
-    private boolean newFormHidable;
+  
     
     
-    public EventCECaseConfigurationBB() {
+    public EventCatConfigBB() {
     }
     
     @PostConstruct

@@ -16,252 +16,245 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventRuleAbstract;
-import com.tcvcog.tcvce.entities.EventRuleSet;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
+import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.Choice;
+import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.Proposal;
+import com.tcvcog.tcvce.entities.ProposalOccPeriod;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.event.ActionEvent;
+import org.omg.CORBA.CurrentHolder;
 
 /**
- *
+ * Backing Bean serving 
+ * <ul>
+ * <li>CECaseWorkflow.xhtml</li>
+ * <li>OccPeriodWorkflow.xhtml</li>
+ * </ul>
+ * by providing all viewing and evaluation methods for workflow related objects
+ * such as Proposal objects, Choice objects inside them, and the entire EventRule 
+ * family
  * @author sylvia
  */
 public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
-    
-    
-    private OccPeriodDataHeavy currentOccPeriod;
-    private EventRuleAbstract currentEventRuleAbstract;
-    private List<EventRuleAbstract> eventRuleList;
-    
-    private List<EventType> eventTypeListAll;
-    private List<EventCategory> eventCategoryListAllActive;
-    
-    private boolean includeEventRuleInCurrentOccPeriodTemplate;
-    private int formEventRuleIDToAdd;
-    
-    // rules
-    private List<EventRuleSet> eventRuleSetList;
-    private EventRuleSet selectedEventRuleSet;
-    
-    
+
     /**
-     * Creates a new instance of ChoiceProposalConfigBB
+     * Creates a new instance of ChoiceProposalBB
      */
     public WorkflowConfigBB() {
     }
     
-        
+    private IFace_EventRuleGoverned currentERG;
+    
+    private Proposal currentProposal;
+    private int formEventRuleIDToAdd;
+    
+    private String formProposalRejectionReason;
+    
+    // view config
+    private List<ViewOptionsProposalsEnum> proposalsViewOptions;
+    private ViewOptionsProposalsEnum selectedProposalsViewOption;
+    
+    private List<ViewOptionsEventRulesEnum> rulesViewOptions;
+    private ViewOptionsEventRulesEnum selectedRulesViewOption;
+    
+    
     @PostConstruct
     public void initBean(){
+        WorkflowCoordinator wc = getWorkflowCoordinator();
+        
+        setProposalsViewOptions(Arrays.asList(ViewOptionsProposalsEnum.values()));
+        setSelectedProposalsViewOption(ViewOptionsProposalsEnum.VIEW_ALL);
+//        currentEventRuleAbstract = wc.rules_getInitializedEventRuleAbstract();
+        
+        setRulesViewOptions(Arrays.asList(ViewOptionsEventRulesEnum.values()));
+        setSelectedRulesViewOption(ViewOptionsEventRulesEnum.VIEW_ALL);
+        
+    }
+    
+    public void proposals_initiateViewPropMetadata(Proposal p){
+        System.out.println("OccInspectionBB.proposals_viewPropMetadata");
+        currentProposal = p;
+    }
+    
+    public void proposal_reject(Proposal p){
+        WorkflowCoordinator wc = getWorkflowCoordinator();
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append(p.getNotes());
+            sb.append("\n*** Proposal Rejection Reason ***");
+            sb.append(formProposalRejectionReason);
+            p.setNotes(sb.toString());
+            
+            wc.rejectProposal(p, currentERG, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            "Proposal id " + p.getProposalID() + " has been rejected!", ""));
+        } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            ex.getMessage(), ""));
+        }
+    }
+
+    /**
+     * Primary entry point for initiating the cascade of impacts from making a choice
+     * @param choice
+     * @param p 
+     */
+    public void proposals_makeChoice(Choice choice, Proposal p){
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         EventCoordinator ec = getEventCoordinator();
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        eventTypeListAll = ec.getEventTypesAll();
-        eventCategoryListAllActive = ec.assembleEventCategoryListActiveOnly(ec.getEventCategoryList());
+        List<EventCnF> evDoneList = null;
+        StringBuilder sb = new StringBuilder();
         
         try {
-            setEventRuleSetList(wc.rules_getEventRuleSetList());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+            evDoneList = wc.evaluateProposal(p, choice, currentERG, getSessionBean().getSessUser());
+            if(evDoneList != null && !evDoneList.isEmpty()){
+                sb.append("Upon ");
+                sb.append(String.valueOf(p.getProposalID()));
+                sb.append(" the following events were added to ");
+                sb.append(currentERG.discloseEventDomain().getTitle());
+                sb.append(" With ID: " );
+                sb.append(currentERG.getBObID());
+                sb.append(": ");
+            }
+            sb.append(ec.buildEventInfoMessage(evDoneList));
 
-        
-    }
-    
-    public void reloadCurrentOccPeriodDataHeavy(){
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        try {
-            setCurrentOccPeriod(oc.assembleOccPeriodDataHeavy(getCurrentOccPeriod(), getSessionBean().getSessUser().getMyCredential()));
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Reloaded occ period ID " + getCurrentOccPeriod().getPeriodID(), ""));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Unable to reload occ period", ""));
-        }
-        
-    }
-    
-    
-    
-    public void rules_initiateEventRuleCreate(ActionEvent ev){
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        currentEventRuleAbstract = wc.rules_getInitializedEventRuleAbstract();
-    }
-    
-    public void rules_initiateEventRuleEdit(EventRuleAbstract era){
-        currentEventRuleAbstract = era;
-        
-    }
-    
-    public void rules_commitEventRuleEdits(ActionEvent ev){
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        try {
-            wc.rules_updateEventRuleAbstract(currentEventRuleAbstract);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Update of event rule successful!", ""));
-            reloadCurrentOccPeriodDataHeavy();
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                sb.toString(), ""));
+            } catch (BObStatusException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 ex.getMessage(), ""));
         }
-    }
+    }    
     
-    public void rules_commitEventRuleCreate(ActionEvent ev){
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        int freshEventRuleID;
+    /**
+     * Passes the task of removing previous proposal evaluation to the
+     * WorkflowCoordinator
+     * @param p 
+     */
+    public void proposals_clearProposal(Proposal p){
+        WorkflowCoordinator cc = getWorkflowCoordinator();
+         System.out.println("OccInspectionBB.clearChoice");
         try {
-            freshEventRuleID = wc.rules_createEventRuleAbstract(currentEventRuleAbstract, getCurrentOccPeriod(), 
-                                                                null, isIncludeEventRuleInCurrentOccPeriodTemplate(),
-                                                                getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "New event rule added with ID " + freshEventRuleID, ""));
-            System.out.println("OccInspectionBB.commiteventRuleCreate");
-            reloadCurrentOccPeriodDataHeavy();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                ex.getMessage(), ""));
-        }
-    }
-    
-    
-    public void rules_addEventRuleByID(ActionEvent ev){
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        try {
-            EventRuleAbstract era = wc.rules_getEventRuleAbstract(getFormEventRuleIDToAdd());
-            wc.rules_attachEventRule(era, getCurrentOccPeriod(), getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Success! added rule to occ period", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                ex.getMessage(), ""));
+            cc.clearProposalEvaluation(p, getSessionBean().getSessUser());
             
-        } 
-    }
-    
-    public void rules_addEventRuleSet(EventRuleSet ers){
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        try {
-            wc.rules_attachRuleSet(ers, getCurrentOccPeriod(), getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Success! added rule set to occ period", ""));
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                ex.getMessage(), ""));
-            
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            ex.getMessage(), ""));
         }
-        
-    }
-    
-   
+    }  
 
     /**
-     * @return the currentEventRuleAbstract
+     * @return the formProposalRejectionReason
      */
-    public EventRuleAbstract getCurrentEventRuleAbstract() {
-        return currentEventRuleAbstract;
+    public String getFormProposalRejectionReason() {
+        return formProposalRejectionReason;
     }
 
     /**
-     * @param currentEventRuleAbstract the currentEventRuleAbstract to set
+     * @return the currentProposal
      */
-    public void setCurrentEventRuleAbstract(EventRuleAbstract currentEventRuleAbstract) {
-        this.currentEventRuleAbstract = currentEventRuleAbstract;
+    public Proposal getCurrentProposal() {
+        return currentProposal;
     }
 
     /**
-     * @return the eventTypeListAll
+     * @return the proposalsViewOptions
      */
-    public List<EventType> getEventTypeListAll() {
-        return eventTypeListAll;
+    public List<ViewOptionsProposalsEnum> getProposalsViewOptions() {
+        return proposalsViewOptions;
     }
 
     /**
-     * @return the eventCategoryListAllActive
+     * @return the selectedProposalsViewOption
      */
-    public List<EventCategory> getEventCategoryListAllActive() {
-        return eventCategoryListAllActive;
+    public ViewOptionsProposalsEnum getSelectedProposalsViewOption() {
+        return selectedProposalsViewOption;
     }
 
     /**
-     * @param eventTypeListAll the eventTypeListAll to set
+     * @return the rulesViewOptions
      */
-    public void setEventTypeListAll(List<EventType> eventTypeListAll) {
-        this.eventTypeListAll = eventTypeListAll;
+    public List<ViewOptionsEventRulesEnum> getRulesViewOptions() {
+        return rulesViewOptions;
     }
 
     /**
-     * @param eventCategoryListAllActive the eventCategoryListAllActive to set
+     * @return the selectedRulesViewOption
      */
-    public void setEventCategoryListAllActive(List<EventCategory> eventCategoryListAllActive) {
-        this.eventCategoryListAllActive = eventCategoryListAllActive;
+    public ViewOptionsEventRulesEnum getSelectedRulesViewOption() {
+        return selectedRulesViewOption;
     }
 
     /**
-     * @return the eventRuleList
+     * @param formProposalRejectionReason the formProposalRejectionReason to set
      */
-    public List<EventRuleAbstract> getEventRuleList() {
-        return eventRuleList;
+    public void setFormProposalRejectionReason(String formProposalRejectionReason) {
+        this.formProposalRejectionReason = formProposalRejectionReason;
     }
 
     /**
-     * @param eventRuleList the eventRuleList to set
+     * @param currentProposal the currentProposal to set
      */
-    public void setEventRuleList(List<EventRuleAbstract> eventRuleList) {
-        this.eventRuleList = eventRuleList;
+    public void setCurrentProposal(ProposalOccPeriod currentProposal) {
+        this.currentProposal = currentProposal;
     }
 
     /**
-     * @return the currentOccPeriod
+     * @param proposalsViewOptions the proposalsViewOptions to set
      */
-    public OccPeriodDataHeavy getCurrentOccPeriod() {
-        return currentOccPeriod;
+    public void setProposalsViewOptions(List<ViewOptionsProposalsEnum> proposalsViewOptions) {
+        this.proposalsViewOptions = proposalsViewOptions;
     }
 
     /**
-     * @param currentOccPeriod the currentOccPeriod to set
+     * @param selectedProposalsViewOption the selectedProposalsViewOption to set
      */
-    public void setCurrentOccPeriod(OccPeriodDataHeavy currentOccPeriod) {
-        this.currentOccPeriod = currentOccPeriod;
+    public void setSelectedProposalsViewOption(ViewOptionsProposalsEnum selectedProposalsViewOption) {
+        this.selectedProposalsViewOption = selectedProposalsViewOption;
     }
 
     /**
-     * @return the includeEventRuleInCurrentOccPeriodTemplate
+     * @param rulesViewOptions the rulesViewOptions to set
      */
-    public boolean isIncludeEventRuleInCurrentOccPeriodTemplate() {
-        return includeEventRuleInCurrentOccPeriodTemplate;
+    public void setRulesViewOptions(List<ViewOptionsEventRulesEnum> rulesViewOptions) {
+        this.rulesViewOptions = rulesViewOptions;
     }
 
     /**
-     * @param includeEventRuleInCurrentOccPeriodTemplate the includeEventRuleInCurrentOccPeriodTemplate to set
+     * @param selectedRulesViewOption the selectedRulesViewOption to set
      */
-    public void setIncludeEventRuleInCurrentOccPeriodTemplate(boolean includeEventRuleInCurrentOccPeriodTemplate) {
-        this.includeEventRuleInCurrentOccPeriodTemplate = includeEventRuleInCurrentOccPeriodTemplate;
+    public void setSelectedRulesViewOption(ViewOptionsEventRulesEnum selectedRulesViewOption) {
+        this.selectedRulesViewOption = selectedRulesViewOption;
+    }
+
+    /**
+     * @return the currentERG
+     */
+    public IFace_EventRuleGoverned getCurrentERG() {
+        return currentERG;
+    }
+
+    /**
+     * @param currentERG the currentERG to set
+     */
+    public void setCurrentERG(IFace_EventRuleGoverned currentERG) {
+        this.currentERG = currentERG;
     }
 
     /**
@@ -277,33 +270,6 @@ public class WorkflowConfigBB extends BackingBeanUtils implements Serializable{
     public void setFormEventRuleIDToAdd(int formEventRuleIDToAdd) {
         this.formEventRuleIDToAdd = formEventRuleIDToAdd;
     }
-
-    /**
-     * @return the eventRuleSetList
-     */
-    public List<EventRuleSet> getEventRuleSetList() {
-        return eventRuleSetList;
-    }
-
-    /**
-     * @return the selectedEventRuleSet
-     */
-    public EventRuleSet getSelectedEventRuleSet() {
-        return selectedEventRuleSet;
-    }
-
-    /**
-     * @param eventRuleSetList the eventRuleSetList to set
-     */
-    public void setEventRuleSetList(List<EventRuleSet> eventRuleSetList) {
-        this.eventRuleSetList = eventRuleSetList;
-    }
-
-    /**
-     * @param selectedEventRuleSet the selectedEventRuleSet to set
-     */
-    public void setSelectedEventRuleSet(EventRuleSet selectedEventRuleSet) {
-        this.selectedEventRuleSet = selectedEventRuleSet;
-    }
+    
     
 }

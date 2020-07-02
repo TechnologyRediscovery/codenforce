@@ -23,21 +23,21 @@ package com.tcvcog.tcvce.entities;
  * 
  * @author Ellen Bascomb
  */
-public enum EventDomainEnum {
+public enum PageModeEnum {
     
-    CODE_ENFORCEMENT        (   "Code enforcement cases", 
-                                "cecase_caseid"             ),
-    OCCUPANCY               (   "Code enforcement cases", 
-                                "occperiod_periodid"             ),
-    UNIVERSAL               (   "All event subdomains", 
-                                "cecase_caseid"             );  // this field should never
-                                                                // be used since the Search Coor
-    private final String title;                                 // is interpreting UNIVERSAL to run
-    private final String dbField;                               // the other two independently
-                                                                // and combine the results
-    private EventDomainEnum(String t, String db){
+    LOOKUP        (   "LOOKUP", true, 3             ),
+    INSERT        (   "INSERT", false, 4            ),
+    UPDATE        (   "UPDATE", false, 4            ),
+    REMOVE        (   "REMOVE", false, 5            );
+                                                                
+    private final String title;                                 
+    private final boolean defaultMode;
+    private final int minUserRankToEnable;
+                                                                
+    private PageModeEnum(String t, boolean def, int rnk){
         title = t;
-        dbField = db;
+        defaultMode = def;
+        minUserRankToEnable = rnk;
     }
 
     /**
@@ -50,8 +50,12 @@ public enum EventDomainEnum {
     /**
      * @return the dbField
      */
-    public String getDbField() {
-        return dbField;
+    public boolean getDefaultMode() {
+        return defaultMode;
+    }
+    
+    public int getMinUserRankToEnable(){
+        return minUserRankToEnable;
     }
 
 
