@@ -43,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -428,8 +430,18 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                                 false,   // enfOfficial
                                                 false,   // muniStaff
                                                 true);  // muniReader
-               break;               
+               break;  
+            case Public: 
+                cred = new Credential(  uap,
+                                                false,   //developer
+                                                false,   // sysadmin
+                                                false,   // cogstaff
+                                                false,   // enfOfficial
+                                                false,   // muniStaff
+                                                false);  // muniReader
+                break;
             default:
+                cred = null;
         }        
         return cred;
     }    
@@ -445,6 +457,44 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         UserIntegrator ui = getUserIntegrator();
         int newUserID = ui.insertUser(usr);
         return newUserID;
+        
+    }
+    
+    /**
+     * Supplies clients with a UserAuthorized carrying a valid credential
+     * backed by a valid UserAuthorizationPeriod required for carrying out many
+     * Coordinator tasks
+     * @return A UserAuthorized with the lowest possible rank
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public UserAuthorized getPublicUserAuthorized() throws IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        UserAuthorized ua = null;
+        int publicUserID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                    .getString("publicuserid"));
+        int publicUserUMAPID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                    .getString("publicuserumap"));
+        User u = getUser(publicUserID);
+        List<UserMuniAuthPeriod> umapList = null;
+        if(u != null){
+            
+             umapList = assembleValidAuthPeriods(u.getUsername());
+        }
+//        UserMuniAuthPeriod umap = ui.getUserMuniAuthPeriod(publicUserUMAPID);
+        
+        try {
+            if(umapList != null && !umapList.isEmpty()){
+                UserMuniAuthPeriod umap = umapList.get(0);
+                umap.setUserID(publicUserID);
+                umapList.clear();
+                umapList.add(umap);
+                ua   = authorizeUser(umap, umapList);
+            }
+        } catch (AuthorizationException ex) {
+            System.out.println(ex);
+        }
+        
+        return ua;
         
     }
     
