@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +41,7 @@ public class PublicInfoBundleEventCnF extends PublicInfoBundle implements Serial
         input.setLastUpdatedTS(LocalDateTime.MIN);
         
         input.setNotes("*****");
+        input.setPersonList(new ArrayList<Person>());
         
         bundledEvent = input;
     }
@@ -59,16 +61,22 @@ public class PublicInfoBundleEventCnF extends PublicInfoBundle implements Serial
         return cecase;
     }
 
-    public void setCecase(PublicInfoBundleCECase cecase) {
-        this.cecase = cecase;
+    public void setCecase(PublicInfoBundleCECase input) {
+        
+        setCaseManagerName(input.getCaseManagerName());
+        setCaseManagerContact(input.getCaseManagerContact());
+        cecase = input;
     }
 
     public PublicInfoBundleOccPeriod getPeriod() {
         return period;
     }
 
-    public void setPeriod(PublicInfoBundleOccPeriod period) {
-        this.period = period;
+    public void setPeriod(PublicInfoBundleOccPeriod input) {
+        
+        setCaseManagerName(input.getCaseManagerName());
+        setCaseManagerContact(input.getCaseManagerContact());
+        period = input;
     }
 
     public List<PublicInfoBundlePerson> getPersonList() {

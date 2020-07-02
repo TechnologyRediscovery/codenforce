@@ -130,10 +130,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 //            infoBundleList.add(extractPublicInfo(c));
 //        }
         return infoBundleList;
-    }    
-    
+    }
+
     /**
-     * Bundles a CECase into a PublicInfoBundleCECase by stripping out its private information.
+     * Bundles a CECase into a PublicInfoBundleCECase by stripping out its
+     * private information.
+     *
      * @param cse
      * @return
      * @throws IntegrationException
@@ -153,12 +155,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (c.isPaccEnabled()) {
             pib.setBundledCase(cse);
-            if (c.getProperty() == null || c.getProperty().isNonAddressable()) {
-                pib.setAddressAssociated(false);
-            } else {
-                pib.setAddressAssociated(true);
-                pib.setPropertyAddress(c.getProperty().getAddress());
-            }
+            pib.setAddress(c.getProperty());
             pib.setPublicEventList(new ArrayList<PublicInfoBundleEventCnF>());
             for (EventCnF ev : c.getVisibleEventList()) {
                 if (ev.getCategory().getUserRankMinimumToView() >= PUBLIC_VIEW_USER_RANK) {
@@ -185,9 +182,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles a CEActionRequest into a PublicInfoBundleCEActionRequest by stripping out its private information.
+     * Bundles a CEActionRequest into a PublicInfoBundleCEActionRequest by
+     * stripping out its private information.
+     *
      * @param req
-     * @return 
+     * @return
      */
     private PublicInfoBundleCEActionRequest extractPublicInfo(CEActionRequest req) {
 
@@ -209,7 +208,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowAddMessageButton(true);
             pib.setShowDetailsPageButton(false);
         } else {
-            pib.setBundledRequest(new CEActionRequest());
+            CEActionRequest skeleton = new CEActionRequest();
+            skeleton.setRequestID(req.getRequestID());
+            pib.setBundledRequest(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
 
@@ -220,9 +221,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles a Payment into a PublicInfoBundlePayment by stripping out its private information.
+     * Bundles a Payment into a PublicInfoBundlePayment by stripping out its
+     * private information.
+     *
      * @param input
-     * @return 
+     * @return
      */
     public PublicInfoBundlePayment extractPublicInfo(Payment input) {
 
@@ -244,7 +247,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         pib.setShowAddMessageButton(false);
         pib.setShowDetailsPageButton(true);
         /*} else {
-            pib.setBundledPerson(new Person());
+            Payment skeleton = new Payment();
+            skeleton.setPaymentID(input.getPaymentID());
+            pib.setBundledPayment(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
 
@@ -253,11 +258,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return pib;
     }
 
-    
     /**
-     * Bundles a Person into a PublicInfoBundlePerson by stripping out its private information.
+     * Bundles a Person into a PublicInfoBundlePerson by stripping out its
+     * private information.
+     *
      * @param input
-     * @return 
+     * @return
      */
     public PublicInfoBundlePerson extractPublicInfo(Person input) {
 
@@ -278,7 +284,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
         } else {
-            pib.setBundledPerson(new Person());
+            Person skeleton = new Person();
+            skeleton.setPersonID(input.getPersonID());
+            pib.setBundledPerson(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
 
@@ -286,11 +294,13 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
     }
-    
+
     /**
-     * Bundles a Property into a PublicInfoBundleProperty by stripping out its private information.
+     * Bundles a Property into a PublicInfoBundleProperty by stripping out its
+     * private information.
+     *
      * @param input
-     * @return 
+     * @return
      */
     public PublicInfoBundleProperty extractPublicInfo(Property input) {
         PublicInfoBundleProperty pib = new PublicInfoBundleProperty();
@@ -306,7 +316,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
         } else {
-            pib.setBundledProperty(new Property());
+            Property skeleton = new Property();
+            skeleton.setPropertyID(skeleton.getPropertyID());
+            pib.setBundledProperty(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
 
@@ -316,13 +328,15 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles an OccPeriod into a PublicInfoBundleOccPeriod by stripping out its private information.
-     * One of the more resource-intense extraction methods, as it has to bundle several lists.
+     * Bundles an OccPeriod into a PublicInfoBundleOccPeriod by stripping out
+     * its private information. One of the more resource-intense extraction
+     * methods, as it has to bundle several lists.
+     *
      * @param input
      * @return
      * @throws IntegrationException
      * @throws BObStatusException
-     * @throws SearchException 
+     * @throws SearchException
      */
     public PublicInfoBundleOccPeriod extractPublicInfo(OccPeriod input) throws IntegrationException, BObStatusException, SearchException {
         PublicInfoBundleOccPeriod pib = new PublicInfoBundleOccPeriod();
@@ -377,7 +391,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
         } else {
-            pib.setBundledPeriod(new OccPeriod());
+            OccPeriod skeleton = new OccPeriod();
+            skeleton.setPeriodID(input.getPeriodID());
+            pib.setBundledPeriod(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
 
@@ -387,10 +403,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles an OccInspection into a PublicInfoBundleOccInspection by stripping out its private information.
-     * One of the more resource-intense extraction methods, as it has to bundle a list of OccPeriods.
+     * Bundles an OccInspection into a PublicInfoBundleOccInspection by
+     * stripping out its private information. One of the more resource-intense
+     * extraction methods, as it has to bundle a list of OccPeriods.
+     *
      * @param input
-     * @return 
+     * @return
      */
     public PublicInfoBundleOccInspection extractPublicInfo(OccInspection input) {
         PublicInfoBundleOccInspection pib = new PublicInfoBundleOccInspection();
@@ -405,7 +423,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
         } else {
-            pib.setBundledInspection(new OccInspection());
+            OccInspection skeleton = new OccInspection();
+            skeleton.setInspectionID(skeleton.getInspectionID());
+            pib.setBundledInspection(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
 
@@ -415,9 +435,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles a FeeAssigned into a PublicInfoBundleFeeAssigned by stripping out its private information.
+     * Bundles a FeeAssigned into a PublicInfoBundleFeeAssigned by stripping out
+     * its private information.
+     *
      * @param input
-     * @return 
+     * @return
      */
     public PublicInfoBundleFeeAssigned extractPublicInfo(FeeAssigned input) {
         PublicInfoBundleFeeAssigned pib = new PublicInfoBundleFeeAssigned();
@@ -434,15 +456,17 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles a PropertyUnit into a PublicInfoBundlePropertyUnit by stripping out its private information.
-     * One of the more resource-intense exportation methods, as it has to export a list of OccPeriods.
+     * Bundles a PropertyUnit into a PublicInfoBundlePropertyUnit by stripping
+     * out its private information. One of the more resource-intense exportation
+     * methods, as it has to export a list of OccPeriods.
+     *
      * @param input
      * @return
      * @throws IntegrationException
      * @throws EventException
      * @throws AuthorizationException
      * @throws BObStatusException
-     * @throws SearchException 
+     * @throws SearchException
      */
     public PublicInfoBundlePropertyUnit extractPublicInfo(PropertyUnit input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
         PublicInfoBundlePropertyUnit pib = new PublicInfoBundlePropertyUnit();
@@ -469,15 +493,17 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles a EventCnF into a PublicInfoBundleEventCnF by stripping out its private information.
-     * One of the more resource-intense exportation methods.
+     * Bundles a EventCnF into a PublicInfoBundleEventCnF by stripping out its
+     * private information. One of the more resource-intense exportation
+     * methods.
+     *
      * @param input
      * @return
      * @throws IntegrationException
      * @throws EventException
      * @throws AuthorizationException
      * @throws BObStatusException
-     * @throws SearchException 
+     * @throws SearchException
      */
     public PublicInfoBundleEventCnF extractPublicInfo(EventCnF input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
         PublicInfoBundleEventCnF pib = new PublicInfoBundleEventCnF();
@@ -485,17 +511,10 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         if (input.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
             CaseCoordinator cc = getCaseCoordinator();
             CECase c = cc.getCECase(input.getCeCaseID());
-            String name = c.getCaseManager().getPerson().getFirstName() + " " + c.getCaseManager().getPerson().getLastName();
-
-            pib.setCaseManagerName(name);
-
             pib.setCecase(extractPublicInfo(c));
         } else if (input.getDomain() == EventDomainEnum.OCCUPANCY) {
             OccupancyCoordinator oc = getOccupancyCoordinator();
             OccPeriod period = oc.getOccPeriod(input.getOccPeriodID());
-            String name = period.getManager().getPerson().getFirstName() + " " + period.getManager().getPerson().getLastName();
-
-            pib.setCaseManagerName(name);
             pib.setPeriod(extractPublicInfo(period));
         }
 
@@ -521,8 +540,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Converts a bundled Payment to an unbundled Payment for internal use.
-     * This method does check for changes.
+     * Converts a bundled Payment to an unbundled Payment for internal use. This
+     * method does check for changes.
+     *
      * @param input
      * @return
      */
@@ -549,29 +569,22 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Converts a bundled FeeAssigned to an unbundled FeeAssigned for internal use.
-     * Currently does not check for changes.
+     * Converts a bundled FeeAssigned to an unbundled FeeAssigned for internal
+     * use. Currently does not check for changes.
+     *
      * @param input
      * @return
-     *
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public FeeAssigned export(PublicInfoBundleFeeAssigned input) {
+    public FeeAssigned export(PublicInfoBundleFeeAssigned input) throws IntegrationException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
         FeeAssigned unbundled = input.getBundledFee();
         FeeAssigned exportable = new FeeAssigned();
 
-        try {
+        exportable = pi.getFeeAssigned(unbundled.getAssignedFeeID(), unbundled.getDomain());
 
-            exportable = pi.getFeeAssigned(unbundled.getAssignedFeeID(), unbundled.getDomain());
-
-        } catch (IntegrationException ex) {
-            System.out.println("Exporting payment failed. Assuming exported payment is new, and could not be found in DB.");
-            System.out.println("But here's the error message, just in case: " + ex.toString());
-            exportable = unbundled;
-
-        }
         ArrayList<Payment> skeletonHorde = new ArrayList<>();
 
         for (PublicInfoBundlePayment bundle : input.getPaymentList()) {
@@ -582,17 +595,18 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Converts a bundled PropertyUnit to an unbundled PropertyUnit for internal use.
-     * Currently does not check for changes.
-     * Uses the data-heavy class to contain the necessary fields.
-     * One of the more resource-intense exportation methods, as it has to export a list of OccPeriods.
+     * Converts a bundled PropertyUnit to an unbundled PropertyUnit for internal
+     * use. Currently does not check for changes. Uses the data-heavy class to
+     * contain the necessary fields. One of the more resource-intense
+     * exportation methods, as it has to export a list of OccPeriods.
+     *
      * @param input
      * @return
      * @throws EventException
      * @throws AuthorizationException
      * @throws BObStatusException
      * @throws IntegrationException
-     * @throws SearchException 
+     * @throws SearchException
      */
     public PropertyUnitDataHeavy export(PublicInfoBundlePropertyUnit input)
             throws EventException, AuthorizationException,
@@ -624,8 +638,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Converts a bundled OccInspection to an unbundled OccInspection for internal use.
-     * Currently does not check for changes.
+     * Converts a bundled OccInspection to an unbundled OccInspection for
+     * internal use. Currently does not check for changes.
+     *
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @param input
      * @return
@@ -635,27 +650,21 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         OccInspectionIntegrator oi = getOccInspectionIntegrator();
         OccInspection unbundled = input.getBundledInspection();
-        try {
 
-            return oi.getOccInspection(unbundled.getInspectionID());
-
-        } catch (IntegrationException ex) {
-            System.out.println("Exporting payment failed. Assuming exported payment is new, and could not be found in DB.");
-            System.out.println("But here's the error message, just in case: " + ex.toString());
-            return unbundled;
-        }
+        return oi.getOccInspection(unbundled.getInspectionID());
     }
 
     /**
-     * Converts a bundled PublicInfoBundleEventCnF to an unbundled OccInspection for internal use.
-     * Currently does not check for changes.
-     * Uses the data-heavy class to contain the necessary fields.
+     * Converts a bundled PublicInfoBundleEventCnF to an unbundled OccInspection
+     * for internal use. Currently does not check for changes. Uses the
+     * data-heavy class to contain the necessary fields.
+     *
      * @param input
      * @return
      * @throws IntegrationException
      * @throws EventException
      * @throws SearchException
-     * @throws BObStatusException 
+     * @throws BObStatusException
      */
     public EventCnFPropUnitCasePeriodHeavy export(PublicInfoBundleEventCnF input) throws IntegrationException, EventException, SearchException, BObStatusException {
 
@@ -692,15 +701,16 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         }
         exportable.setPersonList(personHorde);
-        
+
         return exportable;
 
     }
 
     /**
-     * Converts a bundled PublicInfoBundleCECase to an unbundled CECase for internal use.
-     * Currently does not check for changes.
-     * Uses the data-heavy class to contain the necessary fields.
+     * Converts a bundled PublicInfoBundleCECase to an unbundled CECase for
+     * internal use. Currently does not check for changes. Uses the data-heavy
+     * class to contain the necessary fields.
+     *
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @param input
      * @return
@@ -718,11 +728,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Converts a bundled PublicInfoBundleProperty to an unbundled Property for internal use.
-     * Currently does check for changes.
+     * Converts a bundled PublicInfoBundleProperty to an unbundled Property for
+     * internal use. Currently does check for changes.
+     *
      * @param input
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
     public Property export(PublicInfoBundleProperty input) throws IntegrationException {
 
@@ -751,10 +762,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Converts a bundled PublicInfoBundleOccPeriod to an unbundled OccPeriod for internal use.
-     * Currently does not check for changes.
-     * Uses the data-heavy class to contain the necessary fields.
-     * One of the more resource-intense exportation methods, as it has to export several lists.
+     * Converts a bundled PublicInfoBundleOccPeriod to an unbundled OccPeriod
+     * for internal use. Currently does not check for changes. Uses the
+     * data-heavy class to contain the necessary fields. One of the more
+     * resource-intense exportation methods, as it has to export several lists.
+     *
      * @param input
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
@@ -820,11 +832,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Converts a bundled PublicInfoBundlePerson to an unbundled Person for internal use.
-     * Currently does check for changes.
+     * Converts a bundled PublicInfoBundlePerson to an unbundled Person for
+     * internal use. Currently does check for changes.
+     *
      * @param input
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
     public Person export(PublicInfoBundlePerson input) throws IntegrationException {
         PersonCoordinator pc = getPersonCoordinator();
@@ -898,11 +911,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Attaches a message to a bundle.
-     * TODO: this method uses the old HTML-style notes, and does not attach messages to all bundle classes
+     * Attaches a message to a bundle. TODO: this method uses the old HTML-style
+     * notes, and does not attach messages to all bundle classes
+     *
      * @param bundle
      * @param message
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
     public void attachMessageToBundle(PublicInfoBundle bundle, String message) throws IntegrationException {
         LocalDateTime current = LocalDateTime.now();

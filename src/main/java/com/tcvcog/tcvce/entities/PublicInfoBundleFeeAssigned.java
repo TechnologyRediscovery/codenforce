@@ -68,7 +68,7 @@ public class PublicInfoBundleFeeAssigned extends PublicInfoBundle implements Ser
         
         input.setReducedByUser(new User());
         
-        input.setNotes("");
+        input.setNotes("*****");
         
         bundledFee = input;
     }

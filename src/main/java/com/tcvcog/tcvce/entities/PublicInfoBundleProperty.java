@@ -33,10 +33,7 @@ public class PublicInfoBundleProperty extends PublicInfoBundle implements Serial
         
         
         setMuni(input.getMuni());
-        setAddressAssociated(!input.isNonAddressable());
-        if(isAddressAssociated()){
-        setPropertyAddress(input.getAddress());
-        }
+        setAddress(input);
         
         input.setMuniCode(0);
         input.setNotes("*****");

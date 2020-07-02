@@ -37,6 +37,38 @@ public abstract class PublicInfoBundle {
         return this.getClass().getName();
         
     }
+    /**
+     * Takes a User object and uses its information to populate 
+     * the caseManagerName and caseManagerContact fields.
+     * Also checks for null pointers!
+     * @param manager 
+     */
+    public void setCaseManager(User manager){
+        if (manager != null && manager.getPerson() != null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(manager.getPerson().getFirstName());
+            sb.append(" ");
+            sb.append(manager.getPerson().getLastName());
+            setCaseManagerName(sb.toString());
+            setCaseManagerContact(manager.getPerson().getPhoneWork());
+        }
+    }
+    
+    /**
+     * Takes a Property object and uses its information to populate 
+     * the addressAssociated and propertyAddress fields.
+     * Also checks for null pointers!
+     * @param prop 
+     */
+    public void setAddress(Property prop){
+        if (prop == null || prop.isNonAddressable()) {
+                setAddressAssociated(false);
+            } else {
+                setAddressAssociated(true);
+                setPropertyAddress(prop.getAddress());
+            }
+        
+    }
     
     /**
      * @return the addressAssociated

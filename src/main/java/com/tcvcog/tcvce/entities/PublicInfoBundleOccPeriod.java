@@ -36,7 +36,7 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle implements Seria
     
     public void setBundledPeriod(OccPeriod input) {
         
-        setCaseManagerName(input.getManager().getPerson().getFirstName() + " " + input.getManager().getPerson().getLastName());
+        setCaseManager(input.getManager());
         input.setManager(new User());
         input.setPeriodTypeCertifiedBy(new User());
         input.setPeriodTypeCertifiedTS(LocalDateTime.MIN);

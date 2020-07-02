@@ -100,14 +100,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
         
         setPacc(input.getPublicControlCode());
         
-        if (input.getCaseManager() != null && input.getCaseManager().getPerson() != null) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(input.getCaseManager().getPerson().getFirstName());
-            sb.append(" ");
-            sb.append(input.getCaseManager().getPerson().getLastName());
-            setCaseManagerName(sb.toString());
-            setCaseManagerContact(input.getCaseManager().getPerson().getPhoneWork());
-        }
+        setCaseManager(input.getCaseManager());
         input.setCaseManager(new User());
 
         if (input.getViolationList() != null) {

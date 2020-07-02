@@ -27,14 +27,6 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         setMuni(input.getMuni());
         setPacc(input.getRequestPublicCC());
         setAddressAssociated(!input.getNotAtAddress());
-        if (input.getNotAtAddress() || 
-                    input.getRequestProperty() == null || 
-                    input.getRequestProperty().isNonAddressable()) {
-                setAddressAssociated(false);
-            } else {
-                setAddressAssociated(true);
-                setPropertyAddress(input.getRequestProperty().getAddress());
-            }
         
         input.setRequestor(new Person());
         
@@ -68,8 +60,10 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         return requestProperty;
     }
 
-    public void setRequestProperty(PublicInfoBundleProperty requestProperty) {
-        this.requestProperty = requestProperty;
+    public void setRequestProperty(PublicInfoBundleProperty input) {
+        setAddressAssociated(input.isAddressAssociated());
+        setPropertyAddress(input.getPropertyAddress());
+        requestProperty = input;
     }
     
 }
