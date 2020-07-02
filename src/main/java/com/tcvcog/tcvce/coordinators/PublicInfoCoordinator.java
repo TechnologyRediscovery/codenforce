@@ -48,7 +48,7 @@ import com.tcvcog.tcvce.entities.PublicInfoBundlePayment;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
 import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
@@ -69,11 +69,25 @@ import java.util.List;
 public class PublicInfoCoordinator extends BackingBeanUtils implements Serializable {
 
     final int PUBLIC_VIEW_USER_RANK = 1;
+    private UserAuthorized publicUser;
 
     /**
      * Creates a new instance of PublicInfoCoordinator
      */
     public PublicInfoCoordinator() {
+    }
+
+    /**
+     * Initializes the public user so coordinator methods can be used by users
+     * without a login
+     *
+     * @throws IntegrationException
+     */
+    private void setPublicUser() throws IntegrationException {
+        if (publicUser == null) {
+            UserCoordinator uc = getUserCoordinator();
+            publicUser = uc.getPublicUserAuthorized();
+        }
     }
 
     /**
@@ -132,7 +146,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 //        }
         return infoBundleList;
     }
-    
+
     /**
      * Bundles a CECase into a PublicInfoBundleCECase by stripping out its
      * private information.
@@ -147,7 +161,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      */
     private PublicInfoBundleCECase extractPublicInfo(CECase cse) throws IntegrationException, SearchException, EventException, AuthorizationException, BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
-        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse, getSessionBean().getSessUser().getMyCredential());
+        setPublicUser();
+        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse, publicUser.getMyCredential());
 
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
 
@@ -345,7 +360,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         //Again, no PACC enabled field. Perhaps this will be a good enough filter for now?
         if (!input.isActive()) {
             OccupancyCoordinator oc = getOccupancyCoordinator();
-            OccPeriodDataHeavy heavy = oc.assembleOccPeriodDataHeavy(input, getSessionBean().getSessUser().getMyCredential());
+            setPublicUser();
+            OccPeriodDataHeavy heavy = oc.assembleOccPeriodDataHeavy(input, publicUser.getMyCredential());
 
             pib.setBundledPeriod(input);
 
@@ -472,8 +488,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     public PublicInfoBundlePropertyUnit extractPublicInfo(PropertyUnit input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
         PublicInfoBundlePropertyUnit pib = new PublicInfoBundlePropertyUnit();
         PropertyCoordinator pc = getPropertyCoordinator();
-
-        PropertyUnitDataHeavy heavyUnit = pc.getPropertyUnitWithLists(input, getSessionBean().getSessUser().getMyCredential());
+        setPublicUser();
+        PropertyUnitDataHeavy heavyUnit = pc.getPropertyUnitWithLists(input, publicUser.getMyCredential());
 
         ArrayList<PublicInfoBundleOccPeriod> periodHorde = new ArrayList<>();
 
@@ -621,7 +637,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         try {
 
-            exportable = pc.getPropertyUnitWithLists(unbundled, getSessionBean().getSessUser().getMyCredential());
+            exportable = pc.getPropertyUnitWithLists(unbundled, publicUser.getMyCredential());
 
         } catch (IntegrationException ex) {
             System.out.println("Exporting payment failed. Assuming exported payment is new, and could not be found in DB.");
@@ -721,8 +737,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     public CECaseDataHeavy export(PublicInfoBundleCECase input) throws IntegrationException, BObStatusException, SearchException {
 
         CaseCoordinator cc = getCaseCoordinator();
-
-        CECaseDataHeavy exportable = cc.assembleCECaseDataHeavy(cc.getCECase(input.getBundledCase().getCaseID()), getSessionBean().getSessUser().getMyCredential());
+        setPublicUser();
+        CECaseDataHeavy exportable = cc.assembleCECaseDataHeavy(cc.getCECase(input.getBundledCase().getCaseID()), publicUser.getMyCredential());
 
         return exportable;
 
@@ -779,8 +795,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         OccupancyCoordinator oc = getOccupancyCoordinator();
 
         OccPeriod unbundled = input.getBundledPeriod();
-
-        OccPeriodDataHeavy exportable = oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(unbundled.getPeriodID()), getSessionBean().getSessUser().getMyCredential());
+        setPublicUser();
+        OccPeriodDataHeavy exportable = oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(unbundled.getPeriodID()), publicUser.getMyCredential());
 
         ArrayList<Person> skeletonHorde = new ArrayList<>();
 
