@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -52,182 +53,199 @@ import org.primefaces.event.FileUploadEvent;
  *
  * @author cedba
  */
+public class CEActionRequestSubmitBB extends BackingBeanUtils implements Serializable {
 
-public class CEActionRequestSubmitBB extends BackingBeanUtils implements Serializable{
-    
     // for request lookup
-    
     private CEActionRequest currentRequest;
-    private CEActionRequest requestForSubmission;
-    
+
     private Person currentPerson;
     private int actionRequestorAssignmentMethod;
     private List<Person> personCandidateList;
     private boolean disabledPersonFormFields;
     private Person skeleton;
-    
+
     private TabView tabView;
     private int currentTabIndex;
 
     private ArrayList<Property> propList;
-    
+
     private String houseNum;
     private String streetName;
-    
+
     private Municipality selectedMuni;
-    
+
     private Property selectedProperty;
-    
+
     private boolean form_atSpecificAddress;
     private String form_nonPropertyLocation;
-    
+
     private String form_requestDescription;
     private boolean form_isUrgent;
     private Date form_dateOfRecord;
-    
+
     private boolean form_anonymous;
-    
+
     private int submittedRequestPACC;
-    
+
     // located address
-        
     private java.util.Date currentDate;
-    
+
     private List<Blob> blobList;
     //private Photograph selectedPhoto;
 
     /**
      * Creates a new instance of ActionRequestBean
      */
-    public CEActionRequestSubmitBB(){
+    public CEActionRequestSubmitBB() {
     }
-    
+
     @PostConstruct
-    public void initBean(){
-        CEActionRequest req = getSessionBean().getCeactionRequestForSubmission();
+    public void initBean() {
+
+        // set date of record to current date
+            form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
+                    .atZone(ZoneId.systemDefault()).toInstant());
+            // init new, empty photo list
+            blobList = new ArrayList<>();
+
+        disabledPersonFormFields = false;
+        actionRequestorAssignmentMethod = 1;
+
+        if (currentRequest == null) {
+
+            initializeReqAndMuni();
+
+        }
+    }
+
+    public void initializeReqAndMuni() {
+
+        CEActionRequest sessReq = getSessionBean().getSessCEAR();
         PropertyIntegrator pi = getPropertyIntegrator();
         User usr = getSessionBean().getSessUser();
-        
-        currentRequest = req;
-        
-        // set date of record to current date
-        form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
-                .atZone(ZoneId.systemDefault()).toInstant());
-        // init new, empty photo list
-        this.blobList = new ArrayList<>();    
-        
-        if(usr != null 
-                && 
-            req != null 
-                && 
-            currentRequest.getRequestProperty() != null){
+
+        if (usr != null) {
+
+            selectedMuni = getSessionBean().getSessMuni();
+
+            if (sessReq != null) {
+
+                personCandidateList = getSessionBean().getSessPersonList();
+
+                if (currentRequest.getRequestProperty() != null) {
 //            TODO: occbeta
-            
+
 //            try {
 //                personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonOccPeriodList();
 //            } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
 //                System.out.println(ex);
 //            }
-        } else if (usr != null && req != null ) {
-            personCandidateList = getSessionBean().getSessPersonList();
+                }
+            }
+
         }
-        disabledPersonFormFields = false;
-        actionRequestorAssignmentMethod = 1;
-        if(usr != null){
-            selectedMuni = getSessionBean().getSessMuni();
+
+        currentRequest = sessReq;
+        
+        if (currentRequest == null) {
+            currentRequest = new CEActionRequest();
         }
+
     }
-    
-  
-    
-    public String requestActionAsFacesUser(){
+
+    public String requestActionAsFacesUser() {
         currentRequest.setRequestor(getSessionBean().getSessUser().getPerson());
-        getSessionBean().setCeactionRequestForSubmission(currentRequest);
+        getSessionBean().setSessCEAR(currentRequest);
         return "reviewAndSubmit";
     }
+
     
-    
-    public void changePropertyPersonsDropDown(){
-        
+    //TODO: Determine if die
+    public void changePropertyPersonsDropDown() {
+
     }
-    
-    public void changeActionRequestorAssignment(){
-        
+
+    //TODO: Determine if die
+    public void changeActionRequestorAssignment() {
+
     }
-    
-    public String assignSelectedRequestorPersonAndContinue(){
+
+    public String assignSelectedRequestorPersonAndContinue() {
         currentRequest.setRequestor(currentPerson);
-        getSessionBean().setCeactionRequestForSubmission(currentRequest);
+        getSessionBean().setSessCEAR(currentRequest);
         return "reviewAndSubmit";
     }
-   
-    
-    public String validateActionRequestorNewPersonAndContinue(){
-        getSessionBean().setCeactionRequestForSubmission(currentRequest);
+
+    public String validateActionRequestorNewPersonAndContinue() {
+        getSessionBean().setSessCEAR(currentRequest);
         return "reviewAndSubmit";
     }
-    
-    public int insertActionRequestorNewPerson(Person p){
+
+    public int insertActionRequestorNewPerson(Person p) {
         PersonIntegrator personIntegrator = getPersonIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         int insertedPersonID = 0;
-        
+
         try {
             p.setSource(si.getBOBSource(
                     Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                    .getString("actionRequestPublicUserPersonSourceID"))));
-        
-        
+                            .getString("actionRequestPublicUserPersonSourceID"))));
+
             insertedPersonID = personIntegrator.insertPerson(p);
             System.out.println("CEActionReqeustSubmitBB.storeActionRequestorPerson | PersonID " + insertedPersonID);
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
-                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                    "INTEGRATION ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
-                    "You might call your municipal office to report this error and make a request over the phone. "
-                    + "You can also phone the Turtle Creek COG's technical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
-        } catch (NullPointerException ex){
-             System.out.println(ex.toString());
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "INTEGRATION ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.",
+                            "You might call your municipal office to report this error and make a request over the phone. "
+                            + "You can also phone the Turtle Creek COG's technical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
+        } catch (NullPointerException ex) {
+            System.out.println(ex.toString());
         }
         return insertedPersonID;
     } // close storePerson 
-    
+
     /**
      * Entry mechanism to the Code Enforcement Action Request creation process
-     * We grab the muni the user selected, set it in the new Action Request
-     * and store it in the session bean which we'll access and manipulate
-     * over the next few pages and finally submit on the last page. This is
-     * a poor person's flow system
+     * We grab the muni the user selected, set it in the new Action Request and
+     * store it in the session bean which we'll access and manipulate over the
+     * next few pages and finally submit on the last page. This is a poor
+     * person's flow system
+     *
      * @return String pointer to the next step in the process: choose property
      */
-    public String storeSelectedMuni(){
+    public String storeSelectedMuni() {
         CEActionRequest cear;
         CaseCoordinator cc = getCaseCoordinator();
         cear = cc.getInititalizedCEActionRequest();
         cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
         cear.setBlobIDList(new ArrayList<Integer>());
-        getSessionBean().setCeactionRequestForSubmission(cear);
+        cear.setRequestProperty(new Property());
+        getSessionBean().setSessCEAR(cear);
         return "chooseProperty";
     }
-    
-    public String storePropertyInfo(){
-        if(currentRequest.getRequestProperty() == null){
+
+    public String storePropertyInfo() {
+        if (currentRequest.getRequestProperty() == null) {
             getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                       "Please select a property from the list of search results to continue.", ""));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a property from the list of search results to continue.", ""));
             return "";
         }
+        getSessionBean().setSessCEAR(currentRequest);
         return "describeConcern";
     }
-    
-    public String saveConcernDescriptions(){
+
+    public String saveConcernDescriptions() {
 //        User u = getSessionBean().getFacesUser();
 //        if(u == null){
-        if(getSessionBean().getCeactionRequestForSubmission().getBlobIDList() == null){
-            getSessionBean().getCeactionRequestForSubmission().setBlobIDList(new ArrayList<Integer>());
+
+        if (currentRequest.getBlobIDList() == null) {
+            currentRequest.setBlobIDList(new ArrayList<Integer>());
         }
+        getSessionBean().setSessCEAR(currentRequest);
         getSessionBean().setBlobList(new ArrayList<Blob>());
         return "photoUpload";
 //            
@@ -235,29 +253,32 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //            
 //            return "reviewAndSubmit";
 //        }
-        
+
     }
+
+    //TODO: Figure out why the two photo method are the same and what should we do about it.
     
-    public String skipPhotoUpload(){
+    public String skipPhotoUpload() {
         BlobCoordinator blobc = getBlobCoordinator();
         SessionBean sb = getSessionBean();
-        
+
         // before moving onto the person page, get a person's skeleton from the coordinator, put it
         // in the session for use on the next page
         setupPersonEntry();
         return "requestorDetails";
     }
-    public String savePhotosAndContinue(){
+
+    public String savePhotosAndContinue() {
         BlobCoordinator blobc = getBlobCoordinator();
         SessionBean sb = getSessionBean();
-        
+
         // before moving onto the person page, get a person's skeleton from the coordinator, put it
         // in the session for use on the next page
         setupPersonEntry();
         return "requestorDetails";
     }
-    
-    private void setupPersonEntry(){
+
+    private void setupPersonEntry() {
         UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         Municipality m = currentRequest.getMuni();
@@ -271,27 +292,27 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
 //                .getString("actionRequestPublicUserPersonSourceID")));
         currentRequest.setRequestor(skel);
-        getSessionBean().setCeactionRequestForSubmission(currentRequest);
+        getSessionBean().setSessCEAR(currentRequest);
     }
-    
-    public void handlePhotoUpload(FileUploadEvent ev){
-        if(ev == null){
+
+    public void handlePhotoUpload(FileUploadEvent ev) {
+        if (ev == null) {
             System.out.println("CEActionRequestBB.handlePhotoUpload | event: null");
             return;
         }
         int newPhotoID = 0;
-        
+
         // verify blob types here. Post a FacesMessage if file type is not an image
         String fileType = ev.getFile().getContentType();
         System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + fileType);
-        
-        if(!fileType.contains("jpg") && !fileType.contains("gif") && !fileType.contains("png")){
+
+        if (!fileType.contains("jpg") && !fileType.contains("gif") && !fileType.contains("png")) {
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Incompatible file type. ",
-                        "Please upload image files only (jpg, gif, or png)."));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Incompatible file type. ",
+                            "Please upload image files only (jpg, gif, or png)."));
         }
-        
+
         BlobCoordinator blobc = getBlobCoordinator();
         Blob blob = blobc.getNewBlob();  //init new blob
         blob.setBytes(ev.getFile().getContents());  // set bytes  
@@ -301,135 +322,133 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         } catch (BlobException | IntegrationException ex) {
             System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
         }
-        getSessionBean().getCeactionRequestForSubmission().getBlobIDList().add((Integer)blob.getBlobID());
+        
+        //TODO: SessionBean Bloblist might be desynchronized in submitActionRequest.
+        //Double-check to make sure it works
+        
+        currentRequest.getBlobIDList().add((Integer) blob.getBlobID());
         getSessionBean().getBlobList().add(blob);  // store blob on session bean for testing, take this out later probably
     }
-    
-    
+
     /**
-     * This action method is called when the request code enforcement
-     * action request is submitted online (submit button in submitCERequest
+     * This action method is called when the request code enforcement action
+     * request is submitted online (submit button in submitCERequest
+     *
      * @return the page ID for navigation
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public String submitActionRequest() throws IntegrationException {
-        currentRequest = getSessionBean().getCeactionRequestForSubmission();
-        
+
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         BlobIntegrator blobI = getBlobIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         SessionBean sb = getSessionBean();
         BlobIntegrator blobi = getBlobIntegrator();
         SystemIntegrator si = getSystemIntegrator();
-        
+
         int submittedActionRequestID;
         int personID;
         // start by pulling the person fields and sending them to be entered
         // into db as a person. The ID of this person is returned, and used in our
         // insertion of the action request as a whole. 
-        
+
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
-        
-        if(currentRequest.getRequestor().getPersonID() == 0){
-            if(getSessionBean().getSessUser() != null){
+        if (currentRequest.getRequestor().getPersonID() == 0) {
+            if (getSessionBean().getSessUser() != null) {
                 currentRequest.getRequestor().setSource(
                         si.getBOBSource(Integer.parseInt(
-                        getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString("actionRequestNewPersonByInternalUserPersonSourceID"))));
+                                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                        .getString("actionRequestNewPersonByInternalUserPersonSourceID"))));
             } else {
                 currentRequest.getRequestor().setSource(
                         si.getBOBSource(Integer.parseInt(
-                        getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString("actionRequestPublicUserPersonSourceID"))));
+                                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                        .getString("actionRequestPublicUserPersonSourceID"))));
             }
-             personID = insertActionRequestorNewPerson(currentRequest.getRequestor());
+            personID = insertActionRequestorNewPerson(currentRequest.getRequestor());
             try {
                 currentRequest.setRequestor(pi.getPerson(personID));
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
         } else {
-            
+
             // do nothing, since we already have the person in the system
         }
-        
+
         int controlCode = generateControlCodeFromTime();
         currentRequest.setRequestPublicCC(controlCode);
-        
+
         // all requests now are required to be at a known address
         currentRequest.setIsAtKnownAddress(true);
-        
+
 //        if (form_atSpecificAddress){
-//            req.setRequestProperty(selectedProperty);
+//            sessReq.setRequestProperty(selectedProperty);
 //        } else {
-//            req.setAddressOfConcern(form_nonPropertyLocation);
+//            sessReq.setAddressOfConcern(form_nonPropertyLocation);
 //        }
 //        
-//        req.setIssueType_issueTypeID(violationTypeID);
-//        req.setRequestDescription(form_requestDescription);
-//        req.setDateOfRecord(form_dateOfRecord
+//        sessReq.setIssueType_issueTypeID(violationTypeID);
+//        sessReq.setRequestDescription(form_requestDescription);
+//        sessReq.setDateOfRecord(form_dateOfRecord
 //                .toInstant()
 //                .atZone(ZoneId.systemDefault())
 //                .toLocalDateTime());
-//        req.setIsUrgent(form_isUrgent);
+//        sessReq.setIsUrgent(form_isUrgent);
 //        
         // note that the time stamp is applied by the integration layer
         // with a simple call to the backing bean getTimeStamp method
-
-        try { 
+        try {
             // send the request into the DB
             submittedActionRequestID = ceari.submitCEActionRequest(currentRequest);
             getSessionBean().setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
-            
+
             // insert photos to db and link to request
-            
-            for(Blob blob : sb.getBlobList()){
+            for (Blob blob : sb.getBlobList()) {
                 try {
                     blobi.storeBlob(blob);
-                    sb.getCeactionRequestForSubmission().getBlobIDList().add(blob.getBlobID());
+                    sb.getSessCEAR().getBlobIDList().add(blob.getBlobID());
                     blobI.linkBlobToActionRequest(blob.getBlobID(), sb.getSessCEAR().getRequestID());
                 } catch (BlobException ex) {
                     System.out.println(ex);
                 }
             }
-                    
+
             // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                       "Success! Your request has been submitted and passed to our code enforcement team.", ""));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Success! Your request has been submitted and passed to our code enforcement team.", ""));
             return "successCEAR";
 
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
-               getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "INTEGRATION ERROR: Unable write request into the database, our apologies!",
                             "Please call your municipal office and report your concern by phone."));
             return "";
         }
     }
-    
-  
-    
-    public void storePropertyLocationInfo(ActionEvent event){
-        
+
+    public void storePropertyLocationInfo(ActionEvent event) {
+
     }
-    
-    public void storeNoPropertyInfo(ActionEvent event){
+
+    public void storeNoPropertyInfo(ActionEvent event) {
         System.out.println("ActionRequestBean.storeNoPropertyInfo | request location: " + form_nonPropertyLocation);
     }
-    
-    public void incrementalFormContinue(ActionEvent event){
+
+    public void incrementalFormContinue(ActionEvent event) {
         System.out.println("ActionRequestBean.incrementalFormContinue | tabview: " + currentTabIndex);
     }
 
-      
-    public void searchForPropertiesSingleMuni(ActionEvent ev){
-        PropertyIntegrator pi = getPropertyIntegrator();
-//        
+    public void searchForPropertiesSingleMuni(ActionEvent ev) {
+        SearchCoordinator sc = getSearchCoordinator();
+
 //        try {
-//            propList = (ArrayList<Property>) pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
+//            //propList = (ArrayList<Property>) pi.searchForProperties(houseNum, streetName, currentRequest.getMuni().getMuniCode());
+//            propList = sc.runQuery(q)
 //            getFacesContext().addMessage(null,
 //                new FacesMessage(FacesMessage.SEVERITY_INFO, 
 //                        "Your search completed with " + getPropList().size() + " results", ""));
@@ -442,8 +461,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //            
 //        }
     }
-    
-    
+
     /**
      * @return the form_nonPropertyLocation
      */
@@ -515,8 +533,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         this.form_dateOfRecord = form_dateOfRecord;
     }
 
-   
-
     /**
      * @return the form_anonymous
      */
@@ -530,11 +546,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public void setForm_anonymous(boolean form_anonymous) {
         this.form_anonymous = form_anonymous;
     }
-
-   
-
-    
-    
 
     /**
      * @return the currentPerson
@@ -550,18 +561,14 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         this.currentPerson = currentPerson;
     }
 
-   
-    
-
     /**
      * @return the submittingPersonTypes
      */
     public PersonType[] getSubmittingPersonTypes() {
-        
+
         return PersonType.values();
     }
 
-   
     /**
      * @return the selectedProperty
      */
@@ -577,9 +584,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
 
     /**
-    
-  
-    /**
+     *
+     *
+     * /
+     *
+     **
      * @return the propList
      */
     public ArrayList<Property> getPropList() {
@@ -664,10 +673,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         this.selectedMuni = selectedMuni;
     }
 
-    
-
-   
-
     /**
      * @return the currentDate
      */
@@ -720,7 +725,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
 
     /**
-     * @param actionRequestorAssignmentMethod the actionRequestorAssignmentMethod to set
+     * @param actionRequestorAssignmentMethod the
+     * actionRequestorAssignmentMethod to set
      */
     public void setActionRequestorAssignmentMethod(int actionRequestorAssignmentMethod) {
         this.actionRequestorAssignmentMethod = actionRequestorAssignmentMethod;
@@ -768,13 +774,4 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         this.skeleton = skeleton;
     }
 
-    public CEActionRequest getRequestForSubmission() {
-        return requestForSubmission;
-    }
-
-    public void setRequestForSubmission(CEActionRequest requestForSubmission) {
-        this.requestForSubmission = requestForSubmission;
-    }
-    
-    
 }

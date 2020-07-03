@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -79,8 +80,6 @@ public class CEActionRequest implements Serializable{
     private java.time.LocalDateTime dateOfRecord;
     private long daysSinceDateOfRecord;
     
-    private java.util.Date dateOfRecordUtilDate;
-
     private boolean isAtKnownAddress;
     private String addressOfConcern;
     
@@ -416,6 +415,10 @@ public class CEActionRequest implements Serializable{
      * @return the dateOfRecordUtilDate
      */
     public java.util.Date getDateOfRecordUtilDate() {
+        Date dateOfRecordUtilDate = null;
+        if(dateOfRecord != null){
+           dateOfRecordUtilDate = Date.from(dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
+        }        
         return dateOfRecordUtilDate;
     }
 
@@ -423,8 +426,9 @@ public class CEActionRequest implements Serializable{
      * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
+        if(dateOfRecord != null){
         dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     @Override
@@ -442,7 +446,6 @@ public class CEActionRequest implements Serializable{
         hash = 73 * hash + Objects.hashCode(this.formattedSubmittedTimeStamp);
         hash = 73 * hash + Objects.hashCode(this.dateOfRecord);
         hash = 73 * hash + (int) (this.daysSinceDateOfRecord ^ (this.daysSinceDateOfRecord >>> 32));
-        hash = 73 * hash + Objects.hashCode(this.dateOfRecordUtilDate);
         hash = 73 * hash + (this.isAtKnownAddress ? 1 : 0);
         hash = 73 * hash + Objects.hashCode(this.addressOfConcern);
         hash = 73 * hash + Objects.hashCode(this.requestDescription);
@@ -524,9 +527,6 @@ public class CEActionRequest implements Serializable{
             return false;
         }
         if (!Objects.equals(this.dateOfRecord, other.dateOfRecord)) {
-            return false;
-        }
-        if (!Objects.equals(this.dateOfRecordUtilDate, other.dateOfRecordUtilDate)) {
             return false;
         }
         return true;

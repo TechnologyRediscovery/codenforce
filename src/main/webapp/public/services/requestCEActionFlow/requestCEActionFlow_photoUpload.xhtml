@@ -19,7 +19,7 @@
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
                         
-                        <h1>Upload photos of your concern at <h:outputText value="#{sessionBean.ceactionRequestForSubmission.requestProperty.address}"/> in <h:outputText value="#{sessionBean.ceactionRequestForSubmission.muni.muniName}"/></h1>
+                        <h1>Upload photos of your concern at <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/> in <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.muni.muniName}"/></h1>
                         
                         <h:form id="requestCEActionFlowFormUploadPhoto" enctype="multipart/form-data">
                             

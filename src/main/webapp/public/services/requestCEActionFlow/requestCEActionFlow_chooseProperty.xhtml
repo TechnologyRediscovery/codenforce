@@ -18,7 +18,7 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Select a property in <h:outputText value="#{sessionBean.ceactionRequestForSubmission.muni.muniName}"/></h1>
+                        <h1>Select a property in <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.muni.muniName}"/></h1>
                         
                         <h:form id="requestCEActionFlowFormChooseProperty">
                             
@@ -72,7 +72,7 @@
                                             value="#{cEActionRequestSubmitBB.propList}"
                                             selectionMode="single" tabindex="5"
                                             scrollable="true" scrollHeight="150" 
-                                            selection="#{sessionBean.ceactionRequestForSubmission.requestProperty}"
+                                            selection="#{cEActionRequestSubmitBB.currentRequest.requestProperty}"
                                             rowKey="#{prop.propertyID}">
                                             <p:column>
                                                 <f:facet name="header">

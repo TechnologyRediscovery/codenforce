@@ -93,7 +93,7 @@
                                             <p:dataTable
                                                 id="photoTable"
                                                 var="blobID"
-                                                value="#{sessionBean.ceactionRequestForSubmission.blobIDList}"
+                                                value="#{cEActionRequestSubmitBB.currentRequest.blobIDList}"
                                                 rowKey="#{blobID}"
                                                 tableStyleClass="primeDataTable"
                                                 draggableRows="false" tabindex="6">
@@ -124,13 +124,14 @@
                                         <f:facet name="footer" class="leftalign">
                                             <h:outputLabel styleClass="bold" value="Request description:"/>
                                             <div class="rowExpansion" style="leftalign">
-                                                <h:outputText id="selr-descr" escape="false" value="#{sessionBean.ceactionRequestForSubmission.requestDescription}"/>
+                                                <h:outputText id="selr-descr" escape="false" value="#{CEActionRequestSubmitBB.requestForSubmission.requestDescription}"/>
                                             </div>
                                             
                                         </f:facet>
                                     </h:panelGrid>
                             
-                                    
+                            <!--TODO: Needs button for restarting process in case you screwed up. 
+                                      Preferably edit existing values instead of having to restart whole process-->
                             
                             <h2>Submit to code enforcement officers</h2>
                             <p:commandButton 
@@ -140,11 +141,6 @@
                                 action="#{cEActionRequestSubmitBB.submitActionRequest}"/>
 
                         </h:form>
-
-
-
-
-
 
 
                     </div>

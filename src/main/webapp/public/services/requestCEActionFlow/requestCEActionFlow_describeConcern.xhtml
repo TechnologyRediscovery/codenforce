@@ -18,7 +18,7 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Describe your concern at <h:outputText value="#{sessionBean.ceactionRequestForSubmission.requestProperty.address}"/> in <h:outputText value="#{sessionBean.ceactionRequestForSubmission.muni.muniName}"/></h1>
+                        <h1>Describe your concern at <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/> in <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.muni.muniName}"/></h1>
                         
 
                         <h:form id="requestCEActionFlowFormDescribeConcern">
@@ -28,10 +28,12 @@
                                         <h:outputText styleClass="uiLabel" value="Choose the category of concern from the list or select 'other' and explain your concern below" />
                                     </h:outputLabel>
 
+                            
+                                    <!--TODO: Fix this list box-->
                                     <p:selectOneListbox 
                                         id="violationSOLB" tabindex="1"
                                         required="true"
-                                        style="width: 100%;" value="#{sessionBean.ceactionRequestForSubmission.issueType_issueTypeID}">
+                                        style="width: 100%;" value="#{cEActionRequestSubmitBB.currentRequest.issue}">
 
                                         <f:selectItems value="#{cEActionRequestSubmitBB.violationTypeMap}"/>
                                     </p:selectOneListbox>
@@ -50,7 +52,7 @@
                                         rows="6" tabindex="2"
                                         required="true" 
                                         style="width: 100%;"
-                                        value="#{sessionBean.ceactionRequestForSubmission.requestDescription}" />
+                                        value="#{cEActionRequestSubmitBB.currentRequest.requestDescription}" />
                                     <h:message for="requestDescription" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
@@ -60,7 +62,7 @@
                                         <h:outputText styleClass="uiLabel" value="If different from today, select the date of the incident or condition you are reporting" />
                                     </h:outputLabel>
 
-                                                <p:calendar value="#{sessionBean.ceactionRequestForSubmission.dateOfRecordUtilDate}" 
+                                    <p:calendar value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecordUtilDate}" 
                                                 mode="popup" tabindex="3"
                                                 id="dateOfRecord"
                                                 showOn="button"

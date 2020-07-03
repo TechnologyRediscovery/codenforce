@@ -162,7 +162,6 @@ public class    SessionBean
     /* *** Code Enf Action Request Session Shelves ***  */
     private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
-    private CEActionRequest ceactionRequestForSubmission;
     
     // --- QUERY CEAR ---
     private QueryCEAR queryCEAR;
@@ -502,23 +501,6 @@ public class    SessionBean
     public void setSessCECaseList(List<CECasePropertyUnitHeavy> sessCECaseList) {
         this.sessCECaseList = sessCECaseList;
     }
-
-    /**
-     * @return the ceactionRequestForSubmission
-     */
-    public CEActionRequest getCeactionRequestForSubmission() {
-        return ceactionRequestForSubmission;
-    }
-
-    /**
-     * @param ceactionRequestForSubmission the ceactionRequestForSubmission to set
-     */
-    public void setCeactionRequestForSubmission(CEActionRequest ceactionRequestForSubmission) {
-        this.ceactionRequestForSubmission = ceactionRequestForSubmission;
-    }
-
-  
-   
 
     /**
      * @return the sessCEAR

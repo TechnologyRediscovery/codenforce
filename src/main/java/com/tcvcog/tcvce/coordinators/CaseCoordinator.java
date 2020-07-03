@@ -1099,8 +1099,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         System.out.println("CaseCoordinator.getNewActionRequest");
         CEActionRequest cear = new CEActionRequest();
         // start by writing in the current date
-        cear.setDateOfRecordUtilDate(
-                java.util.Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
+        cear.setDateOfRecord(LocalDateTime.now());
 
         return new CEActionRequest();
 
