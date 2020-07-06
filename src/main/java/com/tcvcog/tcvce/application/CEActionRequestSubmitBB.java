@@ -23,12 +23,14 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
 import java.util.Date;
 import java.io.Serializable;
 import org.primefaces.component.tabview.TabView;
 import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CEActionRequestIssueType;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.entities.Person;
@@ -36,6 +38,9 @@ import com.tcvcog.tcvce.entities.PersonType;
 //import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
+import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -67,7 +72,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private TabView tabView;
     private int currentTabIndex;
 
-    private ArrayList<Property> propList;
+    private List<Property> propList;
 
     private String houseNum;
     private String streetName;
@@ -76,6 +81,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     private Property selectedProperty;
 
+    private List<CEActionRequestIssueType> issueTypeList;
+    
     private boolean form_atSpecificAddress;
     private String form_nonPropertyLocation;
 
@@ -103,10 +110,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public void initBean() {
 
         // set date of record to current date
-            form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
-                    .atZone(ZoneId.systemDefault()).toInstant());
-            // init new, empty photo list
-            blobList = new ArrayList<>();
+        form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
+                .atZone(ZoneId.systemDefault()).toInstant());
+        // init new, empty photo list
+        blobList = new ArrayList<>();
 
         disabledPersonFormFields = false;
         actionRequestorAssignmentMethod = 1;
@@ -121,6 +128,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public void initializeReqAndMuni() {
 
         CEActionRequest sessReq = getSessionBean().getSessCEAR();
+        CaseCoordinator cc = getCaseCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         User usr = getSessionBean().getSessUser();
 
@@ -146,11 +154,18 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         }
 
         currentRequest = sessReq;
-        
+
         if (currentRequest == null) {
             currentRequest = new CEActionRequest();
         }
 
+        if (currentRequest.getMuni() != null) {
+            try{
+        issueTypeList = cc.getIssueTypes(currentRequest.getMuni());
+            } catch(IntegrationException ex){
+                System.out.println("Error occured while fetching issue typelist: " + ex);
+            }
+        }
     }
 
     public String requestActionAsFacesUser() {
@@ -159,7 +174,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         return "reviewAndSubmit";
     }
 
-    
     //TODO: Determine if die
     public void changePropertyPersonsDropDown() {
 
@@ -257,7 +271,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
 
     //TODO: Figure out why the two photo method are the same and what should we do about it.
-    
     public String skipPhotoUpload() {
         BlobCoordinator blobc = getBlobCoordinator();
         SessionBean sb = getSessionBean();
@@ -322,10 +335,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         } catch (BlobException | IntegrationException ex) {
             System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
         }
-        
+
         //TODO: SessionBean Bloblist might be desynchronized in submitActionRequest.
         //Double-check to make sure it works
-        
         currentRequest.getBlobIDList().add((Integer) blob.getBlobID());
         getSessionBean().getBlobList().add(blob);  // store blob on session bean for testing, take this out later probably
     }
@@ -445,21 +457,45 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     public void searchForPropertiesSingleMuni(ActionEvent ev) {
         SearchCoordinator sc = getSearchCoordinator();
+        UserCoordinator uc = getUserCoordinator();
 
-//        try {
-//            //propList = (ArrayList<Property>) pi.searchForProperties(houseNum, streetName, currentRequest.getMuni().getMuniCode());
-//            propList = sc.runQuery(q)
-//            getFacesContext().addMessage(null,
-//                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-//                        "Your search completed with " + getPropList().size() + " results", ""));
-//            
-//        } catch (IntegrationException ex) {
-//            System.out.println(ex);
-//            getFacesContext().addMessage(null,
-//                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-//                        "Unable to complete a property search! Sorry!", ""));
-//            
-//        }
+        propList = new ArrayList<>();
+
+        QueryProperty qp = null;
+        
+        try {
+            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.getPublicUserAuthorized().getMyCredential());
+
+            if (qp != null && !qp.getParamsList().isEmpty()) {
+                SearchParamsProperty spp = qp.getPrimaryParams();
+                spp.setAddress_ctl(true);
+                spp.setAddress_val(houseNum +" "+ streetName);
+                spp.setMuni_ctl(true);
+                spp.setMuni_val(currentRequest.getMuni());
+                spp.setLimitResultCount_ctl(true);
+                spp.setLimitResultCount_val(20);
+
+                sc.runQuery(qp);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Your search completed with " + getPropList().size() + " results", ""));
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Something when wrong with the property search! Sorry!", ""));
+            }
+
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something when wrong with the property search! Sorry!", ""));
+        }
+        
+         if (qp != null && !qp.getBOBResultList().isEmpty()) {
+             propList = qp.getBOBResultList();
+         }
+
     }
 
     /**
@@ -584,14 +620,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
 
     /**
-     *
-     *
-     * /
-     *
-     **
      * @return the propList
      */
-    public ArrayList<Property> getPropList() {
+    public List<Property> getPropList() {
         return propList;
     }
 
@@ -605,7 +636,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     /**
      * @param propList the propList to set
      */
-    public void setPropList(ArrayList<Property> propList) {
+    public void setPropList(List<Property> propList) {
         this.propList = propList;
     }
 
@@ -773,5 +804,21 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public void setSkeleton(Person skeleton) {
         this.skeleton = skeleton;
     }
+
+    public int getCurrentTabIndex() {
+        return currentTabIndex;
+    }
+
+    public void setCurrentTabIndex(int currentTabIndex) {
+        this.currentTabIndex = currentTabIndex;
+    }
+
+    public List<CEActionRequestIssueType> getIssueTypeList() {
+        return issueTypeList;
+    }
+
+    public void setIssueTypeList(List<CEActionRequestIssueType> issueTypeList) {
+        this.issueTypeList = issueTypeList;
+    }   
 
 }

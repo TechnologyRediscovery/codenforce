@@ -626,7 +626,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         CEActionRequestIssueType tpe = null;
         String query = "SELECT issuetypeid, typename, typedescription, muni_municode, notes, \n" +
-                        "       intensity_classid\n" +
+                        "       intensity_classid, active\n" +
                         "  FROM public.ceactionrequestissuetype;";
         Connection con = null;
         PreparedStatement stmt = null;
@@ -664,7 +664,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             tpe.setDescription((rs.getString("typedescription")));
             tpe.setMuni(mc.getMuni(rs.getInt("muni_municode")));
             tpe.setNotes(rs.getString("notes"));
-            tpe.setIntensityClass(si.getIntensityClass(rs.getInt("intensityclass_classid")));
+            tpe.setIntensityClass(si.getIntensityClass(rs.getInt("intensity_classid")));
+            tpe.setActive(rs.getBoolean("active"));
             
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -687,7 +688,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         CEActionRequestIssueType tpe = null;
         
         StringBuilder sb = new StringBuilder();
-        sb.append( "SELECT issuetypeid, typename, typedescription, muni_municode, notes, intensity_classid \n");
+        sb.append( "SELECT issuetypeid, typename, typedescription, muni_municode, notes, intensity_classid, active \n");
         sb.append(" FROM public.ceactionrequestissuetype ");
         if(muni != null){
             sb.append(" WHERE muni_municode = ?;");
