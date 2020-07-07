@@ -17,7 +17,6 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
-
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -44,45 +43,45 @@ import org.primefaces.event.FileUploadEvent;
  * @author ellen bascomb of apt 31y
  */
 public class ViolationAddBB extends BackingBeanUtils implements Serializable {
-    
+
     private CodeViolation currentViolation;
     private CECaseDataHeavy currentCase;
     private List<Blob> blobList;
-    
+
     /**
      * Creates a new instance of ViolationAdd
      */
     public ViolationAddBB() {
-        
+
     }
-    
+
     @PostConstruct
-    public void initBean(){
+    public void initBean() {
         currentViolation = getSessionBean().getSessCodeViolation();
         currentCase = getSessionBean().getSessCECase();
     }
-    
-    public void handlePhotoUpload(FileUploadEvent ev){
-        if(this.currentViolation == null){
+
+    public void handlePhotoUpload(FileUploadEvent ev) {
+        if (this.currentViolation == null) {
             this.currentViolation = getSessionBean().getSessCodeViolation();
         }
-        if(ev == null){
+        if (ev == null) {
             System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
             return;
         }
-        if(this.currentViolation.getBlobIDList() == null){
+        if (this.currentViolation.getBlobIDList() == null) {
             this.currentViolation.setBlobIDList(new ArrayList<Integer>());
         }
-        if(this.blobList == null){
+        if (this.blobList == null) {
             this.blobList = new ArrayList<>();
         }
-        
+
         BlobIntegrator blobi = getBlobIntegrator();
-        Blob blob = getBlobCoordinator().getNewBlob();
-        blob.setBytes(ev.getFile().getContents());
-        blob.setType(BlobType.PHOTO); // TODO: extract type from context somehow
-        
+        Blob blob = null;
         try {
+            blob = getBlobCoordinator().getNewBlob();
+            blob.setBytes(ev.getFile().getContents());
+            blob.setType(BlobType.PHOTO); // TODO: extract type from context somehow
             this.currentViolation.getBlobIDList().add(blobi.storeBlob(blob));
         } catch (IntegrationException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed!\n" + ex);
@@ -93,83 +92,82 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         }
         this.getBlobList().add(blob);
     }
-    
-    public String addViolation(){
-        
-        
+
+    public String addViolation() {
+
         CaseCoordinator cc = getCaseCoordinator();
-        
+
         try {
-             cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase);
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+            cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Violation added.", ""));
-             getSessionBean().getSessionBean().setSessCECase(currentCase);
+            getSessionBean().getSessionBean().setSessCECase(currentCase);
             return "ceCases";
         } catch (IntegrationException | SearchException ex) {
             System.out.println(ex);
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable to edit violation.", 
-                                "This is a system-level error that msut be corrected by an administrator, Sorry!"));
-            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to edit violation.",
+                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
+
         } catch (ViolationException ex) {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), "Stipulated compliance date must "
-                                + "be in the future; please revise the stipulated compliance date."));
+                            + "be in the future; please revise the stipulated compliance date."));
         } catch (BObStatusException ex) {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), "To preserve data integrity, this "
-                                + "case's phase restrictions forbid attaching new code violations."));
+                            + "case's phase restrictions forbid attaching new code violations."));
         } catch (EventException ex) {
             System.out.println(ex);
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), "Violation event exception"));
         }
         return "";
-        
+
     }
-    
-    public String addViolationWithPhotos(){
+
+    public String addViolationWithPhotos() {
         CaseIntegrator ci = getCaseIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
-        
+
         try {
-             currentViolation.setViolationID(cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase));
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+            currentViolation.setViolationID(cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase));
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Violation added.", ""));
             return "violationPhotos";
         } catch (IntegrationException | SearchException ex) {
             System.out.println(ex);
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable to edit violation.", 
-                                "This is a system-level error that must be corrected by an administrator, Sorry!"));
-            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to edit violation.",
+                            "This is a system-level error that must be corrected by an administrator, Sorry!"));
+
         } catch (ViolationException ex) {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, 
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
                             ex.getMessage(), "Stipulated compliance date must be in the future; please revise the stipulated compliance date."));
         } catch (BObStatusException ex) {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), "To preserve data integrity, this "
-                                + "case's phase restrictions forbid attaching new code violations."));
+                            + "case's phase restrictions forbid attaching new code violations."));
         } catch (EventException ex) {
-             System.out.println(ex);
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), "Violation event exception"));
         }
         return "";
-        
+
     }
-    
-    public String photosConfirm(){
+
+    public String photosConfirm() {
         /*  TODO: this obviously
         
         if(this.currentViolation == null){
@@ -201,17 +199,15 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
                     return "";
             }
         }
-        */
+         */
         return "ceHome";
     }
-   
-
 
     /**
      * @return the currentViolation
      */
     public CodeViolation getCurrentViolation() {
-        
+
         currentViolation = getSessionBean().getSessCodeViolation();
         return currentViolation;
     }
@@ -237,8 +233,6 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         this.blobList = blobList;
     }
 
-    
-
     /**
      * @return the currentCase
      */
@@ -253,6 +247,4 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         this.currentCase = currentCase;
     }
 
-  
-    
 }

@@ -141,10 +141,10 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.photodoc(\n" +
-                        "            photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocuploadpersonid, phodocfilename, \n" +
+                        "            photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocuploadpersonid, photodocfilename, \n" +
                         "            photodocblob)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
-                        "            ?);";
+                        "            ?, ?);";
         
         PreparedStatement stmt = null;
         
@@ -175,7 +175,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             blob.setBlobID(lastID);
             
         } catch (SQLException ex) {
-            //System.out.println(ex);
+            System.out.println(ex);
             throw new IntegrationException("Error inserting blob. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }

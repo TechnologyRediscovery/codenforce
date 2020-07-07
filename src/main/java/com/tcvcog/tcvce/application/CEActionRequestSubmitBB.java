@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -53,6 +54,8 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 /**
  *
@@ -82,7 +85,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private Property selectedProperty;
 
     private List<CEActionRequestIssueType> issueTypeList;
-    
+
     private boolean form_atSpecificAddress;
     private String form_nonPropertyLocation;
 
@@ -160,9 +163,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         }
 
         if (currentRequest.getMuni() != null) {
-            try{
-        issueTypeList = cc.getIssueTypes(currentRequest.getMuni());
-            } catch(IntegrationException ex){
+            try {
+                issueTypeList = cc.getIssueTypes(currentRequest.getMuni());
+            } catch (IntegrationException ex) {
                 System.out.println("Error occured while fetching issue typelist: " + ex);
             }
         }
@@ -270,10 +273,24 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     }
 
-    //TODO: Figure out why the two photo method are the same and what should we do about it.
     public String skipPhotoUpload() {
         BlobCoordinator blobc = getBlobCoordinator();
         SessionBean sb = getSessionBean();
+
+        if (currentRequest.getBlobIDList().size() > 0) {
+            try {
+                for (Integer idNum : currentRequest.getBlobIDList()) {
+                    blobc.deleteBlob(idNum);
+                }
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "An error occured while skipping photo blob.", ""));
+            }
+            currentRequest.setBlobIDList(new ArrayList<Integer>());
+            getSessionBean().setSessCEAR(currentRequest);
+        }
 
         // before moving onto the person page, get a person's skeleton from the coordinator, put it
         // in the session for use on the next page
@@ -285,10 +302,39 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         BlobCoordinator blobc = getBlobCoordinator();
         SessionBean sb = getSessionBean();
 
+        for (Blob b : blobList) {
+            currentRequest.getBlobIDList().add(b.getBlobID());
+        }
+        getSessionBean().setSessCEAR(currentRequest);
         // before moving onto the person page, get a person's skeleton from the coordinator, put it
         // in the session for use on the next page
         setupPersonEntry();
         return "requestorDetails";
+    }
+
+    public StreamedContent retrievePhotoStream(int blobID) {
+
+        BlobCoordinator bc = getBlobCoordinator();
+        StreamedContent sc = new DefaultStreamedContent();
+
+        try {
+
+            sc = bc.getImageFromID(blobID);
+
+        } catch (BlobTypeException ex) {
+            System.out.println("CEActionRequestSubmitBB.retrievePhotoStream | ERROR: " + ex);
+        }
+
+        if (sc.getStream() == null) {
+            try {
+                sc = bc.getImage();
+            } catch (BlobTypeException ex) {
+                System.out.println("CEActionRequestSubmitBB.retrievePhotoStream | ERROR: " + ex);
+            }
+
+        }
+
+        return sc;
     }
 
     private void setupPersonEntry() {
@@ -313,33 +359,32 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             System.out.println("CEActionRequestBB.handlePhotoUpload | event: null");
             return;
         }
-        int newPhotoID = 0;
 
         // verify blob types here. Post a FacesMessage if file type is not an image
         String fileType = ev.getFile().getContentType();
         System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + fileType);
 
-        if (!fileType.contains("jpg") && !fileType.contains("gif") && !fileType.contains("png")) {
+        if (!fileType.contains("jpg") && !fileType.contains("jpeg") && !fileType.contains("gif") && !fileType.contains("png")) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Incompatible file type. ",
                             "Please upload image files only (jpg, gif, or png)."));
-        }
+        } else {
 
-        BlobCoordinator blobc = getBlobCoordinator();
-        Blob blob = blobc.getNewBlob();  //init new blob
-        blob.setBytes(ev.getFile().getContents());  // set bytes  
-        blob.setType(BlobType.PHOTO);
-        try {
-            blob.setBlobID(blobc.storeBlob(blob));
-        } catch (BlobException | IntegrationException ex) {
-            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
-        }
+            BlobCoordinator blobc = getBlobCoordinator();
+            Blob blob = null;
+            try {
+                blob = blobc.getNewBlob();  //init new blob
+                blob.setBytes(ev.getFile().getContents());  // set bytes  
+                blob.setType(BlobType.PHOTO);
+                blob.setFilename(ev.getFile().getFileName());
+                blob.setBlobID(blobc.storeBlob(blob));
+            } catch (BlobException | IntegrationException ex) {
+                System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
+            }
 
-        //TODO: SessionBean Bloblist might be desynchronized in submitActionRequest.
-        //Double-check to make sure it works
-        currentRequest.getBlobIDList().add((Integer) blob.getBlobID());
-        getSessionBean().getBlobList().add(blob);  // store blob on session bean for testing, take this out later probably
+            blobList.add(blob);
+        }
     }
 
     /**
@@ -416,6 +461,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             submittedActionRequestID = ceari.submitCEActionRequest(currentRequest);
             getSessionBean().setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
 
+            //TODO: Make sure this is supposed to be here. I think the photos are already in the db
             // insert photos to db and link to request
             for (Blob blob : sb.getBlobList()) {
                 try {
@@ -462,14 +508,14 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         propList = new ArrayList<>();
 
         QueryProperty qp = null;
-        
+
         try {
             qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.getPublicUserAuthorized().getMyCredential());
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsProperty spp = qp.getPrimaryParams();
                 spp.setAddress_ctl(true);
-                spp.setAddress_val(houseNum +" "+ streetName);
+                spp.setAddress_val(houseNum + " " + streetName);
                 spp.setMuni_ctl(true);
                 spp.setMuni_val(currentRequest.getMuni());
                 spp.setLimitResultCount_ctl(true);
@@ -491,10 +537,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Something when wrong with the property search! Sorry!", ""));
         }
-        
-         if (qp != null && !qp.getBOBResultList().isEmpty()) {
-             propList = qp.getBOBResultList();
-         }
+
+        if (qp != null && !qp.getBOBResultList().isEmpty()) {
+            propList = qp.getBOBResultList();
+        }
 
     }
 
@@ -819,6 +865,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     public void setIssueTypeList(List<CEActionRequestIssueType> issueTypeList) {
         this.issueTypeList = issueTypeList;
-    }   
+    }
 
 }
