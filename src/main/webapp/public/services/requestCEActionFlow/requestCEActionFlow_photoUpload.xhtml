@@ -65,7 +65,9 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Photo"/>
                                             </f:facet>
-                                            <p:graphicImage width="100%" value="#{cEActionRequestSubmitBB.retrievePhotoStream(blob.blobID)}"/>
+                                            <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                <f:param name="blobID" value="#{blob.blobID}"/>
+                                            </p:graphicImage>
                                         </p:column>
                                         <p:column>
                                             <f:facet name="header">

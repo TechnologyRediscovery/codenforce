@@ -92,28 +92,30 @@
                                             <p:spacer height="5px"/>
                                             <p:dataTable
                                                 id="photoTable"
-                                                var="blobID"
-                                                value="#{cEActionRequestSubmitBB.currentRequest.blobIDList}"
-                                                rowKey="#{blobID}"
+                                                var="blob"
+                                                value="#{cEActionRequestSubmitBB.blobList}"
+                                                rowKey="#{blob.blobID}"
                                                 tableStyleClass="primeDataTable"
                                                 draggableRows="false" tabindex="6">
                                                 <p:column>
                                                     <f:facet name="header">
                                                         <h:outputText value="blobID"/>
                                                     </f:facet>
-                                                    <h:outputText value="#{blobID}"/>
+                                                    <h:outputText value="#{blob.blobID}"/>
                                                 </p:column>
                                                 <p:column>
                                                     <f:facet name="header">
                                                         <h:outputText value="Photo"/>
                                                     </f:facet>
-                                                    <p:graphicImage width="100%" value="#{cEActionRequestSubmitBB.retrievePhotoStream(blobID)}"/>
+                                                    <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                <f:param name="blobID" value="#{blob.blobID}"/>
+                                            </p:graphicImage>
                                                 </p:column>
                                                 <p:column>
                                                     <f:facet name="header">
                                                         <h:outputText value="Description"/>
                                                     </f:facet>
-                                                    <h:outputText escape="false" value="#{blobCoordinator.getBlob(blobID).description}"/>
+                                                    <h:outputText escape="false" value="#{blob.description}"/>
                                                 </p:column>
                                             </p:dataTable>
                                         </f:facet>
@@ -127,15 +129,18 @@
                                             
                                         </f:facet>
                                     </h:panelGrid>
-                            
-                            <!--TODO: Needs button for restarting process in case you screwed up. 
-                                      Preferably edit existing values instead of having to restart whole process-->
+                           
                             
                             <h2>Submit to code enforcement officers</h2>
                             <p:commandButton 
+                                id="restartRequest" ajax="false"
+                                value="Restart Code Enforcement Request" 
+                                styleClass="buttonOwnLine" tabindex="1"
+                                action="#{cEActionRequestSubmitBB.restartRequest()}"/>
+                            <p:commandButton 
                                 id="submitRequest" ajax="false"
                                 value="Submit Code Enforcement Request" 
-                                styleClass="buttonOwnLine" tabindex="1"
+                                styleClass="buttonOwnLine" tabindex="2"
                                 action="#{cEActionRequestSubmitBB.submitActionRequest}"/>
 
                         </h:form>

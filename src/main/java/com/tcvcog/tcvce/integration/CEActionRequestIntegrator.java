@@ -192,6 +192,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
             if (actionRequest.isIsAtKnownAddress()) {
                 stmt.setInt(3, actionRequest.getRequestProperty().getPropertyID());
+                actionRequest.setAddressOfConcern(actionRequest.getRequestProperty().getAddress());
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
@@ -343,7 +344,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, \n"
                 + "	muniinternalnotes, publicexternalnotes,\n"
-                + "	ceactionrequestissuetype.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid, active \n"
+                + "	ceactionrequestissuetype.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid, ceactionrequest.active \n"
                 + "FROM public.ceactionrequest \n"
                 + "     INNER JOIN ceactionrequestissuetype ON ceactionrequest.issuetype_issuetypeid = ceactionrequestissuetype.issuetypeid ");
         sb.append("WHERE requestID = ?;");

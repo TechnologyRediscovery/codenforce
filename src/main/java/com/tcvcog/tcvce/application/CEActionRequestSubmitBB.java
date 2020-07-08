@@ -22,7 +22,6 @@ import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -47,6 +46,7 @@ import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +54,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
 
 /**
  *
@@ -133,6 +131,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         CEActionRequest sessReq = getSessionBean().getSessCEAR();
         CaseCoordinator cc = getCaseCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
         User usr = getSessionBean().getSessUser();
 
         if (usr != null) {
@@ -160,6 +159,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         if (currentRequest == null) {
             currentRequest = new CEActionRequest();
+            currentRequest.setBlobIDList(new ArrayList<Integer>());
         }
 
         if (currentRequest.getMuni() != null) {
@@ -169,6 +169,18 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 System.out.println("Error occured while fetching issue typelist: " + ex);
             }
         }
+
+        if (currentRequest.getBlobIDList().size() > 0) {
+            for (Integer idNum : currentRequest.getBlobIDList()) {
+                try {
+                    blobList.add(bc.getBlob(idNum));
+                } catch (IntegrationException ex) {
+                    System.out.println("Error occured while fetching request blob list: " + ex);
+                }
+            }
+
+        }
+
     }
 
     public String requestActionAsFacesUser() {
@@ -275,20 +287,22 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     public String skipPhotoUpload() {
         BlobCoordinator blobc = getBlobCoordinator();
-        SessionBean sb = getSessionBean();
 
-        if (currentRequest.getBlobIDList().size() > 0) {
-            try {
-                for (Integer idNum : currentRequest.getBlobIDList()) {
-                    blobc.deleteBlob(idNum);
+        if (blobList.size() > 0) {
+
+            for (Blob b : blobList) {
+                try {
+                    blobc.deleteBlob(b.getBlobID());
+                } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "An error occured while skipping photo blob.", ""));
                 }
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "An error occured while skipping photo blob.", ""));
             }
+
             currentRequest.setBlobIDList(new ArrayList<Integer>());
+            blobList = new ArrayList<>();
             getSessionBean().setSessCEAR(currentRequest);
         }
 
@@ -299,8 +313,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
 
     public String savePhotosAndContinue() {
-        BlobCoordinator blobc = getBlobCoordinator();
-        SessionBean sb = getSessionBean();
 
         for (Blob b : blobList) {
             currentRequest.getBlobIDList().add(b.getBlobID());
@@ -310,31 +322,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // in the session for use on the next page
         setupPersonEntry();
         return "requestorDetails";
-    }
-
-    public StreamedContent retrievePhotoStream(int blobID) {
-
-        BlobCoordinator bc = getBlobCoordinator();
-        StreamedContent sc = new DefaultStreamedContent();
-
-        try {
-
-            sc = bc.getImageFromID(blobID);
-
-        } catch (BlobTypeException ex) {
-            System.out.println("CEActionRequestSubmitBB.retrievePhotoStream | ERROR: " + ex);
-        }
-
-        if (sc.getStream() == null) {
-            try {
-                sc = bc.getImage();
-            } catch (BlobTypeException ex) {
-                System.out.println("CEActionRequestSubmitBB.retrievePhotoStream | ERROR: " + ex);
-            }
-
-        }
-
-        return sc;
     }
 
     private void setupPersonEntry() {
@@ -439,19 +426,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         // all requests now are required to be at a known address
         currentRequest.setIsAtKnownAddress(true);
+        currentRequest.setActive(true);
+        currentRequest.setDateOfRecord(LocalDateTime.now(ZoneId.systemDefault()));
 
-//        if (form_atSpecificAddress){
-//            sessReq.setRequestProperty(selectedProperty);
-//        } else {
-//            sessReq.setAddressOfConcern(form_nonPropertyLocation);
-//        }
-//        
-//        sessReq.setIssueType_issueTypeID(violationTypeID);
-//        sessReq.setRequestDescription(form_requestDescription);
-//        sessReq.setDateOfRecord(form_dateOfRecord
-//                .toInstant()
-//                .atZone(ZoneId.systemDefault())
-//                .toLocalDateTime());
 //        sessReq.setIsUrgent(form_isUrgent);
 //        
         // note that the time stamp is applied by the integration layer
@@ -461,8 +438,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             submittedActionRequestID = ceari.submitCEActionRequest(currentRequest);
             getSessionBean().setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
 
-            //TODO: Make sure this is supposed to be here. I think the photos are already in the db
-            // insert photos to db and link to request
             for (Blob blob : sb.getBlobList()) {
                 try {
                     blobi.storeBlob(blob);
@@ -487,6 +462,26 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                             "Please call your municipal office and report your concern by phone."));
             return "";
         }
+    }
+
+    public String restartRequest() {
+
+        currentRequest = null;
+        getSessionBean().setSessCEAR(null);
+
+        if (blobList.size() > 0) {
+            BlobCoordinator bc = getBlobCoordinator();
+
+            for (Blob b : blobList) {
+                try {
+                    bc.deleteBlob(b.getBlobID());
+                } catch (IntegrationException ex) {
+                    System.out.println("CEActionRequestSubmitBB.restartRequest | ERROR: " + ex.toString());
+                }
+            }
+        }
+
+        return "requestCEActionFlow";
     }
 
     public void storePropertyLocationInfo(ActionEvent event) {
