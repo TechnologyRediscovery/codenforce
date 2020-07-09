@@ -14,15 +14,458 @@
             <ui:define name="content">
                 <f:view id="proposaleventrule-config-view">
 
-                    <div class="mainContainer">
+                     <p:outputPanel id="body-panel">
+                        <h1>Workflow proposal configuration</h1>
 
-                        <h:form id="proposaleventrule-config-messages-form">
-                            <h:messages id="proposaleventrule-config-messages"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
+                        <h:form id="form-messages-global">
+                            <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
                         </h:form>
 
+                        <div class="mainContainer">
+
+                            <div class ="two-column-page-flex-container">
+
+                                <div class="list-column" >
+
+                                    <h:form id="mode-form">
+
+                                        <p:selectOneButton style="width: 100%; margin-top: 10px ; height: 20px;"
+                                                           value="#{directiveChoiceConfigBB.currentMode}" 
+                                                           >
+                                            <f:selectItem itemLabel="LOOKUP" itemValue="Lookup"  />
+                                            <f:selectItem itemLabel="INSERT" itemValue="Insert"  />
+                                            <f:selectItem itemLabel="UPDATE" itemValue="Update"  />
+                                            <f:selectItem itemLabel="REMOVE" itemValue="Remove"  />
+
+                                            <f:ajax render="@all"/>
+
+                                        </p:selectOneButton> 
+
+                                    </h:form>
+
+                                    <p:spacer height="30px"/>
+
+                                    <p:scrollPanel style="height: 550px;" >
+
+                                        <h:form id="muniManage-form-side">
+
+                                            <p:dataTable id="muniTable"
+                                                         var="dir"
+                                                         value="#{directiveChoiceConfigBB.directiveList}"
+                                                         tableStyleClass="primeDataTable"
+                                                         >
+
+                                                <p:column headerText="ID"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{dir.directiveID}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Title"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{dir.title}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Description"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{dir.description}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Option"
+                                                          styleClass="centeredColumnContent"
+                                                          style="width: 80px"
+                                                          >
+
+                                                    <p:selectBooleanButton onLabel="Deselect" 
+                                                                           offLabel="Select"
+                                                                           styleClass="selectButton" 
+                                                                           value="#{directiveChoiceConfigBB.currentDirectiveSelected}"
+                                                                           disabled="#{directiveChoiceConfigBB.getSelectedButtonActive()}"
+                                                                           >
+
+                                                        <p:ajax update="
+                                                                form-messages-global
+                                                                muniManage-form-side
+                                                                muniManage-panel"
+                                                                listener="#{directiveChoiceConfigBB.onObjectSelectButtonChange(dir)}"/>
+
+                                                    </p:selectBooleanButton>
+
+                                                </p:column>
+
+                                            </p:dataTable>
+
+                                            <p:spacer height="10px"/>
+
+                                        </h:form>
+
+                                    </p:scrollPanel>
+
+                                </div>
+
+
+
+                                <div class ="object-column">
+
+                                    <p:outputPanel id = "muniManage-panel" >
+
+                                        <!--LookUp Table-->
+                                        <p:panel id="muniManage-panel-lookup"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Directive Record"
+                                                 rendered="#{municipalityManageSampleBB.getActiveLookupMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="wfmanage-form-lookup">
+                                                
+                                                <h:panelGroup>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-toceo"
+                                                                    value="Direct propoal to default code officer"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-toceo"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.directPropToDefaultMuniCEO}" />
+                                                </div>
+
+                                                    
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-tostaff"
+                                                                    value="Direct to muni staff"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-tostaff"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.directPropToDefaultMuniStaffer}" />
+                                                </div>
+
+                                                    
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-todev"
+                                                                    value="Direct to developer"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-todev"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.directPropToDeveloper}" />
+                                                </div>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-tosysadmin"
+                                                                    value="Direct to sys admin"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-tosysadmin"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.directPropToMuniSysAdmin}" />
+                                                </div>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-todev"
+                                                                    value="Direct to developer"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-todev"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.directPropToDeveloper}" />
+                                                </div>
+
+                                                    
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-execalone"
+                                                                    value="Execute with one choice only"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-exalone"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.executeChoiceIfLoneWolf}" />
+                                                </div>
+                                                    
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-inacgenevent"
+                                                                    value="Inactivate generating event"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-inacgenevent"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.inactivateGeneratingEventOnEvaluation}" />
+                                                </div>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-reldatewin"
+                                                                    value="Maintain relative date window"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-reldatewin"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.maintainRelativeDateWindow}" />
+                                                </div>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-allowmult"
+                                                                    value="Allow multiple instances"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-allowmult"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.instantiateMultipleOnBOB}" />
+                                                </div>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-closedbobs"
+                                                                    value="Apply to closed objects"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-closedbobs"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.applyToClosedBOBs}" />
+                                                </div>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-autoinac"
+                                                                    value="Inactivate on object close"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-autoinac"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.autoInactiveOnBOBClose}" />
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-autoinacwithgenevent"
+                                                                    value="Inactivate on generating event inactivation"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-autoinacwithgenevent"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.autoInactiveOnGenEventInactivation}" />
+                                                </div>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-minrnktoview"
+                                                                    value="Minimum rank to view"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-minrnktoview"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.minimumRequiredUserRankToView}" />
+                                                </div>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-minrnktoeval"
+                                                                    value="Minimum rank to evaluate"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-minrnktoeval"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.minimumRequiredUserRankToEvaluate}" />
+                                                </div>
+                                                    
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-active"
+                                                                    value="Active"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-active"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.active}" />
+                                                </div>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-icon"
+                                                                    value="Icon"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-icon"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{!(empty directiveChoiceConfigBB.currentDirective.icon) 
+                                                                             ? directiveChoiceConfigBB.currentDirective.icon.name : 'no icon'}" />
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-order"
+                                                                    value="Relative order"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-order"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.relativeorder}" />
+                                                </div>
+                                                    
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-reqeval"
+                                                                    value="Mandatory evaluation for object close"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-reqeval"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.requiredEvaluationForBOBClose}" />
+                                                </div>
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-hideprec"
+                                                                    value="Force hide preceding proposals"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-hideprec"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.forceHidePrecedingProps}" />
+                                                </div>
+                                                    
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-hidetrail"
+                                                                    value="Force hide trailing proposals"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-hidetrail"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.forceHideTrailingProps}" />
+                                                </div>
+                                                    
+                                                    
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    <h:outputLabel  styleClass="data_field_label" 
+                                                                    for="dir-ot-nohide"
+                                                                    value="Refuse to be hidden"/>
+                                                    
+                                                    <h:outputText   id="dir-ot-nohide"
+                                                                    styleClass="data_field_value" 
+                                                                    value="#{directiveChoiceConfigBB.currentDirective.refuseToBeHidden}" />
+                                                </div>
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Insert Table-->
+                                        <p:panel id="muniManage-panel-insert"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Insert Panel"
+                                                 rendered="#{municipalityManageSampleBB.getActiveInsertMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="muniManage-form-insert">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <!--Insert Table Content-->
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Insert Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{municipalityManageSampleBB.onInsertButtonChange()}"
+                                                                 value="INSERT"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Update Table-->
+                                        <p:panel id="muniManage-panel-update"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LoopUp Panel"
+                                                 rendered="#{municipalityManageSampleBB.getActiveUpdateMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="muniManage-form-update">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <!--Update Table Content-->
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Update Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{municipalityManageSampleBB.onUpdateButtonChange()}"
+                                                                 value="UPDATE"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Remove Table-->
+                                        <p:panel id="muniManage-panel-remove"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LoopUp Panel"
+                                                 rendered="#{municipalityManageSampleBB.getActiveRemoveMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="muniManage-form-remove">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <!--Remove Table Content-->
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Remove Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{municipalityManageSampleBB.onRemoveButtonChange()}"
+                                                                 value="Remove"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                    </p:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </p:outputPanel>
+                    
                         <h:form id="proposaleventrule-config-form">
 
                             <h1>Proposal and event rule configuration</h1>
@@ -37,7 +480,7 @@
                                     id="occperiod-proposals-eventrules-datatable"
                                     var="rule"
                                     rowKey="#{rule.ruleid}"
-                                    value="#{workflowConfigBB.eventRuleList}"
+                                    value="#{directiveChoiceConfigBB.eventRuleList}"
                                     tableStyleClass="primeDataTable"
                                     draggableColumns="true"
                                     expandedRow="false"
@@ -70,7 +513,7 @@
                                     <p:commandButton    id="eventrules-editrule-cb"
                                                         ajax="true" 
                                                         styleClass="proposal-choice-button"
-                                                        actionListener="#{workflowConfigBB.rules_initiateEventRuleEdit(rule)}"
+                                                        actionListener="#{directiveChoiceConfigBB.rules_initiateEventRuleEdit(rule)}"
                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                         value="Edit rule"
                                                         oncomplete="PF('occperiod-dialog-addediteventrule-var').show()"
@@ -269,7 +712,7 @@
                                                 <h:outputText styleClass="ui-label" value="Rule title:"/>
                                             </h:outputLabel>
                                             <p:spacer height="3px"/>
-                                            <p:inputText id="rule-title-it" value="#{workflowConfigBB.currentEventRuleAbstract.title}" 
+                                            <p:inputText id="rule-title-it" value="#{directiveChoiceConfigBB.currentEventRuleAbstract.title}" 
                                                          style="width: 200px;" tabindex="3" required="true" styleClass="inputText"/>
                                             <h:message    id="rule-title-msg"
                                                           for="rule-title-it" 
@@ -282,7 +725,7 @@
                                                 <h:outputText styleClass="ui-label" 
                                                               value="Rule description" />
                                             </h:outputLabel>
-                                            <p:inputText id="rule-desc-it" value="#{workflowConfigBB.currentEventRuleAbstract.description}" 
+                                            <p:inputText id="rule-desc-it" value="#{directiveChoiceConfigBB.currentEventRuleAbstract.description}" 
                                                          style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
                                             <h:message    id="rule-descr-msg"
                                                           for="rule-descr-it" 
@@ -302,11 +745,11 @@
                                                 <h:outputText styleClass="ui-label" value="Required event type"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-reqet" required="false" 
-                                                             value="#{workflowConfigBB.currentEventRuleAbstract.requiredEventType}" 
+                                                             value="#{directiveChoiceConfigBB.currentEventRuleAbstract.requiredEventType}" 
                                                              tabindex="3"
                                                              styleClass="full-width">
                                                 <f:selectItem itemLabel="Select an event type..." itemDisabled="true" noSelectionOption="true"/>
-                                                <f:selectItems value="#{workflowConfigBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
+                                                <f:selectItems value="#{directiveChoiceConfigBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
                                             </p:selectOneMenu>
                                             <h:message for="rule-lb-reqet" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -317,12 +760,12 @@
                                                 <h:outputText styleClass="ui-label" value="Required event category"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-reqcat" required="false" 
-                                                             value="#{workflowConfigBB.currentEventRuleAbstract.requiredEventCategory}" 
+                                                             value="#{directiveChoiceConfigBB.currentEventRuleAbstract.requiredEventCategory}" 
                                                              tabindex="3"
                                                              styleClass="full-width">
                                                 <f:converter converterId="eventCategoryConverter" />
                                                 <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
-                                                <f:selectItems value="#{workflowConfigBB.eventCategoryListAllActive}" 
+                                                <f:selectItems value="#{directiveChoiceConfigBB.eventCategoryListAllActive}" 
                                                                var="ec" 
                                                                itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
                                             </p:selectOneMenu>
@@ -333,7 +776,7 @@
                                                            value="Req cat thresold (internal to type)" 
                                                            for="rule-it-reqec-thres-typeint"/>
                                             <p:spacer height="3px"/>
-                                            <p:inputText id="rule-it-reqec-thres-typeint" value="#{workflowConfigBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder}" 
+                                            <p:inputText id="rule-it-reqec-thres-typeint" value="#{directiveChoiceConfigBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder}" 
                                                          style="width: 20px;" 
                                                          tabindex="3" 
                                                          required="false" 
@@ -349,7 +792,7 @@
                                                            value="upper bound? (uncheck = lower bound)" 
                                                            for="rule-reqrec-thres-global-upperbound-switch"/>
                                             <p:selectBooleanCheckbox id="rule-req-thres-typeint-upperbound-switch"
-                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                                                     value="#{directiveChoiceConfigBB.currentEventRuleAbstract.requiredECThreshold_typeInternalOrder_treatAsUpperBound}" />
 
                                             <h:outputLabel styleClass="ui-label" 
                                                            value="Req cat thresold (global order)" 
@@ -357,7 +800,7 @@
 
                                             <p:spacer height="3px"/>
 
-                                            <p:inputText id="rule-it-reqec-thres-global" value="#{workflowConfigBB.currentEventRuleAbstract.requiredECThreshold_globalOrder}" 
+                                            <p:inputText id="rule-it-reqec-thres-global" value="#{directiveChoiceConfigBB.currentEventRuleAbstract.requiredECThreshold_globalOrder}" 
                                                          style="width: 20px;" 
                                                          tabindex="3" 
                                                          required="false" 
@@ -373,7 +816,7 @@
                                                            value="upper bound? (uncheck = lower bound)" 
                                                            for="rule-reqrec-thres-global-upperbound-switch"/>
                                             <p:selectBooleanCheckbox id="rule-reqrec-thres-global-upperbound-switch"
-                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.requiredECThreshold_globalOrder_treatAsUpperBound}" />
+                                                                     value="#{directiveChoiceConfigBB.currentEventRuleAbstract.requiredECThreshold_globalOrder_treatAsUpperBound}" />
                                         </h:panelGroup>    
 
 
@@ -383,11 +826,11 @@
                                                 <h:outputText value="Forbidden event type"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-forbiddenet" required="false" 
-                                                             value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenEventType}" 
+                                                             value="#{directiveChoiceConfigBB.currentEventRuleAbstract.forbiddenEventType}" 
                                                              tabindex="3"
                                                              styleClass="full-width">
                                                 <f:selectItem itemLabel="Select an event type..." itemDisabled="true" noSelectionOption="true"/>
-                                                <f:selectItems value="#{workflowConfigBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
+                                                <f:selectItems value="#{directiveChoiceConfigBB.eventTypeListAll}" var="et" itemLabel="#{et.label}" />
                                             </p:selectOneMenu>
                                             <h:message for="rule-lb-forbiddenet" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -398,12 +841,12 @@
                                                 <h:outputText value="Forbidden event category"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-forcat" required="false" 
-                                                             value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenEventCategory}" 
+                                                             value="#{directiveChoiceConfigBB.currentEventRuleAbstract.forbiddenEventCategory}" 
                                                              tabindex="3"
                                                              styleClass="full-width">
                                                 <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
                                                 <f:converter converterId="eventCategoryConverter" />
-                                                <f:selectItems value="#{workflowConfigBB.eventCategoryListAllActive}" 
+                                                <f:selectItems value="#{directiveChoiceConfigBB.eventCategoryListAllActive}" 
                                                                var="ec" itemLabel="#{ec.eventCategoryTitle}  (ID: #{ec.categoryID})" />
                                             </p:selectOneMenu>
                                             <h:message for="rule-lb-forcat" showDetail="false" showSummary="true" 
@@ -417,7 +860,7 @@
 
                                             <p:spacer height="3px"/>
 
-                                            <p:inputText id="rule-it-forec-thres-typeint" value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder}" 
+                                            <p:inputText id="rule-it-forec-thres-typeint" value="#{directiveChoiceConfigBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder}" 
                                                          style="width: 20px;" 
                                                          tabindex="3" 
                                                          required="false" 
@@ -433,13 +876,13 @@
                                                            value="upper bound? (uncheck = lower bound)" 
                                                            for="rule-forec-thres-typeint-upperbound-switch"/>
                                             <p:selectBooleanCheckbox id="rule-forec-thres-typeint-upperbound-switch"
-                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound}" />
+                                                                     value="#{directiveChoiceConfigBB.currentEventRuleAbstract.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound}" />
 
                                             <h:outputLabel styleClass="ui-label" 
                                                            value="Forbidden cat thresold (global order)" 
                                                            for="rule-it-forec-thres-global"/>
                                             <p:spacer height="3px"/>
-                                            <p:inputText id="rule-it-forec-thres-global" value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder}" 
+                                            <p:inputText id="rule-it-forec-thres-global" value="#{directiveChoiceConfigBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder}" 
                                                          style="width: 20px;" 
                                                          tabindex="3" 
                                                          required="false" 
@@ -455,7 +898,7 @@
                                                            value="upper bound? (uncheck = lower bound)" 
                                                            for="rule-forec-thres-global-upperbound-switch"/>
                                             <p:selectBooleanCheckbox id="rule-forec-thres-global-upperbound-switch"
-                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder_treatAsUpperBound}" />
+                                                                     value="#{directiveChoiceConfigBB.currentEventRuleAbstract.forbiddenECThreshold_globalOrder_treatAsUpperBound}" />
 
                                         </h:panelGroup>    
 
@@ -466,7 +909,7 @@
                                                            value="Required pass for entity close" 
                                                            for="rule-req-switch"/>
                                             <p:selectBooleanCheckbox id="rule-req-switch"
-                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.mandatoryRulePassRequiredToCloseEntity}" />
+                                                                     value="#{directiveChoiceConfigBB.currentEventRuleAbstract.mandatoryRulePassRequiredToCloseEntity}" />
 
                                             <p:spacer height="5px" />
 
@@ -474,7 +917,7 @@
                                                            value="Inactivate on entity close" 
                                                            for="rule-inactivate-switch"/>
                                             <p:selectBooleanCheckbox id="rule-inactivate-switch"
-                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.inactivateRuleOnEntityClose}" />
+                                                                     value="#{directiveChoiceConfigBB.currentEventRuleAbstract.inactivateRuleOnEntityClose}" />
 
                                             <p:spacer height="5px" />
 
@@ -482,7 +925,7 @@
                                                            value="Active?" 
                                                            for="rule-active-switch"/>
                                             <p:selectBooleanCheckbox id="rule-active-switch"
-                                                                     value="#{workflowConfigBB.currentEventRuleAbstract.activeRuleAbstract}" />
+                                                                     value="#{directiveChoiceConfigBB.currentEventRuleAbstract.activeRuleAbstract}" />
 
                                             <p:spacer height="3px"/>
 
@@ -490,7 +933,7 @@
                                                            value="Propmpting directive ID" 
                                                            for="rule-promptprop"/>
                                             <p:inputText id="rule-promptprop" 
-                                                         value="#{workflowConfigBB.currentEventRuleAbstract.formPromptingDirectiveID}" 
+                                                         value="#{directiveChoiceConfigBB.currentEventRuleAbstract.formPromptingDirectiveID}" 
                                                          style="width: 20px;" 
                                                          tabindex="3" 
                                                          required="false" 
@@ -512,7 +955,7 @@
                                                            for="rule-notes"/>
                                             <p:spacer height="3px"/>
                                             <p:inputTextarea id="rule-notes" 
-                                                             value="#{workflowConfigBB.currentEventRuleAbstract.notes}" 
+                                                             value="#{directiveChoiceConfigBB.currentEventRuleAbstract.notes}" 
                                                              style="width: 100%; height: 50px;" 
                                                              tabindex="3" 
                                                              required="false" 
@@ -529,12 +972,12 @@
                                                 <h:outputText value="Event category triggered on rule pass"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-triggeredcatonpass" required="false" 
-                                                             value="#{workflowConfigBB.currentEventRuleAbstract.triggeredECOnRulePass}" 
+                                                             value="#{directiveChoiceConfigBB.currentEventRuleAbstract.triggeredECOnRulePass}" 
                                                              styleClass="full-width"
                                                              tabindex="3">
                                                 <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
                                                 <f:converter converterId="eventCategoryConverter" />
-                                                <f:selectItems value="#{workflowConfigBB.eventCategoryListAllActive}" 
+                                                <f:selectItems value="#{directiveChoiceConfigBB.eventCategoryListAllActive}" 
                                                                var="ec" 
                                                                itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
                                             </p:selectOneMenu>
@@ -547,12 +990,12 @@
                                                 <h:outputText value="Event category triggered on rule fail"/>
                                             </h:outputLabel>
                                             <p:selectOneMenu id="rule-lb-triggeredcatonfail" required="false" 
-                                                             value="#{workflowConfigBB.currentEventRuleAbstract.triggeredECOnRuleFail}" 
+                                                             value="#{directiveChoiceConfigBB.currentEventRuleAbstract.triggeredECOnRuleFail}" 
                                                              tabindex="3" 
                                                              styleClass="full-width">
                                                 <f:selectItem itemLabel="Select an event category..." itemDisabled="true" noSelectionOption="true"/>
                                                 <f:converter converterId="eventCategoryConverter" />
-                                                <f:selectItems value="#{workflowConfigBB.eventCategoryListAllActive}" 
+                                                <f:selectItems value="#{directiveChoiceConfigBB.eventCategoryListAllActive}" 
                                                                var="ec" itemLabel="#{ec.eventCategoryTitle} (ID: #{ec.categoryID})" />
                                             </p:selectOneMenu>
                                             <h:message for="rule-lb-triggeredcatonfail" showDetail="false" showSummary="true" 
@@ -568,10 +1011,10 @@
 
                                     <p:commandButton    id="addediteventrule-button-addrule"
                                                         ajax="true" 
-                                                        actionListener="#{workflowConfigBB.rules_commitEventRuleCreate}"
+                                                        actionListener="#{directiveChoiceConfigBB.rules_commitEventRuleCreate}"
                                                         value="create new rule" icon="fa fa-plus"
                                                         disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                        rendered="#{workflowConfigBB.currentEventRuleAbstract.ruleid == 0}"
+                                                        rendered="#{directiveChoiceConfigBB.currentEventRuleAbstract.ruleid == 0}"
                                                         oncomplete="PF('occperiod-dialog-addediteventrule-var').hide()"
                                                         update="occperiod-dialog-proposalmetadata-form-messages
                                                         periodmetadata-form-proposalsconfig
@@ -579,10 +1022,10 @@
 
                                     <p:commandButton    id="addediteventrule-button-editrule"
                                                         ajax="true" 
-                                                        actionListener="#{workflowConfigBB.rules_commitEventRuleEdits}"
+                                                        actionListener="#{directiveChoiceConfigBB.rules_commitEventRuleEdits}"
                                                         value="update rule" icon="fa fa-edit"
                                                         disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                        rendered="#{workflowConfigBB.currentEventRuleAbstract.ruleid != 0}"
+                                                        rendered="#{directiveChoiceConfigBB.currentEventRuleAbstract.ruleid != 0}"
                                                         oncomplete="PF('occperiod-dialog-addediteventrule-var').hide()"
                                                         update="occperiod-dialog-proposalmetadata-form-messages
                                                         periodmetadata-form-proposalsconfig

@@ -17,11 +17,6 @@
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                     </h:messages>
                             
-                    <h1>Event Configuration Tool</h1>
-                    <p>View, Create, and manage event categories inside event types</p>
-                    <p>It's perfectly safe to edit category descriptions on this page. All other changes, 
-                        such as major changes to event category titles, should 
-                    only be edited after consulting the sys admin to avoid making messes.</p>
                     <f:view>
                         <h:form id="caseEventConfigForm">
                             
@@ -97,17 +92,12 @@
                                         <h:outputText value="#{c.publicdeployable}"/>
                                     </p:column>
                                     
-                                    
-                                  
-                                    
                                     <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="REQ" />
                                         </f:facet>
                                         <h:outputText value="#{c.requestable}"/>
                                     </p:column>
-                                    
-                                    
                                     
                                     <p:column width="5%">
                                         <f:facet name="header">

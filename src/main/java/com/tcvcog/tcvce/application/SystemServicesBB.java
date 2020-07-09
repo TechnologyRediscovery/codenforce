@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
@@ -36,6 +37,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +65,8 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     private MunicipalityDataHeavy bbSessionMuni;
     private PropertyDataHeavy bbSessionProperty;
     private Person bbSessionPerson;
+    
+    private List<PageModeEnum> pageModeOptions;
     
     
     // *************************************************************************
@@ -115,7 +119,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
             municipalityListForSearch = bbSessionUser.getAuthMuniList();
         }
         
-        
+       
     }
     
     public String closeRS(){
@@ -461,6 +465,20 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setPersonListForSearch(List<Person> personListForSearch) {
         this.personListForSearch = personListForSearch;
+    }
+
+    /**
+     * @return the pageModeOptions
+     */
+    public List<PageModeEnum> getPageModeOptions() {
+        return pageModeOptions;
+    }
+
+    /**
+     * @param pageModeOptions the pageModeOptions to set
+     */
+    public void setPageModeOptions(List<PageModeEnum> pageModeOptions) {
+        this.pageModeOptions = pageModeOptions;
     }
 
     

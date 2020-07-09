@@ -568,6 +568,46 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
     }
     
     /**
+     * Extracts all records from the choicedirective table and returns IDs only
+     * for coordinator to turn into fully-fledge Directive objects if it pleases
+     * @return never null
+     * @throws IntegrationException 
+     */
+    public List<Integer> getDirectiveDump() throws IntegrationException{
+
+        List<Integer> dirIDList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT directiveid FROM public.choicedirective;");
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(sb.toString());
+            
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                dirIDList.add(rs.getInt("directiveid"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrive Directive", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return dirIDList;
+        
+        
+    }
+    
+    /**
      * Creates a new record in the choicedirective table
      * @param dir
      * @throws IntegrationException 
@@ -840,6 +880,43 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
         
         
     }  
+    
+    /**
+     * Fetches all records in the table eventrule table and returns their ID
+     * 
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> rules_getEventRuleDump() throws IntegrationException{
+        
+        List<Integer> ruleIDList = new ArrayList<>();
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String s =  "SELECT ruleid  FROM public.eventrule;";
+            stmt = con.prepareStatement(s);
+
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                ruleIDList.add(rs.getInt("ruleid"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to generate case history list", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return ruleIDList;
+        
+        
+    }
+    
     
      /**
      * Generator method for EventRuleAbstract objects 

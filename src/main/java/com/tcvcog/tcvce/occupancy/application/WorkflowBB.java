@@ -14,50 +14,48 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.application;
+package com.tcvcog.tcvce.occupancy.application;
 
+import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
+import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
-import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.Choice;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.ProposalOccPeriod;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
-import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import org.omg.CORBA.CurrentHolder;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 
 /**
  *
  * @author sylvia
  */
-public class WorkflowBB extends BackingBeanUtils implements Serializable{
+public class WorkflowBB extends BackingBeanUtils{
 
-    /**
-     * Creates a new instance of ChoiceProposalBB
-     */
-    public WorkflowBB() {
-    }
-    
-    private IFace_EventRuleGoverned currentERG;
+
+     private IFace_EventRuleGoverned currentERG;
     
     private Proposal currentProposal;
     private int formEventRuleIDToAdd;
     
     private String formProposalRejectionReason;
-    
-    
     
     // view config
     private List<ViewOptionsProposalsEnum> proposalsViewOptions;
@@ -66,21 +64,20 @@ public class WorkflowBB extends BackingBeanUtils implements Serializable{
     private List<ViewOptionsEventRulesEnum> rulesViewOptions;
     private ViewOptionsEventRulesEnum selectedRulesViewOption;
     
+
+    /**
+     * Creates a new instance of OccPeriodWorkflowBB
+     */
+    public WorkflowBB() {
+    }
+    
     
     @PostConstruct
     public void initBean(){
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        
-        setProposalsViewOptions(Arrays.asList(ViewOptionsProposalsEnum.values()));
-        setSelectedProposalsViewOption(ViewOptionsProposalsEnum.VIEW_ALL);
-//        currentEventRuleAbstract = wc.rules_getInitializedEventRuleAbstract();
-        
-        setRulesViewOptions(Arrays.asList(ViewOptionsEventRulesEnum.values()));
-        setSelectedRulesViewOption(ViewOptionsEventRulesEnum.VIEW_ALL);
-        
+       
     }
     
-    public void proposals_initiateViewPropMetadata(Proposal p){
+      public void proposals_initiateViewPropMetadata(Proposal p){
         System.out.println("OccInspectionBB.proposals_viewPropMetadata");
         currentProposal = p;
     }
@@ -154,117 +151,5 @@ public class WorkflowBB extends BackingBeanUtils implements Serializable{
         }
     }  
 
-    /**
-     * @return the formProposalRejectionReason
-     */
-    public String getFormProposalRejectionReason() {
-        return formProposalRejectionReason;
-    }
-
-    /**
-     * @return the currentProposal
-     */
-    public Proposal getCurrentProposal() {
-        return currentProposal;
-    }
-
-    /**
-     * @return the proposalsViewOptions
-     */
-    public List<ViewOptionsProposalsEnum> getProposalsViewOptions() {
-        return proposalsViewOptions;
-    }
-
-    /**
-     * @return the selectedProposalsViewOption
-     */
-    public ViewOptionsProposalsEnum getSelectedProposalsViewOption() {
-        return selectedProposalsViewOption;
-    }
-
-    /**
-     * @return the rulesViewOptions
-     */
-    public List<ViewOptionsEventRulesEnum> getRulesViewOptions() {
-        return rulesViewOptions;
-    }
-
-    /**
-     * @return the selectedRulesViewOption
-     */
-    public ViewOptionsEventRulesEnum getSelectedRulesViewOption() {
-        return selectedRulesViewOption;
-    }
-
-    /**
-     * @param formProposalRejectionReason the formProposalRejectionReason to set
-     */
-    public void setFormProposalRejectionReason(String formProposalRejectionReason) {
-        this.formProposalRejectionReason = formProposalRejectionReason;
-    }
-
-    /**
-     * @param currentProposal the currentProposal to set
-     */
-    public void setCurrentProposal(ProposalOccPeriod currentProposal) {
-        this.currentProposal = currentProposal;
-    }
-
-    /**
-     * @param proposalsViewOptions the proposalsViewOptions to set
-     */
-    public void setProposalsViewOptions(List<ViewOptionsProposalsEnum> proposalsViewOptions) {
-        this.proposalsViewOptions = proposalsViewOptions;
-    }
-
-    /**
-     * @param selectedProposalsViewOption the selectedProposalsViewOption to set
-     */
-    public void setSelectedProposalsViewOption(ViewOptionsProposalsEnum selectedProposalsViewOption) {
-        this.selectedProposalsViewOption = selectedProposalsViewOption;
-    }
-
-    /**
-     * @param rulesViewOptions the rulesViewOptions to set
-     */
-    public void setRulesViewOptions(List<ViewOptionsEventRulesEnum> rulesViewOptions) {
-        this.rulesViewOptions = rulesViewOptions;
-    }
-
-    /**
-     * @param selectedRulesViewOption the selectedRulesViewOption to set
-     */
-    public void setSelectedRulesViewOption(ViewOptionsEventRulesEnum selectedRulesViewOption) {
-        this.selectedRulesViewOption = selectedRulesViewOption;
-    }
-
-    /**
-     * @return the currentERG
-     */
-    public IFace_EventRuleGoverned getCurrentERG() {
-        return currentERG;
-    }
-
-    /**
-     * @param currentERG the currentERG to set
-     */
-    public void setCurrentERG(IFace_EventRuleGoverned currentERG) {
-        this.currentERG = currentERG;
-    }
-
-    /**
-     * @return the formEventRuleIDToAdd
-     */
-    public int getFormEventRuleIDToAdd() {
-        return formEventRuleIDToAdd;
-    }
-
-    /**
-     * @param formEventRuleIDToAdd the formEventRuleIDToAdd to set
-     */
-    public void setFormEventRuleIDToAdd(int formEventRuleIDToAdd) {
-        this.formEventRuleIDToAdd = formEventRuleIDToAdd;
-    }
-    
-    
+      
 }

@@ -145,13 +145,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
         
-        ev.setLastUpdatedBy(uc.getUser(rs.getInt("lastudpatedby_userid")));
+        ev.setLastUpdatedBy(uc.getUser(rs.getInt("lastupdatedby_userid")));
         if(rs.getTimestamp("lastupdatedts") != null){
             ev.setCreationts(rs.getTimestamp("lastupdatedts").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
         
-        ev.setActive(rs.getBoolean("activeevent"));
+        ev.setActive(rs.getBoolean("active"));
         ev.setNotes(rs.getString("notes"));
         
         return ev;

@@ -21,6 +21,8 @@ import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.*;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.entities.occupancy.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 
@@ -228,8 +230,35 @@ public class    SessionBean
     /* *** Blob Upload Session Shelves *** */ 
 
     
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                  NAVIGATION                                    <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
     /* *** Navigation Shelves *** */
     private NavigationStack navStack;
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                  SESSION SERVICES                              <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    public List<PageModeEnum> assemblePermittedPageModes(){
+        
+        
+    // Load possible page modes
+        // Thank you to Chen&Chen for designing this system
+        List<PageModeEnum> pageModeOptions = new ArrayList<>();
+        List<PageModeEnum> modesPossible = Arrays.asList(PageModeEnum.values());
+        if(modesPossible != null && !modesPossible.isEmpty()){
+            for(PageModeEnum pm: modesPossible){
+                // only allow users to see modes for which they are authorized
+                if(sessUser != null && pm.getMinUserRankToEnable() <= sessUser.getKeyCard().getGoverningAuthPeriod().getRole().getRank()){
+                    pageModeOptions.add(pm);
+                }
+            }
+        }
+        return pageModeOptions;
+    
+    }
     
     /**
      * Creates a new instance of getSessionBean()

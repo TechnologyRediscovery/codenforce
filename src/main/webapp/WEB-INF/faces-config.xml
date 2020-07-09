@@ -953,6 +953,12 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
+    <managed-bean>
+        <managed-bean-name>eventCatConfigBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventCatConfigBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
 
     <navigation-rule>
         <from-view-id>*</from-view-id>
@@ -967,8 +973,8 @@
             <redirect />
         </navigation-case>
         <navigation-case>
-            <from-outcome>eventConfig</from-outcome>
-            <to-view-id>/restricted/cogstaff/event/eventConfiguration.xhtml</to-view-id>
+            <from-outcome>eventCatConfig</from-outcome>
+            <to-view-id>/restricted/cogstaff/event/eventCatConfig.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -1723,13 +1729,13 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
+    
+    
     <managed-bean>
         <managed-bean-name>cEActionRequestsReportBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsReportBB</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
+    </managed-bean><managed-bean>
         <managed-bean-name>eventCECaseReportBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.EventCECaseReportBB</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
@@ -1760,6 +1766,8 @@
     </managed-bean>
     
     
+    
+    
     <managed-bean>
         <managed-bean-name>blobCoordinator</managed-bean-name>
         <description>Utility application-scoped bean for handling blob upload and download	</description>
@@ -1772,9 +1780,7 @@
         <managed-bean-name>blobIntegrator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.integration.BlobIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
+    </managed-bean><managed-bean>
         <managed-bean-name>linkBlobBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.linkBlobBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
@@ -1983,14 +1989,20 @@
     </managed-bean>
    
     <managed-bean>
-        <managed-bean-name>workflowBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.WorkflowBB</managed-bean-class>
+        <managed-bean-name>workflowConfigBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.WorkflowConfigBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
             
     <managed-bean>
-        <managed-bean-name>workflowConfigBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.WorkflowConfigBB</managed-bean-class>
+        <managed-bean-name>eventRuleConfigBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventRuleConfigBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+            
+    <managed-bean>
+        <managed-bean-name>directiveChoiceConfigBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.DirectiveChoiceConfigBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     

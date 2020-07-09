@@ -133,6 +133,58 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     }
     
     /**
+     * Logic intermediary for extraction of Directives (remember: a Directive 
+     * is used as the 
+     * brains of a Proposal object; Directives are packaged inside this Proposal
+     * when that Proposal is attached to an instance of IFace_EventRuleGoverned
+     * which in June 2020 included CECase and OccPeriod objects
+     * 
+     * 
+     * @param dirID
+     * @return the configured Directive
+     * @throws IntegrationException 
+     */
+    public Directive getDirective(int dirID) throws IntegrationException{
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        Directive d = null;
+        d = wi.getDirective(dirID);
+        return d;
+    }
+    
+    /**
+     * Extracts all Directive objects in the DB; useful only for configuration purposes
+     * 
+     * @param ua
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Directive> getDirectiveListForConfig(UserAuthorized ua) throws IntegrationException{
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        List<Directive> dlist = new ArrayList<>();
+        
+        dlist.addAll(getDirectives(wi.getDirectiveDump()));
+        
+        return dlist;
+        
+    }
+    
+    /**
+     * Utility method to iteratively call getDirective(id)
+     * @param idList
+     * @return
+     * @throws IntegrationException 
+     */
+    private List<Directive> getDirectives(List<Integer> idList) throws IntegrationException{
+        List<Directive> dlist = new ArrayList<>();
+        if(idList != null && !idList.isEmpty()){
+            for(Integer i: idList){
+                dlist.add(getDirective(i));
+            }
+        }
+        return dlist;
+    }
+    
+    /**
      * Iterates over the Choices inside a given Proposal and flips switches
      * on them based on the permissions held by the credential param
      * @param proposal
@@ -670,6 +722,25 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     // *                   EVENT RULES : ADMIN                                 *
     // *************************************************************************
     
+    /**
+     * Extracts all existing records in the eventrule table for config
+     * @param ua
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<EventRuleAbstract> rules_getEventRuleAbstractListForConfig(UserAuthorized ua) throws IntegrationException{
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        List<EventRuleAbstract> eraList = new ArrayList<>();
+        List<Integer> idList = wi.rules_getEventRuleDump();
+        if(idList != null && !idList.isEmpty()){
+            for(Integer i: idList){
+                eraList.add(rules_getEventRuleAbstract(i));
+            }
+        }
+        return eraList;
+        
+    }
+    
 /**
  * Logic intermediary for retrieval of EventRuleAbstract Objects from the DB
  * @param eraid
@@ -694,7 +765,22 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         wi.rules_updateEventRule(era);
     }
     
-    
+    /**
+     * Checks User's rank and, if allowed, toggles EventRuleAbstract's active 
+     * flag to false and sends update to the DB
+     * @param era to deactivate
+     * @param ua doing the deactivating
+     * @throws IntegrationException 
+     */
+    public void rules_removeEventRuleAbstract(EventRuleAbstract era, UserAuthorized ua) throws IntegrationException{
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        
+        if(era.getUserRankMinToDeactivate() <= ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank()){
+            era.setActiveRuleAbstract(false);
+            wi.rules_updateEventRule(era);
+        }
+        
+    }
     
 
     /**
@@ -877,15 +963,15 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
   
     /**
      * Primary entrance point for an EventRuleAbstract instance (not its connection to an Object)
+     * This method will check to see if the int value on the ERA is nonzero, if so
+     * and the DB has a record of that value present, the object Directive will
+     * be replaced with the one fetched by ID
      * @param era required instance
-     * @param period optional--only if you're attaching to an OccPeriod
-     * @param cse Optional--only if you're attachign to a CECaseDataHeavy
-     * @param connectToBOBRuleList Switch me on in order to
-     * @param usr
+     * @param ua
      * @return
      * @throws IntegrationException
      */
-    public int rules_createEventRuleAbstract(EventRuleAbstract era, OccPeriodDataHeavy period, CECaseDataHeavy cse, boolean connectToBOBRuleList, UserAuthorized usr) throws IntegrationException {
+    public int rules_createEventRuleAbstract(EventRuleAbstract era, UserAuthorized ua) throws IntegrationException {
         WorkflowIntegrator wi = getWorkflowIntegrator();
         int freshEventRuleID;
         if (era.getFormPromptingDirectiveID() != 0) {
@@ -896,19 +982,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
             }
         }
         freshEventRuleID = wi.rules_insertEventRule(era);
-        if (period != null && cse == null) {
-            era = wi.rules_getEventRuleAbstract(freshEventRuleID);
-            rules_attachEventRuleAbstractToOccPeriod(era, period, usr);
-            if (connectToBOBRuleList) {
-                rules_attachEventRuleAbstractToOccPeriodTypeRuleSet(era, period);
-            }
-        }
-        if (period == null && cse != null) {
-            era = wi.rules_getEventRuleAbstract(freshEventRuleID);
-            if (connectToBOBRuleList) {
-                rules_attachEventRuleAbstractToMuniCERuleSet(era, cse);
-            }
-        }
+    
         System.out.println("EventCoordinator.rules_createEventRuleAbstract | returned ID: " + freshEventRuleID);
         return freshEventRuleID;
     }
