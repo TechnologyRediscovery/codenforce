@@ -12,58 +12,46 @@
     <h:body>
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
-                <f:view id="requestCEActionFlow1View">
-                    
+                <f:view id="concern-info">
+
                     <div class="mainContainer">
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
-                        <h1>Describe your concern at <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/> in <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.muni.muniName}"/></h1>
-                        
 
-                        <h:form id="requestCEActionFlowFormDescribeConcern">
-                            
-                            
-                                    <h:outputLabel for="violationSOLB" >
-                                        <h:outputText styleClass="uiLabel" value="Choose the category of concern from the list or select 'other' and explain your concern below" />
-                                    </h:outputLabel>
+                        <!--Global Messages-->
+                        <h:form id="pers-info-messages-form">
+                            <p:messages id="pers-info-messages" globalOnly="true" showDetail="true" showSummary="true" />
+                        </h:form>
 
-                            
-                                    <p:selectOneListbox 
+                        <p:panel id="concern-info-panel"
+                                 toggleable="true"
+                                 widgetVar="concern-info-panel-var"
+                                 collapsed="false"
+                                 header="Describe your concern at #{cEActionRequestSubmitBB.currentRequest.requestProperty.address} in #{cEActionRequestSubmitBB.currentRequest.muni.muniName}">
+
+                            <h:form id="concern-info-form">
+
+                                <!--Grid CSS From Primefaces-->
+                                <div class="ui-g data-container">
+
+                                   
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Choose the category of concern from the list or select 'other' and explain your concern below"/>
+                                        <p:selectOneMenu 
                                         id="violationSOLB" tabindex="1"
                                         required="true"
-                                        style="width: 100%;" value="#{cEActionRequestSubmitBB.currentRequest.issue}">
+                                        styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.issue}">
 
                                         <f:selectItems value="#{cEActionRequestSubmitBB.issueTypeList}" var="i" itemValue="#{i}" itemLabel="#{i.name}"/>
                                         <f:converter converterId="issueTypeConverter"/>
-                                    </p:selectOneListbox>
-                                    <h:message for="violationSOLB" showDetail="true" showSummary="true" 
+                                         <h:message for="violationSOLB" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </p:selectOneMenu>
+                                    </div>
 
-                                    <p:spacer height="10px"/>
-
-                                    <h:outputLabel for="requestDescription" >
-                                        <h:outputText styleClass="uiLabel" value="Please describe the specifics of the code enforcement concern selected above" />
-                                    </h:outputLabel>
-
-                                    <p:inputTextarea 
-                                        id="requestDescription" 
-                                        styleClass="textArea" 
-                                        rows="6" tabindex="2"
-                                        required="true" 
-                                        style="width: 100%;"
-                                        value="#{cEActionRequestSubmitBB.currentRequest.requestDescription}" />
-                                    <h:message for="requestDescription" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                    <p:spacer height="10px"/>
-
-                                    <h:outputLabel for="dateOfRecord" >
-                                        <h:outputText styleClass="uiLabel" value="If different from today, select the date of the incident or condition you are reporting" />
-                                    </h:outputLabel>
-
-                                    <p:calendar value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecordUtilDate}" 
-                                                mode="popup" tabindex="3"
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="If different from today, select the date of the incident or condition you are reporting"/>
+                                        <p:calendar value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecordUtilDate}" 
+                                                mode="popup" tabindex="2"
                                                 id="dateOfRecord"
                                                 showOn="button"
                                                 pattern="EEE, dd MMM, yyyy HH:mm"
@@ -71,48 +59,58 @@
                                                 navigator="true"
                                                 showButtonPanel="true"
                                                 showTodayButton="true"/>
+                                    </div>
 
-                                    <h:message for="dateOfRecord" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                    <p:spacer height="10px"/>
-
-                                    <p:outputLabel for="isIUrgentSwitch">
-                                        <h:outputText styleClass="uiLabel"  value="Does this issue involve immediate human safety hazards?"/> 
-                                    </p:outputLabel>
-                                   
-                                    <p:spacer height="10px"/>
-
-                                    <p:inputSwitch tabindex="4" id="isIUrgentSwitch" 
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Does this issue involve immediate human safety hazards?"/>
+                                        <p:inputSwitch tabindex="3" id="isIUrgentSwitch" styleClass="data_field_value"
                                                    value="#{cEActionRequestSubmitBB.currentRequest.isUrgent}"
                                                    onLabel="Yes" offLabel="No" />
-                                    
-                                        <h:outputLabel for="remainAnonymousIS" >
-                                            <h:outputText styleClass="uiLabel" value="Do you wish to remain anonymous during the code enforcement investigation?" />
-                                        </h:outputLabel>
-                                    <p:inputSwitch id="remainAnonymousIS" 
+                                    </div>
+
+                                    <!--Data Field Label And Value-->
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Do you wish to remain anonymous during the code enforcement investigation?"/>
+                                        <p:inputSwitch id="remainAnonymousIS" 
                                                    value="#{cEActionRequestSubmitBB.currentRequest.anonymitiyRequested}" 
                                                    onLabel="Yes" 
-                                                   offLabel="No" tabindex="5"/>
+                                                   offLabel="No" tabindex="4"
+                                                   styleClass="data_field_value"/>
+                                    </div>
 
-                                    <p:spacer height="10px"/>
+                                    <!--Data Field Label And Value-->
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Please describe the specifics of the code enforcement concern selected above"/>
+                                        <p:inputTextarea 
+                                        id="requestDescription" 
+                                        styleClass="textArea" 
+                                        rows="6" tabindex="5"
+                                        required="true"
+                                        value="#{cEActionRequestSubmitBB.currentRequest.requestDescription}" />
+                                    <h:message for="requestDescription" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </div>
 
-                                    <p:commandButton  ajax="false" tabindex="6"
+                                </div>
+
+                                <p:commandButton  ajax="false" tabindex="6"
                                                       value="Next: Upload photos of your concern" id="continueToPhotoUploadButton"
                                                       action="#{cEActionRequestSubmitBB.saveConcernDescriptions}"/>
+                                
+                            </h:form>
 
-                        </h:form>
-                        
-                        
-
-
-
-
+                        </p:panel>
 
                     </div>
+
                 </f:view>
+
             </ui:define>
+
         </ui:composition>
+
     </h:body>
+
 </html>
+
 
