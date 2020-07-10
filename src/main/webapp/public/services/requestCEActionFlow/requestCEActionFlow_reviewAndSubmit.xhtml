@@ -32,37 +32,122 @@
                                 <!--Grid CSS From Primefaces-->
                                 <div class="ui-g data-container">
 
-                                        <h3>Address of Concern</h3>
+                                    <h3>Requestor:</h3>
 
                                     <!--Data Field Label And Value-->
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Sample Label"/>
-                                        <h:outputText styleClass="data_field_value" value="Sample Value"/>
+                                        <h:outputLabel styleClass="data_field_label" value="Role:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.personType.label}"/>
                                     </div>
 
-                                    <!--Data Field Label And Value-->
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Sample Label"/>
-                                        <h:outputText styleClass="data_field_value" value="Sample Value"/>
+                                        <h:outputLabel styleClass="data_field_label" value="Name:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.firstName} #{cEActionRequestSubmitBB.currentRequest.requestor.lastName}"/>
                                     </div>
 
-                                    <!--Data Field Label And Value-->
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Sample Label"/>
-                                        <h:outputText styleClass="data_field_value" value="Sample Value"/>
+                                        <h:outputLabel styleClass="data_field_label" value="Address:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressStreet}"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressCity}, #{cEActionRequestSubmitBB.currentRequest.requestor.addressState}"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressZip}"/>
                                     </div>
 
-                                    <!--Data Field Label And Value-->
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Sample Label"/>
-                                        <h:outputText styleClass="data_field_value" value="Sample Value"/>
+                                        <h:outputLabel styleClass="data_field_label" value="Anonymity requested?"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.anonymitiyRequested ? 'Yes' : 'No'}"/>
                                     </div>
 
-                                    <!--Data Field Label And Value-->
+                                    <h3>Contact information:</h3>
+
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Sample Label"/>
-                                        <h:outputText styleClass="data_field_value" value="Sample Value"/>
+                                        <h:outputLabel styleClass="data_field_label" value="Phone (cell):"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneCell}"/>
                                     </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Phone (work):"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneWork}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Phone (home):"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneHome}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Email:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.email}"/>
+                                    </div>
+
+                                    <h3>Action request:</h3>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Address of concern:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Municipality:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.muni.muniName}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Date submitted:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecord}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Human safety issue?"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.isUrgent}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Request description:"/>
+                                        <h:outputText styleClass="data_field_value" escape="false" value="#{CEActionRequestSubmitBB.requestForSubmission.requestDescription}"/>
+                                    </div>
+
+                                    <h3>Photos:</h3>
+
+                                    <p:dataTable
+                                        id="photoTable"
+                                        var="blob"
+                                        value="#{cEActionRequestSubmitBB.blobList}"
+                                        rowKey="#{blob.blobID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="false" tabindex="6">
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="blobID"/>
+                                            </f:facet>
+                                            <h:outputText value="#{blob.blobID}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Photo"/>
+                                            </f:facet>
+                                            <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                <f:param name="blobID" value="#{blob.blobID}"/>
+                                            </p:graphicImage>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Description"/>
+                                            </f:facet>
+                                            <h:outputText escape="false" value="#{blob.description}"/>
+                                        </p:column>
+                                    </p:dataTable>
+
+                                    <h2>Submit to code enforcement officers</h2>
+                                    <p:commandButton 
+                                        id="restartRequest" ajax="false"
+                                        value="Restart Code Enforcement Request" 
+                                        styleClass="buttonOwnLine" tabindex="1"
+                                        action="#{cEActionRequestSubmitBB.restartRequest()}"/>
+                                    <p:commandButton 
+                                        id="submitRequest" ajax="false"
+                                        value="Submit Code Enforcement Request" 
+                                        styleClass="buttonOwnLine" tabindex="2"
+                                        action="#{cEActionRequestSubmitBB.submitActionRequest}"/>
 
                                 </div>
 
@@ -71,94 +156,6 @@
                         </p:panel>
 
                     </div>
-
-                    <!--Edit Dialog-->
-                    <p:dialog header="Edit"
-                              id="example-dialog"
-                              height="550px" width="50%"
-                              widgetVar="example-dialog-var"
-                              closable="true" 
-                              resizable="false"
-                              responsive="true"
-                              modal="true"
-                              >
-
-                        <h:form id="edit-dialog-form">
-
-                            <!--Grid CSS From Primefaces-->
-                            <div class="ui-g data-container">
-
-                                <!--Edit Dialog Table Header (e.g. Person Name | Last Updated Time)-->
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-                                    <h:outputLabel styleClass="data_table_header" value="PERSON: #{personInfoBB.currPerson.firstName} #{personInfoBB.currPerson.lastName} | ID: #{personInfoBB.currPerson.personID}" />
-                                    <p>This record was last updated on: <h:outputText id="pers-form-lastupdated" value="#{personInfoBB.workingPerson.lastUpdatedPretty}"/></p>
-                                </div>
-
-                                <!--Global Messages Within Edit Dialog-->
-                                <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
-
-                                <!--Edit Dialog Select Boolean Check Box-->
-                                <div class="ui-g-12 ui-md-12 ui-lg-4 data_field">
-                                    <h:outputLabel styleClass="data_field_label" value="Sample?" for="sample-checkbox"/>
-                                    <p:selectBooleanCheckbox id="sample-checkbox" 
-                                                             value="#{personInfoBB.workingPerson.active}" 
-                                                             tabindex="1"
-                                                             />
-                                    <p:message for="sample-checkbox" showDetail="false" showSummary="true" style="width: 100%"/>
-                                </div>
-
-                                <!--Edit Dialog Input text-->
-                                <div class="ui-g-12 ui-md-12 ui-lg-4 data_field">
-                                    <h:outputLabel styleClass="data_field_label" value="Sample" for="sample-inputtext"/>
-                                    <p:inputText id="sample-inputtext" 
-                                                 required="true"
-                                                 value="#{personInfoBB.workingPerson.firstName}" 
-                                                 tabindex="2"
-                                                 />
-                                    <p:message for="sample-inputtext" showDetail="false" showSummary="true" style="width: 100%"/>
-                                </div>
-
-                                <!--Edit Dialog calendar-->
-                                <div class="ui-g-12 ui-md-12 ui-lg-4 data_field">
-                                    <h:outputLabel styleClass="data_field_label" value="Expiry Date" for="sample-calendar"/>
-                                    <p:calendar id="sample-calendar"
-                                                mode="popup"  
-                                                pattern="EEE, dd MMM, yyyy"
-                                                navigator="true" 
-                                                timeInput="true" 
-                                                showHour="false" 
-                                                showMinute="false" 
-                                                showSecond="false" 
-                                                showMillisec="false"
-                                                showButtonPanel="true" 
-                                                showTodayButton="false"
-                                                required="false"
-                                                value="#{personInfoBB.workingPerson.expiryDateUtilDate}"
-                                                tabindex="3" 
-                                                />
-
-                                    <p:message for="sample-calendar" showDetail="false" showSummary="true" style="width: 100%"/>
-                                </div>
-
-                            </div>
-
-                            <!--Edit Dialog button-->
-                            <p:commandButton id="cancel-cb"
-                                             ajax="true"  
-                                             tabindex="27"
-                                             value="Cancel" 
-                                             immediate="true"
-                                             onclick="PF('example-dialog-var').hide()"
-                                             />
-
-                            <p:commandButton id="new-person-cb" 
-                                             ajax="false"
-                                             value="Update" 
-                                             oncomplete="PF('example-dialog-var').hide()"
-                                             />
-                        </h:form>
-
-                    </p:dialog>
 
                 </f:view>
 
@@ -169,5 +166,3 @@
     </h:body>
 
 </html>
-
-
