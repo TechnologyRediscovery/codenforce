@@ -28,42 +28,38 @@
                             <h:panelGroup>
                                 <h:panelGrid columns="1" cellpadding="10" footerClass="gridFooter" style="width: 500px" styleClass="ui-panelgrid-blank">
                                     <p:column>
-                                        <p:outputLabel value="Reason for application: #{sessionBean.occPermitApplication.reason.title}" />
+                                        <p:outputLabel value="Reason for application: #{occPermitApplicationBB.currentApplication.reason.title}" />
                                     </p:column>
                                     
                                     <p:column>
-                                        <p:outputLabel value="Property Address: #{sessionBean.occPermitApplication.applicationPropertyUnit.thisProperty.address}" />
-                                    </p:column>
-                                    
-                                    <p:column> 
-                                        <p:outputLabel value ="Multiunit: #{sessionBean.occPermitApplication.multiUnit ? 'Yes' : 'No'}" />
+                                        <p:outputLabel value="Property Address: #{occPermitApplicationBB.prop.bundledProperty.address}" />
                                     </p:column>
                                     
                                     <p:column>
-                                        <p:outputLabel value="Property Unit: #{sessionBean.occPermitApplication.applicationPropertyUnit.unitNumber}" />
+                                        <p:outputLabel value="Property Unit: #{occPermitApplicationBB.selectedUnit.bundledUnit.unitNum} (#{occPermitApplicationBB.selectedUnit.bundledUnit.notes})" />
                                     </p:column>
                                     
                                     <p:column>
-                                        <p:outputLabel value="Applicant: #{sessionBean.occPermitApplication.applicantPerson.firstName} #{sessionBean.occPermitApplication.applicantPerson.lastName}" />
+                                        <p:outputLabel value="Applicant: #{occPermitApplicationBB.applicant.bundledPerson.firstName} #{occPermitApplicationBB.applicant.bundledPerson.lastName}" />
                                     </p:column>
                                     
                                     <p:column>                                        
                                         <p:outputLabel value="Application Persons:" />
-                                        <p:dataTable var="applicationPerson" value="#{sessionBean.occPermitApplication.attachedPersons}"
-                                         rowKey="#{applicationPerson.personID}">
+                                        <p:dataTable var="applicationPerson" value="#{occPermitApplicationBB.attachedPersons}"
+                                                     rowKey="#{applicationPerson.bundledPerson.personID}">
                                              
                                             <p:column headerText="Name">
-                                                <h:outputText value="#{applicationPerson.firstName} #{applicationPerson.lastName}"/>
+                                                <h:outputText value="#{applicationPerson.bundledPerson.firstName} #{applicationPerson.bundledPerson.lastName}"/>
                                             </p:column>
                                              
                                             <p:column headerText="Person Type">
-                                                <h:outputText value="#{applicationPerson.personType}"/>
+                                                <h:outputText value="#{applicationPerson.bundledPerson.personType}"/>
                                             </p:column>
                                         </p:dataTable>
                                     </p:column>
 
                                     <p:column>
-                                        <p:outputLabel value="Notes: #{sessionBean.occPermitApplication.submissionNotes}" />
+                                        <p:outputLabel value="Notes: #{occPermitApplicationBB.currentApplication.submissionNotes}" />
                                     </p:column>                                    
                                 </h:panelGrid>
                             </h:panelGroup>

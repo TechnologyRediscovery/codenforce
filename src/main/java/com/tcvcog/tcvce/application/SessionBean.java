@@ -173,17 +173,18 @@ public class    SessionBean
     /* >>>                     VIV OccApp                                 <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
+    //Fields used both externally and internally
     private OccPermitApplication sessOccPermitApplication;
+    private PersonType occPermitAppActivePersonType;
+    private OccPermitApplicationReason occPermitApplicationReason;
     
+    //Fields used internally
     private PublicInfoBundleProperty occPermitAppActiveProp;
     private PublicInfoBundleProperty occPermitAppWorkingProp;
     private PublicInfoBundlePropertyUnit occPermitAppActivePropUnit;
-    private PersonType occPermitAppActivePersonType;
     private List<PublicInfoBundlePerson> occPermitAttachedPersons;
     private PublicInfoBundlePerson occPermitApplicant;
     private PublicInfoBundlePerson occPermitPreferredContact;
-    
-    private OccPermitApplicationReason occPermitApplicationReason;
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                        X Payment                               <<< */

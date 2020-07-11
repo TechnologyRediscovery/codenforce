@@ -29,7 +29,7 @@
                                 <p:dataTable
                                     id="chosenPropertyTable"
                                     var="prop" 
-                                    value="#{sessionBean.activePropWithLists}"
+                                    value="#{occPermitApplicationBB.prop.bundledProperty}"
                                     rowKey="#{prop.propertyID}">
 
                                     <p:column>
@@ -45,7 +45,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Type" />
                                         </f:facet>
-                                        <h:outputText value="#{prop.propertyUseTypeString}"/>
+                                        <h:outputText value="#{prop.useType.name}"/>
 
                                     </p:column>
 
@@ -59,29 +59,29 @@
                                 <p:dataTable
                                     id="configuredUnitTable"
                                     var="unit"
-                                    value="#{sessionBean.workingPropWithLists.unitList}"
-                                    rowKey="#{unit.unitID}"
+                                    value="#{occPermitApplicationBB.workingPropUnits}"
+                                    rowKey="#{unit.bundledUnit.unitID}"
                                     >                                         
 
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Unit Number" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.unitNumber}" />
+                                        <h:outputText value="#{unit.bundledUnit.unitNumber}" />
                                     </p:column>
 
                                     <p:column>
                                         <f:facet name="header">
-                                            <h:outputText value="Rental?" />
+                                            <h:outputText value="Rental Notes" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                        <h:outputText value="#{unit.bundledUnit.rentalNotes}" />
                                     </p:column>
 
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Unit Description" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.notes}" />
+                                        <h:outputText value="#{unit.bundledUnit.notes}" />
                                     </p:column>
 
                                 </p:dataTable>
@@ -90,14 +90,12 @@
                             <p:panel>
                                 <h3>Step 3: Select Units For Application</h3>
                                 
-                                
-                                
                                 <p:outputLabel>Chosen Unit:</p:outputLabel>
 
                                 <p:dataTable
                                     id="chosenUnitTable"
                                     var="unit"
-                                    value="#{sessionBean.activePropUnit}"
+                                    value="#{occPermitApplicationBB.selectedUnit.bundledUnit}"
                                     rowKey="#{unit.unitID}"
                                     >                                         
 
@@ -110,9 +108,9 @@
 
                                     <p:column>
                                         <f:facet name="header">
-                                            <h:outputText value="Rental?" />
+                                            <h:outputText value="Rental Notes" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                        <h:outputText value="#{unit.rentalNotes}" />
                                     </p:column>
 
                                     <p:column>
@@ -138,7 +136,7 @@
 
                             <p:selectOneMenu
                                 id="reasonSM" tabindex="1"
-                                value="#{sessionBean.occPermitApplication.reason}">
+                                value="#{occPermitApplicationBB.currentApplication.reason}">
                                 <f:converter converterId="occPermitApplicationReasonConverter"/>
                                 <f:selectItem itemLabel="Select a reason" itemDisabled="true"/>
                                 <f:selectItems id="reasonList" value="#{occPermitApplicationBB.reasonList}" var ="r" itemValue="#{r}" itemLabel="#{r.title}" />
@@ -156,7 +154,7 @@
                                 tabindex="2"
                                 required="false"
                                 style="width: 100%"
-                                value="#{sessionBean.occPermitApplication.submissionNotes}" />
+                                value="#{occPermitApplicationBB.currentApplication.submissionNotes}" />
 
                             <p:spacer height="10px" />
 
@@ -166,7 +164,7 @@
 
                             <p:spacer height="10px"/>
 
-                            <p:commandButton ajax="false"                                             
+                            <p:commandButton ajax="false"
                                              value="Add people to application"
                                              action="#{occPermitApplicationBB.storeReason()}"/>
 

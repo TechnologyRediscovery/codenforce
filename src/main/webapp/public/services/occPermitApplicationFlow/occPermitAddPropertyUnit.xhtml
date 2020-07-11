@@ -29,7 +29,7 @@
                                 <p:dataTable
                                     id="chosenPropertyTable"
                                     var="prop" 
-                                    value="#{occPermitApplicationBB.prop}"
+                                    value="#{occPermitApplicationBB.prop.bundledProperty}"
                                     rowKey="#{prop.propertyID}">
 
                                     <p:column>
@@ -45,7 +45,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Type" />
                                         </f:facet>
-                                        <h:outputText value="#{prop.propertyUseTypeString}"/>
+                                        <h:outputText value="#{prop.useType.name}"/>
 
                                     </p:column>
 

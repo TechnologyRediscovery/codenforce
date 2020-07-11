@@ -34,7 +34,7 @@
                                 <p:dataTable
                                     id="chosenPropertyTable"
                                     var="prop" 
-                                    value="#{sessionBean.activePropWithLists}"
+                                    value="#{occPermitApplicationBB.prop.bundledProperty}"
                                     rowKey="#{prop.propertyID}">
 
                                     <p:column>
@@ -50,7 +50,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Type" />
                                         </f:facet>
-                                        <h:outputText value="#{prop.propertyUseTypeString}"/>
+                                        <h:outputText value="#{prop.useType.name}"/>
 
                                     </p:column>
 
@@ -64,29 +64,29 @@
                                 <p:dataTable
                                     id="configuredUnitTable"
                                     var="unit"
-                                    value="#{sessionBean.workingPropWithLists.unitList}"
-                                    rowKey="#{unit.unitID}"
+                                    value="#{occPermitApplicationBB.workingPropUnits}"
+                                    rowKey="#{unit.bundledUnit.unitID}"
                                     >                                         
 
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Unit Number" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.unitNumber}" />
+                                        <h:outputText value="#{unit.bundledUnit.unitNumber}" />
                                     </p:column>
 
                                     <p:column>
                                         <f:facet name="header">
-                                            <h:outputText value="Rental?" />
+                                            <h:outputText value="Rental Notes" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                        <h:outputText value="#{unit.bundledUnit.rentalNotes}" />
                                     </p:column>
 
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Unit Description" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.notes}" />
+                                        <h:outputText value="#{unit.bundledUnit.notes}" />
                                     </p:column>
 
                                 </p:dataTable>
@@ -100,7 +100,7 @@
                                 <p:dataTable
                                     id="chosenUnitTable"
                                     var="unit"
-                                    value="#{sessionBean.activePropUnit}"
+                                    value="#{occPermitApplicationBB.selectedUnit.bundledUnit}"
                                     rowKey="#{unit.unitID}"
                                     >                                         
 
@@ -113,9 +113,9 @@
 
                                     <p:column>
                                         <f:facet name="header">
-                                            <h:outputText value="Rental?" />
+                                            <h:outputText value="Rental Notes" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                        <h:outputText value="#{unit.rentalNotes}" />
                                     </p:column>
 
                                     <p:column>
@@ -132,18 +132,18 @@
                             <p:panel>
                                 <h3>Step 4: Choose Reason For Application</h3>
 
-                                <p:outputLabel value="The selected reason for the application is: #{sessionBean.occPermitApplication.reason.title}"/>
+                                <p:outputLabel value="The selected reason for the application is: #{occPermitApplicationBB.currentApplication.reason.title}"/>
 
                                 <p:spacer height="5px"/>
 
-                                <p:outputLabel value="Your attached notes: #{sessionBean.occPermitApplication.submissionNotes}"/>
+                                <p:outputLabel value="Your attached notes: #{occPermitApplicationBB.currentApplication.submissionNotes}"/>
                             </p:panel>
 
                             <p:spacer height="5px"/>
 
                             <h2 id="currentStep">Step 5: Add People To Application</h2>
 
-                            <p:outputLabel value="#{sessionBean.occPermitApplication.reason.humanFriendlyDescription}"/>
+                            <p:outputLabel value="#{occPermitApplicationBB.currentApplication.reason.humanFriendlyDescription}"/>
 
                                 <h:panelGrid id="menu" columns="1" cellpadding="10" columnClasses="gridTd-solid-back" style="width:100%">
                                     <h:panelGroup >
@@ -227,15 +227,11 @@
                                                                  action="#{occPermitApplicationBB.addPersonToApplication(person)}" 
                                                                  id="attach-person-cb" value="Attach" />
                                             </p:column>
-                                            <!--
-                                                <p:column>
-                                                    <p:commandButton id="edit-person-cb" value="Edit" action="{occPermitApplicationBB.editPersonInfo(person)}"/>
-                                                </p:column>
-                                            -->
+
                                         </p:dataTable>
                                     </h:panelGroup>
                                 </h:panelGrid>
-                                <p:outputLabel> Can't find the person you are looking for? </p:outputLabel> 
+                                <p:outputLabel> Can't find the person you are looking for? Add a person to the table below and enter their information.</p:outputLabel> 
 
                             <p:spacer height="10px"/>
 
@@ -251,28 +247,29 @@
 
                             <p:dataTable id="applicationPersonTable"
                                          var="applicationPerson" value="#{occPermitApplicationBB.attachedPersons}" 
-                                         selectionMode="single"
-                                         selection="#{occPermitApplicationBB.applicant}"
-                                         rowKey="#{applicationPerson.personID}"
+                                         rowKey="#{applicationPerson.bundledPerson.personID}"
                                          editable="true">                                
                                 <p:column headerText="Name">
-                                    <h:outputText value="#{applicationPerson.firstName} #{applicationPerson.lastName}"/>
+                                    <h:outputText value="#{applicationPerson.bundledPerson.firstName} #{applicationPerson.bundledPerson.lastName}"/>
                                 </p:column>
 
                                 <p:column headerText="Person Type">
-                                    <p:selectOneMenu value="#{applicationPerson.personType}">
+                                    <p:selectOneMenu value="#{applicationPerson.bundledPerson.personType}">
                                         <f:selectItems value="#{occPermitApplicationBB.optAndReqPersons}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
                                     </p:selectOneMenu> 
                                 </p:column>  
-
-                                <p:column headerText="This is me">
-                                    <h:selectBooleanCheckbox value="#{applicationPerson.applicant}"/>
-                                </p:column>
-
+                                
                                 <p:column headerText="Edit?">
-
                                     <p:rowEditor/>
                                 </p:column>
+                                
+                                <p:column headerText="This is me">
+                                     <p:commandButton ajax="true" value="Set as applicant" 
+                                                     action="#{occPermitApplicationBB.setApplicant(applicationPerson)}"
+                                                     update="#{p:component('applicationPersonTable')}"
+                                                     /> 
+                                </p:column>
+
 
                                 <p:column>
                                     <p:commandButton ajax="true" value="Remove" 
@@ -282,6 +279,10 @@
                                 </p:column>
 
                             </p:dataTable>
+                            <p:spacer height="10px"/>
+                            
+                            <h:outputText value="Current Applicant: #{occPermitApplicationBB.applicantName}"/>
+                            
                             <p:spacer height="10px"/>
                             <p:commandButton update="applicationPersonTable" value="Add a new person" action="#{occPermitApplicationBB.addANewPerson}" />
 

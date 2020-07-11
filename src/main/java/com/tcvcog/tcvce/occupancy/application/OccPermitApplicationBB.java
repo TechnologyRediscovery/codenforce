@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
 import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
@@ -69,9 +70,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     private PublicInfoBundlePropertyUnit selectedUnit;
     private PublicInfoBundlePropertyUnit unitToAdd;
     private List<PublicInfoBundlePropertyUnit> workingPropUnits;
-    private String unitNum;
-    private boolean rental;
-    private String unitNotes;
 
     private OccPermitApplicationReason selectedApplicationReason;
     private List<OccPermitApplicationReason> reasonList;
@@ -119,70 +117,67 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         searchPerson = new Person();
 
         // check if we're working with an internal user or the public form
-        if (getSessionBean().getSessUser() != null) {
-
-            // internal user procedure
-            // TODO: Internal users should probably get their own BB. 
-            //This BB has been stuffed will PublicInfoBundles to keep stuff anonymized
-            /*
+        // internal user procedure
+        // TODO: Internal users should probably get their own BB. 
+        //This BB has been stuffed will PublicInfoBundles to keep stuff anonymized
+        /*
             selectedMuni = getSessionBean().getSessMuni();
             Property p = getSessionBean().getSessProperty;
             workingPropUnits = p.getUnitList();
-             */
-        } else { // start public user init procedure
+         */
+        prop = getSessionBean().getOccPermitAppActiveProp();
 
-            prop = getSessionBean().getOccPermitAppActiveProp();
+        selectedMuni = getSessionBean().getSessMuniQueued();
 
-            selectedMuni = getSessionBean().getSessMuniQueued();
+        if (prop != null) {
 
-            if (prop != null) {
+            //If there is no working prop or if the working prop's address is not equal to the active prop's address
+            if (getSessionBean().getOccPermitAppWorkingProp() == null
+                    || !getSessionBean().getOccPermitAppWorkingProp().getBundledProperty().getAddress().equalsIgnoreCase(prop.getBundledProperty().getAddress())) {
 
-                if (getSessionBean().getOccPermitAppWorkingProp() == null
-                        || !getSessionBean().getOccPermitAppWorkingProp().getBundledProperty().getAddress().equalsIgnoreCase(prop.getBundledProperty().getAddress())) {
+                if (prop.getUnitList() == null) {
 
-                    workingPropUnits = prop.getUnitList();
+                    prop.setUnitList(new ArrayList<PublicInfoBundlePropertyUnit>());
+                    workingPropUnits = new ArrayList<>();
 
-                    if (workingPropUnits == null) {
-
-                        prop.setUnitList(new ArrayList<PublicInfoBundlePropertyUnit>());
-                        workingPropUnits = new ArrayList<>();
-
-                    } else {
-                        try {
-
-                            List<PropertyUnit> unbundledUnits = pri.getPropertyUnitList(prop.getBundledProperty());
-
-                            workingPropUnits = new ArrayList<>();
-
-                            for (PropertyUnit unit : unbundledUnits) {
-                                workingPropUnits.add(pic.extractPublicInfo(unit));
-                            }
-
-                        } catch (IntegrationException | AuthorizationException
-                                | BObStatusException | EventException
-                                | SearchException ex) {
-
-                            System.out.println(ex);
-                        }
-                    }
-
-                    getSessionBean().setOccPermitAppWorkingProp(prop);
                 } else {
 
-                    workingPropUnits = getSessionBean().getOccPermitAppWorkingProp().getUnitList();
+                    //TODO: Walk through this and see if the fetching a list is really necessary - setting workingPropUnits equal to prop.unitList might work just fine.
+                    workingPropUnits = prop.getUnitList();
+
+                    try {
+
+                        List<PropertyUnit> unbundledUnits = pri.getPropertyUnitList(prop.getBundledProperty());
+
+                        workingPropUnits = new ArrayList<>();
+
+                        for (PropertyUnit unit : unbundledUnits) {
+                            workingPropUnits.add(pic.extractPublicInfo(unit));
+                        }
+
+                    } catch (IntegrationException | AuthorizationException
+                            | BObStatusException | EventException
+                            | SearchException ex) {
+
+                        System.out.println(ex);
+                    }
+
+                    selectedUnit = getSessionBean().getOccPermitAppActivePropUnit();
 
                 }
+
+                getSessionBean().setOccPermitAppWorkingProp(prop);
+            } else {
+
+                workingPropUnits = getSessionBean().getOccPermitAppWorkingProp().getUnitList();
+
             }
+        }
 
-            if (attachedPersons == null && getSessionBean().getSessOccPermitApplication() != null) {
+        attachedPersons = getSessionBean().getOccPermitAttachedPersons();
 
-                attachedPersons = getSessionBean().getOccPermitAttachedPersons();
-
-                if (attachedPersons == null) {
-                    attachedPersons = new ArrayList();
-                }
-            }
-
+        if (attachedPersons == null) {
+            attachedPersons = new ArrayList();
         }
 
         try {
@@ -300,23 +295,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
     }
 
-    /*
-     * For multiunit properties: Gets the list of property units. For
-     * non-multiunit properties: Sets the activePropertyUnit to default unit.
-     *
-     * Its functionality has been moved to the
-     *
-     * deprecated public void onPropertySelection() { PropertyCoordinator pc =
-     * getPropertyCoordinator();
-     *
-     * getSessionBean().setOccPermitAppActiveProp(prop);
-     *
-     * if (prop.getUnitList().size() == 1) { List<PropertyUnit> propertyUnitList
-     * = prop.getUnitList();
-     * getSessionBean().setOccPermitAppActivePropUnit(propertyUnitList.get(0));
-     * getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
-     * } }
-     */
     /**
      * Adds a blank unit to propUnitsToAdd list. This newly-created unit can
      * then be selected and edited by the user.
@@ -326,13 +304,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
         PropertyUnit newUnit = pc.initPropertyUnit(selectedProperty.getBundledProperty());
         newUnit.setUnitNumber("");
-//        newUnit.setRental(false);
+        newUnit.setRentalNotes("");
         newUnit.setNotes("");
 
         try {
             unitToAdd = pic.extractPublicInfo(newUnit);
         } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
-            System.out.print("OccPermitApplicationBB.addUnitToNewPropUnits() | ERROR: " + ex);
+            System.out.println("OccPermitApplicationBB.addUnitToNewPropUnits() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to add a new unit! Please try again.", ""));
@@ -343,7 +321,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
 
         workingPropUnits.add(unitToAdd);
-        clearAddUnitFormValues();
     }
 
     /**
@@ -353,17 +330,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void removeSelectedUnit(PublicInfoBundlePropertyUnit selectedUnit) {
         workingPropUnits.remove(selectedUnit);
-        clearAddUnitFormValues();
-    }
-
-    /**
-     * Clears add unit form values, so that they are null if the user wishes to
-     * add another unit.
-     */
-    public void clearAddUnitFormValues() {
-        unitNum = null;
-        rental = false;
-        unitNotes = null;
     }
 
     /**
@@ -374,62 +340,29 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public String selectProperty() {
 
-        if (selectedProperty != null) {
-// TODO: occbeta
-//        PropertyCoordinator pc = getPropertyCoordinator();
-
-//            if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
-//                try {
-//                    propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
-//                } catch (BObStatusException ex) {
-//                    System.out.println(ex);
-//                }
-//            } else {
-//                try {
-//                    propWithLists = pc.getPropertyDataHeavy(selectedProperty);
-//                } catch (BObStatusException ex) {
-//                    System.out.println(ex);
-//                }
-//            }
-            getSessionBean().setOccPermitAppActiveProp(prop);
-
-            if (prop.getUnitList().size() == 1) {
-                PublicInfoCoordinator pic = getPublicInfoCoordinator();
-
-                List<PublicInfoBundlePropertyUnit> propertyUnitList = prop.getUnitList();
-                getSessionBean().setOccPermitAppActivePropUnit(propertyUnitList.get(0));
-
-                try {
-
-                    PropertyUnit p = pic.export(propertyUnitList.get(0));
-
-                    getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(p);
-
-                } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
-                    System.out.print("OccPermitApplicationBB.selectProperty() | ERROR: " + ex);
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "An error occured while trying to select a property! Please try again.", ""));
-                    return "";
-                }
-
-            }
-
-            try {
-                ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-                ec.redirect("/tcvce/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep");
-            } catch (IOException ex) {
-            }
-
-            return "addPropertyUnit";
-        } else {
-
+        if (selectedProperty == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a property.", ""));
-
             return "";
         }
+        getSessionBean().setOccPermitAppActiveProp(selectedProperty);
+
+        if (selectedProperty.getUnitList().size() == 1) {
+            PublicInfoCoordinator pic = getPublicInfoCoordinator();
+
+            List<PublicInfoBundlePropertyUnit> propertyUnitList = prop.getUnitList();
+            getSessionBean().setOccPermitAppActivePropUnit(propertyUnitList.get(0));
+
+        }
+
+        try {
+            ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+            ec.redirect("/tcvce/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep");
+        } catch (IOException ex) {
+        }
+
+        return "addPropertyUnit";
     }
 
     /**
@@ -441,24 +374,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public String selectPropertyUnit(PublicInfoBundlePropertyUnit unit) {
 
-        PublicInfoCoordinator pic = getPublicInfoCoordinator();
-
         unit.getBundledUnit().setPropertyID(getSessionBean().getOccPermitAppActiveProp().getBundledProperty().getPropertyID());
         getSessionBean().setOccPermitAppActivePropUnit(unit);
-
-        try {
-
-            PropertyUnit p = pic.export(unit);
-
-            getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(p);
-
-        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
-            System.out.print("OccPermitApplicationBB.selectPropertyUnit() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to select a property Unit! Please try again.", ""));
-            return "";
-        }
 
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
@@ -479,6 +396,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public String finalizeUnitList() {
 
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
+
         try {
             workingPropUnits = pic.sanitizePublicPropertyUnitList(workingPropUnits);
         } catch (BObStatusException ex) {
@@ -487,9 +405,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                             ex.toString(), ""));
             return "";
         }
-//          getSessionBean().getOccPermitApplication().setMultiUnit(workingPropUnits.size() > 1); //if there is more than one unit on the workingPropUnits list, set it to multiunit.
         getSessionBean().getOccPermitAppWorkingProp().setUnitList(workingPropUnits);
-        getSessionBean().getOccPermitAppActiveProp().setUnitList(workingPropUnits); //This line is different from the original method (above)
+        getSessionBean().getOccPermitAppActiveProp().setUnitList(workingPropUnits);
 
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
@@ -530,11 +447,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     }
 
     /**
-     * Sends user to personsRequirementManage.xhtml
+     * Sets the currentApplication on the sessionBean and then sends user to
+     * personsRequirementManage.xhtml
      *
      * @return
      */
     public String storeReason() {
+
+        getSessionBean().setSessOccPermitApplication(currentApplication);
+
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 
@@ -599,21 +520,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     }
 
-    /*
-    DP 5/20/2019: The methods below relating to people must be reworked. The goal is to make sure 
-    all of the correct people are added per the OccAppPersonRequirement for the selected 
-    OccPermitApplicationReason. The user must be able to find people in the database via a search, 
-    edit the person if necessary, or alternatively, create and attach a brand new Person to the application.
-    
-    Features that must be added/reworked:
-    - public person search
-    - person edit
-        - Create a clone Person and edit that
-        - Using clones avoids public users overwriting existing fields in person table in the database
-    - person add
-    - set applicant and preferredContact booleans on OccPermitApplication object
-    - Verify that the OccAppPersonRequirement is met (use OccupancyCoordinator.verifyOccPermitPersonsRequirement())    
-     */
     public String attachPerson(PersonType personType) {
         getSessionBean().setOccPermitAppActivePersonType(personType);
         return "searchPeople";
@@ -653,43 +559,28 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         attachedPersons.remove(person);
     }
 
-    /*
-    Currently not used by the interface
-    public String editPersonInfo(Person person) {
-        person.setPersonType(getSessionBean().getOccPermitAppActivePersonType());
-        attachedPersons = getSessionBean().getSessOccPermitApplication().getAttachedPersons();
-
-        if (attachedPersons == null) {
-            attachedPersons = new ArrayList();
-        }
-        getSessionBean().getSessOccPermitApplication().setAttachedPersons(attachedPersons);
-        getSessionBean().setActiveAnonPerson(person);
-        return "editPerson";
-    }
-     */
     public String addANewPerson() {
 
-//         for (Person p : attachedPersons) {
-// TODO: occbeta: Add a "set as applicant" button on each row holding a person. It will simply overwrite the current applicant.
-//            if (p.isApplicant()) {
-//
-//                if (applicant == null) {
-//
-//                    applicant = p;
-//
-//                } else {
-//
-//                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                            "You have identified multiple people as yourself.", ""));
-//                    return "";
-//
-//                }
-//
-//            }
-//    }
         attachedPersons.add(new PublicInfoBundlePerson());
 
         return "";
+    }
+/*
+    public String setAsApplicant(PublicInfoBundlePerson p) {
+
+        applicant = p;
+
+        return "";
+    }
+*/
+    public String getApplicantName() {
+
+        if (applicant != null) {
+            return applicant.getBundledPerson().getFirstName() + " " + applicant.getBundledPerson().getLastName();
+        } else {
+            return "UNSELECTED";
+        }
+
     }
 
     public List<String> getPersonRequirementDescription() {
@@ -740,15 +631,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public String reviewApplication() {
 
-        PublicInfoCoordinator pic = getPublicInfoCoordinator();
-
         List<Integer> countTypes = new ArrayList();
-
+        
+        //Create an ArrayList that will stores how many of each type
         for (int index = 0; index < 17; index++) {
 
             countTypes.add(0);
 
         }
+        //count each type
         for (PublicInfoBundlePerson p : attachedPersons) {
 
             int index = p.getBundledPerson().getPersonType().ordinal();
@@ -757,24 +648,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             countTypes.set(index, temp);
 
-//            TODO: occbeta
-//            if (p.isApplicant()) {
-//
-//                if (applicant == null) {
-//
-//                    applicant = p;
-//
-//                } else {
-//
-//                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                            "You have identified multiple people as yourself.", ""));
-//                    return "";
-//
-//                }
-//
-//            }
         }
-
+        //compare the counts of each person type with the list of requirements. 
+        //If any required types have less than 1 person, then tell the user they
+        //are missing some types.
         for (PersonType type : requiredPersons) {
 
             int index = type.ordinal();
@@ -811,41 +688,73 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public String submitApplication(String redir) {
 
-        submitUnitChangeList();
-
         OccupancyIntegrator opi = getOccupancyIntegrator();
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
         try {
-            int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getSessOccPermitApplication());
-            getSessionBean().getSessOccPermitApplication().setId(applicationId);
-            opi.insertOccPeriodPersons(getSessionBean().getSessOccPermitApplication());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
+
+            //Now we assemble the current application from exported version of our bundled fields.
+            
+            PropertyUnit exportedUnit = pic.export(selectedUnit);
+
+            currentApplication.setApplicationPropertyUnit(exportedUnit);
+            
+            Person exportedPerson = pic.export(applicant);
+            
+            currentApplication.setApplicantPerson(exportedPerson);
+            
+            //TODO: Set preferred contact
+            
+            List<Person> exportedPeople = new ArrayList<>();
+            
+            for(PublicInfoBundlePerson attachedPerson : attachedPersons){
+                
+                exportedPerson = pic.export(attachedPerson);
+                
+                exportedPeople.add(exportedPerson);
+                
+            }
+            
+            currentApplication.setAttachedPersons(exportedPeople);
+            
+            submitUnitChangeList();
+
+            int applicationId = opi.insertOccPermitApplicationAndReturnId(currentApplication);
+            
+            getSessionBean().setSessOccPermitApplication(opi.getOccPermitApplication(applicationId));
+            
+            opi.insertOccPeriodPersons(currentApplication);
+        } catch (IntegrationException |AuthorizationException | EventException | SearchException ex) {
+            System.out.println("OccPermitApplicationBB.submitApplication() | ERROR: " + ex);
+        } catch (BObStatusException ex){
+            getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Something when wrong while submitting your application: " + ex, ""));
         }
 
         return redir;
     }
 
     public void submitUnitChangeList() {
+        PropertyIntegrator pri = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
+        UserCoordinator uc = getUserCoordinator();
 
         List<PropertyUnitChangeOrder> changeList = new ArrayList<>();
 
-        List<PropertyUnit> currentUnitList = new ArrayList<>();
-
-        PropertyIntegrator pri = getPropertyIntegrator();
-
-        PublicInfoCoordinator pic = getPublicInfoCoordinator();
+        List<PropertyUnitDataHeavy> currentUnitList = new ArrayList<>();
 
         PropertyDataHeavy existingProp = new PropertyDataHeavy();
 
-        Person changedby = getSessionBean().getSessOccPermitApplication().getApplicantPerson();
+        //Grab the unit list that is currently attached to the property in the database
+        try {
+            existingProp = pc.assemblePropertyDataHeavy(prop.getBundledProperty(), uc.getPublicUserAuthorized().getMyCredential());
 
-//         TODO: Occbeta
-//        try {
-//            existingProp = pri.getPropertyDataHeavy(prop.getPropertyID());
-//                    
-//        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
-//            System.out.println(ex);
-//        }
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            System.out.println("OccPermitApplicationBB.submitUnitChangeList() | ERROR: " + ex);
+        }
+
+        //Export the workingPropUnits list from PublicInfoBundles to units. This should preserve changes made by the user.
         for (PublicInfoBundlePropertyUnit bundle : workingPropUnits) {
             try {
                 currentUnitList.add(pic.export(bundle));
@@ -857,73 +766,43 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         for (PropertyUnit workingUnit : currentUnitList) {
 
+            //Intialize change order so it's ready to receive edits.
             PropertyUnitChangeOrder skeleton = new PropertyUnitChangeOrder();
 
             boolean added = true;
 
-            skeleton.setPropertyID(getSessionBean().getSessOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
+            //Done preparing change order, let's actually start comparing the workingUnit (the on the user made) to units currently in the database.
+            for (PropertyUnit existingUnit : existingProp.getUnitList()) {
+                if (workingUnit.getUnitID() != 0 && workingUnit.getUnitID() == existingUnit.getUnitID()) {
 
-            if (changedby.getPersonID() != 0) {
-
-                PersonIntegrator pi = getPersonIntegrator();
-
-                Person temp = new Person();
-
-                try {
-                    temp = pi.getPerson(changedby.getPersonID());
-                } catch (IntegrationException ex) {
-                    System.out.println(ex);
-                }
-
-                String changeName = temp.getFirstName() + " " + temp.getLastName() + " ID: " + temp.getPersonID();
-
-                skeleton.setChangedBy(changeName);
-
-            } else {
-
-                skeleton.setChangedBy(changedby.getFirstName() + " " + changedby.getLastName());
-
-            }
-
-            for (PropertyUnit activeUnit : existingProp.getUnitList()) {
-
-                if (workingUnit.getUnitID() == activeUnit.getUnitID() && workingUnit.getUnitID() != 0) {
-
+                    //this block fires if the unit ID already exists in our database. The unit is an existing one that may have been changed
                     added = false;
 
                     skeleton.setUnitID(workingUnit.getUnitID());
 
-                    if (workingUnit.getUnitNumber() != null) {
-
+                    //check each field for changes
+                    //Also skip over a field if it's null, that would cause an error
+                    if (workingUnit.getUnitNumber() != null && workingUnit.getUnitNumber().compareToIgnoreCase(existingUnit.getUnitNumber()) != 0) {
                         skeleton.setUnitNumber(workingUnit.getUnitNumber());
-
                     }
 
-                    if (workingUnit.getOtherKnownAddress() != null && workingUnit.getOtherKnownAddress().compareToIgnoreCase(activeUnit.getOtherKnownAddress()) != 0) {
-
+                    if (workingUnit.getOtherKnownAddress() != null && workingUnit.getOtherKnownAddress().compareToIgnoreCase(existingUnit.getOtherKnownAddress()) != 0) {
                         skeleton.setOtherKnownAddress(workingUnit.getOtherKnownAddress());
-
                     }
 
-                    if (workingUnit.getNotes().compareToIgnoreCase(activeUnit.getNotes()) != 0) {
-
+                    if (workingUnit.getNotes() != null && workingUnit.getNotes().compareToIgnoreCase(existingUnit.getNotes()) != 0) {
                         skeleton.setNotes(workingUnit.getNotes());
-
                     }
 
-                    if (workingUnit.getRentalNotes().compareToIgnoreCase(activeUnit.getRentalNotes()) != 0) {
-
+                    if (workingUnit.getRentalNotes() != null && workingUnit.getRentalNotes().compareToIgnoreCase(existingUnit.getRentalNotes()) != 0) {
                         skeleton.setRentalNotes(workingUnit.getRentalNotes());
-
                     }
                 }
-
             }
 
             if (added == true) {
 
-                skeleton.setUnitNumber(workingUnit.getUnitNumber());
-
+                //This unit doesn't exist in our database. Save all of its fields so it can be saved to the database
                 skeleton.setOtherKnownAddress(workingUnit.getOtherKnownAddress());
 
                 skeleton.setNotes(workingUnit.getNotes());
@@ -933,6 +812,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             skeleton.setAdded(added);
 
+            //if a change has occured, then we will add it to the changeList that we must submit at the end of this method.
             if (skeleton.changedOccured()) {
 
                 changeList.add(skeleton);
@@ -940,32 +820,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
+        //We checked for changes and added units. We will now check for removed units
         for (PropertyUnit activeUnit : existingProp.getUnitList()) {
 
             PropertyUnitChangeOrder skeleton = new PropertyUnitChangeOrder();
-
-            skeleton.setPropertyID(getSessionBean().getSessOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
-
-            if (changedby.getPersonID() != 0) {
-
-                PersonIntegrator pi = getPersonIntegrator();
-
-                Person temp = new Person();
-
-                try {
-                    temp = pi.getPerson(changedby.getPersonID());
-                } catch (IntegrationException ex) {
-                    System.out.println(ex);
-                }
-
-                String changeName = temp.getFirstName() + " " + temp.getLastName() + " ID: " + temp.getPersonID();
-
-                skeleton.setChangedBy(changeName);
-            } else {
-
-                skeleton.setChangedBy(changedby.getFirstName() + " " + changedby.getLastName());
-
-            }
 
             boolean removed = true;
 
@@ -981,15 +839,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             if (removed == true) {
 
+                //Only the unitID and removed flag are needed to deactivate a unit from the database
                 skeleton.setUnitID(activeUnit.getUnitID());
-
-                skeleton.setUnitNumber(activeUnit.getUnitNumber());
-
-                skeleton.setOtherKnownAddress(activeUnit.getOtherKnownAddress());
-
-                skeleton.setNotes(activeUnit.getNotes());
-
-                skeleton.setRentalNotes(activeUnit.getRentalNotes());
 
                 skeleton.setRemoved(removed);
 
@@ -999,12 +850,39 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
+        //We are done getting change orders. It's time to get them ready for the database and insert them.
+        Person changedby = getSessionBean().getSessOccPermitApplication().getApplicantPerson();
+
         for (PropertyUnitChangeOrder order : changeList) {
 
+            //connect it to the current property
+            order.setPropertyID(getSessionBean().getSessOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
+
+            //save who made this change order
+            if (changedby.getPersonID() != 0) {
+
+                PersonIntegrator pi = getPersonIntegrator();
+
+                Person temp = new Person();
+
+                try {
+                    temp = pi.getPerson(changedby.getPersonID());
+                } catch (IntegrationException ex) {
+                    System.out.println("OccPermitApplicationBB.submitUnitChangeList() | ERROR: " + ex);
+                }
+
+                String changeName = temp.getFirstName() + " " + temp.getLastName() + " ID: " + temp.getPersonID();
+
+                order.setChangedBy(changeName);
+            } else {
+                order.setChangedBy(changedby.getFirstName() + " " + changedby.getLastName());
+            }
+
+            //Finally, insert the order
             try {
                 pri.insertPropertyUnitChange(order);
             } catch (IntegrationException ex) {
-                System.out.println(ex);
+                System.out.println("OccPermitApplicationBB.submitUnitChangeList() | ERROR: " + ex);
             }
 
         }
@@ -1208,48 +1086,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void setWorkingPropUnits(List<PublicInfoBundlePropertyUnit> propUnitsToAdd) {
         this.workingPropUnits = propUnitsToAdd;
-    }
-
-    /**
-     * @return the unitNum
-     */
-    public String getUnitNum() {
-        return unitNum;
-    }
-
-    /**
-     * @param unitNum the unitNum to set
-     */
-    public void setUnitNum(String unitNum) {
-        this.unitNum = unitNum;
-    }
-
-    /**
-     * @return the rental
-     */
-    public boolean isRental() {
-        return rental;
-    }
-
-    /**
-     * @param rental the rental to set
-     */
-    public void setRental(boolean rental) {
-        this.rental = rental;
-    }
-
-    /**
-     * @return the unitNotes
-     */
-    public String getUnitNotes() {
-        return unitNotes;
-    }
-
-    /**
-     * @param unitNotes the unitNotes to set
-     */
-    public void setUnitNotes(String unitNotes) {
-        this.unitNotes = unitNotes;
     }
 
     /**

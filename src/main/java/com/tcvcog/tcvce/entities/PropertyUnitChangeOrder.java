@@ -179,25 +179,18 @@ public class PropertyUnitChangeOrder {
      */
     public boolean changedOccured() {
 
-        boolean temp = false;
-
         if (otherKnownAddress != null) {
-
-            temp = true;
+            return true;
         }
 
         if (notes != null) {
-
-            temp = true;
+            return true;
         }
-
         if (rentalNotes != null) {
-
-            temp = true;
-
+           return true;
         }
         
-        return temp;
+        return false; //If none of the above apply, no changes have been made
 
     }
 
@@ -227,24 +220,16 @@ public class PropertyUnitChangeOrder {
     
     public String newOrRemoved(){
         
-        String output = "";
-        
         if(removed == true)
         {
-            output = "Removed";
-            
-        }
-        else if(added == true) {
-            
-            output = "Added";
-        }
-        else {
-            
-            output = "Edited";
-            
+            return "Removed";
         }
         
-        return output;
+        if(added == true) {    
+            return "Added";
+        }
+            
+            return  "Edited";
         
     }
 
