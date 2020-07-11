@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -28,6 +29,7 @@ import java.util.Date;
 public class PublicInfoBundleProperty extends PublicInfoBundle implements Serializable {
     
     private Property bundledProperty;
+    private List<PublicInfoBundlePropertyUnit> unitList;
 
     public void setBundledProperty(Property input) {
         
@@ -80,6 +82,14 @@ public class PublicInfoBundleProperty extends PublicInfoBundle implements Serial
 
     public Property getBundledProperty() {
         return bundledProperty;
+    }
+
+    public List<PublicInfoBundlePropertyUnit> getUnitList() {
+        return unitList;
+    }
+
+    public void setUnitList(List<PublicInfoBundlePropertyUnit> unitList) {
+        this.unitList = unitList;
     }
     
 }

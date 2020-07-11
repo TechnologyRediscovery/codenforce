@@ -202,9 +202,14 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * stripping out its private information.
      *
      * @param req
+     * @throws AuthorizationException
+     * @throws BObStatusException
+     * @throws EventException
+     * @throws IntegrationException
+     * @throws SearchException
      * @return
      */
-    private PublicInfoBundleCEActionRequest extractPublicInfo(CEActionRequest req) {
+    private PublicInfoBundleCEActionRequest extractPublicInfo(CEActionRequest req) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
 
         PublicInfoBundleCEActionRequest pib = new PublicInfoBundleCEActionRequest();
 
@@ -317,14 +322,27 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      *
      * @param input
      * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.EventException
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public PublicInfoBundleProperty extractPublicInfo(Property input) {
+    public PublicInfoBundleProperty extractPublicInfo(Property input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
         PublicInfoBundleProperty pib = new PublicInfoBundleProperty();
 
         //Again, no PACC enabled field. Perhaps this will be a good enough filter for now?
         if (!input.isActive()) {
 
             pib.setBundledProperty(input);
+
+            ArrayList<PublicInfoBundlePropertyUnit> bundledUnits = new ArrayList<>();
+
+            for (PropertyUnit unit : input.getUnitList()) {
+                bundledUnits.add(extractPublicInfo(unit));
+            }
+
+            pib.setUnitList(bundledUnits);
 
             pib.setTypeName("Property");
             pib.setPaccStatusMessage("Public access enabled");
@@ -598,9 +616,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         PaymentIntegrator pi = getPaymentIntegrator();
 
         FeeAssigned unbundled = input.getBundledFee();
-        FeeAssigned exportable = new FeeAssigned();
 
-        exportable = pi.getFeeAssigned(unbundled.getAssignedFeeID(), unbundled.getDomain());
+        FeeAssigned exportable = pi.getFeeAssigned(unbundled.getAssignedFeeID(), unbundled.getDomain());
 
         ArrayList<Payment> skeletonHorde = new ArrayList<>();
 
@@ -613,7 +630,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
     /**
      * Converts a bundled PropertyUnit to an unbundled PropertyUnit for internal
-     * use. Currently does not check for changes. Uses the data-heavy class to
+     * use. Currently does check for changes. Uses the data-heavy class to
      * contain the necessary fields. One of the more resource-intense
      * exportation methods, as it has to export a list of OccPeriods.
      *
@@ -639,8 +656,14 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             exportable = pc.getPropertyUnitWithLists(unbundled, publicUser.getMyCredential());
 
+            exportable.setUnitNumber(unbundled.getUnitNumber());
+            exportable.setNotes(unbundled.getNotes());
+            if (!unbundled.getRentalNotes().contains("*")) {
+                exportable.setRentalNotes(unbundled.getRentalNotes());
+            }
+
         } catch (IntegrationException ex) {
-            System.out.println("Exporting payment failed. Assuming exported payment is new, and could not be found in DB.");
+            System.out.println("Exporting payment failed. Assuming exported property unit is new, and could not be found in DB.");
             System.out.println("But here's the error message, just in case: " + ex.toString());
             exportable = unbundled;
 
@@ -751,8 +774,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @param input
      * @return
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.EventException
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public Property export(PublicInfoBundleProperty input) throws IntegrationException {
+    public Property export(PublicInfoBundleProperty input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
 
         PropertyCoordinator pc = getPropertyCoordinator();
 
@@ -773,6 +800,14 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         exportable.setOwnerCode(unbundled.getOwnerCode());
         exportable.setPropclass(unbundled.getPropclass());
         exportable.setUseType(unbundled.getUseType());
+
+        ArrayList<PropertyUnit> unitHorde = new ArrayList<>();
+
+        for (PublicInfoBundlePropertyUnit skeleton : input.getUnitList()) {
+            unitHorde.add(export(skeleton));
+        }
+
+        exportable.setUnitList(unitHorde);
 
         return exportable;
 
@@ -925,6 +960,50 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         }
 
         return exportable;
+    }
+
+    /**
+     * Accepts a List of PublicInfoBundlePropertyUnit objects, validates the
+     * input to make sure it is acceptable, sanitizes it, then tosses it back.
+     *
+     * @param input
+     * @return
+     * @throws BObStatusException if the input is not acceptable.
+     */
+    public List<PublicInfoBundlePropertyUnit> sanitizePublicPropertyUnitList(List<PublicInfoBundlePropertyUnit> input) throws BObStatusException {
+
+        PropertyCoordinator pc = getPropertyCoordinator();
+
+        int duplicateNums; //The above boolean is a flag to see if there is more than 1 of  Unit Number. The int to the left stores how many of a given number the loop below finds.
+
+        if (input.isEmpty()) {
+            throw new BObStatusException("Please add at least one unit.");
+        }
+
+        //use a numeric for loop instead of iterating through the objects so that we can store 
+        //the sanitized units
+        for (int index = 0; index < input.size(); index++) {
+            duplicateNums = 0;
+
+            for (PublicInfoBundlePropertyUnit secondUnit : input) {
+                if (input.get(index).getBundledUnit().getUnitNumber().compareTo(secondUnit.getBundledUnit().getUnitNumber()) == 0) {
+                    duplicateNums++;
+                }
+            }
+
+            if (duplicateNums > 1) {
+                throw new BObStatusException("Some Units have the same Number");
+            }
+
+            PublicInfoBundlePropertyUnit temp = input.get(index);
+
+            temp.setBundledUnit(pc.sanitizePropertyUnit(temp.getBundledUnit()));
+
+            input.set(index, temp);
+        }
+
+        return input;
+
     }
 
     /**

@@ -145,75 +145,79 @@
 
                             <p:outputLabel value="#{sessionBean.occPermitApplication.reason.humanFriendlyDescription}"/>
 
-                            <ui:remove><h:panelGrid id="menu" columns="1" cellpadding="10" columnClasses="gridTd-solid-back" style="width:100%">
+                                <h:panelGrid id="menu" columns="1" cellpadding="10" columnClasses="gridTd-solid-back" style="width:100%">
                                     <h:panelGroup >
                                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter">
                                             <h:panelGroup>
                                                 <p:outputLabel id="last-name-ol" value="Filter by last name" />
                                             </h:panelGroup>
                                             <h:panelGroup>
-                                                <p:inputText id="last-name-it" value="#{personSearchPublicBB.params.lastNameSS}"/>
+                                                <p:inputText id="last-name-it" value="#{occPermitApplicationBB.searchPerson.lastName}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="first-name-ol" value="Filter by first name" />
                                             </h:panelGroup>
                                             <h:panelGroup>
-                                                <p:inputText id="first-name-it" value="#{personSearchPublicBB.params.firstNameSS}"/>
+                                                <p:inputText id="first-name-it" value="#{occPermitApplicationBB.searchPerson.firstName}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="email-ol" value="Filter by email" />
                                             </h:panelGroup>
                                             <h:panelGroup>
-                                                <p:inputText id="email-it" value="#{personSearchPublicBB.params.emailSS}"/>
+                                                <p:inputText id="email-it" value="#{occPermitApplicationBB.searchPerson.email}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="phone-number-ol" value="Filter by phone?" />
                                             </h:panelGroup>
                                             <h:panelGroup>
-                                                <p:inputText id="phone-number-it" value="#{personSearchPublicBB.params.phoneNumber}"/>
+                                                <p:inputText id="phone-number-it" value="#{occPermitApplicationBB.searchPerson.phoneCell}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="street-ol" value="Filter by street?" />
                                             </h:panelGroup>                                        
                                             <h:panelGroup>
-                                                <p:inputText id="street-it" value="#{personSearchPublicBB.params.addrStreetSS}"/>
+                                                <p:inputText id="street-it" value="#{occPermitApplicationBB.searchPerson.addressStreet}"/>
                                             </h:panelGroup>
 
                                         </h:panelGrid>
-                                        <p:commandButton value= "Search" action="#{personSearchPublicBB.queryPersons(personSearchPublicBB.params)}" 
+                                        <p:commandButton value= "Search" action="#{occPermitApplicationBB.searchForPersons()}" 
                                                          update="results-dt" ajax="true"/>
 
-                                        <p:dataTable id="results-dt" var="person" value="#{personSearchPublicBB.personSearchResults}" scrollable="true" scrollHeight="300">
+                                        
+                                        <p:dataTable id="results-dt" 
+                                                     var="person" 
+                                                     value="#{personSearchPublicBB.bundledPersonSearchResults}" 
+                                                     scrollable="true" scrollHeight="300">
                                             <p:column headerText="Last Name">
-                                                <h:outputText value="#{person.lastName}" />
+                                                <h:outputText value="#{person.bundledPerson.lastName}" />
                                             </p:column>
 
                                             <p:column headerText="First Name">
-                                                <h:outputText value="#{person.firstName}" />
+                                                <h:outputText value="#{person.bundledPerson.firstName}" />
                                             </p:column>
 
                                             <p:column headerText="Street Address">
-                                                <h:outputText value="#{person.addressStreet}" />
+                                                <h:outputText value="#{person.bundledPerson.addressStreet}" />
                                             </p:column>
 
                                             <p:column headerText="Home Phone">
-                                                <h:outputText value="#{person.phoneHome}" />
+                                                <h:outputText value="#{person.bundledPerson.phoneHome}" />
                                             </p:column>
 
                                             <p:column headerText="Cell Phone">
-                                                <h:outputText value="#{person.phoneCell}" />
+                                                <h:outputText value="#{person.bundledPerson.phoneCell}" />
                                             </p:column>
 
                                             <p:column headerText="Work Phone">
-                                                <h:outputText value="#{person.phoneWork}" />
+                                                <h:outputText value="#{person.bundledPerson.phoneWork}" />
                                             </p:column>
 
                                             <p:column headerText="Email">
-                                                <h:outputText value="#{person.email}" />
+                                                <h:outputText value="#{person.bundledPerson.email}" />
                                             </p:column>
 
                                             <p:column>
@@ -231,7 +235,7 @@
                                         </p:dataTable>
                                     </h:panelGroup>
                                 </h:panelGrid>
-                                <p:outputLabel> Can't find the person you are looking for? </p:outputLabel> </ui:remove>
+                                <p:outputLabel> Can't find the person you are looking for? </p:outputLabel> 
 
                             <p:spacer height="10px"/>
 
@@ -283,7 +287,7 @@
 
                             <p:spacer height="10px"/>
 
-                            
+
                             <p:commandButton ajax="false" value="Review application"
                                              action="#{occPermitApplicationBB.reviewApplication}"/>
 

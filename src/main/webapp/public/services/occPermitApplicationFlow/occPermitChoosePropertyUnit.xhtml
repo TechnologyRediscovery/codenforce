@@ -18,9 +18,7 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Step 1/5: Select a property in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
-                        
-                        
+                        <h1>Step 1/5: Select a property in <h:outputText value="#{occPermitApplicationBB.selectedMuni.muniName}"/></h1>
                         
                         <h:form id="occPermitApplicationChoosePropertyForm">                          
                             <p:panel>
@@ -77,13 +75,13 @@
                                 selectionMode="single" tabindex="5"
                                 scrollable="true" scrollHeight="200" 
                                 selection="#{occPermitApplicationBB.selectedProperty}"
-                                rowKey="#{prop.propertyID}">
+                                rowKey="#{prop.bundledProperty.propertyID}">
 
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Address" />
                                     </f:facet>
-                                    <h:outputText value="#{prop.address}"/>
+                                    <h:outputText value="#{prop.bundledProperty.address}"/>
                                 </p:column>
                                 
 
@@ -92,7 +90,7 @@
                                     <f:facet name="header">
                                         <h:outputText value="Type" />
                                     </f:facet>
-                                    <h:outputText value="#{prop.propertyUseTypeString}"/>
+                                    <h:outputText value="#{prop.bundledProperty.constructionType}"/>
 
                                 </p:column>
 
@@ -130,4 +128,3 @@
         </ui:composition>
     </h:body>
 </html>
-

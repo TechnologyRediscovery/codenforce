@@ -8,10 +8,14 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
@@ -19,11 +23,19 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
+import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
+import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
+import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.IOException;
 import java.io.Serializable;
@@ -42,19 +54,21 @@ import javax.faces.context.FacesContext;
  */
 public class OccPermitApplicationBB extends BackingBeanUtils implements Serializable {
 
+    private OccPermitApplication currentApplication;
+
     private Municipality selectedMuni;
     private Date form_dateOfRecord;
 
     private boolean multiUnit;
     private String houseNum;
     private String streetName;
-    private Property selectedProperty;
-    private List<Property> propList;
-    private Property prop;
+    private PublicInfoBundleProperty selectedProperty;
+    private List<PublicInfoBundleProperty> propList;
+    private PublicInfoBundleProperty prop;
 
-    private PropertyUnit selectedUnit;
-    private PropertyUnit unitToAdd;
-    private List<PropertyUnit> workingPropUnits;
+    private PublicInfoBundlePropertyUnit selectedUnit;
+    private PublicInfoBundlePropertyUnit unitToAdd;
+    private List<PublicInfoBundlePropertyUnit> workingPropUnits;
     private String unitNum;
     private boolean rental;
     private String unitNotes;
@@ -62,13 +76,16 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     private OccPermitApplicationReason selectedApplicationReason;
     private List<OccPermitApplicationReason> reasonList;
 
-    private List<Person> attachedPersons;
+    private List<PublicInfoBundlePerson> attachedPersons;
     private Person applicationPerson;
-    private Person applicant;
+    private PublicInfoBundlePerson applicant;
     private Person currentOwner;
     private Person newOwner;
-    private Person contactPerson;
+    private PublicInfoBundlePerson contactPerson;
     private List<Person> newOccupants;
+
+    private Person searchPerson;
+    private List<PublicInfoBundlePerson> personSearchResults;
 
     private List<PersonType> requiredPersons;
     private List<PersonType> optAndReqPersons;
@@ -89,44 +106,61 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         OccupancyIntegrator opi = getOccupancyIntegrator();
         PropertyIntegrator pri = getPropertyIntegrator();
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
 
         try {
             reasonList = opi.getOccPermitApplicationReasons();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        
-        // check if we're working with an internal user or the public form
-        if(getSessionBean().getSessUser() != null){
-            
-            // internal user procedure
-            
-            selectedMuni = getSessionBean().getSessMuni();
-            Property p = getSessionBean().getSessProperty();
-            workingPropUnits = p.getUnitList();
-            
 
+        currentApplication = getSessionBean().getSessOccPermitApplication();
+
+        searchPerson = new Person();
+
+        // check if we're working with an internal user or the public form
+        if (getSessionBean().getSessUser() != null) {
+
+            // internal user procedure
+            // TODO: Internal users should probably get their own BB. 
+            //This BB has been stuffed will PublicInfoBundles to keep stuff anonymized
+            /*
+            selectedMuni = getSessionBean().getSessMuni();
+            Property p = getSessionBean().getSessProperty;
+            workingPropUnits = p.getUnitList();
+             */
         } else { // start public user init procedure
-            
+
             prop = getSessionBean().getOccPermitAppActiveProp();
+
+            selectedMuni = getSessionBean().getSessMuniQueued();
 
             if (prop != null) {
 
-                if (getSessionBean().getOccPermitAppWorkingProp() == null 
-                        || 
-                    !getSessionBean().getOccPermitAppWorkingProp().getAddress().equalsIgnoreCase(prop.getAddress())) {
+                if (getSessionBean().getOccPermitAppWorkingProp() == null
+                        || !getSessionBean().getOccPermitAppWorkingProp().getBundledProperty().getAddress().equalsIgnoreCase(prop.getBundledProperty().getAddress())) {
 
                     workingPropUnits = prop.getUnitList();
 
                     if (workingPropUnits == null) {
 
-                        prop.setUnitList(new ArrayList<PropertyUnit>());
+                        prop.setUnitList(new ArrayList<PublicInfoBundlePropertyUnit>());
                         workingPropUnits = new ArrayList<>();
 
                     } else {
                         try {
-                            workingPropUnits = pri.getPropertyUnitList(prop);
-                        } catch (IntegrationException ex) {
+
+                            List<PropertyUnit> unbundledUnits = pri.getPropertyUnitList(prop.getBundledProperty());
+
+                            workingPropUnits = new ArrayList<>();
+
+                            for (PropertyUnit unit : unbundledUnits) {
+                                workingPropUnits.add(pic.extractPublicInfo(unit));
+                            }
+
+                        } catch (IntegrationException | AuthorizationException
+                                | BObStatusException | EventException
+                                | SearchException ex) {
 
                             System.out.println(ex);
                         }
@@ -141,7 +175,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             }
 
             if (attachedPersons == null && getSessionBean().getSessOccPermitApplication() != null) {
-                attachedPersons = getSessionBean().getSessOccPermitApplication().getAttachedPersons();
+
+                attachedPersons = getSessionBean().getOccPermitAttachedPersons();
+
                 if (attachedPersons == null) {
                     attachedPersons = new ArrayList();
                 }
@@ -149,11 +185,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
-        //I apologize for the ugly code. It is necessary to prevent a null pointer exception. - Nathan
-        if (getSessionBean().getSessOccPermitApplication() != null
-                && getSessionBean().getSessOccPermitApplication().getReason() != null
-                && getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement() != null) { 
-
+        try {
             requiredPersons = getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getRequiredPersonTypes();
 
             optAndReqPersons = new ArrayList<>();
@@ -161,19 +193,23 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             optAndReqPersons.addAll(requiredPersons);
 
             optAndReqPersons.addAll(getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes());
-
+        } catch (NullPointerException ex) {
+            //Do nothing. The try block simply acts as an optimized null pointer check.
+            //requiredPersonTypes is so deep that otherwise there would have to be three if statements
+            //to make this code safe
         }
 
     } // end postConstruct
-    
-    
-    public String beginInternalOccApp(PropertyUnit pu) throws IntegrationException, BObStatusException{
+
+    /* TODO: Move to internal Occ App BB
+    public String beginInternalOccApp(PublicInfoBundlePropertyUnit pu) throws IntegrationException, BObStatusException {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
-        
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
+
         OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
         getSessionBean().setSessOccPermitApplication(occpermitapp);
-        
+
         getSessionBean().setOccPermitAppActiveProp(pi.getProperty(getSessionBean().getSessProperty().getPropertyID()));
 
         if (prop.getUnitList().size() == 1) {
@@ -181,14 +217,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             getSessionBean().setOccPermitAppActivePropUnit(propertyUnitList.get(0));
             getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(pu);
         }
-        
-        
-        
-        return "beginInternalOccUpp";
-        
-    }
-    
 
+        return "beginInternalOccUpp";
+
+    }*/
     /**
      * Set the user-selected municipality. The property search will be done
      * within this municipality.
@@ -202,7 +234,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                             "Please select a municipality.", ""));
             return "";
         }
-//        getSessionBean().recordSelectedMuni(selectedMuni);
+        getSessionBean().setSessMuniQueued(selectedMuni);
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
         getSessionBean().setSessOccPermitApplication(occpermitapp);
@@ -213,57 +245,98 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      * Searches for a property within the activeMuni set on the SessionBean.
      */
     public void searchForPropertiesSingleMuni() {
-        PropertyIntegrator pi = getPropertyIntegrator();
-        Municipality activeMuni = getSessionBean().getSessMuni();
+        SearchCoordinator sc = getSearchCoordinator();
+        UserCoordinator uc = getUserCoordinator();
 
-        // TODO: occ beta adapt to new search params
-//        try {
-//            propList = pi.searchForProperties(houseNum, streetName, activeMuni.getMuniCode());
+        propList = new ArrayList<>();
 
-            if (propList.size() > 50) {
-                propList.subList(50, propList.size()).clear(); //Limits the search to 50 results.  
+        QueryProperty qp = null;
+
+        try {
+            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.getPublicUserAuthorized().getMyCredential());
+
+            if (qp != null && !qp.getParamsList().isEmpty()) {
+                SearchParamsProperty spp = qp.getPrimaryParams();
+                spp.setAddress_ctl(true);
+                spp.setAddress_val(houseNum + " " + streetName);
+                spp.setMuni_ctl(true);
+                spp.setMuni_val(selectedMuni);
+                spp.setLimitResultCount_ctl(true);
+                spp.setLimitResultCount_val(20);
+
+                sc.runQuery(qp);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Your search completed with " + getPropList().size() + " results", ""));
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Something when wrong with the property search! Sorry!", ""));
             }
+
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println(ex);
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Your search completed with " + getPropList().size() + " result(s)", ""));
-//        } catch (IntegrationException ex) {
-//            System.out.println(ex);
-//            getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                            "Unable to complete a property search! Sorry!", ""));
-//        }
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something when wrong with the property search! Sorry!", ""));
+        }
+
+        if (qp != null && !qp.getBOBResultList().isEmpty()) {
+            PublicInfoCoordinator pic = getPublicInfoCoordinator();
+
+            List<Property> unbundled = qp.getBOBResultList();
+            propList = new ArrayList<>();
+
+            for (Property p : unbundled) {
+                try {
+                    propList.add(pic.extractPublicInfo(p));
+                } catch (AuthorizationException | BObStatusException
+                        | EventException | IntegrationException
+                        | SearchException ex) {
+                    System.out.print("OccPermitApplicationBB.searchForPropertiesSingleMuni() | ERROR: " + ex);
+                }
+            }
+
+        }
     }
 
-    /**
+    /*
      * For multiunit properties: Gets the list of property units. For
      * non-multiunit properties: Sets the activePropertyUnit to default unit.
      *
      * Its functionality has been moved to the
      *
-     * @deprecated
+     * deprecated public void onPropertySelection() { PropertyCoordinator pc =
+     * getPropertyCoordinator();
+     *
+     * getSessionBean().setOccPermitAppActiveProp(prop);
+     *
+     * if (prop.getUnitList().size() == 1) { List<PropertyUnit> propertyUnitList
+     * = prop.getUnitList();
+     * getSessionBean().setOccPermitAppActivePropUnit(propertyUnitList.get(0));
+     * getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
+     * } }
      */
-    public void onPropertySelection() {
-        PropertyCoordinator pc = getPropertyCoordinator();
-
-        getSessionBean().setOccPermitAppActiveProp(prop);
-
-        if (prop.getUnitList().size() == 1) {
-            List<PropertyUnit> propertyUnitList = prop.getUnitList();
-            getSessionBean().setOccPermitAppActivePropUnit(propertyUnitList.get(0));
-            getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
-        }
-    }
-
     /**
      * Adds a blank unit to propUnitsToAdd list. This newly-created unit can
      * then be selected and edited by the user.
      */
     public void addUnitToNewPropUnits() {
         PropertyCoordinator pc = getPropertyCoordinator();
-        unitToAdd = pc.initPropertyUnit(selectedProperty);
-        unitToAdd.setUnitNumber("");
-//        unitToAdd.setRental(false);
-        unitToAdd.setNotes("");
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
+        PropertyUnit newUnit = pc.initPropertyUnit(selectedProperty.getBundledProperty());
+        newUnit.setUnitNumber("");
+//        newUnit.setRental(false);
+        newUnit.setNotes("");
+
+        try {
+            unitToAdd = pic.extractPublicInfo(newUnit);
+        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
+            System.out.print("OccPermitApplicationBB.addUnitToNewPropUnits() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to add a new unit! Please try again.", ""));
+        }
 
         if (workingPropUnits == null) {
             workingPropUnits = new ArrayList<>();
@@ -278,7 +351,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      *
      * @param selectedUnit
      */
-    public void removeSelectedUnit(PropertyUnit selectedUnit) {
+    public void removeSelectedUnit(PublicInfoBundlePropertyUnit selectedUnit) {
         workingPropUnits.remove(selectedUnit);
         clearAddUnitFormValues();
     }
@@ -301,10 +374,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public String selectProperty() {
 
-        PropertyCoordinator pc = getPropertyCoordinator();
-
         if (selectedProperty != null) {
-// todo occbeta
+// TODO: occbeta
+//        PropertyCoordinator pc = getPropertyCoordinator();
+
 //            if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
 //                try {
 //                    propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
@@ -318,21 +391,36 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //                    System.out.println(ex);
 //                }
 //            }
-
             getSessionBean().setOccPermitAppActiveProp(prop);
 
             if (prop.getUnitList().size() == 1) {
-                List<PropertyUnit> propertyUnitList = prop.getUnitList();
+                PublicInfoCoordinator pic = getPublicInfoCoordinator();
+
+                List<PublicInfoBundlePropertyUnit> propertyUnitList = prop.getUnitList();
                 getSessionBean().setOccPermitAppActivePropUnit(propertyUnitList.get(0));
-                getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
+
+                try {
+
+                    PropertyUnit p = pic.export(propertyUnitList.get(0));
+
+                    getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(p);
+
+                } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
+                    System.out.print("OccPermitApplicationBB.selectProperty() | ERROR: " + ex);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "An error occured while trying to select a property! Please try again.", ""));
+                    return "";
+                }
+
             }
-            
+
             try {
                 ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
                 ec.redirect("/tcvce/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep");
             } catch (IOException ex) {
             }
-            
+
             return "addPropertyUnit";
         } else {
 
@@ -351,67 +439,36 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      * @param unit
      * @return
      */
-    public String selectPropertyUnit(PropertyUnit unit) {
+    public String selectPropertyUnit(PublicInfoBundlePropertyUnit unit) {
 
-        boolean missingUnitNum = false;
-        boolean duplicateUnitNum = false;
-        int duplicateNums = 0; //The above boolean is a flag to see if there is more than 1 of  Unit Number. The int to the left stores how many of a given number the loop below finds.
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
 
-        for (PropertyUnit firstUnit : workingPropUnits) {
-            duplicateNums = 0;
+        unit.getBundledUnit().setPropertyID(getSessionBean().getOccPermitAppActiveProp().getBundledProperty().getPropertyID());
+        getSessionBean().setOccPermitAppActivePropUnit(unit);
 
-            if (firstUnit.getUnitNumber().compareTo("") == 0) {
-                missingUnitNum = true;
-                break; //break for performance reasons. Can be removed if breaks are not welcome here.
-            }
+        try {
 
-            for (PropertyUnit secondUnit : workingPropUnits) {
-                if (firstUnit.getUnitNumber().compareTo(secondUnit.getUnitNumber()) == 0) {
-                    duplicateNums++;
-                }
-            }
+            PropertyUnit p = pic.export(unit);
 
-            if (duplicateNums > 1) {
-                duplicateUnitNum = true;
-                break; //break for performance reasons. Can be removed if breaks are not welcome here.
-            }
+            getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(p);
+
+        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
+            System.out.print("OccPermitApplicationBB.selectPropertyUnit() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to select a property Unit! Please try again.", ""));
+            return "";
         }
 
-        if (workingPropUnits.isEmpty()) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please add at least one unit.", ""));
-            return "";
-        } else if (missingUnitNum) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "All units must have a Unit Number", ""));
-            return "";
-
-        } else if (duplicateUnitNum) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Some Units have the same Number", ""));
-            return "";
-
-        } else {
-            unit.setPropertyID(getSessionBean().getOccPermitAppActiveProp().getPropertyID());
-            getSessionBean().setOccPermitAppActivePropUnit(unit);
-            getSessionBean().getSessOccPermitApplication().setApplicationPropertyUnit(unit);
-
-            try {
+        try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-            
-                ec.redirect("/tcvce/public/services/occPermitApplicationFlow/occPermitAddReason.xhtml#currentStep");
-            } catch (IOException ex) {
-            }
-            
-            return "addReason";
+
+            ec.redirect("/tcvce/public/services/occPermitApplicationFlow/occPermitAddReason.xhtml#currentStep");
+        } catch (IOException ex) {
         }
+
+        return "addReason";
     }
-  
-    
-    
 
     /**
      * Finalizes the unit list the user has created so that it can be compared
@@ -421,64 +478,27 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public String finalizeUnitList() {
 
-        boolean missingUnitNum = false;
-        boolean duplicateUnitNum = false;
-        int duplicateNums = 0; //The above boolean is a flag to see if there is more than 1 of  Unit Number. The int to the left stores how many of a given number the loop below finds.
-
-        for (PropertyUnit firstUnit : workingPropUnits) {
-            duplicateNums = 0;
-
-            firstUnit.setUnitNumber(firstUnit.getUnitNumber().replaceAll("(?i)unit", ""));
-
-            if (firstUnit.getUnitNumber().compareTo("") == 0) {
-                missingUnitNum = true;
-                break; //break for performance reasons. Can be removed if breaks are not welcome here.
-            }
-
-            for (PropertyUnit secondUnit : workingPropUnits) {
-                if (firstUnit.getUnitNumber().compareTo(secondUnit.getUnitNumber()) == 0) {
-                    duplicateNums++;
-                }
-            }
-
-            if (duplicateNums > 1) {
-                duplicateUnitNum = true;
-                break; //break for performance reasons. Can be removed if breaks are not welcome here.
-            }
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
+        try {
+            workingPropUnits = pic.sanitizePublicPropertyUnitList(workingPropUnits);
+        } catch (BObStatusException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.toString(), ""));
+            return "";
         }
+//          getSessionBean().getOccPermitApplication().setMultiUnit(workingPropUnits.size() > 1); //if there is more than one unit on the workingPropUnits list, set it to multiunit.
+        getSessionBean().getOccPermitAppWorkingProp().setUnitList(workingPropUnits);
+        getSessionBean().getOccPermitAppActiveProp().setUnitList(workingPropUnits); //This line is different from the original method (above)
 
-        if (workingPropUnits.isEmpty()) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please add at least one unit.", ""));
-            return "";
-        } else if (missingUnitNum) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "All units must have a Unit Number", ""));
-            return "";
-
-        } else if (duplicateUnitNum) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Some Units have the same Number", ""));
-            return "";
-
-        } else {
-//            getSessionBean().getOccPermitApplication().setMultiUnit(workingPropUnits.size() > 1); //if there is more than one unit on the workingPropUnits list, set it to multiunit.
-            getSessionBean().getOccPermitAppWorkingProp().setUnitList(workingPropUnits);
-            getSessionBean().getOccPermitAppActiveProp().setUnitList(workingPropUnits); //This line is different from the original method (above)
-            
-            try {
+        try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-   
-            
-                ec.redirect("/tcvce/public/services/occPermitApplicationFlow/occPermitSelectForApply.xhtml#currentStep");
-            } catch (IOException ex) {
-            }
-            
-            return "selectForApply";
+
+            ec.redirect("/tcvce/public/services/occPermitApplicationFlow/occPermitSelectForApply.xhtml#currentStep");
+        } catch (IOException ex) {
         }
+
+        return "selectForApply";
 
     }
 
@@ -517,12 +537,66 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public String storeReason() {
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-            
-                ec.redirect("/tcvce/public/services/occPermitApplicationFlow/personsRequirementManage.xhtml#currentStep");
-            } catch (IOException ex) {
-            }
-        
+
+            ec.redirect("/tcvce/public/services/occPermitApplicationFlow/personsRequirementManage.xhtml#currentStep");
+        } catch (IOException ex) {
+        }
+
         return "managePeople";
+    }
+
+    public void searchForPersons() {
+
+        UserCoordinator uc = getUserCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
+
+        QueryPerson qp = null;
+
+        try {
+
+            qp = sc.initQuery(QueryPersonEnum.PERSON_NAME, uc.getPublicUserAuthorized().getMyCredential());
+
+            if (qp != null && !qp.getParamsList().isEmpty()) {
+                SearchParamsPerson spp = qp.getPrimaryParams();
+                spp.setName_last_ctl(true);
+                spp.setName_last_val(searchPerson.getLastName());
+                spp.setName_first_ctl(true);
+                spp.setName_first_val(searchPerson.getFirstName());
+                spp.setEmail_ctl(true);
+                spp.setEmail_val(searchPerson.getEmail());
+                spp.setPhoneNumber_ctl(true);
+                spp.setPhoneNumber_val(searchPerson.getPhoneCell());
+                spp.setAddress_streetNum_ctl(true);
+                spp.setAddress_streetNum_val(searchPerson.getAddressStreet());
+                sc.runQuery(qp);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Your search completed with " + personSearchResults.size() + " results", ""));
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Something when wrong with the person search! Sorry!", ""));
+            }
+
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something when wrong with the person search! Sorry!", ""));
+        }
+
+        if (qp != null && !qp.getBOBResultList().isEmpty()) {
+
+            PublicInfoCoordinator pic = getPublicInfoCoordinator();
+            List<Person> skeletonHorde = qp.getBOBResultList();
+            personSearchResults = new ArrayList<>();
+
+            for (Person skeleton : skeletonHorde) {
+                personSearchResults.add(pic.extractPublicInfo(skeleton));
+            }
+
+        }
+
     }
 
     /*
@@ -545,15 +619,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         return "searchPeople";
     }
 
-    public void addPersonToApplication(Person person) {
+    public void addPersonToApplication(PublicInfoBundlePerson person) {
 
         boolean duplicateFlag = false;
 
-        person.setPersonType(PersonType.Other);
+        person.getBundledPerson().setPersonType(PersonType.Other);
 
-        for (Person test : attachedPersons) {
+        for (PublicInfoBundlePerson test : attachedPersons) {
 
-            if (test.getPersonID() == person.getPersonID()) {
+            if (test.getBundledPerson().getPersonID() == person.getBundledPerson().getPersonID()) {
 
                 duplicateFlag = true;
 
@@ -575,10 +649,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
     }
 
-    public void removePersonFromApplication(Person person) {
+    public void removePersonFromApplication(PublicInfoBundlePerson person) {
         attachedPersons.remove(person);
     }
 
+    /*
+    Currently not used by the interface
     public String editPersonInfo(Person person) {
         person.setPersonType(getSessionBean().getOccPermitAppActivePersonType());
         attachedPersons = getSessionBean().getSessOccPermitApplication().getAttachedPersons();
@@ -590,12 +666,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         getSessionBean().setActiveAnonPerson(person);
         return "editPerson";
     }
-
+     */
     public String addANewPerson() {
-        OccPermitApplication temp = getSessionBean().getSessOccPermitApplication();
 
-        for (Person p : attachedPersons) {
-// todo occbeta
+//         for (Person p : attachedPersons) {
+// TODO: occbeta: Add a "set as applicant" button on each row holding a person. It will simply overwrite the current applicant.
 //            if (p.isApplicant()) {
 //
 //                if (applicant == null) {
@@ -611,14 +686,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //                }
 //
 //            }
+//    }
+        attachedPersons.add(new PublicInfoBundlePerson());
 
-        }
-
-        temp.setApplicantPerson(applicant);
-
-        temp.setAttachedPersons(attachedPersons);
-
-        return "addPerson";
+        return "";
     }
 
     public List<String> getPersonRequirementDescription() {
@@ -633,7 +704,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         for (PersonType type : required) {
 
-            description.append(type.getLabel() + ", ");
+            description.append(type.getLabel()).append(", ");
 
         }
 
@@ -647,7 +718,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         for (PersonType type : optional) {
 
-            description.append(type.getLabel() + ", ");
+            description.append(type.getLabel()).append(", ");
 
         }
 
@@ -669,7 +740,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public String reviewApplication() {
 
-        applicant = null;
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
 
         List<Integer> countTypes = new ArrayList();
 
@@ -678,15 +749,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             countTypes.add(0);
 
         }
-        for (Person p : attachedPersons) {
+        for (PublicInfoBundlePerson p : attachedPersons) {
 
-            int index = p.getPersonType().ordinal();
+            int index = p.getBundledPerson().getPersonType().ordinal();
 
             int temp = countTypes.get(index) + 1;
 
             countTypes.set(index, temp);
 
-//            todo occbeta
+//            TODO: occbeta
 //            if (p.isApplicant()) {
 //
 //                if (applicant == null) {
@@ -702,7 +773,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //                }
 //
 //            }
-
         }
 
         for (PersonType type : requiredPersons) {
@@ -725,17 +795,17 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             return "";
         }
 
-        getSessionBean().getSessOccPermitApplication().setApplicantPerson(applicant);
+        getSessionBean().setOccPermitApplicant(applicant);
 
-        getSessionBean().getSessOccPermitApplication().setAttachedPersons(attachedPersons);
+        getSessionBean().setOccPermitAttachedPersons(attachedPersons);
 
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-            
-                ec.redirect("/tcvce/public/services/occPermitApplicationFlow/reviewAndSubmit.xhtml");
-            } catch (IOException ex) {
-            }
-        
+
+            ec.redirect("/tcvce/public/services/occPermitApplicationFlow/reviewAndSubmit.xhtml");
+        } catch (IOException ex) {
+        }
+
         return "reviewApplication";
     }
 
@@ -743,7 +813,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         submitUnitChangeList();
 
-        OccupancyIntegrator opi = getOccupancyIntegrator();        
+        OccupancyIntegrator opi = getOccupancyIntegrator();
         try {
             int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getSessOccPermitApplication());
             getSessionBean().getSessOccPermitApplication().setId(applicationId);
@@ -759,54 +829,62 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         List<PropertyUnitChangeOrder> changeList = new ArrayList<>();
 
+        List<PropertyUnit> currentUnitList = new ArrayList<>();
+
         PropertyIntegrator pri = getPropertyIntegrator();
 
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
+
         PropertyDataHeavy existingProp = new PropertyDataHeavy();
-        
+
         Person changedby = getSessionBean().getSessOccPermitApplication().getApplicantPerson();
 
-        // TODO: Occbeta
-
+//         TODO: Occbeta
 //        try {
 //            existingProp = pri.getPropertyDataHeavy(prop.getPropertyID());
 //                    
 //        } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
 //            System.out.println(ex);
 //        }
-        
-        for (PropertyUnit workingUnit : workingPropUnits) {
+        for (PublicInfoBundlePropertyUnit bundle : workingPropUnits) {
+            try {
+                currentUnitList.add(pic.export(bundle));
+            } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
+                System.out.println("OccPermitApplicationBB.submitUnitChangeList() | ERROR: " + ex);
+            }
+
+        }
+
+        for (PropertyUnit workingUnit : currentUnitList) {
 
             PropertyUnitChangeOrder skeleton = new PropertyUnitChangeOrder();
 
             boolean added = true;
 
             skeleton.setPropertyID(getSessionBean().getSessOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
-            
-            if (changedby.getPersonID() != 0)
-            {
-                
+
+            if (changedby.getPersonID() != 0) {
+
                 PersonIntegrator pi = getPersonIntegrator();
-                
+
                 Person temp = new Person();
-                
+
                 try {
                     temp = pi.getPerson(changedby.getPersonID());
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                 }
-                
+
                 String changeName = temp.getFirstName() + " " + temp.getLastName() + " ID: " + temp.getPersonID();
-                
+
                 skeleton.setChangedBy(changeName);
-                
-            }
-            else
-            {
-            
+
+            } else {
+
                 skeleton.setChangedBy(changedby.getFirstName() + " " + changedby.getLastName());
-                
+
             }
-            
+
             for (PropertyUnit activeUnit : existingProp.getUnitList()) {
 
                 if (workingUnit.getUnitID() == activeUnit.getUnitID() && workingUnit.getUnitID() != 0) {
@@ -814,13 +892,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                     added = false;
 
                     skeleton.setUnitID(workingUnit.getUnitID());
-                    
-                    if(workingUnit.getUnitNumber() != null) {
-                        
+
+                    if (workingUnit.getUnitNumber() != null) {
+
                         skeleton.setUnitNumber(workingUnit.getUnitNumber());
-                        
+
                     }
-                    
+
                     if (workingUnit.getOtherKnownAddress() != null && workingUnit.getOtherKnownAddress().compareToIgnoreCase(activeUnit.getOtherKnownAddress()) != 0) {
 
                         skeleton.setOtherKnownAddress(workingUnit.getOtherKnownAddress());
@@ -833,12 +911,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                     }
 
-//                    if (workingUnit.isRental() != activeUnit.isRental()) {
-//
-//                        skeleton.setRental(workingUnit.isRental());
-//
-//                    }
+                    if (workingUnit.getRentalNotes().compareToIgnoreCase(activeUnit.getRentalNotes()) != 0) {
 
+                        skeleton.setRentalNotes(workingUnit.getRentalNotes());
+
+                    }
                 }
 
             }
@@ -846,13 +923,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             if (added == true) {
 
                 skeleton.setUnitNumber(workingUnit.getUnitNumber());
-                
+
                 skeleton.setOtherKnownAddress(workingUnit.getOtherKnownAddress());
 
                 skeleton.setNotes(workingUnit.getNotes());
 
-//                skeleton.setRental(workingUnit.isRental());
-
+                skeleton.setRentalNotes(workingUnit.getRentalNotes());
             }
 
             skeleton.setAdded(added);
@@ -869,34 +945,31 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             PropertyUnitChangeOrder skeleton = new PropertyUnitChangeOrder();
 
             skeleton.setPropertyID(getSessionBean().getSessOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
-            
-            if (changedby.getPersonID() != 0)
-            {
-                
+
+            if (changedby.getPersonID() != 0) {
+
                 PersonIntegrator pi = getPersonIntegrator();
-                
+
                 Person temp = new Person();
-                
+
                 try {
                     temp = pi.getPerson(changedby.getPersonID());
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                 }
-                
+
                 String changeName = temp.getFirstName() + " " + temp.getLastName() + " ID: " + temp.getPersonID();
-                
+
                 skeleton.setChangedBy(changeName);
-            }
-            else
-            {
-            
+            } else {
+
                 skeleton.setChangedBy(changedby.getFirstName() + " " + changedby.getLastName());
-                
+
             }
-            
+
             boolean removed = true;
 
-            for (PropertyUnit workingUnit : workingPropUnits) {
+            for (PropertyUnit workingUnit : currentUnitList) {
 
                 if (workingUnit.getUnitID() == activeUnit.getUnitID()) {
 
@@ -909,14 +982,14 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             if (removed == true) {
 
                 skeleton.setUnitID(activeUnit.getUnitID());
-                
+
                 skeleton.setUnitNumber(activeUnit.getUnitNumber());
-                
+
                 skeleton.setOtherKnownAddress(activeUnit.getOtherKnownAddress());
 
                 skeleton.setNotes(activeUnit.getNotes());
 
-//                skeleton.setRental(activeUnit.isRental());
+                skeleton.setRentalNotes(activeUnit.getRentalNotes());
 
                 skeleton.setRemoved(removed);
 
@@ -938,7 +1011,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         System.out.println("end of submitting unit change list");
     }
-    
+
     /**
      * @return the selectedMuni
      */
@@ -983,11 +1056,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         this.streetName = streetName;
     }
 
-    public List<Property> getPropList() {
+    public List<PublicInfoBundleProperty> getPropList() {
         return propList;
     }
 
-    public void setPropList(List<Property> propList) {
+    public void setPropList(List<PublicInfoBundleProperty> propList) {
         this.propList = propList;
     }
 
@@ -1032,14 +1105,14 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     /**
      * @return the contactPerson
      */
-    public Person getContactPerson() {
+    public PublicInfoBundlePerson getContactPerson() {
         return contactPerson;
     }
 
     /**
      * @param contactPerson the contactPerson to set
      */
-    public void setContactPerson(Person contactPerson) {
+    public void setContactPerson(PublicInfoBundlePerson contactPerson) {
         this.contactPerson = contactPerson;
     }
 
@@ -1060,56 +1133,56 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     /**
      * @return the propWithLists
      */
-    public Property getProp() {
+    public PublicInfoBundleProperty getProp() {
         return prop;
     }
 
     /**
      * @param p the propWithLists to set
      */
-    public void setProp(Property p) {
+    public void setProp(PublicInfoBundleProperty p) {
         this.prop = p;
     }
 
     /**
      * @return the selectedProperty
      */
-    public Property getSelectedProperty() {
+    public PublicInfoBundleProperty getSelectedProperty() {
         return selectedProperty;
     }
 
     /**
      * @param selectedProperty the selectedProperty to set
      */
-    public void setSelectedProperty(Property selectedProperty) {
+    public void setSelectedProperty(PublicInfoBundleProperty selectedProperty) {
         this.selectedProperty = selectedProperty;
     }
 
     /**
      * @return the selectedUnit
      */
-    public PropertyUnit getSelectedUnit() {
+    public PublicInfoBundlePropertyUnit getSelectedUnit() {
         return selectedUnit;
     }
 
     /**
      * @param selectedUnit the selectedUnit to set
      */
-    public void setSelectedUnit(PropertyUnit selectedUnit) {
+    public void setSelectedUnit(PublicInfoBundlePropertyUnit selectedUnit) {
         this.selectedUnit = selectedUnit;
     }
 
     /**
      * @return the unitToAdd
      */
-    public PropertyUnit getUnitToAdd() {
+    public PublicInfoBundlePropertyUnit getUnitToAdd() {
         return unitToAdd;
     }
 
     /**
      * @param unitToAdd the unitToAdd to set
      */
-    public void setUnitToAdd(PropertyUnit unitToAdd) {
+    public void setUnitToAdd(PublicInfoBundlePropertyUnit unitToAdd) {
         this.unitToAdd = unitToAdd;
     }
 
@@ -1126,14 +1199,14 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     /**
      * @return the propUnitsToAdd
      */
-    public List<PropertyUnit> getWorkingPropUnits() {
+    public List<PublicInfoBundlePropertyUnit> getWorkingPropUnits() {
         return workingPropUnits;
     }
 
     /**
      * @param propUnitsToAdd the propUnitsToAdd to set
      */
-    public void setWorkingPropUnits(List<PropertyUnit> propUnitsToAdd) {
+    public void setWorkingPropUnits(List<PublicInfoBundlePropertyUnit> propUnitsToAdd) {
         this.workingPropUnits = propUnitsToAdd;
     }
 
@@ -1221,19 +1294,19 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         this.params = params;
     }
 
-    public Person getApplicant() {
+    public PublicInfoBundlePerson getApplicant() {
         return applicant;
     }
 
-    public void setApplicant(Person applicant) {
+    public void setApplicant(PublicInfoBundlePerson applicant) {
         this.applicant = applicant;
     }
 
-    public List<Person> getAttachedPersons() {
+    public List<PublicInfoBundlePerson> getAttachedPersons() {
         return attachedPersons;
     }
 
-    public void setAttachedPersons(List<Person> attachedPersons) {
+    public void setAttachedPersons(List<PublicInfoBundlePerson> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
 
@@ -1266,5 +1339,29 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public void setOptAndReqPersons(List<PersonType> optAndReqPersons) {
         this.optAndReqPersons = optAndReqPersons;
     }
-    
+
+    public OccPermitApplication getCurrentApplication() {
+        return currentApplication;
+    }
+
+    public void setCurrentApplication(OccPermitApplication currentApplication) {
+        this.currentApplication = currentApplication;
+    }
+
+    public Person getSearchPerson() {
+        return searchPerson;
+    }
+
+    public void setSearchPerson(Person searchPerson) {
+        this.searchPerson = searchPerson;
+    }
+
+    public List<PublicInfoBundlePerson> getPersonSearchResults() {
+        return personSearchResults;
+    }
+
+    public void setPersonSearchResults(List<PublicInfoBundlePerson> personSearchResults) {
+        this.personSearchResults = personSearchResults;
+    }
+
 }

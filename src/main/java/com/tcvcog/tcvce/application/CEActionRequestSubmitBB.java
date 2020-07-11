@@ -35,7 +35,6 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
-//import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
@@ -61,27 +60,25 @@ import org.primefaces.event.FileUploadEvent;
  */
 public class CEActionRequestSubmitBB extends BackingBeanUtils implements Serializable {
 
-    // for request lookup
     private CEActionRequest currentRequest;
 
     private Person currentPerson;
     private int actionRequestorAssignmentMethod;
     private List<Person> personCandidateList;
     private boolean disabledPersonFormFields;
-    private Person skeleton;
 
     private TabView tabView;
     private int currentTabIndex;
 
-    private List<Property> propList;
+    private List<Property> propList; //TODO: Turn into PublicInfoBundles!
 
     private String houseNum;
     private String streetName;
 
     private Municipality selectedMuni;
 
-    private Property selectedProperty;
-
+    private Property selectedProperty; //TODO: Turn into PublicInfoBundle!
+    
     private List<CEActionRequestIssueType> issueTypeList;
 
     private boolean form_atSpecificAddress;
@@ -830,20 +827,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public void setDisabledPersonFormFields(boolean disabledPersonFormFields) {
         this.disabledPersonFormFields = disabledPersonFormFields;
-    }
-
-    /**
-     * @return the skeleton
-     */
-    public Person getSkeleton() {
-        return skeleton;
-    }
-
-    /**
-     * @param skeleton the skeleton to set
-     */
-    public void setSkeleton(Person skeleton) {
-        this.skeleton = skeleton;
     }
 
     public int getCurrentTabIndex() {

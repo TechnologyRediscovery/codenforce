@@ -36,8 +36,7 @@ public class PropertyUnitChangeOrder {
     private String unitNumber;
     private String otherKnownAddress;
     private String notes;
-    private boolean rental;
-    private boolean boolChanged; //this stores if the rental variable was changed, not whether or not the unit is a rental.
+    private String rentalNotes;
     private boolean removed;
     private boolean added;
     private java.sql.Timestamp changedOn;
@@ -107,14 +106,13 @@ public class PropertyUnitChangeOrder {
         this.notes = notes;
     }
 
-    public boolean isRental() {
-        return rental;
+    public String getRentalNotes() {
+        return rentalNotes;
     }
 
-    public void setRental(boolean rental) {
+    public void setRentalNotes(String rental) {
 
-        boolChanged = true;
-        this.rental = rental;
+        rentalNotes = rental;
     }
 
     public boolean isRemoved() {
@@ -139,10 +137,6 @@ public class PropertyUnitChangeOrder {
 
     public void setApprovedOn(Timestamp approvedOn) {
         this.approvedOn = approvedOn;
-    }
-
-    public boolean isBoolChanged() {
-        return boolChanged;
     }
 
     public boolean isAdded() {
@@ -180,15 +174,6 @@ public class PropertyUnitChangeOrder {
     }
     
     /**
-     * USE SPARINGLY.This variable is already managed by setRental.
-     *
-     * @param boolChanged
-     */
-    public void setBoolChanged(boolean boolChanged) {
-        this.boolChanged = boolChanged;
-    }
-    
-    /**
      * Detects if the unit has actually been changed.
      * @return 
      */
@@ -206,7 +191,7 @@ public class PropertyUnitChangeOrder {
             temp = true;
         }
 
-        if (boolChanged == true) {
+        if (rentalNotes != null) {
 
             temp = true;
 

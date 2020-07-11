@@ -150,7 +150,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         }
         return puwll;
     }
-    
+
     /**
      *
      * @param propUnit
@@ -163,12 +163,79 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public PropertyUnitDataHeavy getPropertyUnitWithLists(PropertyUnit propUnit, Credential cred) throws IntegrationException, EventException, EventException, AuthorizationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
-            try {
-                return configurePropertyUnitDataHeavy(pi.getPropertyUnitWithLists(propUnit.getUnitID()), cred);
-            } catch (ViolationException ex) {
-                System.out.println(ex);
+        try {
+            return configurePropertyUnitDataHeavy(pi.getPropertyUnitWithLists(propUnit.getUnitID()), cred);
+        } catch (ViolationException ex) {
+            System.out.println(ex);
+        }
+        return new PropertyUnitDataHeavy(propUnit); //just in case something goes horribly wrong
+    }
+
+    /**
+     * Accepts a List of PropertyUnit objects, validates the input to make sure
+     * it is acceptable, sanitizes it, then tosses it back.
+     *
+     * @param input
+     * @return
+     * @throws BObStatusException if the input is not acceptable.
+     */
+    public List<PropertyUnit> sanitizePropertyUnitList(List<PropertyUnit> input) throws BObStatusException {
+
+        int duplicateNums; //The above boolean is a flag to see if there is more than 1 of  Unit Number. The int to the left stores how many of a given number the loop below finds.
+
+        if (input.isEmpty()) {
+            throw new BObStatusException("Please add at least one unit.");
+        }
+
+        //use a numeric for loop instead of iterating through the objects so that we can store 
+        //the sanitized units
+        for (int index = 0; index < input.size(); index++) {
+            duplicateNums = 0;
+
+            for (PropertyUnit secondUnit : input) {
+                if (input.get(index).getUnitNumber().compareTo(secondUnit.getUnitNumber()) == 0) {
+                    duplicateNums++;
+                }
             }
-            return new PropertyUnitDataHeavy(propUnit); //just in case something goes horribly wrong
+
+            if (duplicateNums > 1) {
+                throw new BObStatusException("Some Units have the same Number");
+
+            }
+
+            input.set(index, sanitizePropertyUnit(input.get(index)));
+        }
+
+        return input;
+
+    }
+
+    /**
+     * Accepts a PropertyUnit object, validates the input to make sure it is
+     * acceptable, sanitizes it, then tosses it back.
+     *
+     * @param input
+     * @return
+     * @throws BObStatusException if the input is not acceptable.
+     */
+    public PropertyUnit sanitizePropertyUnit(PropertyUnit input) throws BObStatusException {
+
+        input.setUnitNumber(input.getUnitNumber().replaceAll("(?i)unit", ""));
+
+        if (input.getUnitNumber().compareTo("") == 0) {
+            throw new BObStatusException("All units must have a Unit Number");
+        }
+
+        if (input.getUnitNumber().compareTo("-1") == 0) {
+            if (input.getNotes() == null || input.getNotes().compareTo("robot-generated unit representing the primary habitable dwelling on a property") != 0) {
+                throw new BObStatusException("The unit number -1 is used for default property units. Please use another number or \'-[space]1\'.");
+            }
+            throw new BObStatusException("Please change the robot-generated unit to something more meaningful.");
+
+        }
+
+        return input;
+
     }
 
     /**
@@ -205,33 +272,32 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return pudh;
 
     }
-    
+
     /**
      * Logic container for choosing a property info case
+     *
      * @param pdh
-     * @return 
+     * @return
      */
-    public CECase determineGoverningPropertyInfoCase(PropertyDataHeavy pdh){
+    public CECase determineGoverningPropertyInfoCase(PropertyDataHeavy pdh) {
         CECaseDataHeavy chosenCECase = null;
         List<CECaseDataHeavy> cseList = pdh.getPropInfoCaseList();
-        if(cseList != null && !cseList.isEmpty()){
+        if (cseList != null && !cseList.isEmpty()) {
             Collections.sort(cseList);
             chosenCECase = cseList.get(0);
         }
         return chosenCECase;
     }
-    
-    
-    
+
     /**
      * Logic container for checking the existence of a property info case on a
      * given property and if none exists creating one.
      *
      * @param p
      * @param ua
-     * @return 
+     * @return
      */
-    public PropertyDataHeavy configurePDHInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException{
+    public PropertyDataHeavy configurePDHInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException {
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CECase cse = null;
@@ -308,7 +374,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
         if (start == null) {
             return end == null; //If start is null, then end must also be null. Otherwise we have a end without a beginning!
-            
+
         } else if (end != null) { //If start is not null and end is not null, then we can run the following code block
             if (end.isBefore(start) || end.equals(start)) {
                 return false;
@@ -316,7 +382,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                 return true;
             }
         }
-        
+
         return true; //If start is not null, but end is null, no check is necessary. Also, checking would cause a null pointer error.
     }
 
@@ -369,25 +435,27 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return configureProperty(pi.getProperty(propID));
 
     }
-    
+
     /**
      * Logic intermediary for retrieval of a PropertyUnit by id
+     *
      * @param unitID
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
-    public PropertyUnit getPropertyUnit(int unitID) throws IntegrationException{
+    public PropertyUnit getPropertyUnit(int unitID) throws IntegrationException {
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnit(unitID);
 
     }
-    
+
     /**
      * Logic intermediary for extracting a complete list of PropertyUseType
      * objects from the DB
-     * @return 
+     *
+     * @return
      */
-    public List<PropertyUseType> getPropertyUseTypeList(){
+    public List<PropertyUseType> getPropertyUseTypeList() {
         PropertyIntegrator pi = getPropertyIntegrator();
         List<PropertyUseType> putList = null;
         try {
@@ -395,15 +463,15 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        
+
         return putList;
     }
-    
 
     public Property getPropertyByPropUnitID(int unitID) throws IntegrationException {
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnitWithProp(unitID).getProperty();
     }
+
     /**
      * Implements a cascade of logic to determine a best suited startup property
      * for a given session. When a user has no Property history, it extracts the

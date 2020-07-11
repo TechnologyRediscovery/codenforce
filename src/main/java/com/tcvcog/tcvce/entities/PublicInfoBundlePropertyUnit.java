@@ -31,7 +31,6 @@ public class PublicInfoBundlePropertyUnit extends PublicInfoBundle implements Se
    
     public void setBundledUnit(PropertyUnit input) {
         
-        input.setNotes("*****");
         input.setRentalNotes("*****");
         input.setConditionIntensityClassID(0);
         input.setLastUpdatedTS(LocalDateTime.MIN);
