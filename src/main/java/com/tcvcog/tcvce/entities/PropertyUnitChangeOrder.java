@@ -28,7 +28,7 @@ import java.sql.Timestamp;
  *
  * @author Nathan Dietz
  */
-public class PropertyUnitChangeOrder {
+public class PropertyUnitChangeOrder extends BOb {
 
     private int unitChangeID;
     private ChangeOrderAction action; //not in the database, used by interface
@@ -48,7 +48,9 @@ public class PropertyUnitChangeOrder {
     
     // Nathan's fields to deprecate
     private String changedBy; 
-    
+
+    public PropertyUnitChangeOrder() {
+    }
     
     public int getUnitChangeID() {
         return unitChangeID;

@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +24,24 @@ import java.util.List;
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundleEventCnF extends PublicInfoBundle implements Serializable{
+public class PublicInfoBundleEventCnF extends PublicInfoBundle{
     
     private EventCnF bundledEvent;
     private PublicInfoBundleCECase cecase;
     private PublicInfoBundleOccPeriod period;
     private List<PublicInfoBundlePerson> personList;
     
+    @Override
+    public String toString(){
+        
+        return this.getClass().getName() + bundledEvent.getEventID();
+        
+    }
+
+    public EventCnF getBundledEvent() {
+        return bundledEvent;
+    }
+
     public void setBundledEvent(EventCnF input) {
         
         input.setUserCreator(new User());
@@ -46,17 +56,6 @@ public class PublicInfoBundleEventCnF extends PublicInfoBundle implements Serial
         bundledEvent = input;
     }
     
-    @Override
-    public String toString(){
-        
-        return this.getClass().getName() + bundledEvent.getEventID();
-        
-    }
-
-    public EventCnF getBundledEvent() {
-        return bundledEvent;
-    }
-
     public PublicInfoBundleCECase getCecase() {
         return cecase;
     }

@@ -17,7 +17,6 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,7 +24,7 @@ import java.util.List;
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundleOccPeriod extends PublicInfoBundle implements Serializable {
+public class PublicInfoBundleOccPeriod extends PublicInfoBundle {
 
     
     private OccPeriod bundledPeriod;
@@ -33,6 +32,16 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle implements Seria
     private List<PublicInfoBundleOccInspection> inspectionList;
     private List<PublicInfoBundleFeeAssigned> feeList;
     private List<PublicInfoBundlePayment> paymentList;
+
+    @Override
+    public String toString() {
+
+        return this.getClass().getName() + bundledPeriod.getPeriodID();
+    }
+
+    public OccPeriod getBundledPeriod() {
+        return bundledPeriod;
+    }
     
     public void setBundledPeriod(OccPeriod input) {
         
@@ -52,16 +61,6 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle implements Seria
         input.setNotes("*****");
         
         bundledPeriod = input;
-    }
-
-    @Override
-    public String toString() {
-
-        return this.getClass().getName() + bundledPeriod.getPeriodID();
-    }
-
-    public OccPeriod getBundledPeriod() {
-        return bundledPeriod;
     }
 
     public List<PublicInfoBundlePerson> getPersonList() {

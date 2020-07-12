@@ -332,7 +332,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         PublicInfoBundleProperty pib = new PublicInfoBundleProperty();
 
         //Again, no PACC enabled field. Perhaps this will be a good enough filter for now?
-        if (!input.isActive()) {
+        if (input.isActive()) {
 
             pib.setBundledProperty(input);
 
@@ -376,7 +376,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         PublicInfoBundleOccPeriod pib = new PublicInfoBundleOccPeriod();
 
         //Again, no PACC enabled field. Perhaps this will be a good enough filter for now?
-        if (!input.isActive()) {
+        if (input.isActive()) {
             OccupancyCoordinator oc = getOccupancyCoordinator();
             setPublicUser();
             OccPeriodDataHeavy heavy = oc.assembleOccPeriodDataHeavy(input, publicUser.getMyCredential());
@@ -995,11 +995,14 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 throw new BObStatusException("Some Units have the same Number");
             }
 
-            PublicInfoBundlePropertyUnit temp = input.get(index);
+             PublicInfoBundlePropertyUnit skeleton = input.get(index);
+            
+            PropertyUnit sanitary = pc.sanitizePropertyUnit(skeleton.getBundledUnit());
+            //We must manually extract the sanitized fields as using the setBundledUnit 
+            //method would overwrite some of the user's  changes.
+            skeleton.getBundledUnit().setUnitNumber(sanitary.getUnitNumber());
 
-            temp.setBundledUnit(pc.sanitizePropertyUnit(temp.getBundledUnit()));
-
-            input.set(index, temp);
+            input.set(index, skeleton);
         }
 
         return input;

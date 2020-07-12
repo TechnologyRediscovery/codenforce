@@ -5,11 +5,13 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author sylvia
  */
-public abstract class PublicInfoBundle {
+public abstract class PublicInfoBundle implements Serializable {
 
     private int pacc;
     private boolean showDetailsPageButton;
@@ -30,6 +32,8 @@ public abstract class PublicInfoBundle {
     private String caseManagerName;
     private String caseManagerContact;
 
+    public PublicInfoBundle() {
+    }
     
     @Override
     public String toString(){

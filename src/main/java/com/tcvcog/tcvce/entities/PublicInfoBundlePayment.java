@@ -16,27 +16,16 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundlePayment extends PublicInfoBundle implements Serializable{
+public class PublicInfoBundlePayment extends PublicInfoBundle {
     
     private Payment bundledPayment;
     private PublicInfoBundlePerson payer;
-    
-    public void setBundledPayment(Payment input) {
-
-        input.setPayer(new Person());       
-        input.setRecordedBy(new User());
-        input.setEntryTimestamp(LocalDateTime.MIN);
-        input.setNotes("*****");
-        
-        bundledPayment = input;
-    }
     
     @Override
     public String toString(){
@@ -47,6 +36,16 @@ public class PublicInfoBundlePayment extends PublicInfoBundle implements Seriali
 
     public Payment getBundledPayment() {
         return bundledPayment;
+    }
+    
+    public void setBundledPayment(Payment input) {
+
+        input.setPayer(new Person());       
+        input.setRecordedBy(new User());
+        input.setEntryTimestamp(LocalDateTime.MIN);
+        input.setNotes("*****");
+        
+        bundledPayment = input;
     }
 
     public PublicInfoBundlePerson getPayer() {

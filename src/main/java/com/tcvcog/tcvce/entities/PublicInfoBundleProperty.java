@@ -17,7 +17,6 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -26,11 +25,24 @@ import java.util.List;
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundleProperty extends PublicInfoBundle implements Serializable {
+public class PublicInfoBundleProperty extends PublicInfoBundle {
     
     private Property bundledProperty;
     private List<PublicInfoBundlePropertyUnit> unitList;
 
+    public PublicInfoBundleProperty() {
+    }
+    
+    @Override
+    public String toString(){
+        
+        return this.getClass().getName() + bundledProperty.getPropertyID();
+    }
+
+    public Property getBundledProperty() {
+        return bundledProperty;
+    }
+    
     public void setBundledProperty(Property input) {
         
         
@@ -72,16 +84,6 @@ public class PublicInfoBundleProperty extends PublicInfoBundle implements Serial
         input.setTaxYear(0);
         
         bundledProperty = input;
-    }
-    
-    @Override
-    public String toString(){
-        
-        return this.getClass().getName() + bundledProperty.getPropertyID();
-    }
-
-    public Property getBundledProperty() {
-        return bundledProperty;
     }
 
     public List<PublicInfoBundlePropertyUnit> getUnitList() {

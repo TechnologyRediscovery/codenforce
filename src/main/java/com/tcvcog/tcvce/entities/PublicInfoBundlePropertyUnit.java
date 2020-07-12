@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,21 +23,11 @@ import java.util.List;
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundlePropertyUnit extends PublicInfoBundle implements Serializable {
+public class PublicInfoBundlePropertyUnit extends PublicInfoBundle {
     
     private PropertyUnit bundledUnit;
     private List<PublicInfoBundleOccPeriod> periodList;
-   
-    public void setBundledUnit(PropertyUnit input) {
-        
-        input.setRentalNotes("*****");
-        input.setConditionIntensityClassID(0);
-        input.setLastUpdatedTS(LocalDateTime.MIN);
-        
-        bundledUnit = input;
-    }
-    
-    
+       
     @Override
     public String toString() {
         return this.getClass().getName() + bundledUnit.getUnitID();
@@ -46,6 +35,15 @@ public class PublicInfoBundlePropertyUnit extends PublicInfoBundle implements Se
     
     public PropertyUnit getBundledUnit() {
         return bundledUnit;
+    }
+    
+        public void setBundledUnit(PropertyUnit input) {
+        
+        input.setRentalNotes("*****");
+        input.setConditionIntensityClassID(0);
+        input.setLastUpdatedTS(LocalDateTime.MIN);
+        
+        bundledUnit = input;
     }
 
     public List<PublicInfoBundleOccPeriod> getPeriodList() {

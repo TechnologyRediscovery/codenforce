@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ import java.util.List;
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundleFeeAssigned extends PublicInfoBundle implements Serializable {
+public class PublicInfoBundleFeeAssigned extends PublicInfoBundle {
 
     private FeeAssigned bundledFee;
     private List<PublicInfoBundlePayment> paymentList;
@@ -38,6 +37,17 @@ public class PublicInfoBundleFeeAssigned extends PublicInfoBundle implements Ser
     private int codeSetElement;
     private boolean waived;
 
+    @Override
+    public String toString() {
+
+        return this.getClass().getName() + bundledFee.getAssignedFeeID();
+
+    }
+
+    public FeeAssigned getBundledFee() {
+        return bundledFee;
+    }
+    
     public void setBundledFee(FeeAssigned input) {
 
         switch(input.getDomain()){
@@ -71,17 +81,6 @@ public class PublicInfoBundleFeeAssigned extends PublicInfoBundle implements Ser
         input.setNotes("*****");
         
         bundledFee = input;
-    }
-
-    @Override
-    public String toString() {
-
-        return this.getClass().getName() + bundledFee.getAssignedFeeID();
-
-    }
-
-    public FeeAssigned getBundledFee() {
-        return bundledFee;
     }
 
     public int getOccPerAssignedFeeID() {

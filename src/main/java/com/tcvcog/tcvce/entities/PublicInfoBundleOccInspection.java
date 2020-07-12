@@ -17,16 +17,26 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundleOccInspection extends PublicInfoBundle implements Serializable {
+public class PublicInfoBundleOccInspection extends PublicInfoBundle {
     
     private OccInspection bundledInspection;
+    
+    @Override
+    public String toString(){
+        
+        return this.getClass().getName() + bundledInspection.getInspectionID();
+        
+    }
+
+    public OccInspection getBundledInspection() {
+        return bundledInspection;
+    }
     
     public void setBundledInspection(OccInspection input) {
         
@@ -45,17 +55,6 @@ public class PublicInfoBundleOccInspection extends PublicInfoBundle implements S
         input.setNotes("*****");
         
         bundledInspection = input;
-    }
-    
-    @Override
-    public String toString(){
-        
-        return this.getClass().getName() + bundledInspection.getInspectionID();
-        
-    }
-
-    public OccInspection getBundledInspection() {
-        return bundledInspection;
     }
     
 }

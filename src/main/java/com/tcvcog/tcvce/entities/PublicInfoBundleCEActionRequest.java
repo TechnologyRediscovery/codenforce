@@ -5,13 +5,11 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
-
 /**
  * 
  * @author sylvia
  */
-public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements Serializable {
+public class PublicInfoBundleCEActionRequest extends PublicInfoBundle {
     
     //************************************************
     //*******Action request case public data********
@@ -20,8 +18,11 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
     private CEActionRequest bundledRequest;
     private PublicInfoBundlePerson requestor;
     private PublicInfoBundleProperty requestProperty;
-    
 
+    public CEActionRequest getBundledRequest() {
+        return bundledRequest;
+    }
+    
     public void setBundledRequest(CEActionRequest input) {
         
         setMuni(input.getMuni());
@@ -37,10 +38,6 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         input.setMuniNotes("*****");
         
         bundledRequest = input;
-    }
-
-    public CEActionRequest getBundledRequest() {
-        return bundledRequest;
     }
     
     @Override
