@@ -178,7 +178,7 @@ public class    SessionBean
     private PersonType occPermitAppActivePersonType;
     private OccPermitApplicationReason occPermitApplicationReason;
     
-    //Fields used internally
+    //Fields used externally
     private PublicInfoBundleProperty occPermitAppActiveProp;
     private PublicInfoBundleProperty occPermitAppWorkingProp;
     private PublicInfoBundlePropertyUnit occPermitAppActivePropUnit;

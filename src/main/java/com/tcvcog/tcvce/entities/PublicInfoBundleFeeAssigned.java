@@ -70,9 +70,11 @@ public class PublicInfoBundleFeeAssigned extends PublicInfoBundle {
         
         input.setAssignedBy(new User());
         
-        if (input.getWaivedBy() != null || input.getWaivedBy().getUserID() != 0){
+        if (input.getWaivedBy() != null && input.getWaivedBy().getUserID() != 0){
             waived = true;
         }
+        
+        input.setWaivedBy(new User());
         
         input.setLastModified(LocalDateTime.MIN);
         

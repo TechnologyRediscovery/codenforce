@@ -17,10 +17,6 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import java.sql.Timestamp;
-
 /**
  * Models the entity: Property Unit Change Order.Public users compile lists of
  * the units in their property while applying for occupancy.Before applying any
@@ -28,28 +24,100 @@ import java.sql.Timestamp;
  *
  * @author Nathan Dietz
  */
-public class PropertyUnitChangeOrder extends BOb {
+public class PropertyUnitChangeOrder extends ChangeOrder {
 
     private int unitChangeID;
-    private ChangeOrderAction action; //not in the database, used by interface
     private int unitID;
     private String unitNumber;
     private String otherKnownAddress;
     private String notes;
     private String rentalNotes;
-    private boolean removed;
-    private boolean added;
-    private java.sql.Timestamp changedOn;
-    private java.sql.Timestamp approvedOn; //If null, it has not been approved
-    private int propertyUnitID;
-    private User approvedBy; 
-    private int propertyID;
-    private boolean active;
+    
+    
     
     // Nathan's fields to deprecate
     private String changedBy; 
 
     public PropertyUnitChangeOrder() {
+    }
+
+    public PropertyUnitChangeOrder(PropertyUnit input) {
+        unitNumber = input.getUnitNumber();
+        otherKnownAddress = input.getOtherKnownAddress();
+        notes = input.getNotes();
+        rentalNotes = input.getRentalNotes();
+    }
+    
+    
+    
+    /**
+     * This constructor compares a proposed property unit against the original property unit.
+     * If there is a difference between the original and the proposed, the value of the proposed is saved.
+     * @param original
+     * @param proposed 
+     */
+    public PropertyUnitChangeOrder(PropertyUnit original, PropertyUnit proposed){
+        
+                    unitID = proposed.getUnitID();
+
+                    //check each field for changes
+                    if (!compareStrings(original.getUnitNumber(), proposed.getUnitNumber())) {
+                        unitNumber = proposed.getUnitNumber();
+                    }
+
+                    if (!compareStrings(original.getOtherKnownAddress(), proposed.getOtherKnownAddress())) {
+                        otherKnownAddress = proposed.getOtherKnownAddress();
+                    }
+
+                    if (!compareStrings(original.getNotes(), proposed.getNotes())) {
+                        notes = proposed.getNotes();
+                    }
+
+                    if (!compareStrings(original.getRentalNotes(), proposed.getRentalNotes())) {
+                        rentalNotes = proposed.getRentalNotes();
+                    }
+        
+    }
+    
+     public PropertyUnit toPropertyUnit() {
+        
+        PropertyUnit skeleton = new PropertyUnit();
+        
+        skeleton.setUnitNumber(unitNumber);
+        
+        skeleton.setNotes(notes);
+        
+        skeleton.setOtherKnownAddress(otherKnownAddress);
+        
+        return skeleton;
+        
+    }
+    
+    /**
+     * Detects if the unit has actually been changed.
+     * @return 
+     */
+    @Override
+    public boolean changedOccured() {
+
+        if(unitNumber!=null){
+           return true; 
+        }
+        
+        if (otherKnownAddress != null) {
+            return true;
+        }
+
+        if (notes != null) {
+            return true;
+        }
+        if (rentalNotes != null) {
+           return true;
+        }
+        //If none of the above apply, atleast check if it has been added or removed.
+        
+        return added || removed; 
+
     }
     
     public int getUnitChangeID() {
@@ -84,14 +152,6 @@ public class PropertyUnitChangeOrder extends BOb {
         this.unitNumber = unitNumber;
     }
 
-    public User getApprovedBy() {
-        return approvedBy;
-    }
-
-    public void setApprovedBy(User approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
     public String getOtherKnownAddress() {
         return otherKnownAddress;
     }
@@ -117,109 +177,6 @@ public class PropertyUnitChangeOrder extends BOb {
         rentalNotes = rental;
     }
 
-    public boolean isRemoved() {
-        return removed;
-    }
-
-    public void setRemoved(boolean removed) {
-        this.removed = removed;
-    }
-
-    public Timestamp getChangedOn() {
-        return changedOn;
-    }
-
-    public void setChangedOn(Timestamp changedOn) {
-        this.changedOn = changedOn;
-    }
-
-    public Timestamp getApprovedOn() {
-        return approvedOn;
-    }
-
-    public void setApprovedOn(Timestamp approvedOn) {
-        this.approvedOn = approvedOn;
-    }
-
-    public boolean isAdded() {
-        return added;
-    }
-
-    public void setAdded(boolean added) {
-        
-        this.added = added;
-    }
-
-  
-
-    public PropertyUnit toPropertyUnit() {
-        
-        PropertyIntegrator pi = new PropertyIntegrator();
-        
-        PropertyUnit skeleton = new PropertyUnit();
-        
-        skeleton.setUnitNumber(unitNumber);
-        
-        
-        skeleton.setNotes(notes);
-        
-        skeleton.setOtherKnownAddress(otherKnownAddress);
-        
-        try {
-            skeleton.setPropertyID(pi.getProperty(propertyID).getPropertyID());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
-        return skeleton;
-        
-    }
-    
-    /**
-     * Detects if the unit has actually been changed.
-     * @return 
-     */
-    public boolean changedOccured() {
-
-        if (otherKnownAddress != null) {
-            return true;
-        }
-
-        if (notes != null) {
-            return true;
-        }
-        if (rentalNotes != null) {
-           return true;
-        }
-        
-        return false; //If none of the above apply, no changes have been made
-
-    }
-
-    public int getPropertyUnitID() {
-        return propertyUnitID;
-    }
-
-    public void setPropertyUnitID(int unitID) {
-        this.propertyUnitID = unitID;
-    }
-
-    public int getPropertyID() {
-        return propertyID;
-    }
-
-    public void setPropertyID(int propertyID) {
-        this.propertyID = propertyID;
-    }
-
-    public ChangeOrderAction getAction() {
-        return action;
-    }
-
-    public void setAction(ChangeOrderAction action) {
-        this.action = action;
-    }
-    
     public String newOrRemoved(){
         
         if(removed == true)
@@ -234,20 +191,5 @@ public class PropertyUnitChangeOrder extends BOb {
             return  "Edited";
         
     }
-
-    /**
-     * @return the active
-     */
-    public boolean isActive() {
-        return active;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-    
     
 }

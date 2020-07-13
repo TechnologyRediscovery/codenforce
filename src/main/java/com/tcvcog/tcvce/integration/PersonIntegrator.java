@@ -582,7 +582,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     
-   public ArrayList<Person> getPersonList(ArrayList<Integer> peopleIDs) throws IntegrationException {
+   public List<Person> getPersonList(List<Integer> peopleIDs) throws IntegrationException {
         ArrayList<Person> list = new ArrayList<>();
         
         for (int personId: peopleIDs){
@@ -927,7 +927,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      */
-    public ArrayList<Integer> getOccPermitAppPersons(int applicationID) throws IntegrationException{
+    public List<Integer> getOccPermitAppPersons(int applicationID) throws IntegrationException{
         String query = "SELECT person_personid FROM occpermitapplicationperson WHERE permitapp_applicationid = ?";
         Connection con = null;
         PreparedStatement stmt = null;
@@ -1259,6 +1259,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     str.append("%");
                     str.append(params.getPhoneNumber_val());
                     str.append("%");
+                    //There are three phone number parameters, so we will set all three
+                    stmt.setString(++paramCounter, str.toString());
+                    stmt.setString(++paramCounter, str.toString());
                     stmt.setString(++paramCounter, str.toString());
                 }
                 

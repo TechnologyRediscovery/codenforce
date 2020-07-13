@@ -43,7 +43,6 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -1271,7 +1270,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public void insertPropertyUnitChange(PropertyUnitChangeOrder uc) throws IntegrationException {
         String query = "INSERT INTO public.propertyunitchange(\n"
                 + "            unitchangeid, unitnumber, unit_unitid, otherknownaddress, notes, \n"
-                + "            rentalnotes, removed, added, changedon, approvedby, changedby, property_propertyid)\n"
+                + "            rentalnotes, removed, added, changedon, approvedby, changedby)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, ?, ?, ?);";
 
@@ -1290,7 +1289,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
             stmt.setInt(9, uc.getApprovedBy().getUserID());
             stmt.setString(10, uc.getChangedBy());
-            stmt.setInt(11, uc.getPropertyID());
 
             stmt.execute();
         } catch (SQLException ex) {
@@ -1364,7 +1362,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         uc.setApprovedOn(rs.getTimestamp("approvedon"));
         uc.setApprovedBy(ui.getUser(rs.getInt("approvedby")));
         uc.setChangedBy(rs.getString("changedby"));
-        uc.setPropertyID(rs.getInt("property_propertyid"));
         uc.setActive(rs.getBoolean("active"));
         return uc;
     }

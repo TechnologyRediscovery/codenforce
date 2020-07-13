@@ -131,8 +131,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         for(SearchParamsPerson sp: paramsList){
             persTempList.clear();
+
             try {
-                for(Integer i: pi.searchForPersons(sp)){
+                List<Integer> idList = pi.searchForPersons(sp);
+                for(Integer i: idList){
                     persTempList.add(pc.getPerson(i));
                 }
             } catch (IntegrationException ex) {
