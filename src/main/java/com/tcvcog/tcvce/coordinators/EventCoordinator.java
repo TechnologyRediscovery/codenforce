@@ -723,6 +723,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return ec;
     }
   
+    
+    /**
+     * Extracts a complete list of event categories
+     * @return 
+     */
     public List<EventCategory> getEventCategoryList(){
         EventIntegrator ei = getEventIntegrator();
         try {

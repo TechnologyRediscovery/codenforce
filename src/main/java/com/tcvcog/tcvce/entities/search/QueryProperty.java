@@ -73,6 +73,7 @@ public class QueryProperty
 
     /**
      * @return the results
+     * @deprecated 
      */
     public List<Property> getResults() {
         return results;

@@ -25,10 +25,13 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -102,6 +105,45 @@ public class PropertySearchBB extends BackingBeanUtils{
     
     public void clearPropertyList(ActionEvent ev){
         propList.clear();
+    }
+    
+    
+    
+    /**
+     * Demo of using the Search system to extract objects from the DB
+     * in a controlled way
+     * @return 
+     */
+    private List<Property> testPropertySearch(){
+        SearchCoordinator sc = getSearchCoordinator();
+        QueryProperty qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, getSessionBean().getSessUser().getMyCredential());
+        if(qp != null && !qp.getParamsList().isEmpty()){
+            SearchParamsProperty spp = qp.getParamsList().get(0);
+            spp.setAddress_ctl(true);
+            spp.setAddress_val("101 Main");
+            spp.setMuni_ctl(true);
+            spp.setMuni_val(getSessionBean().getSessMuni());
+            spp.setLimitResultCount_ctl(true);
+            spp.setLimitResultCount_val(20);
+        }
+        
+        try {
+            // send assembled query with its configured parameter object
+            // to runQuery, which will delegate the work to the searchForXXX methods
+            // on the intergrators
+            sc.runQuery(qp);
+        } catch (SearchException ex) {
+            System.out.println(ex);
+        }
+        List<Property> propList = null;
+
+        if(qp != null && !qp.getBOBResultList().isEmpty()){
+            // extract the actual business objects from the Query object as a list
+            propList = qp.getBOBResultList();
+        }
+        
+        return propList;
+        
     }
     
     /**

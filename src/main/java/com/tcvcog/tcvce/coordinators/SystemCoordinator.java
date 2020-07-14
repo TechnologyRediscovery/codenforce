@@ -449,7 +449,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             navList.add(CEItem);
             navList.add(codeItem);
         } catch (Exception e) {
-
+            System.out.println(e);
         }
         return navList;
 

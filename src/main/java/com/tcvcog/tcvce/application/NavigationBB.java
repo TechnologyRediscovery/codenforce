@@ -46,6 +46,10 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     private boolean noActiveSource;
     private boolean noActivePerson;
 
+    private List<NavigationItem> NavList;
+
+    private List<NavigationItem> sideBarNavList;
+    
     /**
      * Creates a new instance of NavigationBB
      */
@@ -143,14 +147,17 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         HashMap<String, String> categoryMap;
         categoryMap = new HashMap<>();
 
-        for (int i = 0; i < NavList.size(); i++) {
-            NavigationItem navitem = (NavigationItem) NavList.get(i);
-            List subnavList = navitem.getSubNavitem();
-            String categoryName = navitem.getValue();
-            for (int m = 0; m < subnavList.size(); m++) {
-                NavigationSubItem subnavitem = (NavigationSubItem) subnavList.get(m);
-                String pagePath = subnavitem.getPagePath();
-                categoryMap.put(pagePath, categoryName);
+        if(NavList != null && !NavList.isEmpty()){
+
+            for (int i = 0; i < NavList.size(); i++) {
+                NavigationItem navitem = (NavigationItem) NavList.get(i);
+                List subnavList = navitem.getSubNavitem();
+                String categoryName = navitem.getValue();
+                for (int m = 0; m < subnavList.size(); m++) {
+                    NavigationSubItem subnavitem = (NavigationSubItem) subnavList.get(m);
+                    String pagePath = subnavitem.getPagePath();
+                    categoryMap.put(pagePath, categoryName);
+                }
             }
         }
         return categoryMap;
@@ -167,9 +174,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         return viewID;
     }
 
-    private List<NavigationItem> NavList;
-
-    private List<NavigationItem> sideBarNavList;
+ 
 
     public List<NavigationItem> getNavList() {
         return NavList;
