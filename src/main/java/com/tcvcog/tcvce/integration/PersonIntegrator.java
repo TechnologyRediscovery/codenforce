@@ -20,11 +20,13 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonChangeOrder;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
@@ -38,6 +40,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -1371,5 +1374,306 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return persIDList;
     }
     
+    public PersonChangeOrder generatePersonChangeOrder(ResultSet rs){
+        PersonChangeOrder skeleton = new PersonChangeOrder();
+        UserCoordinator uc = getUserCoordinator();
+        
+        try{
+        skeleton.setPersonChangeID(rs.getInt("personchangeid"));
+        skeleton.setPersonID(rs.getInt("person_personid"));
+        skeleton.setFirstName(rs.getString("firstname"));
+        skeleton.setLastName(rs.getString("lastname"));
+        skeleton.setCompositeLastName(rs.getBoolean("compositelastname"));
+        skeleton.setPhoneCell(rs.getString("phonecell"));
+        skeleton.setPhoneHome(rs.getString("phonehome"));
+        skeleton.setPhoneWork(rs.getString("phonework"));
+        skeleton.setEmail(rs.getString("email"));
+        skeleton.setAddressStreet(rs.getString("addressstreet"));
+        skeleton.setAddressCity(rs.getString("addresscity"));
+        skeleton.setAddressZip(rs.getString("addresszip"));
+        skeleton.setAddressState(rs.getString("addressstate"));
+        skeleton.setUseSeparateMailingAddress(rs.getString("useseparatemailingaddress"));
+        skeleton.setMailingAddressStreet(rs.getString("mailingaddressstreet"));
+        skeleton.setMailingAddressThirdLine(rs.getString("mailingaddresthirdline"));
+        skeleton.setMailingAddressCity(rs.getString("mailingaddresscity"));
+        skeleton.setMailingAddressZip(rs.getString("mailingaddresszip"));
+        skeleton.setMailingAddressState(rs.getString("mailingaddressstate"));
+        
+        skeleton.setRemoved(rs.getBoolean("removed"));
+        skeleton.setAdded(rs.getBoolean("added"));
+        skeleton.setChangedOn(rs.getTimestamp("entryts"));
+        skeleton.setApprovedOn(rs.getTimestamp("approvedondate"));
+        skeleton.setApprovedBy(uc.getUser(rs.getInt("approvedby")));
+        skeleton.setChangedBy(rs.getString("changedby_personid"));
+        skeleton.setActive(rs.getBoolean("active"));
+        
+        } catch(SQLException | IntegrationException ex){
+            System.out.println("PersonIntegrator.generatePersonChangeOrder() | ERROR: " + ex);
+        }
+        
+        return skeleton;
+        
+    }
+    
+    public void insertPersonChangeOrder(PersonChangeOrder order) throws IntegrationException{
+        
+        String query =  "INSERT INTO public.personchange(\n" +
+"            personchangeid, person_personid, firstname, lastname, compositelastname, \n" +
+"            phonecell, phonehome, phonework, email, addressstreet, addresscity, \n" +
+"            addresszip, addressstate, useseparatemailingaddress, mailingaddressstreet, \n" +
+"            mailingaddresthirdline, mailingaddresscity, mailingaddresszip, \n" +
+"            mailingaddressstate, removed, added, entryts, \n" +
+"            changedby_personid)\n" +
+"    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
+"            ?, ?, ?, ?, ?, ?, \n" +
+"            ?, ?, ?, ?, \n" +
+"            ?, ?, ?, \n" +
+"            ?, ?, ?, ?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
 
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, order.getPersonID());
+            stmt.setString(2,order.getFirstName());
+            stmt.setString(3, order.getLastName());
+            stmt.setBoolean(4, order.isCompositeLastName());
+            stmt.setString(5, order.getPhoneCell());
+            stmt.setString(6, order.getPhoneHome());
+            stmt.setString(7, order.getPhoneWork());
+            stmt.setString(8, order.getEmail());
+            stmt.setString(9, order.getAddressStreet());
+            stmt.setString(10, order.getAddressCity());
+            stmt.setString(11, order.getAddressZip());
+            stmt.setString(12, order.getAddressState());
+            stmt.setBoolean(13, order.isUserSeparateMailingAddress());
+            stmt.setString(14, order.getMailingAddressStreet());
+            stmt.setString(15, order.getMailingAddressThirdLine());
+            stmt.setString(16, order.getMailingAddressCity());
+            stmt.setString(17, order.getMailingAddressZip());
+            stmt.setString(18, order.getMailingAddressState());
+            stmt.setBoolean(19, order.isRemoved());
+            stmt.setBoolean(20, order.isAdded());
+            stmt.setTimestamp(21, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setInt(22, order.getPersonID());
+
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to insert person change order ", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public void updatePersonChangeOrder(PersonChangeOrder order) throws IntegrationException{
+        
+        String query =  "UPDATE public.personchange\n" +
+"   SET person_personid=?, firstname=?, lastname=?, \n" +
+"       compositelastname=?, phonecell=?, phonehome=?, phonework=?, email=?, \n" +
+"       addressstreet=?, addresscity=?, addresszip=?, addressstate=?, \n" +
+"       useseparatemailingaddress=?, mailingaddressstreet=?, mailingaddresthirdline=?, \n" +
+"       mailingaddresscity=?, mailingaddresszip=?, mailingaddressstate=?, \n" +
+"       removed=?, added=?, approvedondate=?, approvedby_userid=?, \n"
+                + "changedby_personid=?, active=?\n" +
+" WHERE personchangeid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, order.getPersonID());
+            stmt.setString(2, order.getFirstName());
+            stmt.setString(3, order.getLastName());
+            stmt.setBoolean(4, order.isCompositeLastName());
+            stmt.setString(5, order.getPhoneCell());
+            stmt.setString(6, order.getPhoneHome());
+            stmt.setString(7, order.getPhoneWork());
+            stmt.setString(8, order.getEmail());
+            stmt.setString(9, order.getAddressStreet());
+            stmt.setString(10, order.getAddressCity());
+            stmt.setString(11, order.getAddressZip());
+            stmt.setString(12, order.getAddressState());
+            stmt.setBoolean(13, order.isUserSeparateMailingAddress());
+            stmt.setString(14, order.getMailingAddressStreet());
+            stmt.setString(15, order.getMailingAddressThirdLine());
+            stmt.setString(16, order.getMailingAddressCity());
+            stmt.setString(17, order.getMailingAddressZip());
+            stmt.setString(18, order.getMailingAddressState());
+            stmt.setBoolean(19, order.isRemoved());
+            stmt.setBoolean(20, order.isAdded());
+            stmt.setTimestamp(21, order.getApprovedOn());
+            stmt.setInt(22, order.getApprovedBy().getUserID());
+            stmt.setInt(23, Integer.getInteger(order.getChangedBy()));
+            stmt.setInt(24, order.getPersonChangeID());
+            
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update person change order ", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public List<PersonChangeOrder> getPersonChangeOrderList(Person person) throws IntegrationException{
+        
+        String query =  "SELECT personchangeid, person_personid, firstname, lastname, compositelastname, \n" +
+"       phonecell, phonehome, phonework, email, addressstreet, addresscity, \n" +
+"       addresszip, addressstate, useseparatemailingaddress, mailingaddressstreet, \n" +
+"       mailingaddresthirdline, mailingaddresscity, mailingaddresszip, \n" +
+"       mailingaddressstate, removed, added, entryts, approvedondate, \n" +
+"       approvedby_userid, changedby_userid, changedby_personid, active\n" +
+"  FROM public.personchange\n" +
+"  where person_personid = ? AND active = true AND approvedon IS NULL;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        List<PersonChangeOrder> orderList = new ArrayList<>();
+
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, person.getPersonID());
+            
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()){
+                orderList.add(generatePersonChangeOrder(rs));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to get person change order list", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return orderList;
+        
+    }
+    
+        public List<PersonChangeOrder> getPersonChangeOrderListAll(Person person) throws IntegrationException{
+        
+        String query =  "SELECT personchangeid, person_personid, firstname, lastname, compositelastname, \n" +
+"       phonecell, phonehome, phonework, email, addressstreet, addresscity, \n" +
+"       addresszip, addressstate, useseparatemailingaddress, mailingaddressstreet, \n" +
+"       mailingaddresthirdline, mailingaddresscity, mailingaddresszip, \n" +
+"       mailingaddressstate, removed, added, entryts, approvedondate, \n" +
+"       approvedby_userid, changedby_userid, changedby_personid, active\n" +
+"  FROM public.personchange\n" +
+"  where person_personid = ?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        List<PersonChangeOrder> orderList = new ArrayList<>();
+
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, person.getPersonID());
+            
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()){
+                orderList.add(generatePersonChangeOrder(rs));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to get person change order list", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return orderList;
+        
+    }
+    
+    public void implementPersonChangeOrder(PersonChangeOrder order) throws IntegrationException{
+        
+        Person skeleton = getPerson(order.getPersonID());
+        
+        if (order.getFirstName() != null) {
+            skeleton.setFirstName(order.getFirstName());
+        }
+        
+        if (order.getLastName() != null) {
+            skeleton.setLastName(order.getLastName());
+        }
+        
+        if (order.getCompositeLastName()!= null) {
+            skeleton.setCompositeLastName(order.isCompositeLastName());
+        }
+        
+        if (order.getPhoneCell()!= null) {
+            skeleton.setPhoneCell(order.getPhoneCell());
+        }
+        
+        if (order.getPhoneHome()!= null) {
+            skeleton.setPhoneHome(order.getPhoneHome());
+        }
+        
+        if (order.getPhoneWork()!= null) {
+            skeleton.setPhoneWork(order.getPhoneWork());
+        }
+        
+        if (order.getEmail()!= null) {
+            skeleton.setEmail(order.getEmail());
+        }
+        
+        if (order.getAddressStreet()!= null) {
+            skeleton.setAddressStreet(order.getAddressStreet());
+        }
+        
+        if (order.getAddressCity()!= null) {
+            skeleton.setAddressCity(order.getAddressCity());
+        }
+        
+        if (order.getAddressState()!= null) {
+            skeleton.setAddressState(order.getAddressState());
+        }
+        
+        if (order.getAddressZip()!= null) {
+            skeleton.setAddressZip(order.getAddressZip());
+        }
+        
+        if (order.getUseSeparateMailingAddress()!= null) {
+            skeleton.setUseSeparateMailingAddress(order.isUserSeparateMailingAddress());
+        }
+        
+        if (order.getMailingAddressStreet()!= null) {
+            skeleton.setMailingAddressStreet(order.getMailingAddressStreet());
+        }
+        
+        if (order.getMailingAddressThirdLine()!= null) {
+            skeleton.setMailingAddressThirdLine(order.getMailingAddressThirdLine());
+        }
+        
+        if (order.getMailingAddressCity()!= null) {
+            skeleton.setMailingAddressCity(order.getMailingAddressCity());
+        }
+        
+        if (order.getMailingAddressState()!= null) {
+            skeleton.setMailingAddressState(order.getMailingAddressState());
+        }
+        
+        if (order.getMailingAddressZip()!= null) {
+            skeleton.setMailingAddressZip(order.getMailingAddressZip());
+        }
+        
+        updatePerson(skeleton);
+        
+    }
+    
 } // close class

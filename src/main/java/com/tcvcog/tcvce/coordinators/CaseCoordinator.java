@@ -255,11 +255,25 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public List<CECasePropertyUnitHeavy> assembleCECasePropertyUnitHeavyList(List<CECase> cseList) throws IntegrationException, SearchException{
         
         List<CECasePropertyUnitHeavy> cspudhList = new ArrayList<>();
+        
         if (cseList != null && !cseList.isEmpty()) {
+            if(getSessionBean().getSessUser() !=null){
+            
             for (CECase cse : cseList) {
                 cspudhList.add(assembleCECasePropertyUnitHeavy(cse, getSessionBean().getSessUser().getMyCredential()));
             }
+            } else{
+                //This session must be public
+                UserCoordinator uc = getUserCoordinator();
+                for (CECase cse : cseList) {
+                cspudhList.add(assembleCECasePropertyUnitHeavy(cse, uc.getPublicUserAuthorized().getMyCredential()));
+            }
+            }
+            
+            
         }
+        
+        
         return cspudhList;
     }
     

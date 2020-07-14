@@ -1225,9 +1225,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
-        PropertyIntegrator pi = getPropertyIntegrator();
-
-        PropertyUnit skeleton = pi.getPropertyUnit(uc.getUnitID());
+        PropertyUnit skeleton = getPropertyUnit(uc.getUnitID());
 
         if (uc.getUnitNumber() != null) {
             skeleton.setUnitNumber(uc.getUnitNumber());

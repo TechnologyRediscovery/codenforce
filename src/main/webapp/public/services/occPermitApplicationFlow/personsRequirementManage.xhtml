@@ -145,9 +145,11 @@
 
                             <p:outputLabel value="#{occPermitApplicationBB.currentApplication.reason.humanFriendlyDescription}"/>
 
+                            <b>Remember to hit the enter key when you finish filling out a box!</b>
+                            
                             <h:panelGrid id="menu" columns="1" cellpadding="10" columnClasses="gridTd-solid-back" style="width:100%">
                                 <h:panelGroup >
-                                    <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter">
+                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter">
                                         <h:panelGroup>
                                             <p:outputLabel id="last-name-ol" value="Filter by last name" />
                                         </h:panelGroup>
@@ -231,7 +233,9 @@
                                     </p:dataTable>
                                 </h:panelGroup>
                             </h:panelGrid>
-                            <p:outputLabel> Can't find the person you are looking for? Add a person to the table below and enter their information.</p:outputLabel> 
+                            <p:outputLabel> Can't find the person you are looking for? Add a person to the table below and press the pencil to enter their information.
+                                            Click the arrow button below the pencil to fill in more of their contact information.
+                                            </p:outputLabel> 
 
                             <p:spacer height="10px"/>
 
@@ -281,6 +285,7 @@
 
                                 <p:column headerText="Edit?">
                                     <p:rowEditor/>
+                                    <p:rowToggler/>
                                 </p:column>
 
                                 <p:column headerText="">
@@ -289,7 +294,7 @@
                                                      update="#{p:component('currentApplicantLabel')} #{p:component('currentContactLabel')}"
                                                      /> 
                                 </p:column>
-                                
+
                                 <p:column headerText="">
                                     <p:commandButton ajax="true" value="Set as preferred contact" 
                                                      action="#{occPermitApplicationBB.setContactPerson(applicationPerson)}"
@@ -304,6 +309,127 @@
                                                      update="#{p:component('applicationPersonTable')}"
                                                      /> 
                                 </p:column>
+
+                                <p:rowExpansion>
+
+                                    <div class="outlinedBox">
+
+                                        <p:outputLabel><b>Remember to hit the enter key when you finish filling out a box!</b></p:outputLabel>
+                                        
+                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Phone (cell)" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.phoneCell}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Phone (home)" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.phoneHome}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Phone (work)" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.phoneWork}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Email" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.email}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <p:spacer height="5px"/>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Street" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.addressStreet}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="City" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.addressCity}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="State" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.addressState}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Zip Code" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.addressZip}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputText styleClass="bold" value="If you have a separate mailing address, fill out the section below:"/>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Would you like to use a separate mailing address?" />
+                                                <div class="rowExpansion">
+                                                    <p:inputSwitch value="#{applicationPerson.bundledPerson.useSeparateMailingAddress}" onLabel="Yes" offLabel="No"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Street" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.mailingAddressStreet}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Address third line:" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.mailingAddressThirdLine}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="City" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.mailingAddressCity}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="State" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.mailingAddressState}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Zip Code" />
+                                                <div class="rowExpansion">
+                                                    <p:inputText value="#{applicationPerson.bundledPerson.mailingAddressZip}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+
+                                        </h:panelGrid>
+
+
+
+                                    </div>
+
+                                </p:rowExpansion>
 
                             </p:dataTable>
 

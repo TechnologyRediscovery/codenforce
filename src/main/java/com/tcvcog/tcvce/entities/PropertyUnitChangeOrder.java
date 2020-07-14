@@ -33,11 +33,6 @@ public class PropertyUnitChangeOrder extends ChangeOrder {
     private String notes;
     private String rentalNotes;
     
-    
-    
-    // Nathan's fields to deprecate
-    private String changedBy; 
-
     public PropertyUnitChangeOrder() {
     }
 
@@ -126,14 +121,6 @@ public class PropertyUnitChangeOrder extends ChangeOrder {
 
     public void setUnitChangeID(int unitChangeID) {
         this.unitChangeID = unitChangeID;
-    }
-
-    public String getChangedBy() {
-        return changedBy;
-    }
-
-    public void setChangedBy(String changedBy) {
-        this.changedBy = changedBy;
     }
 
     public int getUnitID() {

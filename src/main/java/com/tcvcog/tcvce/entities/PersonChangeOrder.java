@@ -39,7 +39,6 @@ public class PersonChangeOrder extends ChangeOrder {
     private String email;
     private String addressStreet;
     private String addressCity;
-
     private String addressZip;
     private String addressState;
 
@@ -133,6 +132,26 @@ public class PersonChangeOrder extends ChangeOrder {
 
     }
 
+    public PersonChangeOrder(Person input) {
+        firstName = input.getFirstName();
+        lastName = input.getLastName();
+        setCompositeLastName(input.isCompositeLastName());
+        phoneCell = input.getPhoneCell();
+        phoneHome = input.getPhoneHome();
+        phoneWork = input.getPhoneWork();
+        email = input.getEmail();
+        addressStreet = input.getAddressStreet();
+        addressCity = input.getAddressCity();
+        addressZip = input.getAddressZip();
+        addressState = input.getAddressState();
+        setUseSeparateMailingAddress(input.isUseSeparateMailingAddress());
+        mailingAddressStreet = input.getMailingAddressStreet();
+        mailingAddressThirdLine = input.getMailingAddressThirdLine();
+        mailingAddressCity = input.getMailingAddressCity();
+        mailingAddressZip = input.getMailingAddressZip();
+        mailingAddressState = input.getAddressState();
+    }
+
     public Person toPerson() {
 
         Person skeleton = new Person();
@@ -176,10 +195,6 @@ public class PersonChangeOrder extends ChangeOrder {
         }
 
         if (lastName != null) {
-            return true;
-        }
-
-        if (firstName != null) {
             return true;
         }
 
@@ -282,6 +297,10 @@ public class PersonChangeOrder extends ChangeOrder {
     public String getCompositeLastName() {
         return compositeLastName;
     }
+    
+    public boolean isCompositeLastName(){
+        return Boolean.getBoolean(compositeLastName);
+    }
 
     public final void setCompositeLastName(boolean compositeLastName) {
         this.compositeLastName = "" + compositeLastName;
@@ -357,6 +376,10 @@ public class PersonChangeOrder extends ChangeOrder {
 
     public String getUseSeparateMailingAddress() {
         return useSeparateMailingAddress;
+    }
+    
+    public boolean isUserSeparateMailingAddress(){
+        return Boolean.getBoolean(useSeparateMailingAddress);
     }
 
     public final void setUseSeparateMailingAddress(boolean useSeparateMailingAddress) {

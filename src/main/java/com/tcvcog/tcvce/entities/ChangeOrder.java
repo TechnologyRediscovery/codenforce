@@ -35,6 +35,7 @@ public class ChangeOrder extends BOb {
     protected User approvedBy; 
     protected ChangeOrderAction action; //not in the database, used by interface
     protected boolean active;
+    protected String changedBy;
 
     public ChangeOrder() {
     }
@@ -49,9 +50,10 @@ public class ChangeOrder extends BOb {
         
         return first != null && first.contentEquals(second);
         
-    }    
+    }
+    
     /**
-     * Every changeOrder
+     * Every changeOrder should overwrite this method to check whether or not any fields were changed.
      * @return 
      */
     public boolean changedOccured(){
@@ -122,6 +124,14 @@ public class ChangeOrder extends BOb {
 
     public void setAction(ChangeOrderAction action) {
         this.action = action;
+    }
+
+    public String getChangedBy() {
+        return changedBy;
+    }
+
+    public void setChangedBy(String changedBy) {
+        this.changedBy = changedBy;
     }
     
 }

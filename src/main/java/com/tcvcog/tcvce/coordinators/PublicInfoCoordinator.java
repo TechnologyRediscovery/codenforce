@@ -897,66 +897,73 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         Person exportable = pc.getPerson(unbundled.getPersonID());
 
-        //fields are anonymized by being overwritten with asterisks. If these fields no longer contain asterisks,
-        //then the field has been edited by the user.
-        if (!unbundled.getFirstName().contains("*")) {
-            exportable.setFirstName(unbundled.getFirstName());
-        }
+        if (exportable == null) {
 
-        if (!unbundled.getLastName().contains("*")) {
-            exportable.setLastName(unbundled.getLastName());
-        }
+            //the person is new, so skip the comparison
+            exportable = unbundled;
 
-        if (!unbundled.getPhoneCell().contains("*")) {
-            exportable.setPhoneCell(unbundled.getPhoneCell());
-        }
+        } else {
+            //fields are anonymized by being overwritten with asterisks. If these fields no longer contain asterisks,
+            //then the field has been edited by the user.
+            if (unbundled.getFirstName() != null && !unbundled.getFirstName().contains("*")) {
+                exportable.setFirstName(unbundled.getFirstName());
+            }
 
-        if (!unbundled.getPhoneHome().contains("*")) {
-            exportable.setPhoneHome(unbundled.getPhoneHome());
-        }
+            if (unbundled.getLastName() != null && !unbundled.getLastName().contains("*")) {
+                exportable.setLastName(unbundled.getLastName());
+            }
 
-        if (!unbundled.getPhoneWork().contains("*")) {
-            exportable.setPhoneWork(unbundled.getPhoneWork());
-        }
+            if (unbundled.getPhoneCell() != null && !unbundled.getPhoneCell().contains("*")) {
+                exportable.setPhoneCell(unbundled.getPhoneCell());
+            }
 
-        if (!unbundled.getEmail().contains("*")) {
-            exportable.setEmail(unbundled.getEmail());
-        }
+            if (unbundled.getPhoneHome() != null && !unbundled.getPhoneHome().contains("*")) {
+                exportable.setPhoneHome(unbundled.getPhoneHome());
+            }
 
-        if (!unbundled.getAddressStreet().contains("*")) {
-            exportable.setAddressStreet(unbundled.getAddressStreet());
-        }
+            if (unbundled.getPhoneWork() != null && !unbundled.getPhoneWork().contains("*")) {
+                exportable.setPhoneWork(unbundled.getPhoneWork());
+            }
 
-        if (!unbundled.getAddressCity().contains("*")) {
-            exportable.setAddressCity(unbundled.getAddressCity());
-        }
+            if (unbundled.getEmail() != null && !unbundled.getEmail().contains("*")) {
+                exportable.setEmail(unbundled.getEmail());
+            }
 
-        if (!unbundled.getAddressZip().contains("*")) {
-            exportable.setAddressZip(unbundled.getAddressZip());
-        }
+            if (unbundled.getAddressStreet() != null && !unbundled.getAddressStreet().contains("*")) {
+                exportable.setAddressStreet(unbundled.getAddressStreet());
+            }
 
-        if (!unbundled.getAddressState().contains("*")) {
-            exportable.setAddressState(unbundled.getAddressState());
-        }
+            if (unbundled.getAddressCity() != null && !unbundled.getAddressCity().contains("*")) {
+                exportable.setAddressCity(unbundled.getAddressCity());
+            }
 
-        if (!unbundled.getMailingAddressStreet().contains("*")) {
-            exportable.setMailingAddressStreet(unbundled.getMailingAddressStreet());
-        }
+            if (unbundled.getAddressZip() != null && !unbundled.getAddressZip().contains("*")) {
+                exportable.setAddressZip(unbundled.getAddressZip());
+            }
 
-        if (!unbundled.getMailingAddressThirdLine().contains("*")) {
-            exportable.setMailingAddressThirdLine(unbundled.getMailingAddressThirdLine());
-        }
+            if (unbundled.getAddressState() != null && !unbundled.getAddressState().contains("*")) {
+                exportable.setAddressState(unbundled.getAddressState());
+            }
 
-        if (!unbundled.getMailingAddressCity().contains("*")) {
-            exportable.setMailingAddressCity(unbundled.getMailingAddressCity());
-        }
+            if (unbundled.getMailingAddressStreet() != null && !unbundled.getMailingAddressStreet().contains("*")) {
+                exportable.setMailingAddressStreet(unbundled.getMailingAddressStreet());
+            }
 
-        if (!unbundled.getMailingAddressZip().contains("*")) {
-            exportable.setMailingAddressZip(unbundled.getMailingAddressZip());
-        }
+            if (unbundled.getMailingAddressThirdLine() != null && !unbundled.getMailingAddressThirdLine().contains("*")) {
+                exportable.setMailingAddressThirdLine(unbundled.getMailingAddressThirdLine());
+            }
 
-        if (!unbundled.getMailingAddressState().contains("*")) {
-            exportable.setMailingAddressState(unbundled.getMailingAddressState());
+            if (unbundled.getMailingAddressCity() != null && !unbundled.getMailingAddressCity().contains("*")) {
+                exportable.setMailingAddressCity(unbundled.getMailingAddressCity());
+            }
+
+            if (unbundled.getMailingAddressZip() != null && !unbundled.getMailingAddressZip().contains("*")) {
+                exportable.setMailingAddressZip(unbundled.getMailingAddressZip());
+            }
+
+            if (unbundled.getMailingAddressState() != null && !unbundled.getMailingAddressState().contains("*")) {
+                exportable.setMailingAddressState(unbundled.getMailingAddressState());
+            }
         }
 
         return exportable;
@@ -995,8 +1002,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 throw new BObStatusException("Some Units have the same Number");
             }
 
-             PublicInfoBundlePropertyUnit skeleton = input.get(index);
-            
+            PublicInfoBundlePropertyUnit skeleton = input.get(index);
+
             PropertyUnit sanitary = pc.sanitizePropertyUnit(skeleton.getBundledUnit());
             //We must manually extract the sanitized fields as using the setBundledUnit 
             //method would overwrite some of the user's  changes.
