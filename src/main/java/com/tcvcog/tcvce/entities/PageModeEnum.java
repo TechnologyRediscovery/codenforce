@@ -21,7 +21,7 @@ package com.tcvcog.tcvce.entities;
  * or Occupancy domain; used for routing in Integration and
  * tallying of event stuff
  * 
- * @author Ellen Bascomb
+ * @author Ellen Bascomb of apartment 31Y
  */
 public enum PageModeEnum {
     

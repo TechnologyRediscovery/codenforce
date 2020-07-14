@@ -2,31 +2,25 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobType;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.IntensityClass;
+import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import org.primefaces.event.FileUploadEvent;
 
 /*
  * Copyright (C) 2018 Technology Rediscovery LLC
@@ -41,7 +35,13 @@ import org.primefaces.event.FileUploadEvent;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU General Public License <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
+                                    <h:outputText value=" | " />
+                                    <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
+                                    <h:outputText value=" | " />
+                                    <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currentProperty.parID}"/>  
+                                    <h:outputText value=" | " />
+                                    <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currentProperty.propertyID}"/>  
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -51,10 +51,27 @@ import org.primefaces.event.FileUploadEvent;
  */
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
-    private PropertyDataHeavy currProp;
+     
+    private PageModeEnum currentMode;
+    private List<PageModeEnum> pageModes;
     
-    private Municipality selectedMuni;
+    private PropertyDataHeavy currentProperty;
+    
+    private List<Municipality> muniList;
+    private Municipality muniSelected;
+    
+    
     private List<PropertyUseType> putList;
+    private PropertyUseType selectedPropertyUseType;
+    
+    private List<IntensityClass> conditionIntensityList;
+    private IntensityClass conditionIntensitySelected;
+    
+    private List<BOBSource> sourceList;
+    private BOBSource sourceSelected;
+    
+    
+    
     
     
     /**
@@ -67,10 +84,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
         
-        currProp = getSessionBean().getSessProperty();
+        currentProperty = getSessionBean().getSessProperty();
         
   
-        selectedMuni = getSessionBean().getSessMuni();
+        muniSelected = getSessionBean().getSessMuni();
 
         try {
             putList = pi.getPropertyUseTypeList();
@@ -91,11 +108,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      public void commitPropertyUpdates(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-//            currProp.setAbandonedDateStart(pc.configureDateTime(currProp.getAbandonedDateStart().to));
-            pc.editProperty(currProp, getSessionBean().getSessUser());
+//            currentProperty.setAbandonedDateStart(pc.configureDateTime(currentProperty.getAbandonedDateStart().to));
+            pc.editProperty(currentProperty, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Successfully updated property with ID " + getCurrProp().getPropertyID() 
+                        "Successfully updated property with ID " + getCurrentProperty().getPropertyID() 
                                 + ", which is now your 'active property'", ""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -112,7 +129,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void refreshCurrPropWithLists(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            setCurrProp(pc.getPropertyDataHeavy(currProp.getPropertyID(), getSessionBean().getSessUser().getMyCredential()));
+            setCurrentProperty(pc.getPropertyDataHeavy(currentProperty.getPropertyID(), getSessionBean().getSessUser().getMyCredential()));
         } catch (IntegrationException | BObStatusException | SearchException | AuthorizationException | EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -140,8 +157,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the currentProperty
      */
-    public PropertyDataHeavy getCurrProp() {
-        return currProp;
+    public PropertyDataHeavy getCurrentProperty() {
+        return currentProperty;
     }
     
     
@@ -149,8 +166,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @param currentProperty the currentProperty to set
      */
-    public void setCurrProp(PropertyDataHeavy currentProperty) {
-        this.currProp = currentProperty;
+    public void setCurrentProperty(PropertyDataHeavy currentProperty) {
+        this.currentProperty = currentProperty;
     }
     
  
@@ -159,17 +176,17 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
    
 
     /**
-     * @return the selectedMuni
+     * @return the muniSelected
      */
-    public Municipality getSelectedMuni() {
-        return selectedMuni;
+    public Municipality getMuniSelected() {
+        return muniSelected;
     }
 
     /**
-     * @param selectedMuni the selectedMuni to set
+     * @param muniSelected the muniSelected to set
      */
-    public void setSelectedMuni(Municipality selectedMuni) {
-        this.selectedMuni = selectedMuni;
+    public void setMuniSelected(Municipality muniSelected) {
+        this.muniSelected = muniSelected;
     }
 
  

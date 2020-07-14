@@ -73,7 +73,7 @@
                                                 <h:outputText value="Municipality"/>
                                             </p:outputLabel>
                                             <p:spacer height="5px"/>
-                                            <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuni}">
+                                            <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.muniSelected}">
                                                 <f:selectItems value="#{sessionBean.sessUser.authMunis}"/>
                                             </p:selectOneMenu>
                                             <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 
@@ -379,13 +379,13 @@
 
 
                                 <h1 class="property-blue">
-                                    <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address}" />
+                                    <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
                                     <h:outputText value=" | " />
-                                    <h:outputText value="#{propertyProfileBB.currProp.muni.muniName}" />
+                                    <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
                                     <h:outputText value=" | " />
-                                    <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currProp.lotAndBlock}"/>  
+                                    <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currentProperty.lotAndBlock}"/>  
                                     <h:outputText value=" | " />
-                                    <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currProp.propertyID}"/>  
+                                    <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currentProperty.propertyID}"/>  
                                 </h1>
 
                                 <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
@@ -395,22 +395,22 @@
                                         <div class="datum">
                                         
                                             
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address}" />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currentProperty.address}" />
                                             <p:spacer height="0px" />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_city}" />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currentProperty.address_city}" />
                                             <h:outputText value=", " />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_state}" />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currentProperty.address_state}" />
                                             <h:outputText value=" " />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_zip}" />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currentProperty.address_zip}" />
                                             
                                         </div>
                                         
                                         <div class="datum">
                                             <h:outputText styleClass="ui-label-inline" value="Lot and block: " />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.lotAndBlock}" />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currentProperty.lotAndBlock}" />
                                             <p:spacer height="0px" />
                                             <h:outputText styleClass="ui-label-inline" value="Parcel ID: " />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.parID}" />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currentProperty.parID}" />
                                         </div>
                                         
                                     </h:panelGroup>
@@ -421,7 +421,7 @@
                                             <h:outputText styleClass="uiLabel" value="Use Group:" />
                                         </h:outputLabel>
                                         <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-usegroup-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.useGroup}"/>
+                                        <h:outputText id="prop-info-usegroup-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.useGroup}"/>
                                     </h:panelGroup>
 
                                     <h:panelGroup>
@@ -429,7 +429,7 @@
                                             <h:outputText styleClass="uiLabel" value="Construction Type:" />
                                         </h:outputLabel>
                                         <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-consttype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.constructionType}"/>
+                                        <h:outputText id="prop-info-consttype-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.constructionType}"/>
                                     </h:panelGroup>
 
                                     <h:panelGroup>
@@ -437,13 +437,13 @@
                                             <h:outputText styleClass="uiLabel" value="County Code:" />
                                         </h:outputLabel>
                                         <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-countycode-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.countyCode}"/>
+                                        <h:outputText id="prop-info-countycode-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.countyCode}"/>
                                     </h:panelGroup>
 
                                   
                                     <h:panelGroup>
                                             <h:outputText styleClass="uiLabel" value="Notes:" />
-                                        <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.notes}"/>
+                                        <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.notes}"/>
                                     </h:panelGroup>
                                 </h:panelGrid>
 
@@ -480,7 +480,7 @@
                                     id="datascroller-propunits"
                                     var="unit"
                                     rowIndexVar="#{unit.unitID}"
-                                    value="#{propertyProfileBB.currProp.unitWithListsList}"
+                                    value="#{propertyProfileBB.currentProperty.unitWithListsList}"
                                     widgetVar="events-requiredactions-ds"
                                     >
 
@@ -508,7 +508,7 @@
                                                                ajax="true" 
                                                                actionListener="#{propertyProfileBB.initiateNewOccPeriodCreation(unit)}"
                                                                rendered="#{sessionBean.sessionUssessUserhasMuniStaffPermissions}"
-                                                               disabled="#{!propertyProfileBB.currProp.active}"
+                                                               disabled="#{!propertyProfileBB.currentProperty.active}"
                                                                oncomplete="PF('dialog-addoccperiod-var').show()"
                                                                value="Add new occupancy period" 
                                                                update="dialog-addoccperiod-form"
@@ -585,7 +585,7 @@
                                     rowKey="#{c.caseID}"
                                     widgetVar="propProfileCaseTable"
                                     rowExpandMode="multiple"
-                                    value="#{propertyProfileBB.currProp.ceCaseList}"
+                                    value="#{propertyProfileBB.currentProperty.ceCaseList}"
                                     tableStyleClass="primeDataTable">
                                     <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
@@ -652,7 +652,7 @@
                                 <p:dataTable
                                     id="prop-persons-datatable"
                                     var="person"
-                                    value="#{propertyProfileBB.currProp.personList}"
+                                    value="#{propertyProfileBB.currentProperty.personList}"
                                     rowKey="#{person.personID}"
                                     tableStyleClass="primeDataTable"
                                     rowExpandMode="single"
@@ -927,7 +927,7 @@
                                 <h:panelGroup>
                                     <p:outputLabel value="Street Address"/>
                                     <p:spacer width="5px"/>
-                                    <p:inputText value="#{propertyProfileBB.currProp.address}"
+                                    <p:inputText value="#{propertyProfileBB.currentProperty.address}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                 </h:panelGroup>
@@ -935,7 +935,7 @@
                                 <h:panelGroup>
                                     <p:outputLabel value="City"/>
                                     <p:spacer width="5px"/>
-                                    <p:inputText value="#{propertyProfileBB.currProp.address_city}"
+                                    <p:inputText value="#{propertyProfileBB.currentProperty.address_city}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                 </h:panelGroup>
@@ -943,28 +943,28 @@
 
                                     <p:outputLabel value="Zip Code"/>
                                     <p:spacer width="5px"/>
-                                    <p:inputText value="#{propertyProfileBB.currProp.address_zip}"
+                                    <p:inputText value="#{propertyProfileBB.currentProperty.address_zip}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <p:outputLabel value="State"/>
                                     <p:spacer width="5px"/>
-                                    <p:inputText value="#{propertyProfileBB.currProp.address_state}"
+                                    <p:inputText value="#{propertyProfileBB.currentProperty.address_state}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <p:outputLabel value="Lot and Block"/>
                                     <p:spacer width="5px"/>
-                                    <p:inputText value="#{propertyProfileBB.currProp.lotAndBlock}"
+                                    <p:inputText value="#{propertyProfileBB.currentProperty.lotAndBlock}"
                                                  onkeydown="PF('datatable').onKeyDown(event)"
                                                  onkeyup="PF('datatable').onKeyUp(event)"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <p:outputLabel value="ParcelID"/>
                                     <p:spacer width="5px"/>
-                                    <p:inputText value="#{propertyProfileBB.currProp.parID}"
+                                    <p:inputText value="#{propertyProfileBB.currentProperty.parID}"
                                                   onkeydown="PF('datatable').onKeyDown(event)"
                                                   onkeyup="PF('datatable').onKeyUp(event)"/>
                                 </h:panelGroup>
@@ -972,7 +972,7 @@
                                     <p:outputLabel value="Municipality"/>
                                     <p:spacer width="5px"/>
                                     <h:selectOneMenu id="propinfoedit-muni-som"
-                                                     value="#{propertyProfileBB.currProp.muni}">
+                                                     value="#{propertyProfileBB.currentProperty.muni}">
                                         <f:converter converterId="muniConverter"/>
                                         <f:selectItems id="propinfoedit-muninamelist" 
                                                        value="#{sessionBean.sessessUserthMuniList}"
@@ -1058,7 +1058,7 @@
                                 widgetVar="datatable"
                                 rowIndexVar="rowIndex"
                                 var="unit"
-                                value="#{propertyProfileBB.currProp.unitList}"
+                                value="#{propertyProfileBB.currentProperty.unitList}"
                                 tabindex="2"
                                 rowKey="#{unit.unitID}"
                                 editable="true">                                         
