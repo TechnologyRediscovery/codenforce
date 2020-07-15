@@ -436,6 +436,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public String storeReason() {
 
+        if(currentApplication.getReason() == null){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a reason from the drop-down list.", ""));
+            return "";
+        }
+        
         getSessionBean().setSessOccPermitApplication(currentApplication);
 
         try {
@@ -805,6 +812,14 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             if (added == true) {
 
+                workingUnit.setPropertyID(existingProp.getPropertyID());
+                
+                try{
+                workingUnit.setUnitID(pri.insertPropertyUnit(workingUnit));
+                } catch(IntegrationException ex){
+                    System.out.println("OccPermitApplicationBB.submitUnitChangeList() | ERROR: " + ex);
+                }
+                    
                 //This unit doesn't exist in our database. Save all of its fields so it can be saved to the database
                 skeleton = new PropertyUnitChangeOrder(workingUnit);
             }
@@ -855,24 +870,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         for (PropertyUnitChangeOrder order : changeList) {
 
             //save who made this change order
-            if (changedby.getPersonID() != 0) {
 
-                PersonIntegrator pi = getPersonIntegrator();
-
-                Person temp = new Person();
-
-                try {
-                    temp = pi.getPerson(changedby.getPersonID());
-                } catch (IntegrationException ex) {
-                    System.out.println("OccPermitApplicationBB.submitUnitChangeList() | ERROR: " + ex);
-                }
-
-                String changeName = temp.getFirstName() + " " + temp.getLastName() + " ID: " + temp.getPersonID();
-
-                order.setChangedBy(changeName);
-            } else {
-                order.setChangedBy(changedby.getFirstName() + " " + changedby.getLastName());
-            }
+                order.setChangedBy(changedby.getPersonID());
 
             //Finally, insert the order
             try {
@@ -889,7 +888,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public void submitPersonChangeList() {
         PersonIntegrator pi = getPersonIntegrator();
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
-        UserCoordinator uc = getUserCoordinator();
 
         List<PersonChangeOrder> changeList = new ArrayList<>();
 
@@ -996,6 +994,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         
         Person currentApplicant = applicant.getBundledPerson();
         
+        currentApplicant.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
+        
         try {
            changedby = pi.getPerson(currentApplicant.getPersonID());
            
@@ -1014,31 +1014,53 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             }
         }
         
+        Person contactUnbundled = null;
         //We also need to make sure the preferred contact is in the database
         
         try {
-           pi.getPerson(contactPerson.getBundledPerson().getPersonID());
+           contactUnbundled = pi.getPerson(contactPerson.getBundledPerson().getPersonID());
            
         } catch(IntegrationException ex){
             System.out.println(ex);
+            
+        }
+        
+        if(contactUnbundled == null){
             //Getting from the database failed. We'll have to insert it.
             try{
                 
-               contactPerson.getBundledPerson().setPersonID(pi.insertPerson(contactPerson.getBundledPerson()));
+                 contactUnbundled = contactPerson.getBundledPerson();
+                
+                contactUnbundled.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
+                
+               contactUnbundled.setPersonID(pi.insertPerson(contactPerson.getBundledPerson()));
                 
             } catch(IntegrationException exTwo){
                 System.out.println("OccPermitApplicationBB.submitPersonChangeList() | ERROR: " + exTwo);
             }
-            
         }
 
         for (PersonChangeOrder order : changeList) {
 
-            //save who made this change order
-                String changeName = changedby.getFirstName() + " " + changedby.getLastName() + " ID: " + changedby.getPersonID();
+                order.setChangedBy(changedby.getPersonID());
 
-                order.setChangedBy(changeName);
-
+                if(order.getPersonID() == 0){
+                    
+                    //If they aren't in the database, we need to insert them first so that the change order has something to point to.
+                    
+                    try{
+                        
+                        Person temp = order.toPerson();
+                        
+                        temp.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
+                        
+                    order.setPersonID(pi.insertPerson(temp));
+                    }catch(IntegrationException ex){
+                        System.out.println("OccPermitApplicationBB.submitPersonChangeList() | ERROR: " + ex);
+                    }
+                    
+                }
+                
             //Finally, insert the order
             try {
                 pi.insertPersonChangeOrder(order);

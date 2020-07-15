@@ -133,6 +133,7 @@ public class PersonChangeOrder extends ChangeOrder {
     }
 
     public PersonChangeOrder(Person input) {
+        personID = input.getPersonID();
         firstName = input.getFirstName();
         lastName = input.getLastName();
         setCompositeLastName(input.isCompositeLastName());

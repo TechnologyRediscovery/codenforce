@@ -35,7 +35,7 @@ public class ChangeOrder extends BOb {
     protected User approvedBy; 
     protected ChangeOrderAction action; //not in the database, used by interface
     protected boolean active;
-    protected String changedBy;
+    protected int changedBy;
 
     public ChangeOrder() {
     }
@@ -126,11 +126,11 @@ public class ChangeOrder extends BOb {
         this.action = action;
     }
 
-    public String getChangedBy() {
+    public int getChangedBy() {
         return changedBy;
     }
 
-    public void setChangedBy(String changedBy) {
+    public void setChangedBy(int changedBy) {
         this.changedBy = changedBy;
     }
     

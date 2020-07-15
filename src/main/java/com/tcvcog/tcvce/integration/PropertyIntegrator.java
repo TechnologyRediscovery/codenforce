@@ -1029,7 +1029,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return pu;
     }
     
-    public void insertPropertyUnit(PropertyUnit pu) throws IntegrationException {
+    public int insertPropertyUnit(PropertyUnit pu) throws IntegrationException {
         String query =  "INSERT INTO public.propertyunit(\n" +
                         "            unitid, unitnumber, property_propertyid, otherknownaddress, notes, \n" +
                         "            rentalintentdatestart, rentalintentdatestop, rentalintentlastupdatedby_userid, \n" +
@@ -1041,6 +1041,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
+        int lastID = 0;
+        
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, pu.getUnitNumber());
@@ -1074,6 +1076,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             
             stmt.execute();
+            
+            // grab the newly inserted propertyid
+            String idNumQuery = "SELECT currval('propertunit_unitid_seq');";
+            Statement s = con.createStatement();
+            ResultSet rs;
+            rs = s.executeQuery(idNumQuery);
+            rs.next();
+            lastID = rs.getInt(1);
+            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
@@ -1081,6 +1092,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
+        
+        return lastID;
     }
     
      public void updatePropertyUnit(PropertyUnit pu) throws IntegrationException {
@@ -1267,10 +1280,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     
     public void insertPropertyUnitChange(PropertyUnitChangeOrder uc) throws IntegrationException {
         String query = "INSERT INTO public.propertyunitchange(\n"
-                + "            unitchangeid, unitnumber, unit_unitid, otherknownaddress, notes, \n"
-                + "            rentalnotes, removed, added, changedon, approvedby, changedby)\n"
+                + "            unitchangeid, unitnumber, propertyunit_unitid, otherknownaddress, notes, \n"
+                + "            rentalnotes, removed, added, changedby_personid)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, ?, \n"
-                + "            ?, ?, ?, ?, ?, ?, ?);";
+                + "            ?, ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1284,9 +1297,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(5, uc.getRentalNotes());
             stmt.setBoolean(6, uc.isRemoved());
             stmt.setBoolean(7, uc.isAdded());
-            stmt.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
-            stmt.setInt(9, uc.getApprovedBy().getUserID());
-            stmt.setString(10, uc.getChangedBy());
+            stmt.setInt(8, uc.getChangedBy());
 
             stmt.execute();
         } catch (SQLException ex) {
@@ -1313,10 +1324,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     public PropertyUnitChangeOrder getPropertyUnitChange(int unitChangeId) throws IntegrationException {
         PropertyUnitChangeOrder uc = new PropertyUnitChangeOrder();
-        String query = "SELECT unitchangeid, unitid, property_propertyid, property.address,\n"
+        String query = "SELECT unitchangeid, propertyunit_unitid,\n"
                 + "propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n"
                 + "propertyunitchange.notes, propertyunitchange.rentalnotes,\n"
-                + "removed, added, changedon, approvedon, approvedby, inactive\n"
+                + "removed, added, changedby_personid, approvedondate, approvedby_userid, inactive\n"
                 + "FROM propertyunitchange JOIN propertyunit ON propertyunitchange.unit_unitid = propertyunit.unitid\n"
                 + "JOIN property ON propertyunit.property_propertyid = property.propertyid;"
                 + " WHERE unitchangeid=?;";
@@ -1349,17 +1360,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         UserIntegrator ui = getUserIntegrator();
         PropertyUnitChangeOrder uc = new PropertyUnitChangeOrder();
         uc.setUnitChangeID(rs.getInt("unitchangeid"));
-        uc.setUnitID(rs.getInt("unit_unitid"));
+        uc.setUnitID(rs.getInt("propertyunit_unitid"));
         uc.setUnitNumber(rs.getString("unitnumber"));
         uc.setNotes(rs.getString("notes"));
         uc.setOtherKnownAddress(rs.getString("otherknownaddress"));
         uc.setRentalNotes(rs.getString("rentalnotes"));
         uc.setAdded(rs.getBoolean("added"));
         uc.setRemoved(rs.getBoolean("removed"));
-        uc.setChangedOn(rs.getTimestamp("changedon"));
-        uc.setApprovedOn(rs.getTimestamp("approvedon"));
-        uc.setApprovedBy(ui.getUser(rs.getInt("approvedby")));
-        uc.setChangedBy(rs.getString("changedby"));
+        uc.setApprovedOn(rs.getTimestamp("approvedondate"));
+        uc.setApprovedBy(ui.getUser(rs.getInt("approvedby_userid")));
+        uc.setChangedBy(rs.getInt("changedby_personid"));
         uc.setActive(rs.getBoolean("active"));
         return uc;
     }
@@ -1371,8 +1381,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      */
     public void updatePropertyUnitChange(PropertyUnitChangeOrder changeToUpdate) throws IntegrationException {
         String query = "UPDATE public.propertyunitchange\n"
-                + "SET unitnumber=?, unit_unitid=?, otherknownaddress=?, notes=?, rentalnotes=?,\n"
-                + "removed=?, added=?, changedon=?, approvedon=?, approvedby=?, changedby=?, inactive=?\n"
+                + "SET unitnumber=?, propertyunit_unitid=?, otherknownaddress=?, notes=?, rentalnotes=?,\n"
+                + "removed=?, added=?, approvedon=?, approvedby=?, changedby_personid=?, inactive=?\n"
                 + "WHERE unitchangeid = ?;";
 
         Connection con = getPostgresCon();
@@ -1388,12 +1398,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(5, changeToUpdate.getRentalNotes());
             stmt.setBoolean(6, changeToUpdate.isRemoved());
             stmt.setBoolean(7, changeToUpdate.isAdded());
-            stmt.setTimestamp(8, changeToUpdate.getChangedOn());
-            stmt.setTimestamp(9, changeToUpdate.getApprovedOn());
-            stmt.setInt(10, changeToUpdate.getApprovedBy().getUserID());
-            stmt.setString(11, changeToUpdate.getChangedBy());
-            stmt.setBoolean(12, changeToUpdate.isActive());
-            stmt.setInt(13, changeToUpdate.getUnitChangeID());
+            stmt.setTimestamp(8, changeToUpdate.getApprovedOn());
+            stmt.setInt(9, changeToUpdate.getApprovedBy().getUserID());
+            stmt.setInt(10, changeToUpdate.getChangedBy());
+            stmt.setBoolean(11, changeToUpdate.isActive());
+            stmt.setInt(12, changeToUpdate.getUnitChangeID());
 
             stmt.executeUpdate();
 
@@ -1411,14 +1420,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public List<PropertyUnitChangeOrder> getPropertyUnitChangeList(Property property) throws IntegrationException {
         List<PropertyUnitChangeOrder> ucl = new ArrayList<>();
         String query = "SELECT \n"
-                + "	unitchangeid, unit_unitid, propertyunitchange.property_propertyid, property.address,\n"
+                + "	unitchangeid, propertyunit_unitid, \n"
                 + "	propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n"
                 + "	propertyunitchange.notes, propertyunitchange.rentalnotes,\n"
-                + "	removed, added, changedon, approvedon, changedby, approvedby, inactive\n"
+                + "	removed, added, approvedon, changedby_personid, approvedby_userid, inactive\n"
                 + "FROM \n"
                 + "	propertyunitchange \n"
-                + "JOIN property ON propertyunitchange.property_propertyid = property.propertyid\n"
-                + "WHERE propertyunitchange.property_propertyid=? AND propertyunitchange.inactive IS null AND propertyunitchange.approvedon IS null;";
+                + "JOIN property ON propertyunit.property_propertyid = property.propertyid\n"
+                + "JOIN propertyunit ON propertyunit.propertyunitid = propertyunitchange.propertyunit_unitid"
+                + "WHERE property.propertyid=? AND propertyunitchange.inactive IS null AND propertyunitchange.approvedon IS null;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1446,14 +1456,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public List<PropertyUnitChangeOrder> getPropertyUnitChangeListAll(Property property) throws IntegrationException {
         List<PropertyUnitChangeOrder> ucl = new ArrayList<>();
         String query = "SELECT \n"
-                + "	unitchangeid, unit_unitid, propertyunitchange.property_propertyid, property.address,\n"
+                + "	unitchangeid, propertyunit_unitid, \n"
                 + "	propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n"
                 + "	propertyunitchange.notes, propertyunitchange.rentalnotes,\n"
-                + "	removed, added, changedon, approvedon, changedby, approvedby, inactive\n"
+                + "	removed, added, approvedon, changedby_personid, approvedby_userid, inactive\n"
                 + "FROM \n"
                 + "	propertyunitchange \n"
-                + "JOIN property ON propertyunitchange.property_propertyid = property.propertyid\n"
-                + "WHERE propertyunitchange.property_propertyid=?;";
+                + "JOIN property ON propertyunit.property_propertyid = property.propertyid\n"
+                + "JOIN propertyunit ON propertyunit.propertyunitid = propertyunitchange.propertyunit_unitid"
+                + "WHERE property.propertyid=?;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;

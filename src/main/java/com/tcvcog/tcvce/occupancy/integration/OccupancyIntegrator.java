@@ -1065,10 +1065,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     public int insertOccPermitApplicationAndReturnId(OccPermitApplication application) throws IntegrationException {
-        String query = "INSERT INTO public.occupancypermitapplication(applicationid,  "
+        String query = "INSERT INTO public.occpermitapplication(applicationid,  "
                 + "reason_reasonid, submissiontimestamp, "
-                + "submitternotes, internalnotes, propertyunitid, "
-                + "person_personid, rental) "
+                + "submitternotes, internalnotes, propertyunitid, declaredtotaladults, declaredtotalyouth, rentalintent) "
                 + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?) "
                 + "RETURNING applicationid;";
 
@@ -1078,18 +1077,36 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(2, application.getReason().getId());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
-            stmt.setString(4, application.getSubmissionNotes());
-            stmt.setString(5, application.getInternalNotes());
-            stmt.setString(6, String.valueOf(application.getApplicationPropertyUnit().getUnitID()));
-            stmt.setInt(7, application.getApplicantPerson().getPersonID());
+            stmt.setInt(1, application.getReason().getId());
+            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
+            stmt.setString(3, application.getSubmissionNotes());
+            stmt.setString(4, application.getInternalNotes());
+            stmt.setString(5, String.valueOf(application.getApplicationPropertyUnit().getUnitID()));
+            
+            int adults = 0;
+            int youth = 0;
+                    
+                    for(Person p : application.getAttachedPersons()){
+                        
+                        if(p.isUnder18()){
+                            youth++;
+                        } else {
+                            adults++;
+                        }
+                        
+                    }
+            
+            stmt.setInt(6, adults);
+            stmt.setInt(7, youth);
+            stmt.setBoolean(8, false);
+                    
             stmt.execute();
             ResultSet inserted_application = stmt.getResultSet();
             inserted_application.next();
             applicationId = inserted_application.getInt(1);
 
         } catch (SQLException ex) {
+            System.out.println("OccupancyIntegrator.insertOccPermitApplicationAndReturnId() | ERROR:" + ex);
             throw new IntegrationException("OccupancyIntegrator.insertOccPermitApplicationAndReturnId"
                     + "| IntegrationError: unable to insert occupancy permit application ", ex);
         } finally {
@@ -1135,9 +1152,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     public OccPermitApplication getOccPermitApplication(int applicationID) throws IntegrationException {
         OccPermitApplication occpermitapp = null;
-        String query = "   SELECT applicationid, reason_reasonid, submissiontimestamp, occupancyinspection_id, \n"
+        String query = "   SELECT applicationid, reason_reasonid, submissiontimestamp, \n"
                 + "       submitternotes, internalnotes, propertyunitid, declaredtotaladults, \n"
-                + "       declaredtotalyouth\n"
+                + "       declaredtotalyouth, occperiod_periodid, rentalintent\n"
                 + "  FROM public.occpermitapplication WHERE applicationid=?;";
 
         Connection con = null;
@@ -1169,7 +1186,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         PropertyIntegrator propint = getPropertyIntegrator();
         try {
             occpermitapp.setId(rs.getInt("applicationid"));
-            occpermitapp.setReason(getOccPermitApplicationReason(rs.getInt("reasonid")));
+            occpermitapp.setReason(getOccPermitApplicationReason(rs.getInt("reason_reasonid")));
             occpermitapp.setSubmissionDate(rs.getTimestamp("submissiontimestamp").toLocalDateTime());
             occpermitapp.setSubmissionNotes(rs.getString("submitternotes"));
             occpermitapp.setInternalNotes(rs.getString("internalNotes"));
@@ -1478,8 +1495,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 stmt.setString(5, person.getPersonType().getLabel());
                 stmt.execute();
             } catch (SQLException ex) {
+                System.out.println("OccupancyIntegrator.insertOccPeriodPersons() | ERROR: "+ ex);
                 throw new IntegrationException("OccupancyIntegrator.insertOccPermitPersons"
-                        + " | IntegrationException: Unable to update occupancy permit application ", ex);
+                        + " | IntegrationException: Unable to insert occupancy permit application ", ex);
             }
         }
     }

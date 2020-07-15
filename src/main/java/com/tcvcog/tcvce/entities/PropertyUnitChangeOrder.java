@@ -37,6 +37,7 @@ public class PropertyUnitChangeOrder extends ChangeOrder {
     }
 
     public PropertyUnitChangeOrder(PropertyUnit input) {
+        unitID = input.getUnitID();
         unitNumber = input.getUnitNumber();
         otherKnownAddress = input.getOtherKnownAddress();
         notes = input.getNotes();
