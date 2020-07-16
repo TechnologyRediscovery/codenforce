@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,6 +56,10 @@ public class        PropertyUnitDataHeavy
             this.lastUpdatedTS = prop.getLastUpdatedTS();
 
         }
+    }
+
+    public PropertyUnitDataHeavy() {
+        periodList = new ArrayList<>();
     }
     
     

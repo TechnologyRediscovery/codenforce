@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,10 +24,19 @@ import java.util.Date;
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundlePerson extends PublicInfoBundle implements Serializable {
+public class PublicInfoBundlePerson extends PublicInfoBundle {
     
     private Person bundledPerson;
-
+    
+    @Override
+    public String toString(){
+        return this.getClass().getName() + bundledPerson.getPersonID();
+    }
+    
+    public Person getBundledPerson() {
+        return bundledPerson;
+    }
+    
     public void setBundledPerson(Person input) {
         
         setPaccEnabled(!input.isUnder18());
@@ -76,15 +84,6 @@ public class PublicInfoBundlePerson extends PublicInfoBundle implements Serializ
         input.setMergedList(new ArrayList<Integer>());
         
         bundledPerson = input;
-    }
-    
-    @Override
-    public String toString(){
-        return this.getClass().getName() + bundledPerson.getPersonID();
-    }
-    
-    public Person getBundledPerson() {
-        return bundledPerson;
     }
     
 }

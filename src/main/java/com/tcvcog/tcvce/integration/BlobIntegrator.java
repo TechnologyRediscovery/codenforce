@@ -17,7 +17,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -84,7 +83,6 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public List<Blob> getRecentBlobs() throws IntegrationException{
-        Blob blob = null;
         ArrayList<Blob> blobList = new ArrayList();
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -102,7 +100,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                     .atZone(ZoneId.systemDefault()).toInstant()));
             rs = stmt.executeQuery();
             while(rs.next()){
-                blob = new Blob();
+                Blob blob = new Blob();
                 blob.setBlobID(rs.getInt("photodocid"));
                 blob.setDescription(rs.getString("photodocdescription"));
                 blob.setTimestamp(rs.getTimestamp("photodocdate").toLocalDateTime());
@@ -141,10 +139,10 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.photodoc(\n" +
-                        "            photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocuploadpersonid, phodocfilename, \n" +
+                        "            photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocuploadpersonid, photodocfilename, \n" +
                         "            photodocblob)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
-                        "            ?);";
+                        "            ?, ?);";
         
         PreparedStatement stmt = null;
         
@@ -175,7 +173,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             blob.setBlobID(lastID);
             
         } catch (SQLException ex) {
-            //System.out.println(ex);
+            System.out.println(ex);
             throw new IntegrationException("Error inserting blob. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
@@ -202,9 +200,9 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch (SQLException ex) {
-            //System.out.println(ex);
+            System.out.println("BlobIntegrator.deleteBlob() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
@@ -215,13 +213,14 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         //violation linker table
         query = "DELETE FROM public.codeviolationphotodoc WHERE photodoc_photodocid = ?";
         stmt = null;
+        con = getPostgresCon();
         
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch (SQLException ex) {
-            //System.out.println(ex);
+            System.out.println("BlobIntegrator.deleteBlob() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
@@ -234,49 +233,53 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                         "  FROM public.propertyphotodoc WHERE photodoc_photodocid = ?;";
         
         stmt = null;
+        con = getPostgresCon();
         
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch (SQLException ex) {
-            //System.out.println(ex);
+            System.out.println("BlobIntegrator.deleteBlob() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        //person linker table
+        //person linker table - which doesn't exist at the moment, so this code is commented out.
+        /*
         query = "DELETE" +
                         "  FROM public.personphotodoc WHERE photodoc_photodocid = ?;";
         
         stmt = null;
+        con = getPostgresCon();
         
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch (SQLException ex) {
-            //System.out.println(ex);
+            System.out.println("BlobIntegrator.deleteBlob() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. ", ex);
         } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {ignored} }
+             if (con != null) { try { con.close(); } catch (SQLException e) { ignored } }
         } // close finally
-        
+        */
         
         //delete the main photodoc entry
         query = "DELETE FROM public.photodoc WHERE photodocid = ?;";
         
         stmt = null;
+        con = getPostgresCon();
         
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch (SQLException ex) {
-            //System.out.println(ex);
+            System.out.println("BlobIntegrator.deleteBlob() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting blob. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }

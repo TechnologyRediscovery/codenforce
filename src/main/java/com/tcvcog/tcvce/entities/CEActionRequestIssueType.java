@@ -28,6 +28,7 @@ public class CEActionRequestIssueType {
     private Municipality muni;
     private String notes;
     private IntensityClass intensityClass;
+    private boolean active;
 
     /**
      * @return the issueTypeID
@@ -112,8 +113,13 @@ public class CEActionRequestIssueType {
     public void setIntensityClass(IntensityClass intensityClass) {
         this.intensityClass = intensityClass;
     }
-    
-    
-    
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
     
 }

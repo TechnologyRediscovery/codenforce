@@ -5,7 +5,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +17,12 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializable {
+public class PublicInfoBundleCECase extends PublicInfoBundle{
 
     private CECase bundledCase;
     private boolean paccEnabled;
 
-    private List<EventCnF> publicEventList;
+    private List<PublicInfoBundleEventCnF> publicEventList;
 
     private LocalDateTime mostRecentLoggedEvent;
 
@@ -36,7 +35,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
 
     @Override
     public String toString() {
-    return this.getClass().getName() + bundledCase.getCaseID();
+        return this.getClass().getName() + bundledCase.getCaseID();
     }
 
     @Override
@@ -97,31 +96,24 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
         input.setPropertyUnitID(0);
         input.setNotes("*****");
         input.setSource(new BOBSource());
-        
+
         setPacc(input.getPublicControlCode());
-        
-        if (input.getCaseManager() != null && input.getCaseManager().getPerson() != null) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(input.getCaseManager().getPerson().getFirstName());
-            sb.append(" ");
-            sb.append(input.getCaseManager().getPerson().getLastName());
-            setCaseManagerName(sb.toString());
-            setCaseManagerContact(input.getCaseManager().getPerson().getPhoneWork());
-        }
+
+        setCaseManager(input.getCaseManager());
         input.setCaseManager(new User());
 
         if (input.getViolationList() != null) {
             countViolations = input.getViolationList().size();
         }
         input.setViolationList(new ArrayList<CodeViolation>());
-        
+
         if (input.getNoticeList() != null) {
             countNoticeLetters = input.getNoticeList().size();
         }
         input.setNoticeList(new ArrayList<NoticeOfViolation>());
 
-        if (input.getCitationList() != null){
-        countCitations = input.getCitationList().size();
+        if (input.getCitationList() != null) {
+            countCitations = input.getCitationList().size();
         }
         input.setCitationList(new ArrayList<Citation>());
 
@@ -190,28 +182,30 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @return the paccEnabled
      */
+    @Override
     public boolean isPaccEnabled() {
         return paccEnabled;
     }
 
     /**
-     * @return the publicEventList
-     */
-    public List<EventCnF> getPublicEventList() {
-        return publicEventList;
-    }
-
-    /**
      * @param paccEnabled the paccEnabled to set
      */
+    @Override
     public void setPaccEnabled(boolean paccEnabled) {
         this.paccEnabled = paccEnabled;
     }
 
     /**
+     * @return the publicEventList
+     */
+    public List<PublicInfoBundleEventCnF> getPublicEventList() {
+        return publicEventList;
+    }
+
+    /**
      * @param publicEventList the publicEventList to set
      */
-    public void setPublicEventList(List<EventCnF> publicEventList) {
+    public void setPublicEventList(List<PublicInfoBundleEventCnF> publicEventList) {
         this.publicEventList = publicEventList;
     }
 

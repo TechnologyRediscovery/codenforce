@@ -12,145 +12,157 @@
     <h:body>
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
-                <f:view id="requestCEActionRequestViewReviewAndSubmit">
+                <f:view id="review-info-view">
 
                     <div class="mainContainer">
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
-                        <h1>Review your request details</h1>
 
-                        <h:outputText value=""/>
-
-                        <h:form id="requestCEActionFlowFormReviewAndSubmit">
-                            
-                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                 columnClasses="gridTd, gridTd" id="selectedRequestDetails">
-                                       
-                                        <h:panelGroup>
-                                            <h:outputLabel class="bold" value="Address" />
-                                            <p:spacer height="5px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText id="selr-prop-address" value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/><br />
-                                                <h:outputText id="selr-prop-muni" value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.muni.muniName}"/>
-                                            </div>
-                                           
-                                        </h:panelGroup>
-
-                                        
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel class="bold" value="Date Submitted" />
-                                            <p:spacer height="5px"/>
-                                            <div class="wrapText">
-                                                <h:outputText id="selr-submitted-ts"  value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecord}"/>
-                                            </div>
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
-                                            <div class="wrapText">
-                                                <h:outputLabel styleClass="bold" value="Human safety issue?"/>
-                                                <p:spacer height="5px"/>
-                                                <h:outputText id="selr-isurgent"  value="#{cEActionRequestSubmitBB.currentRequest.isUrgent}"/>
-                                            </div>
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
-
-                                            <div class="wrapText">
-                                                <h:outputLabel id="selr-persontype" styleClass="bold" 
-                                                               value="Person Role: #{cEActionRequestSubmitBB.currentRequest.requestor.personType.label}"/>
-                                                <p:spacer height="5px"/>
-
-                                                <h:outputText id="selr-pers-fn" value="#{cEActionRequestSubmitBB.currentRequest.requestor.firstName} "/> 
-                                                <h:outputText id="selr-pers-ln" value="#{cEActionRequestSubmitBB.currentRequest.requestor.lastName}"/><br /> 
-                                                <h:outputText id="selr-pers-str" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressStreet}"/> <br />
-                                                <h:outputText id="selr-pers-city" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressCity}, "/> 
-                                                <h:outputText id="selr-pers-state" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressState} "/> 
-                                                <h:outputText id="selr-pers-zip" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressZip}"/> 
-                                            </div>
-                                           
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Contact: "/>
-                                            <p:spacer height="5px"/>
-                                            <div class="wrapText"> 
-                                                <h:outputText value="Phone (cell): "/>
-                                                <h:outputText id="selr-pers-phone-cell" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneCell}"/> <br />
-                                                <h:outputText  value="Phone (work): "/>
-                                                <h:outputText id="selr-pers-phone-work" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneWork}"/> <br />
-                                                <h:outputText value="Phone (home): "/>
-                                                <h:outputText id="selr-pers-phone-home" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneHome}"/> <br />
-                                                <h:outputText value="Email: "/>
-                                                <h:outputText id="selr-pers-email" value="#{cEActionRequestSubmitBB.currentRequest.requestor.email}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                
-                                        <f:facet name="footer" class="leftalign">
-                                            <h:outputLabel styleClass="bold" value="Photos: "/>
-                                            <p:spacer height="5px"/>
-                                            <p:dataTable
-                                                id="photoTable"
-                                                var="blobID"
-                                                value="#{sessionBean.ceactionRequestForSubmission.blobIDList}"
-                                                rowKey="#{blobID}"
-                                                tableStyleClass="primeDataTable"
-                                                draggableRows="false" tabindex="6">
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="blobID"/>
-                                                    </f:facet>
-                                                    <h:outputText value="#{blobID}"/>
-                                                </p:column>
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Photo"/>
-                                                    </f:facet>
-                                                    <p:graphicImage width="100%" value="#{blobCoordinator.image}">
-                                                        <f:param name="blobID" value="#{blobID}"/>
-                                                    </p:graphicImage>
-                                                </p:column>
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Description"/>
-                                                    </f:facet>
-                                                    <h:outputText escape="false" value="#{blobCoordinator.getBlob(blobID).description}"/>
-                                                </p:column>
-                                            </p:dataTable>
-                                        </f:facet>
-
-
-                                        <f:facet name="footer" class="leftalign">
-                                            <h:outputLabel styleClass="bold" value="Request description:"/>
-                                            <div class="rowExpansion" style="leftalign">
-                                                <h:outputText id="selr-descr" escape="false" value="#{sessionBean.ceactionRequestForSubmission.requestDescription}"/>
-                                            </div>
-                                            
-                                        </f:facet>
-                                    </h:panelGrid>
-                            
-                                    
-                            
-                            <h2>Submit to code enforcement officers</h2>
-                            <p:commandButton 
-                                id="submitRequest" ajax="false"
-                                value="Submit Code Enforcement Request" 
-                                styleClass="buttonOwnLine" tabindex="1"
-                                action="#{cEActionRequestSubmitBB.submitActionRequest}"/>
-
+                        <!--Global Messages-->
+                        <h:form id="review-info-messages-form">
+                            <p:messages id="review-info-messages" globalOnly="true" showDetail="true" showSummary="true" />
                         </h:form>
 
+                        <p:panel id="review-info-panel"
+                                 toggleable="true"
+                                 widgetVar="review-info-panel-var"
+                                 collapsed="false"
+                                 header="Review your request details">
 
+                            <h:form id="review-info-form">
 
+                                <!--Grid CSS From Primefaces-->
+                                <div class="ui-g data-container">
 
+                                    <h3>Requestor:</h3>
 
+                                    <!--Data Field Label And Value-->
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Role:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.personType.label}"/>
+                                    </div>
 
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Name:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.firstName} #{cEActionRequestSubmitBB.currentRequest.requestor.lastName}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Address:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressStreet}"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressCity}, #{cEActionRequestSubmitBB.currentRequest.requestor.addressState}"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressZip}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Anonymity requested?"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.anonymitiyRequested ? 'Yes' : 'No'}"/>
+                                    </div>
+
+                                    <h3>Contact information:</h3>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Phone (cell):"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneCell}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Phone (work):"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneWork}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Phone (home):"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneHome}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Email:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.email}"/>
+                                    </div>
+
+                                    <h3>Action request:</h3>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Address of concern:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Municipality:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.muni.muniName}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Date submitted:"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecord}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Human safety issue?"/>
+                                        <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.isUrgent}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" value="Request description:"/>
+                                        <h:outputText styleClass="data_field_value" escape="false" value="#{CEActionRequestSubmitBB.requestForSubmission.requestDescription}"/>
+                                    </div>
+
+                                    <h3>Photos:</h3>
+
+                                    <p:dataTable
+                                        id="photoTable"
+                                        var="blob"
+                                        value="#{cEActionRequestSubmitBB.blobList}"
+                                        rowKey="#{blob.blobID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="false" tabindex="6">
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="blobID"/>
+                                            </f:facet>
+                                            <h:outputText value="#{blob.blobID}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Photo"/>
+                                            </f:facet>
+                                            <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                <f:param name="blobID" value="#{blob.blobID}"/>
+                                            </p:graphicImage>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Description"/>
+                                            </f:facet>
+                                            <h:outputText escape="false" value="#{blob.description}"/>
+                                        </p:column>
+                                    </p:dataTable>
+
+                                    <h2>Submit to code enforcement officers</h2>
+                                    <p:commandButton 
+                                        id="restartRequest" ajax="false"
+                                        value="Restart Code Enforcement Request" 
+                                        styleClass="buttonOwnLine" tabindex="1"
+                                        action="#{cEActionRequestSubmitBB.restartRequest()}"/>
+                                    <p:commandButton 
+                                        id="submitRequest" ajax="false"
+                                        value="Submit Code Enforcement Request" 
+                                        styleClass="buttonOwnLine" tabindex="2"
+                                        action="#{cEActionRequestSubmitBB.submitActionRequest}"/>
+
+                                </div>
+
+                            </h:form>
+
+                        </p:panel>
 
                     </div>
-                </f:view>
-            </ui:define>
-        </ui:composition>
-    </h:body>
-</html>
 
+                </f:view>
+
+            </ui:define>
+
+        </ui:composition>
+
+    </h:body>
+
+</html>

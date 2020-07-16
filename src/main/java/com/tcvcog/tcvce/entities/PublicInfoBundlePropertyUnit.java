@@ -17,43 +17,41 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundlePayment extends PublicInfoBundle {
+public class PublicInfoBundlePropertyUnit extends PublicInfoBundle {
     
-    private Payment bundledPayment;
-    private PublicInfoBundlePerson payer;
-    
+    private PropertyUnit bundledUnit;
+    private List<PublicInfoBundleOccPeriod> periodList;
+       
     @Override
-    public String toString(){
-        
-        return this.getClass().getName() + bundledPayment.getPaymentID();
-        
-    }
-
-    public Payment getBundledPayment() {
-        return bundledPayment;
+    public String toString() {
+        return this.getClass().getName() + bundledUnit.getUnitID();
     }
     
-    public void setBundledPayment(Payment input) {
-
-        input.setPayer(new Person());       
-        input.setRecordedBy(new User());
-        input.setEntryTimestamp(LocalDateTime.MIN);
-        input.setNotes("*****");
+    public PropertyUnit getBundledUnit() {
+        return bundledUnit;
+    }
+    
+        public void setBundledUnit(PropertyUnit input) {
         
-        bundledPayment = input;
+        input.setRentalNotes("*****");
+        input.setConditionIntensityClassID(0);
+        input.setLastUpdatedTS(LocalDateTime.MIN);
+        
+        bundledUnit = input;
     }
 
-    public PublicInfoBundlePerson getPayer() {
-        return payer;
+    public List<PublicInfoBundleOccPeriod> getPeriodList() {
+        return periodList;
     }
 
-    public void setPayer(PublicInfoBundlePerson payer) {
-        this.payer = payer;
+    public void setPeriodList(List<PublicInfoBundleOccPeriod> periodList) {
+        this.periodList = periodList;
     }
     
 }

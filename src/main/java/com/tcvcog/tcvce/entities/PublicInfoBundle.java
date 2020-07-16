@@ -5,11 +5,13 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author sylvia
  */
-public abstract class PublicInfoBundle {
+public abstract class PublicInfoBundle implements Serializable {
 
     private int pacc;
     private boolean showDetailsPageButton;
@@ -30,11 +32,45 @@ public abstract class PublicInfoBundle {
     private String caseManagerName;
     private String caseManagerContact;
 
+    public PublicInfoBundle() {
+    }
     
     @Override
     public String toString(){
         
         return this.getClass().getName();
+        
+    }
+    /**
+     * Takes a User object and uses its information to populate 
+     * the caseManagerName and caseManagerContact fields.
+     * Also checks for null pointers!
+     * @param manager 
+     */
+    public void setCaseManager(User manager){
+        if (manager != null && manager.getPerson() != null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(manager.getPerson().getFirstName());
+            sb.append(" ");
+            sb.append(manager.getPerson().getLastName());
+            setCaseManagerName(sb.toString());
+            setCaseManagerContact(manager.getPerson().getPhoneWork());
+        }
+    }
+    
+    /**
+     * Takes a Property object and uses its information to populate 
+     * the addressAssociated and propertyAddress fields.
+     * Also checks for null pointers!
+     * @param prop 
+     */
+    public void setAddress(Property prop){
+        if (prop == null || prop.isNonAddressable()) {
+                setAddressAssociated(false);
+            } else {
+                setAddressAssociated(true);
+                setPropertyAddress(prop.getAddress());
+            }
         
     }
     
