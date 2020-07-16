@@ -29,10 +29,10 @@
 
                             <h:form id="review-info-form">
 
+                                <h3>Requestor:</h3>
+
                                 <!--Grid CSS From Primefaces-->
                                 <div class="ui-g data-container">
-
-                                    <h3>Requestor:</h3>
 
                                     <!--Data Field Label And Value-->
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
@@ -56,8 +56,11 @@
                                         <h:outputLabel styleClass="data_field_label" value="Anonymity requested?"/>
                                         <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.anonymitiyRequested ? 'Yes' : 'No'}"/>
                                     </div>
+                                </div>
 
-                                    <h3>Contact information:</h3>
+                                <h3>Contact information:</h3>
+
+                                <div class="ui-g data-container">
 
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
                                         <h:outputLabel styleClass="data_field_label" value="Phone (cell):"/>
@@ -79,7 +82,11 @@
                                         <h:outputText styleClass="data_field_value" value="#{cEActionRequestSubmitBB.currentRequest.requestor.email}"/>
                                     </div>
 
-                                    <h3>Action request:</h3>
+                                </div>
+
+                                <h3>Action request:</h3>
+
+                                <div class="ui-g data-container">
 
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
                                         <h:outputLabel styleClass="data_field_label" value="Address of concern:"/>
@@ -105,8 +112,10 @@
                                         <h:outputLabel styleClass="data_field_label" value="Request description:"/>
                                         <h:outputText styleClass="data_field_value" escape="false" value="#{CEActionRequestSubmitBB.requestForSubmission.requestDescription}"/>
                                     </div>
+                                </div>
+                                <h3>Photos:</h3>
 
-                                    <h3>Photos:</h3>
+                                <div class="ui-g data-container">
 
                                     <p:dataTable
                                         id="photoTable"
@@ -137,7 +146,12 @@
                                         </p:column>
                                     </p:dataTable>
 
-                                    <h2>Submit to code enforcement officers</h2>
+                                </div>
+
+                                <h2>Submit to code enforcement officers</h2>
+
+                                <div class="ui-g data-container">
+
                                     <p:commandButton 
                                         id="restartRequest" ajax="false"
                                         value="Restart Code Enforcement Request" 
