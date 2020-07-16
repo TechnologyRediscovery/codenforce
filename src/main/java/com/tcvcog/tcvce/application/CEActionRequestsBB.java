@@ -107,7 +107,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             
         }
-            if (selectedRequest == null && requestList.size() > 0) {
+            if (selectedRequest == null && requestList != null && requestList.size() > 0) {
                 selectedRequest = requestList.get(0);
                 generateCEARReasonDonutModel();
             }

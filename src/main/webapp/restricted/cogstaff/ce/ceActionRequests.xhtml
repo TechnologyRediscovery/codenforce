@@ -21,7 +21,7 @@
                             </h:messages>
                         </h:form>
 
-                        <h1>Code Enforcement Action Requests in <h:outputText value="#{sessionBean.sessionMuni.muniName}"/></h1>
+                        <h1>Code Enforcement Action Requests in <h:outputText value="#{sessionBean.sessMuni.muniName}"/></h1>
 
 
                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter" styleClass="split-page-panelgrid"
@@ -44,8 +44,8 @@
                                             update="cears-query-desc-ot"
                                             />
                                     </p:selectOneMenu>
-                                    
-                                    
+
+
 
                                     <p:commandButton    id="execute-selected-query" 
                                                         ajax="true"
@@ -54,8 +54,8 @@
                                                         disabled="false"
                                                         icon="fa fa-wheelchair-alt"
                                                         update="
-                                                            search-params-form
-                                                            actionRequestListForm
+                                                        search-params-form
+                                                        actionRequestListForm
                                                         "/>
                                     <p:spacer height="5px" />
                                     <h:outputLabel styleClass="bold" value="Query description: " for="cears-query-desc-ot" />
@@ -75,7 +75,7 @@
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="Query start date "/>
-                                                <p:calendar id="eventDateCalStart" value="#{cEActionRequestsBB.searchParams.startDateUtilDate}" 
+                                                <p:calendar id="eventDateCalStart" value="#{cEActionRequestsBB.searchParams.date_start_val}" 
                                                             mode="popup"  
                                                             showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                             navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
@@ -87,7 +87,7 @@
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="Query end date "/>
-                                                <p:calendar id="eventDateCalEnd" value="#{cEActionRequestsBB.searchParams.endDateUtilDate}" 
+                                                <p:calendar id="eventDateCalEnd" value="#{cEActionRequestsBB.searchParams.date_end_val}" 
                                                             mode="popup" 
                                                             showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                             navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
@@ -96,53 +96,54 @@
                                                 <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                             </h:panelGroup>
-
                                             <h:panelGroup>
                                                 <p:outputLabel id="useAttachedToCaseOL" for="useAttachedToCase" value="Filter by case attachment?"/>
                                                 <p:spacer height="5px"/>
-                                                <p:selectBooleanCheckbox id="useAttachedToCase" value="#{cEActionRequestsBB.searchParams.useAttachedToCase}" />
+                                                <p:selectBooleanCheckbox id="useAttachedToCase" value="#{cEActionRequestsBB.searchParams.caseAttachment_ctl}" />
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="attachedToCaseOL" for="attachedToCaseCB" value="Attached to case"/>
                                                 <p:spacer height="5px"/>
-                                                <p:selectBooleanCheckbox id="attachedToCaseCB" value="#{cEActionRequestsBB.searchParams.attachedToCase}" disabled="false" />
+                                                <p:selectBooleanButton id="attachedToCaseCB" onLabel="Yes" offLabel="No" value="#{cEActionRequestsBB.searchParams.caseAttachment_val}" disabled="false" />
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="useMarkedUrgentol" for="useMarkedUrgent" value="Filter by safety hazard?"/>
                                                 <p:spacer height="5px"/>
-                                                <p:selectBooleanCheckbox id="useMarkedUrgent" value="#{cEActionRequestsBB.searchParams.useMarkedUrgent}" />
+                                                <p:selectBooleanCheckbox id="useMarkedUrgent" value="#{cEActionRequestsBB.searchParams.urgent_ctl}" />
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="markedUrgentOL" for="useMarkedUrgentcb" value="Safety hazard"/>
                                                 <p:spacer height="5px"/>
-                                                <p:selectBooleanCheckbox id="useMarkedUrgentcb" value="#{cEActionRequestsBB.searchParams.markedUrgent}" disabled="false" />
+                                                <p:selectBooleanButton id="useMarkedUrgentcb" onLabel="Yes" offLabel="No" value="#{cEActionRequestsBB.searchParams.urgent_val}" disabled="false" />
                                             </h:panelGroup>
 
+                                            <ui:remove>
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="useRequestIDOL" for="useRequestIDCB" value="Search by Request ID?"/>
+                                                    <p:spacer height="5px"/>
+                                                    <p:selectBooleanCheckbox id="useRequestIDCB" value="#{cEActionRequestsBB.searchParams}" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="requestIDOL" for="requestIDIT" value="Request ID:"/>
+                                                    <p:spacer height="5px"/>
+                                                    <p:inputText id="requestIDIT" value="#{cEActionRequestsBB.searchParams}" disabled="false"/>
+                                                    <h:message for="requestIDIT" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+                                            </ui:remove>
+
                                             <h:panelGroup>
-                                                <p:outputLabel id="useRequestIDOL" for="useRequestIDCB" value="Search by Request ID?"/>
+                                                <p:outputLabel id="useActionRequestStatusOL" for="useActionRequestStatusSB" value="Search by Request status?"/>
                                                 <p:spacer height="5px"/>
-                                                <p:selectBooleanCheckbox id="useRequestIDCB" value="#{cEActionRequestsBB.searchParams.useRequestID}" />
+                                                <p:selectBooleanCheckbox id="useActionRequestStatusSB" value="#{cEActionRequestsBB.searchParams.requestStatus_ctl}" />
                                             </h:panelGroup>
 
                                             <h:panelGroup>
-                                                <p:outputLabel id="requestIDOL" for="requestIDIT" value="Request ID:"/>
-                                                <p:spacer height="5px"/>
-                                                <p:inputText id="requestIDIT" value="#{cEActionRequestsBB.searchParams.requestID}" disabled="false"/>
-                                                <h:message for="requestIDIT" showDetail="false" showSummary="true" 
-                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <p:outputLabel id="useActionRequestStatusOL" for="useRequestIDCB" value="Search by Request status?"/>
-                                                <p:spacer height="5px"/>
-                                                <p:selectBooleanCheckbox id="useActionRequestStatusSB" value="#{cEActionRequestsBB.searchParams.useRequestStatus}" />
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <p:selectOneMenu id="ceactionrequeststatusmenuSearch" required="false" value="#{cEActionRequestsBB.searchParams.requestStatus}">
+                                                <p:selectOneMenu id="ceactionrequeststatusmenuSearch" required="false" value="#{cEActionRequestsBB.searchParams.requestStatus_val}">
                                                     <f:converter converterId="ceActionRequestStatusConverter"/>
                                                     <f:selectItems value="#{cEActionRequestsBB.statusList}"
                                                                    var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
@@ -152,13 +153,13 @@
                                             <h:panelGroup>
                                                 <p:outputLabel id="useNotAtAddressOL" for="useNotAtAddressCB" value="Filter by not at address?"/>
                                                 <p:spacer height="5px"/>
-                                                <p:selectBooleanCheckbox id="useNotAtAddressCB" value="#{cEActionRequestsBB.searchParams.useNotAtAddress}" />
+                                                <p:selectBooleanCheckbox id="useNotAtAddressCB" value="#{cEActionRequestsBB.searchParams.nonaddressable_ctl}" />
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="notAtAddressOL" for="notAtAddressCB" value="Not at an address"/>
                                                 <p:spacer height="5px"/>
-                                                <p:selectBooleanCheckbox id="notAtAddressCB" value="#{cEActionRequestsBB.searchParams.notAtAnAddress}" disabled="false" />
+                                                <p:selectBooleanButton id="notAtAddressCB" onLabel="Yes" offLabel="No" value="#{cEActionRequestsBB.searchParams.nonaddressable_val}" disabled="false" />
                                             </h:panelGroup>
                                         </h:panelGrid>
                                         <p:spacer height="15px"/>
@@ -168,8 +169,8 @@
                                                             value="Execute custom query" 
                                                             actionListener="#{cEActionRequestsBB.executeCustomQuery}"
                                                             update="
-                                                                actionRequestListForm
-                                                                msgForm
+                                                            actionRequestListForm
+                                                            msgForm
                                                             "/>
 
                                     </p:fieldset>
@@ -177,7 +178,7 @@
                                 </h:form>
 
                                 <h2>Results</h2>
-                                
+
 
                                 <h:form id="actionRequestListForm">
                                     <h:messages id="actionQueryMessages" globalOnly="true" showDetail="true" showSummary="true"
@@ -186,7 +187,7 @@
 
                                     <h:outputText id="query-results-ot" value="results from query named #{cEActionRequestsBB.selectedQueryCEAR.queryName.title} 
                                                   | execution timestamp: #{cEActionRequestsBB.selectedQueryCEAR.executionTimestampPretty}" />
-                                    
+
                                     <p:dataTable
                                         id="actionRequestTable"
                                         var="r"
@@ -211,7 +212,7 @@
                                                 <h:outputText value="Issue Type" />
                                             </f:facet>
                                             <div class="wrapText">
-                                                <h:outputText value="#{r.issueTypeString}"/>
+                                                <h:outputText value="#{r.issue.name}"/>
                                             </div>
                                         </p:column>
 
@@ -254,8 +255,8 @@
                                     </p:dataTable>
 
                                     <p:spacer height="15px"/>
-                                    
-                                      <p:commandButton    id="prep-multi-cear-cb"
+
+                                    <p:commandButton    id="prep-multi-cear-cb"
                                                         value="Prepare request list report"
                                                         actionListener="#{cEActionRequestsBB.prepareReportMultiCEAR}"
                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
@@ -279,13 +280,13 @@
 
                             <h:panelGroup styleClass="split-page-manage-side">
                                 <h:form id="req-details-form">
-                                    
+
                                     <h1>Code enforcement request</h1>
-                                    
+
                                     <h2>
-                                        <h:outputText id="header-type-ot" value="#{cEActionRequestsBB.selectedRequest.issueTypeString}"/>
+                                        <h:outputText id="header-type-ot" value="#{cEActionRequestsBB.selectedRequest.issue.name}"/>
                                         <h:outputText   id="header-id-ot" value=" (id: #{cEActionRequestsBB.selectedRequest.requestID})"/> 
-                                        
+
                                         <br />
                                         <h:outputText id="header-addr-ot" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address} "/>  
                                         <h:outputText id="header-muni-ot" value=", #{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>  
@@ -342,26 +343,33 @@
                                     <hr />
                                     <p:spacer height="5px" />
 
+                                    <ui:remove>
+                                        <!--
+                                        
+                                        TODO: Figure out why prepareReportSingleCEAR has gone missing
+                                        
                                     <p:commandButton    id="print-singleCAR-cb"
                                                         value="Print request"
-                                                        actionListener="#{cEActionRequestsBB.prepareReportSingleCEAR}"
-                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                        actionListener="{cEActionRequestsBB.prepareReportSingleCEAR}"
+                                                        rendered="{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                         disabled="false"
                                                         oncomplete="PF('cear-print-dialog-var').show()"
                                                         icon="fa fa-print"
                                                         update="cear-print-form"
                                                         />
+                                        -->
+                                    </ui:remove>
 
                                     <p:spacer height="5px"/>
 
                                     <p:commandButton      
-                                                          id="attach-internal-note-cb"
-                                                          onclick="PF('muni-message-dialog').show()" 
-                                                          
-                                                          value="Attach internal note"
-                                                          icon="fa fa-pencil-square-o"
-                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                          />
+                                        id="attach-internal-note-cb"
+                                        onclick="PF('muni-message-dialog').show()" 
+
+                                        value="Attach internal note"
+                                        icon="fa fa-pencil-square-o"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                        />
 
 
 
@@ -390,7 +398,7 @@
                                                 <h:outputLabel class="bold" value="Issue Type" />
                                                 <p:spacer height="5px"/>
                                                 <div class="wrapText">
-                                                    <h:outputText id="selr-issueType" value="#{cEActionRequestsBB.selectedRequest.issueTypeString}"/>
+                                                    <h:outputText id="selr-issueType" value="#{cEActionRequestsBB.selectedRequest.issue.name}"/>
                                                 </div>
                                             </h:panelGroup>
 
@@ -550,7 +558,7 @@
                                                                  value="new note" 
                                                                  icon="fa fa-pencil-square-o"
                                                                  styleClass="noFill button-size-small" 
-                                                                 rendered="#{sessiosessionUseresUser.keyCard.hasMuniStaffPermissions}" />
+                                                                 rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}" />
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion" style="leftalign">
                                                     <h:outputText id="selr-notes-public" escape="false" value="#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
@@ -676,7 +684,7 @@
                         <p:confirmDialog message="Override request status" 
                                          severity="alert" widgetVar="override-request-status-dialog"
                                          closable="true"
-                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="override-request-status-form">
 
@@ -719,7 +727,7 @@
                                                      value="Save" icon="fa fa-link" oncomplete="PF('manage-public-access-dialog').hide()"
                                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                      update="req-details-form:selr-notes-public
-                                                                msgForm:ceActionRequestsMessages"/>
+                                                     msgForm:ceActionRequestsMessages"/>
                                     <p:commandButton ajax="true" 
                                                      value="Cancel" icon="fa fa-stop" 
                                                      onclick="PF('manage-public-access-dialog').hide()"/>
@@ -742,7 +750,7 @@
                                                  value="#{cEActionRequestsBB.muniForPropSwitchSearch}">
                                     <f:converter converterId="muniConverter"/>
                                     <f:selectItem itemLabel="select one..." noSelectionOption="true"  itemDisabled="true"/>
-                                    <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                    <f:selectItems id="muniNameList" value="#{sessionBean.sessUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                 </p:selectOneMenu>
 
                                 <p:panelGrid columns="3" layout="grid">
@@ -810,7 +818,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Type" />
                                         </f:facet>
-                                        <h:outputText value="#{prop.useTypeString}"/>
+                                        <h:outputText value="#{prop.useType.name}"/>
                                     </p:column>
                                 </p:dataTable>
 
@@ -862,7 +870,7 @@
                                                          value="#{personBB.searchParams.muni}">
                                             <f:converter converterId="muniConverter"/>
                                             <f:selectItem itemLabel="select muni..." noSelectionOption="true"  itemDisabled="true"/>
-                                            <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                            <f:selectItems id="muniNameList" value="#{sessionBean.sessUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                         </p:selectOneMenu>
                                     </h:panelGroup>
 
@@ -943,7 +951,7 @@
 
                                 <p:commandButton value="Assign request to selected person"
                                                  actionListener="#{cEActionRequestsBB.updateRequestor}"
-                                                rendered="#{!systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                                 rendered="#{!systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
                                                  update="   msgForm:ceActionRequestsMessages
                                                  req-details-form:selr-persontype
                                                  req-details-form:selr-pers-fn
@@ -1309,59 +1317,59 @@
                                widgetVar="cear-print-dialog-var"
                                closable="true" responsive="true"
                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}">
-                        
+
                         <h:form id="cear-print-form">
-                            
-                                        <h2>Print code enforcement requests</h2>
 
-                                        <h:outputLabel for="report-cear-title-it" value="Report title"/>
+                            <h2>Print code enforcement requests</h2>
 
-                                        <p:spacer height="5px"/>
+                            <h:outputLabel for="report-cear-title-it" value="Report title"/>
 
-                                        <p:inputText id="report-cear-title-it" style="width: 300px;" value="#{cEActionRequestsBB.reportConfig.title}"/>
-                                        <p:spacer height="2px"/>
-                                        <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+                            <p:spacer height="5px"/>
 
-                                        <p:spacer height="10px"/>
+                            <p:inputText id="report-cear-title-it" style="width: 300px;" value="#{cEActionRequestsBB.reportConfig.title}"/>
+                            <p:spacer height="2px"/>
+                            <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
-                                        <h:outputLabel for="report-cear-notes-ita" value="Notes"/>
-                                        <p:spacer height="5px"/>
-                                        <p:inputText id="report-cear-notes-ita" style="width: 300px; height: 100px;" value="#{cEActionRequestsBB.reportConfig.notes}"/>
-                                        <p:spacer height="5px"/>
+                            <p:spacer height="10px"/>
 
-                                        <h2>Display options</h2>
+                            <h:outputLabel for="report-cear-notes-ita" value="Notes"/>
+                            <p:spacer height="5px"/>
+                            <p:inputText id="report-cear-notes-ita" style="width: 300px; height: 100px;" value="#{cEActionRequestsBB.reportConfig.notes}"/>
+                            <p:spacer height="5px"/>
 
-                                        <h:outputLabel class="bold" value="Single request or full list?" for="cear-print-singleorlist-is" />
-                                        <p:spacer height="1px"/>
-                                        <p:inputSwitch  id="cear-print-singleorlist-is"
-                                                        value="#{cEActionRequestsBB.reportConfig.printFullCEARQueue}" 
-                                                        onLabel="Print all requests in list" offLabel="Only print active request" />
-                                        
-                                        <p:spacer height="5px"/>
-                        
-                                        <h:outputLabel class="bold" value="Include photographs with requests?" for="cear-print-includephotos-is" />
-                                        <p:spacer height="1px"/>
-                                        <p:inputSwitch  id="cear-print-includephotos-is"
-                                                        value="#{cEActionRequestsBB.reportConfig.includePhotos}" 
-                                                        onLabel="Print photos" offLabel="Hide photos" />
-                                        
-                                        <p:spacer height="5px"/>
-                                        
-                                        <p:commandButton ajax="true" id="cear-print-cancel"
-                                                 value="Cancel" icon="fa fa-stop" 
-                                                 onclick="PF('cear-print-dialog-var').hide()"/>
+                            <h2>Display options</h2>
 
-                                        <p:commandButton ajax="false" action="#{cEActionRequestsBB.generateReportSingleCEAR}"
-                                                 value="Print code enforcement request" icon="fa fa-print" 
-                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions and !cEActionRequestsBB.reportConfig.printFullCEARQueue}"
-                                                 />
-                                        <p:commandButton ajax="false" action="#{cEActionRequestsBB.generateReportMultiCEAR}"
-                                                 value="Generate report" icon="fa fa-print" 
-                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions and cEActionRequestsBB.reportConfig.printFullCEARQueue}"
-                                                 />
-                            </h:form>
+                            <h:outputLabel class="bold" value="Single request or full list?" for="cear-print-singleorlist-is" />
+                            <p:spacer height="1px"/>
+                            <p:inputSwitch  id="cear-print-singleorlist-is"
+                                            value="#{cEActionRequestsBB.reportConfig.printFullCEARQueue}" 
+                                            onLabel="Print all requests in list" offLabel="Only print active request" />
 
-                        
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include photographs with requests?" for="cear-print-includephotos-is" />
+                            <p:spacer height="1px"/>
+                            <p:inputSwitch  id="cear-print-includephotos-is"
+                                            value="#{cEActionRequestsBB.reportConfig.includePhotos}" 
+                                            onLabel="Print photos" offLabel="Hide photos" />
+
+                            <p:spacer height="5px"/>
+
+                            <p:commandButton ajax="true" id="cear-print-cancel"
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('cear-print-dialog-var').hide()"/>
+
+                            <p:commandButton ajax="false" action="#{cEActionRequestsBB.generateReportSingleCEAR}"
+                                             value="Print code enforcement request" icon="fa fa-print" 
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions and !cEActionRequestsBB.reportConfig.printFullCEARQueue}"
+                                             />
+                            <p:commandButton ajax="false" action="#{cEActionRequestsBB.generateReportMultiCEAR}"
+                                             value="Generate report" icon="fa fa-print" 
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions and cEActionRequestsBB.reportConfig.printFullCEARQueue}"
+                                             />
+                        </h:form>
+
+
                     </p:dialog>
 
 
