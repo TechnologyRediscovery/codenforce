@@ -1,0 +1,3 @@
+[submodule "codeconnect/scripts"]
+	path = codeconnect/scripts
+	url = https://github.com/snapperVibes/scripts.git
