@@ -426,7 +426,7 @@ public class CEActionRequest implements Serializable{
      * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        if(dateOfRecord != null){
+        if(dateOfRecordUtilDate != null){
         dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
     }

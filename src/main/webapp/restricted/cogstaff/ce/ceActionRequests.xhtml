@@ -75,7 +75,7 @@
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="Query start date "/>
-                                                <p:calendar id="eventDateCalStart" value="#{cEActionRequestsBB.searchParams.date_start_val}" 
+                                                <p:calendar id="eventDateCalStart" value="#{cEActionRequestsBB.searchParams.date_start_val_util}" 
                                                             mode="popup"  
                                                             showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                             navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
@@ -87,7 +87,7 @@
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="Query end date "/>
-                                                <p:calendar id="eventDateCalEnd" value="#{cEActionRequestsBB.searchParams.date_end_val}" 
+                                                <p:calendar id="eventDateCalEnd" value="#{cEActionRequestsBB.searchParams.date_end_val_util}" 
                                                             mode="popup" 
                                                             showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                             navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
@@ -99,13 +99,13 @@
                                             <h:panelGroup>
                                                 <p:outputLabel id="useAttachedToCaseOL" for="useAttachedToCase" value="Filter by case attachment?"/>
                                                 <p:spacer height="5px"/>
-                                                <p:selectBooleanCheckbox id="useAttachedToCase" value="#{cEActionRequestsBB.searchParams.caseAttachment_ctl}" />
+                                                <p:selectBooleanCheckbox id="useAttachedToCase" value="#{cEActionRequestsBB.searchParams.caseAttachment_ctl}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="attachedToCaseOL" for="attachedToCaseCB" value="Attached to case"/>
                                                 <p:spacer height="5px"/>
-                                                <p:selectBooleanButton id="attachedToCaseCB" onLabel="Yes" offLabel="No" value="#{cEActionRequestsBB.searchParams.caseAttachment_val}" disabled="false" />
+                                                <p:selectBooleanButton id="attachedToCaseCB" onLabel="Yes" offLabel="No" value="#{cEActionRequestsBB.searchParams.caseAttachment_val}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
@@ -168,10 +168,8 @@
                                                             ajax="true" 
                                                             value="Execute custom query" 
                                                             actionListener="#{cEActionRequestsBB.executeCustomQuery}"
-                                                            update="
-                                                            actionRequestListForm
-                                                            msgForm
-                                                            "/>
+                                                            update="search-params-form
+                                                        actionRequestListForm"/>
 
                                     </p:fieldset>
 

@@ -514,9 +514,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 spp.setLimitResultCount_val(20);
 
                 sc.runQuery(qp);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Your search completed with " + getPropList().size() + " results", ""));
+                
             } else {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -532,6 +530,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         if (qp != null && !qp.getBOBResultList().isEmpty()) {
             propList = qp.getBOBResultList();
+            getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Your search completed with " + getPropList().size() + " results", ""));
         }
 
     }

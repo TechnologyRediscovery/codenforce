@@ -112,7 +112,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                 generateCEARReasonDonutModel();
             }
             selectedQueryCEAR = sessionQuery;
-            searchParams = sessionQuery.getParamsList().get(0);
+            searchParams = selectedQueryCEAR.getParamsList().get(0);
             queryList = sc.buildQueryCEARList(getSessionBean().getSessUser().getMyCredential());
 
             CaseCoordinator cc = getCaseCoordinator();
@@ -158,12 +158,23 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void executeQuery(ActionEvent ev) {
         SearchCoordinator searchC = getSearchCoordinator();
         try {
-            requestList = searchC.runQuery(selectedQueryCEAR).getResults();
+           if(selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()){
+                
+                searchC.runQuery(selectedQueryCEAR).getResults();
+                
+            }
+            
+            if(selectedQueryCEAR != null && !selectedQueryCEAR.getBOBResultList().isEmpty()){
+                
+                requestList = selectedQueryCEAR.getBOBResultList();
+                
+            }
             generateCEARReasonDonutModel();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                              "Your query completed with " + requestList.size() + " results!", ""));
         } catch (SearchException ex) {
+            System.out.println("CEActionRequestsBB.executeQuery() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                              "Unable to query action requests, sorry", ""));
@@ -176,15 +187,28 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SearchCoordinator searchCoord = getSearchCoordinator();
         try {
             
-            selectedQueryCEAR = searchCoord.initQuery(QueryCEAREnum.CUSTOM,
-                                                    getSessionBean().getSessUser().getMyCredential());
-            requestList =searchCoord.runQuery(selectedQueryCEAR).getResults();
+            selectedQueryCEAR = searchCoord.initQuery(QueryCEAREnum.CUSTOM, getSessionBean().getSessUser().getMyCredential());
+            
+            selectedQueryCEAR.addParams(searchParams);
+            
+            if(selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()){
+                
+                searchCoord.runQuery(selectedQueryCEAR).getResults();
+                
+            }
+            
+            if(selectedQueryCEAR != null && !selectedQueryCEAR.getBOBResultList().isEmpty()){
+                
+                requestList = selectedQueryCEAR.getBOBResultList();
+                
+            }
             
             generateCEARReasonDonutModel();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                              "Your query completed with " + requestList.size() + " results!", ""));
         } catch (SearchException ex) {
+            System.out.println("CEActionRequestsBB.executeCustomQuery() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                              "Unable to query action requests, sorry", ""));
