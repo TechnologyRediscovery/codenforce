@@ -924,35 +924,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
 
-    /**
-     *
-     * @param applicationID
-     * @return
-     * @throws IntegrationException
-     */
-    public List<Integer> getOccPermitAppPersons(int applicationID) throws IntegrationException{
-        String query = "SELECT person_personid FROM occpermitapplicationperson WHERE permitapp_applicationid = ?";
-        Connection con = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;        
-        ArrayList<Integer> personIDs = new ArrayList();
-        try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, applicationID);
-            rs = stmt.executeQuery();
-            while (rs.next()){
-                personIDs.add(rs.getInt("person_personid"));
-            }
-            
-        } catch (SQLException ex) {
-            throw new IntegrationException("PersonIntegrator.getOccPermitAppPersons | Unable to "
-                    + "retrieve person(s) for given applicationID ", ex);
-        }
-        
-        return personIDs;
-    }
-
     public void updatePersonNotes(Person p) throws IntegrationException {
         Connection con = getPostgresCon();
         String query = "UPDATE person SET notes = ? WHERE personid = ?;";

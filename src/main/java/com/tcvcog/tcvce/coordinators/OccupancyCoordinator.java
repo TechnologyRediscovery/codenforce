@@ -859,7 +859,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * Sets boolean requirementSatisfied on an OccPermitApplication based on the
      * application reason, the person requirement for that reason, and the
      * PersonTypes of the Persons attached to the application.
-     *
+     * TODO: Update
      * @param opa
      */
     public void verifyOccPermitPersonsRequirement(OccPermitApplication opa) {
@@ -877,6 +877,52 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             }
         }
         pr.setRequirementSatisfied(isRequirementSatisfied);
+    }
+    
+    public int insertOccPermitApplication(OccPermitApplication application) 
+            throws IntegrationException, 
+            AuthorizationException, 
+            BObStatusException, 
+            EventException,
+            InspectionException,
+            ViolationException {
+        
+        UserCoordinator uc = getUserCoordinator();
+        OccupancyIntegrator opi = getOccupancyIntegrator();
+        PropertyIntegrator pri = getPropertyIntegrator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
+        
+        UserAuthorized user = uc.getPublicUserAuthorized();
+        
+        Property prop = pri.getPropertyUnitWithProp(application.getApplicationPropertyUnit().getUnitID()).getProperty();
+        
+        MunicipalityDataHeavy muni = mc.assembleMuniDataHeavy(prop.getMuni(), user.getMyCredential());
+        
+        OccPeriod connectedPeriod = initOccPeriod(
+                prop, 
+                application.getApplicationPropertyUnit(), 
+                application.getReason().getProposalPeriodType(), 
+                user, 
+                muni);
+        
+        connectedPeriod.setSource(si.getBOBSource(
+                Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("occPeriodPublicUserBOBSourceID"))));
+        //Check if correct
+        
+        int newPeriodID = addOccPeriod(connectedPeriod, user);
+        
+        connectedPeriod.setPeriodID(newPeriodID);
+        
+        application.setConnectedPeriod(connectedPeriod);
+        
+        int applicationId = opi.insertOccPermitApplication(application);
+
+        opi.insertOccPeriodPersons(application);
+
+        return applicationId;
+        
     }
 
     public void inspectionAction_removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi) throws IntegrationException {

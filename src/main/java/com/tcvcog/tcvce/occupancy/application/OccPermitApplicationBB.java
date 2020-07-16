@@ -14,8 +14,10 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
@@ -561,7 +563,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public String getApplicantName() {
 
-        if (applicant != null) {
+        if (applicant != null && applicant.getBundledPerson() != null) {
             return applicant.getBundledPerson().getFirstName() + " " + applicant.getBundledPerson().getLastName();
         } else {
             return "UNSELECTED";
@@ -575,7 +577,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         //So supply the applicant's name first.
         if (contactPerson == null && applicant != null) {
             return applicant.getBundledPerson().getFirstName() + " " + applicant.getBundledPerson().getLastName();
-        } else if (contactPerson != null) {
+        } else if (contactPerson != null && contactPerson.getBundledPerson() != null) {
             return contactPerson.getBundledPerson().getFirstName() + " " + contactPerson.getBundledPerson().getLastName();
         } else {
             return "UNSELECTED";
@@ -705,7 +707,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public String submitApplication(String redir) {
 
-        OccupancyIntegrator opi = getOccupancyIntegrator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
         try {
 
@@ -743,12 +745,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             submitUnitChangeList();
 
-            int applicationId = opi.insertOccPermitApplicationAndReturnId(currentApplication);
+            oc.insertOccPermitApplication(currentApplication);
 
-            getSessionBean().setSessOccPermitApplication(opi.getOccPermitApplication(applicationId));
-
-            opi.insertOccPeriodPersons(currentApplication);
-        } catch (IntegrationException | AuthorizationException | EventException | SearchException ex) {
+        } catch (IntegrationException | AuthorizationException | EventException | SearchException | InspectionException | ViolationException ex) {
             System.out.println("OccPermitApplicationBB.submitApplication() | ERROR: " + ex);
         } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,

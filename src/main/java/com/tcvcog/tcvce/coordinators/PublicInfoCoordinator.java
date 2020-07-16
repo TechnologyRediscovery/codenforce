@@ -173,9 +173,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledCase(cse);
             pib.setAddress(c.getProperty());
             pib.setPublicEventList(new ArrayList<PublicInfoBundleEventCnF>());
-            for (EventCnF ev : c.getVisibleEventList()) {
-                if (ev.getCategory().getUserRankMinimumToView() >= PUBLIC_VIEW_USER_RANK) {
-                    pib.getPublicEventList().add(extractPublicInfo(ev));
+            if (c.getVisibleEventList() != null) {
+                for (EventCnF ev : c.getVisibleEventList()) {
+                    if (ev.getCategory().getUserRankMinimumToView() >= PUBLIC_VIEW_USER_RANK) {
+                        pib.getPublicEventList().add(extractPublicInfo(ev));
+                    }
                 }
             }
 
@@ -338,8 +340,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             ArrayList<PublicInfoBundlePropertyUnit> bundledUnits = new ArrayList<>();
 
-            for (PropertyUnit unit : input.getUnitList()) {
-                bundledUnits.add(extractPublicInfo(unit));
+            if (input.getUnitList() != null) {
+
+                for (PropertyUnit unit : input.getUnitList()) {
+                    bundledUnits.add(extractPublicInfo(unit));
+                }
             }
 
             pib.setUnitList(bundledUnits);
@@ -388,34 +393,42 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             ArrayList<PublicInfoBundlePerson> bundledPersons = new ArrayList<>();
 
-            for (Person skeleton : heavy.getPersonList()) {
+            if (heavy.getPersonList() != null) {
 
-                bundledPersons.add(extractPublicInfo(skeleton));
+                for (Person skeleton : heavy.getPersonList()) {
 
+                    bundledPersons.add(extractPublicInfo(skeleton));
+
+                }
             }
 
             ArrayList<PublicInfoBundleOccInspection> bundledInspections = new ArrayList<>();
 
-            for (OccInspection skeleton : (List<OccInspection>) heavy.getInspectionList()) {
+            if (heavy.getInspectionList() != null) {
+                for (OccInspection skeleton : (List<OccInspection>) heavy.getInspectionList()) {
 
-                bundledInspections.add(extractPublicInfo(skeleton));
+                    bundledInspections.add(extractPublicInfo(skeleton));
 
+                }
             }
 
             ArrayList<PublicInfoBundleFeeAssigned> bundledFees = new ArrayList<>();
+            if (heavy.getFeeList() != null) {
+                for (FeeAssigned skeleton : heavy.getFeeList()) {
 
-            for (FeeAssigned skeleton : heavy.getFeeList()) {
+                    bundledFees.add(extractPublicInfo(skeleton));
 
-                bundledFees.add(extractPublicInfo(skeleton));
-
+                }
             }
 
             ArrayList<PublicInfoBundlePayment> bundledPayments = new ArrayList<>();
 
-            for (Payment skeleton : heavy.getPaymentList()) {
+            if (heavy.getPaymentList() != null) {
+                for (Payment skeleton : heavy.getPaymentList()) {
 
-                bundledPayments.add(extractPublicInfo(skeleton));
+                    bundledPayments.add(extractPublicInfo(skeleton));
 
+                }
             }
 
             pib.setPersonList(bundledPersons);
@@ -511,8 +524,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         ArrayList<PublicInfoBundleOccPeriod> periodHorde = new ArrayList<>();
 
-        for (OccPeriod period : heavyUnit.getPeriodList()) {
-            periodHorde.add(extractPublicInfo(period));
+        if (heavyUnit.getPeriodList() != null) {
+
+            for (OccPeriod period : heavyUnit.getPeriodList()) {
+                periodHorde.add(extractPublicInfo(period));
+            }
         }
 
         pib.setPeriodList(periodHorde);
@@ -555,10 +571,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         ArrayList<PublicInfoBundlePerson> personHorde = new ArrayList<>();
 
-        for (Person skeleton : input.getPersonList()) {
+        if (input.getPersonList() != null) {
+            for (Person skeleton : input.getPersonList()) {
 
-            personHorde.add(extractPublicInfo(skeleton));
+                personHorde.add(extractPublicInfo(skeleton));
 
+            }
         }
 
         pib.setPersonList(personHorde);
@@ -621,8 +639,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         ArrayList<Payment> skeletonHorde = new ArrayList<>();
 
-        for (PublicInfoBundlePayment bundle : input.getPaymentList()) {
-            skeletonHorde.add(export(bundle));
+        if (input.getPaymentList() != null) {
+
+            for (PublicInfoBundlePayment bundle : input.getPaymentList()) {
+                skeletonHorde.add(export(bundle));
+            }
+
         }
         exportable.setPaymentList(skeletonHorde);
         return exportable;
@@ -670,8 +692,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         }
         ArrayList<OccPeriod> skeletonHorde = new ArrayList<>();
 
-        for (PublicInfoBundleOccPeriod bundle : input.getPeriodList()) {
-            skeletonHorde.add(export(bundle));
+        if (input.getPeriodList() != null) {
+
+            for (PublicInfoBundleOccPeriod bundle : input.getPeriodList()) {
+                skeletonHorde.add(export(bundle));
+            }
+
         }
         exportable.setPeriodList(skeletonHorde);
         return exportable;
@@ -735,9 +761,13 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         ArrayList<Person> personHorde = new ArrayList<>();
 
-        for (PublicInfoBundlePerson skeleton : input.getPersonList()) {
+        if (input.getPersonList() != null) {
 
-            personHorde.add(export(skeleton));
+            for (PublicInfoBundlePerson skeleton : input.getPersonList()) {
+
+                personHorde.add(export(skeleton));
+
+            }
 
         }
         exportable.setPersonList(personHorde);
@@ -803,8 +833,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         ArrayList<PropertyUnit> unitHorde = new ArrayList<>();
 
-        for (PublicInfoBundlePropertyUnit skeleton : input.getUnitList()) {
-            unitHorde.add(export(skeleton));
+        if (input.getUnitList() != null) {
+
+            for (PublicInfoBundlePropertyUnit skeleton : input.getUnitList()) {
+                unitHorde.add(export(skeleton));
+            }
         }
 
         exportable.setUnitList(unitHorde);
@@ -835,40 +868,51 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         ArrayList<Person> skeletonHorde = new ArrayList<>();
 
-        for (PublicInfoBundlePerson bundle : input.getPersonList()) {
+        if (input.getPersonList() != null) {
 
-            skeletonHorde.add(export(bundle));
+            for (PublicInfoBundlePerson bundle : input.getPersonList()) {
 
+                skeletonHorde.add(export(bundle));
+
+            }
         }
 
         ArrayList<OccInspection> inspectionHorde = new ArrayList<>();
 
-        for (PublicInfoBundleOccInspection bundle : input.getInspectionList()) {
+        if (input.getInspectionList() != null) {
 
-            inspectionHorde.add(export(bundle));
+            for (PublicInfoBundleOccInspection bundle : input.getInspectionList()) {
 
+                inspectionHorde.add(export(bundle));
+
+            }
         }
 
         ArrayList<MoneyOccPeriodFeeAssigned> feeHorde = new ArrayList<>();
 
-        for (PublicInfoBundleFeeAssigned bundle : input.getFeeList()) {
+        if (input.getFeeList() != null) {
+            for (PublicInfoBundleFeeAssigned bundle : input.getFeeList()) {
 
-            MoneyOccPeriodFeeAssigned temp = new MoneyOccPeriodFeeAssigned(export(bundle));
+                MoneyOccPeriodFeeAssigned temp = new MoneyOccPeriodFeeAssigned(export(bundle));
 
-            temp.setOccPeriodID(exportable.getPeriodID());
+                temp.setOccPeriodID(exportable.getPeriodID());
 
-            temp.setOccPeriodTypeID(exportable.getType().getTypeID());
+                temp.setOccPeriodTypeID(exportable.getType().getTypeID());
 
-            feeHorde.add(temp);
+                feeHorde.add(temp);
 
+            }
         }
 
         ArrayList<MoneyOccPeriodFeePayment> paymentHorde = new ArrayList<>();
 
-        for (PublicInfoBundlePayment bundle : input.getPaymentList()) {
+        if (input.getPaymentList() != null) {
 
-            paymentHorde.add(new MoneyOccPeriodFeePayment(export(bundle)));
+            for (PublicInfoBundlePayment bundle : input.getPaymentList()) {
 
+                paymentHorde.add(new MoneyOccPeriodFeePayment(export(bundle)));
+
+            }
         }
 
         exportable.setPersonList(skeletonHorde);

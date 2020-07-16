@@ -48,7 +48,7 @@ public class ChangeOrder extends BOb {
      */
     public final boolean compareStrings(String first, String second) {
         
-        return first != null && first.contentEquals(second);
+        return first != null && second != null && first.contentEquals(second);
         
     }
     
