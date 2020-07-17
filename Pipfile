@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+# black can cause issues because it is a pre-release. If it doesn't work properly, try pipenv install black --pre --dev
+black = "*"
+pre-commit = "*"
+
+[packages]
+requests = "*"
+psycopg2 = "*"
+bs4 = "*"
+click = "*"
+colorama = "*"
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
