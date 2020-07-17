@@ -833,6 +833,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     break;
                     
                 case CUSTOM:
+                    paramList.add(generateParams_CEAR_Unprocessed(params, cred));
                     break;
                     
                 default:

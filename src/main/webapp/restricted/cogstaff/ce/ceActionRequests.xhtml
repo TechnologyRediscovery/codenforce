@@ -121,6 +121,9 @@
                                             </h:panelGroup>
 
                                             <ui:remove>
+                                                
+                                                
+                                                <!--TODO: at the time of writing this comment, there isn't a parameter for searching by request ID. If one is added, please put it here. -->
                                                 <h:panelGroup>
                                                     <p:outputLabel id="useRequestIDOL" for="useRequestIDCB" value="Search by Request ID?"/>
                                                     <p:spacer height="5px"/>
@@ -556,7 +559,7 @@
                                                                  value="new note" 
                                                                  icon="fa fa-pencil-square-o"
                                                                  styleClass="noFill button-size-small" 
-                                                                 rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}" />
+                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}" />
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion" style="leftalign">
                                                     <h:outputText id="selr-notes-public" escape="false" value="#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
@@ -586,14 +589,18 @@
 
 
 
-                        <p:confirmDialog message="Attach request to existing case" 
-                                         severity="alert" widgetVar="attach-to-case-dialog"
+                        <p:dialog widgetVar="attach-to-case-dialog"
+                                  header="Attach request to existing case"
+                                  height="550px" width="50%"
+                                  responsive="true"
+                                  
                                          closable="true"
                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="attach-to-existing-case-form">
 
                                 <p>Choose an existing case on <h:outputLabel for="invalidMessageITA" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>:</p>
+                                <p:scrollPanel>
                                 <p:dataScroller
                                     id="cases-on-selected-request-property-DS"
                                     value="#{cEActionRequestsBB.caseListForSelectedProperty}"
@@ -620,8 +627,9 @@
                                     <hr/>
 
                                 </p:dataScroller>
+                                </p:scrollPanel>
                             </h:form>
-                        </p:confirmDialog>
+                        </p:dialog>
 
                         <p:confirmDialog message="Mark request as invalid" 
                                          severity="alert" widgetVar="invalid-dialog"
@@ -715,7 +723,7 @@
                             <p:confirmDialog message="Manage public access" 
                                              severity="alert" widgetVar="manage-public-access-dialog"
                                              closable="true"
-                                             rendered="#{sesssessionUseracesUser.keyCard.hasMuniStaffPermissions}">
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
 
                                 <h:form id="manage-public-access-form">
 
@@ -1186,7 +1194,7 @@
                         <p:confirmDialog message="Attach internal message" 
                                          severity="alert" widgetVar="internal-message-dialog"
                                          closable="true" responsive="true"
-                                         rendered="#{sessionBeasessionUserer.keyCard.hasCOGStaffPermissions}">
+                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}">
 
                             <h:form id="internal-message-form">
                                 <h:outputLabel for="internal-message-ita" value="Message text"/>
@@ -1199,7 +1207,7 @@
                                 <p:spacer height="15px"/>
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachInternalMessage}"
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('internal-message-dialog').hide()"
-                                                 rendered="#{sessionBsessionUserUser.keyCard.hasCOGStaffPermissions}"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
                                                  update="req-details-form:selr-notes-internal
                                                  msgForm:ceActionRequestsMessages"/>
                                 <p:commandButton ajax="true" 

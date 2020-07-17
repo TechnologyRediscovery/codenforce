@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -276,7 +277,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         return cspudhList;
     }
-    
     
     /**
      * Asks the Integrator for an icon based on case phase
@@ -518,6 +518,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         }
             originationEvent.setUserCreator(ua);
+            
+            cedh.setCaseID(freshID);
             
             ec.addEvent(originationEvent, cedh, ua);
     }
