@@ -125,7 +125,7 @@ class Event:
             return None
 
     def _create_cecase_dunder_dict(self, prop_id, unit_id):
-        # TODO: This is essentially a duplicate function (create.cecase_imap). Fix.
+        # TODO: This is essentially a duplicate function (create.cecase_imap)
         # These should be filled out by the subclass
         assert self.casename
         assert self.ce_notes

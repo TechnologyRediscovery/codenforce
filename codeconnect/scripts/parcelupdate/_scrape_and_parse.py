@@ -85,7 +85,6 @@ def _extract_elementlist_from_soup(soup, element_id, element=SPAN, remove_tags=T
 
     Returns:
         list[str,]
-    # Todo: Refactor into function it is called from?
     """
     # Although most keys work fine, addresses in particular return something like
     # ['1267\xa0BRINTON  RD', <br/>, 'PITTSBURGH,\xa0PA\xa015221'] which needs to be escaped

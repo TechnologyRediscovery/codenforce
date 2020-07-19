@@ -23,7 +23,6 @@ def parcel_not_in_db(parid, db_cursor):
     select_sql = """
         SELECT parid FROM property
         WHERE parid = %s"""
-    # TODO: ALLOW DUPLICATE PAIRDS?
     db_cursor.execute(select_sql, [parid])
     row = db_cursor.fetchone()
     if row is None:
@@ -95,7 +94,6 @@ def create_insertmap_from_record(r):
     """
     # Todo: This is a mess. Go over with others
     imap = {}
-    # imap["propertyid"] = None
     imap["municipality_municode"] = r["MUNICODE"]
     imap["parid"] = r["PARID"]
     # imap["lotandblock"] = extract_lotandblock_from_parid(imap["PARID"])
@@ -108,16 +106,13 @@ def create_insertmap_from_record(r):
 
     imap["lotandblock"] = ""  # TODO: FIGURE OUT LOT AND BLOCK
 
-    # TODO: MAKE SURE THIS IS THE CORRECT DATA
     imap["address"] = SPACE.join((r["PROPERTYHOUSENUM"], r["PROPERTYADDRESS"]))
     imap["address_extra"] = r["PROPERTYFRACTION"]  # TODO: Add column
     imap["addr_city"] = r["PROPERTYCITY"]
     imap["addr_state"] = r["PROPERTYSTATE"]
     imap["addr_zip"] = r["PROPERTYZIP"]
-    imap["ownercode"] = r[
-        "OWNERDESC"
-    ]  # Todo: Verify there is an ownercode to ownerdesc table
-    imap["propclass"] = r["CLASS"]  # Todo: Verify
+    imap["ownercode"] = r["OWNERDESC"]
+    imap["propclass"] = r["CLASS"]
     imap["lastupdatedby"] = BOT_ID
     imap["locationdescription"] = None
     imap["bobsource"] = None
@@ -233,7 +228,7 @@ def create_propertyexternaldata_map(prop_id, name, r, tax_status):
     imap["assessedbuildingvalue"] = r["COUNTYBUILDING"]
     imap["assessmentyear"] = r[
         "TAXYEAR"
-    ]  # BIG TODO: IMPORTANT: Scrape assessment year from county
+    ]  # BIG TODO: Scrape assessment year from county
     imap["usecode"] = r["USECODE"]
     imap["livingarea"] = r["FINISHEDLIVINGAREA"]
     imap["condition"] = r["CONDITION"]  # Todo: Condition to condition desc table
@@ -300,25 +295,6 @@ def create_PropertyInfoChange_imap(cecase_id):
     return imap
 
 
-def writePropertyInfoChangeEvent(cvu_map, db_cursor):
-    # TODO: Create different category id's depending on what is different (name vs tax, etc)
-    insert_sql = """
-        INSERT INTO public.event(
-            category_catid, cecase_caseid, creationts,
-            eventdescription, creator_userid, 
-            timestart, timeend, lastupdatedby_userid, lastupdatedts
-        )
-        VALUES(
-            %(category_catid)s, %(cecase_caseid)s, now(),
-            %(eventdescription)s, %(creator_userid)s,
-            now(), now(), %(lastupdatedby_userid)s, now()
-        )"""
-    db_cursor.execute(insert_sql, cvu_map)
-
-
-
-
-
 def update_muni(muni, db_cursor, commit=True):
     """
     The core functionality of the script.
@@ -357,7 +333,6 @@ def update_muni(muni, db_cursor, commit=True):
             imap = create_insertmap_from_record(record)
             prop_id = write_property_to_db(imap, db_cursor)
 
-            # TODO: Put code block in function
             if record["PROPERTYUNIT"] == " ":
                 unit_id = insert.unit(
                     {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
@@ -399,8 +374,7 @@ def update_muni(muni, db_cursor, commit=True):
                 event = events.NewParcelidEvent(parid, prop_id, db_cursor)
                 event.write_to_db(
                     db_cursor
-                )  # Todo: Should these two lines be a single line?
-
+                )
             else:
                 if flags.ownername:
                     event = events.DifferentOwnerEvent(
@@ -436,7 +410,7 @@ def update_muni(muni, db_cursor, commit=True):
                     event = events.DifferentTaxCode(
                         parid, prop_id, flags.taxcode, db_cursor
                     )
-                    event.write_to_db()
+                    event.write_to_db(db_cursor)
                 updated_count += 1
 
         if commit:
