@@ -1,25 +1,79 @@
+from collections import namedtuple
 import fetch
 import insert
 from colorama import init
-
 init()
 from colorama import Fore, Back, Style
 
 from _constants import DEFAULT_PROP_UNIT
 from _constants import BOT_ID
 
-# # Code that inserts new event categories into the database. This is called via a database patch, rather than Python
-# # It is left here for reference.
-"""
-INSERT INTO public.eventcategory(
-            categoryid, categorytype, title, description, notifymonitors,
-            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal,
-            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins,
-            active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
-    VALUES (?, 'PropertyInfoCase'::eventtype, '?', 'Documents ?', ?,
-            TRUE, NULL, 0, 0,
-            NULL, NULL, 1,
-            TRUE, 7, 3, 7);"""
+
+class ParcelFlags:
+    # __slots__ = ["ownername", "street", "citystatezip", "livingarea", "condition", "taxstatus", "new_parcel"] # Slots doesn't work with __dict__
+    def __init__(self):
+        self.new_parcel = False
+
+        # Differences from previous insert
+        self.ownername = False
+        self.street = False
+        self.citystatezip = False
+        self.livingarea = False
+        self.condition = False
+        self.taxstatus = False
+        self.taxcode = False
+
+    def __bool__(self):
+        for k in self.__dict__:
+            if self.__dict__[k]:
+                return True
+        return False
+
+# Flag is passed as a ParcelFlag attribute.
+Flag = namedtuple("flag", ["name", "orig", "new"])
+
+
+def parcel_changed(prop_id, flags, db_cursor):
+    """ Checks if parcel info is different from last time"""
+    select_sql = """
+        SELECT
+            property_propertyid, ownername, address_street, address_citystatezip,
+            livingarea, condition, taxstatus, taxcode
+        FROM public.propertyexternaldata
+        WHERE property_propertyid = %(prop_id)s
+        ORDER BY lastupdated DESC
+        LIMIT 2;
+    """
+
+    db_cursor.execute(select_sql, {"prop_id": prop_id})
+    selection = db_cursor.fetchall()
+    old = selection[0]
+    try:
+        new = selection[1]
+    except IndexError:  # If this is the first time the property_propertyid occurs in propertyexternaldata
+        print("First time parcel has appeared in propertyexternaldata")
+        if flags.new_parcel == False:
+            # TODO: Add flag
+            print(
+                "Error: Parcel appeared in public.propertyexternaldata for the first time even though the parcel ID is flagged as appearing in public.property before."
+            )
+        return flags
+
+    if old[0] != new[0]:
+        flags.ownername = Flag("owner name", old[0], new[0])
+    if old[1] != new[1]:
+        flags.street = Flag("street", old[1], new[1])
+    if old[2] != new[2]:
+        flags.citystatezip = Flag("city, state, or zipcode", old[2], new[2])
+    if old[3] != new[3]:
+        flags.livingarea = Flag("living area size", old[3], new[3])
+    if old[4] != new[4]:
+        flags.condition = Flag("condition", old[4], new[4])
+    if old[5] != new[5]:
+        flags.taxstatus = Flag("tax status", old[5], new[5])
+    if old[6] != new[6]:
+        flags.taxcode = Flag("tax code", old[6], new[6])
+
 
 
 # For simplicity sake, EVENTS ARE CURRENTLY ONLY FOR PROPERTY INFO CASES

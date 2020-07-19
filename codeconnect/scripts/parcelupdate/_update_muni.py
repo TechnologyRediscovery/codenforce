@@ -7,10 +7,10 @@ Actions resulting from trigger functions are commented in the following syntax:
 """
 
 import json
-from collections import namedtuple
 
 import create
 import events
+from events import parcel_changed
 import fetch
 import insert
 import _scrape_and_parse as snp
@@ -280,47 +280,7 @@ def write_propertyexternaldata(propextern_map, db_cursor):
     return db_cursor.fetchone()[0]  # property_id
 
 
-def parcel_changed(prop_id, flags, db_cursor):
-    """ Checks if parcel info is different from last time"""
-    select_sql = """
-        SELECT
-            property_propertyid, ownername, address_street, address_citystatezip,
-            livingarea, condition, taxstatus, taxcode
-        FROM public.propertyexternaldata
-        WHERE property_propertyid = %(prop_id)s
-        ORDER BY lastupdated DESC
-        LIMIT 2;
-    """
 
-    db_cursor.execute(select_sql, {"prop_id": prop_id})
-    selection = db_cursor.fetchall()
-    old = selection[0]
-    try:
-        new = selection[1]
-    except IndexError:  # If this is the first time the property_propertyid occurs in propertyexternaldata
-        print("First time parcel has appeared in propertyexternaldata")
-        if flags.new_parcel == False:
-            # TODO: THROW ERROR: Doesn't properly check for flags
-
-            print(
-                "Error: Parcel appeared in public.propertyexternaldata for the first time even though the parcel ID is flagged as appearing in public.property before."
-            )
-        return flags
-
-    if old[0] != new[0]:
-        flags.ownername = Flag("owner name", old[0], new[0])
-    if old[1] != new[1]:
-        flags.street = Flag("street", old[1], new[1])
-    if old[2] != new[2]:
-        flags.citystatezip = Flag("city, state, or zipcode", old[2], new[2])
-    if old[3] != new[3]:
-        flags.livingarea = Flag("living area size", old[3], new[3])
-    if old[4] != new[4]:
-        flags.condition = Flag("condition", old[4], new[4])
-    if old[5] != new[5]:
-        flags.taxstatus = Flag("tax status", old[5], new[5])
-    if old[6] != new[6]:
-        flags.taxcode = Flag("tax code", old[6], new[6])
 
 
 def create_unit_map(prop_id, unit_id):
@@ -356,28 +316,7 @@ def writePropertyInfoChangeEvent(cvu_map, db_cursor):
     db_cursor.execute(insert_sql, cvu_map)
 
 
-class ParcelFlags:
-    # __slots__ = ["ownername", "street", "citystatezip", "livingarea", "condition", "taxstatus", "new_parcel"] # Slots doesn't work with __dict__
-    def __init__(self):
-        self.new_parcel = False
 
-        # Differences from previous insert
-        self.ownername = False
-        self.street = False
-        self.citystatezip = False
-        self.livingarea = False
-        self.condition = False
-        self.taxstatus = False
-        self.taxcode = False
-
-    def __bool__(self):
-        for k in self.__dict__:
-            if self.__dict__[k]:
-                return True
-        return False
-
-
-Flag = namedtuple("flag", ["name", "orig", "new"])
 
 
 def update_muni(muni, db_cursor, commit=True):
@@ -404,7 +343,7 @@ def update_muni(muni, db_cursor, commit=True):
     updated_count = 0
 
     for record in records:
-        parcel_flags = ParcelFlags()
+        parcel_flags = events.ParcelFlags
         parid = record["PARID"]
 
         data = snp.scrape_county_property_assessments(parid, pages=[TAX])
@@ -475,7 +414,7 @@ def update_muni(muni, db_cursor, commit=True):
                     event.write_to_db(db_cursor)
                 if flags.citystatezip:
                     event = events.DifferentCityStateZip(
-                        parid, prop_id, flags.citystatezip
+                        parid, prop_id, flags.citystatezip, db_cursor
                     )
                     event.write_to_db(db_cursor)
                 if flags.livingarea:
@@ -494,7 +433,9 @@ def update_muni(muni, db_cursor, commit=True):
                     )
                     event.write_to_db(db_cursor)
                 if flags.taxcode:
-                    event = events.DifferentTaxCode(parid, flags.taxcode, db_cursor)
+                    event = events.DifferentTaxCode(
+                        parid, prop_id, flags.taxcode, db_cursor
+                    )
                     event.write_to_db()
                 updated_count += 1
 
