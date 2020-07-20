@@ -1,6 +1,20 @@
 # Parcel Update
 ###### A command line interface for keeping Turtle Creek COG's CodeNForce's data up to date.
+## Using the code
+### Quickstart
+Assuming you are at the root of the CodeNForce folder structure:
+~~~
+$ pipenv install
+$ pipenv shell
+$ cd codeconnect\scripts\parcelupdate
+$ python parcelupdate.py
+~~~
+This updates all parcels using the latest data from the WPRDC. For more options, run `python parcelupdate.py -h`.
 
+*"[Pipenv](https://pipenv.pypa.io/en/latest/) automatically creates and manages a virtualenv for your projects, as well as adds/removes packages from your Pipfile as you install/uninstall packages. It also generates the ever-important Pipfile.lock, which is used to produce deterministic builds."*
+
+
+## Maintaining the code
 ### How to add a new Event Category
 * Add the new event category to the database. See example sql below.
 ~~~{caption="Example insert sql"}  
