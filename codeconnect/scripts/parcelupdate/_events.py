@@ -146,8 +146,8 @@ class Event:
 class NewParcelid(Event):
     """ Indicates a parcel id was added to the database that wasn't in the database before. """
 
-    def __init__(self, parid, prop_id, db_cursor):
-        super().__init__(db_cursor, parid=parid, prop_id=prop_id)
+    def __init__(self, details):
+        super().__init__(details)
         self.category_id = 300
         self.description = "Parcel {} was added.".format(self.parid)
         self.active = True
@@ -156,99 +156,56 @@ class NewParcelid(Event):
         self.occ_period = None
 
 
-# If class was updated:
-# TODO: As I worked, I realized they were all the same. Thus, these should all subclass from the same thing. Make pretty later
+class ParcelChangedEvent(Event):
+    def __init__(self, flags):
+        super().__init__(flags)
+        self.eventdescription = f"Parcel {flags.parid}'s {f.name} changed from {f.orig} to {f.new}"
+        self.active = True
+        self.ce_notes = " "
+        self.event_notes = " "
+        self.occ_period = None
 
 
-class DifferentOwner(Event):
-    def __init__(self, parid, prop_id, flag, db_cursor):
-        super().__init__(db_cursor=db_cursor, parid=parid, prop_id=prop_id)
+class DifferentOwner(ParcelChangedEvent):
+    def __init__(self, details):
+        super().__init__(details)
         self.category_id = 301
-        self.description = (
-            f"Parcel {parid}'s {flag.name} changed from {flag.orig} to {flag.new}"
-        )
-        self.active = True
-        self.ce_notes = " "
-        self.notes = " "
-        self.occ_period = None
 
 
-class DifferentStreet(Event):
-    def __init__(self, parid, prop_id, flag, db_cursor):
-        super().__init__(db_cursor=db_cursor, parid=parid, prop_id=prop_id)
+class DifferentStreet(ParcelChangedEvent):
+    def __init__(self, details):
+        super().__init__(details)
         self.category_id = 302
-        self.description = (
-            f"Parcel {parid}'s {flag.name} changed from {flag.orig} to {flag.new}"
-        )
-        self.active = True
-        self.ce_notes = " "
-        self.notes = " "
-        self.occ_period = None
 
 
-class DifferentCityStateZip(Event):
-    def __init__(self, parid, prop_id, flag, db_cursor):
-        super().__init__(db_cursor=db_cursor, parid=parid, prop_id=prop_id)
+class DifferentCityStateZip(ParcelChangedEvent):
+    def __init__(self, details):
+        super().__init__(details)
         self.category_id = 303
-        self.description = (
-            f"Parcel {parid}'s {flag.name} changed from {flag.orig} to {flag.new}"
-        )
-        self.active = True
-        self.ce_notes = " "
-        self.notes = " "
-        self.occ_period = None
 
 
-class DifferentLivingArea(Event):
-    def __init__(self, parid, prop_id, flag, db_cursor):
-        super().__init__(db_cursor=db_cursor, parid=parid, prop_id=prop_id)
+class DifferentLivingArea(ParcelChangedEvent):
+    def __init__(self, details):
+        super().__init__(details)
         self.category_id = 304
-        self.description = (
-            f"Parcel {parid}'s {flag.name} changed from {flag.orig} to {flag.new}"
-        )
-        self.active = True
-        self.ce_notes = " "
-        self.notes = " "
-        self.occ_period = None
 
 
-class DifferentCondition(Event):
-    def __init__(self, parid, prop_id, flag, db_cursor):
-        super().__init__(db_cursor=db_cursor, parid=parid, prop_id=prop_id)
+class DifferentCondition(ParcelChangedEvent):
+    def __init__(self, details):
+        super().__init__(details)
         self.category_id = 305
-        self.description = (
-            f"Parcel {parid}'s {flag.name} changed from {flag.orig} to {flag.new}"
-        )
-        self.active = True
-        self.ce_notes = " "
-        self.notes = " "
-        self.occ_period = None
 
 
-class DifferentTaxStatus(Event):
-    def __init__(self, parid, prop_id, flag, db_cursor):
-        super().__init__(db_cursor=db_cursor, parid=parid, prop_id=prop_id)
+class DifferentTaxStatus(ParcelChangedEvent):
+    def __init__(self, details):
+        super().__init__(details)
         self.category_id = 306
-        self.description = (
-            f"Parcel {parid}'s {flag.name} changed from {flag.orig} to {flag.new}"
-        )
-        self.active = True
-        self.ce_notes = " "
-        self.notes = " "
-        self.occ_period = None
 
 
-class DifferentTaxCode(Event):
-    def __init__(self, parid, prop_id, flag, db_cursor):
-        super().__init__(db_cursor=db_cursor, parid=parid, prop_id=prop_id)
+class DifferentTaxCode(ParcelChangedEvent):
+    def __init__(self, details):
+        super().__init__(details)
         self.category_id = 307
-        self.description = (
-            f"Parcel {parid}'s {flag.name} changed from {flag.orig} to {flag.new}"
-        )
-        self.active = True
-        self.ce_notes = " "
-        self.notes = " "
-        self.occ_period = None
 
 
 def main():

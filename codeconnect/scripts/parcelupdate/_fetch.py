@@ -78,18 +78,18 @@ def unit_id(prop_id, db_cursor):
     select_sql = """
         SELECT unitid FROM propertyunit
         WHERE property_propertyid = %s"""
-    db_cursor.execute(select_sql, prop_id)
+    db_cursor.execute(select_sql, [prop_id])
     try:
         return db_cursor.fetchone()[0]  # unit id
     except TypeError:
         return None
 
-def ecase_id(self, db_cursor):
+def cecase_id(prop_id, db_cursor):
     select_sql = """
         SELECT caseid FROM cecase
         WHERE property_propertyid = %s
         ORDER BY creationtimestamp DESC;"""
-    db_cursor.execute(select_sql, [self.prop_id])
+    db_cursor.execute(select_sql, [prop_id])
     try:
         return db_cursor.fetchone()[0]  # Case ID
     except TypeError:  # 'NoneType' object is not subscriptable:

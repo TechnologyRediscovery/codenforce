@@ -221,14 +221,14 @@ def update_muni(muni, db_cursor, commit=True):
         else:
             new_parcel = False
             prop_id = fetch.prop_id(parid, db_cursor)
-            unit_id = fetch.unit_id(prop_id)
+            unit_id = fetch.unit_id(prop_id, db_cursor)
             if not unit_id:
                 unit_id = insert.unit(
                     {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
                     db_cursor,
                 )
             # TODO: ERROR: Property exists without property unit
-            cecase_id = fetch.cecase_id(unit_id)
+            cecase_id = fetch.cecase_id(unit_id, db_cursor)
             if not cecase_id:
                 cecase_map = create.cecase_imap(prop_id, unit_id)
                 cecase_id = insert.cecase(cecase_map, db_cursor)
