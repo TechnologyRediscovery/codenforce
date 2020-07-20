@@ -66,6 +66,39 @@ def muni_data_and_write_to_file(Municipality):
     return abs_path
 
 
+def prop_id(parid, db_cursor):
+    select_sql = """
+        SELECT propertyid FROM public.property
+        WHERE parid = %s;"""
+    db_cursor.execute(select_sql, [parid])
+    return db_cursor.fetchone()[0]  # property id
+
+
+def unit_id(prop_id, db_cursor):
+    select_sql = """
+        SELECT unitid FROM propertyunit
+        WHERE property_propertyid = %s"""
+    db_cursor.execute(select_sql, prop_id)
+    try:
+        return db_cursor.fetchone()[0]  # unit id
+    except TypeError:
+        return None
+
+def ecase_id(self, db_cursor):
+    select_sql = """
+        SELECT caseid FROM cecase
+        WHERE property_propertyid = %s
+        ORDER BY creationtimestamp DESC;"""
+    db_cursor.execute(select_sql, [self.prop_id])
+    try:
+        return db_cursor.fetchone()[0]  # Case ID
+    except TypeError:  # 'NoneType' object is not subscriptable:
+        return None
+
+
+
+
+
 def validate_muni_json(file_name):
     with open(file_name, "r") as file:
         f = json.load(file)
@@ -78,14 +111,6 @@ def validate_muni_json(file_name):
             raise ValueError("{} not valid".format(file.name))
         return True
     print(file_name, "could not be validated. Skipping.")
-
-
-def propid(parid, db_cursor):
-    select_sql = """
-        SELECT propertyid FROM public.property
-        WHERE parid = %s;"""
-    db_cursor.execute(select_sql, [parid])
-    return db_cursor.fetchone()[0]  # property id
 
 
 if __name__ == "__main__":

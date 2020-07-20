@@ -1,5 +1,4 @@
 from collections import namedtuple
-import _fetch as fetch
 import _insert as insert
 from colorama import init
 init()
@@ -11,15 +10,17 @@ from _constants import BOT_ID
 
 # These structures help organize the creation of events. See check_for_changes_and_write_events
 Changes = namedtuple("flag", ["name", "orig", "new"])
-class EventDetails:     # Unfortenetly, eventdetails has to be a class (instead of a tuple) because self.changes mutates
-    __slots__ = ["parid", "prop_id", "changes", "db_cursor"]
-    def __init__(self, parid, prop_id, db_cursor):
+class EventDetails:
+    __slots__ = ["parid", "prop_id", "cecase_id", "changes", "db_cursor"]
+    def __init__(self, parid, prop_id, cecase_id, db_cursor):
         self.parid = parid
         self.prop_id = prop_id
+        self.cecase_id = cecase_id
         self.db_cursor = db_cursor  # Although it technically isn't an event detail, passing the db_cursor makes life easier
         self.changes = None
 
-def check_for_changes_and_write_events(parid, prop_id, new_parcel, db_cursor):
+
+def check_for_changes_and_write_events(parid, prop_id, cecase_id, new_parcel, db_cursor):
     """ Checks if parcel info is different from last time. Records Changes. """
     select_sql = """
         SELECT
@@ -30,7 +31,7 @@ def check_for_changes_and_write_events(parid, prop_id, new_parcel, db_cursor):
         ORDER BY lastupdated DESC
         LIMIT 2;
     """
-    details = EventDetails(parid, prop_id, db_cursor)
+    details = EventDetails(parid, prop_id, cecase_id, db_cursor)
     db_cursor.execute(select_sql, {"prop_id": prop_id})
     selection = db_cursor.fetchall()
     old = selection[0]
@@ -75,36 +76,28 @@ def check_for_changes_and_write_events(parid, prop_id, new_parcel, db_cursor):
 class Event:
     """ Abstract base class for all events. """
 
-    def __init__(self, db_cursor, prop_id=None, parid=None, unit_id=None):
-        self.prop_id = prop_id
-        self.parid = parid
-        self.unit_id = unit_id
-        self.default_unit = DEFAULT_PROP_UNIT
+    def __init__(self, details):
+        self.prop_id = details.prop_id
+        self.parid = details.parid
+        self.cecase_id = details.cecase_id
+        self.db_cursor = details.db_cursor
 
-        if not self.prop_id:
-            self.prop_id = fetch.propid(self.parid, db_cursor)
+        # Returned after writing event to database
+        self.event_id = None
 
-        self.ce_caseid = self._get_cecase_id(db_cursor)  # Uses self.prop_id
+        # To be filled in by subclasses
+        self.category_id = None
+        self.description = None
+        self.active = None
+        self.notes = None
+        self.occperiod = None
+
 
     def write_to_db(self):
-        """ Writes an event to the database. If necessary, it also writes a cecase. """
-
-        if self.ce_caseid is None:
-            self.unit_id = self._get_unitid(self.db_cursor)
-            if not self.unit_id:
-                self.unit_id = insert.unit(
-                    {
-                        "unitnumber": DEFAULT_PROP_UNIT,
-                        "property_propertyid": self.prop_id,
-                    },
-                    self.db_cursor,
-                )
-            # Side effect: Modifies the attributes of self to be read by the next func
-            self._create_cecase_dunder_dict(prop_id=self.prop_id, unit_id=self.unit_id)
-            self.ce_caseid = insert.cecase(self.__dict__, self.db_cursor)
+        """ Writes an event to the database. """
         self._write_event_dunder_dict()
-        self.event_id = self._write_event_to_db(self.db_cursor)  # uses self.ce_caseid
-        print(Fore.RED, self.eventdescription, sep="")
+        self.event_id = self._write_event_to_db()  # uses self.ce_caseid
+        print(Fore.RED, self.description, sep="")
         print(Style.RESET_ALL, end="")
 
     def _get_cecase_id(self, db_cursor):
@@ -118,62 +111,20 @@ class Event:
         except TypeError:  # 'NoneType' object is not subscriptable:
             return None
 
-    def _create_cecase_dunder_dict(self, prop_id, unit_id):
-        # TODO: This is essentially a duplicate function (create.cecase_imap)
-        # These should be filled out by the subclass
-        assert self.casename
-        assert self.ce_notes
-        assert self.category_id
-        self.category_catid = self.category_catid
-
-        self.cecasepubliccc = 111111
-        self.property_propertyid = prop_id
-        self.propertyunit_unitid = unit_id
-        self.login_userid = BOT_ID
-        self.casename = self.casename
-        self.casephase = None
-        self.paccenabled = False
-        self.allowuplinkaccess = None
-        self.propertyinfocase = True
-        self.personinfocase_personid = None
-        self.bobsource_sourceid = None
-        self.active = True
-        self.category_catid = self.c
-
-    def _get_unitid(self, db_cursor):
-        if self.unit_id:
-            return self.unit_id
-        select_sql = """
-            SELECT unitid FROM propertyunit
-            WHERE property_propertyid = %s"""
-        db_cursor.execute(select_sql, [self.prop_id])
-        try:
-            return db_cursor.fetchone()[0]  # unit id
-        except TypeError:
-            return None
 
     def _write_event_dunder_dict(self):
-        assert self.category_id or self.category_catid
-        assert self.description or self.eventdescription
+        assert self.category_id
+        assert self.description
         assert self.active
-        assert self.event_notes
+        assert self.notes
 
-        self.cecase_caseid = self.ce_caseid
+        self.cecase_caseid = self.cecase_id
         self.creator_userid = BOT_ID
         self.lastupdatedby_userid = BOT_ID
         self.occperiod_periodid = None
 
-        try:
-            self.eventdescription
-        except AttributeError:
-            self.eventdescription = self.description
 
-        try:
-            self.category_catid
-        except AttributeError:
-            self.category_catid = self.category_id
-
-    def _write_event_to_db(self, db_cursor):
+    def _write_event_to_db(self):
         insert_sql = """
             INSERT INTO event(
                 eventid, category_catid, cecase_caseid, creationts,
@@ -182,14 +133,14 @@ class Event:
                 lastupdatedts
             )
             VALUES(
-                DEFAULT, %(category_catid)s, %(cecase_caseid)s, now(),
-                %(eventdescription)s, %(creator_userid)s, %(active)s, %(event_notes)s,
-                %(occperiod_periodid)s, now(), now(), %(lastupdatedby_userid)s,
+                DEFAULT, %(category_id)s, %(cecase_caseid)s, now(),
+                %(description)s, %(creator_userid)s, %(active)s, %(notes)s,
+                %(occ_period)s, now(), now(), %(lastupdatedby_userid)s,
                 now()
             )
             RETURNING eventid;"""
-        db_cursor.execute(insert_sql, self.__dict__)
-        return db_cursor.fetchone()[0]
+        self.db_cursor.execute(insert_sql, self.__dict__)
+        return self.db_cursor.fetchone()[0]
 
 
 class NewParcelid(Event):
@@ -201,8 +152,8 @@ class NewParcelid(Event):
         self.description = "Parcel {} was added.".format(self.parid)
         self.active = True
         self.ce_notes = " "
-        self.event_notes = " "
-        self.occperiod_periodid = None
+        self.notes = " "
+        self.occ_period = None
 
 
 # If class was updated:
@@ -218,7 +169,7 @@ class DifferentOwner(Event):
         )
         self.active = True
         self.ce_notes = " "
-        self.event_notes = " "
+        self.notes = " "
         self.occ_period = None
 
 
@@ -231,7 +182,7 @@ class DifferentStreet(Event):
         )
         self.active = True
         self.ce_notes = " "
-        self.event_notes = " "
+        self.notes = " "
         self.occ_period = None
 
 
@@ -244,7 +195,7 @@ class DifferentCityStateZip(Event):
         )
         self.active = True
         self.ce_notes = " "
-        self.event_notes = " "
+        self.notes = " "
         self.occ_period = None
 
 
@@ -257,7 +208,7 @@ class DifferentLivingArea(Event):
         )
         self.active = True
         self.ce_notes = " "
-        self.event_notes = " "
+        self.notes = " "
         self.occ_period = None
 
 
@@ -270,7 +221,7 @@ class DifferentCondition(Event):
         )
         self.active = True
         self.ce_notes = " "
-        self.event_notes = " "
+        self.notes = " "
         self.occ_period = None
 
 
@@ -283,7 +234,7 @@ class DifferentTaxStatus(Event):
         )
         self.active = True
         self.ce_notes = " "
-        self.event_notes = " "
+        self.notes = " "
         self.occ_period = None
 
 
@@ -296,7 +247,7 @@ class DifferentTaxCode(Event):
         )
         self.active = True
         self.ce_notes = " "
-        self.event_notes = " "
+        self.notes = " "
         self.occ_period = None
 
 

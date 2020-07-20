@@ -10,9 +10,7 @@ import json
 
 import _create as create
 import _events as events
-from _events import parcel_changed
 import _fetch as fetch
-import _property    # Underline kept to avoid naming collision with the built in function 'property'
 import _insert as insert
 import _scrape_and_parse as snp
 from _constants import GENERALINFO, BUILDING, TAX, SALES
@@ -190,11 +188,14 @@ def update_muni(muni, db_cursor, commit=True):
         owner_name = snp.OwnerName.get_Owner_from_soup(data[TAX])
         tax_status = snp.parse_tax_from_soup(data[TAX])
 
+
+        # This block of code initalizes the following:
+        #   Variables:  prop_id, unit_id, cecase_id
+        #   Flags:      new_parcel
         if parcel_not_in_db(parid, db_cursor):
             new_parcel = True
             imap = create.insertmap_from_record(record)
             prop_id = write_property_to_db(imap, db_cursor)
-
             if record["PROPERTYUNIT"] == " ":
                 unit_id = insert.unit(
                     {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
@@ -210,16 +211,28 @@ def update_muni(muni, db_cursor, commit=True):
                     db_cursor,
                 )
             cecase_map = create.cecase_imap(prop_id, unit_id)
-            insert.cecase(cecase_map, db_cursor)
-
+            cecase_id = insert.cecase(cecase_map, db_cursor)
+            #
             owner_map = create.owner_imap(owner_name, record)
             person_id = write_person_to_db(owner_map, db_cursor)
-
+            #
             connect_property_to_person(prop_id, person_id, db_cursor)
             inserted_count += 1
         else:
             new_parcel = False
-            prop_id = fetch.propid(parid, db_cursor)
+            prop_id = fetch.prop_id(parid, db_cursor)
+            unit_id = fetch.unit_id(prop_id)
+            if not unit_id:
+                unit_id = insert.unit(
+                    {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
+                    db_cursor,
+                )
+            # TODO: ERROR: Property exists without property unit
+            cecase_id = fetch.cecase_id(unit_id)
+            if not cecase_id:
+                cecase_map = create.cecase_imap(prop_id, unit_id)
+                cecase_id = insert.cecase(cecase_map, db_cursor)
+                # TODO: ERROR: Property exists without cecase
 
         validate_data(record, tax_status)
 
@@ -230,14 +243,14 @@ def update_muni(muni, db_cursor, commit=True):
         write_propertyexternaldata(propextern_map, db_cursor)
 
         events.check_for_changes_and_write_events(
-            parid, prop_id, db_cursor
+            parid, prop_id, cecase_id, new_parcel, db_cursor
         )
 
         if commit:
             db_cursor.commit()
         else:
             # Check to make sure variables weren't forgotten to be assigned
-            assert [attr is not None for attr in [prop_id, new_parcel]]
+            assert [attr is not None for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]]
 
         record_count += 1
         print("Record count:\t", record_count, sep="")
