@@ -1,6 +1,6 @@
 from collections import namedtuple
-import fetch
-import insert
+import _fetch as fetch
+import _insert as insert
 from colorama import init
 init()
 from colorama import Fore, Back, Style
@@ -88,7 +88,7 @@ class Event:
         self.default_unit = DEFAULT_PROP_UNIT
 
         if not self.prop_id:
-            self.prop_id = fetch.get_propid(self.parid, db_cursor)
+            self.prop_id = fetch.propid(self.parid, db_cursor)
 
         self.ce_caseid = self._get_cecase_id(db_cursor)  # Uses self.prop_id
 

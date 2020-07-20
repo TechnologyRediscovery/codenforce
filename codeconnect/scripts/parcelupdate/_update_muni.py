@@ -9,10 +9,10 @@ Actions resulting from trigger functions are commented in the following syntax:
 import json
 
 import _create as create
-import events
-from events import parcel_changed
-import fetch
-import insert
+import _events as events
+from _events import parcel_changed
+import _fetch as fetch
+import _insert
 import _scrape_and_parse as snp
 from _constants import GENERALINFO, BUILDING, TAX, SALES
 from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
@@ -166,7 +166,7 @@ def update_muni(muni, db_cursor, commit=True):
     print(MEDIUM_DASHES)
     # We COULD not save the file and work only in JSON,
     # but saving the file is better for understanding what happened
-    filename = fetch.fetch_muni_data_and_write_to_file(muni)
+    filename = fetch.muni_data_and_write_to_file(muni)
     if not fetch.validate_muni_json(filename):
         print(DASHES)
         return
@@ -196,13 +196,13 @@ def update_muni(muni, db_cursor, commit=True):
             prop_id = write_property_to_db(imap, db_cursor)
 
             if record["PROPERTYUNIT"] == " ":
-                unit_id = insert.unit(
+                unit_id = _insert.unit(
                     {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
                     db_cursor,
                 )
             else:
                 print(record["PROPERTYUNIT"])
-                unit_id = insert.unit(
+                unit_id = _insert.unit(
                     {
                         "unitnumber": record["PROPERTYUNIT"],
                         "property_propertyid": prop_id,
@@ -210,7 +210,7 @@ def update_muni(muni, db_cursor, commit=True):
                     db_cursor,
                 )
             cecase_map = create.cecase_imap(prop_id, unit_id)
-            insert.cecase(cecase_map, db_cursor)
+            _insert.cecase(cecase_map, db_cursor)
 
             owner_map = create.owner_imap(owner_name, record)
             person_id = write_person_to_db(owner_map, db_cursor)
@@ -221,7 +221,7 @@ def update_muni(muni, db_cursor, commit=True):
             inserted_count += 1
             inserted_flag = True
         else:
-            prop_id = fetch.get_propid(parid, db_cursor)
+            prop_id = fetch.propid(parid, db_cursor)
             # We have to scrape this again to see if it changed
 
         validate_data(record, owner_name, tax_status)

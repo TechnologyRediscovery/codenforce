@@ -14,15 +14,15 @@ Municipality = namedtuple("Municipalicty", ["municode", "name"])
 
 def main():
     with get_db_and_cursor() as db_cursor:
-        muni_generator = get_munis(db_cursor)
+        muni_generator = munis(db_cursor)
         for muni in muni_generator:
             try:
-                file_name = fetch_muni_data_and_write_to_file(muni)
+                file_name = muni_data_and_write_to_file(muni)
             finally:
                 validate_muni_json(file_name)
 
 
-def get_munis(db_cursor,):
+def munis(db_cursor, ):
     select_sql = "SELECT municode, muniname FROM municipality;"
     db_cursor.execute(select_sql)
     munis = db_cursor.fetchall()
@@ -30,7 +30,7 @@ def get_munis(db_cursor,):
         yield Municipality(*row)
 
 
-def get_muniname_from_municode(municode, db_cursor):
+def muniname_from_municode(municode, db_cursor):
     select_sql = "SELECT municode, muniname FROM municipality where municode = %s"
     db_cursor.execute(select_sql, [municode])
     row = db_cursor.fetchone()
@@ -45,7 +45,7 @@ def get_muniname_from_municode(municode, db_cursor):
             raise e
 
 
-def fetch_muni_data_and_write_to_file(Municipality):
+def muni_data_and_write_to_file(Municipality):
     # Note: The WPRDC limits 50,000 parcels
     script_dir = os.path.dirname(__file__)
     rel_path = os.path.join(PARCEL_ID_LISTS, Municipality.name + "_parcelids.json")
@@ -80,7 +80,7 @@ def validate_muni_json(file_name):
     print(file_name, "could not be validated. Skipping.")
 
 
-def get_propid(parid, db_cursor):
+def propid(parid, db_cursor):
     select_sql = """
         SELECT propertyid FROM public.property
         WHERE parid = %s;"""
