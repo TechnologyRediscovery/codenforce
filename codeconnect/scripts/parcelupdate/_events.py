@@ -9,32 +9,18 @@ from _constants import DEFAULT_PROP_UNIT
 from _constants import BOT_ID
 
 
-class EventFlags:
-    def __init__(self):
-        self.new_parcel = False
-        # Differences from previous insert
-        self.ownername = False
-        self.street = False
-        self.citystatezip = False
-        self.livingarea = False
-        self.condition = False
-        self.taxstatus = False
-        self.taxcode = False
-
-    def __bool__(self):
-        for k in self.__dict__:
-            if self.__dict__[k]:
-                return True
-        return False
-
-
-
-# Changes is passed as a Property attribute.
+# These structures help organize the creation of events. See check_for_changes_and_write_events
 Changes = namedtuple("flag", ["name", "orig", "new"])
+class EventDetails:     # Unfortenetly, eventdetails has to be a class (instead of a tuple) because self.changes mutates
+    __slots__ = ["parid", "prop_id", "changes", "db_cursor"]
+    def __init__(self, parid, prop_id, db_cursor):
+        self.parid = parid
+        self.prop_id = prop_id
+        self.db_cursor = db_cursor  # Although it technically isn't an event detail, passing the db_cursor makes life easier
+        self.changes = None
 
-
-def parcel_changed(prop_id, flags, db_cursor):
-    """ Checks if parcel info is different from last time"""
+def check_for_changes_and_write_events(parid, prop_id, new_parcel, db_cursor):
+    """ Checks if parcel info is different from last time. Records Changes. """
     select_sql = """
         SELECT
             property_propertyid, ownername, address_street, address_citystatezip,
@@ -44,7 +30,7 @@ def parcel_changed(prop_id, flags, db_cursor):
         ORDER BY lastupdated DESC
         LIMIT 2;
     """
-
+    details = EventDetails(parid, prop_id, db_cursor)
     db_cursor.execute(select_sql, {"prop_id": prop_id})
     selection = db_cursor.fetchall()
     old = selection[0]
@@ -52,27 +38,35 @@ def parcel_changed(prop_id, flags, db_cursor):
         new = selection[1]
     except IndexError:  # If this is the first time the property_propertyid occurs in propertyexternaldata
         print("First time parcel has appeared in propertyexternaldata")
-        if flags.new_parcel == False:
+        if not new_parcel:
             # TODO: Add flag
             print(
                 "Error: Parcel appeared in public.propertyexternaldata for the first time even though the parcel ID is flagged as appearing in public.property before."
             )
-        return flags
+            NewParcelid(details).write_to_db()
+        return
 
     if old[0] != new[0]:
-        flags.ownername = Changes("owner name", old[0], new[0])
+        details.changes = Changes("owner name", old[0], new[0])
+        DifferentOwner(details).write_to_db()
     if old[1] != new[1]:
-        flags.street = Changes("street", old[1], new[1])
+        details.changes = Changes("street", old[1], new[1])
+        DifferentStreet(details).write_to_db()
     if old[2] != new[2]:
-        flags.citystatezip = Changes("city, state, or zipcode", old[2], new[2])
+        details.changes = Changes("city, state, or zipcode", old[2], new[2])
+        DifferentCityStateZip(details).write_to_db()
     if old[3] != new[3]:
-        flags.livingarea = Changes("living area size", old[3], new[3])
+        details.changes = Changes("living area size", old[3], new[3])
+        DifferentLivingArea(details).write_to_db()
     if old[4] != new[4]:
-        flags.condition = Changes("condition", old[4], new[4])
+        details.changes = Changes("condition", old[4], new[4])
+        DifferentCondition(details).write_to_db()
     if old[5] != new[5]:
-        flags.taxstatus = Changes("tax status", old[5], new[5])
+        details.changes = Changes("tax status", old[5], new[5])
+        DifferentTaxStatus(details).write_to_db()
     if old[6] != new[6]:
-        flags.taxcode = Changes("tax code", old[6], new[6])
+        details.changes = Changes("tax code", old[6], new[6])
+        DifferentTaxCode(details).write_to_db()
 
 
 
@@ -92,24 +86,24 @@ class Event:
 
         self.ce_caseid = self._get_cecase_id(db_cursor)  # Uses self.prop_id
 
-    def write_to_db(self, db_cursor):
+    def write_to_db(self):
         """ Writes an event to the database. If necessary, it also writes a cecase. """
 
         if self.ce_caseid is None:
-            self.unit_id = self._get_unitid(db_cursor)
+            self.unit_id = self._get_unitid(self.db_cursor)
             if not self.unit_id:
                 self.unit_id = insert.unit(
                     {
                         "unitnumber": DEFAULT_PROP_UNIT,
                         "property_propertyid": self.prop_id,
                     },
-                    db_cursor,
+                    self.db_cursor,
                 )
             # Side effect: Modifies the attributes of self to be read by the next func
             self._create_cecase_dunder_dict(prop_id=self.prop_id, unit_id=self.unit_id)
-            self.ce_caseid = insert.cecase(self.__dict__, db_cursor)
+            self.ce_caseid = insert.cecase(self.__dict__, self.db_cursor)
         self._write_event_dunder_dict()
-        self.event_id = self._write_event_to_db(db_cursor)  # uses self.ce_caseid
+        self.event_id = self._write_event_to_db(self.db_cursor)  # uses self.ce_caseid
         print(Fore.RED, self.eventdescription, sep="")
         print(Style.RESET_ALL, end="")
 
@@ -198,7 +192,7 @@ class Event:
         return db_cursor.fetchone()[0]
 
 
-class NewParcelidEvent(Event):
+class NewParcelid(Event):
     """ Indicates a parcel id was added to the database that wasn't in the database before. """
 
     def __init__(self, parid, prop_id, db_cursor):
@@ -215,7 +209,7 @@ class NewParcelidEvent(Event):
 # TODO: As I worked, I realized they were all the same. Thus, these should all subclass from the same thing. Make pretty later
 
 
-class DifferentOwnerEvent(Event):
+class DifferentOwner(Event):
     def __init__(self, parid, prop_id, flag, db_cursor):
         super().__init__(db_cursor=db_cursor, parid=parid, prop_id=prop_id)
         self.category_id = 301
@@ -228,7 +222,7 @@ class DifferentOwnerEvent(Event):
         self.occ_period = None
 
 
-class DifferentStreetEvent(Event):
+class DifferentStreet(Event):
     def __init__(self, parid, prop_id, flag, db_cursor):
         super().__init__(db_cursor=db_cursor, parid=parid, prop_id=prop_id)
         self.category_id = 302

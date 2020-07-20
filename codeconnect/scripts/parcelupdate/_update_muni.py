@@ -182,23 +182,22 @@ def update_muni(muni, db_cursor, commit=True):
     updated_count = 0
 
     for record in records:
-        prop = _property.Property()
-        prop.parid = record["PARID"]    # Explicit is better than implicit
+        parid = record["PARID"]
 
-        data = snp.scrape_county_property_assessments(prop.parid, pages=[TAX])
+        data = snp.scrape_county_property_assessments(parid, pages=[TAX])
         for page in data:
             data[page] = snp.soupify_html(data[page])
         owner_name = snp.OwnerName.get_Owner_from_soup(data[TAX])
         tax_status = snp.parse_tax_from_soup(data[TAX])
 
-        if parcel_not_in_db(prop.parid, db_cursor):
-            prop.new_parcel = True
+        if parcel_not_in_db(parid, db_cursor):
+            new_parcel = True
             imap = create.insertmap_from_record(record)
-            prop.prop_id = write_property_to_db(imap, db_cursor)
+            prop_id = write_property_to_db(imap, db_cursor)
 
             if record["PROPERTYUNIT"] == " ":
                 unit_id = insert.unit(
-                    {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop.prop_id},
+                    {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
                     db_cursor,
                 )
             else:
@@ -206,78 +205,39 @@ def update_muni(muni, db_cursor, commit=True):
                 unit_id = insert.unit(
                     {
                         "unitnumber": record["PROPERTYUNIT"],
-                        "property_propertyid": prop.prop_id,
+                        "property_propertyid": prop_id,
                     },
                     db_cursor,
                 )
-            cecase_map = create.cecase_imap(prop.prop_id, unit_id)
+            cecase_map = create.cecase_imap(prop_id, unit_id)
             insert.cecase(cecase_map, db_cursor)
 
             owner_map = create.owner_imap(owner_name, record)
             person_id = write_person_to_db(owner_map, db_cursor)
 
-            # ~~ Update Spelling (Not implemented)
-
-            connect_property_to_person(prop.prop_id, person_id, db_cursor)
+            connect_property_to_person(prop_id, person_id, db_cursor)
             inserted_count += 1
-            inserted_flag = True
         else:
-            prop.prop_id = fetch.propid(prop.parid, db_cursor)
-            # We have to scrape this again to see if it changed
+            new_parcel = False
+            prop_id = fetch.propid(parid, db_cursor)
 
         validate_data(record, tax_status)
+
         propextern_map = create.propertyexternaldata_imap(
-            prop.prop_id, owner_name.raw, record, tax_status
+            prop_id, owner_name.raw, record, tax_status
         )
         # Property external data is a misnomer. It's just a log of the data from every time stuff
         write_propertyexternaldata(propextern_map, db_cursor)
 
-        if flags := parcel_changed(prop.prop_id, prop, db_cursor):
-            if flags.new_parcel:
-                event = events.NewParcelidEvent(parid, prop.prop_id, db_cursor)
-                event.write_to_db(
-                    db_cursor
-                )
-            else:
-                if flags.ownername:
-                    event = events.DifferentOwnerEvent(
-                        parid, prop.prop_id, flags.ownername, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.street:
-                    event = events.DifferentStreetEvent(
-                        parid, prop.prop_id, flags.street, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.citystatezip:
-                    event = events.DifferentCityStateZip(
-                        parid, prop.prop_id, flags.citystatezip, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.livingarea:
-                    event = events.DifferentLivingArea(
-                        parid, prop.prop_id, flags.livingarea, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.condition:
-                    event = events.DifferentCondition(
-                        parid, prop.prop_id, flags.condition, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.taxstatus:
-                    event = events.DifferentTaxStatus(
-                        parid, prop.prop_id, flags.taxstatus, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.taxcode:
-                    event = events.DifferentTaxCode(
-                        parid, prop.prop_id, flags.taxcode, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                updated_count += 1
+        events.check_for_changes_and_write_events(
+            parid, prop_id, db_cursor
+        )
 
         if commit:
             db_cursor.commit()
+        else:
+            # Check to make sure variables weren't forgotten to be assigned
+            assert [attr is not None for attr in [prop_id, new_parcel]]
 
         record_count += 1
         print("Record count:\t", record_count, sep="")
