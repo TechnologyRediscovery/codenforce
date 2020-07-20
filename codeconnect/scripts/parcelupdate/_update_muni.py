@@ -126,7 +126,7 @@ def compare(WPRDC_data, AlleghenyCountyData):
         )
 
 
-def validate_data(r, owner, tax):
+def validate_data(r, tax):
     # Todo: Validate more data
     compare(r["TAXYEAR"], int(snp.strip_whitespace(tax.year)))
 
@@ -224,7 +224,7 @@ def update_muni(muni, db_cursor, commit=True):
             prop_id = fetch.propid(parid, db_cursor)
             # We have to scrape this again to see if it changed
 
-        validate_data(record, owner_name, tax_status)
+        validate_data(record, tax_status)
         propextern_map = create.propertyexternaldata_imap(
             prop_id, owner_name.raw, record, tax_status
         )
