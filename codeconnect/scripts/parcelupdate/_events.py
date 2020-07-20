@@ -12,8 +12,11 @@ from _constants import BOT_ID
 class Property:
     # __slots__ = ["ownername", "street", "citystatezip", "livingarea", "condition", "taxstatus", "new_parcel"] # Slots doesn't work with __dict__
     def __init__(self):
-        self.new_parcel = False
+        self.parid = None
+        self.prop_id = None
 
+        # EVENT FLAGS
+        self.new_parcel = False
         # Differences from previous insert
         self.ownername = False
         self.street = False
@@ -29,7 +32,8 @@ class Property:
                 return True
         return False
 
-# Changes is passed as a ParcelFlag attribute.
+
+# Changes is passed as a Property attribute.
 Changes = namedtuple("flag", ["name", "orig", "new"])
 
 
