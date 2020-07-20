@@ -102,3 +102,6 @@ dmypy.json
 
 # Text editors
 .idea
+
+# Script specific files
+*_parcelids.json

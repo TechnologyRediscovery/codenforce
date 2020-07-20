@@ -33,7 +33,6 @@ def get_db_and_cursor(
             However, the implementation is a little whack.
             I'm always looking to learn: make a pull request if you have a more straightforward implementation!
     """
-    # Todo: Option to read in username/password from secrets.json
     try:
         db_conn = psycopg2.connect(
             database=database, user=user, password=password, host=host, port=port

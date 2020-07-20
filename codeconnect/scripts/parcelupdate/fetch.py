@@ -45,7 +45,6 @@ def get_muniname_from_municode(municode, db_cursor):
             raise e
 
 
-# Todo: Is writing .json files the best way to do this? Does it scale?
 def fetch_muni_data_and_write_to_file(Municipality):
     # Note: The WPRDC limits 50,000 parcels
     script_dir = os.path.dirname(__file__)
