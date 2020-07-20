@@ -29,18 +29,22 @@ INSERT INTO public.eventcategory(
          TRUE, 7, 3, 7);
 ~~~
 * Create a class corresponding to the event category in events.py. Make sure it inherits from the base class event. Make sure its name matches up exactly to the name in the database.
-* Add a corresponding flag to the __init\__ method of the class events.Property. It should default to False.
-* Add a check for your flag in the function events.parcel_changed. The check should take the following form:
-~~~
-if old[i] != new[i]:
-       flags.yourflag = Flag("your flag", old[i], new[i])
-~~~
+* **If the event is classified as a [Parcel Change](#parcel-change):**
+  * Add a corresponding flag to the __init\__ method of the class events.Property. It should default to False.
+  * Add a check for your flag in the function events.parcel_changed. The check should take the following form:
+    ~~~
+    if old[i] != new[i]:
+           flags.yourflag = Flag("your flag", old[i], new[i])
+    ~~~
 
-* Add the test for the flag in the function update_muni in _update_muni.py.
-~~~
-if flags.taxstatus:
-    event = events.DifferentTaxStatus(
-       parid, prop_id, flags.your_flag, db_cursor
-    )
-    event.write_to_db(db_cursor)
-~~~
+  * Add the test for the flag in the function update_muni in _update_muni.py.
+    ~~~
+    if flags.taxstatus:
+        event = events.DifferentTaxStatus(
+           parid, prop_id, flags.your_flag, db_cursor
+        )
+        event.write_to_db(db_cursor)
+    ~~~
+<h4 id=parcel-change>What constitutes a Parcel Change?</h4>
+A regular, month to month change.
+Examples include DifferentTaxStatus and DifferentOwner, but do not include events such as NewParcelid and ParcelNotInCountyData.
