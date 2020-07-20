@@ -9,10 +9,9 @@ Actions resulting from trigger functions are commented in the following syntax:
 import json
 
 import _create as create
-import events
-from events import parcel_changed
-import fetch
-import insert
+import _events as events
+import _fetch as fetch
+import _insert as insert
 import _scrape_and_parse as snp
 from _constants import GENERALINFO, BUILDING, TAX, SALES
 from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
@@ -126,7 +125,7 @@ def compare(WPRDC_data, AlleghenyCountyData):
         )
 
 
-def validate_data(r, owner, tax):
+def validate_data(r, tax):
     # Todo: Validate more data
     compare(r["TAXYEAR"], int(snp.strip_whitespace(tax.year)))
 
@@ -166,7 +165,7 @@ def update_muni(muni, db_cursor, commit=True):
     print(MEDIUM_DASHES)
     # We COULD not save the file and work only in JSON,
     # but saving the file is better for understanding what happened
-    filename = fetch.fetch_muni_data_and_write_to_file(muni)
+    filename = fetch.muni_data_and_write_to_file(muni)
     if not fetch.validate_muni_json(filename):
         print(DASHES)
         return
@@ -181,7 +180,6 @@ def update_muni(muni, db_cursor, commit=True):
     updated_count = 0
 
     for record in records:
-        parcel_flags = events.ParcelFlags
         parid = record["PARID"]
 
         data = snp.scrape_county_property_assessments(parid, pages=[TAX])
@@ -190,11 +188,14 @@ def update_muni(muni, db_cursor, commit=True):
         owner_name = snp.OwnerName.get_Owner_from_soup(data[TAX])
         tax_status = snp.parse_tax_from_soup(data[TAX])
 
+
+        # This block of code initalizes the following:
+        #   Variables:  prop_id, unit_id, cecase_id
+        #   Flags:      new_parcel
         if parcel_not_in_db(parid, db_cursor):
-            parcel_flags.new_parcel = True
+            new_parcel = True
             imap = create.insertmap_from_record(record)
             prop_id = write_property_to_db(imap, db_cursor)
-
             if record["PROPERTYUNIT"] == " ":
                 unit_id = insert.unit(
                     {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
@@ -210,73 +211,46 @@ def update_muni(muni, db_cursor, commit=True):
                     db_cursor,
                 )
             cecase_map = create.cecase_imap(prop_id, unit_id)
-            insert.cecase(cecase_map, db_cursor)
-
+            cecase_id = insert.cecase(cecase_map, db_cursor)
+            #
             owner_map = create.owner_imap(owner_name, record)
             person_id = write_person_to_db(owner_map, db_cursor)
-
-            # ~~ Update Spelling (Not implemented)
-
+            #
             connect_property_to_person(prop_id, person_id, db_cursor)
             inserted_count += 1
-            inserted_flag = True
         else:
-            prop_id = fetch.get_propid(parid, db_cursor)
-            # We have to scrape this again to see if it changed
+            new_parcel = False
+            prop_id = fetch.prop_id(parid, db_cursor)
+            unit_id = fetch.unit_id(prop_id, db_cursor)
+            if not unit_id:
+                unit_id = insert.unit(
+                    {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
+                    db_cursor,
+                )
+            # TODO: ERROR: Property exists without property unit
+            cecase_id = fetch.cecase_id(unit_id, db_cursor)
+            if not cecase_id:
+                cecase_map = create.cecase_imap(prop_id, unit_id)
+                cecase_id = insert.cecase(cecase_map, db_cursor)
+                # TODO: ERROR: Property exists without cecase
 
-        validate_data(record, owner_name, tax_status)
+        validate_data(record, tax_status)
+
         propextern_map = create.propertyexternaldata_imap(
             prop_id, owner_name.raw, record, tax_status
         )
         # Property external data is a misnomer. It's just a log of the data from every time stuff
         write_propertyexternaldata(propextern_map, db_cursor)
 
-        if flags := parcel_changed(prop_id, parcel_flags, db_cursor):
-            if flags.new_parcel:
-                event = events.NewParcelidEvent(parid, prop_id, db_cursor)
-                event.write_to_db(
-                    db_cursor
-                )
-            else:
-                if flags.ownername:
-                    event = events.DifferentOwnerEvent(
-                        parid, prop_id, flags.ownername, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.street:
-                    event = events.DifferentStreetEvent(
-                        parid, prop_id, flags.street, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.citystatezip:
-                    event = events.DifferentCityStateZip(
-                        parid, prop_id, flags.citystatezip, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.livingarea:
-                    event = events.DifferentLivingArea(
-                        parid, prop_id, flags.livingarea, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.condition:
-                    event = events.DifferentCondition(
-                        parid, prop_id, flags.condition, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.taxstatus:
-                    event = events.DifferentTaxStatus(
-                        parid, prop_id, flags.taxstatus, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                if flags.taxcode:
-                    event = events.DifferentTaxCode(
-                        parid, prop_id, flags.taxcode, db_cursor
-                    )
-                    event.write_to_db(db_cursor)
-                updated_count += 1
+        events.check_for_changes_and_write_events(
+            parid, prop_id, cecase_id, new_parcel, db_cursor
+        )
 
         if commit:
             db_cursor.commit()
+        else:
+            # Check to make sure variables weren't forgotten to be assigned
+            assert [attr is not None for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]]
 
         record_count += 1
         print("Record count:\t", record_count, sep="")

@@ -99,6 +99,7 @@ declare
     unitid_     integer;
     caseid_     integer;
     personid_   integer;
+    cecaseid_   integer;
 BEGIN
     propertyid_ := MAX(propertyid) FROM property;
         propertyid_ = propertyid_ + incr;
@@ -112,6 +113,9 @@ BEGIN
     personid_ := MAX(personid) FROM person;
         personid_ = personid_ + incr;
         PERFORM setval('person_personidseq', personid_);
+    cecaseid_ := MAX(caseid) FROM cecase;
+        cecaseid_ = cecaseid_ + incr;
+        PERFORM setval('cecase_caseid_seq', cecaseid_);
 END;
 $$ LANGUAGE plpgsql;
 

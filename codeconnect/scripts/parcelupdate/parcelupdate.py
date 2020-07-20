@@ -5,7 +5,7 @@ import time
 
 import click
 
-import fetch
+import _fetch as fetch
 from _update_muni import update_muni
 from _db_conn import get_db_and_cursor
 from _constants import DASHES
@@ -26,24 +26,24 @@ from _constants import DASHES
 def main(municodes, commit, u, password, port):
     """Updates the CodeNForce database with the most recent data provided by the WPRDC."""
     start = time.time()
+
     if commit:
         click.echo("Data will be committed to the database")
     else:
         click.echo("This is a test. Data will NOT be committed.")
     click.echo(DASHES)
-
     # Calls the core functionality for each municipality in the argument
     with get_db_and_cursor(user=u, password=password, port=port) as db_cursor:
         muni_count = 0
         if municodes == ():
             # Update ALL municipalities
-            for muni in fetch.get_munis(db_cursor):
+            for muni in fetch.munis(db_cursor):
                 update_muni(muni, db_cursor, commit)
                 muni_count += 1
 
         else:
             for _municode in municodes:
-                muni = fetch.get_muniname_from_municode(_municode, db_cursor)
+                muni = fetch.muniname_from_municode(_municode, db_cursor)
                 update_muni(muni, db_cursor, commit)
                 muni_count += 1
                 print("Updated", muni_count, "municipalities.")
