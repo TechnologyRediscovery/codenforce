@@ -28,7 +28,8 @@ public enum PageModeEnum {
     LOOKUP        (   "LOOKUP", true, 3, false      ),
     INSERT        (   "INSERT", false, 4, false     ),
     UPDATE        (   "UPDATE", false, 4, true      ),
-    REMOVE        (   "REMOVE", false, 5, true      );
+    REMOVE        (   "REMOVE", false, 5, true      ),
+    VIEW          (   "VIEW",   true, 3, true       );
                                                                 
     private final String title;                                 
     private final boolean defaultMode;

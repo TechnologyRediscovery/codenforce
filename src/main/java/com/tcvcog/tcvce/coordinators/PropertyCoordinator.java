@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import com.tcvcog.tcvce.entities.PropertyExtData;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -79,6 +80,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
 
         PropertyDataHeavy pdh = new PropertyDataHeavy(prop);
 
@@ -109,11 +111,33 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 //            pdh.setChangeList(pi.getPropertyUnitChangeListAll(pr));
             // wait on blobs
             //pdh.setBlobList(new ArrayList<Integer>());
+            
+            // external data
+            pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyHistoryList(cred)));
+            
         } catch (EventException | AuthorizationException ex) {
             System.out.println(ex);
             System.out.println();
         }
         return pdh;
+    }
+    
+    /**
+     * Utility method for calling the integrator method that creates a single
+     * external data record given a list of record IDs
+     * @param extIDList
+     * @return
+     * @throws IntegrationException 
+     */
+    private List<PropertyExtData> fetchExternalDataRecords(List<Integer> extIDList) throws IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        List<PropertyExtData> extList = new ArrayList<>();
+        if(extIDList != null && !extIDList.isEmpty()){
+            for(Integer i: extIDList){
+               extList.add(pi.getPropertyExternalDataRecord(i));
+            }
+        }
+        return extList;
     }
 
     /**
@@ -460,6 +484,20 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         Property prop = new Property();
         prop.setMuni(muni);
         return prop;
+    }
+    
+    
+    /**
+     * Creates a skeleton of a property
+     * @param muni
+     * @return whose ID is 0
+     */
+    public PropertyDataHeavy initPropertyDataHeavy(Municipality muni) {
+        Property prop = new Property();
+        PropertyDataHeavy pdh = new PropertyDataHeavy(prop);
+        
+        prop.setMuni(muni);
+        return pdh;
     }
 
     /**

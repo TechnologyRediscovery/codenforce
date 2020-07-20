@@ -83,6 +83,8 @@ public class    SessionBean
     
     private PropertyUnit sessPropertyUnit;
     
+    private boolean startPropInfoPageWithAdd;
+    
     /* >>> QUERY PROPERTY <<< */
     private QueryProperty queryProperty;
     private List<QueryProperty> queryPropertyList;
@@ -1335,6 +1337,20 @@ public class    SessionBean
      */
     public void setSessEventDomain(EventDomainEnum sessEventDomain) {
         this.sessEventDomain = sessEventDomain;
+    }
+
+    /**
+     * @return the startPropInfoPageWithAdd
+     */
+    public boolean isStartPropInfoPageWithAdd() {
+        return startPropInfoPageWithAdd;
+    }
+
+    /**
+     * @param startPropInfoPageWithAdd the startPropInfoPageWithAdd to set
+     */
+    public void setStartPropInfoPageWithAdd(boolean startPropInfoPageWithAdd) {
+        this.startPropInfoPageWithAdd = startPropInfoPageWithAdd;
     }
     
     

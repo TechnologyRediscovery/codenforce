@@ -46,6 +46,8 @@ public  class       PropertyDataHeavy
     
     private String credentialSignature;
     
+    private List<PropertyExtData> extDataList;
+    
     public PropertyDataHeavy(){
         
     }
@@ -276,6 +278,20 @@ public  class       PropertyDataHeavy
      */
     public List<CECaseDataHeavy> getPropInfoCaseList() {
         return propInfoCaseList;
+    }
+
+    /**
+     * @return the extDataList
+     */
+    public List<PropertyExtData> getExtDataList() {
+        return extDataList;
+    }
+
+    /**
+     * @param extDataList the extDataList to set
+     */
+    public void setExtDataList(List<PropertyExtData> extDataList) {
+        this.extDataList = extDataList;
     }
 
 

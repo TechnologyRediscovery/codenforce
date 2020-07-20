@@ -41,15 +41,12 @@ import javax.faces.event.ActionEvent;
  */
 public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
     
-    
-    // New from Chen&Chen
-    
-    
     private PageModeEnum currentMode;
     private List<PageModeEnum> pageModes;
     
     private EventRuleAbstract currentEventRuleAbstract;
     private boolean currentRuleSelected;
+    
     private List<EventRuleAbstract> eventRuleList;
     private List<EventRuleAbstract> eventRuleListFiltered;
     
@@ -200,6 +197,32 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         return wc.rules_getEventRuleAbstractListForConfig(getSessionBean().getSessUser());
         
     }
+    
+       /**
+     * Listener for clicks to the button on each row of the object table in the 
+     * left column
+     * @param era
+     */
+    public void onObjectSelectButtonChange(EventRuleAbstract era){
+        System.out.println("EventRuleConfigBB.onObjectSelectButtonChange");
+        // "Select" button was selected
+        if (currentRuleSelected && era != null) {
+            
+            eventRuleListFiltered.clear();
+            eventRuleListFiltered.add(era);
+            currentEventRuleAbstract = era;
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected Rule: " + era.getTitle(), ""));
+            // "Select" button wasn't selected
+            currentRuleSelected = true;
+        } else {
+            // reset page
+            loadDefaultPageConfig();
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Page reset" , ""));
+        }
+
+        
+    }
+    
 
     /**
      * Listener for button clicks when user is ready to insert a new EventRule.
@@ -243,31 +266,7 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         return "";
     }
 
-    /**
-     * Listener for clicks to the button on each row of the object table in the 
-     * left column
-     * @param era
-     */
-    public void onObjectSelectButtonChange(EventRuleAbstract era){
-        System.out.println("EventRuleConfigBB.onObjectSelectButtonChange");
-        // "Select" button was selected
-        if (currentRuleSelected && era != null) {
-            
-            eventRuleListFiltered.clear();
-            eventRuleListFiltered.add(era);
-            currentEventRuleAbstract = era;
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected Rule: " + era.getTitle(), ""));
-            // "Select" button wasn't selected
-            currentRuleSelected = true;
-        } else {
-            // reset page
-            loadDefaultPageConfig();
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Page reset" , ""));
-        }
-
-        
-    }
-    
+ 
     /**
      * Internal method to set up a skeleton ERA for creation
      * and is called when the page mode is changed to insert

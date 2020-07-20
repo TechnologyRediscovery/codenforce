@@ -19,9 +19,12 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.EventRuleAbstract;
+import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
@@ -42,15 +45,21 @@ import javax.faces.event.ActionEvent;
  */
 public class PropertySearchBB extends BackingBeanUtils{
     
-    private SearchParamsProperty searchParamsSelected;
+    private PageModeEnum currentMode;
+    private List<PageModeEnum> pageModes;
     
+    private Property currentProperty;
+    private boolean currentPropertySelected;
+    
+    private List<Property> propListMaster;
+    private List<Property> propListDisplayed;
+    private boolean appendResultsToList;
+    
+    private SearchParamsProperty searchParamsSelected;
     private List<SearchParamsProperty> searchParamsCustomized;
     
     private QueryProperty querySelected;
     private List<QueryProperty> queryList;
-    
-    private List<Property> propList;
-    private boolean appendResultsToList;
     
     private List<PropertyUseType> putList;
     
@@ -66,10 +75,11 @@ public class PropertySearchBB extends BackingBeanUtils{
         PropertyCoordinator pc = getPropertyCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         
-        if(getSessionBean().getSessPropertyList() == null){
-            propList = new ArrayList<>();
-        } else {
-            propList = getSessionBean().getSessPropertyList();
+        propListMaster = new ArrayList<>();
+        propListDisplayed = new ArrayList<>();
+        if(getSessionBean().getSessPropertyList() != null && !getSessionBean().getSessPropertyList().isEmpty()){
+            propListMaster.addAll(getSessionBean().getSessPropertyList());
+            propListDisplayed.addAll(propListMaster);
         }
         appendResultsToList = false;
         
@@ -78,6 +88,8 @@ public class PropertySearchBB extends BackingBeanUtils{
             // and put on the SessionBean for us to get here
             queryList = getSessionBean().getQueryPropertyList();
             putList = pi.getPropertyUseTypeList();
+            pageModes = getSessionBean().assemblePermittedPageModes();
+            currentMode = PageModeEnum.LOOKUP;
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -104,11 +116,11 @@ public class PropertySearchBB extends BackingBeanUtils{
     
     
     public void clearPropertyList(ActionEvent ev){
-        propList.clear();
+        propListMaster.clear();
     }
     
     
-    
+       
     /**
      * Demo of using the Search system to extract objects from the DB
      * in a controlled way
@@ -160,9 +172,9 @@ public class PropertySearchBB extends BackingBeanUtils{
             
             pl = sc.runQuery(querySelected).getBOBResultList();
             if(!appendResultsToList){
-                propList.clear();
+                propListMaster.clear();
             } 
-            propList.addAll(pl);
+            propListMaster.addAll(pl);
             
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -296,17 +308,17 @@ public class PropertySearchBB extends BackingBeanUtils{
     }
 
     /**
-     * @return the propList
+     * @return the propListMaster
      */
-    public List<Property> getPropList() {
-        return propList;
+    public List<Property> getPropListMaster() {
+        return propListMaster;
     }
 
     /**
-     * @param propList the propList to set
+     * @param propListMaster the propListMaster to set
      */
-    public void setPropList(List<Property> propList) {
-        this.propList = propList;
+    public void setPropListMaster(List<Property> propListMaster) {
+        this.propListMaster = propListMaster;
     }
 
     /**
@@ -335,6 +347,76 @@ public class PropertySearchBB extends BackingBeanUtils{
      */
     public void setPutList(List<PropertyUseType> putList) {
         this.putList = putList;
+    }
+
+    /**
+     * @return the currentMode
+     */
+    public PageModeEnum getCurrentMode() {
+        return currentMode;
+    }
+
+    /**
+     * @return the pageModes
+     */
+    public List<PageModeEnum> getPageModes() {
+        return pageModes;
+    }
+
+    /**
+     * @return the currentProperty
+     */
+    public Property getCurrentProperty() {
+        return currentProperty;
+    }
+
+    /**
+     * @return the currentPropertySelected
+     */
+    public boolean isCurrentPropertySelected() {
+        return currentPropertySelected;
+    }
+
+    /**
+     * @return the propListDisplayed
+     */
+    public List<Property> getPropListDisplayed() {
+        return propListDisplayed;
+    }
+
+    /**
+     * @param currentMode the currentMode to set
+     */
+    public void setCurrentMode(PageModeEnum currentMode) {
+        this.currentMode = currentMode;
+    }
+
+    /**
+     * @param pageModes the pageModes to set
+     */
+    public void setPageModes(List<PageModeEnum> pageModes) {
+        this.pageModes = pageModes;
+    }
+
+    /**
+     * @param currentProperty the currentProperty to set
+     */
+    public void setCurrentProperty(Property currentProperty) {
+        this.currentProperty = currentProperty;
+    }
+
+    /**
+     * @param currentPropertySelected the currentPropertySelected to set
+     */
+    public void setCurrentPropertySelected(boolean currentPropertySelected) {
+        this.currentPropertySelected = currentPropertySelected;
+    }
+
+    /**
+     * @param propListDisplayed the propListDisplayed to set
+     */
+    public void setPropListDisplayed(List<Property> propListDisplayed) {
+        this.propListDisplayed = propListDisplayed;
     }
     
     
