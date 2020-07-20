@@ -181,7 +181,7 @@ def update_muni(muni, db_cursor, commit=True):
     updated_count = 0
 
     for record in records:
-        parcel_flags = events.ParcelFlags
+        parcel_flags = events.Property
         parid = record["PARID"]
 
         data = snp.scrape_county_property_assessments(parid, pages=[TAX])

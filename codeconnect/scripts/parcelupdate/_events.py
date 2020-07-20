@@ -9,7 +9,7 @@ from _constants import DEFAULT_PROP_UNIT
 from _constants import BOT_ID
 
 
-class ParcelFlags:
+class Property:
     # __slots__ = ["ownername", "street", "citystatezip", "livingarea", "condition", "taxstatus", "new_parcel"] # Slots doesn't work with __dict__
     def __init__(self):
         self.new_parcel = False
@@ -29,8 +29,8 @@ class ParcelFlags:
                 return True
         return False
 
-# Flag is passed as a ParcelFlag attribute.
-Flag = namedtuple("flag", ["name", "orig", "new"])
+# Changes is passed as a ParcelFlag attribute.
+Changes = namedtuple("flag", ["name", "orig", "new"])
 
 
 def parcel_changed(prop_id, flags, db_cursor):
@@ -60,19 +60,19 @@ def parcel_changed(prop_id, flags, db_cursor):
         return flags
 
     if old[0] != new[0]:
-        flags.ownername = Flag("owner name", old[0], new[0])
+        flags.ownername = Changes("owner name", old[0], new[0])
     if old[1] != new[1]:
-        flags.street = Flag("street", old[1], new[1])
+        flags.street = Changes("street", old[1], new[1])
     if old[2] != new[2]:
-        flags.citystatezip = Flag("city, state, or zipcode", old[2], new[2])
+        flags.citystatezip = Changes("city, state, or zipcode", old[2], new[2])
     if old[3] != new[3]:
-        flags.livingarea = Flag("living area size", old[3], new[3])
+        flags.livingarea = Changes("living area size", old[3], new[3])
     if old[4] != new[4]:
-        flags.condition = Flag("condition", old[4], new[4])
+        flags.condition = Changes("condition", old[4], new[4])
     if old[5] != new[5]:
-        flags.taxstatus = Flag("tax status", old[5], new[5])
+        flags.taxstatus = Changes("tax status", old[5], new[5])
     if old[6] != new[6]:
-        flags.taxcode = Flag("tax code", old[6], new[6])
+        flags.taxcode = Changes("tax code", old[6], new[6])
 
 
 

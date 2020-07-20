@@ -29,7 +29,7 @@ INSERT INTO public.eventcategory(
          TRUE, 7, 3, 7);
 ~~~
 * Create a class corresponding to the event category in events.py. Make sure it inherits from the base class event. Make sure its name matches up exactly to the name in the database.
-* Add a corresponding flag to the __init\__ method of the class events.ParcelFlags. It should default to False.
+* Add a corresponding flag to the __init\__ method of the class events.Property. It should default to False.
 * Add a check for your flag in the function events.parcel_changed. The check should take the following form:
 ~~~
 if old[i] != new[i]:
