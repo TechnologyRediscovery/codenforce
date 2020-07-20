@@ -16,17 +16,18 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
+import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
@@ -96,34 +97,34 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     @PostConstruct
     public void initBean() {
         SearchCoordinator sc = getSearchCoordinator();
-        QueryCEAR sessionQuery = getSessionBean().getQueryCEAR();
+        CaseCoordinator cc = getCaseCoordinator();
 
-        selectedRequest = getSessionBean().getSessCEAR();
+        //First search for CEARs using a standard query
+        selectedQueryCEAR = sc.initQuery(QueryCEAREnum.UNPROCESSED, getSessionBean().getSessUser().getMyCredential());
 
-        
-        
         try {
-            requestList = sc.runQuery(sessionQuery).getResults();
-        } catch (SearchException ex) {
-            System.out.println(ex);
+            requestList = sc.runQuery(selectedQueryCEAR).getResults();
 
+            //Update the selected request with the one from the database.
+            if (getSessionBean().getSessCEAR() != null) {
+                selectedRequest = cc.getCEActionRequest(getSessionBean().getSessCEAR().getRequestID());
+            }
+        } catch (SearchException | IntegrationException ex) {
+            System.out.println(ex);
         }
+
         if (selectedRequest == null && requestList != null && requestList.size() > 0) {
             selectedRequest = requestList.get(0);
             generateCEARReasonDonutModel();
         }
-        selectedQueryCEAR = sessionQuery;
         searchParams = selectedQueryCEAR.getParamsList().get(0);
         queryList = sc.buildQueryCEARList(getSessionBean().getSessUser().getMyCredential());
 
-        CaseCoordinator cc = getCaseCoordinator();
-        SearchCoordinator searchCoord = getSearchCoordinator();
-        
         ReportCEARList rpt = cc.getInitializedReportConficCEARs(
                 getSessionBean().getSessUser(), getSessionBean().getSessMuni());
-        
+
         rpt.setPrintFullCEARQueue(false);
-        QueryCEAR query = searchCoord.initQuery(
+        QueryCEAR query = sc.initQuery(
                 QueryCEAREnum.CUSTOM,
                 getSessionBean().getSessUser().getMyCredential());
         List<CEActionRequest> singleReqList = new ArrayList<>();
@@ -160,6 +161,9 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     public void executeQuery(ActionEvent ev) {
         SearchCoordinator searchC = getSearchCoordinator();
+        
+        clearCurrentQuerySQL();
+        
         try {
             if (selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()) {
 
@@ -190,6 +194,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SearchCoordinator searchCoord = getSearchCoordinator();
         try {
 
+            clearCurrentQuerySQL();
+            
             selectedQueryCEAR = searchCoord.initQuery(QueryCEAREnum.CUSTOM, getSessionBean().getSessUser().getMyCredential());
 
             //We will manually grab each parameter so we don't also grab the existing SQL statements that are inside searchParams
@@ -242,6 +248,23 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to query action requests, sorry", ""));
+        }
+    }
+
+    /**
+     * Run this before executing any query on this backing bean. I am not sure
+     * why, but this backing bean sometimes has a problem where it appends
+     * multiple SQL statements before searching This causes the
+     * SearchCoordinator to freak out 'cuz the poor thing was only made for one
+     * SQL statement. Clean out your parameters first with this method!
+     */
+    public void clearCurrentQuerySQL() {
+
+        if (selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()) {
+
+            for (SearchParamsCEActionRequests param : selectedQueryCEAR.getParamsList()) {
+                param.clearSQL();
+            }
         }
     }
 
@@ -342,9 +365,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 // This shelf will be checked by the case creation coordinator
         // and link the request to the new case so we don't lose track of it
         getSessionBean().setSessCEAR(selectedRequest);
-        
+
         //Here's a navstack to guide the user back after they add a case:
-        
         getSessionBean().getNavStack().pushCurrentPage();
 
         return "addNewCase";
@@ -352,7 +374,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     public void path2UseSelectedCaseForAttachment(CECase c) {
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        selectedCaseForAttachment =  c;
+        selectedCaseForAttachment = c;
         try {
             ceari.connectActionRequestToCECase(selectedRequest.getRequestID(), selectedCaseForAttachment.getCaseID(), getSessionBean().getSessUser().getUserID());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -471,19 +493,51 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void searchForProperties(ActionEvent ev) {
+        SearchCoordinator sc = getSearchCoordinator();
 
-        PropertyIntegrator pi = getPropertyIntegrator();
-//        try {
-//            propertyList = pi.searchForProperties(houseNumSearch, streetNameSearch, muniForPropSwitchSearch.getMuniCode());
-//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-//                    "Your search completed with " + propertyList.size() + " results", ""));
-//        } catch (IntegrationException ex) {
-//            System.out.println(ex);
-//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                     "Unable to complete a property search! Sorry!",
-//                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-//        }
+        propertyList = new ArrayList<>();
 
+        QueryProperty qp = null;
+
+        try {
+            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, getSessionBean().getSessUser().getMyCredential());
+
+            if (muniForPropSwitchSearch == null) {
+
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Please select a municipality first", ""));
+
+            } else if (qp != null && !qp.getParamsList().isEmpty()) {
+                SearchParamsProperty spp = qp.getPrimaryParams();
+                spp.setAddress_ctl(true);
+                spp.setAddress_val(houseNumSearch + " " + streetNameSearch);
+                spp.setMuni_ctl(true);
+                spp.setMuni_val(muniForPropSwitchSearch);
+                spp.setLimitResultCount_ctl(true);
+                spp.setLimitResultCount_val(20);
+
+                sc.runQuery(qp);
+
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Something when wrong with the property search! Sorry!", ""));
+            }
+
+        } catch (SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something when wrong with the property search! Sorry!", ""));
+        }
+
+        if (qp != null && !qp.getBOBResultList().isEmpty()) {
+            propertyList = qp.getBOBResultList();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Your search completed with " + getPropertyList().size() + " results", ""));
+        }
     }
 
     public void updateRequestProperty(ActionEvent ev) {
@@ -678,6 +732,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "You are now managing request ID: " + req.getRequestID(), ""));
         selectedRequest = req;
+        getSessionBean().setSessCEAR(req);
 
     }
 

@@ -121,8 +121,8 @@
                                             </h:panelGroup>
 
                                             <ui:remove>
-                                                
-                                                
+
+
                                                 <!--TODO: at the time of writing this comment, there isn't a parameter for searching by request ID. If one is added, please put it here. -->
                                                 <h:panelGroup>
                                                     <p:outputLabel id="useRequestIDOL" for="useRequestIDCB" value="Search by Request ID?"/>
@@ -172,7 +172,7 @@
                                                             value="Execute custom query" 
                                                             actionListener="#{cEActionRequestsBB.executeCustomQuery}"
                                                             update="search-params-form
-                                                        actionRequestListForm"/>
+                                                            actionRequestListForm"/>
 
                                     </p:fieldset>
 
@@ -480,7 +480,7 @@
                                                                     styleClass="noFill button-size-small" 
                                                                     icon="fa fa-child"
                                                                     disabled="#{empty cEActionRequestsBB.selectedRequest}"
-                                                                    rendered="#{sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}" />
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}" />
                                             </h:panelGroup>
 
                                             <h:panelGroup>
@@ -593,40 +593,37 @@
                                   header="Attach request to existing case"
                                   height="550px" width="50%"
                                   responsive="true"
-                                  
-                                         closable="true"
-                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+
+                                  closable="true"
+                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="attach-to-existing-case-form">
 
                                 <p>Choose an existing case on <h:outputLabel for="invalidMessageITA" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>:</p>
                                 <p:scrollPanel>
-                                <p:dataScroller
-                                    id="cases-on-selected-request-property-DS"
-                                    value="#{cEActionRequestsBB.caseListForSelectedProperty}"
-                                    var="c">
-                                    <p>Case ID: <h:outputText value="#{c.caseID}"/> <br />
-                                        Name: <h:outputText value="#{c.caseName}" /> <br />
-                                        Phase: <h:outputText value="#{c.casePhase.label}"/> <br />
-                                        Opening date: <h:outputText value="#{c.originiationDatePretty}"/> <br />
-                                        Closing date: <h:outputText value="#{c.closingDatePretty}"/> <br />
-                                    </p>
-                                    <p:commandButton value="Assign request to this case"
-                                                     actionListener="#{cEActionRequestsBB.path2UseSelectedCaseForAttachment(c)}"
-                                                     update="msgForm:ceActionRequestsMessages
-                                                     req-details-form:selr-status-ot
-                                                     actionRequestListForm:actionRequestTable
-                                                     req-details-form:selr-notes-public
-                                                     req-details-form:selr-attachedCase
-                                                     "
-                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                     oncomplete="PF('attach-to-case-dialog').hide()"/>
-                                    <p:commandButton ajax="true" 
-                                                     value="Cancel" icon="fa fa-stop" 
-                                                     onclick="PF('attach-to-case-dialog').hide()"/>
-                                    <hr/>
+                                    <p:dataScroller
+                                        id="cases-on-selected-request-property-DS"
+                                        value="#{cEActionRequestsBB.caseListForSelectedProperty}"
+                                        var="c">
+                                        <p>Case ID: <h:outputText value="#{c.caseID}"/> <br />
+                                            Name: <h:outputText value="#{c.caseName}" /> <br />
+                                            Phase: <h:outputText value="#{c.casePhase.label}"/> <br />
+                                            Opening date: <h:outputText value="#{c.originiationDatePretty}"/> <br />
+                                            Closing date: <h:outputText value="#{c.closingDatePretty}"/> <br />
+                                        </p>
+                                        <p:commandButton value="Assign request to this case"
+                                                         actionListener="#{cEActionRequestsBB.path2UseSelectedCaseForAttachment(c)}"
+                                                         update="msgForm:ceActionRequestsMessages
+                                                         req-details-form
+                                                         actionRequestListForm:actionRequestTable"
+                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                         oncomplete="PF('attach-to-case-dialog').hide()"/>
+                                        <p:commandButton ajax="true" 
+                                                         value="Cancel" icon="fa fa-stop" 
+                                                         onclick="PF('attach-to-case-dialog').hide()"/>
+                                        <hr/>
 
-                                </p:dataScroller>
+                                    </p:dataScroller>
                                 </p:scrollPanel>
                             </h:form>
                         </p:dialog>
@@ -648,9 +645,8 @@
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.path3AttachInvalidMessage}"
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('invalid-dialog').hide()"
                                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                 update="req-details-form:selr-notes-public
+                                                 update="req-details-form
                                                  msgForm:ceActionRequestsMessages
-                                                 req-details-form:selr-status-ot
                                                  actionRequestListForm:actionRequestTable"/>
                                 <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
@@ -677,9 +673,8 @@
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.path4AttachNoViolationFoundMessage}"
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('no-violation-found-dialog').hide()"
                                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                 update="req-details-form:selr-notes-public
+                                                 update="req-details-form
                                                  msgForm:ceActionRequestsMessages
-                                                 req-details-form:selr-status-ot
                                                  actionRequestListForm:actionRequestTable"/>
                                 <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
@@ -707,8 +702,7 @@
                                                     ajax="true" value="Change request status" 
                                                     actionListener="#{cEActionRequestsBB.updateActionRequestStatus}"
                                                     update="actionRequestListForm:actionRequestTable
-                                                    req-details-form:selr-status-ot
-                                                    req-details-form:selr-notes-public"
+                                                    req-details-form"
                                                     oncomplete="PF('override-request-status-dialog').hide()"/>
                                 <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
@@ -742,21 +736,22 @@
 
                         </ui:remove>
 
-                        <p:confirmDialog message="Change property" 
-                                         severity="alert" widgetVar="change-property-dialog"
-                                         closable="true"
-                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+                        <p:dialog header="Change property"
+                                  widgetVar="change-property-dialog"
+                                  closable="true" rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="change-property-form">
 
-
+                                <h:messages id="propertyChangeMessages" globalOnly="false" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
 
                                 <p:selectOneMenu id="muniSelectMenu" 
                                                  tabindex="1" 
                                                  value="#{cEActionRequestsBB.muniForPropSwitchSearch}">
                                     <f:converter converterId="muniConverter"/>
                                     <f:selectItem itemLabel="select one..." noSelectionOption="true"  itemDisabled="true"/>
-                                    <f:selectItems id="muniNameList" value="#{sessionBean.sessUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                    <f:selectItems id="muniNameList" value="#{systemServicesBB.bbSessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                 </p:selectOneMenu>
 
                                 <p:panelGrid columns="3" layout="grid">
@@ -787,9 +782,7 @@
                                         <p:commandButton
                                             value="Search in Selected Municipality" tabindex="4" ajax="true" icon="fa fa-search"
                                             actionListener="#{cEActionRequestsBB.searchForProperties}" 
-                                            update=    "change-property-form:propSearchHouseNumIT
-                                            change-property-form:propSearchStreetIT
-                                            change-property-form:propertyResultTable"/>
+                                            update=    "change-property-form"/>
                                     </h:panelGroup>
 
                                 </p:panelGrid> 
@@ -834,10 +827,8 @@
                                                  actionListener="#{cEActionRequestsBB.updateRequestProperty}"
                                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                  update="   msgForm:ceActionRequestsMessages
-                                                 req-details-form:selr-prop-address
-                                                 req-details-form:selr-prop-muni
-                                                 actionRequestListForm:actionRequestTable
-                                                 req-details-form:selr-status-ot"
+                                                 req-details-form
+                                                 actionRequestListForm:actionRequestTable"
                                                  oncomplete="PF('change-property-dialog').hide()"/>
                                 <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
@@ -845,10 +836,10 @@
                                 <hr/>
 
                             </h:form>
-                        </p:confirmDialog>
+                        </p:dialog>
 
 
-                        <p:dialog       height="650" width="700"
+                        <p:dialog       width="700"
                                         widgetVar="change-person-dialog"
                                         closable="true" 
                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
@@ -863,8 +854,14 @@
                                 </h:messages>
 
 
-                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                             columnClasses="gridTd-solid-back, gridTd-solid-back">
+                                <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                             columnClasses="gridTd-solid-back, gridTd-solid-back, gridTd-solid-back, gridTd-solid-back">
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="filter-by-muni-ol" for="filter-by-muni-cb" value="Filter by muni?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanButton onLabel="Yes" offLabel="No" id="filter-by-muni-cb" value="#{personSearchBB.paramsSelected.muni_ctl}" />
+                                    </h:panelGroup>
 
                                     <h:panelGroup>
                                         <p:outputLabel for="muniSelectMenu-person">
@@ -873,27 +870,24 @@
 
                                         <p:selectOneMenu id="muniSelectMenu-person" 
                                                          tabindex="1" 
-                                                         value="#{personBB.searchParams.muni}">
+                                                         value="#{personSearchBB.paramsSelected.muni_val}">
                                             <f:converter converterId="muniConverter"/>
                                             <f:selectItem itemLabel="select muni..." noSelectionOption="true"  itemDisabled="true"/>
-                                            <f:selectItems id="muniNameList" value="#{sessionBean.sessUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                            <f:selectItems id="muniNameList" value="#{systemServicesBB.bbSessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                         </p:selectOneMenu>
                                     </h:panelGroup>
-
-                                    <h:panelGroup class="spacer"></h:panelGroup>    
-
 
                                     <h:panelGroup>
                                         <p:outputLabel id="filter-by-fname-ol" for="filter-by-fname-cb" value="Filter by first name?"/>
                                         <p:spacer height="5px"/>
-                                        <p:selectBooleanCheckbox id="filter-by-fname-cb" value="#{personBB.searchParams.filterByFirstName}" />
+                                        <p:selectBooleanButton onLabel="Yes" offLabel="No" id="filter-by-fname-cb" value="#{personSearchBB.paramsSelected.name_first_ctl}" />
                                     </h:panelGroup>
 
                                     <h:panelGroup>
                                         <p:outputLabel for="formFirstName-person">
                                             <h:outputText value="First Name"/>
                                         </p:outputLabel>
-                                        <p:inputText id="formFirstName-person" value="#{personBB.searchParams.firstNameSS}" 
+                                        <p:inputText id="formFirstName-person" value="#{personSearchBB.paramsSelected.name_first_val}" 
                                                      style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
                                         <h:message for="formFirstName-person" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -902,14 +896,14 @@
                                     <h:panelGroup>
                                         <p:outputLabel id="filter-by-lname-ol" for="filter-by-lname-cb" value="Filter by last name?"/>
                                         <p:spacer height="5px"/>
-                                        <p:selectBooleanCheckbox id="filter-by-lname-cb" value="#{personBB.searchParams.filterByLastName}" />
+                                        <p:selectBooleanButton onLabel="Yes" offLabel="No" id="filter-by-lname-cb" value="#{personSearchBB.paramsSelected.name_last_ctl}" />
                                     </h:panelGroup>
 
                                     <h:panelGroup id="lname-person-person">
                                         <p:outputLabel for="formLastName-person">
                                             <h:outputText value="Last Name"/>
                                         </p:outputLabel>
-                                        <p:inputText id="formLastName-person" value="#{personBB.searchParams.lastNameSS}" 
+                                        <p:inputText id="formLastName-person" value="#{personSearchBB.paramsSelected.name_last_val}" 
                                                      style="width: 200px;" tabindex="4" required="false" styleClass="inputText"/>
                                         <h:message for="formLastName-person" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -919,7 +913,7 @@
                                     <h:panelGroup>
                                         <p:outputLabel id="filter-by-personid-ol" for="filter-by-personid-cb" value="Filter by person ID?"/>
                                         <p:spacer height="5px"/>
-                                        <p:selectBooleanCheckbox id="filter-by-personid-cb" value="#{personBB.searchParams.filterByObjectID}" />
+                                        <p:selectBooleanButton onLabel="Yes" offLabel="No" id="filter-by-personid-cb" value="#{personSearchBB.paramsSelected.bobID_ctl}" />
                                     </h:panelGroup>
 
 
@@ -928,8 +922,8 @@
                                         <p:outputLabel for="formPersonID">
                                             <h:outputText value="Person ID number"/>
                                         </p:outputLabel>
-                                        <p:inputText id="formPersonID" value="#{personBB.searchParams.objectID}" 
-                                                     style="width: 25%;" tabindex="3" required="true" styleClass="inputText"/>
+                                        <p:inputText id="formPersonID" value="#{personSearchBB.paramsSelected.bobID_val}"
+                                                     tabindex="3" required="true" styleClass="inputText"/>
                                         <h:message for="formPersonID" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
@@ -938,17 +932,8 @@
 
                                 <p:commandButton
                                     value="Search for Persons" tabindex="4" ajax="true" icon="fa fa-search"
-                                    actionListener="#{personBB.searchForPersons}" 
-                                    update=    "change-person-form:filter-by-personid-cb
-                                    change-person-form:formPersonID
-                                    change-person-form:filter-by-fname-cb
-                                    change-person-form:formFirstName-person
-                                    change-person-form:filter-by-lname-cb
-                                    change-person-form:formLastName-person
-                                    change-person-form:muniSelectMenu-person
-                                    change-person-form:personTable
-                                    change-person-form:person-search-messages
-                                    "/>
+                                    actionListener="#{personSearchBB.executeQuery}" 
+                                    update=    "change-person-form"/>
                                 <h3>Chosen Person:</h3>
                                 <h:outputText id="confirm-person-ot" value="ID #{cEActionRequestsBB.selectedPersonForAttachment.personID}: 
                                               #{cEActionRequestsBB.selectedPersonForAttachment.lastName} "/>
@@ -959,17 +944,7 @@
                                                  actionListener="#{cEActionRequestsBB.updateRequestor}"
                                                  rendered="#{!systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
                                                  update="   msgForm:ceActionRequestsMessages
-                                                 req-details-form:selr-persontype
-                                                 req-details-form:selr-pers-fn
-                                                 req-details-form:selr-pers-ln
-                                                 req-details-form:selr-pers-str
-                                                 req-details-form:selr-pers-city
-                                                 req-details-form:selr-pers-state
-                                                 req-details-form:selr-pers-zip
-                                                 req-details-form:selr-pers-phone-cell
-                                                 req-details-form:selr-pers-phone-work
-                                                 req-details-form:selr-pers-phone-home
-                                                 req-details-form:selr-pers-email"
+                                                 req-details-form"
                                                  oncomplete="PF('change-person-dialog').hide()"/>
 
                                 <p:commandButton ajax="true" 
