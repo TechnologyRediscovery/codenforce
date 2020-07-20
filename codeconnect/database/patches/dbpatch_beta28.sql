@@ -118,7 +118,6 @@ BEGIN
         PERFORM setval('cecase_caseid_seq', cecaseid_);
 END;
 $$ LANGUAGE plpgsql;
-select resetsequences();
 
 -- -- Original code to reset sequences, kept for posterity
 --ALTER SEQUENCE public.propertyid_seq
