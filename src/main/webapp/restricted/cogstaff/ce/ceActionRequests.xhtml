@@ -77,7 +77,7 @@
                                                 <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="Query start date "/>
                                                 <p:calendar id="eventDateCalStart" value="#{cEActionRequestsBB.searchParams.date_start_val_util}" 
                                                             mode="popup"  
-                                                            showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                            showOn="button" pattern="EEE, dd MMM, yyyy"
                                                             navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
                                                             showButtonPanel="true" showTodayButton="true"
                                                             required="true"/>
@@ -89,7 +89,7 @@
                                                 <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="Query end date "/>
                                                 <p:calendar id="eventDateCalEnd" value="#{cEActionRequestsBB.searchParams.date_end_val_util}" 
                                                             mode="popup" 
-                                                            showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                            showOn="button" pattern="EEE, dd MMM, yyyy"
                                                             navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
                                                             showButtonPanel="true" showTodayButton="true"
                                                             required="true" />
@@ -839,14 +839,14 @@
                         </p:dialog>
 
 
-                        <p:dialog       width="700"
+                        <p:dialog       header="Search for a different person"
+                                        width="900"
                                         widgetVar="change-person-dialog"
                                         closable="true" 
                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                        
                                         >
-
-                            <h3>Search for a different person</h3>
-
+                            
                             <h:form id="change-person-form">
 
                                 <h:messages id="person-search-messages" globalOnly="true" showDetail="true" showSummary="true"
@@ -854,12 +854,11 @@
                                 </h:messages>
 
 
-                                <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                <h:panelGrid columns="4" cellpadding="5" footerClass="gridFooter"
                                              columnClasses="gridTd-solid-back, gridTd-solid-back, gridTd-solid-back, gridTd-solid-back">
 
                                     <h:panelGroup>
-                                        <p:outputLabel id="filter-by-muni-ol" for="filter-by-muni-cb" value="Filter by muni?"/>
-                                        <p:spacer height="5px"/>
+                                        <p:outputLabel id="filter-by-muni-ol" for="filter-by-muni-cb" value="Filter by muni? "/>
                                         <p:selectBooleanButton onLabel="Yes" offLabel="No" id="filter-by-muni-cb" value="#{personSearchBB.paramsSelected.muni_ctl}" />
                                     </h:panelGroup>
 
@@ -878,8 +877,7 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup>
-                                        <p:outputLabel id="filter-by-fname-ol" for="filter-by-fname-cb" value="Filter by first name?"/>
-                                        <p:spacer height="5px"/>
+                                        <p:outputLabel id="filter-by-fname-ol" for="filter-by-fname-cb" value="Filter by first name? "/>
                                         <p:selectBooleanButton onLabel="Yes" offLabel="No" id="filter-by-fname-cb" value="#{personSearchBB.paramsSelected.name_first_ctl}" />
                                     </h:panelGroup>
 
@@ -894,8 +892,7 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup>
-                                        <p:outputLabel id="filter-by-lname-ol" for="filter-by-lname-cb" value="Filter by last name?"/>
-                                        <p:spacer height="5px"/>
+                                        <p:outputLabel id="filter-by-lname-ol" for="filter-by-lname-cb" value="Filter by last name? "/>
                                         <p:selectBooleanButton onLabel="Yes" offLabel="No" id="filter-by-lname-cb" value="#{personSearchBB.paramsSelected.name_last_ctl}" />
                                     </h:panelGroup>
 
@@ -911,8 +908,7 @@
 
 
                                     <h:panelGroup>
-                                        <p:outputLabel id="filter-by-personid-ol" for="filter-by-personid-cb" value="Filter by person ID?"/>
-                                        <p:spacer height="5px"/>
+                                        <p:outputLabel id="filter-by-personid-ol" for="filter-by-personid-cb" value="Filter by person ID? "/>
                                         <p:selectBooleanButton onLabel="Yes" offLabel="No" id="filter-by-personid-cb" value="#{personSearchBB.paramsSelected.bobID_ctl}" />
                                     </h:panelGroup>
 
@@ -933,16 +929,24 @@
                                 <p:commandButton
                                     value="Search for Persons" tabindex="4" ajax="true" icon="fa fa-search"
                                     actionListener="#{personSearchBB.executeQuery}" 
-                                    update=    "change-person-form"/>
+                                    update="change-person-form"/>
+                                <p:commandButton   id="pers-search-clearquery-cb" 
+                                                           ajax="true" 
+                                                           actionListener="#{personSearchBB.resetCurrentQuery}"
+                                                           disabled="#{!personSearchBB.querySelected.queryExecuted}"
+                                                           icon="fa fa-eraser" 
+                                                           styleClass="button"
+                                                           value="Reset query" 
+                                                           update="change-person-form"/>
                                 <h3>Chosen Person:</h3>
                                 <h:outputText id="confirm-person-ot" value="ID #{cEActionRequestsBB.selectedPersonForAttachment.personID}: 
-                                              #{cEActionRequestsBB.selectedPersonForAttachment.lastName} "/>
+                                              #{cEActionRequestsBB.selectedPersonForAttachment.firstName} #{cEActionRequestsBB.selectedPersonForAttachment.lastName} "/>
 
 
 
                                 <p:commandButton value="Assign request to selected person"
                                                  actionListener="#{cEActionRequestsBB.updateRequestor}"
-                                                 rendered="#{!systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
                                                  update="   msgForm:ceActionRequestsMessages
                                                  req-details-form"
                                                  oncomplete="PF('change-person-dialog').hide()"/>
@@ -958,14 +962,14 @@
                                 <p:dataTable
                                     id="personTable"
                                     var="p"
-                                    value="#{personBB.personList}"
+                                    value="#{personSearchBB.personList}"
                                     rowKey="#{p.personID}"
                                     tableStyleClass="primeDataTable"
                                     scrollable="true"
-                                    scrollHeight="300"
+                                    scrollHeight="200"
                                     rowExpandMode="single"
                                     expandedRow="false"
-                                    filteredValue="#{personBB.filteredPersonList}"
+                                    filteredValue="#{personSearchBB.filteredPersonList}"
                                     widgetVar="personSelectListTable">
                                     <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
@@ -985,7 +989,7 @@
                                     <p:column width="10%" sortBy="#{p.personType.label}"
                                               filterBy="#{p.personType.label}">
                                         <f:facet name="header">
-                                            <h:outputText value="Person Type" />
+                                            <h:outputText value="Type" />
                                         </f:facet>
                                         <h:outputText value="#{p.personType.label}"/>
                                     </p:column>

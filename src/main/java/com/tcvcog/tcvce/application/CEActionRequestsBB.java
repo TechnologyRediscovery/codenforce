@@ -117,7 +117,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             selectedRequest = requestList.get(0);
             generateCEARReasonDonutModel();
         }
-        searchParams = selectedQueryCEAR.getParamsList().get(0);
+        searchParams = new SearchParamsCEActionRequests();
         queryList = sc.buildQueryCEARList(getSessionBean().getSessUser().getMyCredential());
 
         ReportCEARList rpt = cc.getInitializedReportConficCEARs(
@@ -162,7 +162,9 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void executeQuery(ActionEvent ev) {
         SearchCoordinator searchC = getSearchCoordinator();
         
-        clearCurrentQuerySQL();
+        selectedQueryCEAR = searchC.initQuery(selectedQueryCEAR.getQueryName(), getSessionBean().getSessUser().getMyCredential());
+        
+        requestList = new ArrayList<>();
         
         try {
             if (selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()) {
@@ -194,7 +196,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SearchCoordinator searchCoord = getSearchCoordinator();
         try {
 
-            clearCurrentQuerySQL();
+            requestList = new ArrayList<>();
             
             selectedQueryCEAR = searchCoord.initQuery(QueryCEAREnum.CUSTOM, getSessionBean().getSessUser().getMyCredential());
 
@@ -248,23 +250,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to query action requests, sorry", ""));
-        }
-    }
-
-    /**
-     * Run this before executing any query on this backing bean. I am not sure
-     * why, but this backing bean sometimes has a problem where it appends
-     * multiple SQL statements before searching This causes the
-     * SearchCoordinator to freak out 'cuz the poor thing was only made for one
-     * SQL statement. Clean out your parameters first with this method!
-     */
-    public void clearCurrentQuerySQL() {
-
-        if (selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()) {
-
-            for (SearchParamsCEActionRequests param : selectedQueryCEAR.getParamsList()) {
-                param.clearSQL();
-            }
         }
     }
 
