@@ -26,12 +26,12 @@ from _constants import DASHES
 def main(municodes, commit, u, password, port):
     """Updates the CodeNForce database with the most recent data provided by the WPRDC."""
     start = time.time()
+
     if commit:
         click.echo("Data will be committed to the database")
     else:
         click.echo("This is a test. Data will NOT be committed.")
     click.echo(DASHES)
-
     # Calls the core functionality for each municipality in the argument
     with get_db_and_cursor(user=u, password=password, port=port) as db_cursor:
         muni_count = 0

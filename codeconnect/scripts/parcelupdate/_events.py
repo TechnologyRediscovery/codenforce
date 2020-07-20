@@ -38,7 +38,8 @@ def check_for_changes_and_write_events(parid, prop_id, cecase_id, new_parcel, db
     try:
         new = selection[1]
     except IndexError:  # If this is the first time the property_propertyid occurs in propertyexternaldata
-        print("First time parcel has appeared in propertyexternaldata")
+        print(Fore.YELLOW, "First time parcel has appeared in propertyexternaldata", sep="")
+        print(Style.RESET_ALL, end="")
         if not new_parcel:
             # TODO: Add flag
             print(
