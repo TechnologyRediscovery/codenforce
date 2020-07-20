@@ -12,7 +12,8 @@ import _create as create
 import _events as events
 from _events import parcel_changed
 import _fetch as fetch
-import _insert
+import _property    # Underline kept to avoid naming collision with the built in function 'property'
+import _insert as insert
 import _scrape_and_parse as snp
 from _constants import GENERALINFO, BUILDING, TAX, SALES
 from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
@@ -181,8 +182,8 @@ def update_muni(muni, db_cursor, commit=True):
     updated_count = 0
 
     for record in records:
-        prop = events.Property()
-        prop.parid = record["PARID"]
+        prop = _property.Property()
+        prop.parid = record["PARID"]    # Explicit is better than implicit
 
         data = snp.scrape_county_property_assessments(prop.parid, pages=[TAX])
         for page in data:
@@ -196,13 +197,13 @@ def update_muni(muni, db_cursor, commit=True):
             prop.prop_id = write_property_to_db(imap, db_cursor)
 
             if record["PROPERTYUNIT"] == " ":
-                unit_id = _insert.unit(
+                unit_id = insert.unit(
                     {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop.prop_id},
                     db_cursor,
                 )
             else:
                 print(record["PROPERTYUNIT"])
-                unit_id = _insert.unit(
+                unit_id = insert.unit(
                     {
                         "unitnumber": record["PROPERTYUNIT"],
                         "property_propertyid": prop.prop_id,
@@ -210,7 +211,7 @@ def update_muni(muni, db_cursor, commit=True):
                     db_cursor,
                 )
             cecase_map = create.cecase_imap(prop.prop_id, unit_id)
-            _insert.cecase(cecase_map, db_cursor)
+            insert.cecase(cecase_map, db_cursor)
 
             owner_map = create.owner_imap(owner_name, record)
             person_id = write_person_to_db(owner_map, db_cursor)

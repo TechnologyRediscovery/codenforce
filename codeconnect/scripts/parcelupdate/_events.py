@@ -9,13 +9,8 @@ from _constants import DEFAULT_PROP_UNIT
 from _constants import BOT_ID
 
 
-class Property:
-    # __slots__ = ["ownername", "street", "citystatezip", "livingarea", "condition", "taxstatus", "new_parcel"] # Slots doesn't work with __dict__
+class EventFlags:
     def __init__(self):
-        self.parid = None
-        self.prop_id = None
-
-        # EVENT FLAGS
         self.new_parcel = False
         # Differences from previous insert
         self.ownername = False
@@ -31,6 +26,7 @@ class Property:
             if self.__dict__[k]:
                 return True
         return False
+
 
 
 # Changes is passed as a Property attribute.
