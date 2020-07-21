@@ -1,7 +1,7 @@
 # Todo: Move functions from _update_muni to insert
 
 
-def unit(imap, db_cursor):
+def unit(imap, cursor):
     insert_sql = """
         INSERT INTO public.propertyunit(
             unitid, unitnumber, property_propertyid, otherknownaddress, notes, 
@@ -12,11 +12,11 @@ def unit(imap, db_cursor):
             FALSE)
         RETURNING unitid;
     """
-    db_cursor.execute(insert_sql, imap)
-    return db_cursor.fetchone()[0]  # unit_id
+    cursor.execute(insert_sql, imap)
+    return cursor.fetchone()[0]  # unit_id
 
 
-def cecase(imap, db_cursor):
+def cecase(imap, cursor):
     insert_sql = """INSERT INTO public.cecase(
         caseid, cecasepubliccc, property_propertyid, propertyunit_unitid,
         login_userid, casename, casephase, originationdate,
@@ -32,5 +32,5 @@ def cecase(imap, db_cursor):
         %(active)s
     )
     RETURNING caseid"""
-    db_cursor.execute(insert_sql, imap)
-    return db_cursor.fetchone()[0]  # caseid
+    cursor.execute(insert_sql, imap)
+    return cursor.fetchone()[0]  # caseid

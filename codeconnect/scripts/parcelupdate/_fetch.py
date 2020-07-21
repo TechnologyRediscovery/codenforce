@@ -5,35 +5,28 @@ import os
 
 from collections import namedtuple
 
-from _db_conn import get_db_and_cursor
+
 from _constants import PARCEL_ID_LISTS
 
 
 Municipality = namedtuple("Municipalicty", ["municode", "name"])
 
 
-def main():
-    with get_db_and_cursor() as db_cursor:
-        muni_generator = munis(db_cursor)
-        for muni in muni_generator:
-            try:
-                file_name = muni_data_and_write_to_file(muni)
-            finally:
-                validate_muni_json(file_name)
 
 
-def munis(db_cursor, ):
+
+def munis(cursor):
     select_sql = "SELECT municode, muniname FROM municipality;"
-    db_cursor.execute(select_sql)
-    munis = db_cursor.fetchall()
+    cursor.execute(select_sql)
+    munis = cursor.fetchall()
     for row in munis:
         yield Municipality(*row)
 
 
-def muniname_from_municode(municode, db_cursor):
+def muniname_from_municode(municode, cursor):
     select_sql = "SELECT municode, muniname FROM municipality where municode = %s"
-    db_cursor.execute(select_sql, [municode])
-    row = db_cursor.fetchone()
+    cursor.execute(select_sql, [municode])
+    row = cursor.fetchone()
     try:
         return Municipality(*row)
     except TypeError as e:
@@ -66,37 +59,34 @@ def muni_data_and_write_to_file(Municipality):
     return abs_path
 
 
-def prop_id(parid, db_cursor):
+def prop_id(parid, cursor):
     select_sql = """
         SELECT propertyid FROM public.property
         WHERE parid = %s;"""
-    db_cursor.execute(select_sql, [parid])
-    return db_cursor.fetchone()[0]  # property id
+    cursor.execute(select_sql, [parid])
+    return cursor.fetchone()[0]  # property id
 
 
-def unit_id(prop_id, db_cursor):
+def unit_id(prop_id, cursor):
     select_sql = """
         SELECT unitid FROM propertyunit
         WHERE property_propertyid = %s"""
-    db_cursor.execute(select_sql, [prop_id])
+    cursor.execute(select_sql, [prop_id])
     try:
-        return db_cursor.fetchone()[0]  # unit id
+        return cursor.fetchone()[0]  # unit id
     except TypeError:
         return None
 
-def cecase_id(prop_id, db_cursor):
+def cecase_id(prop_id, cursor):
     select_sql = """
         SELECT caseid FROM cecase
         WHERE property_propertyid = %s
         ORDER BY creationtimestamp DESC;"""
-    db_cursor.execute(select_sql, [prop_id])
+    cursor.execute(select_sql, [prop_id])
     try:
-        return db_cursor.fetchone()[0]  # Case ID
+        return cursor.fetchone()[0]  # Case ID
     except TypeError:  # 'NoneType' object is not subscriptable:
         return None
-
-
-
 
 
 def validate_muni_json(file_name):
@@ -111,7 +101,3 @@ def validate_muni_json(file_name):
             raise ValueError("{} not valid".format(file.name))
         return True
     print(file_name, "could not be validated. Skipping.")
-
-
-if __name__ == "__main__":
-    main()

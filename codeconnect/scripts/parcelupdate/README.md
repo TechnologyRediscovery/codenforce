@@ -33,18 +33,11 @@ INSERT INTO public.eventcategory(
   * Add a check for your flag in the function events.check_for_changes_and_write_events. The check should take the following form:
     ~~~
     if old[i] != new[i]:
-           yourflag = Flag("your flag", old[i], new[i])
-            
+           details.changes = Changes("your flag", old[i], new[i])
+           YourNewEvent.write_to_db()
     ~~~
 
-  * Add the test for the flag in the function update_muni in _update_muni.py.
-    ~~~
-    if flags.taxstatus:
-        event = events.DifferentTaxStatus(
-           parid, prop_id, flags.your_flag, db_cursor
-        )
-        event.write_to_db(db_cursor)
-    ~~~
+
 <h4 id=parcel-change>What constitutes a Parcel Change?</h4>
 A regular, month to month change.
 Examples include DifferentTaxStatus and DifferentOwner, but do not include events such as NewParcelid and ParcelNotInCountyData.
