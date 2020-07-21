@@ -425,22 +425,18 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         currentRequest.setIsAtKnownAddress(true);
         currentRequest.setActive(true);
         currentRequest.setDateOfRecord(LocalDateTime.now(ZoneId.systemDefault()));
-
-//        sessReq.setIsUrgent(form_isUrgent);
 //        
         // note that the time stamp is applied by the integration layer
         // with a simple call to the backing bean getTimeStamp method
         try {
             // send the request into the DB
             submittedActionRequestID = ceari.submitCEActionRequest(currentRequest);
-            getSessionBean().setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
+            sb.setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
 
-            for (Blob blob : sb.getBlobList()) {
+            for (Integer blobID : currentRequest.getBlobIDList()) {
                 try {
-                    blobi.storeBlob(blob);
-                    sb.getSessCEAR().getBlobIDList().add(blob.getBlobID());
-                    blobI.linkBlobToActionRequest(blob.getBlobID(), sb.getSessCEAR().getRequestID());
-                } catch (BlobException ex) {
+                    blobI.linkBlobToActionRequest(blobID, sb.getSessCEAR().getRequestID());
+                } catch (IntegrationException ex) {
                     System.out.println(ex);
                 }
             }

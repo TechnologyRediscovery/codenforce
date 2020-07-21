@@ -10,6 +10,7 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -53,6 +54,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     private CEActionRequest selectedRequest;
     private List<CEActionRequest> requestList;
     private ReportCEARList reportConfig;
+    private String currentMode;
+    private boolean currentCEARSelected;
 
     private DonutChartModel requestReasonDonut;
 
@@ -99,6 +102,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
 
+        currentMode = "Search";
+        
         //First search for CEARs using a standard query
         selectedQueryCEAR = sc.initQuery(QueryCEAREnum.UNPROCESSED, getSessionBean().getSessUser().getMyCredential());
 
@@ -192,7 +197,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void executeCustomQuery(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();
         try {
 
@@ -203,6 +207,13 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             //We will manually grab each parameter so we don't also grab the existing SQL statements that are inside searchParams
             SearchParamsCEActionRequests queryParams = selectedQueryCEAR.getPrimaryParams();
 
+            if(searchParams.getDate_start_val() == null || searchParams.getDate_end_val() == null){
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please specify a start and end date when using a custom query.", ""));
+                return;
+            }
+            
             if (selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()) {
 
                 queryParams.setDate_start_val(searchParams.getDate_start_val());
@@ -252,7 +263,70 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                             "Unable to query action requests, sorry", ""));
         }
     }
+    /**
+     * Determines whether or not a user should currently be able to select a CEAR.
+     * Users should only select CEARs if they're in search mode.
+     * @return 
+     */
+    public boolean getSelectedButtonActive(){
+        return !"Search".equals(currentMode);
+    }
+    
+    public boolean getActiveSearchMode(){
+        return "Search".equals(currentMode);
+    }
+    
+    public boolean getActiveActionsMode(){
+        return "Actions".equals(currentMode);
+    }
+    
+    public boolean getActiveObjectsMode(){
+        return "Objects".equals(currentMode);
+    }
+    
+    public boolean getActiveNotesMode(){
+        return "Notes".equals(currentMode);
+    }
 
+    public String getCurrentMode() {
+        return currentMode;
+    }
+
+    /**
+     *
+     * @param currentMode Lookup, Insert, Update, Remove
+     * @throws IntegrationException
+     * @throws AuthorizationException
+     */
+    public void setCurrentMode(String currentMode) throws IntegrationException, AuthorizationException {
+
+        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
+        String tempCurMode = this.currentMode;
+        //reset default setting every time the Mode has been selected 
+        defaultSetting();
+        //check the currentMode == null or not
+        if (currentMode == null) {
+            this.currentMode = tempCurMode;
+        } else {
+            this.currentMode = currentMode;
+        }
+        //show the current mode in p:messages box
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, this.currentMode + " Mode Selected", ""));
+
+    }
+
+    public boolean isCurrentCEARSelected() {
+        return currentCEARSelected;
+    }
+
+    public void setCurrentCEARSelected(boolean currentCEARSelected) {
+        this.currentCEARSelected = currentCEARSelected;
+    }
+    
+    public void defaultSetting(){
+        currentCEARSelected = false;
+    }
+    
     public void prepareReportMultiCEAR(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();
@@ -698,7 +772,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void deletePhoto(int blobID) {
-        // TODO: remove entry from linker tbale for deleted photos
         for (Integer bid : this.selectedRequest.getBlobIDList()) {
             if (bid.compareTo(blobID) == 0) {
                 this.selectedRequest.getBlobIDList().remove(bid);
@@ -1146,5 +1219,5 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void setRequestReasonDonut(DonutChartModel requestReasonDonut) {
         this.requestReasonDonut = requestReasonDonut;
     }
-
+    
 }

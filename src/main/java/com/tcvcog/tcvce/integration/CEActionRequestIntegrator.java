@@ -256,6 +256,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setRequestStatus(getRequestStatus(rs.getInt("status_id")));
         actionRequest.setPaccEnabled(rs.getBoolean("paccenabled"));
 
+        actionRequest.setIssue(getRequestIssueType(rs.getInt("issuetype_issuetypeid")));
+        
         actionRequest.setRequestID(rs.getInt("requestid"));
         actionRequest.setRequestPublicCC(rs.getInt("requestPubliccc"));
         actionRequest.setMuni(mi.getMuni(rs.getInt("muni_municode")));
@@ -347,7 +349,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	ceactionrequestissuetype.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid, ceactionrequest.active \n"
                 + "FROM public.ceactionrequest \n"
                 + "     INNER JOIN ceactionrequestissuetype ON ceactionrequest.issuetype_issuetypeid = ceactionrequestissuetype.issuetypeid ");
-        sb.append("WHERE requestID = ?;");
+        sb.append("WHERE requestid = ?;");
 
 //        
 //        
@@ -628,7 +630,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         CEActionRequestIssueType tpe = null;
         String query = "SELECT issuetypeid, typename, typedescription, muni_municode, notes, \n" +
                         "       intensity_classid, active\n" +
-                        "  FROM public.ceactionrequestissuetype;";
+                        "  FROM public.ceactionrequestissuetype\n"
+                         + " WHERE issuetypeid = ?;";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -686,8 +689,6 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         List<CEActionRequestIssueType> typeList = new ArrayList();
         
-        CEActionRequestIssueType tpe = null;
-        
         StringBuilder sb = new StringBuilder();
         sb.append( "SELECT issuetypeid, typename, typedescription, muni_municode, notes, intensity_classid, active \n");
         sb.append(" FROM public.ceactionrequestissuetype ");
@@ -711,8 +712,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
             // loop through the result set and reat an action request from each
             while (rs.next()) {
-                tpe = generateCEActionRequestIssueType(rs);
-                typeList.add(tpe);
+                typeList.add(generateCEActionRequestIssueType(rs));
             }
         } catch (SQLException ex) {
             System.out.println(ex);
