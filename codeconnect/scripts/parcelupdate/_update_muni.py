@@ -18,19 +18,19 @@ from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 from _constants import DEFAULT_PROP_UNIT
 
 
-def parcel_not_in_db(parid, db_cursor):
+def parcel_not_in_db(parid, cursor):
     select_sql = """
         SELECT parid FROM property
         WHERE parid = %s"""
-    db_cursor.execute(select_sql, [parid])
-    row = db_cursor.fetchone()
+    cursor.execute(select_sql, [parid])
+    row = cursor.fetchone()
     if row is None:
         print("Parcel {} not in properties.".format(parid))
         return True
     return False
 
 
-def write_property_to_db(imap, db_cursor):
+def write_property_to_db(imap, cursor):
     # Todo: Write function in a way so that we can reuse the insert sql for the alter sql
     insert_sql = """
         INSERT INTO property(
@@ -49,11 +49,11 @@ def write_property_to_db(imap, db_cursor):
         )
         RETURNING propertyid;
     """
-    db_cursor.execute(insert_sql, imap)
-    return db_cursor.fetchone()[0]  # Returns the property_id
+    cursor.execute(insert_sql, imap)
+    return cursor.fetchone()[0]  # Returns the property_id
 
 
-def update_property_in_db(propid, imap, db_cursor):
+def update_property_in_db(propid, imap, cursor):
     # Todo: Write function in a way so that we can reuse the insert sql for the alter sql
     imap["propertyid"] = propid
     insert_sql = """
@@ -78,11 +78,11 @@ def update_property_in_db(propid, imap, db_cursor):
         )
         WHERE propertyid = %(propertyid)
     """
-    db_cursor.execute(insert_sql, imap)
-    return db_cursor.fetchone()[0]  # Returns the property_id
+    cursor.execute(insert_sql, imap)
+    return cursor.fetchone()[0]  # Returns the property_id
 
 
-def write_person_to_db(record, db_cursor):
+def write_person_to_db(record, cursor):
     insert_sql = """
         INSERT INTO public.person(
             persontype, muni_municode, fname, lname, 
@@ -101,11 +101,11 @@ def write_person_to_db(record, db_cursor):
         )
         RETURNING personid;
     """
-    db_cursor.execute(insert_sql, record)
-    return db_cursor.fetchone()[0]
+    cursor.execute(insert_sql, record)
+    return cursor.fetchone()[0]
 
 
-def connect_property_to_person(prop_id, person_id, db_cursor):
+def connect_property_to_person(prop_id, person_id, cursor):
     propperson = {"prop_id": prop_id, "person_id": person_id}
     insert_sql = """
         INSERT INTO public.propertyperson(
@@ -115,7 +115,7 @@ def connect_property_to_person(prop_id, person_id, db_cursor):
             %(prop_id)s, %(person_id)s
         );
     """
-    db_cursor.execute(insert_sql, propperson)
+    cursor.execute(insert_sql, propperson)
 
 
 def compare(WPRDC_data, AlleghenyCountyData):
@@ -130,7 +130,7 @@ def validate_data(r, tax):
     compare(r["TAXYEAR"], int(snp.strip_whitespace(tax.year)))
 
 
-def write_propertyexternaldata(propextern_map, db_cursor):
+def write_propertyexternaldata(propextern_map, cursor):
     insert_sql = """
         INSERT INTO public.propertyexternaldata(
             extdataid,
@@ -152,11 +152,11 @@ def write_propertyexternaldata(propextern_map, db_cursor):
         )
         RETURNING property_propertyid;
     """
-    db_cursor.execute(insert_sql, propextern_map)
-    return db_cursor.fetchone()[0]  # property_id
+    cursor.execute(insert_sql, propextern_map)
+    return cursor.fetchone()[0]  # property_id
 
 
-def update_muni(muni, db_cursor, commit=True):
+def update_muni(muni, db_conn, commit=True):
     """
     The core functionality of the script.
     """
@@ -179,82 +179,84 @@ def update_muni(muni, db_cursor, commit=True):
     inserted_count = 0
     updated_count = 0
 
-    for record in records:
-        parid = record["PARID"]
 
-        data = snp.scrape_county_property_assessments(parid, pages=[TAX])
-        for page in data:
-            data[page] = snp.soupify_html(data[page])
-        owner_name = snp.OwnerName.get_Owner_from_soup(data[TAX])
-        tax_status = snp.parse_tax_from_soup(data[TAX])
+    with db_conn.cursor() as cursor:
+        for record in records:
+            parid = record["PARID"]
+
+            data = snp.scrape_county_property_assessments(parid, pages=[TAX])
+            for page in data:
+                data[page] = snp.soupify_html(data[page])
+            owner_name = snp.OwnerName.get_Owner_from_soup(data[TAX])
+            tax_status = snp.parse_tax_from_soup(data[TAX])
 
 
-        # This block of code initalizes the following:
-        #   Variables:  prop_id, unit_id, cecase_id
-        #   Flags:      new_parcel
-        if parcel_not_in_db(parid, db_cursor):
-            new_parcel = True
-            imap = create.insertmap_from_record(record)
-            prop_id = write_property_to_db(imap, db_cursor)
-            if record["PROPERTYUNIT"] == " ":
-                unit_id = insert.unit(
-                    {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
-                    db_cursor,
-                )
-            else:
-                print(record["PROPERTYUNIT"])
-                unit_id = insert.unit(
-                    {
-                        "unitnumber": record["PROPERTYUNIT"],
-                        "property_propertyid": prop_id,
-                    },
-                    db_cursor,
-                )
-            cecase_map = create.cecase_imap(prop_id, unit_id)
-            cecase_id = insert.cecase(cecase_map, db_cursor)
-            #
-            owner_map = create.owner_imap(owner_name, record)
-            person_id = write_person_to_db(owner_map, db_cursor)
-            #
-            connect_property_to_person(prop_id, person_id, db_cursor)
-            inserted_count += 1
-        else:
-            new_parcel = False
-            prop_id = fetch.prop_id(parid, db_cursor)
-            unit_id = fetch.unit_id(prop_id, db_cursor)
-            if not unit_id:
-                unit_id = insert.unit(
-                    {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
-                    db_cursor,
-                )
-            # TODO: ERROR: Property exists without property unit
-            cecase_id = fetch.cecase_id(unit_id, db_cursor)
-            if not cecase_id:
+            # This block of code initalizes the following:
+            #   Variables:  prop_id, unit_id, cecase_id
+            #   Flags:      new_parcel
+            if parcel_not_in_db(parid, cursor):
+                new_parcel = True
+                imap = create.insertmap_from_record(record)
+                prop_id = write_property_to_db(imap, cursor)
+                if record["PROPERTYUNIT"] == " ":
+                    unit_id = insert.unit(
+                        {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
+                        cursor,
+                    )
+                else:
+                    print(record["PROPERTYUNIT"])
+                    unit_id = insert.unit(
+                        {
+                            "unitnumber": record["PROPERTYUNIT"],
+                            "property_propertyid": prop_id,
+                        },
+                        cursor,
+                    )
                 cecase_map = create.cecase_imap(prop_id, unit_id)
-                cecase_id = insert.cecase(cecase_map, db_cursor)
-                # TODO: ERROR: Property exists without cecase
+                cecase_id = insert.cecase(cecase_map, cursor)
+                #
+                owner_map = create.owner_imap(owner_name, record)
+                person_id = write_person_to_db(owner_map, cursor)
+                #
+                connect_property_to_person(prop_id, person_id, cursor)
+                inserted_count += 1
+            else:
+                new_parcel = False
+                prop_id = fetch.prop_id(parid, cursor)
+                unit_id = fetch.unit_id(prop_id, cursor)
+                if not unit_id:
+                    unit_id = insert.unit(
+                        {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
+                        cursor,
+                    )
+                # TODO: ERROR: Property exists without property unit
+                cecase_id = fetch.cecase_id(unit_id, cursor)
+                if not cecase_id:
+                    cecase_map = create.cecase_imap(prop_id, unit_id)
+                    cecase_id = insert.cecase(cecase_map, cursor)
+                    # TODO: ERROR: Property exists without cecase
 
-        validate_data(record, tax_status)
+            validate_data(record, tax_status)
 
-        propextern_map = create.propertyexternaldata_imap(
-            prop_id, owner_name.raw, record, tax_status
-        )
-        # Property external data is a misnomer. It's just a log of the data from every time stuff
-        write_propertyexternaldata(propextern_map, db_cursor)
+            propextern_map = create.propertyexternaldata_imap(
+                prop_id, owner_name.raw, record, tax_status
+            )
+            # Property external data is a misnomer. It's just a log of the data from every time stuff
+            write_propertyexternaldata(propextern_map, cursor)
 
-        events.check_for_changes_and_write_events(
-            parid, prop_id, cecase_id, new_parcel, db_cursor
-        )
+            events.check_for_changes_and_write_events(
+                parid, prop_id, cecase_id, new_parcel, cursor
+            )
 
-        if commit:
-            db_cursor.commit()
-        else:
-            # Check to make sure variables weren't forgotten to be assigned
-            assert [attr is not None for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]]
+            if commit:
+                db_conn.commit()
+            else:
+                # Check to make sure variables weren't forgotten to be assigned
+                assert [attr is not None for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]]
 
-        record_count += 1
-        print("Record count:\t", record_count, sep="")
-        print("Inserted count:\t", inserted_count, sep="")
-        print("Updated count:\t", updated_count, sep="")
-        print(SHORT_DASHES)
-    print(DASHES)
+            record_count += 1
+            print("Record count:\t", record_count, sep="")
+            print("Inserted count:\t", inserted_count, sep="")
+            print("Updated count:\t", updated_count, sep="")
+            print(SHORT_DASHES)
+        print(DASHES)

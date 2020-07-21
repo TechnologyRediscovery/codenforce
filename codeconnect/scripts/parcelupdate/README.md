@@ -41,9 +41,9 @@ INSERT INTO public.eventcategory(
     ~~~
     if flags.taxstatus:
         event = events.DifferentTaxStatus(
-           parid, prop_id, flags.your_flag, db_cursor
+           parid, prop_id, flags.your_flag, cursor
         )
-        event.write_to_db(db_cursor)
+        event.write_to_db(cursor)
     ~~~
 <h4 id=parcel-change>What constitutes a Parcel Change?</h4>
 A regular, month to month change.

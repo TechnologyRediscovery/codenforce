@@ -1,10 +1,7 @@
 from collections import namedtuple
-import _insert as insert
 from colorama import init
 init()
 from colorama import Fore, Back, Style
-
-from _constants import DEFAULT_PROP_UNIT
 from _constants import BOT_ID
 
 
