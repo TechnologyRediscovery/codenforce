@@ -127,13 +127,14 @@ def connect_property_to_person(prop_id, person_id, cursor):
 def compare(WPRDC_data, AlleghenyCountyData):
     if WPRDC_data != AlleghenyCountyData:
         raise ValueError(
-            "The WPRDC's data does not match the data scraped from Allegheny County"
+            "The WPRDC's data does not match the data scraped from Allegheny County\n"
+            f"\t WPRDC's: {WPRDC_data}\tCounty's: {AlleghenyCountyData}"
         )
 
-
-def validate_data(r, tax):
-    # Todo: Validate more data
-    compare(r["TAXYEAR"], int(_parse.strip_whitespace(tax.year)))
+# Todo: Validate more data
+def validate_data(r, tax):                  #   Example data as applicable to explain transformations
+                                            #   WPRDC               Allegheny County
+    compare(r["TAXYEAR"], int(tax.year))    #   2020.0              2020
 
 
 def write_propertyexternaldata(propextern_map, cursor):
@@ -174,9 +175,12 @@ def write_taxstatus(tax_status, cursor):
     # """
     insert_sql = """
         INSERT INTO taxstatus(
-            year)
+            year, paidstatus, tax, penalty,
+            interest, total, datepaid
+        )
         VALUES(
-            %(year)s
+            %(year)s, %(paidstatus)s, %(tax)s, %(penalty)s,
+            %(interest)s, %(total)s, %(date_paid)s
         )
         returning taxstatusid;
     """

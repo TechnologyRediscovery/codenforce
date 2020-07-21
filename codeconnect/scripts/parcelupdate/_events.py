@@ -61,7 +61,7 @@ def query_propertyexternaldata_for_changes_and_write_events(parid, prop_id, ceca
         details.changes = Changes("condition", old[4], new[4])
         DifferentCondition(details).write_to_db()
     if old[5] != new[5]:
-        details.changes = Changes("tax status", old[5], new[5])
+        details.changes = Changes("tax code", old[5], new[5])
         DifferentTaxCode(details).write_to_db()
 
 
@@ -154,7 +154,7 @@ class NewParcelid(Event):
 class ParcelChangedEvent(Event):
     def __init__(self, d):  # details
         super().__init__(d)
-        self.eventdescription = f"Parcel {d.parid}'s {d.name} changed from {d.orig} to {d.new}"
+        self.eventdescription = f"Parcel {d.parid}'s {d.changes.name} changed from {d.orig} to {d.new}"
         self.active = True
         self.ce_notes = " "
         self.event_notes = " "

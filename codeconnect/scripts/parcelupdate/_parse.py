@@ -56,28 +56,32 @@ def parse_tax_from_soup(soup):
     try:
         return TaxStatus(*[clean_text(x.text) for x in row.contents])
     except TypeError:  # When taxes are unpaid:
-        # Set date_paid to None and blank to "". Todo: Make more pythonic?
+        # Set date_paid and blank set to "" and eventually None. Todo: Make more pythonic?
         rows = [
             row.contents[0].text, row.contents[1].text, row.contents[2].text,
             row.contents[3].text, row.contents[4].text, row.contents[5].text,
-            None, ""
+            "", ""
         ]
         return TaxStatus(*[clean_text(x) for x in rows])
 
-
 # Function currently unused
 def clean_text(text):
-    try:
-        text = strip_whitespace(text)
-        text = strip_dollarsign(text)
-        return text
-    except TypeError:
-        return text
+    text = strip_whitespace(text)
+    text = strip_dollarsign(text)
+    text = remove_commas_from_numerics(text)
+    if text == "":
+        text = None
+    return text
+
 
 def strip_whitespace(text):
     return re.sub(" {2,}", " ", text).strip()
 def strip_dollarsign(text):
     return re.sub(r"\$( )*", "", text)
+def remove_commas_from_numerics(text):
+    if re.fullmatch(r"[\d,\.]+", text):
+        return re.sub(r"[,\.]", "", text)
+    return text
 
 
 class OwnerName:
