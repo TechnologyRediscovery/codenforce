@@ -6,13 +6,19 @@ Actions resulting from trigger functions are commented in the following syntax:
     # ~~ basic function description in pseudo code
 """
 
-import json
+#   Project files imported without an underscore should be read as a statement.
+#   Example: scrape.county_property_assessments scrapes county property assessments.
+#
+#   Otherwise, treat the name as the module name.
+#   Example: _parse.strip_whitespace strips whitespace, _parse.OwnerName is a class
 
+import json
 import _create as create
-import _events as events
 import _fetch as fetch
 import _insert as insert
-import _scrape_and_parse as snp
+import _scrape as scrape
+import _events
+import _parse
 from _constants import GENERALINFO, BUILDING, TAX, SALES
 from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 from _constants import DEFAULT_PROP_UNIT
@@ -127,7 +133,7 @@ def compare(WPRDC_data, AlleghenyCountyData):
 
 def validate_data(r, tax):
     # Todo: Validate more data
-    compare(r["TAXYEAR"], int(snp.strip_whitespace(tax.year)))
+    compare(r["TAXYEAR"], int(_parse.strip_whitespace(tax.year)))
 
 
 def write_propertyexternaldata(propextern_map, cursor):
@@ -137,23 +143,46 @@ def write_propertyexternaldata(propextern_map, cursor):
             property_propertyid, ownername, address_street, address_citystatezip,
             address_city, address_state, address_zip, saleprice,
             saleyear, assessedlandvalue, assessedbuildingvalue, assessmentyear,
-            usecode, livingarea, condition, taxstatus,
-            taxstatusyear, notes, lastupdated, tax,
-            taxcode, taxsubcode
+            usecode, livingarea, condition, 
+            notes, lastupdated, taxstatus_taxstatusid
         )
         VALUES(
             DEFAULT,
             %(property_propertyid)s, %(ownername)s, %(address_street)s, %(address_citystatezip)s,
             %(address_city)s, %(address_state)s, %(address_zip)s, %(saleprice)s,
             %(saleyear)s, %(assessedlandvalue)s, %(assessedbuildingvalue)s, %(assessmentyear)s,
-            %(usecode)s, %(livingarea)s, %(condition)s, %(taxstatus)s,
-            %(taxstatusyear)s, %(notes)s, now(), %(tax)s,
-            %(taxcode)s, %(taxsubcode)s
+            %(usecode)s, %(livingarea)s, %(condition)s,
+            %(notes)s, now(), %(taxstatus_taxstatusid)s
         )
         RETURNING property_propertyid;
     """
     cursor.execute(insert_sql, propextern_map)
     return cursor.fetchone()[0]  # property_id
+
+
+def write_taxstatus(tax_status, cursor):
+    # insert_sql = """
+    #     INSERT INTO taxstatus(
+    #         year, paidstatus, tax, penalty,
+    #         interest, total, datepaid
+    #     )
+    #     VALUES(
+    #         %s, %s, %s, %s,
+    #         %s, %s, %s
+    #     )
+    #     RETURNING taxstatusid;
+    # """
+    insert_sql = """
+        INSERT INTO taxstatus(
+            year)
+        VALUES(
+            %(year)s
+        )
+        returning taxstatusid;
+    """
+    cursor.execute(insert_sql, tax_status._asdict())    # Todo: For fun, learn speed of tuple -> dict
+    return cursor.fetchone()[0] # taxstatus_id
+
 
 
 def update_muni(muni, db_conn, commit=True):
@@ -179,16 +208,15 @@ def update_muni(muni, db_conn, commit=True):
     inserted_count = 0
     updated_count = 0
 
-
     with db_conn.cursor() as cursor:
         for record in records:
             parid = record["PARID"]
 
-            data = snp.scrape_county_property_assessments(parid, pages=[TAX])
+            data = scrape.county_property_assessments(parid, pages=[TAX])
             for page in data:
-                data[page] = snp.soupify_html(data[page])
-            owner_name = snp.OwnerName.get_Owner_from_soup(data[TAX])
-            tax_status = snp.parse_tax_from_soup(data[TAX])
+                data[page] = _parse.soupify_html(data[page])
+            owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])
+            tax_status = _parse.parse_tax_from_soup(data[TAX])
 
 
             # This block of code initalizes the following:
@@ -237,14 +265,14 @@ def update_muni(muni, db_conn, commit=True):
                     # TODO: ERROR: Property exists without cecase
 
             validate_data(record, tax_status)
-
+            tax_status_id = write_taxstatus(tax_status, cursor)
             propextern_map = create.propertyexternaldata_imap(
-                prop_id, owner_name.raw, record, tax_status
+                prop_id, owner_name.raw, record, tax_status_id
             )
             # Property external data is a misnomer. It's just a log of the data from every time stuff
             write_propertyexternaldata(propextern_map, cursor)
 
-            events.check_for_changes_and_write_events(
+            _events.query_propertyexternaldata_for_changes_and_write_events(
                 parid, prop_id, cecase_id, new_parcel, cursor
             )
 

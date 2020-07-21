@@ -5,7 +5,7 @@ from colorama import Fore, Back, Style
 from _constants import BOT_ID
 
 
-# These structures help organize the creation of events. See check_for_changes_and_write_events
+# These structures help organize the creation of events. See query_propertyexternaldata_for_changes_and_write_events
 Changes = namedtuple("flag", ["name", "orig", "new"])
 class EventDetails:
     __slots__ = ["parid", "prop_id", "cecase_id", "changes", "db_cursor"]
@@ -17,12 +17,12 @@ class EventDetails:
         self.changes = None
 
 
-def check_for_changes_and_write_events(parid, prop_id, cecase_id, new_parcel, db_cursor):
+def query_propertyexternaldata_for_changes_and_write_events(parid, prop_id, cecase_id, new_parcel, db_cursor):
     """ Checks if parcel info is different from last time. Records Changes. """
     select_sql = """
         SELECT
             property_propertyid, ownername, address_street, address_citystatezip,
-            livingarea, condition, taxstatus, taxcode
+            livingarea, condition, taxcode
         FROM public.propertyexternaldata
         WHERE property_propertyid = %(prop_id)s
         ORDER BY lastupdated DESC
@@ -62,9 +62,6 @@ def check_for_changes_and_write_events(parid, prop_id, cecase_id, new_parcel, db
         DifferentCondition(details).write_to_db()
     if old[5] != new[5]:
         details.changes = Changes("tax status", old[5], new[5])
-        DifferentTaxStatus(details).write_to_db()
-    if old[6] != new[6]:
-        details.changes = Changes("tax code", old[6], new[6])
         DifferentTaxCode(details).write_to_db()
 
 
@@ -155,9 +152,9 @@ class NewParcelid(Event):
 
 
 class ParcelChangedEvent(Event):
-    def __init__(self, flags):
-        super().__init__(flags)
-        self.eventdescription = f"Parcel {flags.parid}'s {f.name} changed from {f.orig} to {f.new}"
+    def __init__(self, d):  # details
+        super().__init__(d)
+        self.eventdescription = f"Parcel {d.parid}'s {d.name} changed from {d.orig} to {d.new}"
         self.active = True
         self.ce_notes = " "
         self.event_notes = " "
