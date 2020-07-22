@@ -259,18 +259,13 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param ua
      * @throws IntegrationException
      */
-    public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException {
+    public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         prop.setLastUpdatedBy(ua);
         prop.setLastUpdatedTS(LocalDateTime.now());
-//        prop.setAbandonedDateStart(LocalDateTime.parse(prop.getAbandonedDateStart().toString()));
-//        prop.setAbandonedDateStop(LocalDateTime.parse(prop.getAbandonedDateStop().toString()));
-//        prop.setVacantDateStart(LocalDateTime.parse(prop.getVacantDateStart().toString()));
-//        prop.setVacantDateStop(LocalDateTime.parse(prop.getVacantDateStop().toString()));
-//        prop.setUnfitDateStart(LocalDateTime.parse(prop.getUnfitDateStart().toString()));
-//        prop.setUnfitDateStop(LocalDateTime.parse(prop.getUnfitDateStop().toString()));
         if (checkAllDates(prop) == false) {
-
+            throw new BObStatusException("Date error in committing property updates; Ensure no end date is before a start date");
+            
         }
         pi.updateProperty(prop);
 
