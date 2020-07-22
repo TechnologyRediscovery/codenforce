@@ -154,7 +154,7 @@ class NewParcelid(Event):
 class ParcelChangedEvent(Event):
     def __init__(self, d):  # details
         super().__init__(d)
-        self.eventdescription = f"Parcel {d.parid}'s {d.changes.name} changed from {d.orig} to {d.new}"
+        self.eventdescription = f"Parcel {d.parid}'s {d.changes.name} changed from {d.changes.orig} to {d.changes.new}"
         self.active = True
         self.ce_notes = " "
         self.event_notes = " "
