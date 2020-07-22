@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.PropertyExtData;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -224,7 +225,15 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public String onAddNoteButtonChange(){
         EventCoordinator ec = getEventCoordinator();
          
-//        EventCnF ev = ec.initEvent(, ec);
+        try {
+            EventCnF ev = ec.initEvent(currentProperty.getPropInfoCaseList().get(0),
+                    ec.getEventCategory(Integer.parseInt(
+                            getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                    .getString("propertyinfoeventcatid"))));
+            getSessionBean().setSessEventQueued(ev);
+        } catch (IntegrationException | BObStatusException | EventException ex) {
+            System.out.println(ex);
+        }
         
         return "eventAdd";
         
@@ -391,6 +400,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             
         }
         return "";
+        
+    }
+    
+    public String onCreateNewCaseButtonChange(){
+        getSessionBean().setSessProperty(currentProperty);
+        return "addNewCase";
         
     }
     

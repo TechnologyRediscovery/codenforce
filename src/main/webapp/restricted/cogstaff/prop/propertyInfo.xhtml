@@ -806,13 +806,14 @@
                                                         <h:outputText value="#{event.description}"/>
 
                                                     </p:column>
-                                                    <p:column headerText="View"
+                                                    <p:column headerText="Options"
                                                               styleClass="centeredColumnContent">
 
                                                         <p:commandButton    id="prop-events-open-button"
                                                                             ajax="false"
                                                                             styleClass="noFill button-size-small"
                                                                             action="#{propertyProfileBB.onViewEventButtonChange(event)}"
+                                                                            value="View Event"
                                                                             icon="fa fa-folder-open-o"
                                                                             />
 
@@ -878,7 +879,7 @@
 
                                                     </p:column>
 
-                                                    <p:column headerText="View"
+                                                    <p:column headerText="Options"
                                                               styleClass="centeredColumnContent">
 
                                                         <p:commandButton    id="prop-person-exploreperson-button"
@@ -886,6 +887,7 @@
                                                                             styleClass="noFill button-size-small"
                                                                             action="#{propertyProfileBB.onViewPersonProfileButtonChange(person)}"
                                                                             icon="fa fa-folder-open-o"
+                                                                            value="View Person"
                                                                             />
 
                                                     </p:column>
@@ -901,8 +903,20 @@
                                                     toggleable="true"
                                                     widgetVar="prop-cases-panel-var"
                                                     collapsed="false"
-                                                    header="Code Enf. Cases">
+                                                    header="Code Enforcement Cases">
                                             <h:form id="prop-cases-panel-form">
+                                                
+                                                  <p:commandButton   id="prop-cases-newcase-button"
+                                                                   ajax="fase" 
+                                                                   action="#{propertyProfileBB.onCreateNewCaseButtonChange}"
+                                                                   oncomplete="PF('prop-persons-manage-var').show()"
+                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
+                                                                   value="Manage Persons"  
+                                                                   icon="fa fa-user-plus"
+                                                                   />
+                                                  
+                                                  <p:spacer height="5px" />
+                                                
                                                 <p:dataTable id="prop-cases-table"
                                                              var="cse"
                                                              value="#{propertyProfileBB.currentProperty.ceCaseList}"
@@ -938,14 +952,15 @@
 
                                                     </p:column>
 
-                                                    <p:column headerText="View"
+                                                    <p:column headerText="Options"
                                                               styleClass="centeredColumnContent">
 
-                                                        <p:commandButton    id="prop-person-exploreperson-button"
+                                                        <p:commandButton    id="prop-person-viewcase-button"
                                                                             ajax="false"
                                                                             styleClass="noFill button-size-small"
                                                                             action="#{propertyProfileBB.onViewCaseButtonChange(cse)}"
                                                                             icon="fa fa-folder-open-o"
+                                                                            value="View CE Case"
                                                                             />
 
                                                     </p:column>
@@ -965,9 +980,10 @@
 
                                                 <p:commandButton    id="prop-units-explore-button"
                                                                     ajax="false"
+                                                                    value="Configure Units"
                                                                     styleClass="noFill button-size-small"
                                                                     action="#{propertyProfileBB.onPropUnitExploreButtonChange}"
-                                                                    icon="fa fa-home"
+                                                                    icon="fa fa-hotel"
                                                                     />
 
 
@@ -1021,7 +1037,7 @@
 
                                                     </p:column>
 
-                                                    <p:column headerText="Add Period"
+                                                    <p:column headerText="Options"
                                                               styleClass="centeredColumnContent">
 
                                                           <p:commandButton   id="prop-unit-newperiod-button"
@@ -1029,7 +1045,7 @@
                                                                    actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
                                                                    oncomplete="PF('prop-addperiod-dialog-var').show()"
                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
-                                                                   value="New Period"  
+                                                                   value="New Occ Period"  
                                                                    icon="fa fa-id-card-o"
                                                                    />
                                                         

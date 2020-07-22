@@ -754,7 +754,7 @@
   
     
     <navigation-rule>
-        <from-view-id>/restricted/cogview/propertySearch.xhtml</from-view-id>
+        <from-view-id>*</from-view-id>
         <navigation-case>
             <from-outcome>addNewCase</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
