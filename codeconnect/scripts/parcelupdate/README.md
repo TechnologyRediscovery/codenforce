@@ -30,7 +30,7 @@ INSERT INTO public.eventcategory(
 ~~~
 * Create a class corresponding to the event category in events.py. Make sure it inherits from the base class event. Make sure its name matches up exactly to the name in the database.
 * **If the event is classified as a [Parcel Change](#parcel-change):**
-  * Add a check for your flag in the function events.check_for_changes_and_write_events. The check should take the following form:
+  * Add a check for your flag in the function events.query_propertyexternaldata_for_changes_and_write_events. The check should take the following form:
     ~~~
     if old[i] != new[i]:
            details.changes = Changes("your flag", old[i], new[i])

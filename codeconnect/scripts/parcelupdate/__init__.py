@@ -1,6 +1,7 @@
 __all__ = [
     "_constants",
-    "_scrape_and_parse",
+    "_scrape",
+    "_parse"
     "_events",
     "_fetch",
     "parcelupdate",

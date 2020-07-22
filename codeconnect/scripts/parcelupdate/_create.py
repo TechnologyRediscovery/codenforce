@@ -21,7 +21,7 @@ def cecase_imap(prop_id, unit_id):
     return imap
 
 
-def propertyexternaldata_imap(prop_id, name, r, tax_status):
+def propertyexternaldata_imap(prop_id, name, r, taxstatus_id):
     imap = {}
     imap["property_propertyid"] = prop_id
     imap["ownername"] = name
@@ -46,15 +46,8 @@ def propertyexternaldata_imap(prop_id, name, r, tax_status):
     imap["usecode"] = r["USECODE"]
     imap["livingarea"] = r["FINISHEDLIVINGAREA"]
     imap["condition"] = r["CONDITION"]  # Todo: Condition to condition desc table
-    imap["taxcode"] = r["TAXCODE"]
-    # Applies to only to Public Utility Realty Tax Act
-    #   If taxes are paid, they are paid into a state fund rather than to local taxing bodies
-    imap["taxsubcode"] = r["TAXSUBCODE"]
-    imap["taxstatus"] = tax_status.status
-    #   The WPRDC pads their year with a nonbreaking space
-    imap["taxstatusyear"] = r["TAXYEAR"]
-    imap["tax"] = tax_status.tax
     imap["notes"] = SPACE.join(("Scraped by bot", BOT_ID))
+    imap["taxstatus_taxstatusid"] = taxstatus_id
     return imap
 
 
