@@ -25,17 +25,10 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
-import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
-import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -138,9 +131,8 @@ public class PersonSearchBB extends BackingBeanUtils{
     public void executeQuery(ActionEvent event){
         
         SearchCoordinator sc = getSearchCoordinator();
-        List<Person> pl = null;
         try {
-            pl = sc.runQuery(querySelected).getBOBResultList();
+            List<Person> pl = sc.runQuery(querySelected).getBOBResultList();
             if(!isAppendResultsToList()){
                 personList.clear();
             } 

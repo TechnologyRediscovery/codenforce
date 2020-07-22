@@ -43,6 +43,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.ZoneId;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -305,10 +306,48 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return c;
     }
     
-    
-  
-    
-  
+    /**
+     * Gets a CECase according to a Property ID
+     * @param propID
+     * @return
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public List<CECase> getCECasesByProp(int propID) throws IntegrationException, BObStatusException{
+        String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
+            "            login_userid, casename, casephase, originationdate, closingdate, \n" +
+            "            creationtimestamp, notes, paccenabled, allowuplinkaccess, active \n" +
+            "  FROM public.cecase WHERE property_propertyid = ?;";
+        ResultSet rs = null;
+        CaseCoordinator cc = getCaseCoordinator();
+        PreparedStatement stmt = null;
+        Connection con = null;
+        List<CECase> cList = new ArrayList<>();
+        
+        try {
+            
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, propID);
+            //System.out.println("CaseIntegrator.getCECase| sql: " + stmt.toString());
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                cList.add(generateCECase(rs));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get cecase by id", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return cList;
+    }
     
     /**
      * Internal generator for CECase objects
@@ -407,19 +446,16 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws BObStatusException 
      */
     public int insertNewCECase(CECase ceCase) throws IntegrationException, BObStatusException{
-        CaseCoordinator cc = getCaseCoordinator();
-        
         String query = "INSERT INTO public.cecase(\n" +
                         "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
                         "            login_userid, casename, originationdate, closingdate, \n" +
-                        "            notes, creationTimestamp, active) \n" +
+                        "            notes, creationTimestamp, active, casephase) \n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
-                        "            ?, now(), ?);";
+                        "            ?, now(), ?, ?::casephase);";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         int insertedCaseID = 0;
-        CECase freshlyInsertedCase = null;
         Connection con = null;
         PaymentCoordinator pc = getPaymentCoordinator();
         
@@ -443,6 +479,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setString(8, ceCase.getNotes());
             stmt.setBoolean(9, ceCase.isActive());
             
+            stmt.setString(10, ceCase.getCasePhase().toString());
             System.out.println("CaseIntegrator.insertNewCase| sql: " + stmt.toString());
             
             stmt.execute();

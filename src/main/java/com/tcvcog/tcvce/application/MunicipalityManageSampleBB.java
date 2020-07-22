@@ -48,9 +48,8 @@ public class MunicipalityManageSampleBB extends BackingBeanUtils implements Seri
      *
      * @param currentMode Lookup, Insert, Update, Remove
      * @throws IntegrationException
-     * @throws AuthorizationException
      */
-    public void setCurrentMode(String currentMode) throws IntegrationException, AuthorizationException {
+    public void setCurrentMode(String currentMode) throws IntegrationException {
 
         //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
         String tempCurMode = this.currentMode;

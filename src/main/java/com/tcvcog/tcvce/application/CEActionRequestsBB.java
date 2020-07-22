@@ -10,22 +10,25 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
+import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
@@ -51,6 +54,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     private CEActionRequest selectedRequest;
     private List<CEActionRequest> requestList;
     private ReportCEARList reportConfig;
+    private String currentMode;
+    private boolean currentCEARSelected;
 
     private DonutChartModel requestReasonDonut;
 
@@ -71,11 +76,11 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     private Person selectedPersonForAttachment;
 
-    private ArrayList<CECaseDataHeavy> caseListForSelectedProperty;
+    private List<CECase> caseListForSelectedProperty;
     private String houseNumSearch;
     private String streetNameSearch;
 
-    private CECaseDataHeavy selectedCaseForAttachment;
+    private CECase selectedCaseForAttachment;
 
     private Municipality muniForPropSwitchSearch;
     private Property propertyForPropSwitch;
@@ -95,113 +100,244 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     @PostConstruct
     public void initBean() {
         SearchCoordinator sc = getSearchCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
 
-        QueryCEAR sessionQuery = getSessionBean().getQueryCEAR();
-
-        selectedRequest = getSessionBean().getSessCEAR();
-        ReportCEARList rpt = null;
+        currentMode = "Search";
         
+        //First search for CEARs using a standard query
+        selectedQueryCEAR = sc.initQuery(QueryCEAREnum.UNPROCESSED, getSessionBean().getSessUser().getMyCredential());
+
         try {
-            requestList = sc.runQuery(sessionQuery).getResults();
-        } catch (SearchException ex) {
-            System.out.println(ex);
-            
-        }
-            if (selectedRequest == null && requestList.size() > 0) {
-                selectedRequest = requestList.get(0);
-                generateCEARReasonDonutModel();
-            }
-            selectedQueryCEAR = sessionQuery;
-            searchParams = sessionQuery.getParamsList().get(0);
-            queryList = sc.buildQueryCEARList(getSessionBean().getSessUser().getMyCredential());
+            requestList = sc.runQuery(selectedQueryCEAR).getResults();
 
-            CaseCoordinator cc = getCaseCoordinator();
-            SearchCoordinator searchCoord = getSearchCoordinator();
-            rpt = cc.getInitializedReportConficCEARs(
-                    getSessionBean().getSessUser(), getSessionBean().getSessMuni());
-            rpt.setPrintFullCEARQueue(false);
-            QueryCEAR query = searchCoord.initQuery(
-                                                QueryCEAREnum.CUSTOM, 
-                                                getSessionBean().getSessUser().getMyCredential());
-            List<CEActionRequest> singleReqList = new ArrayList<>();
-            if(selectedRequest != null){
-                selectedRequest.setInsertPageBreakBefore(false);
-                singleReqList.add(selectedRequest);
-                query.addToResults(singleReqList);
+            //Update the selected request with the one from the database.
+            if (getSessionBean().getSessCEAR() != null) {
+                selectedRequest = cc.getCEActionRequest(getSessionBean().getSessCEAR().getRequestID());
             }
-            query.setExecutionTimestamp(LocalDateTime.now());
-            rpt.setBOBQuery(query);
-            rpt.setGenerationTimestamp(LocalDateTime.now());
-            rpt.setTitle("Code enforcement request");
-        
+        } catch (SearchException | IntegrationException ex) {
+            System.out.println(ex);
+        }
+
+        if (selectedRequest == null && requestList != null && requestList.size() > 0) {
+            selectedRequest = requestList.get(0);
+            generateCEARReasonDonutModel();
+        }
+        searchParams = new SearchParamsCEActionRequests();
+        queryList = sc.buildQueryCEARList(getSessionBean().getSessUser().getMyCredential());
+
+        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
+                getSessionBean().getSessUser(), getSessionBean().getSessMuni());
+
+        rpt.setPrintFullCEARQueue(false);
+        QueryCEAR query = sc.initQuery(
+                QueryCEAREnum.CUSTOM,
+                getSessionBean().getSessUser().getMyCredential());
+        List<CEActionRequest> singleReqList = new ArrayList<>();
+        if (selectedRequest != null) {
+            selectedRequest.setInsertPageBreakBefore(false);
+            singleReqList.add(selectedRequest);
+            query.addToResults(singleReqList);
+        }
+        query.setExecutionTimestamp(LocalDateTime.now());
+        rpt.setBOBQuery(query);
+        rpt.setGenerationTimestamp(LocalDateTime.now());
+        rpt.setTitle("Code enforcement request");
+
         reportConfig = rpt;
     }
 
     private void generateCEARReasonDonutModel() {
         DataCoordinator dc = getDataCoordinator();
-        
-        if(requestList != null && requestList.size() > 0){
+
+        if (requestList != null && requestList.size() > 0) {
 
             CaseCoordinator cc = getCaseCoordinator();
-            DonutChartModel donut =  new DonutChartModel();
+            DonutChartModel donut = new DonutChartModel();
 
             donut.addCircle(dc.computeCountsByCEARReason(requestList));
 
             donut.setTitle("Requests by reason");
             donut.setLegendPosition("nw");
             donut.setShowDataLabels(true);
-            
+
             requestReasonDonut = donut;
-        } 
+        }
     }
 
     public void executeQuery(ActionEvent ev) {
         SearchCoordinator searchC = getSearchCoordinator();
+        
+        selectedQueryCEAR = searchC.initQuery(selectedQueryCEAR.getQueryName(), getSessionBean().getSessUser().getMyCredential());
+        
+        requestList = new ArrayList<>();
+        
         try {
-            requestList = searchC.runQuery(selectedQueryCEAR).getResults();
+            if (selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()) {
+
+                searchC.runQuery(selectedQueryCEAR).getResults();
+
+            }
+
+            if (selectedQueryCEAR != null && !selectedQueryCEAR.getBOBResultList().isEmpty()) {
+
+                requestList = selectedQueryCEAR.getBOBResultList();
+
+            }
             generateCEARReasonDonutModel();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                             "Your query completed with " + requestList.size() + " results!", ""));
+                            "Your query completed with " + requestList.size() + " results!", ""));
         } catch (SearchException ex) {
+            System.out.println("CEActionRequestsBB.executeQuery() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Unable to query action requests, sorry", ""));
-        } 
+                            "Unable to query action requests, sorry", ""));
+        }
 
     }
 
     public void executeCustomQuery(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();
         try {
+
+            requestList = new ArrayList<>();
             
-            selectedQueryCEAR = searchCoord.initQuery(QueryCEAREnum.CUSTOM,
-                                                    getSessionBean().getSessUser().getMyCredential());
-            requestList =searchCoord.runQuery(selectedQueryCEAR).getResults();
+            selectedQueryCEAR = searchCoord.initQuery(QueryCEAREnum.CUSTOM, getSessionBean().getSessUser().getMyCredential());
+
+            //We will manually grab each parameter so we don't also grab the existing SQL statements that are inside searchParams
+            SearchParamsCEActionRequests queryParams = selectedQueryCEAR.getPrimaryParams();
+
+            if(searchParams.getDate_start_val() == null || searchParams.getDate_end_val() == null){
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please specify a start and end date when using a custom query.", ""));
+                return;
+            }
             
+            if (selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()) {
+
+                queryParams.setDate_start_val(searchParams.getDate_start_val());
+
+                queryParams.setDate_end_val(searchParams.getDate_end_val());
+
+                queryParams.setCaseAttachment_ctl(searchParams.isCaseAttachment_ctl());
+
+                queryParams.setCaseAttachment_val(searchParams.isCaseAttachment_val());
+
+                queryParams.setUrgent_ctl(searchParams.isUrgent_ctl());
+
+                queryParams.setUrgent_val(searchParams.isUrgent_val());
+
+                queryParams.setRequestStatus_ctl(searchParams.isRequestStatus_ctl());
+
+                queryParams.setRequestStatus_val(searchParams.getRequestStatus_val());
+
+                queryParams.setNonaddressable_ctl(queryParams.isNonaddressable_ctl());
+
+                queryParams.setNonaddressable_val(queryParams.isNonaddressable_val());
+            } else {
+                throw new SearchException("The query object was not properly initialized.");
+            }
+            //Time to run the query!
+
+            if (selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()) {
+
+                searchCoord.runQuery(selectedQueryCEAR).getResults();
+
+            }
+
+            if (selectedQueryCEAR != null && !selectedQueryCEAR.getBOBResultList().isEmpty()) {
+
+                requestList = selectedQueryCEAR.getBOBResultList();
+
+            }
+
             generateCEARReasonDonutModel();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                             "Your query completed with " + requestList.size() + " results!", ""));
+                            "Your query completed with " + requestList.size() + " results!", ""));
         } catch (SearchException ex) {
+            System.out.println("CEActionRequestsBB.executeCustomQuery() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Unable to query action requests, sorry", ""));
-        } 
+                            "Unable to query action requests, sorry", ""));
+        }
+    }
+    /**
+     * Determines whether or not a user should currently be able to select a CEAR.
+     * Users should only select CEARs if they're in search mode.
+     * @return 
+     */
+    public boolean getSelectedButtonActive(){
+        return !"Search".equals(currentMode);
+    }
+    
+    public boolean getActiveSearchMode(){
+        return "Search".equals(currentMode);
+    }
+    
+    public boolean getActiveActionsMode(){
+        return "Actions".equals(currentMode);
+    }
+    
+    public boolean getActiveObjectsMode(){
+        return "Objects".equals(currentMode);
+    }
+    
+    public boolean getActiveNotesMode(){
+        return "Notes".equals(currentMode);
     }
 
+    public String getCurrentMode() {
+        return currentMode;
+    }
+
+    /**
+     *
+     * @param currentMode Lookup, Insert, Update, Remove
+     * @throws IntegrationException
+     * @throws AuthorizationException
+     */
+    public void setCurrentMode(String currentMode) throws IntegrationException, AuthorizationException {
+
+        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
+        String tempCurMode = this.currentMode;
+        //reset default setting every time the Mode has been selected 
+        defaultSetting();
+        //check the currentMode == null or not
+        if (currentMode == null) {
+            this.currentMode = tempCurMode;
+        } else {
+            this.currentMode = currentMode;
+        }
+        //show the current mode in p:messages box
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, this.currentMode + " Mode Selected", ""));
+
+    }
+
+    public boolean isCurrentCEARSelected() {
+        return currentCEARSelected;
+    }
+
+    public void setCurrentCEARSelected(boolean currentCEARSelected) {
+        this.currentCEARSelected = currentCEARSelected;
+    }
+    
+    public void defaultSetting(){
+        currentCEARSelected = false;
+    }
+    
     public void prepareReportMultiCEAR(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();
-        
+
         ReportCEARList rpt = cc.getInitializedReportConficCEARs(
                 getSessionBean().getSessUser(), getSessionBean().getSessMuni());
-        
+
         rpt.setPrintFullCEARQueue(true);
         if (selectedQueryCEAR != null) {
             //go run the Query if it hasn't been yet
-            if(selectedQueryCEAR.getExecutionTimestamp() == null){
+            if (selectedQueryCEAR.getExecutionTimestamp() == null) {
                 try {
                     selectedQueryCEAR = searchCoord.runQuery(selectedQueryCEAR);
                 } catch (SearchException ex) {
@@ -215,8 +351,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         }
         reportConfig = rpt;
     }
-    
-  
 
     public String generateReportSingleCEAR() {
         getSessionBean().setSessCEAR(selectedRequest);
@@ -225,16 +359,15 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         return "reportCEARList";
 
     }
-    
-    public String generateReportMultiCEAR(){
+
+    public String generateReportMultiCEAR() {
         getSessionBean().setSessCEAR(selectedRequest);
-        
+
         // Not working
 //        Collections.sort(reportConfig.getBOBQuery().getBOBResultList());
-        
         // tell the first request in the list to not print a page break before itself
         reportConfig.getBOBQuery().getBOBResultList().get(0).setInsertPageBreakBefore(false);
-        
+
         getSessionBean().setSessReport(reportConfig);
         getSessionBean().setQueryCEAR(selectedQueryCEAR);
         return "reportCEARList";
@@ -267,22 +400,22 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                 "Unable to update action request with case attachment notes", ""));
+                                "Unable to update action request with case attachment notes", ""));
             } catch (BObStatusException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                 "Unable to create a new case at property due to a BobStatusException", ""));
+                                "Unable to create a new case at property due to a BobStatusException", ""));
             } catch (SearchException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                 "Unable to create a new case at property due to a SearchException", ""));
+                                "Unable to create a new case at property due to a SearchException", ""));
             }
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Please select an action request from the table to open a new case", ""));
+                            "Please select an action request from the table to open a new case", ""));
             return "";
         }
 
@@ -292,10 +425,13 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         // and link the request to the new case so we don't lose track of it
         getSessionBean().setSessCEAR(selectedRequest);
 
+        //Here's a navstack to guide the user back after they add a case:
+        getSessionBean().getNavStack().pushCurrentPage();
+
         return "addNewCase";
     }
 
-    public void path2UseSelectedCaseForAttachment(CECaseDataHeavy c) {
+    public void path2UseSelectedCaseForAttachment(CECase c) {
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         selectedCaseForAttachment = c;
         try {
@@ -318,7 +454,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     public void path3AttachInvalidMessage(ActionEvent ev) {
         SystemCoordinator sc = getSystemCoordinator();
-        
+
         if (selectedRequest != null) {
             CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
             updateSelectedRequestStatusWithBundleKey("actionRequestInvalidStatusCode");
@@ -416,19 +552,51 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void searchForProperties(ActionEvent ev) {
+        SearchCoordinator sc = getSearchCoordinator();
 
-        PropertyIntegrator pi = getPropertyIntegrator();
-//        try {
-//            propertyList = pi.searchForProperties(houseNumSearch, streetNameSearch, muniForPropSwitchSearch.getMuniCode());
-//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-//                    "Your search completed with " + propertyList.size() + " results", ""));
-//        } catch (IntegrationException ex) {
-//            System.out.println(ex);
-//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                     "Unable to complete a property search! Sorry!",
-//                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-//        }
+        propertyList = new ArrayList<>();
 
+        QueryProperty qp = null;
+
+        try {
+            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, getSessionBean().getSessUser().getMyCredential());
+
+            if (muniForPropSwitchSearch == null) {
+
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Please select a municipality first", ""));
+
+            } else if (qp != null && !qp.getParamsList().isEmpty()) {
+                SearchParamsProperty spp = qp.getPrimaryParams();
+                spp.setAddress_ctl(true);
+                spp.setAddress_val(houseNumSearch + " " + streetNameSearch);
+                spp.setMuni_ctl(true);
+                spp.setMuni_val(muniForPropSwitchSearch);
+                spp.setLimitResultCount_ctl(true);
+                spp.setLimitResultCount_val(20);
+
+                sc.runQuery(qp);
+
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Something when wrong with the property search! Sorry!", ""));
+            }
+
+        } catch (SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something when wrong with the property search! Sorry!", ""));
+        }
+
+        if (qp != null && !qp.getBOBResultList().isEmpty()) {
+            propertyList = qp.getBOBResultList();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Your search completed with " + getPropertyList().size() + " results", ""));
+        }
     }
 
     public void updateRequestProperty(ActionEvent ev) {
@@ -445,8 +613,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to change request property, sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+                    "Unable to change request property, sorry!",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
 
         StringBuilder sb = new StringBuilder();
@@ -480,8 +648,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to add property change note to public listing, sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+                    "Unable to add property change note to public listing, sorry!",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         // force table reload to show changes
         requestList = null;
@@ -506,8 +674,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to change requestor person",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+                    "Unable to change requestor person",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
     }
 
@@ -523,8 +691,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to add change public access code status",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+                    "Unable to add change public access code status",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
     }
 
@@ -543,12 +711,12 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         try {
             ceari.updateActionRequestNotes(selectedRequest);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                     "Done: added internal note to request ID " + selectedRequest.getRequestID(), ""));
+                    "Done: added internal note to request ID " + selectedRequest.getRequestID(), ""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to update notes, sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+                    "Unable to update notes, sorry!",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
 
     }
@@ -572,8 +740,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to update notes, sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+                    "Unable to update notes, sorry!",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
 
     }
@@ -597,16 +765,15 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to update notes, sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+                    "Unable to update notes, sorry!",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
 
     }
-    
-    public void deletePhoto(int blobID){
-        // TODO: remove entry from linker tbale for deleted photos
-        for(Integer bid : this.selectedRequest.getBlobIDList()){
-            if(bid.compareTo(blobID) == 0){
+
+    public void deletePhoto(int blobID) {
+        for (Integer bid : this.selectedRequest.getBlobIDList()) {
+            if (bid.compareTo(blobID) == 0) {
                 this.selectedRequest.getBlobIDList().remove(bid);
                 break;
             }
@@ -623,6 +790,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "You are now managing request ID: " + req.getRequestID(), ""));
         selectedRequest = req;
+        getSessionBean().setSessCEAR(req);
 
     }
 
@@ -660,7 +828,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Please select a request status from the drop-down box to proceed", ""));
+                            "Please select a request status from the drop-down box to proceed", ""));
 
         }
         // force a reload of request list
@@ -764,18 +932,16 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     /**
      * @return the caseListForSelectedProperty
      */
-    public ArrayList<CECaseDataHeavy> getCaseListForSelectedProperty() {
-        CaseIntegrator ci = getCaseIntegrator();
+    public List<CECase> getCaseListForSelectedProperty() {
+        CaseIntegrator ci = new CaseIntegrator();
         if (selectedRequest != null) {
 
-//            try {
-//                caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty());
-//                System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
-//            } catch (IntegrationException ex) {
-//                System.out.println(ex);
-//            } catch (BObStatusException ex) {
-//                System.out.println(ex);
-//            }
+            try {
+                caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty().getPropertyID());
+                System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+            }
         }
         return caseListForSelectedProperty;
     }
@@ -783,21 +949,21 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     /**
      * @param caseListForSelectedProperty the caseListForSelectedProperty to set
      */
-    public void setCaseListForSelectedProperty(ArrayList<CECaseDataHeavy> caseListForSelectedProperty) {
+    public void setCaseListForSelectedProperty(List<CECase> caseListForSelectedProperty) {
         this.caseListForSelectedProperty = caseListForSelectedProperty;
     }
 
     /**
      * @return the selectedCaseForAttachment
      */
-    public CECaseDataHeavy getSelectedCaseForAttachment() {
+    public CECase getSelectedCaseForAttachment() {
         return selectedCaseForAttachment;
     }
 
     /**
      * @param selectedCaseForAttachment the selectedCaseForAttachment to set
      */
-    public void setSelectedCaseForAttachment(CECaseDataHeavy selectedCaseForAttachment) {
+    public void setSelectedCaseForAttachment(CECase selectedCaseForAttachment) {
         this.selectedCaseForAttachment = selectedCaseForAttachment;
     }
 
@@ -981,7 +1147,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         this.selectedPersonForAttachment = selectedPersonForAttachment;
     }
 
-
     /**
      * @return the selectedQueryCEAR
      */
@@ -1042,7 +1207,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      * @return the requestReasonDonut
      */
     public DonutChartModel getRequestReasonDonut() {
-        if(requestReasonDonut == null){
+        if (requestReasonDonut == null) {
             requestReasonDonut = new DonutChartModel();
         }
         return requestReasonDonut;
@@ -1054,5 +1219,5 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void setRequestReasonDonut(DonutChartModel requestReasonDonut) {
         this.requestReasonDonut = requestReasonDonut;
     }
-
+    
 }

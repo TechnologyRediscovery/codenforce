@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -211,6 +212,30 @@ public  class           SearchParams
     }
 
     /**
+     * @return the date_start_val in Util date form.
+     */
+    public Date getDate_start_val_util() {
+        
+        Date dateStartUtilDate = null;
+        if(date_start_val != null){
+           dateStartUtilDate = Date.from(date_start_val.atZone(ZoneId.systemDefault()).toInstant());
+        }        
+        return dateStartUtilDate;
+    }
+
+    /**
+     * @return the date_end_val in Util date form.
+     */
+    public Date getDate_end_val_util() {
+        
+        Date dateEndUtilDate = null;
+        if(date_end_val != null){
+           dateEndUtilDate = Date.from(date_end_val.atZone(ZoneId.systemDefault()).toInstant());
+        }        
+        return dateEndUtilDate;
+    }
+    
+    /**
      * @param date_start_val the date_start_val to set
      */
     public void setDate_start_val(LocalDateTime date_start_val) {
@@ -222,6 +247,26 @@ public  class           SearchParams
      */
     public void setDate_end_val(LocalDateTime date_end_val) {
         this.date_end_val = date_end_val;
+    }
+    
+    /**
+     * @param dateStartUtil the date_start_val to set in Util date form
+     */
+    public void setDate_start_val_util(Date dateStartUtil) {
+        
+        if(dateStartUtil != null){
+        date_start_val = dateStartUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
+    /**
+     * @param dateEndUtil the date_end_val to set in Util date form
+     */
+    public void setDate_end_val_util(Date dateEndUtil) {
+        
+        if(dateEndUtil != null){
+        date_end_val = dateEndUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     /**

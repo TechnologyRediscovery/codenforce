@@ -337,8 +337,15 @@ public  class       OccPeriodDataHeavy
     /**
      * @return the applicationList
      */
-    public List getApplicationList() {
+    public List<OccPermitApplication> getApplicationList() {
         return applicationList;
+    }
+    
+        /**
+     * @param applicationList the applicationList to set
+     */
+    public void setApplicationList(List<OccPermitApplication> applicationList) {
+        this.applicationList = applicationList;
     }
 
 
@@ -368,13 +375,6 @@ public  class       OccPeriodDataHeavy
      */
     public List getBlobIDList() {
         return blobIDList;
-    }
-
-    /**
-     * @param applicationList the applicationList to set
-     */
-    public void setApplicationList(List<OccPermitApplication> applicationList) {
-        this.applicationList = applicationList;
     }
 
     /**
