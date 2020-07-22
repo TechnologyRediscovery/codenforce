@@ -427,7 +427,7 @@ public class    Property
     }
 
     /**
-     * @param landBankProspectIntensityClassID the landBankProspect to set
+     * @param ic
      */
     public void setLandBankProspect(IntensityClass ic) {
         this.landBankProspect = ic;

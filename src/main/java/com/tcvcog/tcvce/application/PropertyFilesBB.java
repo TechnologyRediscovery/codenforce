@@ -65,12 +65,16 @@ public class PropertyFilesBB
     }
     
     public void handleFileUpload(FileUploadEvent ev){
+        
+        try{
         Blob blob = getBlobCoordinator().getNewBlob();
         blob.setBytes(ev.getFile().getContents());
         blob.setType(BlobType.PHOTO); // TODO: BAD CHANGE THIS SOON
-        
-        // DO nothing because I'm moving on to other issues,
+         // DO nothing because I'm moving on to other issues,
         // need to be able to compile before I can do much in the way of testing
+        } catch (IntegrationException ex){
+            
+        }
     }
    
 

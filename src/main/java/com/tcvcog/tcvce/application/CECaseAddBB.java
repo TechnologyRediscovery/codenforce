@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.Property;
 import java.io.Serializable;
 import java.time.ZoneId;
@@ -62,20 +63,21 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable{
         CECase newCase;
         // check to see if we have an action request that needs to be connected
         // to this new case
-        CEActionRequest cear = getSessionBean().getCeactionRequestForSubmission();
+        CEActionRequest cear = getSessionBean().getSessCEAR();
         newCase = cc.initCECase(caseProperty, getSessionBean().getSessUser());
         newCase.setCaseName(formCaseName);
         newCase.setOriginationDate(formOriginationDate.toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         newCase.setNotes(formCaseNotes);
-        
+        newCase.setCasePhase(CasePhaseEnum.PrelimInvestigationPending);
         try {
             cc.insertNewCECase(newCase, getSessionBean().getSessUser(), cear);
             getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(newCase, getSessionBean().getSessUser()));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully added case to property! Access the case from the list below.", ""));
-            return "ceCases";
+            //Send them back to the last page!
+            return getSessionBean().getNavStack().popLastPage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -99,6 +101,10 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable{
         return "";
     }
 
+    public String cancelAdd(){
+        return getSessionBean().getNavStack().popLastPage();
+    }
+    
     /**
      * @return the formPropertyUnitID
      */

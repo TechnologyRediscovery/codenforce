@@ -27,7 +27,8 @@ target/
 ### Python ###
 # Created by https://www.gitignore.io/api/python
 # Byte-compiled / optimized / DLL files
-__pycache__/
+*__pycache__/
+
 *.py[cod]
 *$py.class
 
@@ -85,9 +86,6 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# PyBuilder
-target/
-
 # pyenv
 .python-version
 
@@ -104,3 +102,6 @@ dmypy.json
 
 # Text editors
 .idea
+
+# Script specific files
+*_parcelids.json

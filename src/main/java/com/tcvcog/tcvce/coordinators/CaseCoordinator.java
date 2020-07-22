@@ -37,13 +37,13 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -278,7 +278,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public List<CECasePropertyUnitHeavy> assembleCECasePropertyUnitHeavyList(List<CECase> cseList) {
         
         List<CECasePropertyUnitHeavy> cspudhList = new ArrayList<>();
+        
         if (cseList != null && !cseList.isEmpty()) {
+            if(getSessionBean().getSessUser() !=null){
+            
             for (CECase cse : cseList) {
                 try {
                     cspudhList.add(assembleCECasePropertyUnitHeavy(cse));
@@ -287,10 +290,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                     
                 }
             }
+            } else{
+                //This session must be public
+                UserCoordinator uc = getUserCoordinator();
+                for (CECase cse : cseList) {
+                cspudhList.add(assembleCECasePropertyUnitHeavy(cse, uc.getPublicUserAuthorized().getMyCredential()));
+            }
+            }
+            
+            
         }
+        
+        
         return cspudhList;
     }
-    
     
     /**
      * Asks the Integrator for an icon based on case phase
@@ -532,6 +545,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
             originationEvent.setUserCreator(uc.getUser(ua.getUserID()));
             
+            cedh.setCaseID(freshID);
+            
             ec.addEvent(originationEvent, cedh, ua);
     }
     
@@ -706,6 +721,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * in the system.
      * 
      * @param messagerPhone a simple String rendering of whatever the user types in. Length validation only.
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.EventException
      */
     public void attachPublicMessage(int caseID, String msg, String messagerName, String messagerPhone) throws IntegrationException, BObStatusException, EventException {
         StringBuilder sb = new StringBuilder();
@@ -1145,8 +1163,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         System.out.println("CaseCoordinator.getNewActionRequest");
         CEActionRequest cear = new CEActionRequest();
         // start by writing in the current date
-        cear.setDateOfRecordUtilDate(
-                java.util.Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
+        cear.setDateOfRecord(LocalDateTime.now());
 
         return new CEActionRequest();
 
@@ -1188,7 +1205,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
        return false;
    }
    
-     
+    public List<CEActionRequestIssueType> getIssueTypes(Municipality muni) throws IntegrationException{
+        
+        List<CEActionRequestIssueType> typeList = new ArrayList();
+        
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        
+        typeList = ceari.getRequestIssueTypeList(muni);
+        
+        return typeList;
+        
+    }
+    
    
     // *************************************************************************
     // *                     VIOLATIONS                                        *

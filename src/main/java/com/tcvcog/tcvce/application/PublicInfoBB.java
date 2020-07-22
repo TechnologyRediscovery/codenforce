@@ -6,7 +6,9 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
@@ -34,6 +36,10 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
     public PublicInfoBB() {
     }
     
+    public void initBean(){
+        
+    }
+    
     public void submitPACC(ActionEvent ae){
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
         try {
@@ -50,10 +56,13 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
                 publicInfoBundleList = null;
             }
         } catch (IntegrationException ex) {
-              getFacesContext().addMessage(null,
+            System.out.println(ex);  
+            getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to search for info bundles, sorry!", "This is a system error."));
-        } catch (BObStatusException | SearchException ex) {
+        } catch (SearchException | EventException | AuthorizationException ex) {
             System.out.println(ex);
+        } catch (BObStatusException ex){
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
         
     }

@@ -38,6 +38,7 @@ public class OccPermitApplication {
     private PropertyUnit applicationPropertyUnit;
     private Person applicantPerson;
     private Person preferredContact;
+    private OccPeriod connectedPeriod;
     
     /**
     * This will contain either existing Person objects, new Person objects created by user, or 
@@ -177,6 +178,14 @@ public class OccPermitApplication {
      */
     public void setPreferredContact(Person preferredContact) {
         this.preferredContact = preferredContact;
+    }
+
+    public OccPeriod getConnectedPeriod() {
+        return connectedPeriod;
+    }
+
+    public void setConnectedPeriod(OccPeriod connectedPeriod) {
+        this.connectedPeriod = connectedPeriod;
     }
 
 }

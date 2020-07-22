@@ -191,7 +191,6 @@ public class    SessionBean
     /* *** Code Enf Action Request Session Shelves ***  */
     private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
-    private CEActionRequest ceactionRequestForSubmission;
     
     // --- QUERY CEAR ---
     private QueryCEAR queryCEAR;
@@ -201,15 +200,19 @@ public class    SessionBean
     /* >>>                     VIV OccApp                                 <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
+    //Fields used both externally and internally
     private OccPermitApplication sessOccPermitApplication;
-    
-    private Property occPermitAppActiveProp;
-    private Property occPermitAppWorkingProp;
-    private PropertyUnit occPermitAppActivePropUnit;
     private PersonType occPermitAppActivePersonType;
-    
     private OccPermitApplicationReason occPermitApplicationReason;
-
+    
+    //Fields used externally
+    private PublicInfoBundleProperty occPermitAppActiveProp;
+    private PublicInfoBundleProperty occPermitAppWorkingProp;
+    private PublicInfoBundlePropertyUnit occPermitAppActivePropUnit;
+    private List<PublicInfoBundlePerson> occPermitAttachedPersons;
+    private PublicInfoBundlePerson occPermitApplicant;
+    private PublicInfoBundlePerson occPermitPreferredContact;
+    
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                        X Payment                               <<< */
     /* >>> -------------------------------------------------------------- <<< */
@@ -575,23 +578,6 @@ public class    SessionBean
     }
 
     /**
-     * @return the ceactionRequestForSubmission
-     */
-    public CEActionRequest getCeactionRequestForSubmission() {
-        return ceactionRequestForSubmission;
-    }
-
-    /**
-     * @param ceactionRequestForSubmission the ceactionRequestForSubmission to set
-     */
-    public void setCeactionRequestForSubmission(CEActionRequest ceactionRequestForSubmission) {
-        this.ceactionRequestForSubmission = ceactionRequestForSubmission;
-    }
-
-  
-   
-
-    /**
      * @return the sessCEAR
      */
     public CEActionRequest getSessCEAR() {
@@ -890,42 +876,42 @@ public class    SessionBean
     /**
      * @return the occPermitAppActiveProp
      */
-    public Property getOccPermitAppActiveProp() {
+    public PublicInfoBundleProperty getOccPermitAppActiveProp() {
         return occPermitAppActiveProp;
     }
 
     /**
      * @return the occPermitAppWorkingProp
      */
-    public Property getOccPermitAppWorkingProp() {
+    public PublicInfoBundleProperty getOccPermitAppWorkingProp() {
         return occPermitAppWorkingProp;
     }
 
     /**
      * @param activeProp the occPermitAppActiveProp to set
      */
-    public void setOccPermitAppActiveProp(Property activeProp) {
+    public void setOccPermitAppActiveProp(PublicInfoBundleProperty activeProp) {
         this.occPermitAppActiveProp = activeProp;
     }
 
     /**
      * @param workingProp the occPermitAppWorkingProp to set
      */
-    public void setOccPermitAppWorkingProp(Property workingProp) {
+    public void setOccPermitAppWorkingProp(PublicInfoBundleProperty workingProp) {
         this.occPermitAppWorkingProp = workingProp;
     }
 
     /**
      * @return the occPermitAppActivePropUnit
      */
-    public PropertyUnit getOccPermitAppActivePropUnit() {
+    public PublicInfoBundlePropertyUnit getOccPermitAppActivePropUnit() {
         return occPermitAppActivePropUnit;
     }
 
     /**
      * @param occPermitAppActivePropUnit the occPermitAppActivePropUnit to set
      */
-    public void setOccPermitAppActivePropUnit(PropertyUnit occPermitAppActivePropUnit) {
+    public void setOccPermitAppActivePropUnit(PublicInfoBundlePropertyUnit occPermitAppActivePropUnit) {
         this.occPermitAppActivePropUnit = occPermitAppActivePropUnit;
     }
 
@@ -1393,5 +1379,28 @@ public class    SessionBean
         this.startPropInfoPageWithAdd = startPropInfoPageWithAdd;
     }
     
+    public List<PublicInfoBundlePerson> getOccPermitAttachedPersons() {
+        return occPermitAttachedPersons;
+    }
+
+    public void setOccPermitAttachedPersons(List<PublicInfoBundlePerson> occPermitAttachedPersons) {
+        this.occPermitAttachedPersons = occPermitAttachedPersons;
+    }
+
+    public PublicInfoBundlePerson getOccPermitApplicant() {
+        return occPermitApplicant;
+    }
+
+    public void setOccPermitApplicant(PublicInfoBundlePerson occPermitApplicant) {
+        this.occPermitApplicant = occPermitApplicant;
+    }
+
+    public PublicInfoBundlePerson getOccPermitPreferredContact() {
+        return occPermitPreferredContact;
+    }
+
+    public void setOccPermitPreferredContact(PublicInfoBundlePerson occPermitPreferredContact) {
+        this.occPermitPreferredContact = occPermitPreferredContact;
+    }
     
 }

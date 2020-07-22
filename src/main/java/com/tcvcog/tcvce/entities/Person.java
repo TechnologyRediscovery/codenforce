@@ -62,7 +62,7 @@ public  class       Person
     protected String firstName;
     protected String lastName;
     
-    // frist, middle initial, and last all in lastName
+    // first, middle initial, and last all in lastName
     protected boolean compositeLastName;
     protected boolean businessEntity;
     

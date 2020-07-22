@@ -138,70 +138,18 @@ public class PropertyUnitsBB
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
 
-        boolean missingUnitNum = false;
-
-        boolean duplicateUnitNum = false;//a flag to see if there is more than 1 of  Unit Number.
-
-        boolean badUnitNum = false; //an unusable unit number was entered
-
-        int duplicateNums = 0;//The int to the left stores how many of a given number the loop below finds.
-
-        for (PropertyUnit firstUnit : unitDisplayList) {
-            duplicateNums = 0;
-
-            // remove any use of the word "unit" in a unit identifier
-            firstUnit.setUnitNumber(firstUnit.getUnitNumber().replaceAll("(?i)unit", ""));
-
-            if (firstUnit.getUnitNumber().compareTo("") == 0) {
-                missingUnitNum = true;
-                break; //break for performance reasons. Can be removed if breaks are not welcome here.
-            }
-
-            for (PropertyUnit secondUnit : unitDisplayList) {
-                if (firstUnit.getUnitNumber().compareTo(secondUnit.getUnitNumber()) == 0) {
-                    duplicateNums++;
-                }
-            }
-
-            if (duplicateNums > 1) {
-                duplicateUnitNum = true;
-                break; //break for performance reasons. Can be removed if breaks are not welcome here.
-            }
-
-            if (firstUnit.getUnitNumber().compareTo("-1") == 0) {
-                if (firstUnit.getNotes() == null || firstUnit.getNotes().compareTo("robot-generated unit representing the primary habitable dwelling on a property") != 0) {
-                    getFacesContext().addMessage(null,
+        boolean badUnit = false;
+        
+        try {
+            pc.sanitizePropertyUnitList(unitDisplayList);
+        } catch (BObStatusException ex){
+           getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "The unit number -1 is used for default property units. Please use another number or \'-[space]1\'.", ""));
-                    badUnitNum = true;
-                    break;
-                }
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Please change the robot-generated unit to something more meaningful.", ""));
-                badUnitNum = true;
-                break;
-
-            }
-
+                                    ex.toString(), "")); 
+           badUnit = true;
         }
-
-        if (unitDisplayList.isEmpty()) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please add at least one unit.", ""));
-
-        } else if (missingUnitNum) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "All units must have a Unit Number", ""));
-
-        } else if (duplicateUnitNum) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Some Units have the same Number", ""));
-
-        } else if (!badUnitNum) {
+        
+         if (!badUnit) {
 
             getCurrProp().setUnitList(unitDisplayList);
 

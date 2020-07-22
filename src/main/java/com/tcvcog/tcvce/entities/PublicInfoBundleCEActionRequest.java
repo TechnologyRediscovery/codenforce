@@ -5,13 +5,11 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
-
 /**
  * 
  * @author sylvia
  */
-public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements Serializable {
+public class PublicInfoBundleCEActionRequest extends PublicInfoBundle {
     
     //************************************************
     //*******Action request case public data********
@@ -20,21 +18,16 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
     private CEActionRequest bundledRequest;
     private PublicInfoBundlePerson requestor;
     private PublicInfoBundleProperty requestProperty;
-    
 
+    public CEActionRequest getBundledRequest() {
+        return bundledRequest;
+    }
+    
     public void setBundledRequest(CEActionRequest input) {
         
         setMuni(input.getMuni());
         setPacc(input.getRequestPublicCC());
         setAddressAssociated(!input.getNotAtAddress());
-        if (input.getNotAtAddress() || 
-                    input.getRequestProperty() == null || 
-                    input.getRequestProperty().isNonAddressable()) {
-                setAddressAssociated(false);
-            } else {
-                setAddressAssociated(true);
-                setPropertyAddress(input.getRequestProperty().getAddress());
-            }
         
         input.setRequestor(new Person());
         
@@ -45,10 +38,6 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         input.setMuniNotes("*****");
         
         bundledRequest = input;
-    }
-
-    public CEActionRequest getBundledRequest() {
-        return bundledRequest;
     }
     
     @Override
@@ -68,8 +57,10 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         return requestProperty;
     }
 
-    public void setRequestProperty(PublicInfoBundleProperty requestProperty) {
-        this.requestProperty = requestProperty;
+    public void setRequestProperty(PublicInfoBundleProperty input) {
+        setAddressAssociated(input.isAddressAssociated());
+        setPropertyAddress(input.getPropertyAddress());
+        requestProperty = input;
     }
     
 }
