@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -38,6 +39,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import java.io.Serializable;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
@@ -888,7 +891,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             CaseCoordinator cc = getCaseCoordinator();
 
             try {
-                currentCase = cc.assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser().getMyCredential());
+                currentCase = cc.assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser());
             } catch (BObStatusException | SearchException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -933,7 +936,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
 
         try {
-            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
+            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
 
         } catch (BObStatusException | SearchException ex) {
             getFacesContext().addMessage(null,
@@ -1162,8 +1165,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @return
      */
     public String getCECaseAddress() {
-
-        return currentCase.getProperty().getAddress();
+        
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            return cc.assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddress();
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println(ex);
+        }
+        return null;
 
     }
 

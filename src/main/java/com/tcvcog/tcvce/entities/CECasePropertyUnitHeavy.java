@@ -22,19 +22,19 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- *
- * @author sylvia
+ * Data container object for a CECase that also contains a 
+ * Property object and potentially a PropertyUnit object (CECases are not
+ * directly attached to PropertyUnit objects yet)
+ * 
+ * @author Ellen Bascomb (Apartment 31Y)
  */
 public class CECasePropertyUnitHeavy
         extends CECase {
 
     protected Property property;
     protected PropertyUnit propUnit;
-    protected boolean showHiddenEvents;
-    protected boolean showInactiveEvents;
-    protected List<EventCnF> eventList;
-    protected List<EventCnF> completeEventList;
-
+    
+    
     public CECasePropertyUnitHeavy(CECase cse) {
         this.caseID = cse.caseID;
         this.publicControlCode = cse.publicControlCode;
@@ -100,106 +100,6 @@ public class CECasePropertyUnitHeavy
         this.propUnit = propUnit;
     }
 
-    /**
-     * Implements logic to check each event for hidden status and inactive
-     * status and based on the value of the showHiddenEvents and
-     * showInactiveEvents flags, add the event from the complete list to the
-     * visible list
-     *
-     * @return the visibleEventList
-     */
-    public List<EventCnF> getVisibleEventList() {
-        List<EventCnF> visEventList = new ArrayList<>();
-        for (EventCnF ev : completeEventList) {
-            if (!ev.isActive() && !showInactiveEvents) {
-                continue;
-            }
-            if (ev.isHidden() && !showHiddenEvents) {
-                continue;
-            }
-            visEventList.add(ev);
-        } // close for   
-        return visEventList;
-    }
-
-    /**
-     * @return the activeEventList
-     */
-    public List<EventCnF> getActiveEventList() {
-        List<EventCnF> actEvList = new ArrayList<>();
-        Iterator<EventCnF> iter = completeEventList.iterator();
-        while (iter.hasNext()) {
-            EventCnF ev = iter.next();
-            if (ev.isActive()) {
-                actEvList.add(ev);
-            }
-        }
-        return actEvList;
-    }
-    
-    public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
-        List<EventCnF> visEventList = new ArrayList<>();
-        if (eventList != null) {
-            for (EventCnF ev : eventList) {
-                switch (voahle) {
-                    case VIEW_ACTIVE_HIDDEN:
-                        if (ev.isActive()
-                                && ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ACTIVE_NOTHIDDEN:
-                        if (ev.isActive()
-                                && !ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ALL:
-                        visEventList.add(ev);
-                        break;
-                    case VIEW_INACTIVE:
-                        if (!ev.isActive()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    default:
-                        visEventList.add(ev);
-                } // close switch
-            } // close for   
-        } // close null check
-        return visEventList;
-    }
-
-    public boolean isShowHiddenEvents() {
-        return showHiddenEvents;
-    }
-
-    public void setShowHiddenEvents(boolean showHiddenEvents) {
-        this.showHiddenEvents = showHiddenEvents;
-    }
-
-    public boolean isShowInactiveEvents() {
-        return showInactiveEvents;
-    }
-
-    public void setShowInactiveEvents(boolean showInactiveEvents) {
-        this.showInactiveEvents = showInactiveEvents;
-    }
-
-    public List<EventCnF> getCompleteEventList() {
-        return completeEventList;
-    }
-
-    public void setCompleteEventList(List<EventCnF> completeEventList) {
-        this.completeEventList = completeEventList;
-    }
-
-    public List<EventCnF> getEventList() {
-        return eventList;
-    }
-
-    public void setEventList(List<EventCnF> eventList) {
-        this.eventList = eventList;
-    }
+   
 
 }

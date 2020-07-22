@@ -115,7 +115,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(ev.getDomain() == EventDomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
             edh.setPeriod(oc.getOccPeriodPropertyUnitHeavy(edh.getOccPeriodID()));
         } else if(ev.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
-            edh.setCecase(cc.assembleCECasePropertyUnitHeavy(cc.getCECase(edh.getCeCaseID()), getSessionBean().getSessUser().getMyCredential()));
+            edh.setCecase(cc.assembleCECasePropertyUnitHeavy(cc.getCECase(edh.getCeCaseID())));
             // note that a Property object is already inside our CECase base class
         } else {
             throw new EventException("Cannot build data heavy event");

@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
 import com.tcvcog.tcvce.domain.SessionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
@@ -222,13 +223,13 @@ public  class       SessionInitializer
                             initSubsystem_N_User(ua, ss);
                             break;
                         case I_MUNICIPALITY:
-                            initSubsystem_I_Municipality(cred, ss);
+                            initSubsystem_I_Municipality(ua, ss);
                             break;
                         case II_CODEBOOK:
                             initSubsystem_II_CodeBook(cred, ss, sb.getSessMuni());
                             break;
                         case III_PROPERTY:
-                            initSubsystem_III_Property(cred, ss);
+                            initSubsystem_III_Property(ua, ss);
                             break;
                         case IV_PERSON:
                             initSubsystem_IV_Person(cred, ss);
@@ -240,7 +241,7 @@ public  class       SessionInitializer
                             initSubsystem_VI_OccPeriod(cred, ss, sb.getSessMuni());
                             break;
                         case VII_CECASE:
-                            initSubsystem_VII_CECase(cred, ss);
+                            initSubsystem_VII_CECase(ua, ss);
                             break;
                         case VIII_CEACTIONREQ:
                             initSubsystem_VIII_CEActionRequest(cred, ss);
@@ -381,12 +382,12 @@ public  class       SessionInitializer
      * @param ss under current configuration
      * @throws SessionException for all initialization issues
      */
-    private void initSubsystem_I_Municipality(Credential cred, SubSysEnum ss) throws SessionException{
+    private void initSubsystem_I_Municipality(UserAuthorized ua, SubSysEnum ss) throws SessionException{
         MunicipalityCoordinator mc = getMuniCoordinator();
         
         MunicipalityDataHeavy muniHeavy;
         try {
-            muniHeavy = mc.assembleMuniDataHeavy(cred.getGoverningAuthPeriod().getMuni(), cred);
+            muniHeavy = mc.assembleMuniDataHeavy(ua.getMyCredential().getGoverningAuthPeriod().getMuni(), ua);
         } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
             System.out.println(ex);
             throw new SessionException("Error creating muni data heavy", ex, ss, ExceptionSeverityEnum.SESSION_FATAL);
@@ -431,7 +432,7 @@ public  class       SessionInitializer
      * @param ss under current configuration
      * @throws SessionException for all initialization issues
      */  
-    private void initSubsystem_III_Property(Credential cred, SubSysEnum ss) throws SessionException{
+    private void initSubsystem_III_Property(UserAuthorized ua, SubSysEnum ss) throws SessionException{
         PropertyCoordinator pc = getPropertyCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         SessionBean sessBean = getSessionBean();
@@ -443,12 +444,12 @@ public  class       SessionInitializer
 //            sessBean.setSessPropertyList(pc.assemblePropertyHistoryList(cred));
             
             if(sessBean.getSessPropertyList() == null || sessBean.getSessPropertyList().isEmpty()){
-                sessBean.setSessProperty(pc.selectDefaultProperty(cred));
+                sessBean.setSessProperty(pc.selectDefaultProperty(ua));
             } else {
 //                sessBean.setSessProperty(pc.assemblePropertyDataHeavy(sessBean.getSessPropertyList().get(0), cred));
             }
         
-            sessBean.setQueryPropertyList(sc.buildQueryPropertyList(cred));
+            sessBean.setQueryPropertyList(sc.buildQueryPropertyList(ua.getKeyCard()));
             
             if(!sessBean.getQueryPropertyList().isEmpty()){
                 sessBean.setQueryProperty(sessBean.getQueryPropertyList().get(0));
@@ -582,17 +583,19 @@ public  class       SessionInitializer
      * @param ss under current configuration
      * @throws SessionException for all initialization issues
      */
-    private void initSubsystem_VII_CECase(Credential cred, SubSysEnum ss) throws SessionException{
+    private void initSubsystem_VII_CECase(UserAuthorized ua, SubSysEnum ss) throws SessionException{
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         
         try {
+            List<CECase> hist = cc.getCECaseHistory(ua);
             // NEXT LINE: YUCK!!!!!!!!
-            sb.setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(cc.assembleCECaseDataHeavyList(cc.assembleCaseHistory(cred),cred),cred));
+            sb.setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(hist));
+            
             if(sb.getSessCECaseList().isEmpty()){
-                sb.setSessCECase(cc.assembleCECaseDataHeavy(cc.selectDefaultCECase(cred), cred));
+                sb.setSessCECase(cc.assembleCECaseDataHeavy(cc.selectDefaultCECase(ua), ua));
             } else {
-                sb.setSessCECase(cc.assembleCECaseDataHeavy(sb.getSessCECaseList().get(0), cred));
+                sb.setSessCECase(cc.assembleCECaseDataHeavy(sb.getSessCECaseList().get(0), ua));
             }
             
         } catch (IntegrationException | BObStatusException | SearchException ex) {
@@ -600,7 +603,7 @@ public  class       SessionInitializer
             throw new SessionException("Error assembling session CECase list from history", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
         }
 
-        sb.setQueryCECaseList(sc.buildQueryCECaseList(cred));
+        sb.setQueryCECaseList(sc.buildQueryCECaseList(ua.getKeyCard()));
         if(sb.getQueryCECaseList() != null && !sb.getQueryCECaseList().isEmpty()){
             sb.setQueryCECase(sb.getQueryCECaseList().get(0));
         }

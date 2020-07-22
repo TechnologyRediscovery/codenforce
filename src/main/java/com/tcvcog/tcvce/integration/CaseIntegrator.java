@@ -365,7 +365,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             cse.setLastUpdatedBy(uc.getUser(rs.getInt("lastupdatedby_userid")));
         }
         
-        if(rs.getTimestamp("lastudpatedts") != null){
+        if(rs.getTimestamp("lastupdatedts") != null){
             cse.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
         }
         
@@ -542,8 +542,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
             stmt.setInt(2, ceCase.getPropertyID());
-            if(ceCase.getPropUnit() != null){
-                stmt.setInt(3, ceCase.getPropUnit().getPropertyID());
+            if(ceCase.getPropertyUnitID() != 0){
+                stmt.setInt(3, ceCase.getPropertyUnitID());
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }

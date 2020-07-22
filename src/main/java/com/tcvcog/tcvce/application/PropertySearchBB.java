@@ -234,7 +234,7 @@ public class PropertySearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
         
         try {
-            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessUser().getMyCredential()));
+            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessUser()));
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Managing property at " + prop.getAddress() , ""));

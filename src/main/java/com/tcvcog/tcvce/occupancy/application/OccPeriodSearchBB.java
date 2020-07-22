@@ -129,7 +129,7 @@ public  class   OccPeriodSearchBB
         
         try {
             getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, cred));
-            getSessionBean().setSessProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), cred));
+            getSessionBean().setSessProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), getSessionBean().getSessUser()));
             sc.logObjectView(getSessionBean().getSessUser(), op);
         } catch (IntegrationException | BObStatusException | AuthorizationException | EventException | SearchException ex) {
             System.out.println(ex);

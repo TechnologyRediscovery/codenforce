@@ -120,9 +120,16 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return infoBundleList;
     }
 
+    /**
+     * NADGIT is this deprecated?
+     * @param cse
+     * @return
+     * @throws IntegrationException
+     * @throws SearchException 
+     */
     private PublicInfoBundleCECase extractPublicInfo(CECase cse) throws IntegrationException, SearchException {
         CaseCoordinator cc = getCaseCoordinator();
-        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse, getSessionBean().getSessUser().getMyCredential());
+        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse);
 
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
 
@@ -137,12 +144,14 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 pib.setAddressAssociated(true);
                 pib.setPropertyAddress(c.getProperty().getAddress());
             }
-            pib.setPublicEventList(new ArrayList<EventCnF>());
-            for (EventCnF ev : c.getVisibleEventList()) {
-                if (ev.getCategory().getUserRankMinimumToView() >= PUBLIC_VIEW_USER_RANK) {
-                    pib.getPublicEventList().add(ev);
-                }
-            }
+            
+            // TODO: Deal with these implications
+//            pib.setPublicEventList(new ArrayList<EventCnF>());
+//            for (EventCnF ev : c.getVisibleEventList()) {
+//                if (ev.getCategory().getUserRankMinimumToView() >= PUBLIC_VIEW_USER_RANK) {
+//                    pib.getPublicEventList().add(ev);
+//                }
+//            }
 
             pib.setShowAddMessageButton(false);
             pib.setPaccStatusMessage("Public access enabled");

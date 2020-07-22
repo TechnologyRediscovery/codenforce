@@ -36,6 +36,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -75,7 +77,11 @@ public class CECaseSearchBB
         SearchCoordinator sc = getSearchCoordinator();
 
         SessionBean sb = getSessionBean();
-        currentCase = (sb.getSessCECase());
+        try {
+            currentCase = (cc.assembleCECasePropertyUnitHeavy((CECase) sb.getSessCECase()));
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println(ex);
+        }
 
         queryList = sc.buildQueryCECaseList(getSessionBean().getSessUser().getMyCredential());
         querySelected = getSessionBean().getQueryCECase();
@@ -129,11 +135,9 @@ public class CECaseSearchBB
 
             getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(
                     currentCase,
-                    getSessionBean().getSessUser().getMyCredential()));
+                    getSessionBean().getSessUser()));
 
-            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(
-                    cc.assembleCECasePropertyUnitHeavy(c, getSessionBean().getSessUser().getMyCredential()).getProperty(),
-                    getSessionBean().getSessUser().getMyCredential()));
+            getSessionBean().setSessionProperty(currentCase.getProperty());
 
         } catch (BObStatusException | SearchException ex) {
             getFacesContext().addMessage(null,
@@ -211,8 +215,7 @@ public class CECaseSearchBB
     public void loadCECaseHistory(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            Credential cred = getSessionBean().getSessUser().getMyCredential();
-            caseList.addAll(cc.assembleCECaseDataHeavyList(cc.assembleCaseHistory(cred), cred));
+            caseList.addAll(cc.assembleCECasePropertyUnitHeavyList(cc.getCECaseHistory(getSessionBean().getSessUser())));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Case history loaded", ""));
@@ -242,7 +245,6 @@ public class CECaseSearchBB
     /**
      * Listener method for changes in selected query objects
      *
-     * @param ev
      */
     public void changeQuerySelected() {
         configureParameters();
@@ -340,7 +342,7 @@ public class CECaseSearchBB
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECaseDataHeavy currentCase) {
+    public void setCurrentCase(CECasePropertyUnitHeavy currentCase) {
         this.currentCase = currentCase;
     }
 

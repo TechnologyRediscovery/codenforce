@@ -224,7 +224,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public String onAddNoteButtonChange(){
         EventCoordinator ec = getEventCoordinator();
          
-        EventCnF ev = ec.initEvent(, ec);
+//        EventCnF ev = ec.initEvent(, ec);
         
         return "eventAdd";
         
@@ -243,9 +243,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         
         if(currentProperty != null && currentProperty.getPropInfoCaseList() != null){
-            getSessionBean().setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(
-                                currentProperty.getPropInfoCaseList(), 
-                                getSessionBean().getSessUser().getKeyCard()));
+            getSessionBean().setSessCECaseListWithDowncastAndLookup(currentProperty.getPropInfoCaseList());
         }
         
         return "ceCaseSearch";
@@ -345,7 +343,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         int newID = 0;
         try {
             newID = pc.addProperty(currentProperty, getSessionBean().getSessUser());
-            getSessionBean().setSessProperty(pc.getPropertyDataHeavy(newID, getSessionBean().getSessUser().getMyCredential()));
+            getSessionBean().setSessProperty(pc.getPropertyDataHeavy(newID, getSessionBean().getSessUser()));
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Successfully added property with ID: " + currentProperty.getPropertyID()
@@ -364,7 +362,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         try {
 //            currentProperty.setAbandonedDateStart(pc.configureDateTime(currentProperty.getAbandonedDateStart().to));
             pc.editProperty(currentProperty, getSessionBean().getSessUser());
-            currentProperty = pc.getPropertyDataHeavy(currentProperty.getPropertyID(), getSessionBean().getSessUser().getKeyCard());
+            currentProperty = pc.getPropertyDataHeavy(currentProperty.getPropertyID(), getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Successfully updated property with ID " + getCurrentProperty().getPropertyID() 
@@ -420,7 +418,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         if(cse != null){
             
             try {
-                getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(cse, getSessionBean().getSessUser().getKeyCard()));
+                getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(cse, getSessionBean().getSessUser()));
             } catch (BObStatusException | IntegrationException | SearchException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,

@@ -100,7 +100,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         
         try {
-             cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase);
+             cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase, getSessionBean().getSessUser());
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
@@ -138,7 +138,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         
         try {
-             currentViolation.setViolationID(cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase));
+             currentViolation.setViolationID(cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase, getSessionBean().getSessUser()));
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
