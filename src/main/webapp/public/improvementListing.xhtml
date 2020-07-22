@@ -66,12 +66,12 @@
                                         <h:outputText value="#{ticket.suggestionID}"/>
                                 </p:column>
                                 
-                                <p:column width="10%" sortBy="#{ticket.submitter.LName}"
-                                          filterBy="#{ticket.submitter.LName}">
+                                <p:column width="10%" sortBy="#{ticket.submitter.person.lastName}"
+                                          filterBy="#{ticket.submitter.person.lastName}">
                                     <f:facet name="header">
                                         <h:outputText value="Submitter" />
                                     </f:facet>
-                                    <h:outputText value="#{ticket.submitter.LName}"/>
+                                    <h:outputText value="#{ticket.submitter.person.lastName}"/>
                                 </p:column>
                                 
                                 <p:column width="10%" sortBy="#{ticket.prettySubmissionTimeStamp}"

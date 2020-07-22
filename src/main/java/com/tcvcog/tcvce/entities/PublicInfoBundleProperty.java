@@ -17,26 +17,37 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundleProperty extends PublicInfoBundle implements Serializable {
+public class PublicInfoBundleProperty extends PublicInfoBundle {
     
     private Property bundledProperty;
+    private List<PublicInfoBundlePropertyUnit> unitList;
 
+    public PublicInfoBundleProperty() {
+    }
+    
+    @Override
+    public String toString(){
+        
+        return this.getClass().getName() + bundledProperty.getPropertyID();
+    }
+
+    public Property getBundledProperty() {
+        return bundledProperty;
+    }
+    
     public void setBundledProperty(Property input) {
         
         
         setMuni(input.getMuni());
-        setAddressAssociated(!input.isNonAddressable());
-        if(isAddressAssociated()){
-        setPropertyAddress(input.getAddress());
-        }
+        setAddress(input);
         
         input.setMuniCode(0);
         input.setNotes("*****");
@@ -74,15 +85,13 @@ public class PublicInfoBundleProperty extends PublicInfoBundle implements Serial
         
         bundledProperty = input;
     }
-    
-    @Override
-    public String toString(){
-        
-        return this.getClass().getName() + bundledProperty.getPropertyID();
+
+    public List<PublicInfoBundlePropertyUnit> getUnitList() {
+        return unitList;
     }
 
-    public Property getBundledProperty() {
-        return bundledProperty;
+    public void setUnitList(List<PublicInfoBundlePropertyUnit> unitList) {
+        this.unitList = unitList;
     }
     
 }

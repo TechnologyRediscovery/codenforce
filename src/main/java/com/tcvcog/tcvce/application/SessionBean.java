@@ -17,6 +17,11 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.*;
 import com.tcvcog.tcvce.entities.search.*;
@@ -24,6 +29,8 @@ import com.tcvcog.tcvce.entities.occupancy.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -83,9 +90,29 @@ public class    SessionBean
     
     private PropertyUnit sessPropertyUnit;
     
+    private boolean startPropInfoPageWithAdd;
+    
     /* >>> QUERY PROPERTY <<< */
     private QueryProperty queryProperty;
     private List<QueryProperty> queryPropertyList;
+    
+    public void setSessionProperty(int propID) throws BObStatusException, IntegrationException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(propID == 0){
+            throw new BObStatusException("Prop ID cannot be 0");
+        }
+        pc.getProperty(propID);
+    }
+    
+    public void setSessionProperty(Property prop){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            sessProperty = pc.assemblePropertyDataHeavy(prop, sessUser);
+        } catch (BObStatusException | IntegrationException | SearchException ex) {
+            System.out.println("SessionBean.setSessionProperty: error setting session prop");
+            System.out.println(ex);
+        }
+    }
     
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -164,7 +191,6 @@ public class    SessionBean
     /* *** Code Enf Action Request Session Shelves ***  */
     private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
-    private CEActionRequest ceactionRequestForSubmission;
     
     // --- QUERY CEAR ---
     private QueryCEAR queryCEAR;
@@ -174,15 +200,19 @@ public class    SessionBean
     /* >>>                     VIV OccApp                                 <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
+    //Fields used both externally and internally
     private OccPermitApplication sessOccPermitApplication;
-    
-    private Property occPermitAppActiveProp;
-    private Property occPermitAppWorkingProp;
-    private PropertyUnit occPermitAppActivePropUnit;
     private PersonType occPermitAppActivePersonType;
-    
     private OccPermitApplicationReason occPermitApplicationReason;
-
+    
+    //Fields used externally
+    private PublicInfoBundleProperty occPermitAppActiveProp;
+    private PublicInfoBundleProperty occPermitAppWorkingProp;
+    private PublicInfoBundlePropertyUnit occPermitAppActivePropUnit;
+    private List<PublicInfoBundlePerson> occPermitAttachedPersons;
+    private PublicInfoBundlePerson occPermitApplicant;
+    private PublicInfoBundlePerson occPermitPreferredContact;
+    
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                        X Payment                               <<< */
     /* >>> -------------------------------------------------------------- <<< */
@@ -524,30 +554,28 @@ public class    SessionBean
         }
     }
     
-
+    public void setSessCECaseListWithDowncastAndLookup(List<CECaseDataHeavy> cseldh){
+        CaseCoordinator cc = getCaseCoordinator();
+        List<CECasePropertyUnitHeavy> cseListPDH = new ArrayList<>();
+        if(cseldh != null && !cseldh.isEmpty()){
+            for(CECaseDataHeavy csedh: cseldh){
+                try {
+                    cseListPDH.add(cc.assembleCECasePropertyUnitHeavy(csedh));
+                } catch (IntegrationException | SearchException ex) {
+                    System.out.println(ex);
+                }
+            }
+            sessCECaseList = cseListPDH;
+        }
+        
+    }
+    
     /**
      * @param sessCECaseList the sessCECaseList to set
      */
     public void setSessCECaseList(List<CECasePropertyUnitHeavy> sessCECaseList) {
         this.sessCECaseList = sessCECaseList;
     }
-
-    /**
-     * @return the ceactionRequestForSubmission
-     */
-    public CEActionRequest getCeactionRequestForSubmission() {
-        return ceactionRequestForSubmission;
-    }
-
-    /**
-     * @param ceactionRequestForSubmission the ceactionRequestForSubmission to set
-     */
-    public void setCeactionRequestForSubmission(CEActionRequest ceactionRequestForSubmission) {
-        this.ceactionRequestForSubmission = ceactionRequestForSubmission;
-    }
-
-  
-   
 
     /**
      * @return the sessCEAR
@@ -848,42 +876,42 @@ public class    SessionBean
     /**
      * @return the occPermitAppActiveProp
      */
-    public Property getOccPermitAppActiveProp() {
+    public PublicInfoBundleProperty getOccPermitAppActiveProp() {
         return occPermitAppActiveProp;
     }
 
     /**
      * @return the occPermitAppWorkingProp
      */
-    public Property getOccPermitAppWorkingProp() {
+    public PublicInfoBundleProperty getOccPermitAppWorkingProp() {
         return occPermitAppWorkingProp;
     }
 
     /**
      * @param activeProp the occPermitAppActiveProp to set
      */
-    public void setOccPermitAppActiveProp(Property activeProp) {
+    public void setOccPermitAppActiveProp(PublicInfoBundleProperty activeProp) {
         this.occPermitAppActiveProp = activeProp;
     }
 
     /**
      * @param workingProp the occPermitAppWorkingProp to set
      */
-    public void setOccPermitAppWorkingProp(Property workingProp) {
+    public void setOccPermitAppWorkingProp(PublicInfoBundleProperty workingProp) {
         this.occPermitAppWorkingProp = workingProp;
     }
 
     /**
      * @return the occPermitAppActivePropUnit
      */
-    public PropertyUnit getOccPermitAppActivePropUnit() {
+    public PublicInfoBundlePropertyUnit getOccPermitAppActivePropUnit() {
         return occPermitAppActivePropUnit;
     }
 
     /**
      * @param occPermitAppActivePropUnit the occPermitAppActivePropUnit to set
      */
-    public void setOccPermitAppActivePropUnit(PropertyUnit occPermitAppActivePropUnit) {
+    public void setOccPermitAppActivePropUnit(PublicInfoBundlePropertyUnit occPermitAppActivePropUnit) {
         this.occPermitAppActivePropUnit = occPermitAppActivePropUnit;
     }
 
@@ -1336,6 +1364,43 @@ public class    SessionBean
     public void setSessEventDomain(EventDomainEnum sessEventDomain) {
         this.sessEventDomain = sessEventDomain;
     }
+
+    /**
+     * @return the startPropInfoPageWithAdd
+     */
+    public boolean isStartPropInfoPageWithAdd() {
+        return startPropInfoPageWithAdd;
+    }
+
+    /**
+     * @param startPropInfoPageWithAdd the startPropInfoPageWithAdd to set
+     */
+    public void setStartPropInfoPageWithAdd(boolean startPropInfoPageWithAdd) {
+        this.startPropInfoPageWithAdd = startPropInfoPageWithAdd;
+    }
     
+    public List<PublicInfoBundlePerson> getOccPermitAttachedPersons() {
+        return occPermitAttachedPersons;
+    }
+
+    public void setOccPermitAttachedPersons(List<PublicInfoBundlePerson> occPermitAttachedPersons) {
+        this.occPermitAttachedPersons = occPermitAttachedPersons;
+    }
+
+    public PublicInfoBundlePerson getOccPermitApplicant() {
+        return occPermitApplicant;
+    }
+
+    public void setOccPermitApplicant(PublicInfoBundlePerson occPermitApplicant) {
+        this.occPermitApplicant = occPermitApplicant;
+    }
+
+    public PublicInfoBundlePerson getOccPermitPreferredContact() {
+        return occPermitPreferredContact;
+    }
+
+    public void setOccPermitPreferredContact(PublicInfoBundlePerson occPermitPreferredContact) {
+        this.occPermitPreferredContact = occPermitPreferredContact;
+    }
     
 }

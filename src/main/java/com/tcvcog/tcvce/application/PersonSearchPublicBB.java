@@ -18,12 +18,21 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 
 /**
  *
@@ -32,21 +41,64 @@ import javax.annotation.PostConstruct;
 public class PersonSearchPublicBB extends BackingBeanUtils implements Serializable {
 
     private SearchParamsPerson params;
-    private List<Person> personSearchResults;
-    private Person selectedPerson;
-    
+    private List<Person> personSearchResults; //deprecated
+    private Person selectedPerson; //deprecated
+
+    private List<PublicInfoBundlePerson> bundledPersonSearchResults; //rename to "personSearchResults" when update is complete
+    private PublicInfoBundlePerson bundledSelectedPerson; //rename to "selectedPerson" when update is complete
+
     @PostConstruct
-    public void initBean(){
+    public void initBean() {
         PersonCoordinator pc = getPersonCoordinator();
 //        setParams(pc.);
     }
-    
-    public void queryPersons(SearchParamsPerson params) throws IntegrationException{
-       PersonCoordinator pc = getPersonCoordinator();
-       boolean anonymizeResults = true;
-       
-       // Finish me!
-//       setPersonSearchResults(pc.queryPersons(params, anonymizeResults));
+
+    /**
+     * @param params
+     * @throws IntegrationException
+     */
+    public void queryPublicInfoBundlePersons(SearchParamsPerson params) throws IntegrationException {
+        UserCoordinator uc = getUserCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
+
+        QueryPerson qp = null;
+
+        try {
+
+            qp = sc.initQuery(QueryPersonEnum.PERSON_NAME, uc.getPublicUserAuthorized().getMyCredential());
+
+            if (qp != null && !qp.getParamsList().isEmpty()) {
+                qp.addParams(params);
+
+                sc.runQuery(qp);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Your search completed with " + bundledPersonSearchResults.size() + " results", ""));
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Something when wrong with the person search! Sorry!", ""));
+            }
+
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something when wrong with the person search! Sorry!", ""));
+        }
+
+        if (qp != null && !qp.getBOBResultList().isEmpty()) {
+
+            PublicInfoCoordinator pic = getPublicInfoCoordinator();
+            List<Person> skeletonHorde = qp.getBOBResultList();
+            bundledPersonSearchResults = new ArrayList<>();
+            
+            for(Person skeleton : skeletonHorde){
+                bundledPersonSearchResults.add(pic.extractPublicInfo(skeleton));
+            }
+            
+        }
+
     }
 
     /**
@@ -64,30 +116,47 @@ public class PersonSearchPublicBB extends BackingBeanUtils implements Serializab
     }
 
     /**
-     * @return the personSearchResults
+     * @deprecated @return the personSearchResults
      */
     public List<Person> getPersonSearchResults() {
         return personSearchResults;
     }
 
     /**
-     * @param personSearchResults the personSearchResults to set
+     * @deprecated @param personSearchResults the personSearchResults to set
      */
     public void setPersonSearchResults(List<Person> personSearchResults) {
         this.personSearchResults = personSearchResults;
     }
 
     /**
-     * @return the selectedPerson
+     * @deprecated @return the selectedPerson
      */
     public Person getSelectedPerson() {
         return selectedPerson;
     }
 
     /**
-     * @param selectedPerson the selectedPerson to set
+     * @deprecated @param selectedPerson the selectedPerson to set
      */
     public void setSelectedPerson(Person selectedPerson) {
         this.selectedPerson = selectedPerson;
     }
+
+    public List<PublicInfoBundlePerson> getBundledPersonSearchResults() {
+        return bundledPersonSearchResults;
+    }
+
+    public void setBundledPersonSearchResults(List<PublicInfoBundlePerson> bundledPersonSearchResults) {
+        this.bundledPersonSearchResults = bundledPersonSearchResults;
+    }
+
+    public PublicInfoBundlePerson getBundledSelectedPerson() {
+        return bundledSelectedPerson;
+    }
+
+    public void setBundledSelectedPerson(PublicInfoBundlePerson bundledSelectedPerson) {
+        this.bundledSelectedPerson = bundledSelectedPerson;
+    }
+    
 }

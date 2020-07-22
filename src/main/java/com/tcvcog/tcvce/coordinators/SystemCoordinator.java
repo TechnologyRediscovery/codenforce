@@ -316,14 +316,13 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      */
     //Nav Bar
     //Sub NavItem: Property
+    private final NavigationSubItem propertySearch = getNavSubItem("Search", "/restricted/cogstaff/prop/propertySearch.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyCases = getNavSubItem("Cases", "/restricted/cogstaff/prop/propertyCases.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyEvents = getNavSubItem("Events", "/restricted/cogstaff/prop/propertyEvents.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyInfo = getNavSubItem("Info", "/restricted/cogstaff/prop/propertyInfo.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyDocuments = getNavSubItem("Files", "/restricted/cogstaff/prop/propertyFiles.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyPeriods = getNavSubItem("Periods", "/restricted/cogstaff/prop/propertyOccPeriods.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertyPersons = getNavSubItem("Persons", "/restricted/cogstaff/prop/propertyPersons.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem propertySearch = getNavSubItem("Search", "/restricted/cogstaff/prop/propertySearch.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyUnits = getNavSubItem("Units", "/restricted/cogstaff/prop/propertyUnits.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyDocuments = getNavSubItem("Files", "/restricted/cogstaff/prop/propertyFiles.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Property
     public List<NavigationSubItem> getPropertyNavList() {
@@ -334,7 +333,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList.add(propertyUnits);
         navList.add(propertyCases);
         navList.add(propertyPeriods);
-        navList.add(propertyPersons);
         navList.add(propertyEvents);
         navList.add(propertyDocuments);
         return navList;
@@ -347,7 +345,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem CECitations = getNavSubItem("Citations", "/restricted/cogstaff/ce/ceCaseCitations.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CEEvents = getNavSubItem("Events", "/restricted/cogstaff/ce/ceCaseEvents.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CEPayments = getNavSubItem("Payments", "/restricted/cogstaff/ce/ceCasePayments.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem CERequests = getNavSubItem("Requests", "/restricted/cogstaff/ce/ceCaseRequests.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CERequests = getNavSubItem("Requests", "/restricted/cogstaff/ce/ceActionRequests.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CEFiles = getNavSubItem("Files", "/restricted/cogstaff/ce/ceCaseFiles.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CEPublic = getNavSubItem("Public", "/restricted/cogstaff/ce/ceCasePublic.xhtml", "fa fa-sign-in", false);
 
@@ -449,7 +447,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             navList.add(CEItem);
             navList.add(codeItem);
         } catch (Exception e) {
-
+            System.out.println(e);
         }
         return navList;
 

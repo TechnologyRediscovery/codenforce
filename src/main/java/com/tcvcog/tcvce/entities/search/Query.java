@@ -9,16 +9,11 @@ import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
-import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * An experimental Generic superclass of the Query family
@@ -45,6 +40,7 @@ public abstract class   Query<E extends BOb>
      */
     private RoleType userRankAccessMinimum;
     private Credential credential;
+    protected UserAuthorized requestingUser;
     
     private StringBuilder resultsMessage;
     private LocalDateTime executionTimestamp;
@@ -238,6 +234,20 @@ public abstract class   Query<E extends BOb>
             return EntityUtils.getPrettyDate(executionTimestamp);
         }
         return null;
+    }
+
+    /**
+     * @return the requestingUser
+     */
+    public UserAuthorized getRequestingUser() {
+        return requestingUser;
+    }
+
+    /**
+     * @param requestingUser the requestingUser to set
+     */
+    public void setRequestingUser(UserAuthorized requestingUser) {
+        this.requestingUser = requestingUser;
     }
 
     

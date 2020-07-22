@@ -5,7 +5,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.application.BackingBeanUtils;
 import java.io.Serializable;
 
 /**

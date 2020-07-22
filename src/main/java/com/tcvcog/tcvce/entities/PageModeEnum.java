@@ -21,23 +21,26 @@ package com.tcvcog.tcvce.entities;
  * or Occupancy domain; used for routing in Integration and
  * tallying of event stuff
  * 
- * @author Ellen Bascomb
+ * @author Ellen Bascomb of apartment 31Y
  */
 public enum PageModeEnum {
     
-    LOOKUP        (   "LOOKUP", true, 3             ),
-    INSERT        (   "INSERT", false, 4            ),
-    UPDATE        (   "UPDATE", false, 4            ),
-    REMOVE        (   "REMOVE", false, 5            );
+    LOOKUP        (   "LOOKUP", true, 3, false      ),
+    INSERT        (   "INSERT", false, 4, false     ),
+    UPDATE        (   "UPDATE", false, 4, true      ),
+    REMOVE        (   "REMOVE", false, 5, true      ),
+    VIEW          (   "VIEW",   true, 3, true       );
                                                                 
     private final String title;                                 
     private final boolean defaultMode;
     private final int minUserRankToEnable;
+    private final boolean objectSelectRequiredToEnable;
                                                                 
-    private PageModeEnum(String t, boolean def, int rnk){
+    private PageModeEnum(String t, boolean def, int rnk, boolean obreq){
         title = t;
         defaultMode = def;
         minUserRankToEnable = rnk;
+        objectSelectRequiredToEnable = obreq;
     }
 
     /**
@@ -56,6 +59,13 @@ public enum PageModeEnum {
     
     public int getMinUserRankToEnable(){
         return minUserRankToEnable;
+    }
+
+    /**
+     * @return the objectSelectRequiredToEnable
+     */
+    public boolean isObjectSelectRequiredToEnable() {
+        return objectSelectRequiredToEnable;
     }
 
 

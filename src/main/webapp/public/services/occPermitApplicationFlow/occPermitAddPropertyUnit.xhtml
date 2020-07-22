@@ -29,7 +29,7 @@
                                 <p:dataTable
                                     id="chosenPropertyTable"
                                     var="prop" 
-                                    value="#{sessionBean.activePropWithLists}"
+                                    value="#{occPermitApplicationBB.prop.bundledProperty}"
                                     rowKey="#{prop.propertyID}">
 
                                     <p:column>
@@ -45,7 +45,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Type" />
                                         </f:facet>
-                                        <h:outputText value="#{prop.propertyUseTypeString}"/>
+                                        <h:outputText value="#{prop.useType.name}"/>
 
                                     </p:column>
 
@@ -67,7 +67,9 @@
                                                The Unit Number is required, a 
                                                description may be left blank. 
                                                The description should just 
-                                               describe what the room is (e.g. basement)" />
+                                               describe what the room is (e.g. basement).
+                                               If you intend to rent please explain your plans under
+                                                &quot;Rental notes&quot;."/>
                                 <p:dataTable
                                     id="propertyUnitsToAddTable"
                                     widgetVar="datatable"
@@ -76,7 +78,7 @@
                                     value="#{occPermitApplicationBB.workingPropUnits}"
                                     selectionMode="single" tabindex="1"
                                     selection="#{occPermitApplicationBB.selectedUnit}"
-                                    rowKey="#{unit.unitID}"
+                                    rowKey="#{unit.bundledUnit.unitID}"
                                     editable="true">                                         
 
                                     <p:column>
@@ -84,9 +86,9 @@
                                             <h:outputText value="Unit Number" />
                                         </f:facet>
                                         <p:cellEditor>
-                                            <f:facet name="output"><h:outputText value="#{unit.unitNumber}" /></f:facet>
+                                            <f:facet name="output"><h:outputText value="#{unit.bundledUnit.unitNumber}" /></f:facet>
                                             <f:facet name="input">
-                                                <p:inputText value="#{unit.unitNumber}"
+                                                <p:inputText value="#{unit.bundledUnit.unitNumber}"
                                                              onkeydown="PF('datatable').onKeyDown(event)"
                                                              onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                             </f:facet>
@@ -95,14 +97,16 @@
 
                                     <p:column>
                                         <f:facet name="header">
-                                            <h:outputText value="Rental?" />
+                                            <h:outputText value="Rental notes" />
                                         </f:facet>
                                         <p:cellEditor>
                                             <f:facet name="output">
-                                                <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                                <h:outputText value="#{unit.bundledUnit.rentalNotes}" />
                                             </f:facet>
                                             <f:facet name="input"> 
-                                                <h:selectBooleanCheckbox value="#{unit.rental}"/> 
+                                                <p:inputText value="#{unit.bundledUnit.rentalNotes}"
+                                                             onkeydown="PF('datatable').onKeyDown(event)"
+                                                             onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                             </f:facet>
                                         </p:cellEditor>
                                     </p:column>
@@ -113,10 +117,10 @@
                                         </f:facet>
                                         <p:cellEditor>
                                             <f:facet name="output">
-                                                <h:outputText value="#{unit.notes}" />
+                                                <h:outputText value="#{unit.bundledUnit.notes}" />
                                             </f:facet>
                                             <f:facet name="input">
-                                                <p:inputText value="#{unit.notes}" 
+                                                <p:inputText value="#{unit.bundledUnit.notes}" 
                                                              onkeydown="PF('datatable').onKeyDown(event)"
                                                              onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                             </f:facet>
@@ -182,7 +186,7 @@
                                 <p:spacer height="10px"/>
                                 
                                 <p:commandButton ajax="true"                                                   
-                                                 action="#{occPermitApplicationBB.addUnitToNewPropUnits}" 
+                                                 action="#{occPermitApplicationBB.addUnitToNewPropUnits()}" 
                                                  update="propertyUnitsToAddTable"
                                                  value="Add unit"/>
 

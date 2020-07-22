@@ -17,23 +17,15 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
-import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.entities.Directive;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.PageModeEnum;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,21 +34,19 @@ import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
- * BackingBean to serve the faces page for configuring Directives and their Choices
+ * Model backing bean for our Beta release in July 2020 with the page mode
+ * design implemented site-wide created by Chen&Chen
  * 
  * @author sylvia
  */
 public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
     
-    
-    // New from Chen&Chen
-    
-    
     private PageModeEnum currentMode;
     private List<PageModeEnum> pageModes;
-    private boolean currentRuleSelected;
     
     private EventRuleAbstract currentEventRuleAbstract;
+    private boolean currentRuleSelected;
+    
     private List<EventRuleAbstract> eventRuleList;
     private List<EventRuleAbstract> eventRuleListFiltered;
     
@@ -77,18 +67,21 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
     public EventRuleConfigBB() {
     }
     
-        
+    /**
+     * Bean initializer which builds our rule list and sets up default page modes
+     */    
     @PostConstruct
     public void initBean(){
-        // new from Chen & Chen
-         //initialize default current mode : Lookup
-        currentMode = PageModeEnum.LOOKUP;
-        //initialize default setting
-        defaultSetting();
+        EventCoordinator ec = getEventCoordinator();
         try {
             eventRuleList = fetchRuleList();
             // start by displaying the entire list
-            eventRuleListFiltered.addAll(eventRuleList);
+            eventRuleListFiltered = new ArrayList<>();
+            if(eventRuleList != null && !eventRuleList.isEmpty()){
+                eventRuleListFiltered.addAll(eventRuleList);
+            }
+            eventTypeListAll = ec.getEventTypesAll();
+            eventCategoryListAllActive = ec.assembleEventCategoryListActiveOnly(ec.getEventCategoryList());
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, 
@@ -96,15 +89,20 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
                             ex.getMessage(), ""));
         }
         pageModes = getSessionBean().assemblePermittedPageModes();
+        currentMode = PageModeEnum.LOOKUP;
         
     }
 
+    /**
+     * Getter for currentMode
+     * @return 
+     */
     public PageModeEnum getCurrentMode() {
         return currentMode;
     }
 
     /**
-     *
+     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE, REMOVE
      * @param mode     
      */
     public void setCurrentMode(PageModeEnum mode) {
@@ -112,17 +110,43 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
         PageModeEnum tempCurMode = this.currentMode;
         //reset default setting every time the Mode has been selected 
-        defaultSetting();
+//        loadDefaultPageConfig();
         //check the currentMode == null or not
         if (currentMode == null) {
             this.currentMode = tempCurMode;
         } else {
             this.currentMode = mode;
+            switch(currentMode){
+                case LOOKUP:
+                    loadDefaultPageConfig();
+                    break;
+                case INSERT:
+                    rules_initiateEventRuleCreate();
+                    eventRuleListFiltered.clear();
+                    break;
+                case UPDATE:
+                    if(currentEventRuleAbstract != null){
+                        eventRuleListFiltered.clear();
+                        eventRuleListFiltered.add(currentEventRuleAbstract);
+                        rules_initiateEventRuleEdit(currentEventRuleAbstract);
+                    }
+                    break;
+                case REMOVE:
+//                    eventRuleListFiltered.clear();
+                    if(currentEventRuleAbstract != null){
+                    }
+                    break;
+                default:
+                    break;
+                    
+            }
         }
-        //show the current mode in p:messages box
-        getFacesContext().addMessage(null, 
-            new FacesMessage(FacesMessage.SEVERITY_INFO, 
-            this.currentMode.getTitle() + " Mode Selected", ""));
+        if(currentMode != null){
+            //show the current mode in p:messages box
+            getFacesContext().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                this.currentMode.getTitle() + " Mode Selected", ""));
+        }
 
     }
 
@@ -149,22 +173,62 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
     /**
      * Initialize the whole page into default setting
      */
-    public void defaultSetting() {
-        WorkflowCoordinator wc = getWorkflowCoordinator();
-        //initialize default selecte button in list-column: false
+    public void loadDefaultPageConfig() {
+        System.out.println("EventRuleConfigBB.loadDefaultPageConfig()");
+        currentEventRuleAbstract = null;
         currentRuleSelected = false;
         //initialize default current basic muni list
         eventRuleListFiltered.clear();
-        eventRuleListFiltered.addAll(eventRuleList);
+        try {
+            eventRuleListFiltered.addAll(fetchRuleList());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
     }
     
     
+    /**
+     * Utility method for extracting complete rule list from the Coordinator
+     * @return
+     * @throws IntegrationException 
+     */
     private List<EventRuleAbstract> fetchRuleList() throws IntegrationException{
         WorkflowCoordinator wc = getWorkflowCoordinator();
         return wc.rules_getEventRuleAbstractListForConfig(getSessionBean().getSessUser());
         
     }
+    
+       /**
+     * Listener for clicks to the button on each row of the object table in the 
+     * left column
+     * @param era
+     */
+    public void onObjectSelectButtonChange(EventRuleAbstract era){
+        System.out.println("EventRuleConfigBB.onObjectSelectButtonChange");
+        // "Select" button was selected
+        if (currentRuleSelected && era != null) {
+            
+            eventRuleListFiltered.clear();
+            eventRuleListFiltered.add(era);
+            currentEventRuleAbstract = era;
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected Rule: " + era.getTitle(), ""));
+            // "Select" button wasn't selected
+            currentRuleSelected = true;
+        } else {
+            // reset page
+            loadDefaultPageConfig();
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Page reset" , ""));
+        }
 
+        
+    }
+    
+
+    /**
+     * Listener for button clicks when user is ready to insert a new EventRule.
+     * Delegates all work to internal method
+     * @return Empty string which prompts page reload without wiping bean memory
+     */
     public String onInsertButtonChange() {
         //show successfully inserting message in p:messages box
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Insert Municipality", ""));
@@ -174,6 +238,11 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         return "";
     }
 
+    /**
+     * Listener for user requests to submit object updates;
+     * Delegates all work to internal method
+     * @return Empty string which prompts page reload without wiping bean memory
+     */
     public String onUpdateButtonChange() {
         //show successfully updating message in p:messages box
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Update Municipality", ""));
@@ -183,6 +252,11 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         return "";
     }
 
+    /**
+     * Listener for user requests to remove the currently selected ERA;
+     * Delegates all work to internal, non-listener method.
+     * @return Empty string which prompts page reload without wiping bean memory
+     */
     public String onRemoveButtonChange() {
         //show successfully updating message in p:messages box
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Remove Municipality", ""));
@@ -192,39 +266,31 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         return "";
     }
 
+ 
     /**
-     * Listener for clicks to the button on each row of the object table in the 
-     * left column
-     * @param era
+     * Internal method to set up a skeleton ERA for creation
+     * and is called when the page mode is changed to insert
      */
-    public void onObjectSelectButtonChange(EventRuleAbstract era){
-
-        // "Select" button was selected
-        if (currentRuleSelected == true) {
-            eventRuleList = new ArrayList<>();
-            eventRuleList.add(era);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected Rule: " + era.getTitle(), ""));
-            // "Select" button wasn't selected
-        } else {
-            // reset page
-            defaultSetting();
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Page reset" , ""));
-        }
-
-        
-    }
-    
-    public void rules_initiateEventRuleCreate(ActionEvent ev){
+    private void rules_initiateEventRuleCreate(){
         WorkflowCoordinator wc = getWorkflowCoordinator();
         currentEventRuleAbstract = wc.rules_getInitializedEventRuleAbstract();
     }
     
-    public void rules_initiateEventRuleEdit(EventRuleAbstract era){
+    
+    /**
+     * Internal method to setup the page for editing the requested ERA
+     * @param era 
+     */
+    private void rules_initiateEventRuleEdit(EventRuleAbstract era){
         currentEventRuleAbstract = era;
         
     }
     
-    public void rules_commitEventRuleEdits(){
+    
+    /**
+     * Internal method for finalizing event rule edits
+     */
+    private void rules_commitEventRuleEdits(){
         WorkflowCoordinator wc = getWorkflowCoordinator();
         try {
             wc.rules_updateEventRuleAbstract(currentEventRuleAbstract);
@@ -238,6 +304,9 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+    /**
+     * Internal method for finalizing event rule creation 
+     */
     public void rules_commitEventRuleCreate(){
         WorkflowCoordinator wc = getWorkflowCoordinator();
         int freshEventRuleID;
@@ -255,6 +324,9 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+    /**
+     * Internal method for finalizing event rule removal
+     */
     public void rules_commitEventRuleRemove(){
         WorkflowCoordinator wc = getWorkflowCoordinator();
         try {
@@ -269,9 +341,6 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
                 ex.getMessage(), ""));
         }
     }
-    
-    
-  
    
 
     /**
@@ -392,16 +461,11 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
      * @return the currentRuleSelected
      */
     public boolean isCurrentRuleSelected() {
+        
         return currentRuleSelected;
     }
 
-    /**
-     * @param currentRuleSelected the currentRuleSelected to set
-     */
-    public void setCurrentRuleSelected(boolean currentRuleSelected) {
-        this.currentRuleSelected = currentRuleSelected;
-    }
-
+    
     /**
      * @return the eventRuleListFiltered
      */
@@ -428,6 +492,13 @@ public class EventRuleConfigBB extends BackingBeanUtils implements Serializable{
      */
     public void setPageModes(List<PageModeEnum> pageModes) {
         this.pageModes = pageModes;
+    }
+
+    /**
+     * @param currentRuleSelected the currentRuleSelected to set
+     */
+    public void setCurrentRuleSelected(boolean currentRuleSelected) {
+        this.currentRuleSelected = currentRuleSelected;
     }
 
   

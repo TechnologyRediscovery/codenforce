@@ -34,7 +34,6 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectableStatus;
@@ -69,7 +68,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodStatusEnum;
@@ -859,7 +857,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * Sets boolean requirementSatisfied on an OccPermitApplication based on the
      * application reason, the person requirement for that reason, and the
      * PersonTypes of the Persons attached to the application.
-     *
+     * TODO: Update
      * @param opa
      */
     public void verifyOccPermitPersonsRequirement(OccPermitApplication opa) {
@@ -877,6 +875,52 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             }
         }
         pr.setRequirementSatisfied(isRequirementSatisfied);
+    }
+    
+    public int insertOccPermitApplication(OccPermitApplication application) 
+            throws IntegrationException, 
+            AuthorizationException, 
+            BObStatusException, 
+            EventException,
+            InspectionException,
+            ViolationException {
+        
+        UserCoordinator uc = getUserCoordinator();
+        OccupancyIntegrator opi = getOccupancyIntegrator();
+        PropertyIntegrator pri = getPropertyIntegrator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
+        
+        UserAuthorized user = uc.getPublicUserAuthorized();
+        
+        Property prop = pri.getPropertyUnitWithProp(application.getApplicationPropertyUnit().getUnitID()).getProperty();
+        
+        MunicipalityDataHeavy muni = mc.assembleMuniDataHeavy(prop.getMuni(), user.getMyCredential());
+        
+        OccPeriod connectedPeriod = initOccPeriod(
+                prop, 
+                application.getApplicationPropertyUnit(), 
+                application.getReason().getProposalPeriodType(), 
+                user, 
+                muni);
+        
+        connectedPeriod.setSource(si.getBOBSource(
+                Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("occPeriodPublicUserBOBSourceID"))));
+        //Check if correct
+        
+        int newPeriodID = addOccPeriod(connectedPeriod, user);
+        
+        connectedPeriod.setPeriodID(newPeriodID);
+        
+        application.setConnectedPeriod(connectedPeriod);
+        
+        int applicationId = opi.insertOccPermitApplication(application);
+
+        opi.insertOccPeriodPersons(application);
+
+        return applicationId;
+        
     }
 
     public void inspectionAction_removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi) throws IntegrationException {

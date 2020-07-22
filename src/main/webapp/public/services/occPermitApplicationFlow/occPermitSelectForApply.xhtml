@@ -8,7 +8,7 @@
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
         <title>Add reason to occupancy permit application</title>
-    </h:head>
+    </h:head>public
     <h:body>
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
@@ -29,7 +29,7 @@
                                 <p:dataTable
                                     id="chosenPropertyTable"
                                     var="prop" 
-                                    value="#{sessionBean.activePropWithLists}"
+                                    value="#{occPermitApplicationBB.prop.bundledProperty}"
                                     rowKey="#{prop.propertyID}">
 
                                     <p:column>
@@ -45,7 +45,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Type" />
                                         </f:facet>
-                                        <h:outputText value="#{prop.propertyUseTypeString}"/>
+                                        <h:outputText value="#{prop.useType.name}"/>
 
                                     </p:column>
 
@@ -70,30 +70,29 @@
                                 id="propertyUnitsToAddTable"
                                 var="unit"
                                 value="#{occPermitApplicationBB.workingPropUnits}"
-                                selectionMode="single" tabindex="1"
-                                selection="#{occPermitApplicationBB.selectedUnit}"
-                                rowKey="#{unit.unitID}"
+                                tabindex="1"
+                                rowKey="#{unit.bundledUnit.unitID}"
                                 >                                         
 
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Unit Number" />
                                     </f:facet>
-                                    <h:outputText value="#{unit.unitNumber}" />
+                                    <h:outputText value="#{unit.bundledUnit.unitNumber}" />
                                 </p:column>
 
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="Rental?" />
+                                        <h:outputText value="Rental Notes:" />
                                     </f:facet>
-                                    <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                    <h:outputText value="#{unit.bundledUnit.rentalNotes}" />
                                 </p:column>
 
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Unit Description" />
                                     </f:facet>
-                                    <h:outputText value="#{unit.notes}" />
+                                    <h:outputText value="#{unit.bundledUnit.notes}" />
                                 </p:column>
 
                                 <p:column>
@@ -115,10 +114,6 @@
                             <h3>Step 5: Add People To Application</h3>
 
                             <p:outputLabel>...</p:outputLabel>
-
-                            <ui:remove> <p:spacer height="10px"/>
-                                <p:commandButton ajax="false" value="Confirm and continue"/></ui:remove>
-                                
                             
                         </h:form>
                     </div>

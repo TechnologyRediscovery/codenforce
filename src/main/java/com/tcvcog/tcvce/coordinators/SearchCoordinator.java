@@ -45,7 +45,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private static final int RESULT_COUNT_LIMIT_DEFAULT = 100;
     private static final int FILTER_OFF_DEFVALUE_INT = 0;
     
-    
     private static final int PASTPERIOD_RECENT = 30;
     private static final int PASTPERIOD_WEEK = 7;
     private static final int PASTPERIOD_MONTH = 30;
@@ -131,8 +130,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         for(SearchParamsPerson sp: paramsList){
             persTempList.clear();
+
             try {
-                for(Integer i: pi.searchForPersons(sp)){
+                List<Integer> idList = pi.searchForPersons(sp);
+                for(Integer i: idList){
                     persTempList.add(pc.getPerson(i));
                 }
             } catch (IntegrationException ex) {
@@ -831,6 +832,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     break;
                     
                 case CUSTOM:
+                    paramList.add(generateParams_CEAR_Unprocessed(params, cred));
                     break;
                     
                 default:

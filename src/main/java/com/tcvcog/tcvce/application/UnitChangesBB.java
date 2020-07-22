@@ -114,7 +114,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         PropertyCoordinator pc = getPropertyCoordinator();
         
         try {
-            selectedProperty = pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessUser().getMyCredential());
+            selectedProperty = pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessUser());
             existingUnitList = pi.getPropertyUnitList(selectedProperty);
             proposedUnitList = pi.getPropertyUnitChangeList(selectedProperty);
             
@@ -183,12 +183,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
     public String goToChangeDetail() {
 
-        PropertyCoordinator pc = getPropertyCoordinator();
-        try {
-            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(selectedProperty, getSessionBean().getSessUser().getMyCredential()));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
-            System.out.println(ex);
-        }
+        getSessionBean().setSessionProperty(selectedProperty);
 
         return "unitchangedetail";
 

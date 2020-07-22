@@ -35,7 +35,8 @@ public enum EventType {
     Compliance("Compliance", 5, 3),
     Citation("Citation", 5, 3),
     Occupancy("Occupancy", 5, 3),
-    PropertyInfoCase("Property Info Case", 3, 3);
+    PropertyInfoCase("Property Info Case", 3, 3),
+    Workflow("WOrkflow", 5, 3);
 
     private final String label;
     protected final int userRankMinimumToEnact;
