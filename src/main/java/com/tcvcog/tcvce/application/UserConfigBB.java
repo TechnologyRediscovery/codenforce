@@ -131,13 +131,13 @@ public class UserConfigBB extends BackingBeanUtils{
         System.out.println("UserConfigBB.createNewUser");
     }
     
-    public String reInitSession(UserMuniAuthPeriod umap, Credential cred){
+    public String reInitSession(UserMuniAuthPeriod umap, UserAuthorized ua){
         UserCoordinator uc = getUserCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();
         
         if(uc.verifyReInitSessionRequest(getSessionBean().getSessUser(), umap)){
             try {
-                getSessionBean().setSessMuni(mc.assembleMuniDataHeavy(mc.getMuni(umap.getMuni().getMuniCode()), cred));
+                getSessionBean().setSessMuni(mc.assembleMuniDataHeavy(mc.getMuni(umap.getMuni().getMuniCode()), ua));
                 getSessionBean().setUserForReInit(uc.getUser(umap.getUserID()));
             } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
                 System.out.println(ex);

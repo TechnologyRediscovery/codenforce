@@ -31,10 +31,12 @@
 
                                         <p:selectOneButton style="width: 100%; margin-top: 10px ; height: 20px;"
                                                            value="#{eventRuleConfigBB.currentMode}" 
+                                                           unselectable="false"
                                                            >
                                             <f:selectItems value="#{eventRuleConfigBB.pageModes}"
                                                            var="pmo"
-                                                           itemLabel="#{pmo.title}"/>
+                                                           itemLabel="#{pmo.title}"
+                                                           itemDisabled="#{!eventRuleConfigBB.currentRuleSelected and pmo.objectSelectRequiredToEnable}"/>
 
                                             <f:ajax render="@all"/>
 
@@ -50,7 +52,7 @@
 
                                             <p:dataTable id="evruleconfig-table-rulelist"
                                                          var="rule"
-                                                         value="#{eventRuleConfigBB.eventRuleList}"
+                                                         value="#{eventRuleConfigBB.eventRuleListFiltered}"
                                                          tableStyleClass="primeDataTable"
                                                          >
 
@@ -81,6 +83,8 @@
                                                                            >
 
                                                         <p:ajax update="
+                                                                evruleconfig-form-side
+                                                                mode-form
                                                                 form-messages-global
                                                                 eventrules-panel-lookup
                                                                 eventrules-panel-addupdate"
@@ -111,7 +115,7 @@
                                                  toggleable="true"
                                                  collapsed="false"
                                                  header="Event Rule Record"
-                                                 rendered="#{eventRuleConfigBB.getActiveLookupMode()}"
+                                                 rendered="#{eventRuleConfigBB.getActiveLookupMode() }"
                                                  >
 
                                             <p:spacer height="10px"/>
@@ -189,7 +193,7 @@
                                                     
                                                     <h:outputText   id="evrule-ot-forbidevcat"
                                                                     styleClass="data_field_value" 
-                                                                    value="#{!(eventRuleConfigBB.currentEventRuleAbstract.forbiddenEventCategory) ?
+                                                                    value="#{!(empty eventRuleConfigBB.currentEventRuleAbstract.forbiddenEventCategory) ?
                                                                              eventRuleConfigBB.currentEventRuleAbstract.forbiddenEventCategory.eventCategoryTitle : ' '}" />
                                                 </div>
                                                     
@@ -291,7 +295,7 @@
                                                     
                                                     <h:outputText   id="evrule-ot-evcat-rulepass"
                                                                     styleClass="data_field_value" 
-                                                                    value="#{!(eventRuleConfigBB.currentEventRuleAbstract.triggeredECOnRulePass) ? 
+                                                                    value="#{!(empty eventRuleConfigBB.currentEventRuleAbstract.triggeredECOnRulePass) ? 
                                                                              eventRuleConfigBB.currentEventRuleAbstract.triggeredECOnRulePass.eventCategoryTitle : '' }" />
                                                 </div>
                                                     
@@ -302,7 +306,7 @@
                                                     
                                                     <h:outputText   id="evrule-ot-evcat-rulefail"
                                                                     styleClass="data_field_value" 
-                                                                    value="#{!(eventRuleConfigBB.currentEventRuleAbstract.triggeredECOnRuleFail) ?
+                                                                    value="#{!(empty eventRuleConfigBB.currentEventRuleAbstract.triggeredECOnRuleFail) ?
                                                                              eventRuleConfigBB.currentEventRuleAbstract.triggeredECOnRuleFail.eventCategoryTitle : ''}" />
                                                     
                                                 </div>
@@ -390,7 +394,7 @@
                                                  toggleable="true"
                                                  collapsed="false"
                                                  header="Create and update event rule"
-                                                 rendered="#{eventRuleConfigBB.getActiveInsertUpdateMode()}"
+                                                 rendered="#{eventRuleConfigBB.getActiveInsertUpdateMode() }"
                                                  >
                                             <h:form id="muniManage-form-insert">
                                                 
@@ -725,7 +729,7 @@
                                                                  action="#{eventRuleConfigBB.onInsertButtonChange()}"
                                                                  value="INSERT"
                                                                  disabled="#{(empty eventRuleConfigBB.currentEventRuleAbstract) or
-                                                                             (eventRuleConfigBB.currentEventRuleAbstract.ruleid == 0)}"
+                                                                             (eventRuleConfigBB.currentEventRuleAbstract.ruleid != 0)}"
                                                                  />
                                                 
                                                 <p:commandButton icon="fa fa-edit"
@@ -733,7 +737,7 @@
                                                                  action="#{eventRuleConfigBB.onUpdateButtonChange()}"
                                                                  value="UPDATE"
                                                                  disabled="#{(empty eventRuleConfigBB.currentEventRuleAbstract) or
-                                                                             (eventRuleConfigBB.currentEventRuleAbstract.ruleid != 0)}"
+                                                                             (eventRuleConfigBB.currentEventRuleAbstract.ruleid == 0)}"
                                                                  />
 
                                             </h:form>
@@ -748,7 +752,7 @@
                                                  toggleable="true"
                                                  collapsed="false"
                                                  header="Remove event rule"
-                                                 rendered="#{eventRuleConfigBB.getActiveRemoveMode()}"
+                                                 rendered="#{eventRuleConfigBB.getActiveRemoveMode() }"
                                                  >
 
                                             <p:spacer height="10px"/>
@@ -761,7 +765,7 @@
                                                 <p:commandButton icon="fa fa-stop"
                                                                  ajax="false"
                                                                  action="#{eventRuleConfigBB.onRemoveButtonChange()}"
-                                                                 value="Remove Rule ID:#{eventRuleConfigBB.currentEventRuleAbstract.ruleid}"
+                                                                 value="Permanently remove Rule ID:#{eventRuleConfigBB.currentEventRuleAbstract.ruleid}"
                                                                  />
 
                                             </h:form>

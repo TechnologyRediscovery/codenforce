@@ -1419,7 +1419,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
                     "       mandatorypassreqtocloseentity=?, autoremoveonentityclose=?, promptingdirective_directiveid=?, \n" +
                     "       triggeredeventcatonpass=?, triggeredeventcatonfail=?, active=?, \n" +
                     "       notes=?, requiredeventcatthresholdtypeintorder=?, forbiddeneventcatthresholdtypeintorder=?, \n" +
-                    "       requiredeventcatthresholdglobalorder=?, forbiddeneventcatthresholdglobalorder=?\n" +
+                    "       requiredeventcatthresholdglobalorder=?, forbiddeneventcatthresholdglobalorder=?, \n" +
                     "       userrankmintoconfigure=?, userrankmintoimplement=?, userrankmintowaive=?, \n" +
                     "       userrankmintooverride=?, userrankmintodeactivate=? WHERE ruleid=?;";
         Connection con = getPostgresCon();

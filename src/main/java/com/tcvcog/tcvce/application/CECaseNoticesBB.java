@@ -140,7 +140,7 @@ public class CECaseNoticesBB
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
             caseCoord.novDelete(nov);
-            currentCase = caseCoord.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
+            currentCase = caseCoord.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID() + " has been nuked forever", ""));
@@ -182,7 +182,7 @@ public class CECaseNoticesBB
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
             caseCoord.novMarkAsReturned(currentCase, nov, getSessionBean().getSessUser());
-            currentCase = caseCoord.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
+            currentCase = caseCoord.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID()

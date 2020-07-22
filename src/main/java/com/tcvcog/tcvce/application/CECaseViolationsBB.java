@@ -100,7 +100,7 @@ public class CECaseViolationsBB
      * @param ae
      * @throws BObStatusException 
      */
-    public void updateViolationsCodeBookLink(ActionEvent ae) throws BObStatusException {
+    public void updateViolationCodeBookLink(ActionEvent ae) throws BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
         CodeIntegrator ci = getCodeIntegrator();
         
@@ -112,7 +112,7 @@ public class CECaseViolationsBB
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Success: Updated Violation with new CodeBook linking", ""));
-                currentCase = cc.assembleCECaseDataHeavy(cc.getCECase(currentCase.getCaseID()), getSessionBean().getSessUser().getMyCredential());
+                currentCase = cc.assembleCECaseDataHeavy(cc.getCECase(currentCase.getCaseID()), getSessionBean().getSessUser());
             } else {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,

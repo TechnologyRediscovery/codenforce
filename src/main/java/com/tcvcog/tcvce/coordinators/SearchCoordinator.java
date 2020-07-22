@@ -45,7 +45,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private static final int RESULT_COUNT_LIMIT_DEFAULT = 100;
     private static final int FILTER_OFF_DEFVALUE_INT = 0;
     
-    
     private static final int PASTPERIOD_RECENT = 30;
     private static final int PASTPERIOD_WEEK = 7;
     private static final int PASTPERIOD_MONTH = 30;

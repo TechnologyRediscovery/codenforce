@@ -79,7 +79,7 @@ public class PropertyCreateBB
         try {
             freshID = pc.addProperty(prop, ua);
             prop = pc.getProperty(freshID); 
-            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(prop, ua.getMyCredential()));
+            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(prop, ua));
             sc.logObjectView(ua, prop);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 

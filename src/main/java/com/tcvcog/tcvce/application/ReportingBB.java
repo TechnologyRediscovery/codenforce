@@ -72,7 +72,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         List<CECasePropertyUnitHeavy> csel =  getSessionBean().getSessCECaseList();
         if(csel != null && !csel.isEmpty()){
-            caseList = cc.getCECaseHeavyList(cc.downcastCECasePropertyUnitHeavyList(csel), getSessionBean().getSessUser().getMyCredential());
+            caseList = cc.assembleCECaseDataHeavyList(cc.downcastCECasePropertyUnitHeavyList(csel), getSessionBean().getSessUser());
         }
         
         DataCoordinator dc = getDataCoordinator();

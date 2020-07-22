@@ -40,6 +40,7 @@ public abstract class   Query<E extends BOb>
      */
     private RoleType userRankAccessMinimum;
     private Credential credential;
+    protected UserAuthorized requestingUser;
     
     private StringBuilder resultsMessage;
     private LocalDateTime executionTimestamp;
@@ -233,6 +234,20 @@ public abstract class   Query<E extends BOb>
             return EntityUtils.getPrettyDate(executionTimestamp);
         }
         return null;
+    }
+
+    /**
+     * @return the requestingUser
+     */
+    public UserAuthorized getRequestingUser() {
+        return requestingUser;
+    }
+
+    /**
+     * @param requestingUser the requestingUser to set
+     */
+    public void setRequestingUser(UserAuthorized requestingUser) {
+        this.requestingUser = requestingUser;
     }
 
     

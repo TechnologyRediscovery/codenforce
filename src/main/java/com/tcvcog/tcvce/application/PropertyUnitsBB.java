@@ -192,7 +192,7 @@ public class PropertyUnitsBB
         // mark parent property as updated now
         try {
             pc.editProperty(currProp, getSessionBean().getSessUser());
-            currProp = pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessUser().getMyCredential());
+            currProp = pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessUser());
         } catch (BObStatusException | SearchException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -212,7 +212,7 @@ public class PropertyUnitsBB
     private void refreshCurrPropWithLists() {
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            currProp = pc.getPropertyDataHeavy(currProp.getPropertyID(), getSessionBean().getSessUser().getMyCredential());
+            currProp = pc.getPropertyDataHeavy(currProp.getPropertyID(), getSessionBean().getSessUser());
             getSessionBean().setSessProperty(currProp);
         } catch (IntegrationException | BObStatusException | SearchException | AuthorizationException | EventException ex) {
             System.out.println(ex);

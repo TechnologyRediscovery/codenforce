@@ -171,16 +171,21 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (c.isPaccEnabled()) {
             pib.setBundledCase(cse);
-            pib.setAddress(c.getProperty());
-            pib.setPublicEventList(new ArrayList<PublicInfoBundleEventCnF>());
-            if (c.getVisibleEventList() != null) {
-                for (EventCnF ev : c.getVisibleEventList()) {
-                    if (ev.getCategory().getUserRankMinimumToView() >= PUBLIC_VIEW_USER_RANK) {
-                        pib.getPublicEventList().add(extractPublicInfo(ev));
-                    }
-                }
+            if (c.getProperty() == null || c.getProperty().isNonAddressable()) {
+                pib.setAddressAssociated(false);
+            } else {
+                pib.setAddressAssociated(true);
+                pib.setPropertyAddress(c.getProperty().getAddress());
             }
-
+            
+            // TODO: Deal with these implications
+//            pib.setPublicEventList(new ArrayList<EventCnF>());
+//            for (EventCnF ev : c.getVisibleEventList()) {
+//                if (ev.getCategory().getUserRankMinimumToView() >= PUBLIC_VIEW_USER_RANK) {
+//                    pib.getPublicEventList().add(ev);
+//                }
+//            }
+            pib.setAddress(c.getProperty());
             pib.setShowAddMessageButton(false);
             pib.setPaccStatusMessage("Public access enabled");
 

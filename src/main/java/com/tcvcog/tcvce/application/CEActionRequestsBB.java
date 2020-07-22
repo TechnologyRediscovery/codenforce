@@ -381,7 +381,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         if (selectedRequest != null) {
             try {
                 if (selectedRequest.getRequestProperty() != null) {
-                    getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(selectedRequest.getRequestProperty(), getSessionBean().getSessUser().getMyCredential()));
+                    getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(selectedRequest.getRequestProperty(), getSessionBean().getSessUser()));
                 }
 
                 MessageBuilderParams mbp = new MessageBuilderParams();

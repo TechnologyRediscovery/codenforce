@@ -255,6 +255,16 @@ public class OccPeriodWorkflowBB extends BackingBeanUtils{
         reloadCurrentOccPeriodDataHeavy();
      }
      
+     /**
+      * Logic container for liasing with the OccCoor to
+      * update managers
+      * @param ev 
+      */
+     public void updateOccPeriodManager(ActionEvent ev){
+         
+         
+     }
+     
     
   
 
