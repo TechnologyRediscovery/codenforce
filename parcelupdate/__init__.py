@@ -1,4 +1,5 @@
 __all__ = [
+    "_connection",
     "_constants",
     "_scrape",
     "_parse",

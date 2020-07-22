@@ -1,11 +1,3 @@
-"""
-
-Important note: This Python script's work is not isolated.
-Upon certain actions, the database will call various trigger functions.
-Actions resulting from trigger functions are commented in the following syntax:
-    # ~~ basic function description in pseudo code
-"""
-
 #   Project files imported without an underscore should be read as a statement.
 #   Example: scrape.county_property_assessments scrapes county property assessments.
 #
