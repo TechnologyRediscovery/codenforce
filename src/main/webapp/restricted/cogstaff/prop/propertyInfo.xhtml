@@ -17,14 +17,15 @@
                     <p:outputPanel id="body-panel">
 
                         <h:form id="prop-info-header-form">
-                            <h1> <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
-                                <h:outputText value=" | " />
-                                <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
-                                <h:outputText value=" | " />
-                                <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currentProperty.parID}"/>  
-                                <h:outputText value=" | " />
-                                <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currentProperty.propertyID}"/>  
-                            </h1>
+
+                            <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
+                            <h:outputText value=" | " />
+                            <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
+                            <h:outputText value=" | " />
+                            <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currentProperty.parID}"/>  
+                            <h:outputText value=" | " />
+                            <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currentProperty.propertyID}"/>  
+
                         </h:form>
 
                         <h:form id="form-messages-global">
@@ -50,6 +51,9 @@
                                             <f:ajax render="@all"/>
                                         </p:selectOneButton> 
                                     </h:form>
+
+                                    <p:spacer height="8px" />
+
 
                                     <!--LookUp Table-->
                                     <p:panel id="propinfo-panel-info"
@@ -219,9 +223,9 @@
                                                     <h:outputText   id="propinfo-ot-abandonedstart"
                                                                     value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStart)}" />
                                                     <h:outputText   id="propinfo-ot-abandonedlink"
-                                                                    value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStop) ? ' to ' : ' to present' }" />
+                                                                    value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStop) and !(empty propertyProfileBB.currentProperty.abandonedDateStop)  ? ' ' : ' to present' }" />
                                                     <h:outputText   id="propinfo-ot-abandonedstop"
-                                                                    value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStop)}" />
+                                                                    value="to #{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStop)}" />
                                                     <h:outputText   id="propinfo-ot-abandoneduser"
                                                                     value="#{!(empty propertyProfileBB.currentProperty.abandonedBy) ? propertyProfileBB.currentProperty.abandonedBy.username : ''}" />
                                                 </div>
@@ -235,9 +239,9 @@
                                                     <h:outputText   id="propinfo-ot-vacantstart"
                                                                     value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStart)}" />
                                                     <h:outputText   id="propinfo-ot-vacantlink"
-                                                                    value="#{!(empty propertyProfileBB.currentProperty.vacantDateStop) ? ' to ' : ' to present' }" />
+                                                                    value="#{!(empty propertyProfileBB.currentProperty.vacantDateStop) and !(empty propertyProfileBB.currentProperty.vacantDateStart) ? ' ' : ' to present' }" />
                                                     <h:outputText   id="propinfo-ot-vacantstop"
-                                                                    value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStop)}" />
+                                                                    value="to #{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStop)}" />
                                                     <h:outputText   id="propinfo-ot-vacantby"
                                                                     value="#{!(empty propertyProfileBB.currentProperty.vacantBy) ? propertyProfileBB.currentProperty.vacantBy.username : ''}" />
                                                 </div>
@@ -251,9 +255,9 @@
                                                     <h:outputText   id="propinfo-ot-unfitstart"
                                                                     value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStart)}" />
                                                     <h:outputText   id="propinfo-ot-unfitlink"
-                                                                    value="#{!(empty propertyProfileBB.currentProperty.unfitDateStop) ? ' to ' : ' to present' }" />
+                                                                    value="#{empty propertyProfileBB.currentProperty.unfitDateStop and !(empty propertyProfileBB.currentProperty.unfitDateStart) ? '  ' : ' to present' }" />
                                                     <h:outputText   id="propinfo-ot-unfitstop"
-                                                                    value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStop)}" />
+                                                                    value=" to #{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStop)}" />
                                                     <h:outputText   id="propinfo-ot-unfituser"
                                                                     value="#{!(empty propertyProfileBB.currentProperty.unfitBy) ? propertyProfileBB.currentProperty.unfitBy.username : ''}" />
                                                 </div>
@@ -320,14 +324,16 @@
 
 
                                             <div    id="propinf-ot-notes-div"
-                                                    class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                    class="data_field"
+                                                    style="clear:both;">
                                                 <h:outputLabel  styleClass="data_field_label" 
                                                                 for="propinfo-ot-notes"
                                                                 value="Notes"/>
 
                                                 <h:outputText   id="propinfo-ot-notes"
                                                                 styleClass="data_field_value" 
-                                                                value="#{propertyProfileBB.currentProperty.notes}" />
+                                                                value="#{propertyProfileBB.currentProperty.notes}"
+                                                                escape="false"/>
                                             </div>
 
                                         </h:form>
@@ -339,21 +345,36 @@
                                     <p:panel id="propinfo-panel-addupdate"
                                              toggleable="true"
                                              collapsed="false"
-                                             header="Create and update property"
+                                             header="#{propertyProfileBB.currentProperty.propertyID == 0 ? 'New property record':'Update property record'}"
                                              rendered="#{propertyProfileBB.getActiveInsertUpdateMode() }"
                                              >
 
-                                        <h:form id="muniManage-form-insert">
-                                            
-                                            
-                                                <p:commandButton    id="prop-add-discard-button-1"
+                                        <h:form id="prop-add-form">
+
+
+                                                <p:commandButton    id="prop-add-addnew-commit-button-1"
+                                                                    icon="fa fa-thmubs-o-up"
+                                                                    ajax="false"
+                                                                    action="#{propertyProfileBB.onInsertButtonChange()}"
+                                                                    value="Commit record"
+                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
+                                                                    />
+
+                                                <p:commandButton    id="prop-add-update-commit-button-1"
                                                                     icon="fa fa-edit"
+                                                                    ajax="false"
+                                                                    action="#{propertyProfileBB.onUpdateButtonChange()}"
+                                                                    value="Commit updates"
+                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID != 0}"
+                                                                    />
+
+                                                 <p:commandButton    id="prop-add-discard-button-1"
+                                                                    icon="fa fa-trash-o"
                                                                     ajax="true"
                                                                     action="#{propertyProfileBB.onDiscardNewPropertyDataButtonChange}"
-                                                                    value="UPDATE"
-                                                                    disabled="#{(empty propertyProfileBB.currentProperty) or
-                                                                                (propertyProfileBB.currentProperty.propertyID == 0)}"
-                                                                    />
+                                                                    value="Discard new record"
+                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
+                                                                />
 
                                             <div    id="prop-add-container-div"
                                                     class="ui-g data-container">
@@ -384,7 +405,7 @@
                                                         class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
                                                     <p:outputLabel value="Zip Code"
-                                                                   for="prop-add-zip-ol"
+                                                                   for="prop-add-zip-it"
                                                                    />
 
                                                     <p:inputText    id="prop-add-zip-it"
@@ -398,7 +419,7 @@
                                                     <p:outputLabel  value="Municipality"
                                                                     for="prop-add-muni-som"/>
 
-                                                    <h:selectOneMenu id="propinfoedit-muni-som"
+                                                    <h:selectOneMenu id="prop-add-muni-som"
                                                                      value="#{propertyProfileBB.currentProperty.muni}" style="width:175px;height:25px">
                                                         <f:converter converterId="muniConverter"/>
                                                         <f:selectItems id="propinfoedit-muninamelist" 
@@ -412,7 +433,7 @@
                                                         class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
                                                     <p:outputLabel value="State"
-                                                                   for="prop-add-state-ol"
+                                                                   for="prop-add-state-it"
                                                                    />
 
                                                     <p:inputText    id="prop-add-state-it"
@@ -460,7 +481,6 @@
                                                                 showButtonPanel="true" 
                                                                 showTodayButton="true"
                                                                 maxdate="#{propertyProfileBB.currentProperty.unfitDateUtilStop}">
-                                                        <p:ajax event="dateSelect" update="propinfoedit-end-unfit"/>
                                                     </p:calendar>
                                                 </div>
 
@@ -481,7 +501,6 @@
                                                                 showButtonPanel="true" 
                                                                 showTodayButton="true"
                                                                 mindate="#{propertyProfileBB.currentProperty.unfitDateUtilStart}">
-                                                        <p:ajax event="dateSelect" update="propinfoedit-end-unfit"/>
                                                     </p:calendar>
 
                                                 </div>
@@ -503,7 +522,6 @@
                                                                 showButtonPanel="true" 
                                                                 showTodayButton="true"
                                                                 maxdate="#{propertyProfileBB.currentProperty.vacantDateUtilStop}">
-                                                        <p:ajax event="dateSelect" update="propinfoedit-stop-vacant"/>
                                                     </p:calendar>
                                                 </div>
 
@@ -524,7 +542,6 @@
                                                                 showButtonPanel="true" 
                                                                 showTodayButton="true"
                                                                 mindate="#{propertyProfileBB.currentProperty.vacantDateUtilStart}">
-                                                        <p:ajax event="dateSelect" update="propinfoedit-start-vacant"/>
                                                     </p:calendar>
                                                 </div>
 
@@ -545,7 +562,6 @@
                                                                 showButtonPanel="true" 
                                                                 showTodayButton="true"
                                                                 maxdate="#{propertyProfileBB.currentProperty.abandonedDateUtilStop}">
-                                                        <p:ajax event="dateSelect" update="propinfoedit-stop-abandoned"/>
                                                     </p:calendar>
                                                 </div>
 
@@ -566,44 +582,40 @@
                                                                 showButtonPanel="true" 
                                                                 showTodayButton="true"
                                                                 mindate="#{propertyProfileBB.currentProperty.abandonedDateUtilStart}">
-                                                        <p:ajax event="dateSelect" update="propinfoedit-stop-abandoned"/>
                                                     </p:calendar>
                                                 </div>
 
 
-                                                <!--Insert Button only activates with a new ERA-->
-                                                <p:commandButton    id="prop-add-addnew-commit-button"
-                                                                    icon="fa fa-edit"
+
+
+                                                <p:commandButton    id="prop-add-addnew-commit-button-2"
+                                                                    icon="fa fa-thmubs-o-up"
                                                                     ajax="false"
                                                                     action="#{propertyProfileBB.onInsertButtonChange()}"
-                                                                    value="INSERT"
-                                                                    disabled="#{(empty propertyProfileBB.currentProperty) or
-                                                                                (propertyProfileBB.currentProperty.propertyID != 0)}"
+                                                                    value="Commit record"
+                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
                                                                     />
 
-                                                <p:commandButton    id="prop-add-update-commit-button"
+                                                <p:commandButton    id="prop-add-update-commit-button-2"
                                                                     icon="fa fa-edit"
                                                                     ajax="false"
                                                                     action="#{propertyProfileBB.onUpdateButtonChange()}"
-                                                                    value="UPDATE"
-                                                                    disabled="#{(empty propertyProfileBB.currentProperty) or
-                                                                                (propertyProfileBB.currentProperty.propertyID == 0)}"
+                                                                    value="Commit updates"
+                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID != 0}"
                                                                     />
 
-                                                <p:commandButton    id="prop-add-discard-button-2"
-                                                                    icon="fa fa-edit"
+                                                 <p:commandButton    id="prop-add-discard-button-2"
+                                                                    icon="fa fa-trash-o"
                                                                     ajax="true"
                                                                     action="#{propertyProfileBB.onDiscardNewPropertyDataButtonChange}"
-                                                                    value="UPDATE"
-                                                                    disabled="#{(empty propertyProfileBB.currentProperty) or
-                                                                                (propertyProfileBB.currentProperty.propertyID == 0)}"
-                                                                    />
+                                                                    value="Discard new record"
+                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
+                                                                />
                                             </div>
                                         </h:form>
                                     </p:panel>
 
 
-                                    <!--Remove Table-->
                                     <p:panel id="prop-remove-panel"
                                              toggleable="true"
                                              collapsed="false"
@@ -616,7 +628,6 @@
 
                                             <p>Caution: This action is like 'delete'; we have to dig the record back out by
                                                 hand if you goof.</p>
-                                            <!--Remove Button-->
                                             <p:commandButton icon="fa fa-stop"
                                                              ajax="false"
                                                              action="#{propertyProfileBB.onRemoveButtonChange()}"
@@ -631,10 +642,406 @@
 
 
 
+
+
                                 </div>
 
                                 <div class ="object-column">
                                     <p:outputPanel id = "prop-lists-outpanel" >
+
+
+                                        <p:panel    id="prop-workflow-panel"
+                                                    toggleable="true"
+                                                    widgetVar="prop-workflow-panel-var"
+                                                    collapsed="false"
+                                                    header="Proposals">
+                                            <h:form id="prop-workflow-form">
+
+
+
+                                                <p:selectOneMenu id="prop-workflow-viewoptions-som" 
+                                                                 value="#{propertyProfileBB.selectedPropViewOption}" 
+                                                                 tabindex="10">
+
+                                                    <f:selectItems  id="prop-workflow-viewoptions-selitems" 
+                                                                    value="#{workflowBB.proposalsViewOptions}" 
+                                                                    var="pvo" 
+                                                                    itemValue="#{pvo}" 
+                                                                    itemLabel="#{pvo.label}"/>
+                                                    <p:ajax update="proposals-proposalscroller"                                                           
+                                                            immediate="true"/>
+                                                </p:selectOneMenu>
+
+                                                <p:dataScroller id="proposals-proposalscroller"
+                                                                var="proposal"
+                                                                widgetVar="proposals-proposalscroller-var"
+                                                                value="#{propertyProfileBB.currentProperty.assembleProposalList(propertyProfileBB.selectedPropViewOption)}"
+                                                                rowIndexVar="#{proposal.proposalID}">
+
+                                                    <div class="outlinedBox">
+                                                        <div class="proposal-metadata-container">
+                                                            <div class="proposal-propbuttoncontainer">
+                                                                <p:commandButton    id="proposal-button-showdescription"
+                                                                                    styleClass="noFill button-size-small button-moreinfo"
+                                                                                    icon="fa fa-info"/>
+
+                                                                <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
+                                                                                for="proposal-button-showdescription"
+                                                                                hideEffect="fade" 
+                                                                                dynamic="true" 
+                                                                                showCloseIcon="true"
+                                                                                style="width:300px" 
+                                                                                modal="false">
+
+                                                                    <h:outputText       styleClass="proposal-description"
+                                                                                        value="#{proposal.directive.description}" />
+                                                                </p:overlayPanel>
+
+
+                                                                <p:commandButton    id="proposal-button-rejectionreason"
+                                                                                    styleClass="noFill button-size-small"
+                                                                                    oncomplete="PF('occperiod-rejectproposal-dialog-var').show()"
+                                                                                    rendered="#{!proposal.directive.requiredEvaluationForBOBClose 
+                                                                                                or systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions }"
+                                                                                    icon="fa fa-trash"/>
+                                                            </div>
+                                                            <div class="proposal-prophead">
+                                                                <h:outputText value="#{proposal.directive.title}" />
+                                                            </div>
+
+                                                            <p:spacer height="5px" />
+
+                                                            <h:panelGrid   id="prop-workflow-propinfo-pg" 
+                                                                           columns="1" 
+                                                                           style="clear:both;"
+                                                                           columnClasses="gridTd" 
+                                                                           rendered="true">
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                                  value="Intended for: "  />
+                                                                    <h:outputText styleClass="data-text" 
+                                                                                  value="#{proposal.responderIntended.person.firstName}" />
+                                                                    <h:outputText styleClass="data-text" 
+                                                                                  value=" " />
+                                                                    <h:outputText styleClass="data-text" 
+                                                                                  value="#{proposal.responderIntended.person.lastName}" />
+                                                                </h:panelGroup>
+                                                            </h:panelGrid>
+                                                        </div>
+
+                                                        <p:dataScroller id="proposals-choicescroller"
+                                                                        var="choice"
+                                                                        widgetVar="proposals-choicescroller-var"
+                                                                        value="#{proposal.directive.choiceListVisible}"
+                                                                        rowIndexVar="#{choice.choiceID}">
+
+                                                            <p:commandButton    id="proposal-choice-button-choose"
+                                                                                ajax="true" 
+                                                                                styleClass="proposal-choice-button"
+                                                                                actionListener="#{workflowBB.proposals_makeChoice(choice, proposal)}"
+                                                                                disabled="#{!choice.canChoose or !(empty proposal.responseTS)}"
+                                                                                value="#{choice.title}"
+                                                                                icon="#{!(empty choice.icon) ? choice.icon.fontAwesome : 'fa fa-fighter-jet'}"
+                                                                                title="#{choice.description}"
+                                                                                update="occperiod-form-proposals
+                                                                                occperiod-panel-proposals-messages-form"/>
+                                                            <p:spacer height="5px" />
+                                                        </p:dataScroller>
+                                                    </div>
+                                                </p:dataScroller>
+                                            </h:form>
+                                        </p:panel>
+
+                                        <p:panel    id="prop-events-panel"
+                                                    toggleable="true"
+                                                    widgetVar="prop-events-panel-var"
+                                                    collapsed="false"
+                                                    header="Events">
+
+                                            <h:form id="prop-events-panel-form">
+
+                                                <p:commandButton    id="prop-events-noteevent-init-button"
+                                                                    ajax="false"
+                                                                    value="Create Note Event"
+                                                                    styleClass="noFill button-size-small"
+                                                                    action="#{propertyProfileBB.onAddNoteButtonChange}"
+                                                                    icon="fa fa-sticky-note-o"
+                                                                    />
+
+
+                                                <p:commandButton    id="prop-events-seeall-button"
+                                                                    ajax="false"
+                                                                    value="Info case list"
+                                                                    styleClass="noFill button-size-small"
+                                                                    action="#{propertyProfileBB.onInfoCaseListButtonChange}"
+                                                                    icon="fa fa-clipboard"
+                                                                    />
+                                                
+                                                <p:spacer height="5px" />
+
+                                                <p:dataTable id="prop-events-table"
+                                                             var="event"
+                                                             value="#{propertyProfileBB.currentProperty.completeEventList}"
+                                                             tableStyleClass="primeDataTable"
+                                                             rowKey="#{event.eventID}"
+                                                             >
+
+                                                    <p:column headerText="ID"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{event.eventID}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Category"
+                                                              styleClass="centeredColumnContent">
+                                                        <h:outputText value="#{event.category.eventCategoryTitle}" />
+
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Description"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{event.description}"/>
+
+                                                    </p:column>
+                                                    <p:column headerText="View"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <p:commandButton    id="prop-events-open-button"
+                                                                            ajax="false"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{propertyProfileBB.onViewEventButtonChange(event)}"
+                                                                            icon="fa fa-folder-open-o"
+                                                                            />
+
+
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </h:form>
+
+                                        </p:panel>
+
+
+
+                                        <p:panel    id="prop-persons-panel"
+                                                    toggleable="true"
+                                                    widgetVar="prop-events-panel-var"
+                                                    collapsed="false"
+                                                    header="Persons">
+                                            <h:form id="prop-persons-panel-form">
+
+                                                <p:commandButton   id="prop-persons-manage-button"
+                                                                   ajax="true" 
+                                                                   actionListener="#{propertyProfileBB.onPersonManageButtonChange}"
+                                                                   oncomplete="PF('prop-persons-manage-var').show()"
+                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
+                                                                   value="Manage Persons"  
+                                                                   icon="fa fa-user-plus"
+                                                                   />
+                                                
+                                                <p:spacer height="5px" />
+
+                                                <p:dataTable id="prop-persons-table"
+                                                             var="person"
+                                                             value="#{propertyProfileBB.currentProperty.personList}"
+                                                             tableStyleClass="primeDataTable"
+                                                             rowKey="#{person.personID}"
+                                                             >
+
+                                                    <p:column headerText="Name"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{person.lastName}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Type"
+                                                              styleClass="centeredColumnContent">
+                                                        <h:outputText value="#{person.personType.label}" />
+
+
+                                                    </p:column>
+                                                    
+                                                    <p:column headerText="Last updated"
+                                                              styleClass="centeredColumnContent">
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(person.lastUpdated)}" />
+
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Sys ID"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{person.personID}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="View"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <p:commandButton    id="prop-person-exploreperson-button"
+                                                                            ajax="false"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{propertyProfileBB.onViewPersonProfileButtonChange(person)}"
+                                                                            icon="fa fa-folder-open-o"
+                                                                            />
+
+                                                    </p:column>
+
+
+                                                </p:dataTable>
+                                            </h:form>
+
+
+                                        </p:panel>
+
+                                        <p:panel    id="prop-cases-panel"
+                                                    toggleable="true"
+                                                    widgetVar="prop-cases-panel-var"
+                                                    collapsed="false"
+                                                    header="Code Enf. Cases">
+                                            <h:form id="prop-cases-panel-form">
+                                                <p:dataTable id="prop-cases-table"
+                                                             var="cse"
+                                                             value="#{propertyProfileBB.currentProperty.ceCaseList}"
+                                                             tableStyleClass="primeDataTable"
+                                                             rowKey="#{cse.caseID}"
+                                                             >
+
+
+                                                    <p:column headerText="Status"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{cse.open ? 'Open' : 'Closed'}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Name"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{cse.caseName}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Phase"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{cse.casePhase.label}"/>
+
+                                                    </p:column>
+                                                    <p:column headerText="ID"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{cse.caseID}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="View"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <p:commandButton    id="prop-person-exploreperson-button"
+                                                                            ajax="false"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{propertyProfileBB.onViewCaseButtonChange(cse)}"
+                                                                            icon="fa fa-folder-open-o"
+                                                                            />
+
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <p:panel    id="prop-units-panel"
+                                                    toggleable="true"
+                                                    widgetVar="prop-events-panel-var"
+                                                    collapsed="false"
+                                                    header="Units">
+                                            <h:form id="prop-units-panel-form">
+
+
+                                                <p:commandButton    id="prop-units-explore-button"
+                                                                    ajax="false"
+                                                                    styleClass="noFill button-size-small"
+                                                                    action="#{propertyProfileBB.onPropUnitExploreButtonChange}"
+                                                                    icon="fa fa-home"
+                                                                    />
+
+
+                                                <p:dataTable id="prop-units-table"
+                                                             var="unit"
+                                                             value="#{propertyProfileBB.currentProperty.unitWithListsList}"
+                                                             tableStyleClass="primeDataTable"
+                                                             rowKey="#{unit.unitID}"
+                                                             >
+
+                                                    <p:column headerText="Number"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{unit.unitNumber}"/>
+
+                                                    </p:column>
+                                                    
+                                                    <p:column headerText="# Occ Periods"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{unit.periodList.size()}"/>
+
+                                                    </p:column>
+                                                    
+                                                    
+                                                    <p:column headerText="Rent start"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
+
+                                                    </p:column>
+                                                    
+                                                    <p:column headerText="Rent stop"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
+
+                                                    </p:column>
+                                                    
+                                                    <p:column headerText="Last updated"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.lastUpdatedTS)}"/>
+
+                                                    </p:column>
+                                                    
+                                                    <p:column headerText="Sys ID"
+                                                              styleClass="centeredColumnContent">
+                                                        <h:outputText value="#{unit.unitID}"/>
+
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Add Period"
+                                                              styleClass="centeredColumnContent">
+
+                                                          <p:commandButton   id="prop-unit-newperiod-button"
+                                                                   ajax="true" 
+                                                                   actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
+                                                                   oncomplete="PF('prop-addperiod-dialog-var').show()"
+                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
+                                                                   value="New Period"  
+                                                                   icon="fa fa-id-card-o"
+                                                                   />
+                                                        
+
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </h:form>
+
+
+
+                                        </p:panel>
+
 
                                         <p:panel    id="prop-extinfo-panel"
                                                     toggleable="true"
@@ -643,45 +1050,35 @@
                                                     header="External Data Records">
 
                                             <h:form id="prop-extinfo-panel-form">
-                                                <p:dataTable id="muniTable"
-                                                             var="muni"
-                                                             value="#{municipalityManageSampleBB.currentMuniList}"
+                                                <p:dataTable id="prop-extinfo-table"
+                                                             var="record"
+                                                             value="#{propertyProfileBB.currentProperty.extDataList}"
                                                              tableStyleClass="primeDataTable"
+                                                             rowKey="#{record.extdataid}"
                                                              >
 
-                                                    <p:column headerText="Code"
+                                                    <p:column headerText="Date"
                                                               styleClass="centeredColumnContent">
 
-                                                        <h:outputText value="#{muni.muniCode}"/>
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(record.lastupdated)}"/>
 
                                                     </p:column>
 
-                                                    <p:column headerText="Name"
+                                                    <p:column headerText="Owner name"
                                                               styleClass="centeredColumnContent">
 
-                                                        <h:outputText value="#{muni.muniName}"/>
+                                                        <h:outputText value="#{record.ownername}"/>
 
                                                     </p:column>
 
-                                                    <p:column headerText="Option"
-                                                              styleClass="centeredColumnContent"
-                                                              style="width: 80px"
-                                                              >
+                                                    <p:column headerText="Tax status"
+                                                              styleClass="centeredColumnContent">
 
-                                                        <p:selectBooleanButton onLabel="Deselect" 
-                                                                               offLabel="Select"
-                                                                               styleClass="selectButton" 
-                                                                               value="#{municipalityManageSampleBB.currentMuniSelected}"
-                                                                               disabled="#{municipalityManageSampleBB.getSelectedButtonActive()}"
-                                                                               >
-
-                                                            <p:ajax update="
-                                                                    form-messages-global"
-                                                                    listener="#{municipalityManageSampleBB.onMuniSelectedButtonChange(muni.muniCode)}"/>
-
-                                                        </p:selectBooleanButton>
+                                                        <h:outputText value="#{record.taxstatus}"/>
 
                                                     </p:column>
+
+
 
                                                 </p:dataTable>
 
@@ -699,6 +1096,102 @@
 
                         </div>
                     </p:outputPanel>
+
+
+                 
+
+                    <p:dialog   id="prop-persons-manage-dialog"
+                                height="300" width="550"
+                                widgetVar="prop-persons-manage-var"
+                                closable="true"
+                                header="Manage Person Connections"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                >
+
+                        <h:form id="prop-persons-manage-form">
+
+                            <h:messages id="prop-persons-manage-form-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+                            <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Current person list:"/>
+                            <p:selectOneMenu id="person-list-menu" required="false" value="#{propertyProfileBB.personSelected}">
+                                <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                <f:selectItems value="#{sessionBean.sessPersonList}"  var="p" itemValue="#{p}" 
+                                               itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                <f:converter converterId="personConverter"/>
+                            </p:selectOneMenu>
+                            <h:message for="person-list-menu" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                            <p:commandButton    ajax="true" actionListener="#{propertyProfileBB.queueSelectedPerson}"
+                                                value="Add selected person to event" disabled="true"
+                                                update="persons-to-add-ds"/>
+                            <p:spacer height="5px"/>
+
+                            <p:dataScroller     id="persons-to-add-ds"
+                                                value="#{propertyProfileBB.personToAddList}"
+                                                var="pers">
+                                <h:outputText value="#{pers.firstName} #{pers.lastName} (id:#{pers.personID})"/>
+                                <p:commandButton    ajax="true" icon="fa fa-stop"
+                                                    process="persons-to-add-ds" immediate="true"
+                                                    actionListener="#{eventsBB.deQueuePersonFromEvent(pers)}"
+                                                    update="persons-to-add-ds"/>
+                            </p:dataScroller>
+
+
+
+
+                        </h:form>
+                    </p:dialog>
+                    
+                    <p:dialog    id="prop-addperiod-dialog"
+                                 height="400" width="600"
+                                 widgetVar="prop-addperiod-dialog-var"
+                                 closable="true" 
+                                 header="Add New Occupancy Period">
+
+
+                        <h:form id="dialog-addoccperiod-form">
+                            <h:messages id="prop-occperiods-addop-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+
+                            <h:outputLabel styleClass="ui-label" for="som-occperiodtype" value="Occupancy type" />
+
+                            <p:selectOneMenu
+                                id="som-occperiodtype" tabindex="1" required="true"
+                                value="#{propertyOccPeriodsBB.selectedOccPeriodType}">
+                                <f:converter converterId="occPeriodTypeConverter"/>
+                                <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
+                                <f:selectItems id="si-typelist" 
+                                               value="#{propertyOccPeriodsBB.occPeriodTypeList}" 
+                                               var ="opt" 
+                                               itemValue="#{opt}" 
+                                               itemLabel="#{opt.title}" />
+                            </p:selectOneMenu>
+
+                            <p:spacer height="5px" />
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('dialog-addoccperiod-var').hide()"
+                                             tabindex="4"/>
+
+
+                            <p:commandButton ajax="false"
+                                             action="#{propertyOccPeriodsBB.addNewOccPeriod}"
+                                             icon="fa fa-plus-square"
+                                             styleClass="inline-button"
+                                             value="Create new period" 
+                                             tabindex="3"/>
+
+                        </h:form>
+                    </p:dialog>
+
                 </f:view>
 
                 <script type="text/javascript">

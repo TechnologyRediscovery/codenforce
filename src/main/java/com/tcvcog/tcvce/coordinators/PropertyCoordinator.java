@@ -94,6 +94,16 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             qcse = sc.initQuery(QueryCECaseEnum.PROPINFOCASES, cred);
             qcse.getPrimaryParams().setProperty_val(prop);
             pdh.setPropInfoCaseList(cc.getCECaseHeavyList(sc.runQuery(qcse).getBOBResultList(), cred));
+            
+            // check list and see if it's emtpy; 
+            if(pdh.getPropInfoCaseList() == null){
+                pdh.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
+            }
+                
+            if(pdh.getPropInfoCaseList().isEmpty()){
+                createPropertyInfoCase(pdh, ua);
+            }
+            
 
             // UnitDataHeavy list
             // remember that units data heavy contain all our occ periods and inspections
@@ -113,7 +123,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             //pdh.setBlobList(new ArrayList<Integer>());
             
             // external data
-            pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyHistoryList(cred)));
+            pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getPropertyID())));
             
         } catch (EventException | AuthorizationException ex) {
             System.out.println(ex);
@@ -238,25 +248,36 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param p
      * @param ua
      * @return 
+     * @throws com.tcvcog.tcvce.domain.SearchException 
      */
-    public PropertyDataHeavy configurePDHInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException{
+    public PropertyDataHeavy createPropertyInfoCase(PropertyDataHeavy p, Credential cred) throws SearchException{
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
-        CECase cse = null;
-        try {
-            cse = cc.initCECase(p, uc.getUser(ua.getKeyCard().getGoverningAuthPeriod().getUserID()));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+        CECase cse = cc.initCECase(p, cred);
         //review all case mems and set app ones for info case
+        
         try {
-            cc.insertNewCECase(cse, ua, null);
+            cse.setCaseManager(uc.getUser(cred.getGoverningAuthPeriod().getUserID()));
+            cc.insertNewCECase(cse, cred, null);
         } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
             System.out.println(ex);
         }
+        if(p.getPropInfoCaseList() == null){
+            p.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
+        }
+        
+            
         return p;
     }
 
+    /**
+     * Primary pathway for the creation of new records in the property table--the biggie!!
+     * @param prop
+     * @param ua
+     * @return
+     * @throws IntegrationException 
+     */
+    
     public int addProperty(Property prop, UserAuthorized ua) throws IntegrationException {
         PropertyIntegrator pi = getPropertyIntegrator();
         SystemIntegrator si = getSystemIntegrator();

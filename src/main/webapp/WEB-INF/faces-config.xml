@@ -1216,7 +1216,7 @@
         <navigation-case>
             <from-action>#{caseAddBB.addNewCase}</from-action>
             <from-outcome>ceCases</from-outcome>
-            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -2003,6 +2003,12 @@
     <managed-bean>
         <managed-bean-name>directiveChoiceConfigBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.DirectiveChoiceConfigBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+            
+    <managed-bean>
+        <managed-bean-name>workflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.WorkflowBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     

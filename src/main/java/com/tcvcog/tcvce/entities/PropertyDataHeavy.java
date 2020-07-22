@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -177,6 +178,60 @@ public  class       PropertyDataHeavy
         
         return perList;
         
+    }
+    
+    /**
+     * Extracts proposals from all PropertyInfo cases attached to property
+     * @param vope
+     * @return 
+     */
+    public List assembleProposalList(ViewOptionsProposalsEnum vope) {
+        List<Proposal> proposalList = new ArrayList<>();
+        List<Proposal> proposalListVisible = new ArrayList<>();
+        if(propInfoCaseList != null && !propInfoCaseList.isEmpty()){
+            for(CECaseDataHeavy cse: propInfoCaseList){
+                proposalList.addAll(cse.assembleProposalList(ViewOptionsProposalsEnum.VIEW_ALL));
+            }
+        }
+        
+        
+        if (!proposalList.isEmpty()) {
+            for (Proposal p : proposalList) {
+                switch (vope) {
+                    case VIEW_ALL:
+                        proposalListVisible.add(p);
+                        break;
+                    case VIEW_ACTIVE_HIDDEN:
+                        if (p.isActive() && p.isHidden()) {
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if (p.isActive() && !p.isHidden() && !p.getDirective().isRefuseToBeHidden()) {
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_EVALUATED:
+                        if (p.getResponseTS() != null) {
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_INACTIVE:
+                        if (!p.isActive()) {
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    case VIEW_NOT_EVALUATED:
+                        if (p.getResponseTS() == null) {
+                            proposalListVisible.add(p);
+                        }
+                        break;
+                    default:
+                        proposalListVisible.add(p);
+                } // switch
+            } // for
+        } // if
+        return proposalListVisible;
     }
     
     public List<EventCnF> getCompleteEventList(){

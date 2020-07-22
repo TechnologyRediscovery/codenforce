@@ -297,14 +297,14 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                         "            vacantdatestart, vacantdatestop, vacantby_userid, condition_intensityclassid, \n" +
                         "            landbankprospect_intensityclassid, landbankheld, active, nonaddressable, \n" +
                         "            usetype_typeid, creationts)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, now(), ?, \n" +
-                        "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, \n" +
-                        "            ?, now());"; // im so sorry 
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" + // 1-4
+                        "            ?, ?, ?, ?, ?, \n" + // 5-9
+                        "            ?, ?, ?, ?, now(), ?, \n" + // 10-14
+                        "            ?, ?, ?, ?, \n" + // 15-18
+                        "            ?, ?, ?, ?, \n" + // 19-22
+                        "            ?, ?, ?, ?, \n" + // 23-26
+                        "            ?, ?, ?, ?, \n" + // 27-30
+                        "            ?, now());"; // im so sorry  // 31
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -328,96 +328,96 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(11, prop.getAddress_zip());
             stmt.setString(12, prop.getOwnerCode());
             stmt.setString(13, prop.getPropclass());
-            
-            if(prop.getLastUpdatedTS() != null){
-                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(prop.getLastUpdatedTS()));
+            if(prop.getLastUpdatedBy() != null){
+                stmt.setInt(14, prop.getLastUpdatedBy().getUserID());
             } else {
-                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+                stmt.setNull(14, java.sql.Types.NULL);
             }
             
-            if(prop.getLastUpdatedBy() != null){
-                stmt.setInt(15, prop.getLastUpdatedBy().getUserID());
+            // line break
+            if(prop.getLocationDescriptor() != null){
+                stmt.setInt(15, prop.getLocationDescriptor().getLocationID());
             } else {
                 stmt.setNull(15, java.sql.Types.NULL);
             }
-            
-            if(prop.getLocationDescriptor() != null){
-                stmt.setInt(16, prop.getLocationDescriptor().getLocationID());
+            if(prop.getBobSource()!= null){
+                stmt.setInt(16, prop.getBobSource().getSourceid());
             } else {
                 stmt.setNull(16, java.sql.Types.NULL);
             }
-            
-            if(prop.getBobSource()!= null){
-                stmt.setInt(17, prop.getBobSource().getSourceid());
+            if(prop.getUnfitDateStart() != null){
+                stmt.setTimestamp(17, java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
             } else {
                 stmt.setNull(17, java.sql.Types.NULL);
             }
-            
-            if(prop.getUnfitDateStart() != null){
-                stmt.setTimestamp(18, java.sql.Timestamp.valueOf(prop.getUnfitDateStart()));
+            if(prop.getUnfitDateStop() != null){
+                stmt.setTimestamp(18, java.sql.Timestamp.valueOf(prop.getUnfitDateStop()));
             } else {
                 stmt.setNull(18, java.sql.Types.NULL);
             }
             
-            if(prop.getUnfitDateStop() != null){
-                stmt.setTimestamp(19, java.sql.Timestamp.valueOf(prop.getUnfitDateStop()));
+            
+            if(prop.getUnfitBy() != null){
+                stmt.setInt(19, prop.getUnfitBy().getUserID());
             } else {
                 stmt.setNull(19, java.sql.Types.NULL);
             }
             
-            if(prop.getUnfitBy() != null){
-                stmt.setInt(20, prop.getUnfitBy().getUserID());
-            } else {
+            if(prop.getAbandonedDateStart()!= null){
+                stmt.setTimestamp(20, java.sql.Timestamp.valueOf(prop.getAbandonedDateStart()));
+            }else {
                 stmt.setNull(20, java.sql.Types.NULL);
             }
             
-            if(prop.getAbandonedDateStart()!= null){
-                stmt.setTimestamp(21, java.sql.Timestamp.valueOf(prop.getAbandonedDateStart()));
-            }
             if(prop.getAbandonedDateStop()!= null){
-                stmt.setTimestamp(22, java.sql.Timestamp.valueOf(prop.getAbandonedDateStop()));
+                stmt.setTimestamp(21, java.sql.Timestamp.valueOf(prop.getAbandonedDateStop()));
+            }else {
+                stmt.setNull(21, java.sql.Types.NULL);
             }
             
             if(prop.getAbandonedBy()!= null){
-                stmt.setInt(23, prop.getAbandonedBy().getUserID());
+                stmt.setInt(22, prop.getAbandonedBy().getUserID());
             } else {
-                stmt.setNull(23, java.sql.Types.NULL);
+                stmt.setNull(22, java.sql.Types.NULL);
             }
             
             if(prop.getVacantDateStart()!= null){
-                stmt.setTimestamp(24, java.sql.Timestamp.valueOf(prop.getVacantDateStart()));
+                stmt.setTimestamp(23, java.sql.Timestamp.valueOf(prop.getVacantDateStart()));
+            }else {
+                stmt.setNull(23, java.sql.Types.NULL);
             }
             if(prop.getVacantDateStop()!= null){
-                stmt.setTimestamp(25, java.sql.Timestamp.valueOf(prop.getVacantDateStop()));
+                stmt.setTimestamp(24, java.sql.Timestamp.valueOf(prop.getVacantDateStop()));
+            }else {
+                stmt.setNull(24, java.sql.Types.NULL);
             }
-            
             if(prop.getVacantBy()!= null){
-                stmt.setInt(26, prop.getVacantBy().getUserID());
+                stmt.setInt(25, prop.getVacantBy().getUserID());
             } else {
-                stmt.setNull(26, java.sql.Types.NULL);
+                stmt.setNull(25, java.sql.Types.NULL);
             }
 
             if(prop.getCondition()!= null){
-                stmt.setInt(27, prop.getCondition().getClassID());
+                stmt.setInt(26, prop.getCondition().getClassID());
             } else {
-                stmt.setNull(27, java.sql.Types.NULL);
+                stmt.setNull(26, java.sql.Types.NULL);
             }
             
 
             if(prop.getLandBankProspect()!= null){
-                stmt.setInt(28, prop.getLandBankProspect().getClassID());
+                stmt.setInt(27, prop.getLandBankProspect().getClassID());
             } else {
-                stmt.setNull(28, java.sql.Types.NULL);
+                stmt.setNull(27, java.sql.Types.NULL);
             }
             
-            stmt.setBoolean(29, prop.isLandBankHeld());
-            stmt.setBoolean(30, prop.isActive());
-            stmt.setBoolean(31, prop.isNonAddressable());
+            stmt.setBoolean(28, prop.isLandBankHeld());
+            stmt.setBoolean(29, prop.isActive());
+            stmt.setBoolean(30, prop.isNonAddressable());
             
             if(prop.getUseType() != null){
-                stmt.setInt(32, prop.getUseType().getTypeID());
+                stmt.setInt(31, prop.getUseType().getTypeID());
             } else {
-                stmt.setNull(32, java.sql.Types.NULL);
+                stmt.setNull(31, java.sql.Types.NULL);
             }
 
             stmt.execute();
@@ -1632,6 +1632,14 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     }
     
+    
+    
+    // *************************************************************************
+    // **                 EXTERNAL DATA                                       **
+    // *************************************************************************
+    
+    /**
+    
     /**
      * Returns a full table dump of PropertyUseType entries
      * @param propID
@@ -1712,7 +1720,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         PropertyExtData bundle = new PropertyExtData();
         
         bundle.setExtdataid(rs.getInt("extdataid"));
-        bundle.setProperty_propertyid(rs.getInt("property_proertyid"));
+        bundle.setProperty_propertyid(rs.getInt("property_propertyid"));
         bundle.setOwnername(rs.getString("ownername"));
         bundle.setOwnerphone(rs.getString("ownerphone"));
         bundle.setAddress_street(rs.getString("address_street"));
@@ -1736,7 +1744,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
         bundle.setTaxstatusyear(rs.getInt("taxstatusyear"));
         bundle.setNotes(rs.getString("notes"));
-        bundle.setLastupdated(rs.getTimestamp("rs.getlastupdated").toLocalDateTime());
+        bundle.setLastupdated(rs.getTimestamp("lastupdated").toLocalDateTime());
         bundle.setTax(rs.getString("tax"));
         bundle.setTaxcode(rs.getString("taxcode"));
         bundle.setTaxsubcode(rs.getString("taxsubcode"));

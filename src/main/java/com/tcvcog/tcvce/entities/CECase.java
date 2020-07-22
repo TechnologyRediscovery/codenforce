@@ -56,6 +56,11 @@ public class        CECase
     protected List<CodeViolation> violationList;
     
     protected boolean active;
+    protected int personInfoPersonID;
+    protected boolean propertyInfoCase;
+    
+    protected User lastUpdatedBy;
+    protected LocalDateTime lastUpdatedTS;
     
     public CECase(){
     }
@@ -477,6 +482,62 @@ public class        CECase
      */
     public void setPropertyUnitID(int propertyUnitID) {
         this.propertyUnitID = propertyUnitID;
+    }
+
+    /**
+     * @return the propertyInfoCase
+     */
+    public boolean isPropertyInfoCase() {
+        return propertyInfoCase;
+    }
+
+    /**
+     * @param propertyInfoCase the propertyInfoCase to set
+     */
+    public void setPropertyInfoCase(boolean propertyInfoCase) {
+        this.propertyInfoCase = propertyInfoCase;
+    }
+
+    /**
+     * @return the personInfoPersonID
+     */
+    public int getPersonInfoPersonID() {
+        return personInfoPersonID;
+    }
+
+    /**
+     * @param personInfoPersonID the personInfoPersonID to set
+     */
+    public void setPersonInfoPersonID(int personInfoPersonID) {
+        this.personInfoPersonID = personInfoPersonID;
+    }
+
+    /**
+     * @return the lastUpdatedBy
+     */
+    public User getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    /**
+     * @return the lastUpdatedTS
+     */
+    public LocalDateTime getLastUpdatedTS() {
+        return lastUpdatedTS;
+    }
+
+    /**
+     * @param lastUpdatedBy the lastUpdatedBy to set
+     */
+    public void setLastUpdatedBy(User lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    /**
+     * @param lastUpdatedTS the lastUpdatedTS to set
+     */
+    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
+        this.lastUpdatedTS = lastUpdatedTS;
     }
 
     

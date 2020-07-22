@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Storage container for records extracted from the
@@ -45,6 +46,127 @@ public class PropertyExtData {
     private int livingarea;
     private String condition;
     private String taxstatus;
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + this.extdataid;
+        hash = 67 * hash + this.property_propertyid;
+        hash = 67 * hash + Objects.hashCode(this.ownername);
+        hash = 67 * hash + Objects.hashCode(this.ownerphone);
+        hash = 67 * hash + Objects.hashCode(this.address_street);
+        hash = 67 * hash + Objects.hashCode(this.address_citystatezip);
+        hash = 67 * hash + Objects.hashCode(this.address_city);
+        hash = 67 * hash + Objects.hashCode(this.address_state);
+        hash = 67 * hash + Objects.hashCode(this.address_zip);
+        hash = 67 * hash + (int) (Double.doubleToLongBits(this.saleprice) ^ (Double.doubleToLongBits(this.saleprice) >>> 32));
+        hash = 67 * hash + (int) (Double.doubleToLongBits(this.saleyear) ^ (Double.doubleToLongBits(this.saleyear) >>> 32));
+        hash = 67 * hash + (int) (Double.doubleToLongBits(this.assessedlandvalue) ^ (Double.doubleToLongBits(this.assessedlandvalue) >>> 32));
+        hash = 67 * hash + (int) (Double.doubleToLongBits(this.assessedbuildingvalue) ^ (Double.doubleToLongBits(this.assessedbuildingvalue) >>> 32));
+        hash = 67 * hash + this.assessmentyear;
+        hash = 67 * hash + Objects.hashCode(this.usecode);
+        hash = 67 * hash + this.yearbuilt;
+        hash = 67 * hash + this.livingarea;
+        hash = 67 * hash + Objects.hashCode(this.condition);
+        hash = 67 * hash + Objects.hashCode(this.taxstatus);
+        hash = 67 * hash + this.taxstatusyear;
+        hash = 67 * hash + Objects.hashCode(this.notes);
+        hash = 67 * hash + Objects.hashCode(this.lastupdated);
+        hash = 67 * hash + Objects.hashCode(this.tax);
+        hash = 67 * hash + Objects.hashCode(this.taxcode);
+        hash = 67 * hash + Objects.hashCode(this.taxsubcode);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PropertyExtData other = (PropertyExtData) obj;
+        if (this.extdataid != other.extdataid) {
+            return false;
+        }
+        if (this.property_propertyid != other.property_propertyid) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.saleprice) != Double.doubleToLongBits(other.saleprice)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.saleyear) != Double.doubleToLongBits(other.saleyear)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.assessedlandvalue) != Double.doubleToLongBits(other.assessedlandvalue)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.assessedbuildingvalue) != Double.doubleToLongBits(other.assessedbuildingvalue)) {
+            return false;
+        }
+        if (this.assessmentyear != other.assessmentyear) {
+            return false;
+        }
+        if (this.yearbuilt != other.yearbuilt) {
+            return false;
+        }
+        if (this.livingarea != other.livingarea) {
+            return false;
+        }
+        if (this.taxstatusyear != other.taxstatusyear) {
+            return false;
+        }
+        if (!Objects.equals(this.ownername, other.ownername)) {
+            return false;
+        }
+        if (!Objects.equals(this.ownerphone, other.ownerphone)) {
+            return false;
+        }
+        if (!Objects.equals(this.address_street, other.address_street)) {
+            return false;
+        }
+        if (!Objects.equals(this.address_citystatezip, other.address_citystatezip)) {
+            return false;
+        }
+        if (!Objects.equals(this.address_city, other.address_city)) {
+            return false;
+        }
+        if (!Objects.equals(this.address_state, other.address_state)) {
+            return false;
+        }
+        if (!Objects.equals(this.address_zip, other.address_zip)) {
+            return false;
+        }
+        if (!Objects.equals(this.usecode, other.usecode)) {
+            return false;
+        }
+        if (!Objects.equals(this.condition, other.condition)) {
+            return false;
+        }
+        if (!Objects.equals(this.taxstatus, other.taxstatus)) {
+            return false;
+        }
+        if (!Objects.equals(this.notes, other.notes)) {
+            return false;
+        }
+        if (!Objects.equals(this.tax, other.tax)) {
+            return false;
+        }
+        if (!Objects.equals(this.taxcode, other.taxcode)) {
+            return false;
+        }
+        if (!Objects.equals(this.taxsubcode, other.taxsubcode)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastupdated, other.lastupdated)) {
+            return false;
+        }
+        return true;
+    }
     private int taxstatusyear;
     private String notes;
     private LocalDateTime lastupdated;
@@ -52,6 +174,7 @@ public class PropertyExtData {
     private String taxcode;
     private String taxsubcode;
 
+    
     /**
      * @return the extdataid
      */

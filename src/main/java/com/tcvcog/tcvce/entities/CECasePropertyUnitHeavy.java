@@ -64,6 +64,11 @@ public class CECasePropertyUnitHeavy
         this.violationList = cse.violationList;
        
         this.active = cse.active;
+        this.propertyInfoCase = cse.propertyInfoCase;
+        this.personInfoPersonID = cse.getPersonInfoPersonID();
+        
+        this.lastUpdatedBy = cse.getLastUpdatedBy();
+        this.lastUpdatedTS = cse.getLastUpdatedTS();
 
     }
 

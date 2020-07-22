@@ -71,7 +71,7 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable{
         
         try {
             cc.insertNewCECase(newCase, getSessionBean().getSessUser(), cear);
-            getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(newCase, getSessionBean().getSessUser().getMyCredential()));
+            getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(newCase, getSessionBean().getSessUser()));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully added case to property! Access the case from the list below.", ""));

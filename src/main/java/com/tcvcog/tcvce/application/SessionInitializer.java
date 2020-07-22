@@ -587,8 +587,8 @@ public  class       SessionInitializer
         SearchCoordinator sc = getSearchCoordinator();
         
         try {
-        
-            sb.setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(cc.assembleCaseHistory(cred)));
+            // NEXT LINE: YUCK!!!!!!!!
+            sb.setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(cc.assembleCECaseDataHeavyList(cc.assembleCaseHistory(cred),cred),cred));
             if(sb.getSessCECaseList().isEmpty()){
                 sb.setSessCECase(cc.assembleCECaseDataHeavy(cc.selectDefaultCECase(cred), cred));
             } else {

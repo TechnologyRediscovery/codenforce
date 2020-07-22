@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
@@ -210,7 +211,8 @@ public class CECaseSearchBB
     public void loadCECaseHistory(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            caseList.addAll(cc.assembleCECasePropertyUnitHeavyList(cc.assembleCaseHistory(getSessionBean().getSessUser().getMyCredential())));
+            Credential cred = getSessionBean().getSessUser().getMyCredential();
+            caseList.addAll(cc.assembleCECaseDataHeavyList(cc.assembleCaseHistory(cred), cred));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Case history loaded", ""));
@@ -219,7 +221,7 @@ public class CECaseSearchBB
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not load case history, sorry.", ""));
-        } catch (SearchException | BObStatusException ex) {
+        } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
