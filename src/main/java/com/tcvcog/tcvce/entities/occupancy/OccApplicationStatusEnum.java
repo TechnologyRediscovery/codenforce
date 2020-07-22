@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) 2020 Technology Rediscovery LLC.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,26 +14,27 @@ Council of Governments, PA
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.tcvcog.tcvce.entities.occupancy;
 
 /**
  *
- * @author ellen bascomb of apt 31y
+ * @author Nathan Dietz
  */
-public enum OccInspectionStatusEnum {
-
-    NOTINSPECTED("Not inspected", 0, "inspectionStatusIcon_notinspected"),
-    PASS("Passed", 1, "inspectionStatusIcon_pass"),
-    FAIL("Failed", 2, "inspectionStatusIcon_fail");
+public enum OccApplicationStatusEnum {
+    
+    Waiting("Submitted, Awaiting Review", 0, "inspectionStatusIcon_notinspected"),
+    NewOccPeriod("Attached to new OccPeriod", 1, "inspectionStatusIcon_pass"),
+    OldOccPeriod("Attached to existing OccPeriod", 2, "inspectionStatusIcon_pass"),
+    Rejected("Application Rejected", 3, "inspectionStatusIcon_fail"),
+    Invalid("Invalid or duplicate application", 4, "inspectionStatusIcon_fail");
     
     private final String label;
-    private final int phaseOrder;
+    private final int pathID;
     private final String iconPropertyLookup;
     
-    private OccInspectionStatusEnum(String label, int ord, String iconLkup){
+    private OccApplicationStatusEnum(String label, int ord, String iconLkup){
         this.label = label;
-        this.phaseOrder = ord;
+        this.pathID = ord;
         this.iconPropertyLookup = iconLkup;
     }
     
@@ -43,12 +43,11 @@ public enum OccInspectionStatusEnum {
     }
     
     public int getOrder(){
-        return phaseOrder;
+        return pathID;
     }
     
     public String getIconPropertyLookup(){
         return iconPropertyLookup;
     }
+    
 }
-
-

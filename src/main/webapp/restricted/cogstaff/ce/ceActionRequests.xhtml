@@ -28,6 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </h:head>
 
     <!--TODO: NOT TAB-INDEXED-->
+    <!--PLEASE READ:
+        In the panels you will see a lot of spacers without a size attribute or anything. These are to take up columns in the grid.
+        If you can come up with a better arrangement for the panels, feel free to get rid of them or rearrange them to your hearts' content.
+    -->
 
     <h:body id="cearManageBody">
 
@@ -426,6 +430,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Description:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestDescription}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Public access reference num (PACC):"/>
@@ -443,10 +456,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-
+                                                    
+                                                    <p:spacer/>
+                                                    
                                                     <h3>Available actions:</h3>
 
                                                     <p:spacer height="5px"/>
+                                                    
+                                                    <p:spacer/>
+                                                    
+                                                    <p:spacer/>
 
                                                     <p:commandButton    id="open-new-case-cb"
                                                                         ajax="false" value="Open new code enf case at this property" 

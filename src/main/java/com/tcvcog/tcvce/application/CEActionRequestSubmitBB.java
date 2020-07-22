@@ -311,8 +311,16 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     public String savePhotosAndContinue() {
 
+        BlobIntegrator bi = getBlobIntegrator();
         for (Blob b : blobList) {
             currentRequest.getBlobIDList().add(b.getBlobID());
+            
+            //Also, save the description to the database.
+            try{
+            bi.updateBlobDescriptors(b);
+            } catch(IntegrationException ex){
+                System.out.println("CEActionRequestSubmitBB.savePhotosAndContinue() | ERROR: " + ex);
+            }
         }
         getSessionBean().setSessCEAR(currentRequest);
         // before moving onto the person page, get a person's skeleton from the coordinator, put it

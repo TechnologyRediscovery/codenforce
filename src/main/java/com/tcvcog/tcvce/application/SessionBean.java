@@ -1346,5 +1346,5 @@ public class    SessionBean
     public void setOccPermitPreferredContact(PublicInfoBundlePerson occPermitPreferredContact) {
         this.occPermitPreferredContact = occPermitPreferredContact;
     }
-    
+
 }

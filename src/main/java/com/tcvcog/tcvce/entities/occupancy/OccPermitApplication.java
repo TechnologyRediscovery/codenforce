@@ -31,8 +31,9 @@ import java.util.List;
 public class OccPermitApplication {
     private int id;
     private OccPermitApplicationReason reason;
+    private OccApplicationStatusEnum status;
     private LocalDateTime submissionDate;
-    private Date submissionDateUtilDate;;
+    private Date submissionDateUtilDate;
     private String submissionNotes;
     private String internalNotes;
     private PropertyUnit applicationPropertyUnit;
@@ -186,6 +187,14 @@ public class OccPermitApplication {
 
     public void setConnectedPeriod(OccPeriod connectedPeriod) {
         this.connectedPeriod = connectedPeriod;
+    }
+
+    public OccApplicationStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(OccApplicationStatusEnum status) {
+        this.status = status;
     }
 
 }

@@ -40,6 +40,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
+import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import java.io.Serializable;
@@ -754,7 +755,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?);   ";
+                + "            ?, ?, ?);";
         ResultSet rs = null;
         Connection con = null;
         PreparedStatement stmt = null;
@@ -1035,8 +1036,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         String query = "INSERT INTO public.occpermitapplication(applicationid,  "
                 + "reason_reasonid, submissiontimestamp, "
                 + "submitternotes, internalnotes, propertyunitid, "
-                + "declaredtotaladults, declaredtotalyouth, rentalintent, occperiod_periodid) "
-                + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                + "declaredtotaladults, declaredtotalyouth, rentalintent, occperiod_periodid, status) "
+                + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::occapplicationstatus) "
                 + "RETURNING applicationid;";
 
         Connection con = null;
@@ -1068,6 +1069,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(7, youth);
             stmt.setBoolean(8, false);
             stmt.setInt(9, application.getConnectedPeriod().getPeriodID());
+            stmt.setString(10, OccApplicationStatusEnum.Waiting.getLabel());
                     
             stmt.execute();
             ResultSet inserted_application = stmt.getResultSet();
@@ -1124,7 +1126,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         OccPermitApplication occpermitapp = null;
         String query = "   SELECT applicationid, reason_reasonid, submissiontimestamp, \n"
                 + "       submitternotes, internalnotes, propertyunitid, declaredtotaladults, \n"
-                + "       declaredtotalyouth, occperiod_periodid, rentalintent\n"
+                + "       declaredtotalyouth, occperiod_periodid, rentalintent, status\n"
                 + "  FROM public.occpermitapplication WHERE applicationid=?;";
 
         Connection con = null;
@@ -1162,6 +1164,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             occpermitapp.setInternalNotes(rs.getString("internalNotes"));
             occpermitapp.setApplicationPropertyUnit(propint.getPropertyUnit(rs.getInt("propertyunitid")));
             occpermitapp.setConnectedPeriod(getOccPeriod(rs.getInt("occperiod_periodid")));
+            occpermitapp.setStatus(OccApplicationStatusEnum.valueOf(rs.getString("status")));
             
             List<Person> personList = new ArrayList<>();
             
@@ -1218,7 +1221,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     public void updateOccPermitApplication(OccPermitApplication application) throws IntegrationException {
         String query = "UPDATE public.occupancypermitapplication"
                 + "SET multiunit=?, reason_reasonid=?, submissiontimestamp=?, "
-                + "submitternotes=?, internalnotes=?, propertyunitid=?"
+                + "submitternotes=?, internalnotes=?, propertyunitid=?, status=?::occapplicationstatus"
                 + "WHERE occupancypermitapplication.applicationid = ?;";
 
         Connection con = getPostgresCon();
@@ -1231,7 +1234,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setString(4, application.getSubmissionNotes());
             stmt.setString(5, application.getInternalNotes());
             stmt.setString(6, String.valueOf(application.getApplicationPropertyUnit().getUnitID()));
-            stmt.setInt(7, application.getId());
+            stmt.setString(7, application.getStatus().name());
+            stmt.setInt(8, application.getId());
             stmt.executeUpdate();
 
         } catch (SQLException ex) {

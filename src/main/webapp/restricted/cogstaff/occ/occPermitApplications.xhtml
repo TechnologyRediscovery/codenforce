@@ -49,7 +49,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h:form id="mode-form">
 
                                         <p:selectOneButton style="width: 100%; margin-top: 10px ; height: 20px;"
-                                                           value="#{OccPermitManageBB.currentMode}" 
+                                                           value="#{occPermitManageBB.currentMode}" 
                                                            >
                                             <f:selectItem itemLabel="SEARCH" itemValue="Search"  />
                                             <f:selectItem itemLabel="ACTIONS" itemValue="Actions"  />
@@ -66,29 +66,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     <p:scrollPanel style="height: 550px;" >
 
-                                        <!--Use Municipality As A Sample For Side Panel-->
-                                        <h:form id="muniManage-form-side">
+                                        <h:form id="occPermitManage-form-side">
 
-                                            <p:dataTable id="muniTable"
-                                                         var="muni"
-                                                         value="#{municipalityManageSampleBB.currentMuniList}"
+                                            <p:dataTable id="occPermitTable"
+                                                         var="permit"
+                                                         value="#{occPermitManageBB.permitList}"
                                                          tableStyleClass="primeDataTable"
                                                          >
 
-                                                <p:column headerText="Code"
+                                                <p:column headerText="ID"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{muni.muniCode}"/>
+                                                    <h:outputText value="#{permit.id}"/>
 
                                                 </p:column>
 
                                                 <p:column headerText="Name"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{muni.muniName}"/>
+                                                    <h:outputText value="#{permit.reason.title}"/>
 
                                                 </p:column>
+                                                
+                                                <p:column headerText="Status"
+                                                          styleClass="centeredColumnContent">
 
+                                                    <h:outputText value="#{permit.status.label}"/>
+
+                                                </p:column>
+                                                
+                                                <p:column headerText="Date Submitted"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{permit.submissionDateUtilDate}"/>
+
+                                                </p:column>
+                                                
                                                 <p:column headerText="Option"
                                                           styleClass="centeredColumnContent"
                                                           style="width: 80px"
@@ -97,15 +110,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <p:selectBooleanButton onLabel="Deselect" 
                                                                            offLabel="Select"
                                                                            styleClass="selectButton" 
-                                                                           value="#{municipalityManageSampleBB.currentMuniSelected}"
-                                                                           disabled="#{municipalityManageSampleBB.getSelectedButtonActive()}"
+                                                                           value="#{occPermitManageBB.currentPermitSelected}"
+                                                                           disabled="#{occPermitManageBB.getSelectedButtonActive()}"
                                                                            >
 
                                                         <p:ajax update="
                                                                 form-messages-global
-                                                                muniManage-form-side
-                                                                muniManage-panel"
-                                                                listener="#{municipalityManageSampleBB.onMuniSelectedButtonChange(muni.muniCode)}"/>
+                                                                occPermitManage-form-side
+                                                                occPermitManage-panel"
+                                                                listener="#{occPermitManageBB.onPermitSelection(permit)}"/>
 
                                                     </p:selectBooleanButton>
 
@@ -125,19 +138,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                 <div class ="object-column">
 
-                                    <p:outputPanel id = "muniManage-panel" >
+                                    <p:outputPanel id = "occPermitManage-panel" >
 
-                                        <!--LookUp Table-->
-                                        <p:panel id="muniManage-panel-lookup"
+                                        <!--Search Table-->
+                                        <p:panel id="occPermitManage-panel-search"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="LoopUp Panel"
-                                                 rendered="#{municipalityManageSampleBB.getActiveLookupMode()}"
+                                                 header="Search Panel"
+                                                 rendered="#{occPermitManageBB.getActiveSearchMode()}"
                                                  >
 
                                             <p:spacer height="10px"/>
 
-                                            <h:form id="muniManage-form-lookup">
+                                            <h:form id="occPermitManage-form-search">
 
                                                 <p:panelGrid columns="4" 
                                                              layout="grid"
@@ -153,17 +166,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </p:panel>
 
 
-                                        <!--Insert Table-->
-                                        <p:panel id="muniManage-panel-insert"
+                                        <!--Actions Table-->
+                                        <p:panel id="occPermitManage-panel-actions"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="Insert Panel"
-                                                 rendered="#{municipalityManageSampleBB.getActiveInsertMode()}"
+                                                 header="Actions Panel"
+                                                 rendered="#{occPermitManageBB.getActiveActionsMode()}"
                                                  >
 
                                             <p:spacer height="10px"/>
 
-                                            <h:form id="muniManage-form-insert">
+                                            <h:form id="occPermitManage-form-actions">
 
                                                 <p:panelGrid columns="4" 
                                                              layout="grid"
@@ -176,29 +189,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 <p:spacer height="10px" />
 
-                                                <!--Insert Button-->
-                                                <p:commandButton icon="fa fa-edit"
-                                                                 ajax="false"
-                                                                 action="#{municipalityManageSampleBB.onInsertButtonChange()}"
-                                                                 value="INSERT"
-                                                                 />
 
                                             </h:form>
 
                                         </p:panel>
 
 
-                                        <!--Update Table-->
-                                        <p:panel id="muniManage-panel-update"
+                                        <!--Objects Table-->
+                                        <p:panel id="occPermitManage-panel-objects"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="LoopUp Panel"
-                                                 rendered="#{municipalityManageSampleBB.getActiveUpdateMode()}"
+                                                 header="Objects Panel"
+                                                 rendered="#{occPermitManageBB.getActiveObjectsMode()}"
                                                  >
 
                                             <p:spacer height="10px"/>
 
-                                            <h:form id="muniManage-form-update">
+                                            <h:form id="occPermitManage-form-objects">
 
                                                 <p:panelGrid columns="4" 
                                                              layout="grid"
@@ -211,29 +218,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 <p:spacer height="10px" />
 
-                                                <!--Update Button-->
-                                                <p:commandButton icon="fa fa-edit"
-                                                                 ajax="false"
-                                                                 action="#{municipalityManageSampleBB.onUpdateButtonChange()}"
-                                                                 value="UPDATE"
-                                                                 />
-
                                             </h:form>
-
                                         </p:panel>
 
 
-                                        <!--Remove Table-->
-                                        <p:panel id="muniManage-panel-remove"
+                                        <!--Notes Table-->
+                                        <p:panel id="occPermitManage-panel-notes"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="LoopUp Panel"
-                                                 rendered="#{municipalityManageSampleBB.getActiveRemoveMode()}"
+                                                 header="Notes Panel"
+                                                 rendered="#{occPermitManageBB.getActiveNotesMode()}"
                                                  >
 
                                             <p:spacer height="10px"/>
 
-                                            <h:form id="muniManage-form-remove">
+                                            <h:form id="occPermitManage-form-notes">
 
                                                 <p:panelGrid columns="4" 
                                                              layout="grid"
@@ -245,13 +244,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </p:panelGrid>
 
                                                 <p:spacer height="10px" />
-
-                                                <!--Remove Button-->
-                                                <p:commandButton icon="fa fa-edit"
-                                                                 ajax="false"
-                                                                 action="#{municipalityManageSampleBB.onRemoveButtonChange()}"
-                                                                 value="Remove"
-                                                                 />
 
                                             </h:form>
 
@@ -268,4 +260,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </ui:composition>
     </h:body>
 </html>
-
