@@ -28,7 +28,7 @@ setup(
     author_email="LearningWithSnapper@gmail.com",
     python_requires=">=3.8",
     # url=URL,
-    # packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*", "parcelidlists"]),
+    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*", "parcelidlists"]),
     # If your package is a single module, use this instead of 'packages':
     py_modules=['parcelupdate',],
 

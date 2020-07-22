@@ -18,9 +18,13 @@ TAXINFO = "lblTaxInfo"
 SPAN = "span"
 TR = "tr"
 
-# Bot attributes
+
+
+# Database attributes
 BOT_NAME = "sylvia"
 BOT_ID = "99"
+COG_DB = "cogdb"
+TEST_DB = "testdb"
 
 # Output directories
 PARCEL_ID_LISTS = "parcelidlists"
