@@ -19,6 +19,7 @@ import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyExtData;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -101,7 +102,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
         pageModes = new ArrayList<>();
-        pageModes.add(PageModeEnum.VIEW);
+        pageModes.add(PageModeEnum.LOOKUP);
         pageModes.add(PageModeEnum.INSERT);
         pageModes.add(PageModeEnum.UPDATE);
         pageModes.add(PageModeEnum.REMOVE);
@@ -109,7 +110,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         if(getSessionBean().isStartPropInfoPageWithAdd()){
             currentMode = PageModeEnum.INSERT;
         } else {
-            currentMode = PageModeEnum.VIEW;
+            currentMode = PageModeEnum.LOOKUP;
         }
         
         personToAddList = new ArrayList<>();
@@ -152,9 +153,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         } else {
             this.currentMode = mode;
             switch(currentMode){
-                case VIEW:
-                    initiatePropertyView();
-                    break;
+                case LOOKUP:
+                    initPropertyLookup();
                 case INSERT:
                     initiatePropertyAdd();
                     break;
@@ -181,10 +181,19 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         }
 
     }
+    
+    
+
+    //check if current mode == Lookup
+    public boolean getActiveLookupMode() {
+        // hard-wired on since there's always a property loaded
+        return PageModeEnum.LOOKUP.equals(currentMode) ;
+    }
 
     //check if current mode == Lookup
     public boolean getActiveViewMode() {
-        return PageModeEnum.VIEW.equals(currentMode);
+        // hard-wired on since there's always a property loaded
+        return true;
     }
 
     //check if current mode == Insert
@@ -237,6 +246,28 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         
         return "eventAdd";
         
+    }
+    
+    /**
+     * Action listener for user request to view a full property record from
+     * the list
+     * @param prop 
+     */
+    public void onExplorePropertyButtonChange(Property prop){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(prop != null){
+            try {
+                currentProperty = pc.getPropertyDataHeavy(prop.getPropertyID(), getSessionBean().getSessUser());
+                 getFacesContext().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "Loaded property record for " + prop.getAddress(), ""));
+            } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    "Fatal error loading property; apologies!", ""));
+            }
+        }
     }
     
     public void onCommitNoteButtonChange(ActionEvent ev){
@@ -305,6 +336,14 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return "propertyUnits";
     }
     
+    /**
+     * Listener for user requests to view advanced search dialog
+     * @param ev 
+     */
+    public void onAdvancedSearchButtonChange(ActionEvent ev){
+        
+        
+    }
 
     
     /**
@@ -316,6 +355,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         
     }
  
+    private void initPropertyLookup(){
+        
+    }
+    
     private void initiatePropertyView(){
         
     }

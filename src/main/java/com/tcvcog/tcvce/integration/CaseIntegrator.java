@@ -318,9 +318,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public List<CECase> getCECasesByProp(int propID) throws IntegrationException, BObStatusException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
-            "            login_userid, casename, casephase, originationdate, closingdate, \n" +
-            "            creationtimestamp, notes, paccenabled, allowuplinkaccess, active \n" +
-            "  FROM public.cecase WHERE property_propertyid = ?;";
+                        "       login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
+                        "       notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
+                        "       bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts \n" +
+                        "  FROM public.cecase WHERE property_propertyid = ?;";
         ResultSet rs = null;
         CaseCoordinator cc = getCaseCoordinator();
         PreparedStatement stmt = null;
@@ -511,7 +512,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setBoolean(9, ceCase.isPaccEnabled());
             stmt.setBoolean(10, ceCase.isAllowForwardLinkedPublicAccess());
             stmt.setBoolean(11, ceCase.isPropertyInfoCase());
-            stmt.setInt(12, ceCase.getPersonInfoPersonID());
+            if(ceCase.getPersonInfoPersonID() != 0){
+                stmt.setInt(12, ceCase.getPersonInfoPersonID());
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL); 
+                
+            }
             
             if(ceCase.getSource() != null){
                 stmt.setInt(13, ceCase.getSource().getSourceid());

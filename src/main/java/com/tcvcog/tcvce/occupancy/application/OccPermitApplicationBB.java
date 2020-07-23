@@ -772,7 +772,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         //Grab the unit list that is currently attached to the property in the database
         try {
-            existingProp = pc.assemblePropertyDataHeavy(prop.getBundledProperty(), uc.getPublicUserAuthorized().getMyCredential());
+            existingProp = pc.assemblePropertyDataHeavy(prop.getBundledProperty(), uc.getPublicUserAuthorized());
 
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println("OccPermitApplicationBB.submitUnitChangeList() | ERROR: " + ex);

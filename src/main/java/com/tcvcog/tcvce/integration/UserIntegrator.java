@@ -675,7 +675,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
          Connection con = getPostgresCon();
         
          String query = "UPDATE public.login\n" +
-            "   SET password= ? WHERE userid = ?";
+            "   SET password = encode(digest(?, 'md5'), 'base64') WHERE userid = ?";
         
         PreparedStatement stmt = null;
         

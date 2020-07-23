@@ -338,12 +338,13 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         CECase cse = cc.initCECase(p, ua);
         //review all case mems and set app ones for info case
         
-        try {
-            cse.setCaseManager(uc.getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
-            cc.insertNewCECase(cse, ua, null);
-        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
-            System.out.println(ex);
-        }
+//        try {
+//            cse.setCaseManager(uc.getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
+// TODO: Debug later
+//            cc.insertNewCECase(cse, ua, null);
+//        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
+//            System.out.println(ex);
+//        }
         if(p.getPropInfoCaseList() == null){
             p.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
         }

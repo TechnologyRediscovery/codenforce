@@ -212,6 +212,14 @@ public class PropertySearchBB extends BackingBeanUtils{
             if(queryList != null && !queryList.isEmpty()){
                 querySelected = queryList.get(0);
             }
+            if(appendResultsToList == false){
+                if(propListMaster != null && !propListMaster.isEmpty()){
+                    propListMaster.clear();
+                }
+            }
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Query reset ", ""));
             
         } catch (IntegrationException ex) {
              System.out.println(ex);

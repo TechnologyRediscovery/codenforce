@@ -895,7 +895,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         Property prop = pri.getPropertyUnitWithProp(application.getApplicationPropertyUnit().getUnitID()).getProperty();
         
-        MunicipalityDataHeavy muni = mc.assembleMuniDataHeavy(prop.getMuni(), user.getMyCredential());
+        MunicipalityDataHeavy muni = mc.assembleMuniDataHeavy(prop.getMuni(), user);
         
         OccPeriod connectedPeriod = initOccPeriod(
                 prop, 

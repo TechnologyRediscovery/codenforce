@@ -162,7 +162,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     private PublicInfoBundleCECase extractPublicInfo(CECase cse) throws IntegrationException, SearchException, EventException, AuthorizationException, BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
-        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse, publicUser.getMyCredential());
+        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse);
 
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
 
@@ -742,6 +742,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         EventCoordinator ec = getEventCoordinator();
         EventCnF unbundled = input.getBundledEvent();
         EventCnFPropUnitCasePeriodHeavy exportable;
+        CaseCoordinator cc = getCaseCoordinator();
 
         try {
 
@@ -755,7 +756,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (unbundled.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
 
-            exportable.setCecase(export(input.getCecase()));
+            exportable.setCecase(cc.assembleCECasePropertyUnitHeavy(export(input.getCecase())));
 
         } else if (unbundled.getDomain() == EventDomainEnum.OCCUPANCY) {
 
@@ -796,7 +797,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
-        CECaseDataHeavy exportable = cc.assembleCECaseDataHeavy(cc.getCECase(input.getBundledCase().getCaseID()), publicUser.getMyCredential());
+        CECaseDataHeavy exportable = cc.assembleCECaseDataHeavy(cc.getCECase(input.getBundledCase().getCaseID()), publicUser);
 
         return exportable;
 

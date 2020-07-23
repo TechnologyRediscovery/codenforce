@@ -58,6 +58,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     
     private String formUsername;
     private String formPassword;
+    private String formPasswordReentry;
     
     private String formNotes;
     
@@ -179,14 +180,22 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         
         UserCoordinator uc = getUserCoordinator();
         try { 
-            uc.updateUserPassword(currentUser, formPassword);
-            refreshCurrentUser();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully udpated your password to --> " + formPassword 
-                                    + " <-- Please write this down in a safe place; "
-                                    + "If you lose it, you'll have to make a new one.", ""));
+            if(formPassword.equals(formPasswordReentry)){
+                uc.updateUserPassword(currentUser, formPassword);
+                refreshCurrentUser();
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Successfully udpated your password to --> " + formPassword 
+                                        + " <-- Please write this down in a safe place; "
+                                        + "If you lose it, you'll have to make a new one.", ""));
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Passwords do not match!", ""));
+                
+            }
             formPassword = "";
+            formPasswordReentry = "";
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -323,6 +332,20 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      */
     public void setUserPersonList(List<Person> userPersonList) {
         this.userPersonList = userPersonList;
+    }
+
+    /**
+     * @return the formPasswordReentry
+     */
+    public String getFormPasswordReentry() {
+        return formPasswordReentry;
+    }
+
+    /**
+     * @param formPasswordReentry the formPasswordReentry to set
+     */
+    public void setFormPasswordReentry(String formPasswordReentry) {
+        this.formPasswordReentry = formPasswordReentry;
     }
 
   

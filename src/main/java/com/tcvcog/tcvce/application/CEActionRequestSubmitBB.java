@@ -139,7 +139,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
                 personCandidateList = getSessionBean().getSessPersonList();
 
-                if (currentRequest.getRequestProperty() != null) {
+//                if (currentRequest.getRequestProperty() != null) {
 //            TODO: occbeta
 
 //            try {
@@ -147,7 +147,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //            } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
 //                System.out.println(ex);
 //            }
-                }
+//                }
             }
 
         }
@@ -161,7 +161,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         if (currentRequest.getMuni() != null) {
             try {
-                issueTypeList = cc.getIssueTypes(currentRequest.getMuni());
+//                issueTypeList = cc.getIssueTypes(currentRequest.getMuni());
+                issueTypeList = cc.getIssueTypes();
             } catch (IntegrationException ex) {
                 System.out.println("Error occured while fetching issue typelist: " + ex);
             }
