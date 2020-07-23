@@ -33,7 +33,7 @@ def _extract_elementlist_from_soup(soup, element_id, element=SPAN, remove_tags=T
         cleaned_content.append(tag)
 
     if len(cleaned_content) != 0:
-        # Todo: Log error here
+        # Todo: Log error HERE
         return cleaned_content
     return cleaned_content
 

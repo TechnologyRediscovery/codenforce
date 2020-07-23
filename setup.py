@@ -5,9 +5,9 @@ from codecs import open # Honestly, I am not sure if this is necessary.
 
 about = {}
 
-# here = os.path.abspath(os.path.dirname(__file__))
+# HERE = os.path.abspath(os.path.dirname(__file__))
 #
-# with open(os.path.join(here, "parcelupdate", '__version__.py'), 'r', 'utf-8') as f:
+# with open(os.path.join(HERE, "parcelupdate", '__version__.py'), 'r', 'utf-8') as f:
 #     exec(f.read(), about)
 
 requires = [

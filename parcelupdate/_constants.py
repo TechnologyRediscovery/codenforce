@@ -24,6 +24,7 @@ TR = "tr"
 BOT_NAME = "sylvia"
 BOT_ID = "99"
 COG_DB = "cogdb"
+BASE_DB = "cogdb"
 TEST_DB = "testdb"
 
 # Output directories

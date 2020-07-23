@@ -9,7 +9,7 @@ def connection_and_cursor(
         password="c0d3",
         host="localhost",
         port=5432,
-        cursor_name="cursor"
+        cursor_name=None
 ):
     try:
         conn = psycopg2.connect(

@@ -1,19 +1,21 @@
 import os
 from os import path
+import datetime
 import psycopg2
-from psycopg2 import extensions
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT # <-- ADD THIS LINE
 from psycopg2.errors import *
 from contextlib import contextmanager
 import re
 
 from _connection import connection_and_cursor
-from parcelupdate._constants import COG_DB, TEST_DB, BOT_NAME
+from parcelupdate._constants import BASE_DB, TEST_DB, BOT_NAME
 
 
-here = path.abspath(path.dirname(__file__))
-patch_folder = path.abspath(
-    path.join(here, "..", "..", "codeconnect", "database", "patches")
+HERE = path.abspath(path.dirname(__file__))
+PATCH_FOLDER = path.abspath(
+    path.join(HERE, "..", "..", "codeconnect", "database", "patches")
 )
+AGGREGATE = "dbpatch_aggregate.sql"
 
 ########################################################################################
 # Human sort: https://nedbatchelder.com/blog/200712/human_sorting.html
@@ -38,35 +40,26 @@ def sort_nicely(l):
 ########################################################################################
 
 def _order_patches():
-    return sort_nicely([f for f in os.listdir(patch_folder) if f.startswith("dbpatch_b")])
+    return sort_nicely([f for f in os.listdir(PATCH_FOLDER) if f.startswith("dbpatch_b")])
     #   Note:   The alphabetical sorting correctly places dbpatch_beta2➕.sql after
     #           dbpatch_beta2.sql and 'dbpatch_beta_RUN_ME_LAST at the end.
 
 def write_aggregate_patch():
     patches = _order_patches()
-    with open(path.join(patch_folder, "dbpatch_aggregate.sql"), "w", encoding="utf-8") as f:
+    with open(path.join(PATCH_FOLDER, AGGREGATE), "w", encoding="utf-8") as f:
+        f.write(f"-- Aggregate patch written on {datetime.datetime.now()}\n")
         for patch in patches:
-            p = open(path.abspath(path.join(patch_folder, patch)), "r")
-            f.write(f"-- {p.name}\n")
+            p = open(path.abspath(path.join(PATCH_FOLDER, patch)), "r")
+            f.write(f"-- {path.basename(p.name)}\n")
             f.writelines(p.readlines())
-            f.write("\n")
+            # for line in p.readlines():
+            #     if line.upper().startswith("BEGIN;"):
+            #         continue
+            #     if line.upper().startswith("COMMIT;"):
+            #         continue
+            #     f.write(f"{line}\n")
+
             p.close()
-
-write_aggregate_patch()
-
-
-
-
-
-
-# with psycopg2.connect(database="testdb", user="sylvia", password="c0d3", port=5432) as db_conn:
-#     with db_conn.cursor(name="test_cursor") as cursor:
-#
-#         def test_datebase_has_matching_schema():
-#             with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", port=5432) as db_conn:
-#                 with db_conn.cursor(name="test_cursor") as cursor:
-
-
 
 # with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", port=5432) as conn:
 #     print ("type(conn):", type(conn))
@@ -107,23 +100,38 @@ write_aggregate_patch()
 #         print("Cursor closed.")
 
 
-def from_patches(patches, **kwargs):
-    def test_database_build_schema(base, test, cursor):
-        select_sql = """
-        SELECT column_name, data_type, column_default, is_nullable
-            FROM   information_schema.columns
-            WHERE  table_name = %s
-            ORDER  BY column_name;
-        """
-        with connection_and_cursor(database=COG_DB) as (base_conn, base_cursor):
-            with connection_and_cursor(database=TEST_DB) as (test_conn, test_cursor):
-
-                base_db = base_cursor.execute(select_sql, [base])
-                test_db = test_cursor.execute(select_sql, [test])
-                if base_db == test_db:
-                    return True
-                return False
-
+def from_patches(**kwargs):
+    """ Writes an empty database from the patches for testing.
+    """
+    write_aggregate_patch()
+    with open(path.join(PATCH_FOLDER, AGGREGATE), "r") as f:
+        sql = "".join(f.readlines())
     with connection_and_cursor(port=5432) as (conn, cursor):
-        pass
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        try:
+            cursor.execute("CREATE DATABASE testdb;")
+            print("Created new testdb")
+        except DuplicateDatabase:
+            cursor.execute("DROP DATABASE testdb;")
+            print("Dropped old testdb")
+            cursor.execute("CREATE DATABASE testdb;")
+            print("Created new testdb")
+    with connection_and_cursor(port=5432, database=TEST_DB) as (t_conn, test_cursor):
+        test_cursor.execute(sql)
+
+        # try:
+        #     cursor.execute("DROP DATABASE testdb;")
+        #     print("Dropped table")
+        # except InvalidCatalogName as e:
+        #     print(e)
+        # conn.autocommit = True
+        # auto_cursor = conn.cursor()
+        # auto_cursor.execute(sql)
+
+from_patches()
+# write_aggregate_patch()
+# with open(path.join(PATCH_FOLDER, AGGREGATE), "r") as f:
+#     sql = "".join(f.readlines())
+# with connection_and_cursor(port=5432) as (conn, cursor):
+#     cursor.execute(sql)
 
