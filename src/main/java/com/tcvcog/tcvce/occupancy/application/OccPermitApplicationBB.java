@@ -713,6 +713,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             submitPersonChangeList(); //so we'll have person records for the export methods to grab
 
+            submitUnitChangeList();
+            
             //Now we assemble the current application from exported version of our bundled fields.
             PropertyUnit exportedUnit = pic.export(selectedUnit);
 
@@ -742,8 +744,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             }
 
             currentApplication.setAttachedPersons(exportedPeople);
-
-            submitUnitChangeList();
 
             oc.insertOccPermitApplication(currentApplication);
 
@@ -815,6 +815,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                 
                 try{
                 workingUnit.setUnitID(pri.insertPropertyUnit(workingUnit));
+                
+                if(workingUnit.getUnitNumber().equals(selectedUnit.getBundledUnit().getUnitNumber())){
+                    selectedUnit.setBundledUnit(workingUnit); //To make sure the application gets linked to this unit
+                }
+                
                 } catch(IntegrationException ex){
                     System.out.println("OccPermitApplicationBB.submitUnitChangeList() | ERROR: " + ex);
                 }
@@ -864,13 +869,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
 
         //We are done getting change orders. It's time to get them ready for the database and insert them.
-        Person changedby = getSessionBean().getSessOccPermitApplication().getApplicantPerson();
+        int changedbyID = applicant.getBundledPerson().getPersonID();
 
         for (PropertyUnitChangeOrder order : changeList) {
 
             //save who made this change order
 
-                order.setChangedBy(changedby.getPersonID());
+                order.setChangedBy(changedbyID);
 
             //Finally, insert the order
             try {

@@ -1069,7 +1069,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(7, youth);
             stmt.setBoolean(8, false);
             stmt.setInt(9, application.getConnectedPeriod().getPeriodID());
-            stmt.setString(10, OccApplicationStatusEnum.Waiting.getLabel());
+            stmt.setString(10, OccApplicationStatusEnum.Waiting.name());
                     
             stmt.execute();
             ResultSet inserted_application = stmt.getResultSet();
@@ -1162,11 +1162,14 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             occpermitapp.setSubmissionDate(rs.getTimestamp("submissiontimestamp").toLocalDateTime());
             occpermitapp.setSubmissionNotes(rs.getString("submitternotes"));
             occpermitapp.setInternalNotes(rs.getString("internalNotes"));
-            occpermitapp.setApplicationPropertyUnit(propint.getPropertyUnit(rs.getInt("propertyunitid")));
+            occpermitapp.setApplicationPropertyUnit(propint.getPropertyUnit(Integer.parseInt(rs.getString("propertyunitid"))));
             occpermitapp.setConnectedPeriod(getOccPeriod(rs.getInt("occperiod_periodid")));
             occpermitapp.setStatus(OccApplicationStatusEnum.valueOf(rs.getString("status")));
             
             List<Person> personList = new ArrayList<>();
+            
+            if(occpermitapp.getConnectedPeriod() != null)
+            {
             
             for (PersonOccPeriod skeleton : pi.getPersonOccPeriodList(occpermitapp.getConnectedPeriod())) {
                 
@@ -1181,16 +1184,52 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 personList.add(skeleton);
                 
             }
-            
+            }
             occpermitapp.setAttachedPersons(personList);
             
         } catch (SQLException ex) {
+            System.out.println("OccupancyIntegrator.generateOccPermitApplication() | ERROR: " + ex);
             throw new IntegrationException("OccupancyInspectionIntegrator.generateOccPermitApplication | "
                     + "IntegrationException: Unable to generate occupancy permit application ", ex);
         }
         return occpermitapp;
     }
 
+    /**
+     * Gets all OccPermitApplications. Use with care.
+     * @return
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws AuthorizationException
+     * @throws BObStatusException
+     * @throws ViolationException 
+     */
+    public List<OccPermitApplication> getOccPermitApplicationList() throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException {
+        List<OccPermitApplication> occpermitappList = new ArrayList<>();
+        String query = "SELECT applicationid \n"
+                + "  FROM public.occpermitapplication;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                occpermitappList.add(getOccPermitApplication(rs.getInt("applicationid")));
+            }
+        } catch (SQLException ex) {
+            throw new IntegrationException("OccupancyIntegrator.getOccPermitApplicationList", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        return occpermitappList;
+    }
+    
     public List<OccPermitApplication> getOccPermitApplicationList(OccPeriod op) throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException {
         List<OccPermitApplication> occpermitappList = new ArrayList<>();
         String query = "SELECT occpermitapp_applicationid\n"
@@ -1486,7 +1525,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 } else {
                     stmt.setBoolean(4, false);
                 }
-                stmt.setString(5, person.getPersonType().getLabel());
+                stmt.setString(5, person.getPersonType().name());
                 stmt.execute();
             } catch (SQLException ex) {
                 System.out.println("OccupancyIntegrator.insertOccPeriodPersons() | ERROR: "+ ex);

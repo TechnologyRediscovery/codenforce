@@ -17,12 +17,22 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
+import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -34,11 +44,20 @@ import javax.faces.application.FacesMessage;
 public class OccPermitManageBB extends BackingBeanUtils implements Serializable {
     
     private String currentMode;
-    private boolean currentPermitSelected;
+    private boolean currentApplicationSelected;
     
-    private OccPermitApplication selectedPermit;
+    private OccPermitApplication searchParams;
+    private List<OccApplicationStatusEnum> statusList;
+    private LocalDateTime queryBegin;
+    private LocalDateTime queryEnd;
+    private boolean reason_ctl;
+    private boolean status_ctl;
+    private boolean connectedOccPeriod_ctl;
+    private boolean connectedOccPeriod_val;
     
-    private List<OccPermitApplication> permitList;
+    private OccPermitApplication selectedApplication;
+//    private QueryOccPermitApplication selectedQueryOccApplicaton;
+    private List<OccPermitApplication> applicationList;
 
     public OccPermitManageBB() {
     }
@@ -48,6 +67,15 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
 
         //initialize default current mode : Lookup
         currentMode = "Search";
+        
+        statusList = new ArrayList<>();
+        
+        for (OccApplicationStatusEnum status : OccApplicationStatusEnum.values()){
+            
+            statusList.add(status);
+            
+        }
+        
         //initialize default setting 
         defaultSetting();
     }
@@ -83,12 +111,19 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
     
     public void defaultSetting(){
         
-        SearchCoordinator sc = getSearchCoordinator();
+        OccupancyIntegrator oi = getOccupancyIntegrator();
         
-        currentPermitSelected = false;
+        currentApplicationSelected = false;
         
-        //permitList use search coordinator 
-        
+        try{
+        applicationList = oi.getOccPermitApplicationList();
+        } catch (BObStatusException ex){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Error while retrieving Occupancy Permit Applications: " + ex, ""));
+        } catch(AuthorizationException | EventException | IntegrationException | ViolationException ex){
+            System.out.println("OccPermitManageBB.defaultSetting() | ERROR: "+ ex);
+        }
     }
 
     /**
@@ -112,47 +147,208 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
 
     }
     
-    public void onPermitSelection(OccPermitApplication permit){
+    public void executeCustomQuery(){
         
-        if(currentPermitSelected){
-        selectedPermit = permit;
+        OccupancyIntegrator oi = getOccupancyIntegrator();
         
-        permitList = new ArrayList<>();
+        currentApplicationSelected = false;
         
-        permitList.add(permit);
+        if(queryBegin == null || queryEnd ==null){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please specify a start and end date when executing a custom query", ""));
+            return;
+        }
         
-        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Currently Selected Application: " + permit.getReason().getTitle() + "ID:(" + permit.getId() + ")", ""));
+        try{
+        List<OccPermitApplication> results = oi.getOccPermitApplicationList();
+        
+        Iterator itr = results.iterator();
+        
+        //A variable that represents the result of a question we ask about an application.
+        //If the answer is different as the given search parameter, remove the application
+        boolean testCondition = false;
+        
+        while(itr.hasNext()){
+            
+            OccPermitApplication temp = (OccPermitApplication) itr;
+            
+            if(temp.getSubmissionDate().compareTo(queryBegin) < 0 || temp.getSubmissionDate().compareTo(queryEnd) > 0){
+                itr.remove();
+            }
+            
+            if(reason_ctl){
+                
+                if(temp.getReason() != searchParams.getReason()){
+                    itr.remove();
+                }
+                
+            }
+            
+            if(status_ctl){
+               if(temp.getStatus() != searchParams.getStatus()){
+                    itr.remove();
+                } 
+            }
+            
+            if(connectedOccPeriod_ctl){
+                
+                testCondition = temp.getConnectedPeriod() != null && temp.getConnectedPeriod().getPeriodID() != 0; //test if an occperiod is connected
+                
+                if(testCondition != connectedOccPeriod_val) {
+                    //if the test does not evaluate to our desired state, remove it
+                    itr.remove();
+                }
+                
+            }
+            
+        }
+        
+                
+        } catch (BObStatusException ex){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Error while retrieving Occupancy Permit Applications: " + ex, ""));
+        } catch(AuthorizationException | EventException | IntegrationException | ViolationException ex){
+            System.out.println("OccPermitManageBB.defaultSetting() | ERROR: "+ ex);
+        }
+        
+    }
+    
+    public void onApplicationSelection(OccPermitApplication application){
+        
+        if(currentApplicationSelected){
+        selectedApplication = application;
+        
+        applicationList = new ArrayList<>();
+        
+        applicationList.add(application);
+        
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Currently Selected Application: " + application.getReason().getTitle() + "ID:(" + application.getId() + ")", ""));
         } else{
             defaultSetting();
             
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Application: " + permit.getReason().getTitle() + "ID:(" + permit.getId() + ")", ""));
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Application: " + application.getReason().getTitle() + "ID:(" + application.getId() + ")", ""));
             
         }
         
     }
 
-    public boolean isCurrentPermitSelected() {
-        return currentPermitSelected;
+    public boolean isCurrentApplicationSelected() {
+        return currentApplicationSelected;
     }
 
-    public void setCurrentPermitSelected(boolean currentPermitSelected) {
-        this.currentPermitSelected = currentPermitSelected;
+    public void setCurrentApplicationSelected(boolean currentApplicationSelected) {
+        this.currentApplicationSelected = currentApplicationSelected;
     }
 
-    public List<OccPermitApplication> getPermitList() {
-        return permitList;
+    public List<OccPermitApplication> getApplicationList() {
+        return applicationList;
     }
 
-    public void setPermitList(List<OccPermitApplication> permitList) {
-        this.permitList = permitList;
+    public void setApplicationList(List<OccPermitApplication> applicationList) {
+        this.applicationList = applicationList;
     }
 
-    public OccPermitApplication getSelectedPermit() {
-        return selectedPermit;
+    public OccPermitApplication getSelectedApplication() {
+        return selectedApplication;
     }
 
-    public void setSelectedPermit(OccPermitApplication selectedPermit) {
-        this.selectedPermit = selectedPermit;
+    public void setSelectedApplication(OccPermitApplication selectedApplication) {
+        this.selectedApplication = selectedApplication;
+    }
+
+    public OccPermitApplication getSearchParams() {
+        return searchParams;
+    }
+
+    public void setSearchParams(OccPermitApplication searchParams) {
+        this.searchParams = searchParams;
+    }
+
+    public boolean isReason_ctl() {
+        return reason_ctl;
+    }
+
+    public void setReason_ctl(boolean reason_ctl) {
+        this.reason_ctl = reason_ctl;
+    }
+
+    public boolean isStatus_ctl() {
+        return status_ctl;
+    }
+
+    public void setStatus_ctl(boolean status_ctl) {
+        this.status_ctl = status_ctl;
+    }
+    
+    public boolean isConnectedOccPeriod_ctl() {
+        return connectedOccPeriod_ctl;
+    }
+
+    public void setConnectedOccPeriod_ctl(boolean connectedOccPeriod_ctl) {
+        this.connectedOccPeriod_ctl = connectedOccPeriod_ctl;
+    }
+
+    public boolean isConnectedOccPeriod_val() {
+        return connectedOccPeriod_val;
+    }
+
+    public void setConnectedOccPeriod_val(boolean connectedOccPeriod_val) {
+        this.connectedOccPeriod_val = connectedOccPeriod_val;
+    }
+
+    public LocalDateTime getQueryBegin() {
+        return queryBegin;
+    }
+
+    public void setQueryBegin(LocalDateTime queryBegin) {
+        this.queryBegin = queryBegin;
+    }
+    
+    public Date getQueryBegin_Util() {
+        
+        Date utilDate = null;
+        if(queryBegin != null){
+           utilDate = Date.from(queryBegin.atZone(ZoneId.systemDefault()).toInstant());
+        }        
+        return utilDate;
+    }
+
+    public void setQueryBegin_Util(Date queryBeginUtil) {
+        if(queryBeginUtil != null){
+        queryBegin = queryBeginUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
+    public LocalDateTime getQueryEnd() {
+        return queryEnd;
+    }
+
+    public void setQueryEnd(LocalDateTime queryEnd) {
+        this.queryEnd = queryEnd;
+    }
+    
+    public Date getQueryEnd_Util() {
+        Date utilDate = null;
+        if(queryEnd != null){
+           utilDate = Date.from(queryEnd.atZone(ZoneId.systemDefault()).toInstant());
+        }        
+        return utilDate;
+    }
+
+    public void setQueryEnd_Util(Date queryEndUtil) {
+        if(queryEndUtil != null){
+        queryEnd = queryEndUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
+    public List<OccApplicationStatusEnum> getStatusList() {
+        return statusList;
+    }
+
+    public void setStatusList(List<OccApplicationStatusEnum> statusList) {
+        this.statusList = statusList;
     }
     
 }

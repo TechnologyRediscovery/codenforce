@@ -239,7 +239,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     private PersonOccPeriod generatePersonOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
-        PersonOccPeriod pop = new PersonOccPeriod(getPerson(rs.getInt("personid")));
+        PersonOccPeriod pop = new PersonOccPeriod(getPerson(rs.getInt("person_personid")));
         pop.setApplicant(rs.getBoolean("applicant"));;
         pop.setPreferredContact(rs.getBoolean("preferredcontact"));
         pop.setApplicationPersonTppe(PersonType.valueOf(rs.getString("applicationpersontype")));

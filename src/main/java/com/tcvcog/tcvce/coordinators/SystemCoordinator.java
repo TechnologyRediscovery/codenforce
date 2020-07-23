@@ -19,13 +19,9 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.NavigationItem;
-import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
@@ -42,7 +38,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -370,6 +365,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     //Sub NavItem: Occupancy
     private final NavigationSubItem occPeriodStatus = getNavSubItem("Period Status", "/restricted/cogstaff/occ/occPeriodWorkflow.xhtml", "fa fa-sign-in", true);
     private final NavigationSubItem occPermits = getNavSubItem("Permits", "/restricted/cogstaff/occ/occPeriodPermits.xhtml", "fa fa-sign-in", true);
+    private final NavigationSubItem occPermitApplications = getNavSubItem("Permit Applications", "/restricted/cogstaff/occ/occPermitApplications.xhtml", "fa fa-sign-in", true);
     private final NavigationSubItem occEvents = getNavSubItem("Events", "/restricted/cogstaff/occ/occPeriodEvents.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem occInspections = getNavSubItem("Inspections", "/restricted/cogstaff/occ/occPeriodInspections.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem occDocuments = getNavSubItem("Payments", "/restricted/cogstaff/occ/occPeriodPayments.xhtml", "fa fa-sign-in", false);
@@ -380,6 +376,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList = new ArrayList<>();
         navList.add(occPeriodStatus);
         navList.add(occPermits);
+        navList.add(occPermitApplications);
         navList.add(occEvents);
         navList.add(occInspections);
         navList.add(occDocuments);

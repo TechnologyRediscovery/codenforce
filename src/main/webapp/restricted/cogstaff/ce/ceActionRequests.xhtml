@@ -652,7 +652,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Officer-only notes:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearNotesTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
+                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                         <p:commandButton onclick="PF('internal-message-dialog').show()" 
@@ -666,7 +666,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="System internal only notes:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearNotesTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
+                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                         <p:commandButton onclick="PF('muni-message-dialog').show()" 
@@ -680,7 +680,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Public notes:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearNotesTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
+                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                         <p:commandButton onclick="PF('public-message-dialog').show()" 

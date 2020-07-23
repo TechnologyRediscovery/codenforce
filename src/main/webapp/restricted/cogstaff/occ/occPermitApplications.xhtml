@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <title>Occupancy Permit Applications</title>
     </h:head>
 
+    <!--TODO: NOT TAB-INDEXED-->
+
     <h:body id="occPermitManageBody">
 
         <ui:composition template="../../navContainer_restricted.xhtml">
@@ -69,39 +71,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:form id="occPermitManage-form-side">
 
                                             <p:dataTable id="occPermitTable"
-                                                         var="permit"
-                                                         value="#{occPermitManageBB.permitList}"
+                                                         var="app"
+                                                         value="#{occPermitManageBB.applicationList}"
                                                          tableStyleClass="primeDataTable"
                                                          >
 
                                                 <p:column headerText="ID"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{permit.id}"/>
+                                                    <h:outputText value="#{app.id}"/>
 
                                                 </p:column>
 
                                                 <p:column headerText="Name"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{permit.reason.title}"/>
+                                                    <h:outputText value="#{app.reason.title}"/>
 
                                                 </p:column>
-                                                
+
                                                 <p:column headerText="Status"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{permit.status.label}"/>
+                                                    <h:outputText value="#{app.status.label}"/>
 
                                                 </p:column>
-                                                
+
                                                 <p:column headerText="Date Submitted"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{permit.submissionDateUtilDate}"/>
+                                                    <h:outputText value="#{app.submissionDateUtilDate}"/>
 
                                                 </p:column>
-                                                
+
                                                 <p:column headerText="Option"
                                                           styleClass="centeredColumnContent"
                                                           style="width: 80px"
@@ -110,7 +112,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <p:selectBooleanButton onLabel="Deselect" 
                                                                            offLabel="Select"
                                                                            styleClass="selectButton" 
-                                                                           value="#{occPermitManageBB.currentPermitSelected}"
+                                                                           value="#{occPermitManageBB.currentApplicationSelected}"
                                                                            disabled="#{occPermitManageBB.getSelectedButtonActive()}"
                                                                            >
 
@@ -118,7 +120,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 form-messages-global
                                                                 occPermitManage-form-side
                                                                 occPermitManage-panel"
-                                                                listener="#{occPermitManageBB.onPermitSelection(permit)}"/>
+                                                                listener="#{occPermitManageBB.onApplicationSelection(app)}"/>
 
                                                     </p:selectBooleanButton>
 
@@ -152,14 +154,140 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <h:form id="occPermitManage-form-search">
 
-                                                <p:panelGrid columns="4" 
+
+                                                <p:panelGrid columns="2" 
                                                              layout="grid"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             columnClasses="gridTd, gridTd" 
                                                              >
 
-                                                    <!--LookUp Table Content-->
+                                                    <ui:remove>
+                                                        <h:panelGroup>
+                                                            <p:selectOneMenu id="applicationquery-som" 
+                                                                             tabindex="1" 
+                                                                             value="#{occPermitManageBB.selectedQueryOccAppplication}"
+                                                                             style="margin-right: 10px;">
+                                                                <f:converter converterId="bOBQueryConverter"/>
+                                                                <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>
+                                                                <f:selectItems id="querylist-si" value="#{occPermitManageBB.queryList}" var="q" itemValue="#{q}" itemLabel="#{q.queryTitle}" />
+                                                                <p:ajax update="application-query-desc-ot"/>
+                                                            </p:selectOneMenu>
 
+                                                            <p:commandButton    id="execute-selected-query" 
+                                                                                ajax="true"
+                                                                                value="perform selected query" 
+                                                                                actionListener="#{occPermitManageBB.executeQuery}"
+                                                                                disabled="false"
+                                                                                icon="fa fa-wheelchair-alt"
+                                                                                update="
+                                                                                occPermitManage-panel-search
+                                                                                occPermitManage-form-side
+                                                                                form-messages-global"/>
+                                                            <p:spacer height="5px" />
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="bold" value="Query description: " for="cears-query-desc-ot" />
+                                                            <p:spacer height="5px" />
+                                                            <h:outputText id="cears-query-desc-ot" value="#{occPermitManageBB.selectedQueryApplication.queryName.desc}" />
+                                                        </h:panelGroup>
+
+                                                    </ui:remove>
+
+                                                    <h3>Advanced search options</h3>
+
+                                                    <p:spacer/>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Query start date"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="occPermitSearchTermsLabel">
+                                                            <p:calendar id="eventDateCalStart" value="#{occPermitManageBB.queryBegin_Util}" 
+                                                                        mode="popup"  
+                                                                        showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                                        navigator="true" tabindex="16"
+                                                                        showButtonPanel="true" showTodayButton="true"/>
+                                                            <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Query end date"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="occPermitTermsLabel">
+                                                            <p:calendar id="eventDateCalEnd" value="#{occPermitManageBB.queryEnd_Util}" 
+                                                                        mode="popup" 
+                                                                        showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                                        navigator="true" tabindex="16"
+                                                                        showButtonPanel="true" showTodayButton="true"/>
+                                                            <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Filter by OccPeriod attachment?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="occPermitSearchTermsLabel">
+                                                            <p:selectBooleanCheckbox id="useAttachedToOccPeriod" value="#{occPermitManageBB.connectedOccPeriod_ctl}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:outputLabel value="Attached to case"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearSearchTermsLabel">
+                                                            <p:selectBooleanButton id="attachedToCaseCB" onLabel="Yes" offLabel="No" value="#{occPermitManageBB.connectedOccPeriod_val}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Search by Application Reason?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearSearchTermsLabel">
+                                                            <p:selectBooleanCheckbox id="useOccPermitReasonCB" value="#{occPermitManageBB.reason_ctl}" />
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:selectOneMenu id="occApplicationReasonMenuSearch" required="false" value="#{occPermitManageBB.searchParams.reason}">
+                                                            <f:converter converterId="occPermitApplicationReasonConverter"/>
+                                                            <f:selectItem itemLabel="Select a reason" itemDisabled="true"/>
+                                                            <f:selectItems id="reasonList" value="#{occPermitApplicationBB.reasonList}" var ="r" itemValue="#{r}" itemLabel="#{r.title}" />
+                                                        </p:selectOneMenu>
+                                                    </h:panelGroup>
+
+                                                    <p:spacer/>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Search by Request status?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearSearchTermsLabel">
+                                                            <p:selectBooleanCheckbox id="useOccPermitReasonSB" value="#{occPermitManageBB.status_ctl}" />
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:selectOneMenu id="occApplicationStatusMenuSearch" required="false" value="#{occPermitManageBB.searchParams.status}">
+                                                            
+                                                            
+                                                            <f:converter converterId="occPermitApplicationStatusConverter"/>
+                                                            <f:selectItems value="#{occPermitManageBB.statusList}"
+                                                                           var="status" itemValue="#{status}" itemLabel="#{status.label}"/>
+                                                            
+                                                            
+                                                        </p:selectOneMenu>
+                                                    </h:panelGroup>
+
+                                                    <p:spacer/>
+
+                                                    <p:commandButton id="custom-query-cb"
+                                                                     ajax="true" 
+                                                                     value="Execute custom query" 
+                                                                     actionListener="#{occPermitManageBB.executeCustomQuery}"
+                                                                     update="occPermitManage-form-side
+                                                                     occPermitManage-panel-search
+                                                                     form-messages-global"/>
+                                                    
                                                 </p:panelGrid>
+
 
                                             </h:form>
 
