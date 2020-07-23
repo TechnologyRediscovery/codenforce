@@ -1,39 +1,62 @@
 import os
+from os import path
 import psycopg2
 from psycopg2 import extensions
 from psycopg2.errors import *
 from contextlib import contextmanager
+import re
 
 from _connection import connection_and_cursor
 from parcelupdate._constants import COG_DB, TEST_DB, BOT_NAME
 
 
-here = os.path.abspath(os.path.dirname(__file__))
-patch_folder = os.path.abspath(
-    os.path.join(here, "..", "..", "codeconnect", "database", "patches")
+here = path.abspath(path.dirname(__file__))
+patch_folder = path.abspath(
+    path.join(here, "..", "..", "codeconnect", "database", "patches")
 )
 
-# def from_patches():
-#     # Todo: Refactor back into a function?
-#     with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", port=5432) as db_conn:
-#         with db_conn.cursor(name="test_cursor") as cursor:
-#             patches = _get_patches()
-#             for patch in patches:
-#                 cursor.execute(patch)
+########################################################################################
+# Human sort: https://nedbatchelder.com/blog/200712/human_sorting.html
+########################################################################################
+def _tryint(s):
+    try:
+        return int(s)
+    except ValueError:
+        return s
 
-#
-# def _alphabatize(_list):
-#     # Todo: Implement using quicksort?
-#     pass
-#     return []
-#
-#
-# def _get_patches():
-#     mega_patch = ""
-#     patches = [f for f in os.listdir(patch_folder) if f.startswith("dbpatch_")]
-#     numbers = [n.lstrip("dbpatch_beta").rstrip(".sql") for n in patches]
-#     print(patches)
-#     print(numbers)
+def _alphanum_key(s):
+    """ Turn a string into a list of string and number chunks.
+        "z23a" -> ["z", 23, "a"]
+    """
+    return [ _tryint(c) for c in re.split('([0-9]+)', s) ]
+
+def sort_nicely(l):
+    """ Sort the given list in the way that humans expect.
+    """
+    return sorted(l, key=_alphanum_key)
+########################################################################################
+########################################################################################
+
+def _order_patches():
+    return sort_nicely([f for f in os.listdir(patch_folder) if f.startswith("dbpatch_b")])
+    #   Note:   The alphabetical sorting correctly places dbpatch_beta2➕.sql after
+    #           dbpatch_beta2.sql and 'dbpatch_beta_RUN_ME_LAST at the end.
+
+def write_aggregate_patch():
+    patches = _order_patches()
+    with open(path.join(patch_folder, "dbpatch_aggregate.sql"), "w", encoding="utf-8") as f:
+        for patch in patches:
+            p = open(path.abspath(path.join(patch_folder, patch)), "r")
+            f.write(f"-- {p.name}\n")
+            f.writelines(p.readlines())
+            f.write("\n")
+            p.close()
+
+write_aggregate_patch()
+
+
+
+
 
 
 # with psycopg2.connect(database="testdb", user="sylvia", password="c0d3", port=5432) as db_conn:
@@ -102,4 +125,5 @@ def from_patches(patches, **kwargs):
                 return False
 
     with connection_and_cursor(port=5432) as (conn, cursor):
+        pass
 
