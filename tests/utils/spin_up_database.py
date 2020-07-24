@@ -12,8 +12,14 @@ from parcelupdate._constants import BASE_DB, TEST_DB, BOT_NAME
 
 
 HERE = path.abspath(path.dirname(__file__))
+DATABASE_FOLDER = path.abspath(
+    path.join(HERE, "..", "..", "codeconnect", "database")
+)
 PATCH_FOLDER = path.abspath(
-    path.join(HERE, "..", "..", "codeconnect", "database", "patches")
+    path.join(DATABASE_FOLDER, "patches")
+)
+SCHEMA_FOLDER = path.abspath(
+    path.join(DATABASE_FOLDER, "schema_dumps")
 )
 AGGREGATE = "dbpatch_aggregate.sql"
 
@@ -100,24 +106,24 @@ def write_aggregate_patch():
 #         print("Cursor closed.")
 
 
-def from_patches(**kwargs):
-    """ Writes an empty database from the patches for testing.
-    """
-    write_aggregate_patch()
-    with open(path.join(PATCH_FOLDER, AGGREGATE), "r") as f:
-        sql = "".join(f.readlines())
-    with connection_and_cursor(port=5432) as (conn, cursor):
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        try:
-            cursor.execute("CREATE DATABASE testdb;")
-            print("Created new testdb")
-        except DuplicateDatabase:
-            cursor.execute("DROP DATABASE testdb;")
-            print("Dropped old testdb")
-            cursor.execute("CREATE DATABASE testdb;")
-            print("Created new testdb")
-    with connection_and_cursor(port=5432, database=TEST_DB) as (t_conn, test_cursor):
-        test_cursor.execute(sql)
+# def from_patches(**kwargs):
+#     """ Writes an empty database from the patches for testing.
+#     """
+#     write_aggregate_patch()
+#     with open(path.join(PATCH_FOLDER, AGGREGATE), "r") as f:
+#         sql = "".join(f.readlines())
+#     with connection_and_cursor(port=5432) as (conn, cursor):
+#         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+#         try:
+#             cursor.execute("CREATE DATABASE testdb;")
+#             print("Created new testdb")
+#         except DuplicateDatabase:
+#             cursor.execute("DROP DATABASE testdb;")
+#             print("Dropped old testdb")
+#             cursor.execute("CREATE DATABASE testdb;")
+#             print("Created new testdb")
+#     with connection_and_cursor(port=5432, database=TEST_DB) as (t_conn, test_cursor):
+#         test_cursor.execute(sql)
 
         # try:
         #     cursor.execute("DROP DATABASE testdb;")
@@ -128,10 +134,30 @@ def from_patches(**kwargs):
         # auto_cursor = conn.cursor()
         # auto_cursor.execute(sql)
 
-from_patches()
+# from_patches()
 # write_aggregate_patch()
 # with open(path.join(PATCH_FOLDER, AGGREGATE), "r") as f:
 #     sql = "".join(f.readlines())
 # with connection_and_cursor(port=5432) as (conn, cursor):
 #     cursor.execute(sql)
+
+# TODO: Automatically update schema name. Write a shell script that executes pg_dump.
+SCHEMA_FILE = path.join(SCHEMA_FOLDER, "2020.24.07_cogdb_schema.sql")
+
+def from_dumped_schema():
+    with open(SCHEMA_FILE, "r") as schema:
+        sql = "".join(schema.readlines())
+        with connection_and_cursor(port=5432) as (conn, cursor):
+            conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+            try:
+                cursor.execute("CREATE DATABASE testdb;")
+                print("Created new testdb")
+            except DuplicateDatabase:
+                cursor.execute("DROP DATABASE testdb;")
+                print("Dropped old testdb")
+                cursor.execute("CREATE DATABASE testdb;")
+                print("Created new testdb")
+    with connection_and_cursor(port=5432, database=TEST_DB) as (t_conn, test_cursor):
+        test_cursor.execute(sql)
+        print("Filled in test schema")
 

@@ -85,7 +85,7 @@ public class PropertySearchBB extends BackingBeanUtils{
         
         try {
             // the list of avail queries is built by the SessionInitializer
-            // and put on the SessionBean for us to get here
+            // and put on the SessionBean for us to get HERE
             queryList = getSessionBean().getQueryPropertyList();
             putList = pi.getPropertyUseTypeList();
             pageModes = getSessionBean().assemblePermittedPageModes();

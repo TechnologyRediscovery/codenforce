@@ -60,7 +60,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean() {
         // Load Navigation lists from SystemCoordinator and place
-        // in member variables here
+        // in member variables HERE
         SystemCoordinator ssc = getSystemCoordinator();
         NavList = ssc.navList();
         sideBarNavList = ssc.sideBarNavList();

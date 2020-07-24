@@ -24,7 +24,7 @@ public abstract class PublicInfoBundle implements Serializable {
     
     // some info bundles like an action request may not be associated with a
     // specific Property object. Most are, however, and the String rep of its 
-    // address will be stored here
+    // address will be stored HERE
     private boolean addressAssociated;
     private String propertyAddress;
     private Municipality muni;

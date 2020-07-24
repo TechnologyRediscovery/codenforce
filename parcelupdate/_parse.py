@@ -89,6 +89,12 @@ class OwnerName:
 
     def __init__(self, parid=None):
         self.multientity = None
+    def __str__(self):
+        return self.clean
+    def __repr__(self):
+        return f"{self.__class__.__name__}<{self.clean}>"
+
+
 
     @classmethod
     def get_Owner_from_soup(cls, soup: str):
@@ -120,3 +126,7 @@ class OwnerName:
                 cleaned_names.append(strip_whitespace(name))
             return ", ".join(cleaned_names)
         return strip_whitespace(self.raw[0])
+
+
+
+

@@ -31,7 +31,7 @@ TEST_DB = "testdb"
 PARCEL_ID_LISTS = "parcelidlists"
 
 # Formatting
-DASHES = "-" * 90
-MEDIUM_DASHES = "-" * 60
-SHORT_DASHES = "-" * 30
+DASHES = "-" * 88
+MEDIUM_DASHES = "-" * 58
+SHORT_DASHES = "-" * 29
 SPACE = " "

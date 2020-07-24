@@ -5,6 +5,7 @@
 #   Example: _parse.strip_whitespace strips whitespace, _parse.OwnerName is a class
 
 import json
+
 import _create as create
 import _fetch as fetch
 import _insert as insert
@@ -211,8 +212,24 @@ def update_muni(muni, db_conn, commit=True):
             data = scrape.county_property_assessments(parid, pages=[TAX])
             for page in data:
                 data[page] = _parse.soupify_html(data[page])
-            owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])
+
+
+
+
+
+            owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])        ## TODO: UNIT TESTS START HERE ^
             tax_status = _parse.parse_tax_from_soup(data[TAX])
+
+            import pickle
+            from os import path
+            import sys
+            sys.setrecursionlimit(10000)
+            with open(path.join("pickle", "_" + str(record_count) + "_" + "data.pickle"), "wb") as da:
+                pickle.dump(data,da)
+            with open(path.join("pickle", "_" + str(record_count) + "_" + "own.pickle"), "wb") as ow:
+                pickle.dump(data,ow)
+            with open(path.join("pickle", "_" + str(record_count) + "_" + "tax.pickle"), "wb") as ta:
+                pickle.dump(data,ta)
 
 
             # This block of code initalizes the following:

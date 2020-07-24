@@ -52,7 +52,7 @@ public  class       Person
     protected BOBSource source;
     
     /**
-     * We don't use a User object here due to cycling
+     * We don't use a User object HERE due to cycling
      */
     protected int creatorUserID;
     protected LocalDateTime creationTimeStamp;

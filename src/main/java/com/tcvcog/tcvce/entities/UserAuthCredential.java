@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * Stores access data for a user
  * Note the switches are private and final--so they can't be tweaked on the fly
- * by changes in other classes. Watch git changes for those in here!
+ * by changes in other classes. Watch git changes for those in HERE!
  *  
  * @deprecated replaced by com.tcvcog.tcvce.entities.Credential
  * @author Ellen Bascomb

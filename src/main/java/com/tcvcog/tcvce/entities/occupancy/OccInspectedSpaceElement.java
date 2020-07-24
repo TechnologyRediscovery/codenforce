@@ -36,7 +36,7 @@ public class OccInspectedSpaceElement
     
     private int inspectedSpaceElementID;
     
-      // here lies the remains of composition replaced by inheritance! 2-AUG-19 on occbeta
+      // HERE lies the remains of composition replaced by inheritance! 2-AUG-19 on occbeta
 //    private OccSpaceElement spaceElement;
     
     private LocalDateTime lastInspectedTS;

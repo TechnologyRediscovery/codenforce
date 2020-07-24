@@ -578,7 +578,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to delete the space and its associated"
                     + "elements: Probably because this space has been used in one or more"
-                    + "occupancy inspectsion. It's here to stay!", ex);
+                    + "occupancy inspectsion. It's HERE to stay!", ex);
 
         } finally {
             if (con != null) {

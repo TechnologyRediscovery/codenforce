@@ -25,6 +25,6 @@ import com.tcvcog.tcvce.entities.BOb;
 public abstract class OccPeriodPublic
                 extends BOb {
     
-    //TODO: Decide what to put here or if it should even exist
+    //TODO: Decide what to put HERE or if it should even exist
     
 }

@@ -880,7 +880,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         updateCECaseMetadata(c);
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
-        // hardcoding it down here in the Java
+        // hardcoding it down HERE in the Java
         e.setUserCreator(getSessionBean().getSessUser());
         e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));

@@ -344,7 +344,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             return;
         }
 
-        // verify blob types here. Post a FacesMessage if file type is not an image
+        // verify blob types HERE. Post a FacesMessage if file type is not an image
         String fileType = ev.getFile().getContentType();
         System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + fileType);
 

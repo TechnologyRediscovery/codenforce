@@ -4,7 +4,6 @@ import math
 import time
 
 import click
-import psycopg2
 
 import _fetch as fetch
 from _connection import connection_and_cursor

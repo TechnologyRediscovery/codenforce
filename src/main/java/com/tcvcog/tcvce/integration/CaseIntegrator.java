@@ -746,7 +746,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
             // entryts stamped by PG's now()
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(v.getStipulatedComplianceDate()));
-            // a smidge of business logic here! Whoopsies
+            // a smidge of business logic HERE! Whoopsies
             stmt.setNull(5, java.sql.Types.NULL); // actual compliance
             
             stmt.setDouble(6, v.getPenalty());
