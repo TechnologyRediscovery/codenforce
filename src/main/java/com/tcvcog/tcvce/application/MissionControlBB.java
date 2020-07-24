@@ -71,7 +71,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public void initBean() {
         UserCoordinator uc = getUserCoordinator();
         currentUser = getSessionBean().getSessUser();
-        userList = uc.assembleUserListForSearch(getSessionBean().getSessUser());
+        userList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
         
         generateMainDash();
     }
@@ -109,7 +109,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      */
     public String switchMuni() throws IntegrationException, SQLException{
         CodeIntegrator ci = getCodeIntegrator();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         MunicipalityDataHeavy muniComp;
         try {
             muniComp = mi.getMunDataHeavy(selectedMuni.getMuniCode());

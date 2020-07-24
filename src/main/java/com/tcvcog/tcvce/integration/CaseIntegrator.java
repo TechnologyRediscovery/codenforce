@@ -372,7 +372,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         cse.setPropertyID(rs.getInt("property_propertyid"));
         cse.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
         
-        cse.setCaseManager(uc.getUser(rs.getInt("login_userid")));
+        cse.setCaseManager(uc.user_getUser(rs.getInt("login_userid")));
 
         cse.setCaseName(rs.getString("casename"));
         
@@ -402,7 +402,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         cse.setActive(rs.getBoolean("active"));
         
         if(rs.getInt("lastupdatedby_userid") != 0){
-            cse.setLastUpdatedBy(uc.getUser(rs.getInt("lastupdatedby_userid")));
+            cse.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
         }
         
         if(rs.getTimestamp("lastupdatedts") != null){
@@ -1681,7 +1681,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     
     private TextBlock generateTextBlock(ResultSet rs) throws SQLException, IntegrationException{
         TextBlock tb = new TextBlock();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         
         tb.setBlockID(rs.getInt("blockid"));
         tb.setTextBlockCategoryID(rs.getInt("categoryid"));

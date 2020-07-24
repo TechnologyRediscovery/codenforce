@@ -111,7 +111,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         bbSessionProperty = getSessionBean().getSessProperty();
         bbSessionPerson = getSessionBean().getSessPerson();
         
-        userListForSearch = uc.assembleUserListForSearch(getSessionBean().getSessUser());
+        userListForSearch = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
         propertyListForSearch = getSessionBean().getSessPropertyList();
         personListForSearch = getSessionBean().getSessPersonList();
         
@@ -170,7 +170,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     
     public void logErrorPageLoad(){
 //        try {
-//            getLogIntegrator().makeLogEntry(getSessionBean().getSessionUser().getUserID(),
+//            getLogIntegrator().makeLogEntry(getSessionBean().getSessionUser().auth_getUserID(),
 //                    getSessionID(), 2, "error page hit", true, false);
 //        } catch (IntegrationException ex) {
 //            getFacesContext().addMessage(null,

@@ -86,7 +86,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     private void setPublicUser() throws IntegrationException {
         if (publicUser == null) {
             UserCoordinator uc = getUserCoordinator();
-            publicUser = uc.getPublicUserAuthorized();
+            publicUser = uc.auth_getPublicUserAuthorized();
         }
     }
 

@@ -56,7 +56,24 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * *******************************
+ * ***    SECURITY CRITICAL    ***
+ * *******************************
+ * 
+ * Central backing bean and psuedo-coordinator at the Session level
+ * that processes the requested UserMuniAuthPeriod and builds an entire
+ * session full of business objects once security checks are passed
+ * 
+ * As expected, this class works in tandem with the UserCoordinator
+ * to manage the UserMuniAuthorizationPeriod list, one of which is chosen
+ * and becomes and television program!
+ * 
+ * Contents in brief:
+ * <ul>
+ * <li>User-centric login and session initialization methods</li>
+ * <li>Subsystem initialization controller</li>
+ * <li>A heap of subsystem-specific initialization methods</li>
+ * </ul>
  * @author ellen bascomb of apt 31y
  */
 public  class       SessionInitializer 
@@ -91,25 +108,28 @@ public  class       SessionInitializer
         } else if(userQueuedForSession == null){
             try {
                 // we have a first init! Ask the container for its user
-                userQueuedForSession = getContainerAuthenticatedUser();
+                userQueuedForSession = sessionInit_getContainerAuthenticatedUser();
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
         } 
             
-            
-            umapListValidForUserSelect = uc.assembleValidAuthPeriods(userQueuedForSession);
-            getSessionBean().setSessUMAPListValidOnly(umapListValidForUserSelect);
-//            userAuthorizedQueuedForSession = uc.authorizeUser(userQueuedForSession, muniQueuedForSession, umapQueuedForSession);
+        umapListValidForUserSelect = uc.auth_assembleValidAuthPeriods(userQueuedForSession);
+        getSessionBean().setSessUMAPListValidOnly(umapListValidForUserSelect);
+//            userAuthorizedQueuedForSession = uc.auth_authorizeUser_SECURITYCRITICAL(userQueuedForSession, muniQueuedForSession, umapQueuedForSession);
     }
     
     
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * JBoss is responsible for the first query against the DB. If a username/pass
      * matches the query, this method will extract the username from any old request
      * @return the username string of an authenticated user from the container
      */
-    private String getContainerAuthenticatedUser() throws IntegrationException {
+    private String sessionInit_getContainerAuthenticatedUser() throws IntegrationException {
         System.out.println("SessionInitializer.getContainerAuthenticatedUser");
         FacesContext fc = getFacesContext();
         ExternalContext ec = fc.getExternalContext();
@@ -125,25 +145,33 @@ public  class       SessionInitializer
      * 
      * @param u 
      */
-    public void loadAuthPeriodsForAlternateUser(User u){
+    public void sessionInit_loadAuthPeriodsForAlternateUser(User u){
         
         
         
     }
     
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * Processes the user's choice of their authorization period
      * and initiates the entire auth process to create a fully populted session
      * @param umap the chosen UMAP, which should be valid
      * @return 
      */
-    public String credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
-           return configureSession(umap);
+    public String sessionInit_credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
+           return sessionInit_configureSession(umap);
         
     }
     
     
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * Core configuration method for sessions that takes in a chosen UMAP from
      * a pre-assembled list of valid UMAPs
      * 
@@ -153,7 +181,7 @@ public  class       SessionInitializer
      * @return nav string
      * @throws IntegrationException 
      */
-    public String configureSession(UserMuniAuthPeriod umap) {
+    public String sessionInit_configureSession(UserMuniAuthPeriod umap) {
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
         System.out.println("SessionInitializer.configureSession()");
@@ -161,7 +189,7 @@ public  class       SessionInitializer
         try {
             // The central call which initiates the User's session for a particular municipality
             // Muni will be null when called from initiateInternalSession
-            UserAuthorized authUser = uc.authorizeUser(umap, getSessionBean().getSessUMAPListValidOnly());
+            UserAuthorized authUser = uc.auth_authorizeUser_SECURITYCRITICAL(umap, getSessionBean().getSessUMAPListValidOnly());
             
             // as long as we have an actual user, proceed with session config
             if(authUser != null){
@@ -197,6 +225,10 @@ public  class       SessionInitializer
     
     
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * Distributor method for all subsystem initialization routines.
      * Individual subsystems are initialized in an order which allows 
      * each to use objects generated during its predecessors sequences, such as
@@ -276,6 +308,10 @@ public  class       SessionInitializer
     }
     
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * Designed for recording data about the human user's computer connected to our surver.
      * TODO: during early design tests, this method wasn't getting the UserAgent from the HTTP
      * headers like we wanted to
@@ -347,6 +383,10 @@ public  class       SessionInitializer
     }
 
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * Subsystem initialization controller
      *
      * >>> -------------------------------------------------------------- <<<
@@ -756,7 +796,7 @@ public  class       SessionInitializer
          UserMuniAuthPeriodLogEntry umaple;
          UserCoordinator uc = getUserCoordinator();
          
-        umaple = uc.assembleUserMuniAuthPeriodLogEntrySkeleton(
+        umaple = uc.auth_assembleUserMuniAuthPeriodLogEntrySkeleton(
                               authUser, 
                               UserMuniAuthPeriodLogEntryCatEnum.SESSION_INIT);
 
@@ -767,7 +807,7 @@ public  class       SessionInitializer
             umaple.setAudit_muni_municode(sb.getSessMuni().getMuniCode());
             umaple.setAudit_usercredential_userid(authUser.getMyCredential().getGoverningAuthPeriod().getUserID());
             try {
-                uc.logCredentialInvocation(umaple, authUser.getMyCredential().getGoverningAuthPeriod());
+                uc.auth_logCredentialInvocation(umaple, authUser.getMyCredential().getGoverningAuthPeriod());
             } catch (IntegrationException | AuthorizationException ex) {
                 System.out.println(ex);
                 throw new SessionException( "Failure creating user muni auth period log entry", 

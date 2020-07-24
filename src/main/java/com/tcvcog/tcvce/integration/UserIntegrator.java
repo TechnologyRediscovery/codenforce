@@ -31,7 +31,7 @@ import com.tcvcog.tcvce.entities.UserAuthCredential;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.UserConfigReady;
+import com.tcvcog.tcvce.entities.UserAuthorizedForConfig;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -293,7 +293,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     
     private UserMuniAuthPeriod generateUserMuniAuthPeriod(ResultSet rs) throws SQLException, IntegrationException{
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         UserMuniAuthPeriod per = new UserMuniAuthPeriod(mi.getMuni(rs.getInt("muni_municode")));
         
         per.setUserMuniAuthPeriodID(rs.getInt("muniauthperiodid"));

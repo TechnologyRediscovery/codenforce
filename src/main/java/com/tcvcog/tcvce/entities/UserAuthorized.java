@@ -38,7 +38,7 @@ public class UserAuthorized extends User{
     /**
      * Only contains valid auth periods
      */
-    private Map<Municipality, List<UserMuniAuthPeriod>> muniAuthPeriodsMap;
+    protected Map<Municipality, List<UserMuniAuthPeriod>> muniAuthPeriodsMap;
     
     protected LocalDateTime pswdLastUpdated;
     protected LocalDateTime forcePasswordResetTS;
@@ -63,6 +63,11 @@ public class UserAuthorized extends User{
         
         this.active = u.isActive();
         this.noLoginVirtualUser = u.isNoLoginVirtualUser();
+        
+        
+        this.createdByUserId = u.getCreatedByUserId();
+        this.createdTS = u.getCreatedTS();
+    
     }
     
     

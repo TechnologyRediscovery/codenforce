@@ -139,13 +139,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             ev.setTimeEnd(dt);
         }
         
-        ev.setUserCreator(uc.getUser(rs.getInt("creator_userid")));
+        ev.setUserCreator(uc.user_getUser(rs.getInt("creator_userid")));
         if(rs.getTimestamp("creationts") != null){
             ev.setCreationts(rs.getTimestamp("creationts").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
         
-        ev.setLastUpdatedBy(uc.getUser(rs.getInt("lastupdatedby_userid")));
+        ev.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
         if(rs.getTimestamp("lastupdatedts") != null){
             ev.setCreationts(rs.getTimestamp("lastupdatedts").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());

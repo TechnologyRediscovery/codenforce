@@ -33,7 +33,7 @@ import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.UserConfigReady;
+import com.tcvcog.tcvce.entities.UserAuthorizedForConfig;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -94,11 +94,11 @@ public class UserConfigBB extends BackingBeanUtils{
         SearchCoordinator searchCoord = getSearchCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();
         
-        pageModes = new ArrayList<>();
-        pageModes.add(PageModeEnum.LOOKUP);
-        pageModes.add(PageModeEnum.INSERT);
-        pageModes.add(PageModeEnum.UPDATE);
-        pageModes.add(PageModeEnum.REMOVE);
+        setPageModes(new ArrayList<PageModeEnum>());
+        getPageModes().add(PageModeEnum.LOOKUP);
+        getPageModes().add(PageModeEnum.INSERT);
+        getPageModes().add(PageModeEnum.UPDATE);
+        getPageModes().add(PageModeEnum.REMOVE);
          // use same pathway as clicking the button
          currentMode = PageModeEnum.LOOKUP;
         setCurrentMode(currentMode);
@@ -106,9 +106,9 @@ public class UserConfigBB extends BackingBeanUtils{
         try {
             userAuthorizedInConfig = getSessionBean().getSessUser();
             umapInConfig = userAuthorizedInConfig.getMyCredential().getGoverningAuthPeriod();
-            userListForConfig = uc.assembleUserListForConfig(getSessionBean().getSessUser());
+            userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
             muniCandidateList = mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessUser());
-            roleTypeCandidateList = uc.getPermittedRoleTypesToGrant(getSessionBean().getSessUser());
+            roleTypeCandidateList = uc.auth_getPermittedRoleTypesToGrant(getSessionBean().getSessUser());
         } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
         }
@@ -214,7 +214,7 @@ public class UserConfigBB extends BackingBeanUtils{
     private void initLookup(){
         UserCoordinator uc = getUserCoordinator();
         try {
-            userListForConfig = uc.assembleUserListForConfig(getSessionBean().getSessUser());
+            userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
               getFacesContext().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Loaded user list for configuration", ""));
@@ -242,7 +242,7 @@ public class UserConfigBB extends BackingBeanUtils{
         UserCoordinator uc = getUserCoordinator();
         if(u != null){
             try {
-                userAuthorizedInConfig = uc.transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), u);
+                userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), u);
             } catch (AuthorizationException | IntegrationException ex) {
             
             }
@@ -256,7 +256,7 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void onInsertCommitButtonChange(ActionEvent ev) {
         //show successfully inserting message in p:messages box
-        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Insert Municipality", ""));
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Inserted User", ""));
         //reminder: set muniManageSample in faces-config.xml
         //return to muniManage_sample.xhtml page
         
@@ -269,9 +269,17 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void onUpdateCommitButtonChange(ActionEvent ev) {
         //show successfully updating message in p:messages box
-        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Update Municipality", ""));
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Updated User", ""));
         //reminder: set muniManageSample in faces-config.xml
         //return to muniManage_sample.xhtml page
+        
+    }
+    
+    /**
+     * Listener for user requests to abandon their update or insert changes
+     * @param ev 
+     */
+    public void onDiscardChangesButton(ActionEvent ev){
         
     }
     
@@ -283,7 +291,7 @@ public class UserConfigBB extends BackingBeanUtils{
      * @param ev
      */
     public void onRemoveCommitButtonChange(ActionEvent ev) {
-        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Remove Municipality", ""));
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully removed user from active management", ""));
     }
     
  
@@ -313,21 +321,25 @@ public class UserConfigBB extends BackingBeanUtils{
 
   
     
-    
+    /**
+     * Internal logic container for beginning the user creation change process
+     * Delegated from the mode button router
+     */
     public void initiateCreateNewUser(){
         UserCoordinator uc = getUserCoordinator();
-        userAuthorizedInConfig = new UserAuthorized(uc.getUserSkeleton(getSessionBean().getSessUser()));
+        userAuthorizedInConfig = new UserAuthorized(uc.user_getUserSkeleton(getSessionBean().getSessUser()));
         System.out.println("UserConfigBB.createNewUser");
     }
+    
     
     public String reInitSession(UserMuniAuthPeriod umap, UserAuthorized ua){
         UserCoordinator uc = getUserCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();
         
-        if(uc.verifyReInitSessionRequest(getSessionBean().getSessUser(), umap)){
+        if(uc.auth_verifyReInitSessionRequest_SECURITYCRITICAL(getSessionBean().getSessUser(), umap)){
             try {
                 getSessionBean().setSessMuni(mc.assembleMuniDataHeavy(mc.getMuni(umap.getMuni().getMuniCode()), ua));
-                getSessionBean().setUserForReInit(uc.getUser(umap.getUserID()));
+                getSessionBean().setUserForReInit(uc.user_getUser(umap.getUserID()));
             } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -353,7 +365,7 @@ public class UserConfigBB extends BackingBeanUtils{
     public void invalidateUserMuniAuthPeriod(){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.invalidateUserAuthPeriod(umapInConfig, getSessionBean().getSessUser(), formInvalidateRecordReason);
+            uc.auth_invalidateUserAuthPeriod(umapInConfig, getSessionBean().getSessUser(), formInvalidateRecordReason);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully invalidated auth period id" + umapInConfig.getUserMuniAuthPeriodID(), ""));
@@ -368,7 +380,7 @@ public class UserConfigBB extends BackingBeanUtils{
     public void initiateManageAuthPeriods(User ua){
         try {
             UserCoordinator uc = getUserCoordinator();
-            userAuthorizedInConfig = uc.transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), ua);
+            userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), ua);
             umapListInConfigFromUserAuth = userAuthorizedInConfig.getMuniAuthPeriodsMap().get(userAuthorizedInConfig.getMyCredential().getGoverningAuthPeriod().getMuni());
             System.out.println("UserConfigBB.initiateViewAddAuthPeriods | UMAP list size: " + umapListInConfigFromUserAuth.size());
             if(umapListInConfigFromUserAuth != null){  
@@ -385,7 +397,7 @@ public class UserConfigBB extends BackingBeanUtils{
     public void initiateAddAuthPeriod(){
         UserCoordinator uc = getUserCoordinator();
         try {
-            umapInConfig = uc.initializeUserMuniAuthPeriod(getSessionBean().getSessUser(), 
+            umapInConfig = uc.auth_initializeUserMuniAuthPeriod_SECURITYCRITICAL(getSessionBean().getSessUser(), 
                                                             userAuthorizedInConfig, 
                                                             getSessionBean().getSessMuni());
             formUmapNotes = "";
@@ -405,7 +417,7 @@ public class UserConfigBB extends BackingBeanUtils{
                                                                 formUmapNotes,
                                                                 umapInConfig.getNotes()));
             }
-            uc.insertUserMuniAuthorizationPeriod(getSessionBean().getSessUser(), userAuthorizedInConfig, umapInConfig);
+            uc.auth_insertUserMuniAuthorizationPeriod_SECURITYCRITICAL(getSessionBean().getSessUser(), userAuthorizedInConfig, umapInConfig);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully added new auth period!", ""));
@@ -422,7 +434,7 @@ public class UserConfigBB extends BackingBeanUtils{
      public void initiateUserUpdates(User usr){
         UserCoordinator uc = getUserCoordinator();
         try {
-            userAuthorizedInConfig = uc.transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), usr);
+            userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), usr);
         } catch (AuthorizationException | IntegrationException ex) {
             getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -453,7 +465,7 @@ public class UserConfigBB extends BackingBeanUtils{
     private void reloadCurrentUser(){
         UserCoordinator uc = getUserCoordinator();
         try {
-            userAuthorizedInConfig = uc.transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), userAuthorizedInConfig);
+            userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), userAuthorizedInConfig);
             getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Reloaded current user: " + userAuthorizedInConfig.getUsername(), ""));
@@ -490,7 +502,7 @@ public class UserConfigBB extends BackingBeanUtils{
     public void commitUsernameUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.updateUser(userAuthorizedInConfig, null, formUsername);
+            uc.user_updateUser(userAuthorizedInConfig, null, formUsername);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));
@@ -515,11 +527,11 @@ public class UserConfigBB extends BackingBeanUtils{
         User usr;
         
         try {
-            freshUserID = uc.insertNewUser(userAuthorizedInConfig);
+            freshUserID = uc.user_insertNewUser(userAuthorizedInConfig);
             if(freshUserID != 0){
-                usr = uc.getUser(freshUserID);
-                freshUserPswd = uc.generateRandomPassword();
-                uc.updateUserPassword(usr, freshUserPswd);
+                usr = uc.user_getUser(freshUserID);
+                freshUserPswd = uc.user_generateRandomPassword_SECURITYCRITICAL();
+                uc.user_updateUserPassword_SECURITYCRITICAL(usr, freshUserPswd);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Successfully added username " + usr.getUsername()
@@ -550,7 +562,7 @@ public class UserConfigBB extends BackingBeanUtils{
     public void commitUserPersonUpdates(){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.updateUser(userAuthorizedInConfig, selectedUserPerson, null);
+            uc.user_updateUser(userAuthorizedInConfig, selectedUserPerson, null);
             reloadCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -572,9 +584,9 @@ public class UserConfigBB extends BackingBeanUtils{
     public void resetCurrentUserPassword(){
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
-        freshPasswordCleartext = uc.generateRandomPassword();
+        freshPasswordCleartext = uc.user_generateRandomPassword_SECURITYCRITICAL();
         try {
-            uc.updateUserPassword(userAuthorizedInConfig, freshPasswordCleartext);
+            uc.user_updateUserPassword_SECURITYCRITICAL(userAuthorizedInConfig, freshPasswordCleartext);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Password reset success! New password for " 
@@ -783,19 +795,7 @@ public class UserConfigBB extends BackingBeanUtils{
         this.formUmapNotes = formUmapNotes;
     }
 
-    /**
-     * @return the userSelectedForConfig
-     */
-    public User getUserSelectedForConfig() {
-        return userSelectedForConfig;
-    }
-
-    /**
-     * @param userSelectedForConfig the userSelectedForConfig to set
-     */
-    public void setUserSelectedForConfig(User userSelectedForConfig) {
-        this.userSelectedForConfig = userSelectedForConfig;
-    }
+   
 
     /**
      * @return the formNotes
@@ -823,6 +823,20 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void setUserSelected(boolean userSelected) {
         this.userSelected = userSelected;
+    }
+
+    /**
+     * @return the pageModes
+     */
+    public List<PageModeEnum> getPageModes() {
+        return pageModes;
+    }
+
+    /**
+     * @param pageModes the pageModes to set
+     */
+    public void setPageModes(List<PageModeEnum> pageModes) {
+        this.pageModes = pageModes;
     }
     
 }

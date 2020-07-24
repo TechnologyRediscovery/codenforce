@@ -856,7 +856,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
 //        event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
-        event.setUserCreator(uc.getUserRobot());
+        event.setUserCreator(uc.user_getUserRobot());
         event.setActive(true);
         event.setHidden(false);
         event.setNotes("Event created by a public user");

@@ -461,7 +461,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
     }
 
     private BOBSource generateBOBSource(ResultSet rs) throws SQLException, IntegrationException {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         BOBSource bs = new BOBSource();
         bs.setSourceid(rs.getInt("sourceid"));
         bs.setTitle(rs.getString("title"));;

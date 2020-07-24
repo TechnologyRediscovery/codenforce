@@ -168,7 +168,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             }
         }
         
-        managerInspectorCandidateList = uc.assembleUserListForSearch(getSessionBean().getSessUser());
+        managerInspectorCandidateList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
         itemFilterOptions = Arrays.asList(ViewOptionsOccChecklistItemsEnum.values());
         inspectedElementAddValueCandidateList = Arrays.asList(OccInspectionStatusEnum.values());
         

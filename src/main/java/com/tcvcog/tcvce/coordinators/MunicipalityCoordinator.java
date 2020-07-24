@@ -60,7 +60,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
 
     public MunicipalityDataHeavy assembleMuniDataHeavy(Municipality muni, UserAuthorized ua) throws IntegrationException, AuthorizationException, BObStatusException, EventException {
         MunicipalityDataHeavy mdh = null;
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         mdh = mi.getMunDataHeavy(muni.getMuniCode());
         return configureMuniDataHeavy(mdh, ua);
     }
@@ -82,7 +82,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
     }
 
     public Municipality getMuni(int muniCode) throws IntegrationException {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         try {
             return mi.getMuni(muniCode);
         } catch (SQLException ex) {
@@ -132,7 +132,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
      * @throws IntegrationException
      */
     public List<Municipality> getPermittedMunicipalityListForAdminMuniAssignment(UserAuthorized user) throws IntegrationException {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         List<Municipality> muniList = new ArrayList<>();
         if (user.getMyCredential().getGoverningAuthPeriod().getRole() == RoleType.Developer) {
             muniList.addAll(mi.getMuniList());
@@ -153,7 +153,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
      * @throws AuthorizationException 
      */
     public MunicipalityDataHeavy getMuniDataHeavyList(int muniCode) throws IntegrationException, AuthorizationException {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         return mi.getMunDataHeavy(muniCode);
     }
     
@@ -165,7 +165,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
      */
     public void updateMuni(MunicipalityDataHeavy muni, User user) throws IntegrationException{
         muni.setLastUpdatedBy(user);
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         mi.updateMuniDataHeavy(muni);
     }
     /**
@@ -175,7 +175,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
      */
     public void insertMuni(MunicipalityDataHeavy muni, User user){
         muni.setLastUpdatedBy(user);
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         mi.insertMuniDataHeavy(muni);
     }
     
@@ -185,7 +185,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
      * @throws IntegrationException 
      */
     public ArrayList<MuniProfile> getMuniProfilesList() throws IntegrationException{
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         return mi.getMuniProfileList();
     }
     

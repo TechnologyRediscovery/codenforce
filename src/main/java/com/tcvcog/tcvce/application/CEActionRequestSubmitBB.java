@@ -328,7 +328,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         Municipality m = currentRequest.getMuni();
         Person skel = pc.personCreateMakeSkeleton(m);
         try {
-            skel.setCreatorUserID(uc.getUserRobot().getUserID());
+            skel.setCreatorUserID(uc.user_getUserRobot().getUserID());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -499,7 +499,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         QueryProperty qp = null;
 
         try {
-            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.getPublicUserAuthorized().getMyCredential());
+            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.auth_getPublicUserAuthorized().getMyCredential());
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsProperty spp = qp.getPrimaryParams();

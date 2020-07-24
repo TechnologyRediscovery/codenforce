@@ -535,7 +535,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 //            originationEvent.setNotes(generateCaseInitNoteFromCEAR(cear));
 
         }
-        originationEvent.setUserCreator(uc.getUser(ua.getUserID()));
+        originationEvent.setUserCreator(uc.user_getUser(ua.getUserID()));
 
         cedh.setCaseID(freshID);
 
@@ -908,7 +908,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         NoticeOfViolation nov = new NoticeOfViolation();
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
 
         try {
             nov.setStyle(si.getPrintStyle(mdh.getDefaultNOVStyleID()));

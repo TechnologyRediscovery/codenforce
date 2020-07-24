@@ -70,7 +70,7 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
         else {
             try {
                 UserCoordinator uc = getUserCoordinator();            
-                unauthorizedMuniList = uc.getUnauthorizedMunis(selectedUser);
+                unauthorizedMuniList = uc.auth_getUnauthorizedMunis(selectedUser);
             } catch (IntegrationException ex) {
                 System.out.println("UserAuthMuniManageBB.getUnauthorizedMuniList | " 
                         + ex.toString());
@@ -90,7 +90,7 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
 //                userList = ui.getCompleteActiveUserList();
             }
 //        } catch (IntegrationException ex) {
-//            System.out.println("UserAuthMuniManageBB.assembleUserListForConfig | " + ex.toString());
+//            System.out.println("UserAuthMuniManageBB.user_auth_assembleUserListForConfig | " + ex.toString());
 //            getFacesContext().addMessage(null,
 //                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
 //                            "Unable to acquire list of users.",
@@ -134,7 +134,7 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
      * for the selected user.
      */
     public void onSelectedUserChange() {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         clearAuthMuniList();
         clearUnauthorizedMuniList();
 
@@ -233,7 +233,7 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
      */
     public String removeAuthMuni(Municipality muni){
         UserIntegrator ui = getUserIntegrator();        
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         try {
             ui.deleteUserAuthMuni(selectedUser, muni);
         }

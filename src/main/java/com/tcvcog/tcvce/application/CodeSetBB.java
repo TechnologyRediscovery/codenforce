@@ -47,7 +47,7 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean(){
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         try {
             muniNameIDMap = mi.getMunicipalityStringIDMap();
             

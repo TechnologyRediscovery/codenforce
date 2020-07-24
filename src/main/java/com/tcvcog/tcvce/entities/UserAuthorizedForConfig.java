@@ -20,38 +20,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- *
+ * Represents a User ready to be configured but does not contain
+ * a credential, so that object can't be used for any funny business
  * @author sylvia
  */
-public class UserConfigReady extends User{
-    
-   
-    
-   
-  
+public class UserAuthorizedForConfig extends UserAuthorized{
 
      /**
      * This constructor is the only way of setting the internals of this
      * security-critical BOB, so all must be assembled by the coordinator
      * and then only read from
      * @param u
-     * @param uap
-     * @param akc 
      */
-    public UserConfigReady(  User u){
-        this.userID = u.getUserID();
-        this.username = u.getUsername();
-        this.person = u.getPerson();
-        this.personID = u.getPersonID();
-        this.notes = u.getNotes();
-        this.badgeNumber = u.getBadgeNumber();
-        this.oriNumber = u.getOriNumber();
-        
-        this.active = u.isActive();
-        this.noLoginVirtualUser = u.isNoLoginVirtualUser();
-        
-        this.createdByUserId = u.getCreatedByUserId();
-        this.createdTS = u.getCreatedTS();
+    public UserAuthorizedForConfig(UserAuthorized u){
+        super(u);
+        this.muniAuthPeriodsMap = u.muniAuthPeriodsMap;
+        this.pswdLastUpdated = u.pswdLastUpdated;
+        this.forcePasswordResetTS = u.forcePasswordResetTS;
     }
     
     

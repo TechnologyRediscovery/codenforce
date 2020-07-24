@@ -891,7 +891,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         MunicipalityCoordinator mc = getMuniCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         
-        UserAuthorized user = uc.getPublicUserAuthorized();
+        UserAuthorized user = uc.auth_getPublicUserAuthorized();
         
         Property prop = pri.getPropertyUnitWithProp(application.getApplicationPropertyUnit().getUnitID()).getProperty();
         

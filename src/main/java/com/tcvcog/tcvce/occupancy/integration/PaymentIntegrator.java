@@ -712,7 +712,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     public Fee generateFee(ResultSet rs) throws IntegrationException {
 
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
 
         Fee fee = new Fee();
 
@@ -2112,7 +2112,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     private Fee generateOccupancyInspectionFee(ResultSet rs) throws IntegrationException {
         Fee newOif = new Fee();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         try {
             newOif.setOccupancyInspectionFeeID(rs.getInt("feeid"));
             newOif.setMuni(mi.getMuni(rs.getInt("muni_municode")));

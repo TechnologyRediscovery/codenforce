@@ -127,7 +127,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         System.out.println("UserBB.refreshCurrentUser");
         UserCoordinator uc = getUserCoordinator();
 //        try {
-//            currentUser = uc.authorizeUser(currentUser, getSessionBean().getSessionMuni(), null);
+//            currentUser = uc.auth_authorizeUser_SECURITYCRITICAL(currentUser, getSessionBean().getSessionMuni(), null);
 //            
 //        } catch (IntegrationException ex) {
 //            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
@@ -142,7 +142,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     public void commitUsernameUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.updateUser(currentUser, null, formUsername);
+            uc.user_updateUser(currentUser, null, formUsername);
             refreshCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -161,7 +161,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         try {
             
-            uc.updateUser(currentUser, formSelectedUserPerson, null);
+            uc.user_updateUser(currentUser, formSelectedUserPerson, null);
             refreshCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -181,7 +181,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         try { 
             if(formPassword.equals(formPasswordReentry)){
-                uc.updateUserPassword(currentUser, formPassword);
+                uc.user_updateUserPassword_SECURITYCRITICAL(currentUser, formPassword);
                 refreshCurrentUser();
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,

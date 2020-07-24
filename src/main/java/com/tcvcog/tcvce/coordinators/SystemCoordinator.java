@@ -253,7 +253,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         if (muniCodeNameMap == null) {
 
             Map<Integer, String> m = null;
-            MunicipalityIntegrator mi = getMunicipalityIntegrator();
+            MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
             try {
                 m = mi.getMunicipalityMap();
             } catch (IntegrationException ex) {

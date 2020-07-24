@@ -129,7 +129,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         Person newPerson = new Person();
         SystemCoordinator ssc = getSystemCoordinator();
         SystemIntegrator si = getSystemIntegrator();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
         
         
         try {
@@ -1374,7 +1374,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         skeleton.setAdded(rs.getBoolean("added"));
         skeleton.setChangedOn(rs.getTimestamp("entryts"));
         skeleton.setApprovedOn(rs.getTimestamp("approvedondate"));
-        skeleton.setApprovedBy(uc.getUser(rs.getInt("approvedby")));
+        skeleton.setApprovedBy(uc.user_getUser(rs.getInt("approvedby")));
         skeleton.setChangedBy(rs.getInt("changedby_personid"));
         skeleton.setActive(rs.getBoolean("active"));
         
