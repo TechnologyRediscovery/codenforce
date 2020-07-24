@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
@@ -37,6 +38,7 @@ import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,7 +52,8 @@ import javax.faces.event.ActionEvent;
  */
 public class UserConfigBB extends BackingBeanUtils{
     
-    
+    private PageModeEnum currentMode;
+    private List<PageModeEnum> pageModes;
 
     private UserAuthorized userAuthorizedInConfig;
     private String freshPasswordCleartext;
@@ -60,7 +63,7 @@ public class UserConfigBB extends BackingBeanUtils{
     private String formUmapNotes;
     
     private List<User> userListForConfig;
-    private User userSelectedForConfig;
+    private boolean userSelected;
     
     private RoleType selectedRoleType;
     private List<RoleType> roleTypeCandidateList;
@@ -75,12 +78,30 @@ public class UserConfigBB extends BackingBeanUtils{
     private List<Person> userPersonList;
     private Person selectedUserPerson;
     
+      /**
+     * Creates a new instance of userConfig
+     */
+    public UserConfigBB() {
+    }
+    
+    /**
+     * Initializer for the User configuration process and UMAP creation
+     */
     @PostConstruct
     public void initBean(){
         UserCoordinator uc = getUserCoordinator();
         setSelectedMuni(getSessionBean().getSessMuni());
         SearchCoordinator searchCoord = getSearchCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();
+        
+        pageModes = new ArrayList<>();
+        pageModes.add(PageModeEnum.LOOKUP);
+        pageModes.add(PageModeEnum.INSERT);
+        pageModes.add(PageModeEnum.UPDATE);
+        pageModes.add(PageModeEnum.REMOVE);
+         // use same pathway as clicking the button
+         currentMode = PageModeEnum.LOOKUP;
+        setCurrentMode(currentMode);
         
         try {
             userAuthorizedInConfig = getSessionBean().getSessUser();
@@ -99,8 +120,180 @@ public class UserConfigBB extends BackingBeanUtils{
             qp = searchCoord.runQuery(qp);
             userPersonList = qp.getResults();
         } catch (SearchException ex) {
-            Logger.getLogger(UserConfigBB.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex);
         }
+    }
+    
+    /**
+     * Getter for currentMode
+     * @return 
+     */
+    public PageModeEnum getCurrentMode() {
+        return currentMode;
+    }
+
+    /**
+     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE, REMOVE
+     * @param mode     
+     */
+    public void setCurrentMode(PageModeEnum mode) {
+
+        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
+        PageModeEnum tempCurMode = this.currentMode;
+        //reset default setting every time the Mode has been selected 
+//        loadDefaultPageConfig();
+        //check the currentMode == null or not
+        if (currentMode == null) {
+            this.currentMode = tempCurMode;
+        } else {
+            this.currentMode = mode;
+            switch(currentMode){
+                case LOOKUP:
+                    initLookup();
+                    break;
+                case INSERT:
+                    initiateCreateNewUser();
+                    break;
+                case UPDATE:
+                    initUpdate();
+                    break;
+                case REMOVE:
+                    initRemove();
+                    break;
+                default:
+                    break;
+                    
+            }
+        }
+        if(currentMode != null){
+            //show the current mode in p:messages box
+            getFacesContext().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                this.currentMode.getTitle() + " Mode Selected", ""));
+        }
+        
+
+    }
+    
+    
+
+    //check if current mode == Lookup
+    public boolean getActiveLookupMode() {
+        // hard-wired on since there's always a property loaded
+        return PageModeEnum.LOOKUP.equals(currentMode) ;
+    }
+
+    //check if current mode == Lookup
+    public boolean getActiveViewMode() {
+        // hard-wired on since there's always a property loaded
+        return true;
+    }
+
+    //check if current mode == Insert
+    public boolean getActiveInsertUpdateMode() {
+        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
+    }
+
+    //check if current mode == Remove
+    public boolean getActiveRemoveMode() {
+        return PageModeEnum.REMOVE.equals(currentMode);
+    }
+
+
+    /**
+     * Internal logic conatiner for changes to page mode: Remove
+     */
+    private void initRemove(){
+        
+        
+    }
+
+    /**
+     * Internal logic container for changes to page mode: Lookup
+     */
+    private void initLookup(){
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            userListForConfig = uc.assembleUserListForConfig(getSessionBean().getSessUser());
+              getFacesContext().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "Loaded user list for configuration", ""));
+        } catch (IntegrationException | AuthorizationException ex) {
+              getFacesContext().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    "FATAL: Unable to load user list from database; Apologies", ""));
+        }
+        
+    }
+    
+    /**
+     * Internal logic container for changes to the page mode: update
+     */
+    private void initUpdate(){
+        
+    }
+    
+    /**
+     * Primary listener method which copies a reference to the selected 
+     * user from the list and sets it on the selected user perch
+     * @param u 
+     */
+    public void onUserSelectButtonChange(User u){
+        UserCoordinator uc = getUserCoordinator();
+        if(u != null){
+            try {
+                userAuthorizedInConfig = uc.transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), u);
+            } catch (AuthorizationException | IntegrationException ex) {
+            
+            }
+        }
+    }
+    
+     /**
+     * Listener for button clicks when user is ready to insert a new EventRule.
+     * Delegates all work to internal method
+     * @param ev
+     */
+    public void onInsertCommitButtonChange(ActionEvent ev) {
+        //show successfully inserting message in p:messages box
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Insert Municipality", ""));
+        //reminder: set muniManageSample in faces-config.xml
+        //return to muniManage_sample.xhtml page
+        
+    }
+
+    /**
+     * Listener for user requests to submit object updates;
+     * Delegates all work to internal method
+     * @param ev
+     */
+    public void onUpdateCommitButtonChange(ActionEvent ev) {
+        //show successfully updating message in p:messages box
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Update Municipality", ""));
+        //reminder: set muniManageSample in faces-config.xml
+        //return to muniManage_sample.xhtml page
+        
+    }
+    
+    
+
+    /**
+     * Listener for user requests to remove the currently selected ERA;
+     * Delegates all work to internal, non-listener method.
+     * @param ev
+     */
+    public void onRemoveCommitButtonChange(ActionEvent ev) {
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Remove Municipality", ""));
+    }
+    
+ 
+    /**
+     * Listener for user requests to view advanced search dialog
+     * @param ev 
+     */
+    public void onAdvancedSearchButtonChange(ActionEvent ev){
+        
+        
     }
     
     
@@ -118,14 +311,10 @@ public class UserConfigBB extends BackingBeanUtils{
         this.userListForConfig = userListForConfig;
     }
 
-    /**
-     * Creates a new instance of userConfig
-     */
-    public UserConfigBB() {
-    }
+  
     
     
-    public void initiateCreateNewUser(ActionEvent ev){
+    public void initiateCreateNewUser(){
         UserCoordinator uc = getUserCoordinator();
         userAuthorizedInConfig = new UserAuthorized(uc.getUserSkeleton(getSessionBean().getSessUser()));
         System.out.println("UserConfigBB.createNewUser");
@@ -229,6 +418,7 @@ public class UserConfigBB extends BackingBeanUtils{
         }
     }
     
+    
      public void initiateUserUpdates(User usr){
         UserCoordinator uc = getUserCoordinator();
         try {
@@ -242,6 +432,10 @@ public class UserConfigBB extends BackingBeanUtils{
         }
     }
     
+    /**
+     * Listener for requests to jump to edit a Person record
+     * @return 
+     */
     public String editUserPersonRecord(){
         getSessionBean().setSessPersonQueued(userAuthorizedInConfig.getPerson());
         return "persons";
@@ -253,6 +447,9 @@ public class UserConfigBB extends BackingBeanUtils{
 
     }
     
+    /**
+     * Internal organ for refreshing the current UserAuthorized
+     */
     private void reloadCurrentUser(){
         UserCoordinator uc = getUserCoordinator();
         try {
@@ -270,6 +467,9 @@ public class UserConfigBB extends BackingBeanUtils{
         
     }
     
+    /**
+     * Internal organ for refreshing the UMAP being edited
+     */
     private void reloadCurrentUMAP(){
         UserIntegrator ui = getUserIntegrator();
         try {
@@ -283,6 +483,10 @@ public class UserConfigBB extends BackingBeanUtils{
     }
     
     
+    /**
+     * Possibly reduntant UserCoordinator client method
+     * @param ev 
+     */
     public void commitUsernameUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
@@ -300,8 +504,10 @@ public class UserConfigBB extends BackingBeanUtils{
     }
     
     
-    
-    public void commitUserInsert(ActionEvent ev) {
+    /**
+     * Finalizes the new user creation process with the UserCoordinator
+     */
+    public void commitUserInsert() {
         System.out.println("UserBB.commitInsert");
         UserCoordinator uc = getUserCoordinator();
         String freshUserPswd = null;
@@ -337,8 +543,11 @@ public class UserConfigBB extends BackingBeanUtils{
     }
 
     
-    
-    public void commitUserPersonUpdates(ActionEvent ev){
+    /**
+     * Finalizes updates to Users with the UserCoordinator
+     * @param ev 
+     */
+    public void commitUserPersonUpdates(){
         UserCoordinator uc = getUserCoordinator();
         try {
             uc.updateUser(userAuthorizedInConfig, selectedUserPerson, null);
@@ -357,24 +566,9 @@ public class UserConfigBB extends BackingBeanUtils{
     
     
     
-    public void commitUserCreation(){
-        UserCoordinator uc = getUserCoordinator();
-        int freshUserID;
-        try {
-            freshUserID = uc.insertNewUser(userAuthorizedInConfig);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "User add success! New user ID: " + freshUserID, ""));
-        } catch (IntegrationException ex) {
-            
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "User add failed; integration error", ""));
-        }
-        
-    }
-    
+    /**
+     * Logic container for liasing with the UserCoordinator for password reset
+     */
     public void resetCurrentUserPassword(){
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
@@ -615,6 +809,20 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void setFormNotes(String formNotes) {
         this.formNotes = formNotes;
+    }
+
+    /**
+     * @return the userSelected
+     */
+    public boolean isUserSelected() {
+        return userSelected;
+    }
+
+    /**
+     * @param userSelected the userSelected to set
+     */
+    public void setUserSelected(boolean userSelected) {
+        this.userSelected = userSelected;
     }
     
 }

@@ -1,0 +1,756 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>User Manager</title> 
+   </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:form id="usermanage-messages-form">
+                        <h:messages id="usermanage-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                    </h:form>
+
+                    <h1>System User Manager</h1>
+                    <f:view>
+                        <h:form id="userManageForm">
+
+                            <p:commandButton ajax="true" value="Add new user" 
+                                             icon="fa fa-plus" 
+                                             actionListener="#{userConfigBB.initiateCreateNewUser}"
+                                             oncomplete="PF('userconfig-useraddupdate-dialog-var').show()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                             update="userconfig-messages-form
+                                                    userconfig-useraddupdate-username-messages-form
+                                                    userconfig-useraddupdate-username-form"/>
+
+                            <p:spacer height="15px"/>
+
+                            <p:dataTable
+                                id="userconfig-usertable"
+                                var="user"
+                                value="#{userConfigBB.userListForConfig}"
+                                rowKey="#{user.userID}"
+                                tableStyleClass="primeDataTable">
+
+                                <p:column width="3%" exportable="false">
+                                    <f:facet name="header">
+                                        <h:outputText value="Expand row" 
+                                                      escape="false"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.userID}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Username" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.username}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Person" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.person.firstName}"/>
+                                    <h:outputText value=" "/>
+                                    <h:outputText value="#{user.person.lastName}"/>
+                                    <h:outputText value=", PersID: #{user.person.personID} "/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Created" />
+                                    </f:facet>
+                                    <h:outputText value="#{userConfigBB.getPrettyDate(user.createdTS)}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Active?" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.active}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Virtual?" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.noLoginVirtualUser}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <p:commandButton ajax="true"
+                                                     id="updateUser" 
+                                                     value="user settings" 
+                                                     icon="fa fa-gears"
+                                                     styleClass="multiButtonLineButton" 
+                                                     actionListener="#{userConfigBB.initiateUserUpdates(user)}"
+                                                     oncomplete="PF('userconfig-useraddupdate-dialog-var').show()"
+                                                     update="userconfig-useraddupdate-dialog" />
+                                    <p:commandButton ajax="true"
+                                                     id="userconfig-button-configauthperiods" 
+                                                     value="manage auth periods" 
+                                                     icon="fa fa-id-card"
+                                                     styleClass="multiButtonLineButton" 
+                                                     actionListener="#{userConfigBB.initiateManageAuthPeriods(user)}"
+                                                     oncomplete="PF('user-authorizations-dialog-var').show()"
+                                                     update="user-authorizations-dialog-periodtable-form"
+                                                     />
+                                </p:column>
+
+                                <p:rowExpansion>
+                                    <div class="outlinedBox">
+
+                                        <h:panelGrid columns="2" border="0" 
+                                                     cellpadding="5" columnClasses="gridTd, gridTd"
+                                                     footerClass="gridFooter">
+                                            <h:panelGroup>
+
+                                                <h:outputLabel value="Created by: " />
+                                                <p:spacer height="0px" />
+                                                <h:outputLabel value="user id: " />
+                                                <h:outputText value="#{user.createdByUserId}" />
+
+                                            </h:panelGroup>
+
+                                            <f:facet name="footer">
+                                                <h:outputLabel value="User notes:" />
+                                                <h:outputLabel value="#{user.notes}" escape="false" />
+                                            </f:facet>
+                                        </h:panelGrid>
+
+                                    </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+
+                            <p:spacer height="15px"/>
+                            <hr/>
+                            <p:spacer height="15px"/>
+
+                        </h:form>
+
+                        <p:dialog      
+                            id="user-authorizations-dialog"
+                            height="650" width="800"
+                            widgetVar="user-authorizations-dialog-var"
+                            closable="true" 
+                            rendered="true">
+
+                            <h:form id="user-authorizations-dialog-periodtable-form">
+                                
+                                  <p:commandButton ajax="true"
+                                                         id="usersconfig-authperiods-button-new" 
+                                                         value="Add new auth period" 
+                                                         icon="fa fa-plus"
+                                                         styleClass="multiButtonLineButton" 
+                                                         actionListener="#{userConfigBB.initiateAddAuthPeriod}"
+                                                         oncomplete="PF('userconfig-addauthperiod-dialog-var').show()"
+                                                         update="userconfig-addauthperiod-form" />
+
+                                <h2>Existing User-Muni-Auth-Periods for User <h:outputText value="#{userConfigBB.userAuthorizedInConfig.username}" /></h2>
+
+                                <p:dataTable
+                                    id="userconfig-muniauthperiods-dt"
+                                    var="muPeriod"
+                                    value="#{userConfigBB.userAuthorizedInConfig.muniAuthPeriodListForCredMuni}"
+                                    rowKey="#{muPeriod.userMuniAuthPeriodID}"
+                                    tableStyleClass="primeDataTable">
+
+                                    <p:column width="5%" exportable="false">
+                                        <f:facet name="header">
+                                            <h:outputText value="EXP!" 
+                                                          escape="false"/>
+                                        </f:facet>
+                                        <p:rowToggler/>
+                                    </p:column>
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Municipality" escape="false" />
+                                        </f:facet>
+                                        <h:outputText value="#{muPeriod.muni.muniName}"/>
+                                        <h:outputText value=" " class="spacer-char"/>
+                                        <h:outputText value="(" class="spacer-char"/>
+                                        <h:outputText value="#{muPeriod.muni.muniCode}"/>
+                                        <h:outputText value=")" class="obid-open"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Period" escape="false" />
+                                        </f:facet>
+                                        <h:outputText value="(" class="objectid-open"/>
+                                        <h:outputText value="#{muPeriod.userMuniAuthPeriodID}"/>
+                                        <h:outputText value=")" class="objectid-close"/>
+                                    </p:column>
+
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Access start" />
+                                        </f:facet>
+                                        <h:outputText value="#{userConfigBB.getPrettyDate(muPeriod.startDate)}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Access stop" />
+                                        </f:facet>
+                                        <h:outputText value="#{userConfigBB.getPrettyDate(muPeriod.stopDate)}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Role" />
+                                        </f:facet>
+                                        <h:outputText value="#{muPeriod.role.label}"/>
+                                        <h:outputText value=":"
+                                                      class="separator-role-rank"/>
+                                        <h:outputText value="#{muPeriod.role.rank}"/>
+                                        <h:outputText value=":"
+                                                      class="separator-role-rank"/>
+                                        <h:outputText value="pr"
+                                                      class="separator-role-rank"/>
+                                        <h:outputText value="#{muPeriod.assignmentRelativeOrder}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="DeacTS" />
+                                        </f:facet>
+                                        <h:outputText value="#{userConfigBB.getPrettyDate(muPeriod.recorddeactivatedTS)}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Assignment rank" />
+                                        </f:facet>
+                                        <h:outputText value="#{muPeriod.assignmentRelativeOrder}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Actions" />
+                                        </f:facet>
+                                        <p:commandButton ajax="false"
+                                                         id="users-authrecordtable-button-initializenewsession" 
+                                                         value="initialize session" 
+                                                         icon="fa fa-user-circle-o"
+                                                         rendered="#{muPeriod.valid and systemServicesBB.bbSessionUser.keyCard.hasDeveloperPermissions}"
+                                                         styleClass="multiButtonLineButton" 
+                                                         action="#{userConfigBB.reInitSession(muPeriod)}"
+                                                          />
+                                        
+                                        <p:spacer height="3px" />
+                                        
+                                        <p:commandButton ajax="true"
+                                                         id="users-authrecordtable-button-invalidate" 
+                                                         value="invalidate" 
+                                                         icon="fa fa-close"
+                                                         rendered="#{muPeriod.valid}"
+                                                         styleClass="multiButtonLineButton" 
+                                                         actionListener="#{userConfigBB.initiateInvalidateUserAuthPeriod(user, muPeriod)}"
+                                                         oncomplete="PF('userconfig-dialog-invalidateperiod-var').show()"
+                                                         update="userconfig-dialog-invalidateperiodform" />
+                                    </p:column>
+                                    <p:rowExpansion>
+                                        <div class="outlinedBox">
+
+                                            <h:panelGrid columns="2" border="0" 
+                                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                                         footerClass="gridFooter"
+                                                         headerClass="gridHeader">
+                                                
+                                                <h:panelGroup>
+
+                                                    <h:outputLabel value="Created by: " />
+                                                    <p:spacer height="0px" />
+                                                    <h:outputLabel value="user id: " />
+                                                    <h:outputText value="#{muPeriod.createdByUserID}" />
+
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel value="Created TS:" />
+                                                    <h:outputText value="#{userConfigBB.getPrettyDate(muPeriod.createdTS)}"/>
+                                                </h:panelGroup>
+                                                <f:facet name="footer">
+                                                    <h:outputLabel value="Notes:" />
+                                                    <p:spacer height="0px" />
+                                                    <h:outputText value="#{muPeriod.notes}" escape="false" style="text-align: left;"/>
+
+                                                    <h4>Log entries associated with this authorization period</h4>
+
+
+                                                    <p:scrollPanel id="userconfig-authperiod-logentry-scrollpanel"
+                                                                   style="height: 200px;">
+
+                                                        <p:dataTable
+                                                            id="userconfig-muniauthperiods-logentry-table"
+                                                            var="muEntry"
+                                                            value="#{muPeriod.periodActivityLogBook}"
+                                                            rowKey="#{muEntry.logBookEntryID}"
+                                                            tableStyleClass="primeDataTable">
+
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Log entry ID" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{muEntry.logBookEntryID}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="AuthPerID" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{muEntry.userMuniAuthPeriodID}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Category" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{muEntry.category}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="TS" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{muEntry.entryTS}"/>
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                    </p:scrollPanel>
+
+                                                </f:facet>
+                                            </h:panelGrid>
+                                        </div>
+                                    </p:rowExpansion>
+
+                                </p:dataTable>
+                            </h:form>
+
+                        </p:dialog>
+
+                           <p:dialog 
+                            id="userconfig-addauthperiod-dialog"
+                            header="Create new authorization period" 
+                            widgetVar="userconfig-addauthperiod-dialog-var" 
+                            responsive="true" 
+                            width="575"
+                            modal="false"
+                               height="450">
+                               
+                            <h:form id="userconfig-addauthperiod-messages-form">
+                                <h:messages id="userconfig-addauthperiod-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
+                                
+                            <h:form id="userconfig-addauthperiod-form">
+
+                                <h2>
+                                    <h:outputText id="useradd-userid-head1" value="Add authorization record for "/>
+                                    <h:outputText id="useradd-userid-ot" value="userid: #{userConfigBB.userAuthorizedInConfig.userID}"/>
+                                </h2>
+
+                                <h:panelGrid columns="2" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd"
+                                             footerClass="gridFooter"> 
+                                    <h:panelGroup>
+
+                                        <h:outputLabel value="Access Start Date*" for="startDateCal"/>
+                                        <p:spacer height="5px" />
+                                        <p:calendar value="#{userConfigBB.umapInConfig.startDateUtilDate}" 
+                                                    mode="popup" 
+                                                    id="aup-cal-starttdate"
+                                                    showOn="button"
+                                                    pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true"
+                                                    tabindex="5"
+                                                    showButtonPanel="true"
+                                                    showTodayButton="true"
+                                                    required="true"/>
+
+                                        <h:message for="aup-cal-starttdate" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel value="Access Termination Date*" for="aup-cal-stopdate"/>
+                                        <p:spacer height="5px" />
+                                        <p:calendar value="#{userConfigBB.umapInConfig.stopDateUtilDate}" 
+                                                    mode="popup" tabindex="6"
+                                                    id="aup-cal-stopdate"
+                                                    showOn="button"
+                                                    pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true"
+                                                    showButtonPanel="true"
+                                                    showTodayButton="true"
+                                                    required="true"/>
+
+                                        <h:message for="aup-cal-stopdate" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+
+                                        <p:outputLabel  for="aup-roletype-som" value="Role type"/>
+                                        <p:spacer height="5px" />
+                                        <p:selectOneMenu id="aup-roletype-som" 
+                                                         required="true" 
+                                                         value="#{userConfigBB.umapInConfig.role}">
+                                            <f:selectItem itemLabel="select a role..." noSelectionOption="true" />
+                                            <f:selectItems value="#{userConfigBB.roleTypeCandidateList}"  var="rt" itemValue="#{rt}" 
+                                                           itemLabel="#{rt.label}, rank #{rt.rank}"/>
+                                        </p:selectOneMenu>
+                                        <h:message for="aup-roletype-som" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+
+                                    <h:panelGroup>
+                                        <p:outputLabel  for="aup-muni-som" value="Municipality"/>
+                                        <p:spacer height="4px" />
+                                        <p:selectOneMenu id="aup-muni-som" 
+                                                         required="true" 
+                                                         value="#{userConfigBB.umapInConfig.muni}">
+                                            <f:converter converterId="muniConverter" />
+                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
+                                            <f:selectItems value="#{userConfigBB.muniCandidateList}"  var="mu" itemValue="#{mu}" 
+                                                           itemLabel="#{mu.muniName}"/>
+                                        </p:selectOneMenu>
+                                        <h:message for="aup-muni-som" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <p:outputLabel for="authperiod-add-assrank-it"
+                                                       value="Assignment order ranking (higher # = higher precedence)" />
+                                        
+                                        <p:spacer height="5px" />
+                                        
+                                        <p:inputText id="authperiod-add-assrank-it" 
+                                                     value="#{userConfigBB.umapInConfig.assignmentRelativeOrder}" 
+                                                     style="width: 50px;" 
+                                                     tabindex="3" 
+                                                      type="number"
+                                                     required="true" 
+                                                     styleClass="inputText"/>
+
+                                        <h:message for="authperiod-add-assrank-it" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                         <p:outputLabel for="userconfig-addauthperiod-notes-it"
+                                                       value="Notes" />
+                                        
+                                        <p:spacer height="5px" />
+                                        
+                                        <p:inputText id="userconfig-addauthperiod-notes-it" 
+                                                     value="#{userConfigBB.formUmapNotes}" 
+                                                     style="width: 250px;" 
+                                                     tabindex="3" 
+                                                     required="false" 
+                                                     styleClass="inputText"/>
+
+                                        <h:message for="authperiod-add-assrank-it" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                </h:panelGrid>
+
+                                <p:spacer height="15px"/>
+                                <p:commandButton    ajax="true" 
+                                                    tabindex="2"
+                                                    value="Cancel" 
+                                                    icon="fa fa-stop" 
+                                                    onclick="PF('userconfig-addauthperiod-dialog-var').hide()"/>
+
+                                <p:commandButton    id="userconfig-button-commituap"
+                                                    ajax="true" 
+                                                    value="Commit new authorization period" 
+                                                    icon="fa fa-plus" 
+                                                    tabindex="3" 
+                                                    actionListener="#{userConfigBB.commitNewAuthPeriod}"
+                                                    oncomplete="PF('userconfig-addauthperiod-dialog-var').hide()"
+                                                    update="userconfig-addauthperiod-messages-form"
+                                                    />
+                            </h:form>
+                        </p:dialog>
+                        
+                        <p:dialog 
+                            id="userconfig-dialog-invalidateperiod"
+                            header="Invalidate authorization period" 
+                            widgetVar="userconfig-dialog-invalidateperiod-var" 
+                            responsive="true" 
+                            width="500"
+                            modal="false"
+                            height="300">
+
+                            <h:form id="userconfig-dialog-invalidateperiod-messages-form">
+                                <h:messages id="userconfig-dialog-invalidateperiod-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
+
+                            <h:form id="userconfig-dialog-invalidateperiodform">
+                                <h2> 
+                                    <h:outputText value="Invalidate authorization period for " />
+                                    <h:outputText value="#{userConfigBB.userAuthorizedInConfig.username}" />
+                                    <h:outputText value=" in " />
+                                    <h:outputText value="#{userConfigBB.umapInConfig.muni.muniName}" />
+                                </h2>
+
+                                <p:outputLabel for="userauthper-invalidate-reason-it">
+                                    <h:outputText value="Reason for invalidation"/>
+                                </p:outputLabel>
+                                <p:inputText id="userauthper-invalidate-reason-it" 
+                                             value="#{userConfigBB.formInvalidateRecordReason}" 
+                                             style="width: 400px;" 
+                                             tabindex="3" 
+                                             required="true" 
+                                             styleClass="inputText"/>
+                                <h:message for="userauthper-invalidate-reason-it" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                <p:commandButton ajax="true" 
+                                                 value="Abort invalidation" icon="fa fa-stop" 
+                                                 onclick="PF('userconfig-dialog-invalidateperiod-var').hide()"
+                                                 tabindex="4"/> 
+
+                                <p:commandButton    id="userconfig-invalidateauthper-button-commitinvalidate"
+                                                    ajax="true" 
+                                                    value="Invalidate period (undoable!)" 
+                                                    icon="fa fa-fire" 
+                                                    tabindex="11" 
+                                                    actionListener="#{userConfigBB.invalidateUserMuniAuthPeriod}"
+                                                    update="userconfig-dialog-invalidateperiod" />
+                                                    
+                                                     
+                                <p:spacer height="5px" />
+                            </h:form>
+
+                        </p:dialog>
+
+                        <p:dialog 
+                            id="userconfig-useraddupdate-dialog"
+                            header="User settings" 
+                            widgetVar="userconfig-useraddupdate-dialog-var" 
+                            responsive="true" 
+                            width="800"
+                            modal="false"
+                            height="600">
+                            
+                            
+                            
+                            <h:form id="userconfig-messages-form">
+                                <h:messages id="userconfig-messages"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+
+                                <f:subview id="userconfig-useraddupdate-subview-header-userupdate"
+                                           rendered="#{userConfigBB.userAuthorizedInConfig.userID != 0}">
+                                    
+                                    <h2>User settings for <h:outputText value="#{userConfigBB.userAuthorizedInConfig.username}" /></h2>
+                                   
+                                </f:subview>
+                                
+                                <f:subview id="userconfig-useraddupdate-subview-header-newuser"
+                                           rendered="#{userConfigBB.userAuthorizedInConfig.userID == 0}">
+                                    <h2>Create new user</h2>
+                                </f:subview>
+                                
+                            </h:form>
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+                                <h:panelGroup>
+                                    <h:form id="userconfig-useraddupdate-username-messages-form">
+                                        <h:messages id="userconfig-useraddupdate-username-messages"
+                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
+                                    <h:form id="userconfig-useraddupdate-username-form">
+                                        <p:outputLabel for="userconfig-useraddupdate-username-it">
+                                            <h:outputText value="User name"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="userconfig-useraddupdate-username-it" value="#{userConfigBB.userAuthorizedInConfig.username}" 
+                                                     size="12"
+                                                     maxlength="20"
+                                                     tabindex="3" 
+                                                     required="true" 
+                                                     validatorMessage="Length must be between 5 and 20 characters"
+                                                     styleClass="inputText">
+                                            <f:validateLength minimum="5" maximum="20" />
+                                        </p:inputText>
+                                        <h:message for="userconfig-useraddupdate-username-it" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:commandButton    id="userconfig-useraddupdate-username-button-update"
+                                                            ajax="true"
+                                                            actionListener="#{userConfigBB.commitUsernameUpdates}"
+                                                            icon="fa fa-thumbs-o-up"
+                                                            update="userconfig-useraddupdate-username-messages-form
+                                                            userManageForm"
+                                                            value="Update username" 
+                                                            tabindex="3"/>
+                                    </h:form>
+
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:form id="userconfig-useraddupdate-personlink-messages-form">
+                                        <h:messages id="userconfig-useraddupdate-personlink-messages"
+                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
+
+                                    <h:form id="userconfig-useraddupdate-personlink-form">
+                                        <h3>User:Person mapping</h3>
+                                        <h:outputText value="This user is currently mapped to: " />
+                                        <p:spacer height="5px" />
+                                        <h:outputText value="#{userConfigBB.userAuthorizedInConfig.person.firstName}" />
+                                        <h:outputText value=" " />
+                                        <h:outputText value="#{userConfigBB.userAuthorizedInConfig.person.lastName}" />
+                                        <h:outputText value=" (ID: #{userConfigBB.userAuthorizedInConfig.person.personID})" />
+                                        <h:outputText value=" " />
+
+
+                                        <p:spacer height="5px" />
+
+                                        <p:outputLabel  for="userconfig-som-userpersons" value="Available User-type persons:"/>
+                                        <p:selectOneMenu id="userconfig-som-userpersons" 
+                                                         required="true" 
+                                                         value="#{userConfigBB.userAuthorizedInConfig.person}">
+                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                            <f:selectItems value="#{userConfigBB.userPersonList}"  var="p" itemValue="#{p}" 
+                                                           itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                            <f:converter converterId="personConverter"/>
+                                        </p:selectOneMenu>
+                                        <h:message for="userconfig-som-userpersons" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:commandButton    id="userconfig-button-updatepersonlink"
+                                                            ajax="true"
+                                                            actionListener="#{userConfigBB.commitUserPersonUpdates}"
+                                                            update="userconfig-useraddupdate-personlink-messages-form
+                                                            userconfig-useraddupdate-personlink-form
+                                                            userManageForm:userconfig-usertable"
+                                                            icon="fa fa-thumbs-0-up"
+                                                            value="Update person link" 
+                                                            tabindex="3"/>
+
+                                    </h:form>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:form id="userconfig-messages-form-updatepassword">
+                                        <h:messages id="userconfig-messages-updategepassword"
+                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
+
+                                    <h:form id="userconfig-form-updatepassword">
+                                        <h:outputText value="Reset password and generate new"/>
+                                        <p:commandButton    id="userconfig-button-newpass"
+                                                            ajax="true"
+                                                            actionListener="#{userConfigBB.resetCurrentUserPassword}"
+                                                            oncomplete="PF('userconfig-newpass-dialog-var').show()"
+                                                            update="userconfig-newpass-dialog"
+                                                            icon="fa fa-key"
+                                                            value="Generate and assign new random password" 
+                                                            tabindex="3"/>
+                                    </h:form>
+                                </h:panelGroup>
+                                
+                                <f:facet name="footer">
+                                    <p>
+                                       <h:outputText value="Notes: " styleClass="ui-label"/>
+                                       <h:outputText value="#{userConfigBB.userAuthorizedInConfig.notes}" escape="false" />
+                                   </p>
+                               </f:facet>
+
+                            </h:panelGrid>
+
+                            <h:form id="userconfig-form-close">                             
+
+
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel"
+                                                 icon="fa fa-stop" 
+                                                 onclick="PF('userconfig-useraddupdate-dialog').hide()"
+                                                 tabindex="4"
+                                                 />
+
+
+                                <p:commandButton ajax="true" 
+                                                 value="Done!" 
+                                                 icon="fa thumbs-up" 
+                                                 onclick="PF('userconfig-useraddupdate-dialog').hide()"
+                                                 tabindex="4"
+                                                 update="userManageForm:userconfig-usertable"/>
+                            </h:form>
+
+                        </p:dialog>
+                        
+                           <p:dialog 
+                            id="userconfig-newpass-dialog"
+                            header="New Password" 
+                            widgetVar="userconfig-newpass-dialog-var" 
+                            responsive="true" 
+                            width="600"
+                            modal="false"
+                            height="300">
+                            
+                               <div class="newpasswd-cont">
+                                   
+                                    <h:outputText value="User #{userConfigBB.userAuthorizedInConfig.username} has been assigned " />
+                                    <h:outputText value="the following password. Please safely transfer this password" />
+                                    <h:outputText value="by passing a paper slip directly and/or phoning it over. " />
+                                    <h:outputText value="codeNforce passwords are all cAse SenSiTive." />
+                                    
+                                    <div class="newpasswd-text">
+                                        
+                                        <h:outputText id="userconfig-newpass-ot"
+                                                      value="#{userConfigBB.freshPasswordCleartext}"
+                                                      styleClass="newpsswd" />
+                                    </div>
+                                    
+                                    <h:outputText value="(Please do not email or text the new password, and " />
+                                    <h:outputText value="(generally seek to limit its entry into any computer." />
+
+                                    <p:spacer height="5px" />
+                                    <p:commandButton ajax="true" 
+                                                     value="Done!" 
+                                                     icon="fa thumbs-up" 
+                                                     onclick="PF('userconfig-newpass-dialog-var').hide()"
+                                                     tabindex="4"/>
+
+                               </div>
+                           </p:dialog>
+
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
