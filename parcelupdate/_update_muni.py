@@ -226,10 +226,8 @@ def update_muni(muni, db_conn, commit=True):
             sys.setrecursionlimit(10000)
             with open(path.join("pickle", "_" + str(record_count) + "_" + "data.pickle"), "wb") as da:
                 pickle.dump(data,da)
-            with open(path.join("pickle", "_" + str(record_count) + "_" + "own.pickle"), "wb") as ow:
-                pickle.dump(data,ow)
-            with open(path.join("pickle", "_" + str(record_count) + "_" + "tax.pickle"), "wb") as ta:
-                pickle.dump(data,ta)
+            print(record_count)
+            print(tax_status)
 
 
             # This block of code initalizes the following:
