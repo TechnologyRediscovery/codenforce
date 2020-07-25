@@ -11,6 +11,9 @@ def connection_and_cursor(
         port=5432,
         cursor_name=None
 ):
+    """
+    :return: (psycopg2.extensions.connection, psycopg2.extensions.cursor)
+    """
     try:
         conn = psycopg2.connect(
             database=database, user=user, password=password, host=host, port=port
