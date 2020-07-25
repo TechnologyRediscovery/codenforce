@@ -220,16 +220,6 @@ def update_muni(muni, db_conn, commit=True):
             owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])        ## TODO: UNIT TESTS START HERE ^
             tax_status = _parse.parse_tax_from_soup(data[TAX])
 
-            import pickle
-            from os import path
-            import sys
-            sys.setrecursionlimit(10000)
-            with open(path.join("pickle", "_" + str(record_count) + "_" + "data.pickle"), "wb") as da:
-                pickle.dump(data,da)
-            print(record_count)
-            print(tax_status)
-
-
             # This block of code initalizes the following:
             #   Variables:  prop_id, unit_id, cecase_id
             #   Flags:      new_parcel
