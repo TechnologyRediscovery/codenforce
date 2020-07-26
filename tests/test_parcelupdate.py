@@ -53,41 +53,27 @@ class TestParse:
     # We COULD parametrize these tests, but ultimately explicit is better than implicit.
     # It's not a lot of repeated code for just 4 test cases.
     class TestTaxStatus:
-        import sys
-        sys.setrecursionlimit(100000)
+
 
         def test_paid(self):
             with open(MOCKS + "paid.pickle", "rb") as p:
-                data = pickle.load(p)
-                soup = data["Tax"]
-            with open(MOCKS + "paid.pickle", "wb") as rewrite:
-                pickle.dump(soup, rewrite)
+                soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) ==  TaxStatus(year='2020', paidstatus='PAID', tax='473', penalty='000', interest='000', total='473', date_paid='6/2/2020', blank=None)
 
         def test_unpaid(self):
             with open(MOCKS + "unpaid.pickle", "rb") as p:
-                data = pickle.load(p)
-                soup = data["Tax"]
-            with open(MOCKS + "unpaid.pickle", "wb") as rewrite:
-                pickle.dump(soup, rewrite)
+                soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == TaxStatus(year='2020', paidstatus='UNPAID', tax='36894', penalty='1845', interest='369', total='39108', date_paid=None, blank=None)
 
         def test_balancedue(self):
             with open(MOCKS + "balancedue.pickle", "rb") as p:
-                data = pickle.load(p)
-                soup = data["Tax"]
-            with open(MOCKS + "balancedue.pickle", "wb") as rewrite:
-                pickle.dump(soup, rewrite)
-
+                soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == TaxStatus(year='2020', paidstatus='BALANCE DUE', tax='069', penalty='003', interest='001', total='073', date_paid=None, blank=None)
 
         def test_none(self):
             # Todo: Does the truely represent no taxes, or is it representative of blank data?
             with open(MOCKS + "none.pickle", "rb") as p:
-                data = pickle.load(p)
-                soup = data["Tax"]
-            with open(MOCKS + "none.pickle", "wb") as rewrite:
-                pickle.dump(soup, rewrite)
+                soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == TaxStatus(year='2020', paidstatus=None, tax='000', penalty='000', interest='000', total='000', date_paid=None, blank=None)
 
 
