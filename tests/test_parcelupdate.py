@@ -48,17 +48,45 @@ details = EventDetails(None, None, None, None)
 details.changes = Changes(None, None, None)
 
 
+class TestEventsTrigger:
+    """
+    """
+    def test_TriggerCoverage(self):
+        pass
+
+    def test_NewParcelid_trigger(self):
+        pass
+
+    def test_DifferentOwner_trigger(self):
+        pass
+
+    def testDifferentStreet_trigger(self):
+        pass
+
+    def testDifferentCityStateZip(self):
+        pass
+
+    def testDifferentLivingArea(self):
+        pass
+
+    def testDifferentCondition(self):
+        pass
+
+    def testDifferentTaxStatus(self):
+        pass
+
+    def testDifferentTaxCode(self):
+        pass
+
+
+
 class TestParse:
-    # TODO: pickled objects to fixtures
-    # We COULD parametrize these tests, but ultimately explicit is better than implicit.
-    # It's not a lot of repeated code for just 4 test cases.
-    class TestTaxStatus:
-
-
+    # Todo: pickled objects to fixtures?
+    class TestParseTaxFromSoup:
         def test_paid(self):
             with open(MOCKS + "paid.pickle", "rb") as p:
                 soup = pickle.load(p)
-            assert _parse.parse_tax_from_soup(soup) ==  TaxStatus(year='2020', paidstatus='PAID', tax='473', penalty='000', interest='000', total='473', date_paid='6/2/2020', blank=None)
+            assert _parse.parse_tax_from_soup(soup) == TaxStatus(year='2020', paidstatus='PAID', tax='473', penalty='000', interest='000', total='473', date_paid='6/2/2020', blank=None)
 
         def test_unpaid(self):
             with open(MOCKS + "unpaid.pickle", "rb") as p:
@@ -77,8 +105,45 @@ class TestParse:
             assert _parse.parse_tax_from_soup(soup) == TaxStatus(year='2020', paidstatus=None, tax='000', penalty='000', interest='000', total='000', date_paid=None, blank=None)
 
 
+    class TestParseOwnerFromSoup:
+        pass
+
 
 with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432") as conn:
+
+    class TestWrites():
+        """
+        These tests ensure that the code write to the database properly.
+
+        They WRITE to a local copy of the cogdb database, so changes to the database may persist between tests.
+        """
+        class TestTaxStatusWrites:
+            """ Tests data scraped from Allegheny County. Also compares it to the record.
+            """
+            def test_paid(self):
+                pass
+                # tax_status(year='2020', paidstatus='PAID', tax='473', penalty='000', interest='000', total='473', date_paid='6/2/2020', blank=None)
+
+            def test_unpaid(self):
+                pass
+                # tax_status(year='2020', paidstatus='UNPAID', tax='36894', penalty='1845', interest='369', total='39108', date_paid=None, blank=None)
+
+            def test_balancedue(self):
+                pass
+                # tax_status(year='2020', paidstatus='BALANCE DUE', tax='069', penalty='003', interest='001', total='073', date_paid=None, blank=None)
+
+            def test_none(self):
+                # Todo: Does the truly represent no taxes, or is it representative of blank data?
+                pass
+                # tax_status(year='2020', paidstatus=None, tax='000', penalty='000', interest='000', total='000', date_paid=None, blank=None)
+
+
+
+        class TestRecordWrites:
+            # Uses a mocked OwnerName
+            pass
+
+
 
     class TestIntegrity():
         """
@@ -86,7 +151,6 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
 
         They read from a local copy of the cogdb database.
         """
-
         class TestEventCategories:
             """ Ensures events in _events.py share the same attributes of their counterpart in the database.
             """
@@ -128,69 +192,6 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
                     cursor.execute(select_sql, info)
                     row = cursor.fetchone()
                     assert instance.active == row[0]
-
-
-
-        class TestWrites():
-            """
-            These tests ensure that the code write to the database properly.
-
-            They WRITE to a local copy of the cogdb database, so changes to the database may persist between tests.
-            """
-            pass
-
-
-
-        class TestTaxStatus:
-            """ Tests data scraped from Allegheny County. Also compares it to the record.
-            """
-
-            def test_paid(self):
-                pass
-                # tax_status(year='2020', paidstatus='PAID', tax='473', penalty='000', interest='000', total='473', date_paid='6/2/2020', blank=None)
-
-            def test_unpaid(self):
-                pass
-                # 11
-                # tax_status(year='2020', paidstatus='UNPAID', tax='36894', penalty='1845', interest='369', total='39108', date_paid=None, blank=None)
-
-            def test_balancedue(self):
-                pass
-                # 19
-                # tax_status(year='2020', paidstatus='BALANCE DUE', tax='069', penalty='003', interest='001', total='073', date_paid=None, blank=None)
-
-            def test_none(self):
-                # Todo: Does the truely represent no taxes, or is it representative of blank data?
-                pass
-                # 0
-                # tax_status(year='2020', paidstatus=None, tax='000', penalty='000', interest='000', total='000', date_paid=None, blank=None)
-
-
-
-#         class TestEventsTrigger:
-#             """
-#             """
-#
-#             def test_TriggerCoverage(self):
-#                 """
-#                 """
-#                 pass
-#             def test_NewParcelid_trigger(self):
-#                 pass
-#             def test_DifferentOwner_trigger(self):
-#                 pass
-#             def testDifferentStreet_trigger(self):
-#                 pass
-#             def testDifferentCityStateZip(self):
-#                 pass
-#             def testDifferentLivingArea(self):
-#                 pass
-#             def testDifferentCondition(self):
-#                 pass
-#             def testDifferentTaxStatus(self):
-#                 pass
-#             def testDifferentTaxCode(self):
-#                 pass
 
 
 
