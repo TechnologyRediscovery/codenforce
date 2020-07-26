@@ -155,17 +155,6 @@ def write_propertyexternaldata(propextern_map, cursor):
 
 
 def write_taxstatus(tax_status, cursor):
-    # insert_sql = """
-    #     INSERT INTO taxstatus(
-    #         year, paidstatus, tax, penalty,
-    #         interest, total, datepaid
-    #     )
-    #     VALUES(
-    #         %s, %s, %s, %s,
-    #         %s, %s, %s
-    #     )
-    #     RETURNING taxstatusid;
-    # """
     insert_sql = """
         INSERT INTO taxstatus(
             year, paidstatus, tax, penalty,
@@ -212,10 +201,6 @@ def update_muni(muni, db_conn, commit=True):
             data = scrape.county_property_assessments(parid, pages=[TAX])
             for page in data:
                 data[page] = _parse.soupify_html(data[page])
-
-
-
-
 
             owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])        ## TODO: UNIT TESTS START HERE ^
             tax_status = _parse.parse_tax_from_soup(data[TAX])
@@ -280,7 +265,7 @@ def update_muni(muni, db_conn, commit=True):
             if commit:
                 db_conn.commit()
             else:
-                # Check to make sure variables weren't forgotten to be assigned
+                # A check to make sure variables weren't forgotten to be assigned. Maybe move to testing suite?
                 assert [attr is not None for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]]
 
             record_count += 1
