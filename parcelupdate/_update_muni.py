@@ -205,7 +205,7 @@ def update_muni(muni, db_conn, commit=True):
             owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])        ## TODO: UNIT TESTS START HERE ^
             tax_status = _parse.parse_tax_from_soup(data[TAX])
 
-            # This block of code initalizes the following:
+            # This block of code initializes the following:
             #   Variables:  prop_id, unit_id, cecase_id
             #   Flags:      new_parcel
             if parcel_not_in_db(parid, cursor):

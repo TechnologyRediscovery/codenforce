@@ -27,6 +27,8 @@ from _constants import DASHES, COG_DB
 def main(municodes, commit, u, password, port):
     """Updates the CodeNForce database with the most recent data provided by the WPRDC."""
 
+    commit = False
+
     start = time.time()
     if commit:
         click.echo("Data will be committed to the database")
