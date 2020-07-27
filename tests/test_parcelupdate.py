@@ -47,13 +47,12 @@ for k in d:
 details = EventDetails(None, None, None, None)
 details.changes = Changes(None, None, None)
 
+# Todo: During this setup phase, add CogLand objects into local db
+
 
 class TestEventsTrigger:
     """
     """
-    def test_TriggerCoverage(self):
-        pass
-
     def test_NewParcelid_trigger(self):
         pass
 
@@ -115,34 +114,41 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
         """
         These tests ensure that the code write to the database properly.
 
-        They WRITE to a local copy of the cogdb database, so changes to the database may persist between tests.
+        They write to a local copy of the cogdb database.
+        Changes to the database persist between tests, so these are not "pure" unittests.
         """
-        class TestTaxStatusWrites:
-            """ Tests data scraped from Allegheny County. Also compares it to the record.
-            """
-            def test_paid(self):
-                pass
-                # tax_status(year='2020', paidstatus='PAID', tax='473', penalty='000', interest='000', total='473', date_paid='6/2/2020', blank=None)
-
-            def test_unpaid(self):
-                pass
-                # tax_status(year='2020', paidstatus='UNPAID', tax='36894', penalty='1845', interest='369', total='39108', date_paid=None, blank=None)
-
-            def test_balancedue(self):
-                pass
-                # tax_status(year='2020', paidstatus='BALANCE DUE', tax='069', penalty='003', interest='001', total='073', date_paid=None, blank=None)
-
-            def test_none(self):
-                # Todo: Does the truly represent no taxes, or is it representative of blank data?
-                pass
-                # tax_status(year='2020', paidstatus=None, tax='000', penalty='000', interest='000', total='000', date_paid=None, blank=None)
-
-
-
-        class TestRecordWrites:
-            # Uses a mocked OwnerName
+        def test_create_property_imap(self):
             pass
 
+        def test_write_property(self):
+            pass
+
+        def test_create_cecase_imap(self):
+            pass
+
+        def test_write_cecase(self):
+            pass
+
+        def test_create_owner_imap(self):
+            pass
+
+        def test_write_person(self):
+            pass
+
+        def test_connect_prop_to_person(self):
+            pass
+
+        def test_create_tax_status_imap(self):
+            pass
+
+        def test_write_tax_status(self):
+            pass
+
+        def test_create_propertyexternaldataimap(self):
+            pass
+
+        def test_write_propertyexternaldata(self):
+            pass
 
 
     class TestIntegrity():
@@ -156,7 +162,7 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
             """
 
             @pytest.mark.parametrize("event", event_categories)
-            def test_name(self, event):
+            def test_name_integrity(self, event):
                 """ Compares the class's name to the database's event category's title.
                 """
                 with conn.cursor() as cursor:
@@ -176,7 +182,7 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
 
             # Todo: Refactor and do a little currying
             @pytest.mark.parametrize("event", event_categories)
-            def test_active(self, event):
+            def test_active_integrity(self, event):
                 """ Compares the class's default active status to the database's.
                 """
                 with conn.cursor() as cursor:

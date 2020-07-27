@@ -210,7 +210,7 @@ def update_muni(muni, db_conn, commit=True):
             #   Flags:      new_parcel
             if parcel_not_in_db(parid, cursor):
                 new_parcel = True
-                imap = create.insertmap_from_record(record)
+                imap = create.property_insertmap(record)
                 prop_id = write_property_to_db(imap, cursor)
                 if record["PROPERTYUNIT"] == " ":
                     unit_id = insert.unit(

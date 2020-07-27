@@ -51,7 +51,7 @@ def propertyexternaldata_imap(prop_id, name, r, taxstatus_id):
     return imap
 
 
-def insertmap_from_record(r):
+def property_insertmap(r):
     """
     Arguments:
         r: dict
