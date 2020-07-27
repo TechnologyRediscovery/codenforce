@@ -5,8 +5,9 @@ __all__ = [
     "_parse",
     "_events",
     "_fetch",
-    "parcelupdate",
     "_insert",
+    "_utils",
+    "parcelupdate",
 ]
 
 #   parcelupdate uses semantic versioning (https://semver.org/)

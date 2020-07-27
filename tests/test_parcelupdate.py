@@ -123,6 +123,9 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
         def test_write_property(self):
             pass
 
+        def test_write_unit(self):
+            pass
+
         def test_create_cecase_imap(self):
             pass
 
