@@ -26,6 +26,8 @@ import java.util.List;
  */
 public class UserAuthorizedForConfig extends UserAuthorized{
 
+    private List<UserMuniAuthPeriod> umapList;
+    
      /**
      * This constructor is the only way of setting the internals of this
      * security-critical BOB, so all must be assembled by the coordinator
@@ -37,6 +39,41 @@ public class UserAuthorizedForConfig extends UserAuthorized{
         this.muniAuthPeriodsMap = u.muniAuthPeriodsMap;
         this.pswdLastUpdated = u.pswdLastUpdated;
         this.forcePasswordResetTS = u.forcePasswordResetTS;
+        this.lastUpdatedTS = u.lastUpdatedTS;
+        this.deactivatedByUserID = u.deactivatedByUserID;
+        this.deactivatedTS = u.deactivatedTS;
+    }
+
+    /**
+     * Security logic container to prohibit users from even starting
+     * the deactivation process for users with Dev level UMAPs in list
+     * @return 
+     */
+    public boolean allowUserDeactivation(){
+        boolean allow = true;
+        if(umapList != null){
+            for(UserMuniAuthPeriod umap: umapList){
+                if(umap.getRole() == RoleType.Developer){
+                    allow = false;
+                }
+            }
+        }
+        
+        return allow;
+    }
+    
+    /**
+     * @return the umapList
+     */
+    public List<UserMuniAuthPeriod> getUmapList() {
+        return umapList;
+    }
+
+    /**
+     * @param umapList the umapList to set
+     */
+    public void setUmapList(List<UserMuniAuthPeriod> umapList) {
+        this.umapList = umapList;
     }
     
     

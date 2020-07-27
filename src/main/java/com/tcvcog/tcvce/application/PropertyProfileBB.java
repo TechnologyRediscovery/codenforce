@@ -187,8 +187,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
 
     //check if current mode == Lookup
     public boolean getActiveViewMode() {
-        // hard-wired on since there's always a property loaded
-        return true;
+        return PageModeEnum.VIEW.equals(currentMode) || PageModeEnum.LOOKUP.equals(currentMode) ;
+        
     }
 
     //check if current mode == Insert

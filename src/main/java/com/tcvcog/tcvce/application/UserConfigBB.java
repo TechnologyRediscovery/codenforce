@@ -55,15 +55,16 @@ public class UserConfigBB extends BackingBeanUtils{
     private PageModeEnum currentMode;
     private List<PageModeEnum> pageModes;
 
-    private UserAuthorized userAuthorizedInConfig;
+    
+    private UserAuthorizedForConfig userAuthorizedInConfig;
     private String freshPasswordCleartext;
     
     private UserMuniAuthPeriod umapInConfig;
-    private List<UserMuniAuthPeriod> umapListInConfigFromUserAuth;
     private String formUmapNotes;
     
     private List<User> userListForConfig;
     private boolean userSelected;
+    
     
     private RoleType selectedRoleType;
     private List<RoleType> roleTypeCandidateList;
@@ -104,7 +105,8 @@ public class UserConfigBB extends BackingBeanUtils{
         setCurrentMode(currentMode);
         
         try {
-            userAuthorizedInConfig = getSessionBean().getSessUser();
+            userAuthorizedInConfig = uc.user_assembleUserAuthorizedForConfig(getSessionBean().getSessUser());
+            userSelected = true;
             umapInConfig = userAuthorizedInConfig.getMyCredential().getGoverningAuthPeriod();
             userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
             muniCandidateList = mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessUser());
@@ -149,29 +151,23 @@ public class UserConfigBB extends BackingBeanUtils{
             this.currentMode = mode;
             switch(currentMode){
                 case LOOKUP:
-                    initLookup();
+                    onModeLookupInit();
                     break;
                 case INSERT:
-                    initiateCreateNewUser();
+                    onModeInsertInit();
                     break;
                 case UPDATE:
-                    initUpdate();
+                    onModeUpdateInit();
                     break;
                 case REMOVE:
-                    initRemove();
+                    onModeRemoveInit();
                     break;
                 default:
                     break;
                     
             }
         }
-        if(currentMode != null){
-            //show the current mode in p:messages box
-            getFacesContext().addMessage(null, 
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                this.currentMode.getTitle() + " Mode Selected", ""));
-        }
-        
+       
 
     }
     
@@ -200,18 +196,30 @@ public class UserConfigBB extends BackingBeanUtils{
     }
 
 
+    
+    
     /**
-     * Internal logic conatiner for changes to page mode: Remove
+     * Primary listener method which copies a reference to the selected 
+     * user from the list and sets it on the selected user perch
+     * @param u 
      */
-    private void initRemove(){
-        
-        
+    public void onObjetViewButtonChange(User u){
+        UserCoordinator uc = getUserCoordinator();
+        if(u != null){
+            try {
+                userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), u);
+                userSelected = true;
+            } catch (AuthorizationException | IntegrationException ex) {
+            
+            }
+        }
     }
-
+     
+ 
     /**
      * Internal logic container for changes to page mode: Lookup
      */
-    private void initLookup(){
+    private void onModeLookupInit(){
         UserCoordinator uc = getUserCoordinator();
         try {
             userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
@@ -226,40 +234,74 @@ public class UserConfigBB extends BackingBeanUtils{
         
     }
     
-    /**
-     * Internal logic container for changes to the page mode: update
-     */
-    private void initUpdate(){
-        
-    }
+   
     
     /**
-     * Primary listener method which copies a reference to the selected 
-     * user from the list and sets it on the selected user perch
-     * @param u 
+     * Internal logic container for beginning the user creation change process
+     * Delegated from the mode button router
      */
-    public void onUserSelectButtonChange(User u){
+    public void onModeInsertInit(){
         UserCoordinator uc = getUserCoordinator();
-        if(u != null){
-            try {
-                userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), u);
-            } catch (AuthorizationException | IntegrationException ex) {
+        try {
+            userAuthorizedInConfig = uc.user_assembleUserAuthorizedForConfig(new UserAuthorized(uc.user_getUserSkeleton(getSessionBean().getSessUser())));
+        } catch (IntegrationException ex) {
             
-            }
         }
+        System.out.println("UserConfigBB.createNewUser");
     }
+    
+    
+     public void onModeUpdateInit(){
+         // nothign to do here yet since the user is selected
+     }
+     
+    
+     public void onModeRemoveInit(){
+       // nothing to do here yet but let panels reset themselves
+    }
+     
+     
+     
+    
+    
     
      /**
      * Listener for button clicks when user is ready to insert a new EventRule.
      * Delegates all work to internal method
      * @param ev
      */
-    public void onInsertCommitButtonChange(ActionEvent ev) {
-        //show successfully inserting message in p:messages box
-        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Inserted User", ""));
-        //reminder: set muniManageSample in faces-config.xml
-        //return to muniManage_sample.xhtml page
+    public void onUserInsertCommitButtonChange(ActionEvent ev) {
+         System.out.println("UserBB.commitInsert");
+        UserCoordinator uc = getUserCoordinator();
+        String freshUserPswd = null;
+        int freshUserID;
+        User usr;
         
+        try {
+            freshUserID = uc.user_insertNewUser(userAuthorizedInConfig);
+            if(freshUserID != 0){
+                usr = uc.user_getUser(freshUserID);
+                freshUserPswd = uc.user_generateRandomPassword_SECURITYCRITICAL();
+                uc.user_updateUserPassword_SECURITYCRITICAL(usr, freshUserPswd);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Successfully added username " + usr.getUsername()
+                                + " to the system with an initial password of " + freshUserPswd, ""));
+                
+            }
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add user to system, my apologies",
+                            "This is a system-level error that must be corrected by an administrator"));
+        } catch (AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add user to system, my apologies",
+                            "This is an authroization be corrected by an administrator"));
+        }//show successfully inserting message in p:messages box
     }
 
     /**
@@ -267,12 +309,36 @@ public class UserConfigBB extends BackingBeanUtils{
      * Delegates all work to internal method
      * @param ev
      */
-    public void onUpdateCommitButtonChange(ActionEvent ev) {
+    public void onUserUpdateCommitButtonChange(ActionEvent ev) {
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            uc.user_updateUser(userAuthorizedInConfig, null, formUsername);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully udpated user", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update user", ""));
+            
+        }
         //show successfully updating message in p:messages box
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Updated User", ""));
         //reminder: set muniManageSample in faces-config.xml
         //return to muniManage_sample.xhtml page
         
+    }
+    
+    
+
+    /**
+     * Listener for user requests to remove the currently selected ERA;
+     * Delegates all work to internal, non-listener method.
+     * @param ev
+     */
+    public void onUserRemoveCommitButtonChange(ActionEvent ev) {
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully removed user from active management", ""));
     }
     
     /**
@@ -284,25 +350,17 @@ public class UserConfigBB extends BackingBeanUtils{
     }
     
     
-
-    /**
-     * Listener for user requests to remove the currently selected ERA;
-     * Delegates all work to internal, non-listener method.
-     * @param ev
-     */
-    public void onRemoveCommitButtonChange(ActionEvent ev) {
-        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully removed user from active management", ""));
-    }
-    
  
     /**
-     * Listener for user requests to view advanced search dialog
+     * Listener for user requests to view super table
      * @param ev 
      */
-    public void onAdvancedSearchButtonChange(ActionEvent ev){
+    public void onLoadFullTableButtonChange(ActionEvent ev){
         
         
     }
+    
+    
     
     
     /**
@@ -321,18 +379,8 @@ public class UserConfigBB extends BackingBeanUtils{
 
   
     
-    /**
-     * Internal logic container for beginning the user creation change process
-     * Delegated from the mode button router
-     */
-    public void initiateCreateNewUser(){
-        UserCoordinator uc = getUserCoordinator();
-        userAuthorizedInConfig = new UserAuthorized(uc.user_getUserSkeleton(getSessionBean().getSessUser()));
-        System.out.println("UserConfigBB.createNewUser");
-    }
     
-    
-    public String reInitSession(UserMuniAuthPeriod umap, UserAuthorized ua){
+    public String onSessionReinitWithNewUMAP(UserMuniAuthPeriod umap, UserAuthorized ua){
         UserCoordinator uc = getUserCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();
         
@@ -357,12 +405,12 @@ public class UserConfigBB extends BackingBeanUtils{
         
     }
     
-    public void initiateInvalidateUserAuthPeriod(UserAuthorized u, UserMuniAuthPeriod uap){
+    public void onInvalidateUserAuthPeriodInit(UserMuniAuthPeriod uap){
         umapInConfig = uap;
-        userAuthorizedInConfig = u;
+        
     }
     
-    public void invalidateUserMuniAuthPeriod(){
+    public void onInvalidateUserMuniAuthPeriodCommit(){
         UserCoordinator uc = getUserCoordinator();
         try {
             uc.auth_invalidateUserAuthPeriod(umapInConfig, getSessionBean().getSessUser(), formInvalidateRecordReason);
@@ -376,25 +424,8 @@ public class UserConfigBB extends BackingBeanUtils{
         }
         
     }
-    
-    public void initiateManageAuthPeriods(User ua){
-        try {
-            UserCoordinator uc = getUserCoordinator();
-            userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), ua);
-            umapListInConfigFromUserAuth = userAuthorizedInConfig.getMuniAuthPeriodsMap().get(userAuthorizedInConfig.getMyCredential().getGoverningAuthPeriod().getMuni());
-            System.out.println("UserConfigBB.initiateViewAddAuthPeriods | UMAP list size: " + umapListInConfigFromUserAuth.size());
-            if(umapListInConfigFromUserAuth != null){  
-                umapInConfig = umapListInConfigFromUserAuth.get(0);
-            }
-        } catch (AuthorizationException | IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            
-        }
-    }
-    
-    public void initiateAddAuthPeriod(){
+
+    public void onAuthPeriodNewInit(){
         UserCoordinator uc = getUserCoordinator();
         try {
             umapInConfig = uc.auth_initializeUserMuniAuthPeriod_SECURITYCRITICAL(getSessionBean().getSessUser(), 
@@ -408,7 +439,7 @@ public class UserConfigBB extends BackingBeanUtils{
         }
     }
     
-    public void commitNewAuthPeriod(){
+    public void onAuthPeriodNewCommit(){
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
         try {
@@ -431,33 +462,21 @@ public class UserConfigBB extends BackingBeanUtils{
     }
     
     
-     public void initiateUserUpdates(User usr){
-        UserCoordinator uc = getUserCoordinator();
-        try {
-            userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), usr);
-        } catch (AuthorizationException | IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                               "Could not authorize user for configuration", ""));
-
-            
-        }
-    }
+    
+   
+    
     
     /**
      * Listener for requests to jump to edit a Person record
+     * @param p
      * @return 
      */
-    public String editUserPersonRecord(){
+    public String onEditUserPersonRecordButtonChange(Person p){
         getSessionBean().setSessPersonQueued(userAuthorizedInConfig.getPerson());
         return "persons";
     }
 
-    public void updateUser(UserAuthorized u) {
-        
-        userAuthorizedInConfig = u;
-
-    }
+    
     
     /**
      * Internal organ for refreshing the current UserAuthorized
@@ -494,72 +513,13 @@ public class UserConfigBB extends BackingBeanUtils{
         }
     }
     
-    
-    /**
-     * Possibly reduntant UserCoordinator client method
-     * @param ev 
-     */
-    public void commitUsernameUpdates(ActionEvent ev){
-        UserCoordinator uc = getUserCoordinator();
-        try {
-            uc.user_updateUser(userAuthorizedInConfig, null, formUsername);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully udpated user", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update user", ""));
-            
-        }
-    }
-    
-    
-    /**
-     * Finalizes the new user creation process with the UserCoordinator
-     */
-    public void commitUserInsert() {
-        System.out.println("UserBB.commitInsert");
-        UserCoordinator uc = getUserCoordinator();
-        String freshUserPswd = null;
-        int freshUserID;
-        User usr;
-        
-        try {
-            freshUserID = uc.user_insertNewUser(userAuthorizedInConfig);
-            if(freshUserID != 0){
-                usr = uc.user_getUser(freshUserID);
-                freshUserPswd = uc.user_generateRandomPassword_SECURITYCRITICAL();
-                uc.user_updateUserPassword_SECURITYCRITICAL(usr, freshUserPswd);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Successfully added username " + usr.getUsername()
-                                + " to the system with an initial password of " + freshUserPswd, ""));
-                
-            }
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to add user to system, my apologies",
-                            "This is a system-level error that must be corrected by an administrator"));
-        } catch (AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to add user to system, my apologies",
-                            "This is an authroization be corrected by an administrator"));
-        }
 
-    }
 
     
     /**
      * Finalizes updates to Users with the UserCoordinator
-     * @param ev 
      */
-    public void commitUserPersonUpdates(){
+    public void onUserPersonLinkUpdate(){
         UserCoordinator uc = getUserCoordinator();
         try {
             uc.user_updateUser(userAuthorizedInConfig, selectedUserPerson, null);
@@ -581,7 +541,36 @@ public class UserConfigBB extends BackingBeanUtils{
     /**
      * Logic container for liasing with the UserCoordinator for password reset
      */
-    public void resetCurrentUserPassword(){
+    public void onForceResetUserPassword(){
+        UserCoordinator uc = getUserCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        freshPasswordCleartext = uc.user_generateRandomPassword_SECURITYCRITICAL();
+        try {
+            uc.user_updateUserPassword_SECURITYCRITICAL(userAuthorizedInConfig, freshPasswordCleartext);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Password reset success! New password for " 
+                                + userAuthorizedInConfig.getUsername() 
+                                + " is now " + freshPasswordCleartext, ""));
+            formInvalidateRecordReason = "";
+            userAuthorizedInConfig.setNotes(sc.formatAndAppendNote(getSessionBean().getSessUser(), 
+                                    formInvalidateRecordReason, 
+                                    userAuthorizedInConfig.getNotes()));
+         } catch (IntegrationException | AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Password update error in DB; password unchanged", ""));
+            
+        }
+        
+    }
+    
+    
+    /**
+     * Logic container for liasing with the UserCoordinator for password reset
+     */
+    public void onResetUserPassword(){
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
         freshPasswordCleartext = uc.user_generateRandomPassword_SECURITYCRITICAL();
@@ -645,7 +634,7 @@ public class UserConfigBB extends BackingBeanUtils{
     /**
      * @param userAuthorizedInConfig the userAuthorizedInConfig to set
      */
-    public void setUserAuthorizedInConfig(UserAuthorized userAuthorizedInConfig) {
+    public void setUserAuthorizedInConfig(UserAuthorizedForConfig userAuthorizedInConfig) {
         this.userAuthorizedInConfig = userAuthorizedInConfig;
     }
 
@@ -767,19 +756,7 @@ public class UserConfigBB extends BackingBeanUtils{
 
    
 
-    /**
-     * @return the umapListInConfigFromUserAuth
-     */
-    public List<UserMuniAuthPeriod> getUmapListInConfigFromUserAuth() {
-        return umapListInConfigFromUserAuth;
-    }
-
-    /**
-     * @param umapListInConfigFromUserAuth the umapListInConfigFromUserAuth to set
-     */
-    public void setUmapListInConfigFromUserAuth(List<UserMuniAuthPeriod> umapListInConfigFromUserAuth) {
-        this.umapListInConfigFromUserAuth = umapListInConfigFromUserAuth;
-    }
+   
 
     /**
      * @return the formUmapNotes
@@ -838,5 +815,6 @@ public class UserConfigBB extends BackingBeanUtils{
     public void setPageModes(List<PageModeEnum> pageModes) {
         this.pageModes = pageModes;
     }
-    
+
+   
 }

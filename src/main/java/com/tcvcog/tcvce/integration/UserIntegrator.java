@@ -18,20 +18,14 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthCredential;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.UserAuthorizedForConfig;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -72,7 +66,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         User newUser = null;
         // broken query
         String query =  "   SELECT userid, username, notes, personlink, \n" +
-                        "       active, nologinvirtualonly\n" +
+                        "       createdby, createdts, nologinvirtualonly, \n" +
+                        "       deactivatedts, deactivated_userid, lastupdatedts\n" +
                         "  FROM public.login WHERE userid = ?;";
         
         PreparedStatement stmt = null;
@@ -96,6 +91,50 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         return newUser;
     }
+    
+    
+     /**
+     * Note that the client method is responsible for moving the cursor on the 
+     * result set object before passing it into this method     * 
+     * @param rs
+     * @return
+     * @throws IntegrationException 
+     */
+    private User generateUser(ResultSet rs) throws IntegrationException, SQLException{
+        User user = new User();
+        PersonIntegrator pi = getPersonIntegrator();
+            // line 1 of SELECT
+            user.setUserID(rs.getInt("userid"));
+            user.setUsername(rs.getString("username"));
+            user.setNotes(rs.getString("notes"));
+            user.setPersonID(rs.getInt("personlink"));
+            if(rs.getInt("personlinik") != 0){
+                user.setPerson(pi.getPerson(rs.getInt("personlink")));
+            }
+            // line 2 of SELECT
+            user.setCreatedByUserId(rs.getInt("createdby"));
+            if(rs.getTimestamp("createdts") != null){
+                user.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+            }
+            user.setNoLoginVirtualUser(rs.getBoolean("nologinvirtualonly"));
+            
+            // line 3 of SELECT
+            if(rs.getTimestamp("deactivatedts") != null){
+                user.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());   
+            }
+            user.setDeactivatedBy(rs.getInt("deactivated_userid"));
+            if(rs.getTimestamp("lastupdatedts") != null){
+                user.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+            }
+            
+            
+        
+        return user;
+    }
+    
+  
+ 
+    
     
     /**
      *
@@ -123,16 +162,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             while(rs.next()){
                 ua = new UserAuthorized(usr);
-                if(rs.getTimestamp("pswdlastupdated") != null){
-                    ua.setPswdLastUpdated(rs.getTimestamp("pswdlastupdated").toLocalDateTime());
-                }
-                if(rs.getTimestamp("forcepasswordreset") != null){
-                    ua.setForcePasswordResetTS(rs.getTimestamp("forcepasswordreset").toLocalDateTime());
-                }
-                ua.setCreatedByUserId(rs.getInt("createdby"));
-                if(rs.getTimestamp("createdts") != null){
-                    ua.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
-                }
+                ua = generateUserAuthorized(ua, rs);
             }
             
         } catch (SQLException ex) {
@@ -147,36 +177,31 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return ua;
     }
     
-   
-    
-     /**
-     * Note that the client method is responsible for moving the cursor on the 
-     * result set object before passing it into this method     * 
+    /**
+     * Generator method for UserAuthorized objects
+     * @param ua
      * @param rs
      * @return
-     * @throws IntegrationException 
+     * @throws SQLException 
      */
-    private User generateUser(ResultSet rs) throws IntegrationException{
-        User user = new User();
-        PersonIntegrator pi = getPersonIntegrator();
-        try {
-            user.setUserID(rs.getInt("userid"));
-            user.setUsername(rs.getString("username"));
-            user.setNotes(rs.getString("notes"));
-            user.setActive(rs.getBoolean("active"));
-            user.setPersonID(rs.getInt("personlink"));
-            user.setPerson(pi.getPerson(rs.getInt("personlink")));
-            user.setNoLoginVirtualUser(rs.getBoolean("nologinvirtualonly"));
-            
-        } catch (SQLException ex) {
-            throw new IntegrationException("Cannot create user", ex);
-        }
+    private UserAuthorized generateUserAuthorized(UserAuthorized ua, ResultSet rs) throws SQLException{
         
-        return user;
+            if(rs.getTimestamp("pswdlastupdated") != null){
+                ua.setPswdLastUpdated(rs.getTimestamp("pswdlastupdated").toLocalDateTime());
+            }
+            if(rs.getTimestamp("forcepasswordreset") != null){
+                ua.setForcePasswordResetTS(rs.getTimestamp("forcepasswordreset").toLocalDateTime());
+            }
+            ua.setCreatedByUserId(rs.getInt("createdby"));
+            if(rs.getTimestamp("createdts") != null){
+                ua.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+            }
+        
+        return ua;
+        
     }
     
-  
- 
+   
     
     /**
      * Provides a complete list of records by User in the table loginmuniauthperiod.
@@ -450,7 +475,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    
+    /**
+     * Generator method for objects representing an entry in the user auth log
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
     private UserMuniAuthPeriodLogEntry generateMuniAuthPeriodLogEntry(ResultSet rs) throws SQLException, IntegrationException{
         UserMuniAuthPeriodLogEntry uacle = new UserMuniAuthPeriodLogEntry();
         
@@ -529,7 +560,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }
     
 
-    
+    /**
+     * Insertion point for records in the loginmuniauthperiod table
+     * @param uap
+     * @throws IntegrationException 
+     */
     public void insertNewUserAuthorizationPeriod(UserMuniAuthPeriod uap) throws IntegrationException{
         
         Connection con = getPostgresCon();
@@ -568,6 +603,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.execute();
             
+            updateUserLastUpdatedTS(uap.getUserID());
+            
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error inserting new authorization period", ex);
@@ -579,15 +616,22 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    
+    /**
+     * Insertion point for records in the login table; NOTE that this is a rather 
+     * sparse isnert since several login fields like password, etc., are managed 
+     * by separate methods in this class and the UserCoordinator
+     * @param userToInsert
+     * @return
+     * @throws IntegrationException 
+     */
     public int insertUser(User userToInsert) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         String query =  "INSERT INTO public.login(\n" +
                         "            userid, username, notes, personlink, \n" +
-                        "            active, createdby, createdts, nologinvirtualonly \n" +
+                        "             createdby, createdts, nologinvirtualonly \n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
-                        "            ?, ?, now(), ?);";
+                        "            ?, now(), ?);";
         
         PreparedStatement stmt = null;
         
@@ -602,12 +646,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setInt(3, userToInsert.getPerson().getPersonID());
             }
             
-            stmt.setBoolean(4, userToInsert.isActive());
-            
-            stmt.setInt(5, userToInsert.getCreatedByUserId());
+            stmt.setInt(4, userToInsert.getCreatedByUserId());
             
             // created ts from db's now()
-            stmt.setBoolean(6, userToInsert.isNoLoginVirtualUser());
+            stmt.setBoolean(5, userToInsert.isNoLoginVirtualUser());
             
             stmt.execute();
             
@@ -651,6 +693,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.executeUpdate();
             
+            // any update to a User's UMAP is also an update to that user, so stamp it!
+            updateUserLastUpdatedTS(uap.getUserID());
+            
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error updating password", ex);
@@ -677,6 +722,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
          String query = "UPDATE public.login\n" +
             "   SET password = encode(digest(?, 'md5'), 'base64') WHERE userid = ?";
         
+         String updateQuery = "UPDATE public.login\n" +
+            "   SET pswdlastupdated = now() WHERE userid = ?";
+        
         PreparedStatement stmt = null;
         
         try {
@@ -685,6 +733,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(2, user.getUserID());
             
             stmt.executeUpdate();
+            
+            stmt = con.prepareStatement(updateQuery);
+            stmt.setInt(1, user.getUserID());
+            
+            stmt.executeUpdate();
+            
+            updateUserLastUpdatedTS(user.getUserID());
             
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -695,12 +750,51 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
+    /**
+     * Utility method for marking a User as last updated now() since
+     * there are a number of methods that change a single field, like username,
+     * or forcing a password reset
+     * @param userID
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateUserLastUpdatedTS(int userID) throws IntegrationException{
+         Connection con = getPostgresCon();
+        
+         String query = "UPDATE public.login\n" +
+            "   SET lastudpatedts = now() WHERE userid = ?";
+        
+        PreparedStatement stmt = null;
+        if(userID != 0){
+            try {
+                stmt = con.prepareStatement(query);
+                stmt.setInt(1, userID);
+
+                stmt.executeUpdate();
+
+            } catch (SQLException ex) {
+                System.out.println(ex);
+                throw new IntegrationException("Error updating user's lastupdated timestamp", ex);
+            } finally{
+                 if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            } // close finally
+        }
+        
+    }
+    
+    
+    /**
+     * Updates fields on login table record; most login fields are managed by independent
+     * methods for security thoroughness
+     * @param usr
+     * @throws IntegrationException 
+     */
     public void updateUser(User usr) throws IntegrationException{
         Connection con = getPostgresCon();
         
         String query =  "UPDATE public.login\n" +
                         "   SET username=?, notes=?, personlink=?, \n" +
-                        "    active=?, nologinvirtualonly=?\n" +
+                        "    nologinvirtualonly=?, deactivatedts=?, deactivated_userid=?, lastupdatedts=now() \n" +
                         " WHERE userid=?;";
         
         PreparedStatement stmt = null;
@@ -710,18 +804,41 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             stmt.setString(1, usr.getUsername());
             stmt.setString(2, usr.getNotes());
-            
+    
+            // check both the object and ID person link fields
+            // without a Person object, use the raw ID
             if(usr.getPerson() == null){
-                stmt.setInt(3, usr.getPersonID());
-            } else {
-                stmt.setInt(3, usr.getPerson().getPersonID());
+                if(usr.getPersonID() != 0){
+                    stmt.setInt(3, usr.getPersonID());
+                } else {
+                    stmt.setNull(3, java.sql.Types.NULL);
+                }
+            } else { // we've got a person object
+                if(usr.getPerson().getPersonID() != 0){ // make sure it's not a new Person
+                    stmt.setInt(3, usr.getPerson().getPersonID());
+                } else {
+                    stmt.setNull(3, java.sql.Types.NULL);
+                }
             }
             
-            stmt.setBoolean(4, usr.isActive());
-            stmt.setBoolean(5, usr.isNoLoginVirtualUser());
-            stmt.setInt(6, usr.getUserID());
+            stmt.setBoolean(4, usr.isNoLoginVirtualUser());
+            
+            if(usr.getDeactivatedTS() != null){
+                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(usr.getDeactivatedTS()));
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            if(usr.getDeactivatedBy() != 0){
+                stmt.setInt(6, usr.getDeactivatedBy());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(7, usr.getUserID());
             
             stmt.executeUpdate();
+            
             
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -734,23 +851,21 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
    
     /**
-     * TODO: Implement functionality for password reset
+     * Forces the passed in user to reset their password on next login
      * @param usr
      * @throws IntegrationException 
      */
-    public void updateUserAuthorized(UserAuthorized usr) throws IntegrationException{
+    public void forcePasswordReset(User usr) throws IntegrationException{
         Connection con = getPostgresCon();
         String query =  "UPDATE public.login\n" +
-                        "   SET forcepasswordreset=? " +
+                        "   SET forcepasswordreset=now() " +
                         " WHERE userid=?;";
         PreparedStatement stmt = null;
         
         try {
             
             stmt = con.prepareStatement(query);
-            if(usr.getForcePasswordResetTS() != null){
-                stmt.setTimestamp(1, java.sql.Timestamp.valueOf(usr.getForcePasswordResetTS()));
-            }
+            stmt.setInt(1, usr.getUserID());
             
             stmt.executeUpdate();
             
@@ -801,6 +916,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return userID;
     }
     
+    /**
+     * Utility method for extracting USER ids of all users who aren't deactivated
+     * @return
+     * @throws IntegrationException 
+     */
     public List<Integer> getSystemUserIDList() throws IntegrationException{
 
         List<Integer> idlst = new ArrayList<>();
@@ -830,122 +950,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         return idlst;
     }
-    
-    
-    /** 
-     * Inserts user-municipality mappings into the loginmuni table. This effectively gives the user
-     * "permissions" to view the data for the municipalities that are linked to their userid.     * 
-     * @param u - A User
-     * @param munilist - A list of municipalities to be mapped to User u
-     * @throws IntegrationException 
-     */
-    public void setUserAuthMunis(User u, List<Municipality> munilist) throws IntegrationException{       
-        Connection con = getPostgresCon();
-        String query = "INSERT INTO loginmuni (\n" + 
-                "userid, muni_municode)\n" +  "VALUES (?,?)";        
-        int userId = u.getUserID();
-        PreparedStatement stmt = null;
-        
-        try {                   
-                stmt = con.prepareStatement(query);
-                stmt.setInt(1,userId);
-                for(Municipality muni: munilist){
-                    System.out.println("UserIntegrator.setUserAuthMunis: " + muni.getMuniCode());
-                    int municode = muni.getMuniCode();
-                    stmt.setInt(2,municode);
-                    stmt.execute();
-                }
-                
-        } catch (SQLException ex) {
-            System.out.println("UserIntegrator.setUserAuthMunis exception encountered." + ex);
-            throw new IntegrationException("Error in mapping authorized municipality to user", ex);
-        } finally {
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        }
-        
-    }
-    
-    /**
-     * Removes a user-municipality mapping from the loginmuni table.     * 
-     * @param u - A User
-     * @param muni - A Municipality
-     * @throws IntegrationException 
-     */
-    public void deleteUserAuthMuni(User u, Municipality muni) throws IntegrationException{
-        Connection con = getPostgresCon();
-        String query = "DELETE FROM loginmuni WHERE (userid, muni_municode) = (?,?)";
-        
-        int userId = u.getUserID();
-        int municode = muni.getMuniCode();
-        PreparedStatement stmt = null;
-        
-        try { 
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, userId);
-            stmt.setInt(2,municode);
-            stmt.execute();
-        }
-        catch (SQLException ex) {
-            System.out.println("UserIntegrator.deleteUserAuthMuni: Error deleting row from loginmuni");
-            throw new IntegrationException();
-        } finally {
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        }
-    }        
-    
-  
-    //xiaohong add
-    public ArrayList<User> getUserList() throws IntegrationException {
-
-        String query = "   SELECT userid, username, notes, personlink, \n"
-                + "        active, nologinvirtualonly\n"
-                + "        FROM public.login ;";
-
-        Connection con = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        ArrayList<User> userList = new ArrayList<>();
-        User user ;
-
-        try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                user = generateUser(rs);
-                userList.add(user);
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error getting user", ex);
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-        } // close finally
-
-        return userList;
-    }
-   
-    
     
 
     

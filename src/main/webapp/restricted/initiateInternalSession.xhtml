@@ -14,181 +14,176 @@
             <ui:define name="content">
                 <f:view id="initiateSessionView">
                     <div class="mainContainer">
-                        
+
                         <h:form id="init-session-messages-form">
-                             <h:messages id="init-session-messages" globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            <h:messages id="init-session-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
-                        
-                        
+
                         <h:form id="initiateSessionForm">
-                            <h1>Authentication successful for user <h:outputText value="#{sessionInitializer.userQueuedForSession}" /></h1>
-                            
-                            
-                            
+                            <h1>Authentication successful for user <h:outputText value="#{sessionInitializer.usernameQueuedForSession}" /></h1>
+
                             <p>Choose one of your valid authorization period to credentialization your session</p>
-                         
-                               <p:dataTable
-                                            id="usersettings-umaps-table"
-                                            var="period"
-                                            value="#{sessionInitializer.umapListValidForUserSelect}"
-                                            rowKey="#{period.userMuniAuthPeriodID}"
-                                            tableStyleClass="primeDataTable">
+                                <p:dataTable
+                                    id="usersettings-umaps-table"
+                                    var="period"
+                                    value="#{sessionInitializer.umapCandidateList}"
+                                    rowKey="#{period.userMuniAuthPeriodID}"
+                                    tableStyleClass="primeDataTable">
 
-                                            <p:column width="3%" exportable="false">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Expand row" />
+                                    <p:column width="3%" exportable="false">
+                                        <f:facet name="header">
+                                            <h:outputText value="Expand row" />
+                                        </f:facet>
+                                        <p:rowToggler/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Period ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{period.userMuniAuthPeriodID}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Muni" />
+                                        </f:facet>
+                                        <h:outputText value="#{period.muni.muniName}"/>
+                                    </p:column>
+
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Access start" />
+                                        </f:facet>
+                                        <h:outputText value="#{systemServicesBB.getPrettyDate(period.startDate)}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Access stop" />
+                                        </f:facet>
+                                        <h:outputText value="#{systemServicesBB.getPrettyDate(period.stopDate)}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Role" />
+                                        </f:facet>
+                                        <h:outputText value="#{period.role.label}"/>
+                                        <h:outputText value=" (rank: #{period.role.rank})"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Deactivated TS" />
+                                        </f:facet>
+                                        <h:outputText value="#{systemServicesBB.getPrettyDate(period.recorddeactivatedTS)}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Assignment rank" />
+                                        </f:facet>
+                                        <h:outputText value="#{period.assignmentRelativeOrder}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Actions" />
+                                        </f:facet>
+                                        <p:commandButton ajax="false"
+                                                         id="sessioninit-umaplist-button-credentialize" 
+                                                         value="load session" 
+                                                         icon="fa fa-credit-card"
+                                                         styleClass="multiButtonLineButton" 
+                                                         action="#{sessionInitializer.sessionInit_credentializeUserMuniAuthPeriod(period)}"
+                                                         update="init-session-messages-form"/>
+                                    </p:column>
+                                    <p:rowExpansion>
+                                        <div class="outlinedBox">
+
+                                            <h:panelGrid columns="2" border="0" 
+                                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                                         footerClass="gridFooter">
+                                                <h:panelGroup>
+
+                                                    <h:outputLabel value="Created by: " />
+                                                    <p:spacer height="0px" />
+                                                    <h:outputLabel value="user id: " />
+                                                    <h:outputText value="#{period.createdByUserID}" />
+
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel value="Created TS:" />
+                                                    <h:outputText value="#{systemServicesBB.getPrettyDate(period.createdTS)}"/>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+
+                                                    <h:outputLabel value="Notes" />
+                                                    <h:outputText value="#{period.notes}" escape="false"/>
+                                                </h:panelGroup>
+
+                                                <f:facet name="footer">
+
+                                                    <h4>Log entries associated with this authorization period</h4>
+
+                                                    <p:scrollPanel id="usersettings-umaps-log-scrollpanel"
+                                                                   style="height: 200px;">
+
+                                                        <p:dataTable
+                                                            id="usersettings-umaps-log-table"
+                                                            var="entry"
+                                                            value="#{period.periodActivityLogBook}"
+                                                            rowKey="#{entry.logBookEntryID}"
+                                                            tableStyleClass="primeDataTable">
+
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Log entry ID" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{entry.logBookEntryID}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="AuthPerID" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{entry.userMuniAuthPeriodID}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Cat" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{entry.category}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="TS" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{entry.entryTS}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Client address" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{entry.header_remoteaddr}"/>
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                    </p:scrollPanel>
+
                                                 </f:facet>
-                                                <p:rowToggler/>
-                                            </p:column>
+                                            </h:panelGrid>
+                                        </div>
+                                    </p:rowExpansion>
+                                </p:dataTable>
 
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Period ID" />
-                                                </f:facet>
-                                                <h:outputText value="#{period.userMuniAuthPeriodID}"/>
-                                            </p:column>
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Muni" />
-                                                </f:facet>
-                                                <h:outputText value="#{period.muni.muniName}"/>
-                                            </p:column>
-
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Access start" />
-                                                </f:facet>
-                                                <h:outputText value="#{systemServicesBB.getPrettyDate(period.startDate)}"/>
-                                            </p:column>
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Access stop" />
-                                                </f:facet>
-                                                <h:outputText value="#{systemServicesBB.getPrettyDate(period.stopDate)}"/>
-                                            </p:column>
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Role" />
-                                                </f:facet>
-                                                <h:outputText value="#{period.role.label}"/>
-                                                <h:outputText value=" (rank: #{period.role.rank})"/>
-                                            </p:column>
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Deactivated TS" />
-                                                </f:facet>
-                                                <h:outputText value="#{systemServicesBB.getPrettyDate(period.recorddeactivatedTS)}"/>
-                                            </p:column>
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Assignment rank" />
-                                                </f:facet>
-                                                <h:outputText value="#{period.assignmentRelativeOrder}"/>
-                                            </p:column>
-
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Actions" />
-                                                </f:facet>
-                                                <p:commandButton ajax="false"
-                                                                 id="sessioninit-umaplist-button-credentialize" 
-                                                                 value="load session" 
-                                                                 icon="fa fa-credit-card"
-                                                                 styleClass="multiButtonLineButton" 
-                                                                 action="#{sessionInitializer.sessionInit_credentializeUserMuniAuthPeriod(period)}"
-                                                                 update="init-session-messages-form"/>
-                                            </p:column>
-                                            <p:rowExpansion>
-                                                <div class="outlinedBox">
-
-                                                    <h:panelGrid columns="2" border="0" 
-                                                                 cellpadding="5" columnClasses="gridTd, gridTd"
-                                                                 footerClass="gridFooter">
-                                                        <h:panelGroup>
-
-                                                            <h:outputLabel value="Created by: " />
-                                                            <p:spacer height="0px" />
-                                                            <h:outputLabel value="user id: " />
-                                                            <h:outputText value="#{period.createdByUserID}" />
-
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputLabel value="Created TS:" />
-                                                            <h:outputText value="#{systemServicesBB.getPrettyDate(period.createdTS)}"/>
-                                                        </h:panelGroup>
-                                                        <h:panelGroup>
-
-                                                            <h:outputLabel value="Notes" />
-                                                            <h:outputText value="#{period.notes}" escape="false"/>
-                                                        </h:panelGroup>
-
-                                                        <f:facet name="footer">
-
-                                                            <h4>Log entries associated with this authorization period</h4>
-
-                                                            <p:scrollPanel id="usersettings-umaps-log-scrollpanel"
-                                                                           style="height: 200px;">
-
-                                                                <p:dataTable
-                                                                    id="usersettings-umaps-log-table"
-                                                                    var="entry"
-                                                                    value="#{period.periodActivityLogBook}"
-                                                                    rowKey="#{entry.logBookEntryID}"
-                                                                    tableStyleClass="primeDataTable">
-
-                                                                    <p:column>
-                                                                        <f:facet name="header">
-                                                                            <h:outputText value="Log entry ID" />
-                                                                        </f:facet>
-                                                                        <h:outputText value="#{entry.logBookEntryID}"/>
-                                                                    </p:column>
-                                                                    <p:column>
-                                                                        <f:facet name="header">
-                                                                            <h:outputText value="AuthPerID" />
-                                                                        </f:facet>
-                                                                        <h:outputText value="#{entry.userMuniAuthPeriodID}"/>
-                                                                    </p:column>
-                                                                    <p:column>
-                                                                        <f:facet name="header">
-                                                                            <h:outputText value="Cat" />
-                                                                        </f:facet>
-                                                                        <h:outputText value="#{entry.category}"/>
-                                                                    </p:column>
-                                                                    <p:column>
-                                                                        <f:facet name="header">
-                                                                            <h:outputText value="TS" />
-                                                                        </f:facet>
-                                                                        <h:outputText value="#{entry.entryTS}"/>
-                                                                    </p:column>
-                                                                    <p:column>
-                                                                        <f:facet name="header">
-                                                                            <h:outputText value="Client address" />
-                                                                        </f:facet>
-                                                                        <h:outputText value="#{entry.header_remoteaddr}"/>
-                                                                    </p:column>
-                                                                </p:dataTable>
-                                                            </p:scrollPanel>
-
-                                                        </f:facet>
-                                                    </h:panelGrid>
-                                                </div>
-                                            </p:rowExpansion>
-                                        </p:dataTable>
-                            
-                              <p:commandButton    id="navcontres-button-logout"
-                                                            action="#{systemServicesBB.logout}" 
-                                                            value="Logout"
-                                                            icon="fa fa-sign-out"
-                                                            ajax="false"/>
+                            <p:commandButton    id="navcontres-button-logout"
+                                                action="#{systemServicesBB.logout}" 
+                                                value="Logout"
+                                                icon="fa fa-sign-out"
+                                                ajax="false"/>
                         </h:form>
                     </div>
                 </f:view>

@@ -3,7 +3,16 @@
 -- "Mid-july" launch changes
 -- Person revisions: adding type of link to propertyperson
 -- 
--- 
+-- EXTRA RUN ON SERVER
+-- ALTER TABLE public.codeviolation ADD COLUMN lastupdatedts timestamp with time zone;
+-- ALTER TABLE public.codeviolation ADD COLUMN lastupdated_userid integer;
+-- ALTER TABLE public.codeviolation ADD COLUMN active boolean;
+-- ALTER TABLE public.codeviolation ALTER COLUMN active SET DEFAULT true;
+-- ALTER TABLE public.codeviolation
+--   ADD CONSTRAINT codeviolation_lastupdatedby_fk FOREIGN KEY (lastupdated_userid)
+--       REFERENCES public.login (userid) MATCH SIMPLE
+--       ON UPDATE NO ACTION ON DELETE NO ACTION;
+
 -- ****************************************************************************
 
 INSERT INTO public.icon(
@@ -25,6 +34,9 @@ ALTER TABLE cecase DROP COLUMN casephase;
 
 ALTER TABLE public.cecase ADD COLUMN lastupdatedby_userid INTEGER CONSTRAINT cecase_lastupdatedby_userid_fk REFERENCES login (userid);
 ALTER TABLE public.cecase ADD COLUMN lastupdatedts TIMESTAMP WITH TIME ZONE;
+
+-- Run on remote server 27 July 2020
+ALTER TABLE public.login DROP COLUMN userrole;
 
 
 

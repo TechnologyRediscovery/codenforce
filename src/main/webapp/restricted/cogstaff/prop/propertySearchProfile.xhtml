@@ -234,14 +234,7 @@
                                                     <h:outputText value="#{prop.muni.muniName}"/>
                                                 </p:column>
 
-                                                <p:column width="12%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Use Type"/>
-                                                    </f:facet>
-                                                    <h:outputText value="#{prop.useType}" />
-                                                </p:column>
-
-                                                <p:column width="5%">
+                                                <p:column width="25%">
                                                     <f:facet name="header">
                                                         <h:outputText value=""/>
                                                     </f:facet>
@@ -898,7 +891,8 @@
                                                     toggleable="true"
                                                     widgetVar="prop-workflow-panel-var"
                                                     collapsed="false"
-                                                    header="Proposals">
+                                                    header="Proposals"
+                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
                                             <h:form id="prop-workflow-form">
 
 
@@ -1000,7 +994,8 @@
                                                     toggleable="true"
                                                     widgetVar="prop-events-panel-var"
                                                     collapsed="false"
-                                                    header="Events">
+                                                    header="Events"
+                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
 
                                             <h:form id="prop-events-panel-form">
 
@@ -1074,7 +1069,8 @@
                                                     toggleable="true"
                                                     widgetVar="prop-events-panel-var"
                                                     collapsed="false"
-                                                    header="Persons">
+                                                    header="Persons"
+                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
                                             <h:form id="prop-persons-panel-form">
 
                                                 <p:commandButton   id="prop-persons-manage-button"
@@ -1147,7 +1143,8 @@
                                                     toggleable="true"
                                                     widgetVar="prop-cases-panel-var"
                                                     collapsed="false"
-                                                    header="Code Enforcement Cases">
+                                                    header="Code Enforcement Cases"
+                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
                                             <h:form id="prop-cases-panel-form">
 
                                                 <p:commandButton   id="prop-cases-newcase-button"
@@ -1218,7 +1215,8 @@
                                                     toggleable="true"
                                                     widgetVar="prop-events-panel-var"
                                                     collapsed="false"
-                                                    header="Units">
+                                                    header="Units"
+                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
                                             <h:form id="prop-units-panel-form">
 
 
@@ -1307,7 +1305,8 @@
                                                     toggleable="true"
                                                     widgetVar="prop-info-var"
                                                     collapsed="false"
-                                                    header="External Data Records">
+                                                    header="External Data Records"
+                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
 
                                             <h:form id="prop-extinfo-panel-form">
                                                 <p:dataTable id="prop-extinfo-table"

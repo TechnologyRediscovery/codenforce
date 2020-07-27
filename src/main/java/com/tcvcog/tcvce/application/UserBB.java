@@ -119,31 +119,12 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     
     
     
-    /**
-     * We must do a full re-init of the session!
-     * @deprecated  
-     */
-    public void refreshCurrentUser(){
-        System.out.println("UserBB.refreshCurrentUser");
-        UserCoordinator uc = getUserCoordinator();
-//        try {
-//            currentUser = uc.auth_authorizeUser_SECURITYCRITICAL(currentUser, getSessionBean().getSessionMuni(), null);
-//            
-//        } catch (IntegrationException ex) {
-//            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (AuthorizationException ex) {
-//            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        
-        
-    }
-    
+  
     
     public void commitUsernameUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
             uc.user_updateUser(currentUser, null, formUsername);
-            refreshCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));
@@ -162,7 +143,6 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         try {
             
             uc.user_updateUser(currentUser, formSelectedUserPerson, null);
-            refreshCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated your person link", ""));
@@ -182,7 +162,6 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         try { 
             if(formPassword.equals(formPasswordReentry)){
                 uc.user_updateUserPassword_SECURITYCRITICAL(currentUser, formPassword);
-                refreshCurrentUser();
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Successfully udpated your password to --> " + formPassword 

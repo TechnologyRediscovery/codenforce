@@ -41,6 +41,7 @@ import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
@@ -49,8 +50,12 @@ import javax.servlet.http.HttpServletRequest;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.SubSysEnum;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -80,13 +85,12 @@ public  class       SessionInitializer
         extends     BackingBeanUtils 
         implements  Serializable {
 
-    private String userQueuedForSession;
+    private String usernameQueuedForSession;
     private UserAuthorized userAuthorizedQueuedForSession;
+    private List<UserMuniAuthPeriod> umapCandidateList;
     private UserMuniAuthPeriod umapQueuedForSession;
     private Municipality muniQueuedForSession;
     private SessionBean sb;
-    
-    private List<UserMuniAuthPeriod> umapListValidForUserSelect;
     
     /**
      * Creates a new instance of SessionInitializer
@@ -99,24 +103,45 @@ public  class       SessionInitializer
         sb = getSessionBean();
         System.out.println("SessionInitializer.initBean");
         userAuthorizedQueuedForSession = null;
+        User tmpUser = null;
         UserCoordinator uc = getUserCoordinator();
+        UserIntegrator ui = getUserIntegrator();
         // check to see if we have an internal session created already
         // to determine which user we authenticate with
         
         if(sb.getUserForReInit() != null){
-            userQueuedForSession = sb.getUserForReInit().getUsername();
-        } else if(userQueuedForSession == null){
+            usernameQueuedForSession = sb.getUserForReInit().getUsername();
+        } else if(usernameQueuedForSession == null){
             try {
                 // we have a first init! Ask the container for its user
-                userQueuedForSession = sessionInit_getContainerAuthenticatedUser();
+                usernameQueuedForSession = sessionInit_getContainerAuthenticatedUser();
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
         } 
+        try {
+            tmpUser = ui.getUser(ui.getUserID(usernameQueuedForSession));
+            userAuthorizedQueuedForSession = uc.auth_prepareUserForSessionChoice(tmpUser);
+            sb.setSessUser(userAuthorizedQueuedForSession);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        umapCandidateList = new ArrayList<>();
+        
+        List<Municipality> tempMuniList;
+        if(userAuthorizedQueuedForSession != null && userAuthorizedQueuedForSession.getMuniAuthPeriodsMap() != null){
             
-        umapListValidForUserSelect = uc.auth_assembleValidAuthPeriods(userQueuedForSession);
-        getSessionBean().setSessUMAPListValidOnly(umapListValidForUserSelect);
-//            userAuthorizedQueuedForSession = uc.auth_authorizeUser_SECURITYCRITICAL(userQueuedForSession, muniQueuedForSession, umapQueuedForSession);
+            Set<Municipality> muniSet = userAuthorizedQueuedForSession.getMuniAuthPeriodsMap().keySet();
+            if(!muniSet.isEmpty()){
+                tempMuniList = new ArrayList(muniSet);
+                for(Municipality muni: tempMuniList){
+                    umapCandidateList.addAll(userAuthorizedQueuedForSession.getMuniAuthPeriodsMap().get(muni));
+                }
+
+            }
+        }
+        
     }
     
     
@@ -162,7 +187,9 @@ public  class       SessionInitializer
      * @return 
      */
     public String sessionInit_credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
-           return sessionInit_configureSession(umap);
+        String page = sessionInit_configureSession(getSessionBean().getSessUser(), umap);
+        
+        return page;
         
     }
     
@@ -177,11 +204,11 @@ public  class       SessionInitializer
      * 
      * The logic work is passed up to the UserCoordinator
      * 
+     * @param ua
      * @param umap
      * @return nav string
-     * @throws IntegrationException 
      */
-    public String sessionInit_configureSession(UserMuniAuthPeriod umap) {
+    public String sessionInit_configureSession(UserAuthorized ua, UserMuniAuthPeriod umap) {
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
         System.out.println("SessionInitializer.configureSession()");
@@ -189,7 +216,7 @@ public  class       SessionInitializer
         try {
             // The central call which initiates the User's session for a particular municipality
             // Muni will be null when called from initiateInternalSession
-            UserAuthorized authUser = uc.auth_authorizeUser_SECURITYCRITICAL(umap, getSessionBean().getSessUMAPListValidOnly());
+            UserAuthorized authUser = uc.auth_authorizeUser_SECURITYCRITICAL(ua, umap);
             
             // as long as we have an actual user, proceed with session config
             if(authUser != null){
@@ -857,17 +884,17 @@ public  class       SessionInitializer
 
     /**
 
-     * @return the userQueuedForSession
+     * @return the usernameQueuedForSession
      */
-    public String getUserQueuedForSession() {
-        return userQueuedForSession;
+    public String getUsernameQueuedForSession() {
+        return usernameQueuedForSession;
     }
 
     /**
-     * @param userQueuedForSession the userQueuedForSession to set
+     * @param usernameQueuedForSession the usernameQueuedForSession to set
      */
-    public void setUserQueuedForSession(String userQueuedForSession) {
-        this.userQueuedForSession = userQueuedForSession;
+    public void setUsernameQueuedForSession(String usernameQueuedForSession) {
+        this.usernameQueuedForSession = usernameQueuedForSession;
     }
 
     /**
@@ -885,16 +912,18 @@ public  class       SessionInitializer
     }
 
     /**
-     * @return the umapListValidForUserSelect
+     * @return the umapCandidateList
      */
-    public List<UserMuniAuthPeriod> getUmapListValidForUserSelect() {
-        return umapListValidForUserSelect;
+    public List<UserMuniAuthPeriod> getUmapCandidateList() {
+        return umapCandidateList;
     }
 
     /**
-     * @param umapListValidForUserSelect the umapListValidForUserSelect to set
+     * @param umapCandidateList the umapCandidateList to set
      */
-    public void setUmapListValidForUserSelect(List<UserMuniAuthPeriod> umapListValidForUserSelect) {
-        this.umapListValidForUserSelect = umapListValidForUserSelect;
+    public void setUmapCandidateList(List<UserMuniAuthPeriod> umapCandidateList) {
+        this.umapCandidateList = umapCandidateList;
     }
+
+   
 }

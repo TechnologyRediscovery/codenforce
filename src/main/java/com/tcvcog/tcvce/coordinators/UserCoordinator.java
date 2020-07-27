@@ -28,6 +28,7 @@ import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.UserAuthorizedForConfig;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -43,8 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Set;
 
 /**
  * *** SECURITY SENSITIVE CLASS ***
@@ -119,83 +119,131 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * 
      * Client methods are system login backing beans; NOT config
      * 
-     * @param umapReq
-     * @param umapListValidOnly
+     * @param ua
+     * @param umapReq with complete Muni-UMAP map in place
      * @return the fully baked cog user
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException occurs if the user
      * has been retrieved from the database but their access has been toggled off
      */
-    public UserAuthorized auth_authorizeUser_SECURITYCRITICAL(UserMuniAuthPeriod umapReq, List<UserMuniAuthPeriod> umapListValidOnly) throws AuthorizationException, IntegrationException{
-        UserIntegrator ui = getUserIntegrator();    
-        UserAuthorized usrAuth = null;
-        Map<Municipality, List<UserMuniAuthPeriod>> umapMasterMap = new HashMap<>();
-        Municipality mu;        
+    public UserAuthorized auth_authorizeUser_SECURITYCRITICAL(UserAuthorized ua, UserMuniAuthPeriod umapReq ) throws AuthorizationException, IntegrationException{
         
-        System.out.println("UserCoordinator.authorizeUser()");
-        
-//        User usr = user_getUser(umapReq.auth_getUserID());
-//        List<UserMuniAuthPeriod> safeList = cleanUserMuniAuthPeriodList(ui.getUserMuniAuthPeriodsRaw(umapReq.auth_getUserID()));
-        List<UserMuniAuthPeriod> safeList = umapListValidOnly;
-        
-        if(safeList != null && !safeList.isEmpty()){
-            Collections.sort(safeList);
+        if(ua != null && umapReq != null){
             
-            Map<Municipality, List<UserMuniAuthPeriod>> tempMap = new HashMap<>();
-            usrAuth = ui.getUserAuthorizedNoAuthPeriods(user_getUser(umapReq.getUserID()));
-            List<UserMuniAuthPeriod> tempUMAPList;
-            
-            // Create a mapping of all valid muni auth periods for each authorized Muni
-            for(UserMuniAuthPeriod umap: safeList){
-                mu = umap.getMuni();
-                if(umapMasterMap.containsKey(mu)){
-                    tempUMAPList = umapMasterMap.get(mu); // pull out our authorized peridos
-                    tempUMAPList.add(umap); // add our new one
-                    Collections.sort(tempUMAPList); // sort based first on role rank, then assignment order ACROSS munis
-                    tempMap.put(umap.getMuni(), tempUMAPList); // and overwrite the previous val (i.e. keep the same reference)
-                } else {
-                    // no existing record for that muni, so make a list, inject, and put
-                    tempUMAPList = new ArrayList<>();
-                    tempUMAPList.add(umap);
-                    tempMap.put(umap.getMuni(), safeList);
-                }
-            } // close for over periods
-
             // ************************************************************
             // ******* GENERATE AND INJECT CREDENTIAL FOR CHOSEN MUNI *****
             // ************************************************************
             Credential cr = auth_generateCredential_SECURITYCRITICAL(umapReq);
-            usrAuth.setMyCredential(cr);
+            ua.setMyCredential(cr);
+        } else {
+            throw new AuthorizationException("UserAuthorized and requested UMAP required for auth");
+            
+        }
 
             // finally, inject the muniPeriodMap into the UA whose credential is set
-            usrAuth.setMuniAuthPeriodsMap(tempMap);
-        } 
-        return usrAuth;
+        return ua;
+    }
+    
+    /**
+     * Provides its sole client of the SessionInitializer with a UserAuthorized
+     * minus a credential but only valid UMAPs keyed by Muni
+     * @param usr
+     * @return
+     * @throws IntegrationException 
+     */
+    public UserAuthorized auth_prepareUserForSessionChoice(User usr) throws IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        
+        UserAuthorized ua = ui.getUserAuthorizedNoAuthPeriods(usr);
+        ua.setMuniAuthPeriodsMap(auth_cleanMuniUMAPMap(auth_assembleMuniUMAPMapRaw(usr)));
+        return ua;
     }
     
     
+   
+    
     /**
-     * Asks the integrator for all UMAPs for a given u, cleans that list, 
-     * and returns the sorted Collection
-     * @param username
-     * @return sorted UMAP list which can then be passed to auth_authorizeUser_SECURITYCRITICAL.
+     * Serves the userConfigBB as its sole client who needs to display both valid
+     * and invalid UMAPS to the admin user
+     * @param u
+     * @return 
      */
-    public List<UserMuniAuthPeriod> auth_assembleValidAuthPeriods(String username){
+    private Map<Municipality, List<UserMuniAuthPeriod>> auth_assembleMuniUMAPMapRaw(User u){
+        
         UserIntegrator ui = getUserIntegrator();
-        List<UserMuniAuthPeriod> umapList = null;
+        Map<Municipality, List<UserMuniAuthPeriod>> umapMapRaw = null;
+        List<UserMuniAuthPeriod> rawList = null;
         
         try {
-            umapList = ui.getUserMuniAuthPeriodsRaw(ui.getUserID(username));
+            umapMapRaw = auth_buildMuniUMAPMap(ui.getUserMuniAuthPeriodsRaw(u.getUserID()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             
         }
         
-        auth_cleanUserMuniAuthPeriodList(umapList);
+        return umapMapRaw;
         
-        return umapList;
+        
     }
     
+    /**
+     * Utility method for creating a mapping of Municipality objects to 
+     * lists of UMAPs for that muni
+     * 
+     * @param umapListRaw
+     * @return 
+     */
+    private Map<Municipality, List<UserMuniAuthPeriod>> auth_buildMuniUMAPMap(List<UserMuniAuthPeriod> umapListRaw){
+        
+        Map<Municipality, List<UserMuniAuthPeriod>> tempMap = new HashMap<>();
+        List<UserMuniAuthPeriod> tempUMAPList;
+        
+          
+            for(UserMuniAuthPeriod umap: umapListRaw){
+                Municipality mu = umap.getMuni();
+                if(tempMap.containsKey(mu)){
+                    tempUMAPList = tempMap.get(mu); // pull out our authorized peridos
+                    tempUMAPList.add(umap); // add our new one
+                    Collections.sort(tempUMAPList); // sort based first on role rank, then assignment order ACROSS munis
+                } else {
+                    // no existing record for that muni, so make a list, inject, and put
+                    tempUMAPList = new ArrayList<>();
+                    tempUMAPList.add(umap);
+                }
+                tempMap.put(umap.getMuni(), tempUMAPList);
+            } // close for over periods
+            
+            return tempMap;
+        
+    }
+    
+    /**
+     * Factory method for UserAuthorizedForConfig objects which contain
+     * a list of raw UMAPs for configuration
+     * @param ua
+     * @return
+     * @throws IntegrationException 
+     */
+    public UserAuthorizedForConfig user_assembleUserAuthorizedForConfig(UserAuthorized ua) throws IntegrationException{
+        UserAuthorizedForConfig uafg = null;
+        if(ua != null){
+             uafg = new UserAuthorizedForConfig(ua);
+             uafg.setUmapList(user_auth_getUMAPListRaw(ua));
+        }
+        return uafg;
+    }
+    
+    /**
+     * Extracts all UMAP objects from the DB, valid or not
+     * @param u
+     * @return
+     * @throws IntegrationException 
+     */
+    private List<UserMuniAuthPeriod> user_auth_getUMAPListRaw(User u) throws IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        return ui.getUserMuniAuthPeriodsRaw(u.getUserID());
+        
+    }
     
   
     
@@ -207,6 +255,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * TODO: Customize list based on muni connections
      * NOTED in github issues by ECD 25-may-2020
      * 
+     * @param usr
      * @return An assembled list of users for authorization
      */
     public List<User> user_assembleUserListForSearch(User usr){
@@ -252,6 +301,33 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         uap.setValidatedTS(syncNow);
         return uap;
     }
+    
+    
+    
+    /**
+     * Internal untility method for rebuild a Muni-UMAP map with only valid UMAPS
+     * @param umapMapRaw
+     * @return 
+     */
+    private Map<Municipality, List<UserMuniAuthPeriod>> auth_cleanMuniUMAPMap(Map<Municipality, List<UserMuniAuthPeriod>> umapMapRaw){
+        List<UserMuniAuthPeriod> tempUMAPList = new ArrayList<>();
+        List<Municipality> tempMuniList;
+        Map<Municipality, List<UserMuniAuthPeriod>> tempMap = new HashMap<>();
+
+            if(umapMapRaw != null && !umapMapRaw.isEmpty()){
+                Set<Municipality> muniSet = umapMapRaw.keySet();
+                if(!muniSet.isEmpty()){
+                    tempMuniList = new ArrayList(muniSet);
+                    for(Municipality muni: tempMuniList){
+                        tempUMAPList = umapMapRaw.get(muni);
+                        tempMap.put(muni, auth_cleanUserMuniAuthPeriodList(tempUMAPList));
+                    }
+
+                }
+            }
+            return tempMap;
+            
+        }
     
     /**
      * Convenience adaptor method for checking the validity of a generic list of raw UMAPs
@@ -543,23 +619,27 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         UserAuthorized ua = null;
         int publicUserID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                     .getString("publicuserid"));
-        int publicUserUMAPID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                    .getString("publicuserumap"));
+
         User u = user_getUser(publicUserID);
-        List<UserMuniAuthPeriod> umapList = null;
+       
         if(u != null){
             
-             umapList = auth_assembleValidAuthPeriods(u.getUsername());
+             ua = auth_prepareUserForSessionChoice(u);
         }
 //        UserMuniAuthPeriod umap = ui.getUserMuniAuthPeriod(publicUserUMAPID);
         
         try {
-            if(umapList != null && !umapList.isEmpty()){
-                UserMuniAuthPeriod umap = umapList.get(0);
-                umap.setUserID(publicUserID);
-                umapList.clear();
-                umapList.add(umap);
-                ua   = auth_authorizeUser_SECURITYCRITICAL(umap, umapList);
+            if(ua != null && ua.getMuniAuthPeriodsMap() != null && !ua.getMuniAuthPeriodsMap().isEmpty()){
+                Map<Municipality, List<UserMuniAuthPeriod>> umapMapTemp = ua.getMuniAuthPeriodsMap();
+                // be design, we have only one muni, COGland for this user
+                List<Municipality> muniList  =new ArrayList<>();
+                muniList.addAll(umapMapTemp.keySet());
+                if(!muniList.isEmpty() && umapMapTemp.containsKey(muniList.get(0))){
+                    List<UserMuniAuthPeriod> umapList = umapMapTemp.get(muniList.get(0));
+                    if(umapList != null && !umapList.isEmpty()){
+                        ua = auth_authorizeUser_SECURITYCRITICAL(ua, umapList.get(0));
+                    }
+                }
             }
         } catch (AuthorizationException ex) {
             System.out.println(ex);
@@ -632,20 +712,47 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             return sb;
     }
     
+   
+    
     /**
-     * TODO: Write my guts
-     * 
-     * Creates the text of a note to document changes to username field values
-     * 
-     * @param sb
-     * @param currPers
-     * @param updatedUsername
-     * @return 
+     * Logic container for checking permissibility of User record deactivation.
+     * Key role is to prohibit any UI-based deactivation of developer users :)
+     * @param ua
+     * @param ufcToDeac 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    private StringBuilder user_assembleUsernameUpdateNote(StringBuilder sb, Person currPers, String updatedUsername){
+    public void user_deactivateUser(UserAuthorized ua, UserAuthorizedForConfig ufcToDeac) throws AuthorizationException, IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        if(ufcToDeac != null){
+            if(auditUMAPList_allowDeactivation_freeOfDevCreds(ufcToDeac.getUmapList())){
+                ufcToDeac.setDeactivatedBy(ua);
+                ui.updateUser(ua);
+            } else {
+                throw new AuthorizationException("Users with a UMAP of rank: developer cannot be deactivated from the UI");
+
+            }
+        } else {
+            throw new AuthorizationException("Cannot deactivate a null user!");
+        }
+    }
+    
+    /**
+     * Mini logic container to check a list of UMAPs for dev credentials
+     * @param umapList
+     * @return true if no dev ranked UMAPs were found
+     */
+    private boolean auditUMAPList_allowDeactivation_freeOfDevCreds(List<UserMuniAuthPeriod> umapList){
+         
+        boolean allowDeactivation = true;
         
+        for(UserMuniAuthPeriod umap: umapList){
+                    if(umap.getRole() == RoleType.Developer){
+                        allowDeactivation = false;
+                    }
+                }
         
-        return sb;
+        return allowDeactivation;
     }
     
     
@@ -653,31 +760,25 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * Updates the User's Person and username only. 
      * Note -- does not update the password which is updated separately
      * @param u
-     * @param persToUpdate
-     * @param usernameToUpdate
      * @throws IntegrationException 
      */
-    public void user_updateUser(User u, Person persToUpdate, String usernameToUpdate) throws IntegrationException{
+    public void user_updateUser(User u) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
-        MessageBuilderParams mb = new MessageBuilderParams();
         StringBuilder sb = new StringBuilder();
-        mb.setExistingContent(u.getNotes());
-        if(persToUpdate != null){
-            
-            u.setPerson(persToUpdate);
-            sb = user_assemblePersonLinkUpdateNote(sb, u.getPerson(), persToUpdate);
-        }
-
-        if(usernameToUpdate != null){
-            sb = user_assembleUsernameUpdateNote(sb, u.getPerson(), usernameToUpdate );
-            u.setUsername(usernameToUpdate);
-        }
-        
         ui.updateUser(u);
         
+    }
+    
+    
+    public void user_updateUserPersonLink(User u, Person freshPerson){
+        
+        MessageBuilderParams mb = new MessageBuilderParams();
+        mb.setExistingContent(u.getNotes());
         mb.setNewMessageContent(sb.toString());
         user_appendNoteToUser(u, mb);
+        
     }
+    
     
     /**
      * *** SECURITY CRITICAL METHOD ***
@@ -844,10 +945,15 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws AuthorizationException
      * @throws IntegrationException 
      */
-    public UserAuthorized user_transformUserToUserAuthorizedForConfig(UserAuthorized userRequestor, User userToConfigure) throws AuthorizationException, IntegrationException{
+    public UserAuthorizedForConfig user_transformUserToUserAuthorizedForConfig(UserAuthorized userRequestor, User userToConfigure) throws AuthorizationException, IntegrationException{
+        UserAuthorizedForConfig uafc = null;
+        UserIntegrator ui = getUserIntegrator();
+        if(userRequestor != null && userToConfigure != null){
+            uafc = new UserAuthorizedForConfig(ui.getUserAuthorizedNoAuthPeriods(userToConfigure));
+            uafc.setMuniAuthPeriodsMap(auth_assembleMuniUMAPMapRaw(userToConfigure));
+        }
         
-
-        return null;
+        return uafc;
     }
     
 

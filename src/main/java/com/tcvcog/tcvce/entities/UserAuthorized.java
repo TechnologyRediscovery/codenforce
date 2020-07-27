@@ -61,12 +61,15 @@ public class UserAuthorized extends User{
         this.badgeNumber = u.getBadgeNumber();
         this.oriNumber = u.getOriNumber();
         
-        this.active = u.isActive();
         this.noLoginVirtualUser = u.isNoLoginVirtualUser();
         
         
         this.createdByUserId = u.getCreatedByUserId();
         this.createdTS = u.getCreatedTS();
+        
+        this.lastUpdatedTS = u.lastUpdatedTS;
+        this.deactivatedByUserID = u.deactivatedByUserID;
+        this.deactivatedTS = u.deactivatedTS;
     
     }
     
