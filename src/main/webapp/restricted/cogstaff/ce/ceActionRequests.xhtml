@@ -800,7 +800,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      severity="alert" widgetVar="override-request-status-dialog"
                                      closable="true"
                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
-
                         <h:form id="override-request-status-form">
 
                             <h:outputLabel styleClass="bold" for="ceactionrequeststatusmenu" value="Change status to:"/>
@@ -820,7 +819,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 oncomplete="PF('override-request-status-dialog').hide()"/>
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('manage-public-access-dialog').hide()"/>
+                                             onclick="PF('override-request-status-dialog').hide()"/>
                         </h:form>
                     </p:confirmDialog>
 

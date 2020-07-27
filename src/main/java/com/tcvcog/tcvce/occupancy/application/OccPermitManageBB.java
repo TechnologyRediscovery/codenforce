@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -27,6 +28,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -36,16 +39,17 @@ import java.util.Iterator;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  *
  * @author Nathan Dietz
  */
 public class OccPermitManageBB extends BackingBeanUtils implements Serializable {
-    
+
     private String currentMode;
     private boolean currentApplicationSelected;
-    
+
     private OccPermitApplication searchParams;
     private List<OccApplicationStatusEnum> statusList;
     private LocalDateTime queryBegin;
@@ -54,7 +58,11 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
     private boolean status_ctl;
     private boolean connectedOccPeriod_ctl;
     private boolean connectedOccPeriod_val;
-    
+
+    private String rejectedApplicationMessage;
+    private String invalidApplicationMessage;
+    private OccApplicationStatusEnum newStatus;
+
     private OccPermitApplication selectedApplication;
 //    private QueryOccPermitApplication selectedQueryOccApplicaton;
     private List<OccPermitApplication> applicationList;
@@ -67,62 +75,69 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
 
         //initialize default current mode : Lookup
         currentMode = "Search";
-        
+
+        searchParams = new OccPermitApplication();
+
         statusList = new ArrayList<>();
-        
-        for (OccApplicationStatusEnum status : OccApplicationStatusEnum.values()){
-            
+
+        for (OccApplicationStatusEnum status : OccApplicationStatusEnum.values()) {
+
             statusList.add(status);
-            
+
         }
-        
+
         //initialize default setting 
         defaultSetting();
     }
-    
+
     /**
-     * Determines whether or not a user should currently be able to select a CEAR.
-     * Users should only select CEARs if they're in search mode.
-     * @return 
+     * Determines whether or not a user should currently be able to select a
+     * CEAR. Users should only select CEARs if they're in search mode.
+     *
+     * @return
      */
-    public boolean getSelectedButtonActive(){
+    public boolean getSelectedButtonActive() {
         return !"Search".equals(currentMode);
     }
-    
-    public boolean getActiveSearchMode(){
+
+    public boolean getActiveSearchMode() {
         return "Search".equals(currentMode);
     }
-    
-    public boolean getActiveActionsMode(){
+
+    public boolean getActiveActionsMode() {
         return "Actions".equals(currentMode);
     }
-    
-    public boolean getActiveObjectsMode(){
+
+    public boolean getActiveObjectsMode() {
         return "Objects".equals(currentMode);
     }
-    
-    public boolean getActiveNotesMode(){
+
+    public boolean getActiveNotesMode() {
         return "Notes".equals(currentMode);
     }
 
     public String getCurrentMode() {
         return currentMode;
     }
-    
-    public void defaultSetting(){
-        
+
+    public void defaultSetting() {
+
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        
+
         currentApplicationSelected = false;
-        
-        try{
-        applicationList = oi.getOccPermitApplicationList();
-        } catch (BObStatusException ex){
+
+        try {
+            applicationList = oi.getOccPermitApplicationList();
+
+            if (selectedApplication != null) {
+                selectedApplication = oi.getOccPermitApplication(selectedApplication.getId());
+            }
+        } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Error while retrieving Occupancy Permit Applications: " + ex, ""));
-        } catch(AuthorizationException | EventException | IntegrationException | ViolationException ex){
-            System.out.println("OccPermitManageBB.defaultSetting() | ERROR: "+ ex);
+        } catch (AuthorizationException | EventException | IntegrationException | ViolationException ex) {
+            System.out.println("OccPermitManageBB.defaultSetting() | ERROR: " + ex);
         }
     }
 
@@ -146,92 +161,198 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, this.currentMode + " Mode Selected", ""));
 
     }
-    
-    public void executeCustomQuery(){
-        
+
+    public void executeCustomQuery() {
+
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        
+
         currentApplicationSelected = false;
-        
-        if(queryBegin == null || queryEnd ==null){
+
+        if (queryBegin == null || queryEnd == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please specify a start and end date when executing a custom query", ""));
             return;
         }
-        
-        try{
-        List<OccPermitApplication> results = oi.getOccPermitApplicationList();
-        
-        Iterator itr = results.iterator();
-        
-        //A variable that represents the result of a question we ask about an application.
-        //If the answer is different as the given search parameter, remove the application
-        boolean testCondition = false;
-        
-        while(itr.hasNext()){
-            
-            OccPermitApplication temp = (OccPermitApplication) itr;
-            
-            if(temp.getSubmissionDate().compareTo(queryBegin) < 0 || temp.getSubmissionDate().compareTo(queryEnd) > 0){
-                itr.remove();
-            }
-            
-            if(reason_ctl){
-                
-                if(temp.getReason() != searchParams.getReason()){
+
+        try {
+            List<OccPermitApplication> results = oi.getOccPermitApplicationList();
+
+            Iterator itr = results.iterator();
+
+            while (itr.hasNext()) {
+
+                OccPermitApplication temp = (OccPermitApplication) itr.next();
+
+                //A variable that represents the result of a question we ask about an application.
+                //If the answer is different as the given search parameter, remove the application
+                boolean testCondition = false;
+
+                if (temp.getSubmissionDate().compareTo(queryBegin) < 0 || temp.getSubmissionDate().compareTo(queryEnd) > 0) {
                     itr.remove();
+                } else if (reason_ctl) {
+
+                    if (temp.getReason().getId() != searchParams.getReason().getId()) {
+                        itr.remove();
+                    }
+
+                } else if (status_ctl) {
+                    if (temp.getStatus() != searchParams.getStatus()) {
+                        itr.remove();
+                    }
+                } else if (connectedOccPeriod_ctl) {
+
+                    testCondition = temp.getConnectedPeriod() != null && temp.getConnectedPeriod().getPeriodID() != 0; //test if an occperiod is connected
+
+                    if (testCondition != connectedOccPeriod_val) {
+                        //if the test does not evaluate to our desired state, remove it
+                        itr.remove();
+                    }
+
                 }
-                
+
             }
-            
-            if(status_ctl){
-               if(temp.getStatus() != searchParams.getStatus()){
-                    itr.remove();
-                } 
-            }
-            
-            if(connectedOccPeriod_ctl){
-                
-                testCondition = temp.getConnectedPeriod() != null && temp.getConnectedPeriod().getPeriodID() != 0; //test if an occperiod is connected
-                
-                if(testCondition != connectedOccPeriod_val) {
-                    //if the test does not evaluate to our desired state, remove it
-                    itr.remove();
-                }
-                
-            }
-            
-        }
-        
-                
-        } catch (BObStatusException ex){
+
+            applicationList = results;
+
+        } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Error while retrieving Occupancy Permit Applications: " + ex, ""));
-        } catch(AuthorizationException | EventException | IntegrationException | ViolationException ex){
-            System.out.println("OccPermitManageBB.defaultSetting() | ERROR: "+ ex);
+        } catch (AuthorizationException | EventException | IntegrationException | ViolationException ex) {
+            System.out.println("OccPermitManageBB.defaultSetting() | ERROR: " + ex);
         }
-        
+
+    }
+
+    public void onApplicationSelection(OccPermitApplication application) {
+
+        if (currentApplicationSelected) {
+            selectedApplication = application;
+
+            applicationList = new ArrayList<>();
+
+            applicationList.add(application);
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Currently Selected Application: " + application.getReason().getTitle() + "ID:(" + application.getId() + ")", ""));
+        } else {
+            defaultSetting();
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Application: " + application.getReason().getTitle() + "ID:(" + application.getId() + ")", ""));
+
+        }
+
+    }
+
+    public void changeApplicationStatus(ActionEvent ev) {
+        System.out.println("updateStatus");
+
+        if (newStatus == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a status before applying your changes.", ""));
+        } else {
+            updateSelectedPermitStatus(newStatus);
+            defaultSetting();
+
+        }
+
+    }
+
+    /**
+     * A method that changes only the selectedApplication's status.
+     *
+     * @param statusToSet
+     */
+    private void updateSelectedPermitStatus(OccApplicationStatusEnum statusToSet) {
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+
+        try {
+            OccPermitApplication app = oi.getOccPermitApplication(selectedApplication.getId());
+            oi.updateOccPermitApplication(app);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Status changed on application ID " + selectedApplication.getId(), ""));
+            defaultSetting();
+        } catch (IntegrationException | AuthorizationException
+                | BObStatusException | EventException | ViolationException ex) {
+            System.out.println("OccPermitManageBB.updateSelectedPermitStatus() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to update application status.", ""));
+        }
+    }
+
+    public void path4AttachInvalidMessage(ActionEvent ev) {
+
+        SystemCoordinator sc = getSystemCoordinator();
+
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+
+        selectedApplication.setStatus(OccApplicationStatusEnum.Invalid);
+
+        // build message to document change
+        MessageBuilderParams mcc = new MessageBuilderParams();
+        mcc.setUser(getSessionBean().getSessUser());
+        mcc.setExistingContent(selectedApplication.getExternalPublicNotes());
+        mcc.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidOccPermitApplicationHeader"));
+        mcc.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidOccPermitApplicationExplanation"));
+        mcc.setNewMessageContent(invalidApplicationMessage);
+
+        selectedApplication.setExternalPublicNotes(sc.appendNoteBlock(mcc));
+        try {
+            oi.updateOccPermitApplication(selectedApplication);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Public note added to Occupancy permit application ID " + selectedApplication.getId() + ".", ""));
+
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to write message to The Database",
+                            "This is a system level error that must be corrected by a sys admin--sorries!."));
+        }
     }
     
-    public void onApplicationSelection(OccPermitApplication application){
-        
-        if(currentApplicationSelected){
-        selectedApplication = application;
-        
-        applicationList = new ArrayList<>();
-        
-        applicationList.add(application);
-        
-        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Currently Selected Application: " + application.getReason().getTitle() + "ID:(" + application.getId() + ")", ""));
-        } else{
-            defaultSetting();
-            
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Application: " + application.getReason().getTitle() + "ID:(" + application.getId() + ")", ""));
-            
+    public void path3AttachRejectionMessage(ActionEvent ev) {
+
+        SystemCoordinator sc = getSystemCoordinator();
+
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+
+        selectedApplication.setStatus(OccApplicationStatusEnum.Rejected);
+
+        // build message to document change
+        MessageBuilderParams mcc = new MessageBuilderParams();
+        mcc.setUser(getSessionBean().getSessUser());
+        mcc.setExistingContent(selectedApplication.getExternalPublicNotes());
+        mcc.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("rejectedOccPermitApplicationHeader"));
+        mcc.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("rejectedOccPermitApplicationExplanation"));
+        mcc.setNewMessageContent(rejectedApplicationMessage);
+
+        selectedApplication.setExternalPublicNotes(sc.appendNoteBlock(mcc));
+        try {
+            oi.updateOccPermitApplication(selectedApplication);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Public note added to Occupancy permit application ID " + selectedApplication.getId() + ".", ""));
+
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to write message to The Database",
+                            "This is a system level error that must be corrected by a sys admin--sorries!."));
         }
-        
+    }
+
+    public boolean isPathsDisabled() {
+
+        if (selectedApplication == null) {
+            return true;
+        }
+
+        return selectedApplication.getStatus() != OccApplicationStatusEnum.Waiting; //paths should be disabled if the occ application is not waiting to be reviewed.
+
     }
 
     public boolean isCurrentApplicationSelected() {
@@ -281,7 +402,7 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
     public void setStatus_ctl(boolean status_ctl) {
         this.status_ctl = status_ctl;
     }
-    
+
     public boolean isConnectedOccPeriod_ctl() {
         return connectedOccPeriod_ctl;
     }
@@ -305,19 +426,19 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
     public void setQueryBegin(LocalDateTime queryBegin) {
         this.queryBegin = queryBegin;
     }
-    
+
     public Date getQueryBegin_Util() {
-        
+
         Date utilDate = null;
-        if(queryBegin != null){
-           utilDate = Date.from(queryBegin.atZone(ZoneId.systemDefault()).toInstant());
-        }        
+        if (queryBegin != null) {
+            utilDate = Date.from(queryBegin.atZone(ZoneId.systemDefault()).toInstant());
+        }
         return utilDate;
     }
 
     public void setQueryBegin_Util(Date queryBeginUtil) {
-        if(queryBeginUtil != null){
-        queryBegin = queryBeginUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if (queryBeginUtil != null) {
+            queryBegin = queryBeginUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
     }
 
@@ -328,18 +449,18 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
     public void setQueryEnd(LocalDateTime queryEnd) {
         this.queryEnd = queryEnd;
     }
-    
+
     public Date getQueryEnd_Util() {
         Date utilDate = null;
-        if(queryEnd != null){
-           utilDate = Date.from(queryEnd.atZone(ZoneId.systemDefault()).toInstant());
-        }        
+        if (queryEnd != null) {
+            utilDate = Date.from(queryEnd.atZone(ZoneId.systemDefault()).toInstant());
+        }
         return utilDate;
     }
 
     public void setQueryEnd_Util(Date queryEndUtil) {
-        if(queryEndUtil != null){
-        queryEnd = queryEndUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if (queryEndUtil != null) {
+            queryEnd = queryEndUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
     }
 
@@ -350,5 +471,29 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
     public void setStatusList(List<OccApplicationStatusEnum> statusList) {
         this.statusList = statusList;
     }
-    
+
+    public String getRejectedApplicationMessage() {
+        return rejectedApplicationMessage;
+    }
+
+    public void setRejectedApplicationMessage(String rejectedApplicationMessage) {
+        this.rejectedApplicationMessage = rejectedApplicationMessage;
+    }
+
+    public String getInvalidApplicationMessage() {
+        return invalidApplicationMessage;
+    }
+
+    public void setInvalidApplicationMessage(String invalidApplicationMessage) {
+        this.invalidApplicationMessage = invalidApplicationMessage;
+    }
+
+    public OccApplicationStatusEnum getNewStatus() {
+        return newStatus;
+    }
+
+    public void setNewStatus(OccApplicationStatusEnum newStatus) {
+        this.newStatus = newStatus;
+    }
+
 }

@@ -164,7 +164,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <h:panelGroup>
                                                             <p:selectOneMenu id="applicationquery-som" 
                                                                              tabindex="1" 
-                                                                             value="#{occPermitManageBB.selectedQueryOccAppplication}"
+                                                                             value="#{occPermitManageBB.selectedQueryOccApplication}"
                                                                              style="margin-right: 10px;">
                                                                 <f:converter converterId="bOBQueryConverter"/>
                                                                 <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>
@@ -266,13 +266,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                         <p:selectOneMenu id="occApplicationStatusMenuSearch" required="false" value="#{occPermitManageBB.searchParams.status}">
-                                                            
-                                                            
                                                             <f:converter converterId="occPermitApplicationStatusConverter"/>
+                                                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
                                                             <f:selectItems value="#{occPermitManageBB.statusList}"
                                                                            var="status" itemValue="#{status}" itemLabel="#{status.label}"/>
-                                                            
-                                                            
                                                         </p:selectOneMenu>
                                                     </h:panelGroup>
 
@@ -285,7 +282,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      update="occPermitManage-form-side
                                                                      occPermitManage-panel-search
                                                                      form-messages-global"/>
-                                                    
+
                                                 </p:panelGrid>
 
 
@@ -311,8 +308,91 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
-                                                    <!--Insert Table Content-->
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitManageBB.selectedApplication.id}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Reason:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitManageBB.selectedApplication.reason.title} (#{occPermitManageBB.selectedApplication.reason.description})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Status:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitManageBB.selectedApplication.status.label}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Date Submitted:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitManageBB.selectedApplication.submissionDateUtilDate.toString()}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <p:commandButton    id="open-new-period-cb"
+                                                                        ajax="false" value="Create a new Occupancy Period" 
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        action="#{occPermitManageBB.path1SpawnNewOccPeriod()}"
+                                                                        disabled="#{occPermitManageBB.isPathsDisabled()}"
+                                                                        icon="fa fa-folder" styleClass="occpermit-actions-button"/>
+
+                                                    <p:commandButton    id="new-unit-period-cb"
+                                                                        value="Add a new unit and attach a new period to it"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        disabled="#{occPermitManageBB.isPathsDisabled()}"
+                                                                        action="#{occPermitManageBB.path2NewUnitAndPeriod()}"
+                                                                        icon="fa fa-book" />
+
+
+                                                    <p:commandButton    id="reject-application-cb"
+                                                                        value="Reject application"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        disabled="#{occPermitManageBB.isPathsDisabled()}"
+                                                                        onclick="PF('reject-application-dialog').show()"
+                                                                        icon="fa fa-circle-o"/>
+
+                                                    <p:commandButton    id="invalid-application-cb"
+                                                                        value="Invalid application"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        disabled="#{occPermitManageBB.isPathsDisabled()}"
+                                                                        onclick="PF('invalid-application-dialog').show()"
+                                                                        icon="fa fa-exclamation-circle"/>
+
+                                                    <p:commandButton    id="manually-override-status-cb"
+                                                                        value="Manually override application status"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                                        disabled="#{empty occPermitManageBB.selectedApplication}"
+                                                                        onclick="PF('override-application-status-dialog').show()"
+                                                                        icon="fa fa-gears"/>
+
+
+                                                    <!--No report generator yet!-->
+                                                    <ui:remove>
+                                                        <p:commandButton    id="prep-multi-application-cb"
+                                                                            value="Prepare application list report"
+                                                                            actionListener="#{occPermitManageBB.prepareReportMultiApplication}"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                            disabled="false"
+                                                                            oncomplete="PF('application-print-dialog-var').show()"
+                                                                            icon="fa fa-print"
+                                                                            update="application-print-form"
+                                                                            />
+                                                    </ui:remove>
                                                 </p:panelGrid>
 
                                                 <p:spacer height="10px" />
@@ -367,7 +447,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
-                                                    <!--Remove Table Content-->
+                                                    <!--TODO: add note editing buttons and dialogues-->
+                                                    
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Submission Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitManageBB.selectedApplication.submissionNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Internal Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitManageBB.selectedApplication.internalNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="External (Public) Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitManageBB.selectedApplication.externalPublicNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
                                                 </p:panelGrid>
 
@@ -383,6 +490,87 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             </div>
                         </div>
                     </p:outputPanel>
+
+                    <p:confirmDialog message="Reject Occupancy Permit Application" 
+                                     severity="alert" widgetVar="reject-application-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+
+                        <h:form id="reject-application-form">
+                            <h:outputLabel for="rejectionMessageITA" value="Explain why you reject this application:"/>
+                            <p:spacer height="15px"/>
+                            <p:inputTextarea id="rejectionMessageITA" style="width: 300px; height: 200px;" value="#{occPermitManageBB.rejectedApplicationMessage}"/>
+                            <p:spacer height="15px"/>
+                            <p>This message, your name, and a timestamp will be appended <br />to the public note section of application ID 
+                                <h:outputText escape="false" value="#{occPermitManageBB.selectedApplication.id}"/> </p>
+
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" actionListener="#{occPermitManageBB.path3AttachRejectionMessage}"
+                                             value="Submit" icon="fa fa-link" oncomplete="PF('reject-application-dialog').hide()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                             update="occPermitManage-panel-actions
+                                             form-messages-global
+                                             occPermitManage-form-side"/>
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('reject-application-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+
+                    <p:confirmDialog message="Mark request as invalid" 
+                                     severity="alert" widgetVar="invalid-application-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+
+                        <h:form id="invalid-form">
+                            <h:outputLabel for="invalidMessageITA" value="What makes this an invalid application?"/>
+                            <p:spacer height="15px"/>
+                            <p:inputTextarea id="invalidMessageITA" style="width: 300px; height: 200px;" value="#{occPermitManageBB.invalidApplicationMessage}"/>
+                            <p:spacer height="15px"/>
+                            <p>This message, your name, and a timestamp will be appended <br />to the public note section of application ID 
+                                <h:outputText escape="false" value="#{occPermitManageBB.selectedApplication.id}"/> </p>
+
+                            <p:spacer height="15px "/>
+                            <p:commandButton ajax="true" actionListener="#{occPermitManageBB.path4AttachInvalidMessage}"
+                                             value="Submit" icon="fa fa-link" oncomplete="PF('invalid-application-dialog').hide()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                             update="occPermitManage-panel-actions
+                                             form-messages-global
+                                             occPermitManage-form-side"/>
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('invalid-application-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+
+                    <p:confirmDialog message="Override application status" 
+                                     severity="alert" widgetVar="override-application-status-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+
+                        <h:form id="override-application-status-form">
+
+                            <h:outputLabel styleClass="bold" for="applicationstatusmenu" value="Change status to:"/>
+
+                            <p:selectOneMenu id="applicationstatusmenu" required="false" value="#{occPermitManageBB.newStatus}">
+                                <f:converter converterId="occPermitApplicationStatusConverter"/>
+                                <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                <f:selectItems value="#{occPermitManageBB.statusList}"
+                                               var="status" itemValue="#{status}" itemLabel="#{status.label}"/>
+                            </p:selectOneMenu>
+
+                            <p:commandButton    id="change-application-status-cb"
+                                                ajax="true" value="Change application status" 
+                                                actionListener="#{occPermitManageBB.changeApplicationStatus}"
+                                                update="occPermitManage-panel-actions
+                                                form-messages-global
+                                                occPermitManage-form-side"
+                                                oncomplete="PF('override-application-status-dialog').hide()"/>
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('override-application-status-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
                 </f:view>
             </ui:define>
         </ui:composition>

@@ -36,6 +36,7 @@ public class OccPermitApplication {
     private Date submissionDateUtilDate;
     private String submissionNotes;
     private String internalNotes;
+    private String externalPublicNotes;
     private PropertyUnit applicationPropertyUnit;
     private Person applicantPerson;
     private Person preferredContact;
@@ -197,4 +198,12 @@ public class OccPermitApplication {
         this.status = status;
     }
 
+    public String getExternalPublicNotes() {
+        return externalPublicNotes;
+    }
+
+    public void setExternalPublicNotes(String externalPublicNotes) {
+        this.externalPublicNotes = externalPublicNotes;
+    }
+    
 }
