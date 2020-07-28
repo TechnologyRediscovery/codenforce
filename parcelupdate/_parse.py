@@ -98,7 +98,8 @@ class OwnerName:
 
     @classmethod
     def get_Owner_from_soup(cls, soup: str):
-        """ Factory method for creating OwnerNames from parcel ids. """
+        """ Factory method for creating OwnerNames from parcel ids.
+        """
         o = OwnerName()
         o.raw = o._parse_owners_from_soup(soup)
         o.clean = (
@@ -126,7 +127,3 @@ class OwnerName:
                 cleaned_names.append(strip_whitespace(name))
             return ", ".join(cleaned_names)
         return strip_whitespace(self.raw[0])
-
-
-
-

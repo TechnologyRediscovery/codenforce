@@ -19,7 +19,6 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True):
 
     Don't forget to delete your call to the pickler after you are done!
 
-
     How to use:
         Given the following source code, assuming we want to pickle foo
             >>> class Foo: pass
@@ -32,7 +31,6 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True):
             >>>     foo = Foo()
             >>>     pickler(foo, "foo")
         Enjoy your new serialized objects, "0_foo.pickle", "1_foo.pickle", and 2_foo.pickle".
-
         You can find them in codenforce/tests/mocks
 
 
@@ -54,9 +52,10 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True):
 
         """
     global THE_PICKLER_COUNT
-    sys.setrecursionlimit(100000)
+    initial_recursion = sys.getrecursionlimit()
     with open(path.join(path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".pickle"), "wb") as f:
+        sys.setrecursionlimit(100000)
         pickle.dump(obj, f)
     if incr:
         THE_PICKLER_COUNT += 1
-
+    sys.setrecursionlimit(initial_recursion)

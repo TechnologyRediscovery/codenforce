@@ -20,11 +20,13 @@ about = {}
 #       with open(os.path.join(HERE, "parcelupdate", '__version__.py'), 'r', 'utf-8') as f:
 #           exec(f.read(), about)
 
+description = "A command line interface for keeping Turtle Creek COG's CodeNForce's data up to date."
+
 setup(
     name="parcelupdate",
     version='0.0.1',
-    description="short description",
-    long_description="Looooooong description",
+    description=description,
+    long_description=description,
     author="Snapper Vibes",
     author_email="LearningWithSnapper@gmail.com",
     python_requires=">=3.8",
@@ -32,8 +34,7 @@ setup(
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*", "parcelidlists"]),
     # If your package is a single module, use this instead of 'packages':
     py_modules=['parcelupdate',],
-
     install_requires=requires,
     include_package_data=True,
-    license='MIT',
+    license='GNU GENERAL PUBLIC LICENSE',
 )
