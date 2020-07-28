@@ -23,8 +23,8 @@ package com.tcvcog.tcvce.entities.occupancy;
 public enum OccApplicationStatusEnum {
     
     Waiting("Submitted, Awaiting Review", 0, "inspectionStatusIcon_notinspected"),
-    NewOccPeriod("Attached to new OccPeriod", 1, "inspectionStatusIcon_pass"),
-    OldOccPeriod("Attached to existing OccPeriod", 2, "inspectionStatusIcon_pass"),
+    NewUnit("Attached to new Property Unit", 1, "inspectionStatusIcon_pass"),
+    OldUnit("Attached to existing Property Unit", 2, "inspectionStatusIcon_pass"),
     Rejected("Application Rejected", 3, "inspectionStatusIcon_fail"),
     Invalid("Invalid or duplicate application", 4, "inspectionStatusIcon_fail");
     

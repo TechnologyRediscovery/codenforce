@@ -1,0 +1,233 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+Copyright (C) 2020 Technology Rediscovery LLC.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Person info</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="period-creation-view">
+
+                    <div class="mainContainer">
+
+                        <!--Global Messages-->
+                        <h:form id="period-creation-messages-form">
+                            <p:messages id="period-creation-messages" globalOnly="true" showDetail="true" showSummary="true" />
+                        </h:form>
+
+                        <p:panel id="manage-units-panel"
+                                 toggleable="true"
+                                 widgetVar="manage-units-panel-var"
+                                 collapsed="false"
+                                 header="Units On Property"
+                                 rendered="#{not occPermitManageBB.unitAlreadyDetermined}">
+
+                            <h:form id="manage-units-info-form">
+
+                                <div class="ui-g data-container">
+
+                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
+                                        <h:outputLabel styleClass="data_table_header" 
+                                                       value="Select or create a unit" />
+                                    </div>
+
+                                    <p:dataTable
+                                        id="propertyUnits"
+                                        widgetVar="datatable"
+                                        rowIndexVar="rowIndex"
+                                        var="unit"
+                                        value="#{occPermitManageBB.propertyForApplication.unitList}"
+                                        selectionMode="single" tabindex="1"
+                                        selection="#{occPermitManageBB.unitForApplication}"
+                                        rowKey="#{unit.unitID}"
+                                        editable="true">                                         
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Unit Number" />
+                                            </f:facet>
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{unit.unitNumber}" /></f:facet>
+                                                <f:facet name="input">
+                                                    <p:inputText value="#{unit.unitNumber}"
+                                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                </f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Rental notes" />
+                                            </f:facet>
+                                            <p:cellEditor>
+                                                <f:facet name="output">
+                                                    <h:outputText value="#{unit.rentalNotes}" />
+                                                </f:facet>
+                                                <f:facet name="input"> 
+                                                    <p:inputText value="#{unit.rentalNotes}"
+                                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                </f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Unit Description" />
+                                            </f:facet>
+                                            <p:cellEditor>
+                                                <f:facet name="output">
+                                                    <h:outputText value="#{unit.notes}" />
+                                                </f:facet>
+                                                <f:facet name="input">
+                                                    <p:inputText value="#{unit.notes}" 
+                                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                </f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+                                        <p:column style="width:40px">
+                                            <f:facet name="header">
+                                                <h:outputText value="Edit?" />
+                                            </f:facet>
+                                            <p:rowEditor/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Remove?" />
+                                            </f:facet>
+                                            <p:commandButton ajax="true" value="Remove" 
+                                                             action="#{occPermitManageBB.removeSelectedUnit(unit)}"
+                                                             update="#{p:component('propertyUnits')}
+                                                             manage-units-info-form"/>                                      
+                                        </p:column>
+
+                                    </p:dataTable>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <p:commandButton ajax="true" value="Add a unit" 
+                                                         action="#{occPermitManageBB.addNewUnit()}"
+                                                         update="#{p:component('propertyUnits')}
+                                                         manage-units-info-form"/> 
+                                    </div>
+
+                                </div>
+
+                            </h:form>
+
+                        </p:panel>
+
+                        <p:panel id="new-period-panel"
+                                 toggleable="true"
+                                 widgetVar="new-period-panel-var"
+                                 collapsed="false"
+                                 header="Create Period">
+
+                            <h:form id="new-period-info-form">
+
+                                <div class="ui-g data-container">
+
+                                    <!--Data Table Header (e.g. User Name)-->
+                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
+                                        <h:outputLabel styleClass="data_table_header" 
+                                                       value="Accept Occupancy Permit Application" />
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" 
+                                                       value="Please type a message explaining your approval of their application. This message, your name, and a timestamp 
+                                                       will be appended to the public note section of application ID #{occPermitManageBB.selectedApplication.id} 
+                                                       as well as the newly created Occupancy Period."/>
+                                        <p:inputTextarea id="acceptMessageITA" style="width: 300px; height: 200px;" value="#{occPermitManageBB.acceptApplicationMessage}"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <p:commandButton actionListener="#{occPermitManageBB.attachToOccPeriod()}"
+                                                         value="Accept Permit and Attach to OccPeriod" icon="fa fa-link"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <p:commandButton value="Cancel" icon="fa fa-stop" 
+                                                         actionListener="#{occPermitManageBB.cancelAttachment()}"/>
+                                    </div>
+
+                                </div>
+
+                            </h:form>
+
+                        </p:panel>
+
+                    </div>
+
+                </f:view>
+
+            </ui:define>
+
+        </ui:composition>
+
+    </h:body>
+
+    <script type="text/javascript">
+
+        $(function () {
+            $.extend(PF("datatable"), {
+                onKeyDown: function (e) {
+                    var key = e.which,
+                            keyCode = $.ui.keyCode;
+
+                    if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                        e.preventDefault();
+                    }
+                },
+
+                onKeyUp: function (e, rowIndex) {
+                    var key = e.which,
+                            keyCode = $.ui.keyCode;
+                    //.ui-row-editor-check .ui-icon-check .ui-c
+                    if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                        this.tbody
+                                .find('.ui-row-editor .ui-icon-check')
+                                .eq(rowIndex)
+                                .click();
+                    }
+
+                    if (key === keyCode.ESCAPE) {
+                        this.tbody
+                                .find('.ui-row-editor .ui-icon-close')
+                                .eq(rowIndex)
+                                .click();
+                    }
+                }
+            });
+        });
+
+    </script>
+
+</html>
+
+

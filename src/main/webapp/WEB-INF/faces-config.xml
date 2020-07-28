@@ -1086,6 +1086,12 @@
         </navigation-case>
         
         <navigation-case>
+            <from-outcome>occPermitNewPeriod</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occPermitNewPeriod.xhtml</to-view-id>
+            <redirect />       
+        </navigation-case>
+        
+        <navigation-case>
             <from-outcome>occPeriodWorkflow</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/occPeriodWorkflow.xhtml</to-view-id>
         </navigation-case>

@@ -33,6 +33,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -197,28 +198,25 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     } // close method
     
     /**
-     * We have a special type of Person which are those who have been attached to an Occ period
- through an application, which may suggest a certain person type in relation to a particular
- occupancy period
- 
- As of Beta launch Jan 2020, this functionality wasn't turned on yet.
+     * We have a special type of Person which are those who have been attached to an application
+     * or OccPeriod, and this method fetches those connected to an OccPeriod
      * 
-     * @param period
+     * @param application
      * @return
      * @throws IntegrationException 
      */
-    public List<PersonOccPeriod> getPersonOccPeriodList(OccPeriod period) throws IntegrationException{
+    public List<PersonOccPeriod> getPersonOccApplicationList(OccPermitApplication application) throws IntegrationException{
         List<PersonOccPeriod> personList = new ArrayList<>();
         String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype\n" +
-                                "   FROM public.occperiodperson WHERE period_periodid=?;";
+                                "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             stmt = con.prepareStatement(selectQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setInt(1, period.getPeriodID());
+            stmt.setInt(1, application.getId());
             rs = stmt.executeQuery();
             while(rs.next()){
                 personList.add(generatePersonOccPeriod(rs));
@@ -227,7 +225,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to insert person and connect to property", ex);
+            throw new IntegrationException("Unable to get persons connected to OccPermitApplication", ex);
 
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -243,8 +241,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         pop.setApplicant(rs.getBoolean("applicant"));;
         pop.setPreferredContact(rs.getBoolean("preferredcontact"));
         pop.setApplicationPersonTppe(PersonType.valueOf(rs.getString("applicationpersontype")));
-        return pop;
-        
+        return pop;        
     }
     
 
@@ -592,7 +589,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             list.add(getPerson(personId));
         }
         return list;
-    } // close getPersonOccPeriodList()
+    } // close getPersonOccApplicationList()
 
     /**
      * Updates a given record for a person in the database. Will throw an error

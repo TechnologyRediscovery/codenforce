@@ -1173,7 +1173,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             if(occpermitapp.getConnectedPeriod() != null)
             {
             
-            for (PersonOccPeriod skeleton : pi.getPersonOccPeriodList(occpermitapp.getConnectedPeriod())) {
+            for (PersonOccPeriod skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
                 
                 if (skeleton.isApplicant()){
                     occpermitapp.setApplicantPerson(skeleton);
@@ -1497,9 +1497,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * @param application
      * @throws IntegrationException
      */
-    public void insertOccPeriodPersons(OccPermitApplication application) throws IntegrationException {
+    public void insertOccApplicationPersons(OccPermitApplication application) throws IntegrationException {
 
-        String query = "INSERT INTO public.occperiodperson(period_periodid, "
+        String query = "INSERT INTO public.occpermitapplicationperson(occpermitapplication_applicationid, "
                 + "person_personid, applicant, preferredcontact, applicationpersontype)\n"
                 + "VALUES (?, ?, ?, ?, CAST (? AS persontype));";
 
@@ -1510,7 +1510,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         for (Person person : applicationPersons) {
             try {
                 stmt = con.prepareStatement(query);
-                stmt.setInt(1, application.getConnectedPeriod().getPeriodID());
+                stmt.setInt(1, application.getId());
                 stmt.setInt(2, person.getPersonID());
 
                 /* If the person at this step of the for-loop is the applicantPerson on the 
@@ -1531,13 +1531,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 stmt.setString(5, person.getPersonType().name());
                 stmt.execute();
             } catch (SQLException ex) {
-                System.out.println("OccupancyIntegrator.insertOccPeriodPersons() | ERROR: "+ ex);
-                throw new IntegrationException("OccupancyIntegrator.insertOccPermitPersons"
+                System.out.println("OccupancyIntegrator.insertOccApplicationPersons() | ERROR: "+ ex);
+                throw new IntegrationException("OccupancyIntegrator.insertOccApplicationPersons"
                         + " | IntegrationException: Unable to insert occupancy permit application ", ex);
             }
         }
     }
-
+    
     /*
     
      OccPeriodType tpe = null;

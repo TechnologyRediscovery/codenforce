@@ -17,16 +17,19 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
-import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -34,6 +37,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -49,6 +53,9 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
 
     private String currentMode;
     private boolean currentApplicationSelected;
+    private boolean unitAlreadyDetermined; //used by occPermitNewPeriod.xhtml to flag whether or not the selected path has already determined a unit.
+    private PropertyUnit unitForApplication;
+    private Property propertyForApplication;
 
     private OccPermitApplication searchParams;
     private List<OccApplicationStatusEnum> statusList;
@@ -61,6 +68,7 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
 
     private String rejectedApplicationMessage;
     private String invalidApplicationMessage;
+    private String acceptApplicationMessage;
     private OccApplicationStatusEnum newStatus;
 
     private OccPermitApplication selectedApplication;
@@ -80,19 +88,28 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
 
         statusList = new ArrayList<>();
 
-        for (OccApplicationStatusEnum status : OccApplicationStatusEnum.values()) {
+        statusList.addAll(Arrays.asList(OccApplicationStatusEnum.values()));
 
-            statusList.add(status);
+        unitForApplication = getSessionBean().getSessPropertyUnit();
 
+        selectedApplication = getSessionBean().getSessOccPermitApplication();
+
+        try {
+            PropertyCoordinator pc = getPropertyCoordinator();
+            propertyForApplication = pc.getPropertyByPropUnitID(selectedApplication.getApplicationPropertyUnit().getUnitID());
+        } catch (IntegrationException ex) {
+            System.out.println("OccPermitManageBB.initBean() | ERROR: " + ex);
+        } catch (NullPointerException ex) {
+            //do nothing, this is just to check if anything is null in the method call above
         }
 
-        //initialize default setting 
+        //initialize default setting         
         defaultSetting();
     }
 
     /**
-     * Determines whether or not a user should currently be able to select a
-     * CEAR. Users should only select CEARs if they're in search mode.
+     * Determines whether or not a user should currently be able to select an
+     * application. Users should only select CEARs if they're in search mode.
      *
      * @return
      */
@@ -283,35 +300,76 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
         }
     }
 
-    public void path4AttachInvalidMessage(ActionEvent ev) {
+    public void removeSelectedUnit(PropertyUnit unit) {
+        propertyForApplication.getUnitList().remove(unit);
+    }
 
-        SystemCoordinator sc = getSystemCoordinator();
+    public void addNewUnit() {
+        PropertyUnit newUnit = new PropertyUnit();
+        newUnit.setPropertyID(propertyForApplication.getPropertyID());
+        newUnit.setActive(true);
+        propertyForApplication.getUnitList().add(newUnit);
+    }
 
-        OccupancyIntegrator oi = getOccupancyIntegrator();
-
-        selectedApplication.setStatus(OccApplicationStatusEnum.Invalid);
-
-        // build message to document change
-        MessageBuilderParams mcc = new MessageBuilderParams();
-        mcc.setUser(getSessionBean().getSessUser());
-        mcc.setExistingContent(selectedApplication.getExternalPublicNotes());
-        mcc.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidOccPermitApplicationHeader"));
-        mcc.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidOccPermitApplicationExplanation"));
-        mcc.setNewMessageContent(invalidApplicationMessage);
-
-        selectedApplication.setExternalPublicNotes(sc.appendNoteBlock(mcc));
+    public String attachToOccPeriod() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oi.updateOccPermitApplication(selectedApplication);
+            int newPeriodID = oc.attachApplicationToNewOccPeriod(selectedApplication, acceptApplicationMessage);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Public note added to Occupancy permit application ID " + selectedApplication.getId() + ".", ""));
-
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
+                    "Application successfully attached to Occ Period!", ""));
+            
+            selectedApplication.setConnectedPeriod(oc.getOccPeriod(newPeriodID));
+            
+        } catch (AuthorizationException | EventException | InspectionException | IntegrationException | ViolationException ex) {
+            System.out.println("OccPermitManageBB.attachToOccPeriod() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to write message to The Database",
-                            "This is a system level error that must be corrected by a sys admin--sorries!."));
+                            "An error occured while trying to attach the application to an Occ Period!", ""));
+            selectedApplication.setStatus(OccApplicationStatusEnum.Waiting);
+        } catch (BObStatusException ex) {
+            System.out.println("OccPermitManageBB.attachToOccPeriod() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to attach the application to an Occ Period: " + ex, ""));
+            selectedApplication.setStatus(OccApplicationStatusEnum.Waiting);
         }
+
+        getSessionBean().setSessOccPermitApplication(selectedApplication);
+
+        return getSessionBean().getNavStack().popLastPage();
+    }
+
+    public String cancelAttachment() {
+
+        selectedApplication.setStatus(OccApplicationStatusEnum.Waiting);
+
+        getSessionBean().setSessOccPermitApplication(selectedApplication);
+
+        return getSessionBean().getNavStack().popLastPage();
+    }
+
+    public String path1SpawnNewOccPeriod(){
+        
+        selectedApplication.setStatus(OccApplicationStatusEnum.OldUnit);
+
+        getSessionBean().setSessOccPermitApplication(selectedApplication);
+        
+        getSessionBean().getNavStack().pushCurrentPage();
+        
+        return "occPermitNewPeriod";
+        
+    }
+    
+    public String path2NewUnitAndPeriod(){
+        
+        selectedApplication.setStatus(OccApplicationStatusEnum.NewUnit);
+
+        getSessionBean().setSessOccPermitApplication(selectedApplication);
+        
+        getSessionBean().getNavStack().pushCurrentPage();
+        
+        return "occPermitNewPeriod";
+        
     }
     
     public void path3AttachRejectionMessage(ActionEvent ev) {
@@ -329,6 +387,37 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
         mcc.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("rejectedOccPermitApplicationHeader"));
         mcc.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("rejectedOccPermitApplicationExplanation"));
         mcc.setNewMessageContent(rejectedApplicationMessage);
+
+        selectedApplication.setExternalPublicNotes(sc.appendNoteBlock(mcc));
+        try {
+            oi.updateOccPermitApplication(selectedApplication);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Public note added to Occupancy permit application ID " + selectedApplication.getId() + ".", ""));
+
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to write message to The Database",
+                            "This is a system level error that must be corrected by a sys admin--sorries!."));
+        }
+    }
+
+    public void path4AttachInvalidMessage(ActionEvent ev) {
+
+        SystemCoordinator sc = getSystemCoordinator();
+
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+
+        selectedApplication.setStatus(OccApplicationStatusEnum.Invalid);
+
+        // build message to document change
+        MessageBuilderParams mcc = new MessageBuilderParams();
+        mcc.setUser(getSessionBean().getSessUser());
+        mcc.setExistingContent(selectedApplication.getExternalPublicNotes());
+        mcc.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidOccPermitApplicationHeader"));
+        mcc.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidOccPermitApplicationExplanation"));
+        mcc.setNewMessageContent(invalidApplicationMessage);
 
         selectedApplication.setExternalPublicNotes(sc.appendNoteBlock(mcc));
         try {
@@ -494,6 +583,38 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
 
     public void setNewStatus(OccApplicationStatusEnum newStatus) {
         this.newStatus = newStatus;
+    }
+
+    public boolean isUnitAlreadyDetermined() {
+        return unitAlreadyDetermined;
+    }
+
+    public void setUnitAlreadyDetermined(boolean unitAlreadyDetermined) {
+        this.unitAlreadyDetermined = unitAlreadyDetermined;
+    }
+
+    public PropertyUnit getUnitForApplication() {
+        return unitForApplication;
+    }
+
+    public void setUnitForApplication(PropertyUnit unitForApplication) {
+        this.unitForApplication = unitForApplication;
+    }
+
+    public Property getPropertyForApplication() {
+        return propertyForApplication;
+    }
+
+    public void setPropertyForApplication(Property propertyForApplication) {
+        this.propertyForApplication = propertyForApplication;
+    }
+
+    public String getAcceptApplicationMessage() {
+        return acceptApplicationMessage;
+    }
+
+    public void setAcceptApplicationMessage(String acceptApplicationMessage) {
+        this.acceptApplicationMessage = acceptApplicationMessage;
     }
 
 }
