@@ -726,7 +726,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         UserIntegrator ui = getUserIntegrator();
         if(ufcToDeac != null){
             if(auditUMAPList_allowDeactivation_freeOfDevCreds(ufcToDeac.getUmapList())){
-                ufcToDeac.setDeactivatedBy(ua);
+                ufcToDeac.setDeactivatedBy(ua.getUserID());
                 ui.updateUser(ua);
             } else {
                 throw new AuthorizationException("Users with a UMAP of rank: developer cannot be deactivated from the UI");
@@ -770,13 +770,22 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     
-    public void user_updateUserPersonLink(User u, Person freshPerson){
+    public void user_updateUserPersonLink(User u, Person freshPerson) throws IntegrationException, AuthorizationException{
         
-        MessageBuilderParams mb = new MessageBuilderParams();
-        mb.setExistingContent(u.getNotes());
-        mb.setNewMessageContent(sb.toString());
-        user_appendNoteToUser(u, mb);
-        
+        UserIntegrator ui = getUserIntegrator();
+        if(u != null && u.getPersonID() != 0){
+    
+            // TODO: complete note on user udpates
+            MessageBuilderParams mb = new MessageBuilderParams();
+            mb.setExistingContent(u.getNotes());
+    //        mb.setNewMessageContent(sb.toString());
+    //        user_appendNoteToUser(u, mb);
+
+            ui.updateUser(u);
+            
+        } else {
+            throw new AuthorizationException("User-person links must be to real Person objects");
+        }
     }
     
     

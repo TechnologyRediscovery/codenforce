@@ -108,7 +108,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setUsername(rs.getString("username"));
             user.setNotes(rs.getString("notes"));
             user.setPersonID(rs.getInt("personlink"));
-            if(rs.getInt("personlinik") != 0){
+            if(rs.getInt("personlink") != 0){
                 user.setPerson(pi.getPerson(rs.getInt("personlink")));
             }
             // line 2 of SELECT

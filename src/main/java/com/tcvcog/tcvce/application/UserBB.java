@@ -124,7 +124,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     public void commitUsernameUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.user_updateUser(currentUser, null, formUsername);
+            uc.user_updateUser(currentUser);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));
@@ -142,7 +142,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         try {
             
-            uc.user_updateUser(currentUser, formSelectedUserPerson, null);
+            uc.user_updateUser(currentUser);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated your person link", ""));

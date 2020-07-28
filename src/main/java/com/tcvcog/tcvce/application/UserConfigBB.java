@@ -25,7 +25,6 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
@@ -36,12 +35,9 @@ import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.UserAuthorizedForConfig;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -312,7 +308,7 @@ public class UserConfigBB extends BackingBeanUtils{
     public void onUserUpdateCommitButtonChange(ActionEvent ev) {
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.user_updateUser(userAuthorizedInConfig, null, formUsername);
+            uc.user_updateUser(userAuthorizedInConfig);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));
@@ -522,17 +518,17 @@ public class UserConfigBB extends BackingBeanUtils{
     public void onUserPersonLinkUpdate(){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.user_updateUser(userAuthorizedInConfig, selectedUserPerson, null);
+            uc.user_updateUserPersonLink(userAuthorizedInConfig, selectedUserPerson);
             reloadCurrentUser();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated your person link: see notes", ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update person link, sorry!", ""));
-        }
+                            "Could not update person link, sorry!" + ex.toString(), ""));
+        } 
     }
     
     
