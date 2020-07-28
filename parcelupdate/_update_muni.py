@@ -7,6 +7,7 @@
 import json
 import _create as create
 import _fetch as fetch
+from _fetch import valid_json
 import _insert as insert
 import _scrape as scrape
 import _events
@@ -170,6 +171,87 @@ def write_taxstatus(tax_status, cursor):
     return cursor.fetchone()[0] # taxstatus_id
 
 
+def insert_and_update_database(record, conn, cursor, commit):
+    parid = record["PARID"]
+
+    data = scrape.county_property_assessments(parid, pages=[TAX])
+    for page in data:
+        data[page] = _parse.soupify_html(data[page])
+
+    owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])        ## TODO: UNIT TESTS START HERE ^
+    tax_status = _parse.parse_tax_from_soup(data[TAX])
+
+    # This block of code initializes the following:
+    #   Variables:  prop_id, unit_id, cecase_id
+    #   Flags:      new_parcel
+    if parcel_not_in_db(parid, cursor):
+        new_parcel = True
+        imap = create.property_insertmap(record)
+        prop_id = write_property_to_db(imap, cursor)
+        if record["PROPERTYUNIT"] == " ":
+            unit_id = insert.unit(
+                {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
+                cursor,
+            )
+        else:
+            print(record["PROPERTYUNIT"])
+            unit_id = insert.unit(
+                {
+                    "unitnumber": record["PROPERTYUNIT"],
+                    "property_propertyid": prop_id,
+                },
+                cursor,
+            )
+        cecase_map = create.cecase_imap(prop_id, unit_id)
+        cecase_id = insert.cecase(cecase_map, cursor)
+        #
+        owner_map = create.owner_imap(owner_name, record)
+        person_id = write_person_to_db(owner_map, cursor)
+        #
+        connect_property_to_person(prop_id, person_id, cursor)
+        Tally.inserted += 1
+    else:
+        new_parcel = False
+        prop_id = fetch.prop_id(parid, cursor)
+        unit_id = fetch.unit_id(prop_id, cursor)
+        if not unit_id:
+            unit_id = insert.unit(
+                {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
+                cursor,
+            )
+        # TODO: ERROR: Property exists without property unit
+        cecase_id = fetch.cecase_id(unit_id, cursor)
+        if not cecase_id:
+            cecase_map = create.cecase_imap(prop_id, unit_id)
+            cecase_id = insert.cecase(cecase_map, cursor)
+            # TODO: ERROR: Property exists without cecase
+
+    validate_data(record, tax_status)
+    tax_status_id = write_taxstatus(tax_status, cursor)
+    propextern_map = create.propertyexternaldata_imap(
+        prop_id, owner_name.raw, record, tax_status_id
+    )
+    # Property external data is a misnomer. It's just a log of the data from every time stuff
+    write_propertyexternaldata(propextern_map, cursor)
+
+    if _events.query_propertyexternaldata_for_changes_and_write_events(
+            parid, prop_id, cecase_id, new_parcel, cursor
+    ):
+        Tally.updated +=1
+
+
+    if commit:
+        conn.commit()
+    else:
+        # A check to make sure variables weren't forgotten to be assigned. Maybe move to testing suite?
+        assert [attr is not None for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]]
+
+    Tally.total += 1
+    print("Record count:", Tally.total, sep="\t")
+    print("Inserted count:", Tally.inserted, sep="\t")
+    print("Updated count:", Tally.updated, sep="\t")
+    print(SHORT_DASHES)
+
 
 def update_muni(muni, db_conn, commit=True):
     """
@@ -178,10 +260,8 @@ def update_muni(muni, db_conn, commit=True):
 
     print("Updating {} ({})".format(muni.name, muni.municode))
     print(MEDIUM_DASHES)
-    # We COULD not save the file and work only in JSON,
-    # but saving the file is better for understanding what happened
     filename = fetch.muni_data_and_write_to_file(muni)
-    if not fetch.validate_muni_json(filename):
+    if not valid_json(filename):
         print(DASHES)
         return
 
@@ -191,83 +271,7 @@ def update_muni(muni, db_conn, commit=True):
 
     with db_conn.cursor() as cursor:
         for record in records:
-            parid = record["PARID"]
-
-            data = scrape.county_property_assessments(parid, pages=[TAX])
-            for page in data:
-                data[page] = _parse.soupify_html(data[page])
-
-            owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])        ## TODO: UNIT TESTS START HERE ^
-            tax_status = _parse.parse_tax_from_soup(data[TAX])
-
-            # This block of code initializes the following:
-            #   Variables:  prop_id, unit_id, cecase_id
-            #   Flags:      new_parcel
-            if parcel_not_in_db(parid, cursor):
-                new_parcel = True
-                imap = create.property_insertmap(record)
-                prop_id = write_property_to_db(imap, cursor)
-                if record["PROPERTYUNIT"] == " ":
-                    unit_id = insert.unit(
-                        {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
-                        cursor,
-                    )
-                else:
-                    print(record["PROPERTYUNIT"])
-                    unit_id = insert.unit(
-                        {
-                            "unitnumber": record["PROPERTYUNIT"],
-                            "property_propertyid": prop_id,
-                        },
-                        cursor,
-                    )
-                cecase_map = create.cecase_imap(prop_id, unit_id)
-                cecase_id = insert.cecase(cecase_map, cursor)
-                #
-                owner_map = create.owner_imap(owner_name, record)
-                person_id = write_person_to_db(owner_map, cursor)
-                #
-                connect_property_to_person(prop_id, person_id, cursor)
-                Tally.inserted += 1
-            else:
-                new_parcel = False
-                prop_id = fetch.prop_id(parid, cursor)
-                unit_id = fetch.unit_id(prop_id, cursor)
-                if not unit_id:
-                    unit_id = insert.unit(
-                        {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
-                        cursor,
-                    )
-                # TODO: ERROR: Property exists without property unit
-                cecase_id = fetch.cecase_id(unit_id, cursor)
-                if not cecase_id:
-                    cecase_map = create.cecase_imap(prop_id, unit_id)
-                    cecase_id = insert.cecase(cecase_map, cursor)
-                    # TODO: ERROR: Property exists without cecase
-
-            validate_data(record, tax_status)
-            tax_status_id = write_taxstatus(tax_status, cursor)
-            propextern_map = create.propertyexternaldata_imap(
-                prop_id, owner_name.raw, record, tax_status_id
+            insert_and_update_database(
+                record, db_conn, cursor, commit
             )
-            # Property external data is a misnomer. It's just a log of the data from every time stuff
-            write_propertyexternaldata(propextern_map, cursor)
-
-            if _events.query_propertyexternaldata_for_changes_and_write_events(
-                parid, prop_id, cecase_id, new_parcel, cursor
-            ):
-                Tally.updated +=1
-
-
-            if commit:
-                db_conn.commit()
-            else:
-                # A check to make sure variables weren't forgotten to be assigned. Maybe move to testing suite?
-                assert [attr is not None for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]]
-
-            Tally.total += 1
-            print("Record count:", Tally.total, sep="\t")
-            print("Inserted count:", Tally.inserted, sep="\t")
-            print("Updated count:", Tally.updated, sep="\t")
-            print(SHORT_DASHES)
         print(DASHES)

@@ -2,13 +2,11 @@
 
 import math
 import time
-
 import click
-
 import _fetch as fetch
 from _connection import connection_and_cursor
 from _update_muni import update_muni
-
+from _constants import Tally
 from _constants import DASHES, COG_DB
 
 
@@ -36,23 +34,17 @@ def main(municodes, commit, u, password, port):
         click.echo("This is a test. Data will NOT be committed.")
     click.echo(DASHES)
 
-
     with connection_and_cursor(database=COG_DB, user=u, password=password, port=port) as (conn, cursor):
         muni_count = 0
         if municodes == ():
-            # Update ALL municipalities
-            for muni in fetch.munis(cursor):
-                update_muni(muni, conn, commit)
-                muni_count += 1
-
-        else:
-            for _municode in municodes:
-                muni = fetch.muniname_from_municode(_municode, cursor)
-                update_muni(muni, conn, commit)
-                muni_count += 1
-                print("Updated", muni_count, "municipalities.")
+            # Update ALL municipalities.
+            municodes = [muni for muni in fetch.munis(cursor)]
+        for _municode in municodes:
+            muni = fetch.muniname_from_municode(_municode, cursor)
+            update_muni(muni, conn, commit)
+            Tally.muni_count += 1
+            print("Updated", Tally.muni_count, "municipalities.")
         end = time.time()
-
         print("Update completed in", math.ceil(end - start), "seconds")
 
 

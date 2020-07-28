@@ -42,5 +42,6 @@ class _Tally:
         self.total = 0
         self.inserted = 0
         self.updated = 0
+        self.muni_count = 0
 
 Tally = _Tally()
