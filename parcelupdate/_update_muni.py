@@ -5,16 +5,16 @@
 #   Example: _parse.strip_whitespace strips whitespace, _parse.OwnerName is a class
 
 import json
-
 import _create as create
 import _fetch as fetch
 import _insert as insert
 import _scrape as scrape
 import _events
 import _parse
+from _constants import Tally
 from _constants import GENERALINFO, BUILDING, TAX, SALES
-from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 from _constants import DEFAULT_PROP_UNIT
+from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 
 
 def parcel_not_in_db(parid, cursor):
@@ -189,11 +189,6 @@ def update_muni(muni, db_conn, commit=True):
         file = json.load(f)
         records = file["result"]["records"]
 
-    # Debugging tools
-    record_count = 0
-    inserted_count = 0
-    updated_count = 0
-
     with db_conn.cursor() as cursor:
         for record in records:
             parid = record["PARID"]
@@ -233,7 +228,7 @@ def update_muni(muni, db_conn, commit=True):
                 person_id = write_person_to_db(owner_map, cursor)
                 #
                 connect_property_to_person(prop_id, person_id, cursor)
-                inserted_count += 1
+                Tally.inserted += 1
             else:
                 new_parcel = False
                 prop_id = fetch.prop_id(parid, cursor)
@@ -258,9 +253,11 @@ def update_muni(muni, db_conn, commit=True):
             # Property external data is a misnomer. It's just a log of the data from every time stuff
             write_propertyexternaldata(propextern_map, cursor)
 
-            _events.query_propertyexternaldata_for_changes_and_write_events(
+            if _events.query_propertyexternaldata_for_changes_and_write_events(
                 parid, prop_id, cecase_id, new_parcel, cursor
-            )
+            ):
+                Tally.updated +=1
+
 
             if commit:
                 db_conn.commit()
@@ -268,9 +265,9 @@ def update_muni(muni, db_conn, commit=True):
                 # A check to make sure variables weren't forgotten to be assigned. Maybe move to testing suite?
                 assert [attr is not None for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]]
 
-            record_count += 1
-            print("Record count:\t", record_count, sep="")
-            print("Inserted count:\t", inserted_count, sep="")
-            print("Updated count:\t", updated_count, sep="")
+            Tally.total += 1
+            print("Record count:", Tally.total, sep="\t")
+            print("Inserted count:", Tally.inserted, sep="\t")
+            print("Updated count:", Tally.updated, sep="\t")
             print(SHORT_DASHES)
         print(DASHES)

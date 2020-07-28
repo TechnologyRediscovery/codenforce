@@ -1,3 +1,4 @@
+# TODO: Rename file. Or maybe move Tally to a new file. I don't want to because we already have too many files.
 # Allegheny County Property Assessment tabs
 GENERALINFO = "GeneralInfo"
 BUILDING = "Building"
@@ -35,3 +36,11 @@ DASHES = "-" * 88
 MEDIUM_DASHES = "-" * 58
 SHORT_DASHES = "-" * 29
 SPACE = " "
+
+class _Tally:
+    def __init__(self):
+        self.total = 0
+        self.inserted = 0
+        self.updated = 0
+
+Tally = _Tally()

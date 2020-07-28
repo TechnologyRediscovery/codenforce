@@ -64,6 +64,8 @@ def query_propertyexternaldata_for_changes_and_write_events(parid, prop_id, ceca
         details.changes = Changes("tax code", old[5], new[5])
         DifferentTaxCode(details).write_to_db()
 
+    if details.changes:
+        return True
 
 
 # For simplicity sake, EVENTS ARE CURRENTLY ONLY FOR PROPERTY INFO CASES
