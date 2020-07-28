@@ -98,16 +98,7 @@
     <security-role>
         <role-name>Developer</role-name>
     </security-role>
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>cogstaff</web-resource-name>
-            <url-pattern>/restricted/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <description/>
-            <role-name>cogstaff</role-name>
-        </auth-constraint>
-    </security-constraint>
+   
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>usergen</web-resource-name>

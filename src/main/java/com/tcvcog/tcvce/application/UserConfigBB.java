@@ -102,11 +102,16 @@ public class UserConfigBB extends BackingBeanUtils{
         
         try {
             userAuthorizedInConfig = uc.user_assembleUserAuthorizedForConfig(getSessionBean().getSessUser());
-            userSelected = true;
-            umapInConfig = userAuthorizedInConfig.getMyCredential().getGoverningAuthPeriod();
-            userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
-            muniCandidateList = mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessUser());
-            roleTypeCandidateList = uc.auth_getPermittedRoleTypesToGrant(getSessionBean().getSessUser());
+            if(userAuthorizedInConfig != null){
+                
+                userSelected = true;
+                umapInConfig = getSessionBean().getSessUser().getKeyCard().getGoverningAuthPeriod();
+                userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
+                muniCandidateList = mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessUser());
+                roleTypeCandidateList = uc.auth_getPermittedRoleTypesToGrant(getSessionBean().getSessUser());
+            } else {
+                System.out.println("UserConfigBB.initBean: FATAL init error; null userconfig");
+            }
         } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
         }
@@ -577,10 +582,14 @@ public class UserConfigBB extends BackingBeanUtils{
                         "Password reset success! New password for " 
                                 + userAuthorizedInConfig.getUsername() 
                                 + " is now " + freshPasswordCleartext, ""));
-            formInvalidateRecordReason = "";
-            userAuthorizedInConfig.setNotes(sc.formatAndAppendNote(getSessionBean().getSessUser(), 
-                                    formInvalidateRecordReason, 
-                                    userAuthorizedInConfig.getNotes()));
+            // TODO: get this in the right place
+//            formInvalidateRecordReason = "";
+//            userAuthorizedInConfig.setNotes(sc.formatAndAppendNote(getSessionBean().getSessUser(), 
+//                                    formInvalidateRecordReason, 
+//                                    userAuthorizedInConfig.getNotes()));
+            
+            uc.user_forcePasswordReset(userAuthorizedInConfig);
+
          } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -595,7 +604,7 @@ public class UserConfigBB extends BackingBeanUtils{
     /**
      * @return the userAuthorizedInConfig
      */
-    public UserAuthorized getUserAuthorizedInConfig() {
+    public UserAuthorizedForConfig getUserAuthorizedInConfig() {
         return userAuthorizedInConfig;
     }
 

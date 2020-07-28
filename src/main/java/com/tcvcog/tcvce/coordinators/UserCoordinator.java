@@ -769,6 +769,19 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
+    /**
+     * Logic intermediary for forcing password reset on next login
+     * // As of BETA 2020 this doesn't get "forced" yet
+     * 
+     * @param u
+     * @throws IntegrationException 
+     */
+    public void user_forcePasswordReset(User u) throws IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        ui.forcePasswordReset(u);
+        
+    }
+    
     
     public void user_updateUserPersonLink(User u, Person freshPerson) throws IntegrationException, AuthorizationException{
         
