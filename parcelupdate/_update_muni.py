@@ -178,12 +178,9 @@ def insert_and_update_database(record, conn, cursor, commit):
     for page in data:
         data[page] = _parse.soupify_html(data[page])
 
-    owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])        ## TODO: UNIT TESTS START HERE ^
+    owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])
     tax_status = _parse.parse_tax_from_soup(data[TAX])
 
-    # This block of code initializes the following:
-    #   Variables:  prop_id, unit_id, cecase_id
-    #   Flags:      new_parcel
     if parcel_not_in_db(parid, cursor):
         new_parcel = True
         imap = create.property_insertmap(record)

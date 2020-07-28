@@ -39,7 +39,8 @@ def _scrape_county_property_assessment(parcel_id: str, page: str, output: dict):
 
 # There was a point that we planned to scrape multiple pages. Thus, we set up threading.
 # However, we realized that the tax page had all the data we need
-# Thus, the threading doesn't actually do anything since we are on a single thread.
+# Thus, the threading doesn't actually do anything since we are on a single thread,
+# and the code is needlessly cluttered and complicated
 def county_property_assessments(parcel_id, pages):
     results = {}
     threads = []
