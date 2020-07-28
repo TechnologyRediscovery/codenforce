@@ -35,7 +35,6 @@ def main(municodes, commit, u, password, port):
     click.echo(DASHES)
 
     with connection_and_cursor(database=COG_DB, user=u, password=password, port=port) as (conn, cursor):
-        muni_count = 0
         if municodes == ():
             # Update ALL municipalities.
             municodes = [muni for muni in fetch.munis(cursor)]

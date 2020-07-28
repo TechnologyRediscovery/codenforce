@@ -172,14 +172,13 @@ def write_taxstatus(tax_status, cursor):
 
 
 def insert_and_update_database(record, conn, cursor, commit):
+    """
+    """
     parid = record["PARID"]
-
-    data = scrape.county_property_assessments(parid, pages=[TAX])
-    for page in data:
-        data[page] = _parse.soupify_html(data[page])
-
-    owner_name = _parse.OwnerName.get_Owner_from_soup(data[TAX])
-    tax_status = _parse.parse_tax_from_soup(data[TAX])
+    html = scrape.county_property_assessments(parid)
+    soup = _parse.soupify_html(html)
+    owner_name = _parse.OwnerName.get_Owner_from_soup(soup)
+    tax_status = _parse.parse_tax_from_soup(soup)
 
     if parcel_not_in_db(parid, cursor):
         new_parcel = True
@@ -207,7 +206,7 @@ def insert_and_update_database(record, conn, cursor, commit):
         #
         connect_property_to_person(prop_id, person_id, cursor)
         Tally.inserted += 1
-    else:
+    else:   # If the parcel was already in the database
         new_parcel = False
         prop_id = fetch.prop_id(parid, cursor)
         unit_id = fetch.unit_id(prop_id, cursor)
@@ -235,7 +234,6 @@ def insert_and_update_database(record, conn, cursor, commit):
             parid, prop_id, cecase_id, new_parcel, cursor
     ):
         Tally.updated +=1
-
 
     if commit:
         conn.commit()
