@@ -386,6 +386,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param prop
      * @param ua
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();

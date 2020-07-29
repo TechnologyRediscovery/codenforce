@@ -93,6 +93,45 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
+      /**
+     * Extracts complete table dump of the login table
+     * 
+     * @return IDs of all users in the login table
+     * @throws IntegrationException 
+     */
+    public List<Integer> getUserListComplete() throws IntegrationException{
+        
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        // broken query
+        String query =  "SELECT userid FROM public.login;";
+        
+        List<Integer> idl = new ArrayList<>();
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                idl.add(rs.getInt("userid"));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error getting user", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        System.out.println("UserIntegrator.getUserListComplete: Returning list size "+ idl.toString());
+        return idl;
+    }
+    
+    
+    
      /**
      * Note that the client method is responsible for moving the cursor on the 
      * result set object before passing it into this method     * 

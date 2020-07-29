@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -135,5 +136,60 @@ public class BOBSource implements Serializable {
     public void setCreatorUserID(int creatorUserID) {
         this.creatorUserID = creatorUserID;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 41 * hash + this.sourceid;
+        hash = 41 * hash + Objects.hashCode(this.title);
+        hash = 41 * hash + Objects.hashCode(this.description);
+        hash = 41 * hash + this.creatorUserID;
+        hash = 41 * hash + Objects.hashCode(this.muni);
+        hash = 41 * hash + (this.userattributable ? 1 : 0);
+        hash = 41 * hash + (this.active ? 1 : 0);
+        hash = 41 * hash + Objects.hashCode(this.notes);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BOBSource other = (BOBSource) obj;
+        if (this.sourceid != other.sourceid) {
+            return false;
+        }
+        if (this.creatorUserID != other.creatorUserID) {
+            return false;
+        }
+        if (this.userattributable != other.userattributable) {
+            return false;
+        }
+        if (this.active != other.active) {
+            return false;
+        }
+        if (!Objects.equals(this.title, other.title)) {
+            return false;
+        }
+        if (!Objects.equals(this.description, other.description)) {
+            return false;
+        }
+        if (!Objects.equals(this.notes, other.notes)) {
+            return false;
+        }
+        if (!Objects.equals(this.muni, other.muni)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
     
 }

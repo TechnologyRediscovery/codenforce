@@ -35,10 +35,63 @@ ALTER TABLE cecase DROP COLUMN casephase;
 ALTER TABLE public.cecase ADD COLUMN lastupdatedby_userid INTEGER CONSTRAINT cecase_lastupdatedby_userid_fk REFERENCES login (userid);
 ALTER TABLE public.cecase ADD COLUMN lastupdatedts TIMESTAMP WITH TIME ZONE;
 
--- Run on remote server 27 July 2020
-ALTER TABLE public.login DROP COLUMN userrole;
 
 
+
+ALTER TABLE public.login ADD COLUMN lastupdatedts TIMESTAMP WITH TIME ZONE DEFAULT now();
+ALTER TABLE public.login DROP COLUMN pswdcleartext;
+ALTER TABLE public.login DROP COLUMN active;
+
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Well-Kept', 999, 1, 'propcondition', TRUE, 
+            10);
+
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Weathered', 999, 2, 'propcondition', TRUE, 
+            10);
+
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Deterioriated', 999, 3, 'propcondition', TRUE, 
+            10);
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Structurally unsound', 999, 5, 'propcondition', TRUE, 
+            10);
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Optimal location', 999, 1, 'landbankprospect', TRUE, 
+            10);
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Poor location', 999, 2, 'landbankprospect', TRUE, 
+            10);
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Solid location, severe damage', 999, 3, 'landbankprospect', TRUE, 
+            10);
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Poor location, Desirable condition', 999, 4, 'landbankprospect', TRUE, 
+            10);
 
 
 

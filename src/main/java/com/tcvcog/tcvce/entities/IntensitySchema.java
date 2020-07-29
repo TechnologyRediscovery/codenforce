@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -25,6 +26,8 @@ import java.util.Objects;
 public class IntensitySchema{
     
     private String label;
+    
+    protected List<IntensityClass> classList;
     
     public IntensitySchema() {
         
@@ -66,6 +69,20 @@ public class IntensitySchema{
 
     public String getLabel(){
         return label;
+    }
+
+    /**
+     * @return the classList
+     */
+    public List<IntensityClass> getClassList() {
+        return classList;
+    }
+
+    /**
+     * @param classList the classList to set
+     */
+    public void setClassList(List<IntensityClass> classList) {
+        this.classList = classList;
     }
 
 }

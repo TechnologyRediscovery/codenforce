@@ -27,6 +27,9 @@ import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.IntensityClass;
+import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.PrintStyle;
@@ -42,9 +45,12 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -204,7 +210,58 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     public String stampCurrentTimeForNote() {
         return getPrettyDate(LocalDateTime.now());
     }
+    
+    /**
+     * Assembles an intensity schema with only active classes inside
+     * @param schemaName
+     * @return
+     * @throws IntegrationException 
+     */
+    public IntensitySchema getIntensitySchemaWithClasses(String schemaName) throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        IntensitySchema is = new IntensitySchema(schemaName);
+        List<IntensityClass> classList = si.getIntensityClassList(schemaName);
+        List<IntensityClass> classListFinal = new ArrayList<>();
+        if(classList != null && !classList.isEmpty()){
+            for(IntensityClass ic: classList){
+                if(ic.isActive()){
+                    classListFinal.add(ic);
+                    
+                }
+            }
+        }
+        if(!classListFinal.isEmpty()){
+            Collections.sort(classListFinal);
+        }
+        is.setClassList(classListFinal);
+        return is;
+    }
 
+    /**
+     * Builds a complete list of BOb sources for drop downs
+     * @return 
+     */
+    public List<BOBSource> getBobSourceListComplete(){
+        List<BOBSource> sourceList = new ArrayList<>();
+        SystemIntegrator si = getSystemIntegrator();
+        List<Integer> idl = null;
+        try {
+            idl = si.getBobSourceListComplete();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        if(idl != null && !idl.isEmpty()){
+            for(Integer i: idl){
+                try {
+                    sourceList.add(si.getBOBSource(i));
+                } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                }
+            }
+        }
+        return sourceList;
+    }
+    
     /**
      * Adapter method for taking in simple note info, not in Object format
      * and creating the populated MessageBuilderParams instance required

@@ -956,6 +956,26 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
 
     }
     
+    /**
+     * Extracts all user records for Developer config
+     * @param ua
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public List<User> user_assembleUserListComplete(UserAuthorized ua) throws IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        List<User> ul = new ArrayList<>();
+        if(ua.getKeyCard().isHasDeveloperPermissions()){
+            List<Integer> idl = ui.getUserListComplete();
+            if(idl != null && !idl.isEmpty()){
+                for(Integer i: idl){
+                    ul.add(user_getUser(i));
+                }
+            }
+        }
+        return ul;
+    }
+    
     
     /**
      * Logic bundle for building a UserAuthorized without a credential for
@@ -973,8 +993,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         if(userRequestor != null && userToConfigure != null){
             uafc = new UserAuthorizedForConfig(ui.getUserAuthorizedNoAuthPeriods(userToConfigure));
             uafc.setMuniAuthPeriodsMap(auth_assembleMuniUMAPMapRaw(userToConfigure));
+            uafc.setUmapList(ui.getUserMuniAuthPeriodsRaw(userToConfigure.getUserID()));
+            System.out.println("UserCoordinator.user_transformUserToUserAuthorizedForConfig: Transformed username " + userToConfigure.getUsername());
         }
-        
         return uafc;
     }
     

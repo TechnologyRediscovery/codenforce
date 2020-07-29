@@ -22,15 +22,7 @@
 
                         <div class="mainContainer">
 
-                            <!-- TITLE COMPONENT -->
-                            <div class="public-title">
-                                <div class="public-title-main">
-                                    User Configuration
-                                </div>
-                                <div class="public-title-sub">
-                                    and municipal access period management
-                                </div>
-                            </div>
+
 
 
                             <div class ="two-column-page-flex-container">
@@ -71,7 +63,7 @@
                                             </h:form>
                                             <h:form id="usercfg-search-form" >
 
-                                               
+
                                             </h:form>
 
 
@@ -88,27 +80,43 @@
 
                                             <h:form id="usercfg-search-results-form">
 
+                                                <p:commandButton  ajax="true"
+                                                                  id="usercfg-loadall-button"
+                                                                  value="Load All System Users"
+                                                                  icon="fa fa-user-plus"
+                                                                  styleClass="multiButtonLineButton"
+                                                                  actionListener="#{userConfigBB.onLoadAllUsersButtonChange}"
+                                                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasDeveloperPermissions}"
+                                                                  update="
+                                                                  userconfig-usertable
+                                                                  usercfg-search-messages-form
+                                                                  " 
+                                                                  />
+
+                                                <p:spacer height="5px" />
+
                                                 <p:dataTable
                                                     id="userconfig-usertable"
                                                     var="user"
                                                     value="#{userConfigBB.userListForConfig}"
                                                     rowKey="#{user.userID}"
+                                                    rowStyleClass="#{user.userID == userConfigBB.userAuthorizedInConfig.userID ? 'row-emphasis':''}"
                                                     tableStyleClass="primeDataTable">
 
-                                                    <p:column>
+                                                    <p:column sortBy="#{user.userID}">
                                                         <f:facet name="header">
                                                             <h:outputText value="ID" />
                                                         </f:facet>
                                                         <h:outputText value="#{user.userID}"/>
                                                     </p:column>
 
-                                                    <p:column>
+                                                    <p:column sortBy="#{user.username}">
                                                         <f:facet name="header">
                                                             <h:outputText value="Username" />
                                                         </f:facet>
                                                         <h:outputText value="#{user.username}"/>
                                                     </p:column>
-                                                    <p:column>
+                                                    <p:column sortBy="#{user.person.lastName}">
                                                         <f:facet name="header">
                                                             <h:outputText value="Person" />
                                                         </f:facet>
@@ -117,20 +125,20 @@
                                                         <h:outputText value="#{user.person.lastName}"/>
                                                         <h:outputText value=", PersID: #{user.person.personID} "/>
                                                     </p:column>
-                                                    <p:column>
+                                                    <p:column sortBy="#{user.createdTS}">
                                                         <f:facet name="header">
                                                             <h:outputText value="Created" />
                                                         </f:facet>
                                                         <h:outputText value="#{userConfigBB.getPrettyDate(user.createdTS)}"/>
                                                     </p:column>
 
-                                                    <p:column>
+                                                    <p:column sortBy="#{user.active}">
                                                         <f:facet name="header">
                                                             <h:outputText value="Active?" />
                                                         </f:facet>
                                                         <h:outputText value="#{user.active}"/>
                                                     </p:column>
-                                                    <p:column>
+                                                    <p:column sortBy="#{user.noLoginVirtualUser}">
                                                         <f:facet name="header">
                                                             <h:outputText value="Virtual?" />
                                                         </f:facet>
@@ -140,11 +148,22 @@
                                                     <p:column>
                                                         <p:commandButton ajax="true"
                                                                          id="usercfg-viewuser"
-                                                                         value="View"
+                                                                         value="#{user.userID == userConfigBB.userAuthorizedInConfig.userID ? 'Selected':'View'}"
                                                                          icon="fa fa-user-o"
                                                                          styleClass="multiButtonLineButton"
                                                                          actionListener="#{userConfigBB.onObjetViewButtonChange(user)}"
-                                                                         update="usercfg-object-outpanel" 
+                                                                         update="
+                                                                         userconfig-usertable
+                                                                         usercfg-user-title-form
+                                                                         usercfg-panel-info
+                                                                         usercfg-umap-panel
+                                                                         usercfg-panel-notes
+                                                                         usercfg-panel-addupdate
+                                                                         usercfg-personlink-panel
+                                                                         usercfg-remove-panel
+                                                                         usercfg-umap-panel
+                                                                         usercfg-pswd-panel
+                                                                         " 
                                                                          />
                                                     </p:column>
                                                 </p:dataTable>
@@ -159,179 +178,143 @@
                                     <p:outputPanel id = "usercfg-object-outpanel" >
                                         <h:form id="usercfg-user-title-form">
 
-                                            <div class="public-title">
-                                                <div class="public-title-main">
-                                                    Configure User: <h:outputText value="#{userConfigBB.userAuthorizedInConfig.username}" />
-                                                </div>
-                                                <div class="public-title-sub">
-                                                    <h:outputText value="#{userConfigBB.userAuthorizedInConfig.person.firstName}" />
-                                                    <h:outputText value=" " />
-                                                    <h:outputText value="#{userConfigBB.userAuthorizedInConfig.person.lastName}" />
-                                                    <h:outputText value="(ID: #{userConfigBB.userAuthorizedInConfig.userID})" />
-                                                </div>
-                                            </div>
+                                            Configuring User: <h:outputText value="#{userConfigBB.userAuthorizedInConfig.username}" />
+
                                         </h:form>
 
                                         <p:panel id="usercfg-panel-info"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="User Record"
+                                                 header="User Record for #{userConfigBB.userAuthorizedInConfig.username}"
                                                  rendered="#{userConfigBB.getActiveViewMode() }"
                                                  >
 
-                                            <p:spacer height="10px"/>
 
                                             <h:form id="evruleconfig-panel-info-form">
+                                                <div class="ui-g data-container">
 
-                                                <div    id='usercfg-ot-addr-div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  value="Username"
-                                                                    styleClass="data_field_label"
-                                                                    for="userinfo-username"
-                                                                    />
-                                                    <div class="data_field_value" >
-                                                        <h:outputText id="userinfo-username"
-                                                                      styleClass="data_field_value" 
-                                                                      value="#{userConfigBB.userAuthorizedInConfig.username}" />
+                                                    <div    id='usercfg-ot-addr-div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <h:outputLabel  value="Username"
+                                                                        styleClass="data_field_label"
+                                                                        for="userinfo-username"
+                                                                        />
+                                                        <div class="data_field_value" >
+                                                            <h:outputText id="userinfo-username"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{userConfigBB.userAuthorizedInConfig.username}" />
+                                                        </div>
                                                     </div>
-                                                </div>
 
 
-                                                <div    id='userinfo--div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  value="ID"
-                                                                    styleClass="data_field_label"
-                                                                    for="userinfo-id"
-                                                                    />
-                                                    <div class="data_field_value" >
-                                                        <h:outputText id="userinfo-id"
-                                                                      styleClass="data_field_value" 
-                                                                      value="#{userConfigBB.userAuthorizedInConfig.userID}" />
+                                                    <div    id='userinfo--div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <h:outputLabel  value="ID"
+                                                                        styleClass="data_field_label"
+                                                                        for="userinfo-id"
+                                                                        />
+                                                        <div class="data_field_value" >
+                                                            <h:outputText id="userinfo-id"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{userConfigBB.userAuthorizedInConfig.userID}" />
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div    id='userinfo--div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  value="Password Last Updated"
-                                                                    styleClass="data_field_label"
-                                                                    for="userinfo-pswdlastupdated"
-                                                                    />
-                                                    <div class="data_field_value" >
-                                                        <h:outputText id="userinfo-pswdlastupdated"
-                                                                      styleClass="data_field_value" 
-                                                                      value="#{!(empty userConfigBB.userAuthorizedInConfig.pswdLastUpdated) ? userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.pswdLastUpdated): ''}" />
+                                                    <div    id='userinfo--div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  value="Password Last Updated"
+                                                                        styleClass="data_field_label"
+                                                                        for="userinfo-pswdlastupdated"
+                                                                        />
+                                                        <div class="data_field_value" >
+                                                            <h:outputText id="userinfo-pswdlastupdated"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.pswdLastUpdated) ? userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.pswdLastUpdated): ''}" />
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div    id='userinfo--div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  value="Person Link"
-                                                                    styleClass="data_field_label"
-                                                                    for="userinfo-personlink"
-                                                                    />
-                                                    <div class="data_field_value" >
-                                                        <h:outputText id="userinfo-personlink"
-                                                                      styleClass="data_field_value" 
-                                                                      value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? userConfigBB.userAuthorizedInConfig.person.lastName: ''}" />
-                                                        <h:outputText id="userinfo-personlink2"
-                                                                      value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? '(ID:': ''}" />
-                                                        <h:outputText id="userinfo-personlink3"
-                                                                      value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? userConfigBB.userAuthorizedInConfig.person.personID: ''}" />
-                                                        <h:outputText id="userinfo-personlink4"
-                                                                      value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? ')': ''}" />
+                                                    <div    id='userinfo--div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  value="Person Link"
+                                                                        styleClass="data_field_label"
+                                                                        for="userinfo-personlink"
+                                                                        />
+                                                        <div class="data_field_value" >
+                                                            <h:outputText id="userinfo-personlink"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? userConfigBB.userAuthorizedInConfig.person.lastName: ''}" />
+                                                            <h:outputText id="userinfo-personlink2"
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? '(ID:': ''}" />
+                                                            <h:outputText id="userinfo-personlink3"
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? userConfigBB.userAuthorizedInConfig.person.personID: ''}" />
+                                                            <h:outputText id="userinfo-personlink4"
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? ')': ''}" />
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div    id='userinfo--div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  value="Active"
-                                                                    styleClass="data_field_label"
-                                                                    for="userinfo-active"
-                                                                    />
-                                                    <div class="data_field_value" >
-                                                        <h:outputText id="userinfo-active"
-                                                                      styleClass="data_field_value" 
-                                                                      value="#{empty userConfigBB.userAuthorizedInConfig.deactivatedTS ? 'Active user': userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.deactivatedTS)}" />
-                                                        <h:outputText id="userinfo-active2"
-                                                                      styleClass="data_field_value" 
-                                                                      value="#{userConfigBB.userAuthorizedInConfig.deactivatedBy == 0 ? userConfigBB.userAuthorizedInConfig.deactivatedBy : ''}" />
+                                                    <div    id='userinfo--div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  value="Active"
+                                                                        styleClass="data_field_label"
+                                                                        for="userinfo-active"
+                                                                        />
+                                                        <div class="data_field_value" >
+                                                            <h:outputText id="userinfo-active"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{empty userConfigBB.userAuthorizedInConfig.deactivatedTS ? 'Active user': userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.deactivatedTS)}" />
+                                                            <h:outputText id="userinfo-active2"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{userConfigBB.userAuthorizedInConfig.deactivatedBy == 0 ? userConfigBB.userAuthorizedInConfig.deactivatedBy : ''}" />
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div    id='userinfo--div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  value="Creation"
-                                                                    styleClass="data_field_label"
-                                                                    for="userinfo-creation"
-                                                                    />
-                                                    <div class="data_field_value" >
-                                                        <h:outputText id="userinfo-creation"
-                                                                      styleClass="data_field_value" 
-                                                                      value="#{!(empty userConfigBB.userAuthorizedInConfig.createdTS) ? userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.createdTS) : ''}" />
-                                                        <h:outputText id="userinfo-creation2"
-                                                                      styleClass="data_field_value" 
-                                                                      value="#{userConfigBB.userAuthorizedInConfig.createdByUserId == 0 ? userConfigBB.userAuthorizedInConfig.createdByUserId  : ''}" />
+                                                    <div    id='userinfo--div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  value="Creation"
+                                                                        styleClass="data_field_label"
+                                                                        for="userinfo-creation"
+                                                                        />
+                                                        <div class="data_field_value" >
+                                                            <h:outputText id="userinfo-creation"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.createdTS) ? userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.createdTS) : ''}" />
+                                                            <h:outputText id="userinfo-creation2"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{userConfigBB.userAuthorizedInConfig.createdByUserId == 0 ? userConfigBB.userAuthorizedInConfig.createdByUserId  : ''}" />
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div    id='userinfo--div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  value="Virtual User"
-                                                                    styleClass="data_field_label"
-                                                                    for="userinfo-virtual"
-                                                                    />
-                                                    <div class="data_field_value" >
-                                                        <h:outputText id="userinfo-virtual"
-                                                                      styleClass="data_field_value" 
-                                                                      value="#{userConfigBB.userAuthorizedInConfig.noLoginVirtualUser ? 'Virtual only; no login' : 'Regular user'}" />
+                                                    <div    id='userinfo--div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  value="Virtual User"
+                                                                        styleClass="data_field_label"
+                                                                        for="userinfo-virtual"
+                                                                        />
+                                                        <div class="data_field_value" >
+                                                            <h:outputText id="userinfo-virtual"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{userConfigBB.userAuthorizedInConfig.noLoginVirtualUser ? 'Virtual only; no login' : 'Regular user'}" />
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div    id='userinfo--div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  value="Last Updated"
-                                                                    styleClass="data_field_label"
-                                                                    for="userinfo-lastupdated"
-                                                                    />
-                                                    <div class="data_field_value" >
-                                                        <h:outputText id="userinfo-lastupdated"
-                                                                      styleClass="data_field_value" 
-                                                                      value="#{!(empty userConfigBB.userAuthorizedInConfig.lastUpdatedTS) ? userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.lastUpdatedTS) : ''}" />
-                                                    </div>
-                                                </div>
-
-
-                                            </h:form>
-
-                                        </p:panel>
-
-                                        <p:panel id="usercfg-panel-notes"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Notes"
-                                                 rendered="#{userConfigBB.activeViewMode }"
-                                                 >
-
-                                            <h:form id="usercfg-notes-form">
-
-                                                <div    id='userinfo-notes-div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  value="Notes"
-                                                                    styleClass="data_field_label"
-                                                                    for="userinfo-notes"
-                                                                    />
-                                                    <div class="data_field_value" >
-                                                        <h:outputText id="userinfo-notes"
-                                                                      styleClass="data_field_value" 
-                                                                      escape="false"
-                                                                      value="#{userConfigBB.userAuthorizedInConfig.notes}" />
+                                                    <div    id='userinfo--div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  value="Last Updated"
+                                                                        styleClass="data_field_label"
+                                                                        for="userinfo-lastupdated"
+                                                                        />
+                                                        <div class="data_field_value" >
+                                                            <h:outputText id="userinfo-lastupdated"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.lastUpdatedTS) ? userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.lastUpdatedTS) : ''}" />
+                                                        </div>
                                                     </div>
                                                 </div>
 
                                             </h:form>
 
-
                                         </p:panel>
+
 
 
                                         <p:panel id="usercfg-panel-addupdate"
@@ -348,6 +331,7 @@
                                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                                 </h:messages>
 
+                                                
 
                                                 <div    id="usercfg-add-container-div"
                                                         class="ui-g data-container">
@@ -430,7 +414,7 @@
                                                  rendered="#{userConfigBB.activeInsertUpdateMode}"
                                                  >
                                             <h:form id="usercfg-personlink-messages-form">
-                                                
+
                                                 <h:messages id="usercfg-personlink-messages"
                                                             globalOnly="true" showDetail="true" showSummary="true"
                                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
@@ -736,6 +720,29 @@
 
                                                 </h:form>
                                             </div>
+                                        </p:panel>
+
+                                        <p:panel id="usercfg-panel-notes"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Notes"
+                                                 rendered="#{userConfigBB.activeViewMode }"
+                                                 >
+
+                                            <h:form id="usercfg-notes-form">
+
+                                                <h:outputLabel  value="Notes"
+                                                                styleClass="data_field_label"
+                                                                for="userinfo-notes"
+                                                                />
+                                                <h:outputText id="userinfo-notes"
+                                                              styleClass="data_field_value" 
+                                                              escape="false"
+                                                              value="#{userConfigBB.userAuthorizedInConfig.notes}" />
+
+                                            </h:form>
+
+
                                         </p:panel>
 
                                     </p:outputPanel>

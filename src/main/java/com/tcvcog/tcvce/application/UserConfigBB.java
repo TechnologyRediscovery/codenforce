@@ -38,6 +38,8 @@ import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -210,6 +212,7 @@ public class UserConfigBB extends BackingBeanUtils{
             try {
                 userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), u);
                 userSelected = true;
+                System.out.println("UserConfigBB.onObjectViewButtonChange: Assmbled user for config for " + userAuthorizedInConfig.getUsername());
             } catch (AuthorizationException | IntegrationException ex) {
             
             }
@@ -262,7 +265,27 @@ public class UserConfigBB extends BackingBeanUtils{
     }
      
      
-     
+     public void onLoadAllUsersButtonChange(ActionEvent ev){
+         UserCoordinator uc = getUserCoordinator();
+        try {
+            userListForConfig = uc.user_assembleUserListComplete(getSessionBean().getSessUser());
+            if(userListForConfig != null && !userListForConfig.isEmpty()){
+                userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), userListForConfig.get(0));
+            } else {
+                userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), getSessionBean().getSessUser());
+            }
+            System.out.println("UserConfigBB.onLoadAllUsersButtonChange: ulist size " + userListForConfig.size());
+              getFacesContext().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "Complete user list loaded!", ""));
+        } catch (IntegrationException | AuthorizationException ex) {
+            System.out.println(ex);  
+            getFacesContext().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    "FATAL: Unable to load complete user list from database; Apologies", ""));
+            
+        }
+     }
     
     
     

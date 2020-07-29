@@ -16,7 +16,7 @@
 
                     <p:outputPanel id="body-panel">
 
-                         
+
 
                         <h:form id="form-messages-global">
                             <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
@@ -128,7 +128,7 @@
                                             </h:panelGrid>
 
                                             <p:spacer height="5px" />
-                                             
+
                                             <p:outputLabel for="prop-search-appendresults-chkbox-0">
                                                 <h:outputText value="Append results to list? "
                                                               styleClass="bold"/>
@@ -292,20 +292,20 @@
                                     <p:outputPanel id = "prop-lists-outpanel" >
                                         <h:form id="prop-info-header-form">
 
-                                                <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
-                                                <h:outputText value=" | " />
-                                                <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
-                                                <h:outputText value=" | " />
-                                                <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currentProperty.parID}"/>
-                                                <h:outputText value=" | " />
-                                                <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currentProperty.propertyID}"/>
+                                            <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
+                                            <h:outputText value=" | " />
+                                            <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
+                                            <h:outputText value=" | " />
+                                            <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currentProperty.parID}"/>
+                                            <h:outputText value=" | " />
+                                            <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currentProperty.propertyID}"/>
 
-                                            </h:form>
+                                        </h:form>
 
                                         <p:panel id="propinfo-panel-info"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="Property Record"
+                                                 header="Property Record ID:#{propertyProfileBB.currentProperty.propertyID} (Created: #{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.creationTS)} | Last udpated:#{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.lastUpdatedTS)})"
                                                  rendered="#{propertyProfileBB.getActiveViewMode() }"
                                                  >
 
@@ -314,280 +314,279 @@
                                             <h:form id="evruleconfig-panel-info-form">
 
 
-                                                <div    id='propinfo-ot-addr-div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-addr"
-                                                                    value="Address"/>
+                                                <div class="ui-g data-container">
 
-                                                    <div class="data_field_value" >
+                                                    <div    id='propinfo-ot-addr-div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-addr"
+                                                                        value="Address"/>
 
-                                                        <h:outputText   id="propinfo-ot-addr"
-                                                                        value="#{propertyProfileBB.currentProperty.address}" />
-                                                        <p:spacer height="0px" />
-                                                        <h:outputText value="#{propertyProfileBB.currentProperty.address_city}" />
-                                                        <h:outputText value=", " />
-                                                        <h:outputText value="#{propertyProfileBB.currentProperty.address_state}" />
-                                                        <h:outputText value=" " />
-                                                        <h:outputText value="#{propertyProfileBB.currentProperty.address_zip}" />
+                                                        <div class="data_field_value" >
+
+                                                            <h:outputText   id="propinfo-ot-addr"
+                                                                            value="#{propertyProfileBB.currentProperty.address}" />
+                                                            <p:spacer height="0px" />
+                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address_city}" />
+                                                            <h:outputText value=", " />
+                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address_state}" />
+                                                            <h:outputText value=" " />
+                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address_zip}" />
+                                                        </div>
+
                                                     </div>
 
-                                                </div>
+                                                    <div    id="propinfo-ot-muni-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-muni"
+                                                                        value="Municipality"/>
 
-                                                <div    id="propinfo-ot-muni-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-muni"
-                                                                    value="Municipality"/>
-
-                                                    <h:outputText   id="propinfo-ot-"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.currentProperty.muni.muniName}
-                                                                    (ID:#{propertyProfileBB.currentProperty.muni.muniCode})" />
-                                                </div>
-
-
-                                                <div    id="propinfo-ot-parid-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-parid"
-                                                                    value="Parcel ID"/>
-
-                                                    <h:outputText   id="propinfo-ot-parid"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.currentProperty.parID}" />
-                                                </div>
-
-
-                                                <div    id="propinfo-ot-lab-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-lab"
-                                                                    value="Lot-Block"/>
-
-                                                    <h:outputText   id="propinfo-ot-lab"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.currentProperty.lotAndBlock}" />
-                                                </div>
-
-
-
-
-                                                <div    id="propinfo-ot-usegroup-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-usegroup"
-                                                                    value="Use Group"/>
-
-                                                    <h:outputText   id="propinfo-ot-usegroup"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.currentProperty.useGroup}" />
-                                                </div>
-
-
-                                                <div    id="propinfo-ot-const-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-const"
-                                                                    value="Construction type"/>
-
-                                                    <h:outputText   id="propinfo-ot-const"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.currentProperty.constructionType}" />
-                                                </div>
-
-
-                                                <div    id="propinfo-ot-cond-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-cond"
-                                                                    value="Condition class"/>
-
-                                                    <h:outputText   id="propinfo-ot-cond"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{!(empty propertyProfileBB.currentProperty.condition)
-                                                                             ? propertyProfileBB.currentProperty.condition.title
-                                                                             : ''}" />
-                                                </div>
-
-
-                                                <div    id='propinfo-ot-count-div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-county"
-                                                                    value="County code"/>
-
-                                                    <h:outputText   id="propinfo-ot-county"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.currentProperty.countyCode}" />
-                                                </div>
-
-
-                                                <div    id='propinfo-ot-lastupdated-div'
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-lastupdated"
-                                                                    value="Last updated"/>
-
-                                                    <h:outputText   id="propinfo-ot-lastupdated"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.lastUpdatedTS)}
-                                                                    by #{!(empty propertyProfileBB.currentProperty.lastUpdatedBy)
-                                                                         ? propertyProfileBB.currentProperty.lastUpdatedBy.username : ''}" />
-                                                </div>
-
-
-                                                <div    id="propinfo-ot-lastupdated-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-source"
-                                                                    value="Source"/>
-
-                                                    <h:outputText   id="propinfo-ot-source"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{!(empty propertyProfileBB.currentProperty.bobSource)
-                                                                             ? propertyProfileBB.currentProperty.bobSource.title : ''}" />
-                                                </div>
-
-
-                                                <div    id="propinfo-ot-location"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-location"
-                                                                    value="Location"/>
-
-                                                    <h:outputText   id="propinfo-ot-location"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{!(empty propertyProfileBB.currentProperty)
-                                                                             ? propertyProfileBB.currentProperty.locationDescriptor.locationDescription : ''}" />
-                                                </div>
-
-                                                <div    id="propinfo-ot-abandonedstart-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-abandonedstart"
-                                                                    value="Abandonment"/>
-                                                    <div class="data_field_value">
-                                                        <h:outputText   id="propinfo-ot-abandonedstart"
-                                                                        value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStart)}" />
-                                                        <h:outputText   id="propinfo-ot-abandonedlink"
-                                                                        value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStop) and !(empty propertyProfileBB.currentProperty.abandonedDateStop)  ? ' ' : ' to present' }" />
-                                                        <h:outputText   id="propinfo-ot-abandonedstop"
-                                                                        value="to #{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStop)}" />
-                                                        <h:outputText   id="propinfo-ot-abandoneduser"
-                                                                        value="#{!(empty propertyProfileBB.currentProperty.abandonedBy) ? propertyProfileBB.currentProperty.abandonedBy.username : ''}" />
+                                                        <h:outputText   id="propinfo-ot-"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.muni.muniName}
+                                                                        (ID:#{propertyProfileBB.currentProperty.muni.muniCode})" />
                                                     </div>
-                                                </div>
-                                                <div    id="propinfo-ot-vacantstart-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-vacantstart"
-                                                                    value="Vacant"/>
-                                                    <div class="data_field_value">
-                                                        <h:outputText   id="propinfo-ot-vacantstart"
-                                                                        value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStart)}" />
-                                                        <h:outputText   id="propinfo-ot-vacantlink"
-                                                                        value="#{!(empty propertyProfileBB.currentProperty.vacantDateStop) and !(empty propertyProfileBB.currentProperty.vacantDateStart) ? ' ' : ' to present' }" />
-                                                        <h:outputText   id="propinfo-ot-vacantstop"
-                                                                        value="to #{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStop)}" />
-                                                        <h:outputText   id="propinfo-ot-vacantby"
-                                                                        value="#{!(empty propertyProfileBB.currentProperty.vacantBy) ? propertyProfileBB.currentProperty.vacantBy.username : ''}" />
+
+
+                                                    <div    id="propinfo-ot-parid-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-parid"
+                                                                        value="Parcel ID"/>
+
+                                                        <h:outputText   id="propinfo-ot-parid"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.parID}" />
                                                     </div>
-                                                </div>
-                                                <div    id="propinfo-ot-vacant-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-unfitstart"
-                                                                    value="Unfit for occupancy"/>
-                                                    <div class="data_field_value">
-                                                        <h:outputText   id="propinfo-ot-unfitstart"
-                                                                        value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStart)}" />
-                                                        <h:outputText   id="propinfo-ot-unfitlink"
-                                                                        value="#{empty propertyProfileBB.currentProperty.unfitDateStop and !(empty propertyProfileBB.currentProperty.unfitDateStart) ? '  ' : ' to present' }" />
-                                                        <h:outputText   id="propinfo-ot-unfitstop"
-                                                                        value=" to #{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStop)}" />
-                                                        <h:outputText   id="propinfo-ot-unfituser"
-                                                                        value="#{!(empty propertyProfileBB.currentProperty.unfitBy) ? propertyProfileBB.currentProperty.unfitBy.username : ''}" />
+
+
+                                                    <div    id="propinfo-ot-lab-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-lab"
+                                                                        value="Lot-Block"/>
+
+                                                        <h:outputText   id="propinfo-ot-lab"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.lotAndBlock}" />
                                                     </div>
-                                                </div>
 
 
-                                                <div    id="propinfo-ot-landbankpropspect-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-lbprospect"
-                                                                    value="Land bank prospect"/>
-
-                                                    <h:outputText   id="propinfo-ot-lbprospect"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{!(empty propertyProfileBB.currentProperty.landBankProspect)
-                                                                             ? propertyProfileBB.currentProperty.landBankProspect.title : ' '}" />
-                                                </div>
-
-                                                <div    id="propinfo-ot-landbankheld-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-landbank"
-                                                                    value="Land bank held"/>
-
-                                                    <h:outputText   id="propinfo-ot-landbank"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.currentProperty.landBankHeld}" />
-                                                </div>
-
-                                                <div    id="propinfo-ot-nonaddressable-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-nonaddressable"
-                                                                    value="Nonaddressable"/>
-
-                                                    <h:outputText   id="propinfo-ot-nonaddressable"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.currentProperty.nonAddressable}" />
-                                                </div>
 
 
-                                                <div    id="propinf-ot-active-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-active"
-                                                                    value="Active"/>
+                                                    <div    id="propinfo-ot-usegroup-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-usegroup"
+                                                                        value="Use Group"/>
 
-                                                    <h:outputText   id="propinfo-ot-active"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.currentProperty.active}" />
-                                                </div>
-
-
-                                                <div    id="propinfo-ot-creationts-div"
-                                                        class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-creationts"
-                                                                    value="Created"/>
-
-                                                    <h:outputText   id="propinfo-ot-creationts"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.creationTS)}" />
-                                                </div>
+                                                        <h:outputText   id="propinfo-ot-usegroup"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.useGroup}" />
+                                                    </div>
 
 
-                                                <div    id="propinf-ot-notes-div"
-                                                        class="data_field"
-                                                        style="clear:both;">
-                                                    <h:outputLabel  styleClass="data_field_label"
-                                                                    for="propinfo-ot-notes"
-                                                                    value="Notes"/>
+                                                    <div    id="propinfo-ot-const-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-const"
+                                                                        value="Construction type"/>
 
-                                                    <h:outputText   id="propinfo-ot-notes"
-                                                                    styleClass="data_field_value"
-                                                                    value="#{propertyProfileBB.currentProperty.notes}"
-                                                                    escape="false"/>
+                                                        <h:outputText   id="propinfo-ot-const"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.constructionType}" />
+                                                    </div>
+
+
+                                                    <div    id="propinfo-ot-cond-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-cond"
+                                                                        value="Condition class"/>
+
+                                                        <h:outputText   id="propinfo-ot-cond"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{!(empty propertyProfileBB.currentProperty.condition)
+                                                                                 ? propertyProfileBB.currentProperty.condition.title
+                                                                                 : ''}" />
+                                                    </div>
+
+
+                                                    <div    id='propinfo-ot-count-div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-county"
+                                                                        value="County code"/>
+
+                                                        <h:outputText   id="propinfo-ot-county"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.countyCode}" />
+                                                    </div>
+
+
+                                                   
+
+                                                    <div    id="propinfo-ot-source-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-source"
+                                                                        value="Source"/>
+
+                                                        <h:outputText   id="propinfo-ot-source"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{!(empty propertyProfileBB.currentProperty.bobSource)
+                                                                                 ? propertyProfileBB.currentProperty.bobSource.title : ''}" />
+                                                    </div>
+
+
+
+                                                    <div    id="propinfo-ot-abandonedstart-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-abandonedstart"
+                                                                        value="Abandonment"/>
+                                                        <div class="data_field_value">
+                                                            <h:outputText   id="propinfo-ot-abandonedstart-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStart) ? 'Start Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-abandonedstart-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStart) : ''}" />
+                                                            <p:spacer height="2px" />
+                                                            <h:outputText   id="propinfo-ot-abandonedstop-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStop) ? 'Stop Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-abandonedstop-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStop) : ''}" />
+                                                        </div>
+                                                    </div>
+                                                    <div    id="propinfo-ot-vacantstart-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-vacantstart"
+                                                                        value="Vacany"/>
+                                                        <div class="data_field_value">
+                                                            <h:outputText   id="propinfo-ot-vacantstart-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.vacantDateStart) ? 'Start Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-vacantstart-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.vacantDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStart) : ''}" />
+                                                            <p:spacer height="2px" />
+                                                            <h:outputText   id="propinfo-ot-vacantstop-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.vacantDateStop) ? 'Stop Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-vacantstop-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.vacantDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStop) : ''}" />
+
+                                                        </div>
+                                                    </div>
+                                                    <div    id="propinfo-ot-unfit-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-unfitstart"
+                                                                        value="Unfitness of occupancy"/>
+                                                        <div class="data_field_value">
+                                                            <h:outputText   id="propinfo-ot-unfitstart-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.unfitDateStart) ? 'Start Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-unfitstart-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.unfitDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStart) : ''}" />
+                                                            <p:spacer height="2px" />
+                                                            <h:outputText   id="propinfo-ot-unfitstop-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.unfitDateStop) ? 'Stop Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-unfitstop-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.unfitDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStop) : ''}" />
+
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div    id="propinfo-ot-landbankpropspect-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-lbprospect"
+                                                                        value="Land bank prospect"/>
+
+                                                        <h:outputText   id="propinfo-ot-lbprospect"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{!(empty propertyProfileBB.currentProperty.landBankProspect)
+                                                                                 ? propertyProfileBB.currentProperty.landBankProspect.title : ' '}" />
+                                                    </div>
+
+                                                    <div    id="propinfo-ot-landbankheld-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-landbank"
+                                                                        value="Land bank held"/>
+
+                                                        <h:outputText   id="propinfo-ot-landbank"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.landBankHeld}" />
+                                                    </div>
+
+                                                    <div    id="propinfo-ot-nonaddressable-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-nonaddressable"
+                                                                        value="Nonaddressable"/>
+
+                                                        <h:outputText   id="propinfo-ot-nonaddressable"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.nonAddressable}" />
+                                                    </div>
+
+
+                                                    <div    id="propinf-ot-active-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-active"
+                                                                        value="Active"/>
+
+                                                        <h:outputText   id="propinfo-ot-active"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.active}" />
+                                                    </div>
+
+
+                                                 
                                                 </div>
 
                                             </h:form>
 
                                         </p:panel>
 
+                                        <p:panel id="propinfo-notes-panel"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Property Notes"
+                                                 rendered="#{propertyProfileBB.activeLookupMode }"
+                                                 > 
+                                            <h:form id="propinfo-notes-form">
+                                                <h:messages id="propinfo-notes-messages"
+                                                            globalOnly="true" showDetail="true" showSummary="true"
+                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                                </h:messages>
+
+                                                <div class="ui-g data-container">
+                                                    <p:commandButton   id="propinfo-notes-add-button"
+                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                       value="Add new note"  
+                                                                       icon="fa fa-sticky-note-o"
+                                                                       actionListener="#{propertyProfileBB.onNoteInitButtonChange}"
+                                                                       oncomplete="PF('propinfo-notes-dialog-var').show()"
+                                                                       update="propinfo-note-create-form"/>
+
+                                                    <div    id="propinf-ot-notes-div"
+                                                            class="data_field"
+                                                            style="clear:both;">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-notes"
+                                                                        value="Notes"/>
+
+                                                        <h:outputText   id="propinfo-ot-notes"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.notes}"
+                                                                        escape="false"/>
+                                                    </div>
+                                                </div>
+
+                                            </h:form>
+                                        </p:panel>
 
                                         <!--Insert Table-->
                                         <p:panel id="propinfo-panel-addupdate"
@@ -618,7 +617,7 @@
 
                                                 <p:commandButton    id="prop-add-discard-button-1"
                                                                     icon="fa fa-trash-o"
-                                                                    ajax="true"
+                                                                    ajax="false"
                                                                     action="#{propertyProfileBB.onDiscardNewPropertyDataButtonChange}"
                                                                     value="Discard new record"
                                                                     rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
@@ -711,6 +710,78 @@
                                                         <p:inputText    id="prop-add-parid-it"
                                                                         value="#{propertyProfileBB.currentProperty.parID}"/>
                                                     </div>
+                                                    
+                                                    <div    id="prop-add-usegroup-div"
+                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                                        <p:outputLabel value="Use Group"
+                                                                       for="prop-add-usegroup-it"/>
+
+                                                        <p:inputText    id="prop-add-usegroup-it"
+                                                                        value="#{propertyProfileBB.currentProperty.useGroup}"/>
+                                                    </div>
+                                                    
+                                                    
+                                                    <div    id="prop-add-const-div"
+                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                                        <p:outputLabel value="Construction type"
+                                                                       for="prop-add-const-it"/>
+
+                                                        <p:inputText    id="prop-add-const-it"
+                                                                        value="#{propertyProfileBB.currentProperty.constructionType}"/>
+                                                    </div>
+                                                    
+                                                  
+                                                    
+                                                    <div    id="prop-add-cond-div"
+                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                                        <p:outputLabel  value="Condition"
+                                                                        for="prop-add-condition-som"/>
+
+                                                        <h:selectOneMenu id="prop-add-condition-som"
+                                                                         value="#{propertyProfileBB.currentProperty.condition}" style="width:175px;height:25px">
+                                                            <f:converter converterId="intensityClassConverter"/>
+                                                            <f:selectItems id="propinfoedit-condition-selitems"
+                                                                           value="#{propertyProfileBB.conditionIntensityList}"
+                                                                           var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
+
+                                                        </h:selectOneMenu>
+                                                    </div>
+                                                    
+                                                    <div    id="prop-add-landprospect-div"
+                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                                        <p:outputLabel  value="Land Bank Prospect"
+                                                                        for="prop-add-landprospect-som"/>
+
+                                                        <h:selectOneMenu id="prop-add-landprospect-som"
+                                                                         value="#{propertyProfileBB.currentProperty.landBankProspect}" style="width:175px;height:25px">
+                                                            <f:converter converterId="intensityClassConverter"/>
+                                                            <f:selectItems id="propinfoedit-landprospect-selitems"
+                                                                           value="#{propertyProfileBB.landBankProspectIntensityList}"
+                                                                           var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
+
+                                                        </h:selectOneMenu>
+                                                    </div>
+                                                    
+                                                    <div    id="prop-add-source-div"
+                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                                        <p:outputLabel  value="Object Source"
+                                                                        for="prop-add-source-som"/>
+
+                                                        <h:selectOneMenu id="prop-add-source-som"
+                                                                         value="#{propertyProfileBB.currentProperty.bobSource}" style="width:175px;height:25px">
+                                                            <f:converter converterId="bobSourceConverter"/>
+                                                            <f:selectItems id="propinfoedit-sourcess-elitems"
+                                                                           value="#{propertyProfileBB.sourceList}"
+                                                                           var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
+
+                                                        </h:selectOneMenu>
+                                                    </div>
+                                                    
 
                                                     <div    id="prop-add-unfit-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
@@ -895,8 +966,6 @@
                                                     rendered="#{propertyProfileBB.getActiveViewMode() }">
                                             <h:form id="prop-workflow-form">
 
-
-
                                                 <p:selectOneMenu id="prop-workflow-viewoptions-som"
                                                                  value="#{propertyProfileBB.selectedPropViewOption}"
                                                                  tabindex="10">
@@ -999,13 +1068,7 @@
 
                                             <h:form id="prop-events-panel-form">
 
-                                                <p:commandButton    id="prop-events-noteevent-init-button"
-                                                                    ajax="false"
-                                                                    value="Create Note Event"
-                                                                    styleClass="noFill button-size-small"
-                                                                    action="#{propertyProfileBB.onAddNoteButtonChange}"
-                                                                    icon="fa fa-sticky-note-o"
-                                                                    />
+
 
 
                                                 <p:commandButton    id="prop-events-seeall-button"
@@ -1863,6 +1926,56 @@
                                              value="Create new period"
                                              tabindex="3"/>
 
+                        </h:form>
+                    </p:dialog>
+                    <p:dialog   id="propinfo-notes-dialog"
+                                height="300" width="750"
+                                widgetVar="propinfo-notes-dialog-var"
+                                closable="true"
+                                header="Note Builder"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                >
+
+                        <h:form id="propinfo-note-create-form">
+
+                            <h:messages id="propinfo-dialog-note-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+                            <h:panelGrid columns="1"
+                                         columnClasses="gridTd, gridTd">
+
+                                <h:panelGroup>
+                                    <h:outputText styleClass="ui-label" value="Note text: "/>
+                                    <p:editor   id="propinfo-notes-editor"
+                                                value="#{propertyProfileBB.formNoteText}"
+                                                controls="bold italic underline strikethrough font size style color
+                                                bullets numbering center undo redo rule link removeformat"
+                                                width="400" required="false"
+                                                height="200"/>
+
+
+                                    <p:spacer height="5px" />
+                                    <p:commandButton    id="propinfo-updatemetadata-button-cancel"
+                                                        ajax="true"  tabindex="27"
+                                                        value="Cancel"
+                                                        icon="fa fa-stop"
+                                                        immediate="true"
+                                                        onclick="PF('propinfo-notes-dialog-var').hide()"
+                                                        />
+
+                                    <p:commandButton   id="propinfo-dialog-notes-button-addnote"
+                                                       ajax="true" 
+                                                       actionListener="#{propertyProfileBB.onNoteCommitButtonChange}"
+                                                       oncomplete="PF('propinfo-notes-dialog-var').hide()"
+                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
+                                                       value="Attach Note"  
+                                                       styleClass="inline-button"
+                                                       icon="fa fa-sticky-note-o"
+                                                       update="propinfo-notes-form"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
                         </h:form>
                     </p:dialog>
 

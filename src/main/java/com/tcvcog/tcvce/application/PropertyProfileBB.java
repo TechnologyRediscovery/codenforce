@@ -4,6 +4,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -22,10 +23,14 @@ import com.tcvcog.tcvce.entities.PropertyExtData;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -43,13 +48,7 @@ import javax.faces.event.ActionEvent;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
-                                    <h:outputText value=" | " />
-                                    <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
-                                    <h:outputText value=" | " />
-                                    <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currentProperty.parID}"/>  
-                                    <h:outputText value=" | " />
-                                    <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currentProperty.propertyID}"/>  
+ * You should have received a copy of the GNU General Public License 
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -72,10 +71,9 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private PropertyUseType selectedPropertyUseType;
     
     private List<IntensityClass> conditionIntensityList;
-    private IntensityClass conditionIntensitySelected;
-    
+    protected List<IntensityClass> landBankProspectIntensityList;
     private List<BOBSource> sourceList;
-    private BOBSource sourceSelected;
+    
     
     private List<PropertyExtData> propExtDataListFiltered;
     
@@ -95,6 +93,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
         pageModes = new ArrayList<>();
         pageModes.add(PageModeEnum.LOOKUP);
         pageModes.add(PageModeEnum.INSERT);
@@ -118,6 +117,13 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
 
         try {
             putList = pi.getPropertyUseTypeList();
+            sourceList = sc.getBobSourceListComplete();
+            conditionIntensityList = sc.getIntensitySchemaWithClasses(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_propertycondition"))
+                    .getClassList();
+            landBankProspectIntensityList = sc.getIntensitySchemaWithClasses(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_landbankprospect"))
+                    .getClassList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -245,6 +251,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     /**
      * Action listener for user request to view a full property record from
+     * Also acts as  a property reload tool
      * the list
      * @param prop 
      */
@@ -258,15 +265,53 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                     "Loaded property record for " + prop.getAddress(), ""));
             } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
                 System.out.println(ex);
-                 getFacesContext().addMessage(null, 
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                getFacesContext().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     "Fatal error loading property; apologies!", ""));
             }
         }
     }
     
-    public void onCommitNoteButtonChange(ActionEvent ev){
+    /**
+     * Listener for commencement of note writing process
+     * @param ev 
+     */
+    public void onNoteInitButtonChange(ActionEvent ev){
+        formNoteText = new String();
         
+    }
+    
+    
+    /**
+     * Listener for user requests to commit new note content to the current Property
+     * 
+     * @param ev 
+     */
+    public void onNoteCommitButtonChange(ActionEvent ev){
+        SystemCoordinator sc = getSystemCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
+        mbp.setExistingContent(currentProperty.getNotes());
+        mbp.setNewMessageContent(formNoteText);
+        mbp.setHeader("Property Note");
+        mbp.setUser(getSessionBean().getSessUser());
+        currentProperty.setNotes(sc.appendNoteBlock(mbp));
+        try {
+            currentProperty.setLastUpdatedTS(LocalDateTime.now());
+            pc.editProperty(currentProperty, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Succesfully appended note!", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Fatal error appending note; apologies!", ""));
+            
+        }
+        
+        onExplorePropertyButtonChange(currentProperty);
         
     }
     
@@ -589,25 +634,13 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return conditionIntensityList;
     }
 
-    /**
-     * @return the conditionIntensitySelected
-     */
-    public IntensityClass getConditionIntensitySelected() {
-        return conditionIntensitySelected;
-    }
+   
 
     /**
      * @return the sourceList
      */
     public List<BOBSource> getSourceList() {
         return sourceList;
-    }
-
-    /**
-     * @return the sourceSelected
-     */
-    public BOBSource getSourceSelected() {
-        return sourceSelected;
     }
 
     /**
@@ -638,12 +671,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.conditionIntensityList = conditionIntensityList;
     }
 
-    /**
-     * @param conditionIntensitySelected the conditionIntensitySelected to set
-     */
-    public void setConditionIntensitySelected(IntensityClass conditionIntensitySelected) {
-        this.conditionIntensitySelected = conditionIntensitySelected;
-    }
+   
 
     /**
      * @param sourceList the sourceList to set
@@ -652,12 +680,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.sourceList = sourceList;
     }
 
-    /**
-     * @param sourceSelected the sourceSelected to set
-     */
-    public void setSourceSelected(BOBSource sourceSelected) {
-        this.sourceSelected = sourceSelected;
-    }
 
     /**
      * @return the propExtDataListFiltered
@@ -727,6 +749,20 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setSelectedPropViewOption(ViewOptionsProposalsEnum selectedPropViewOption) {
         this.selectedPropViewOption = selectedPropViewOption;
+    }
+
+    /**
+     * @return the landBankProspectIntensityList
+     */
+    public List<IntensityClass> getLandBankProspectIntensityList() {
+        return landBankProspectIntensityList;
+    }
+
+    /**
+     * @param landBankProspectIntensityList the landBankProspectIntensityList to set
+     */
+    public void setLandBankProspectIntensityList(List<IntensityClass> landBankProspectIntensityList) {
+        this.landBankProspectIntensityList = landBankProspectIntensityList;
     }
 
    
