@@ -1,4 +1,4 @@
-CREATE TYPE occapplicationstatus AS ENUM ('Waiting','NewOccPeriod','OldOccPeriod','Rejected','Invalid');
+CREATE TYPE occapplicationstatus AS ENUM ('Waiting','NewUnit','OldUnit','Rejected','Invalid');
 
 ALTER TABLE occpermitapplication
 ADD status occapplicationstatus;

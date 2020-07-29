@@ -877,17 +877,37 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @param application
      * @return the application ID
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.EventException
      */
-    public int insertOccPermitApplication(OccPermitApplication application) throws IntegrationException {
+    public int insertOccPermitApplication(OccPermitApplication application) 
+            throws IntegrationException, AuthorizationException, 
+            BObStatusException, EventException {
 
         OccupancyIntegrator opi = getOccupancyIntegrator();
 
-        OccPeriod connectedPeriod = getOccPeriod(getSessionBean().getSessMuni().getDefaultOccPeriodID());
+        OccPeriod connectedPeriod = null;
 
+        if (getSessionBean().getSessUser() != null) {
+            //if we are in the middle of an internal session, the muni will be stored in the SessMuni field.
+            connectedPeriod = getOccPeriod(getSessionBean().getSessMuni().getDefaultOccPeriodID());
+        } else {
+            //if sessUser is null, we're in an external session, which stores the current muni in sessMuniQueued
+            MunicipalityCoordinator mc = getMuniCoordinator();
+            UserCoordinator uc = getUserCoordinator();
+
+            MunicipalityDataHeavy temp = mc.assembleMuniDataHeavy(getSessionBean().getSessMuniQueued(), uc.getPublicUserAuthorized().getMyCredential());
+
+            connectedPeriod = getOccPeriod(temp.getDefaultOccPeriodID());
+
+        }
         application.setConnectedPeriod(connectedPeriod);
 
         int applicationId = opi.insertOccPermitApplication(application);
 
+        application.setId(applicationId);
+        
         opi.insertOccApplicationPersons(application);
 
         return applicationId;
@@ -939,7 +959,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         int newPeriodID = addOccPeriod(connectedPeriod, user);
 
         //Now we need to update the Application with the fact that it was ttached
-        
         connectedPeriod.setPeriodID(newPeriodID);
 
         application.setConnectedPeriod(connectedPeriod);

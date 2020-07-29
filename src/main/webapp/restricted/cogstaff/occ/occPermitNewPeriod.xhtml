@@ -50,7 +50,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
                                         <h:outputLabel styleClass="data_table_header" 
-                                                       value="Select or create a unit" />
+                                                       value="Edit unit list and then select a unit" />
+                                        <h:outputLabel styleClass="data_field_label" 
+                                                       value="Your changes to the unit list at #{occPermitManageBB.propertyForApplication.address} will be saved to the database
+                                                       once you accept the application."/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                        <h:outputLabel styleClass="data_field_label" 
+                                                       value="What units would you like to see?"/>
+                                        <p:selectOneMenu style="width: 300px;" 
+                                                         id="prop-unit-list-viewoptions" 
+                                                         value="#{occPermitManageBB.currentViewOption}"
+                                                         >
+
+                                            <p:ajax update="manage-units-info-form"/>
+
+                                            <f:selectItems  id="select-view-option-items"
+                                                            value="#{propertyUnitsBB.allViewOptions}"
+                                                            var="vo"
+                                                            itemValue="#{vo}"
+                                                            itemLabel="#{vo.label}"/>
+                                        </p:selectOneMenu>
                                     </div>
 
                                     <p:dataTable
@@ -58,16 +79,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         widgetVar="datatable"
                                         rowIndexVar="rowIndex"
                                         var="unit"
-                                        value="#{occPermitManageBB.propertyForApplication.unitList}"
+                                        value="#{occPermitManageBB.unitList}"
                                         selectionMode="single" tabindex="1"
                                         selection="#{occPermitManageBB.unitForApplication}"
                                         rowKey="#{unit.unitID}"
                                         editable="true">                                         
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Unit Number" />
-                                            </f:facet>
+                                        <p:column headerText="Unit Number">
                                             <p:cellEditor>
                                                 <f:facet name="output"><h:outputText value="#{unit.unitNumber}" /></f:facet>
                                                 <f:facet name="input">
@@ -78,10 +96,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </p:cellEditor>
                                         </p:column>
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Rental notes" />
-                                            </f:facet>
+                                        <p:column headerText="Rental Intent Date Start:">
+                                            <p:cellEditor>
+                                                <f:facet name="output">
+                                                    <h:outputText value="#{unit.rentalIntentDateStart}" />
+                                                </f:facet>
+                                                <f:facet name="input">
+                                                    <p:calendar
+                                                        value="#{unit.rentalIntentDateStartUtil}"
+                                                        mode="popup"
+                                                        showOn="button"
+                                                        pattern="EEE, dd MMM, yyyy"
+                                                        navigator="true"
+                                                        showButtonPanel="true"
+                                                        showTodayButton="true"
+                                                        required="false"/>
+                                                </f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+                                        <p:column headerText="Unit Intent Date End:">
+                                            <p:cellEditor>
+                                                <f:facet name="output">
+                                                    <h:outputText value="#{unit.rentalIntentDateStop}" />
+                                                </f:facet>
+                                                <f:facet name="input">
+                                                    <p:calendar
+                                                        value="#{unit.rentalIntentDateStopUtil}"
+                                                        mode="popup"
+                                                        showOn="button"
+                                                        pattern="EEE, dd MMM, yyyy"
+                                                        navigator="true"
+                                                        showButtonPanel="true"
+                                                        showTodayButton="true"
+                                                        required="false"/>
+                                                </f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+                                        <p:column headerText="Rental notes">
                                             <p:cellEditor>
                                                 <f:facet name="output">
                                                     <h:outputText value="#{unit.rentalNotes}" />
@@ -94,10 +147,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </p:cellEditor>
                                         </p:column>
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Unit Description" />
-                                            </f:facet>
+                                        <p:column headerText="Unit Description">
                                             <p:cellEditor>
                                                 <f:facet name="output">
                                                     <h:outputText value="#{unit.notes}" />
@@ -110,23 +160,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </p:cellEditor>
                                         </p:column>
 
-                                        <p:column style="width:40px">
-                                            <f:facet name="header">
-                                                <h:outputText value="Edit?" />
-                                            </f:facet>
+                                        <p:column style="width:40px" headerText="Edit?">
                                             <p:rowEditor/>
                                         </p:column>
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Remove?" />
-                                            </f:facet>
-                                            <p:commandButton ajax="true" value="Remove" 
-                                                             action="#{occPermitManageBB.removeSelectedUnit(unit)}"
-                                                             update="#{p:component('propertyUnits')}
-                                                             manage-units-info-form"/>                                      
+                                        <p:column headerText="Remove?">
+                                            <p:selectBooleanButton onLabel="Active" offLabel="Deactivated" id="button-editunits-deactivateunit" 
+                                                                   value="#{unit.active}" 
+                                                                   disabled="#{unit.unitID==0}"
+                                                                   />                                      
                                         </p:column>
-
                                     </p:dataTable>
 
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
@@ -158,6 +201,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                        value="Accept Occupancy Permit Application" />
                                     </div>
 
+                                    <p:spacer/>
+
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
                                         <h:outputLabel styleClass="data_field_label" 
                                                        value="Please type a message explaining your approval of their application. This message, your name, and a timestamp 
@@ -166,17 +211,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <p:inputTextarea id="acceptMessageITA" style="width: 300px; height: 200px;" value="#{occPermitManageBB.acceptApplicationMessage}"/>
                                     </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <p:commandButton actionListener="#{occPermitManageBB.attachToOccPeriod()}"
-                                                         value="Accept Permit and Attach to OccPeriod" icon="fa fa-link"/>
-                                    </div>
-
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <p:commandButton value="Cancel" icon="fa fa-stop" 
-                                                         actionListener="#{occPermitManageBB.cancelAttachment()}"/>
-                                    </div>
-
                                 </div>
+
+                                <p:commandButton action="#{occPermitManageBB.attachToOccPeriod()}"
+                                                 value="Accept Permit and Attach to OccPeriod" icon="fa fa-link"/>
+                                <p:commandButton value="Cancel" icon="fa fa-stop" 
+                                                 action="#{occPermitManageBB.cancelAttachment()}"/>
 
                             </h:form>
 

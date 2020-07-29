@@ -186,6 +186,9 @@ public class    SessionBean
     private PublicInfoBundlePerson occPermitApplicant;
     private PublicInfoBundlePerson occPermitPreferredContact;
     
+    //Fields only used internally
+    private boolean unitDetermined;
+    
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                        X Payment                               <<< */
     /* >>> -------------------------------------------------------------- <<< */
@@ -1347,4 +1350,12 @@ public class    SessionBean
         this.occPermitPreferredContact = occPermitPreferredContact;
     }
 
+    public boolean isUnitDetermined() {
+        return unitDetermined;
+    }
+
+    public void setUnitDetermined(boolean unitDetermined) {
+        this.unitDetermined = unitDetermined;
+    }
+    
 }

@@ -1260,27 +1260,28 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     public void updateOccPermitApplication(OccPermitApplication application) throws IntegrationException {
-        String query = "UPDATE public.occupancypermitapplication"
-                + "SET multiunit=?, reason_reasonid=?, submissiontimestamp=?, "
-                + "submitternotes=?, internalnotes=?, propertyunitid=?, externalnotes=?, status=?::occapplicationstatus"
-                + "WHERE occupancypermitapplication.applicationid = ?;";
+        String query = "UPDATE public.occpermitapplication "
+                + "SET reason_reasonid=?, submissiontimestamp=?, "
+                + "submitternotes=?, internalnotes=?, propertyunitid=?, externalnotes=?, status=?::occapplicationstatus "
+                + "WHERE occpermitapplication.applicationid = ?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(2, application.getReason().getId());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
-            stmt.setString(4, application.getSubmissionNotes());
-            stmt.setString(5, application.getInternalNotes());
-            stmt.setString(6, String.valueOf(application.getApplicationPropertyUnit().getUnitID()));
-            stmt.setString(7, application.getExternalPublicNotes());
-            stmt.setString(8, application.getStatus().name());
-            stmt.setInt(9, application.getId());
+            stmt.setInt(1, application.getReason().getId());
+            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
+            stmt.setString(3, application.getSubmissionNotes());
+            stmt.setString(4, application.getInternalNotes());
+            stmt.setString(5, String.valueOf(application.getApplicationPropertyUnit().getUnitID()));
+            stmt.setString(6, application.getExternalPublicNotes());
+            stmt.setString(7, application.getStatus().name());
+            stmt.setInt(8, application.getId());
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
+            System.out.println("OccupancyIntegrator.updateOccPermitApplication() | ERROR: " + ex);
             throw new IntegrationException("OccupancyInspectionIntegrator.updateOccPermitApplication"
                     + " | IntegrationException: Unable to update occupancy permit application ", ex);
         } finally {

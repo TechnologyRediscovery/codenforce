@@ -33,11 +33,13 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -56,6 +58,8 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
     private boolean unitAlreadyDetermined; //used by occPermitNewPeriod.xhtml to flag whether or not the selected path has already determined a unit.
     private PropertyUnit unitForApplication;
     private Property propertyForApplication;
+    private List<ViewOptionsActiveListsEnum> allViewOptions;
+    private ViewOptionsActiveListsEnum currentViewOption;
 
     private OccPermitApplication searchParams;
     private List<OccApplicationStatusEnum> statusList;
@@ -74,6 +78,7 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
     private OccPermitApplication selectedApplication;
 //    private QueryOccPermitApplication selectedQueryOccApplicaton;
     private List<OccPermitApplication> applicationList;
+    private List<PropertyUnit> unitList;
 
     public OccPermitManageBB() {
     }
@@ -94,6 +99,10 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
 
         selectedApplication = getSessionBean().getSessOccPermitApplication();
 
+        unitAlreadyDetermined = getSessionBean().isUnitDetermined();
+        
+        
+        
         try {
             PropertyCoordinator pc = getPropertyCoordinator();
             propertyForApplication = pc.getPropertyByPropUnitID(selectedApplication.getApplicationPropertyUnit().getUnitID());
@@ -101,6 +110,14 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
             System.out.println("OccPermitManageBB.initBean() | ERROR: " + ex);
         } catch (NullPointerException ex) {
             //do nothing, this is just to check if anything is null in the method call above
+        }
+        
+        allViewOptions = Arrays.asList(ViewOptionsActiveListsEnum.values());
+
+        if (currentViewOption == null && propertyForApplication != null) {
+
+            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
+
         }
 
         //initialize default setting         
@@ -146,9 +163,6 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
         try {
             applicationList = oi.getOccPermitApplicationList();
 
-            if (selectedApplication != null) {
-                selectedApplication = oi.getOccPermitApplication(selectedApplication.getId());
-            }
         } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -313,7 +327,22 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
 
     public String attachToOccPeriod() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         try {
+            
+            if(!unitAlreadyDetermined){
+
+                //If we edited the unit list, let's save it to the database
+                
+                List<PropertyUnit> temp = pc.applyUnitList(unitList, propertyForApplication);
+            
+                for(PropertyUnit unit : temp){
+                    if (unit.getUnitNumber().contentEquals(selectedApplication.getApplicationPropertyUnit().getUnitNumber())){
+                        selectedApplication.setApplicationPropertyUnit(unit);
+                    }
+                }
+            }
+            
             int newPeriodID = oc.attachApplicationToNewOccPeriod(selectedApplication, acceptApplicationMessage);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Application successfully attached to Occ Period!", ""));
@@ -356,6 +385,8 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
         
         getSessionBean().getNavStack().pushCurrentPage();
         
+        getSessionBean().setUnitDetermined(true);
+        
         return "occPermitNewPeriod";
         
     }
@@ -367,6 +398,8 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
         getSessionBean().setSessOccPermitApplication(selectedApplication);
         
         getSessionBean().getNavStack().pushCurrentPage();
+        
+        getSessionBean().setUnitDetermined(false);
         
         return "occPermitNewPeriod";
         
@@ -617,4 +650,65 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
         this.acceptApplicationMessage = acceptApplicationMessage;
     }
 
+    public List<ViewOptionsActiveListsEnum> getAllViewOptions() {
+        return allViewOptions;
+    }
+
+    public void setAllViewOptions(List<ViewOptionsActiveListsEnum> allViewOptions) {
+        this.allViewOptions = allViewOptions;
+    }
+
+    public ViewOptionsActiveListsEnum getCurrentViewOption() {
+        return currentViewOption;
+    }
+
+    public void setCurrentViewOption(ViewOptionsActiveListsEnum input) {
+
+        currentViewOption = input;
+
+        unitList = new ArrayList<>();
+
+        if (null == currentViewOption) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to set the current view option. Returning to default.", ""));
+            currentViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
+        } else {
+            switch (currentViewOption) {
+                case VIEW_ALL:
+                    unitList.addAll(propertyForApplication.getUnitList());
+                    break;
+
+                case VIEW_ACTIVE:
+                    for (PropertyUnit unit : propertyForApplication.getUnitList()) {
+                        if (unit.isActive()) {
+                            unitList.add(unit);
+                        }
+                    }
+
+                    break;
+
+                case VIEW_INACTIVE:
+                    for (PropertyUnit unit : propertyForApplication.getUnitList()) {
+                        if (!unit.isActive()) {
+                            unitList.add(unit);
+                        }
+                    }
+
+                    break;
+            }
+
+        }
+
+        
+    }
+
+    public List<PropertyUnit> getUnitList() {
+        return unitList;
+    }
+
+    public void setUnitList(List<PropertyUnit> unitList) {
+        this.unitList = unitList;
+    }
+    
 }
