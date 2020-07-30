@@ -51,7 +51,7 @@ import javax.faces.event.ActionEvent;
  *
  * @author Nathan Dietz
  */
-public class OccPermitManageBB extends BackingBeanUtils implements Serializable {
+public class OccPermitApplicationManageBB extends BackingBeanUtils implements Serializable {
 
     private String currentMode;
     private boolean currentApplicationSelected;
@@ -80,7 +80,7 @@ public class OccPermitManageBB extends BackingBeanUtils implements Serializable 
     private List<OccPermitApplication> applicationList;
     private List<PropertyUnit> unitList;
 
-    public OccPermitManageBB() {
+    public OccPermitApplicationManageBB() {
     }
 
     @PostConstruct

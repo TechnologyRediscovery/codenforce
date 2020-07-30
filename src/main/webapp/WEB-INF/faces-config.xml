@@ -1013,10 +1013,10 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>occPermitManageBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPermitManageBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>occPermitApplicationManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPermitApplicationManageBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>occPermitBB</managed-bean-name>

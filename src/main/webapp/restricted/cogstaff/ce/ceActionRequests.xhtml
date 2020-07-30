@@ -59,7 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                            >
                                             <f:selectItem itemLabel="SEARCH" itemValue="Search"  />
                                             <f:selectItem itemLabel="ACTIONS" itemValue="Actions"  />
-                                            <f:selectItem itemLabel="OBJECTS" itemValue="Objects"  />
+                                            <f:selectItem itemLabel="CONNECTIONS" itemValue="Objects"  />
                                             <f:selectItem itemLabel="NOTES" itemValue="Notes"  />
 
                                             <f:ajax render="@all"/>
@@ -538,11 +538,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </p:panel>
 
 
-                                        <!--Objects Table-->
+                                        <!--Connections Table-->
                                         <p:panel id="cearManage-panel-objects"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="Objects Panel"
+                                                 header="Connections Panel"
                                                  rendered="#{cEActionRequestsBB.getActiveObjectsMode()}"
                                                  >
 
