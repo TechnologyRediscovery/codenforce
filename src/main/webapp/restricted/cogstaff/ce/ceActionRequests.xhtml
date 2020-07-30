@@ -402,6 +402,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <div class="cearActionsTableOutputLabel">
                                                             <h:outputText id="selr-attachedCase" 
                                                                           value="#{cEActionRequestsBB.selectedRequest.caseID == 0 ? null : cEActionRequestsBB.selectedRequest.caseID}"/>
+                                                            <p:commandButton value="Go to CECase" icon="fa fa-folder" action="#{cEActionRequestsBB.goToCase()}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>

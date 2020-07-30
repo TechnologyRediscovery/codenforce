@@ -324,6 +324,24 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         currentCEARSelected = false;
     }
     
+    public String goToCase(){
+        
+        CaseCoordinator cc = getCaseCoordinator();
+        try{
+        CECase cse = cc.getCECase(selectedRequest.getCaseID());
+        
+        getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(cse, getSessionBean().getSessUser().getMyCredential()));
+        
+        return "ceCaseWorkflow";
+        } catch (BObStatusException | IntegrationException | SearchException ex){
+            System.out.println("CEActionRequestsBB.goToCase() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to redirect you to the CE Case Workflow.", ""));
+            return "";
+        }
+    }
+    
     public void prepareReportMultiCEAR(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();

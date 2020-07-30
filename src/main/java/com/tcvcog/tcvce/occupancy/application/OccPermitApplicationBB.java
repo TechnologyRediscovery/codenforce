@@ -19,6 +19,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
+import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -731,17 +732,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             //If there is no contactPerson specified, it defaults to the applicant.
             currentApplication.setPreferredContact(exportedPerson);
 
-            List<Person> exportedPeople = new ArrayList<>();
-
+            currentApplication.setAttachedPersons(new ArrayList<PersonOccPeriod>());
+            
             for (PublicInfoBundlePerson attachedPerson : attachedPersons) {
 
                 exportedPerson = pic.export(attachedPerson);
 
-                exportedPeople.add(exportedPerson);
+                currentApplication.getAttachedPersons().add((PersonOccPeriod) exportedPerson);
 
             }
-
-            currentApplication.setAttachedPersons(exportedPeople);
 
             oc.insertOccPermitApplication(currentApplication);
 

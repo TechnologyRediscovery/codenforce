@@ -1168,26 +1168,25 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             occpermitapp.setStatus(OccApplicationStatusEnum.valueOf(rs.getString("status")));
             occpermitapp.setExternalPublicNotes(rs.getString("externalnotes"));
             
-            List<Person> personList = new ArrayList<>();
-            
             if(occpermitapp.getConnectedPeriod() != null)
             {
             
-            for (PersonOccPeriod skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
+                occpermitapp.setAttachedPersons(new ArrayList<PersonOccPeriod>());
                 
-                if (skeleton.isApplicant()){
-                    occpermitapp.setApplicantPerson(skeleton);
+                for (PersonOccPeriod skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
+
+                    if (skeleton.isApplicant()){
+                        occpermitapp.setApplicantPerson(skeleton);
+                    }
+
+                    if(skeleton.isPreferredContact()){
+                        occpermitapp.setPreferredContact(skeleton);
+                    }
+
+                    occpermitapp.getAttachedPersons().add(skeleton);
+
                 }
-                
-                if(skeleton.isPreferredContact()){
-                    occpermitapp.setPreferredContact(skeleton);
-                }
-                
-                personList.add(skeleton);
-                
             }
-            }
-            occpermitapp.setAttachedPersons(personList);
             
         } catch (SQLException ex) {
             System.out.println("OccupancyIntegrator.generateOccPermitApplication() | ERROR: " + ex);
@@ -1507,7 +1506,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
-        List<Person> applicationPersons = application.getAttachedPersons();
+        List<PersonOccPeriod> applicationPersons = application.getAttachedPersons();
         for (Person person : applicationPersons) {
             try {
                 stmt = con.prepareStatement(query);

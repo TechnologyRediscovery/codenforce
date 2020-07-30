@@ -343,20 +343,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-                                                    
+
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Connected to OccPeriod?"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearActionsTableOutputLabel">
                                                             <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.connectedPeriod.periodID == 0 ? 'Not connected' :  occPermitApplicationManageBB.selectedApplication.connectedPeriod.periodID}"/>
+                                                            <p:commandButton value="Go to OccPeriod" icon="fa fa-folder" action="#{occPermitApplicationManageBB.goToOccPeriod()}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-                                                    
+
                                                     <p:spacer/>
-                                                    
+
                                                     <p:spacer/>
-                                                    
+
                                                     <p:spacer/>
 
                                                     <p:commandButton    id="open-new-period-cb"
@@ -435,12 +436,281 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
-                                                    
+                                                    <h2>Property Unit:</h2>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Unit ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.unitID}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Property ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.propertyID}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Unit Number:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.unitNumber}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Other Known Address:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.otherKnownAddress}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Rental Intent Date Start:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalIntentDateStart}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Rental Intent Date Stop:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalIntentDateStop}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Rental Intent Last Updated By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalIntentLastUpdatedBy.person.firstName} #{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalIntentLastUpdatedBy.person.lastName} ID:(#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalIntentLastUpdatedBy.person.personID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.notes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Rental Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Active?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.active ? 'Yes' : 'No'}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Edit unit list for this property?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:commandButton    id="edit-unit-list-cb"
+                                                                                value="Edit"
+                                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
+                                                                                onclick="PF('').show()"
+                                                                                icon="fa fa-gears"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
                                                 </p:panelGrid>
 
-                                                <p:spacer height="10px" />
+                                                <h2>Attached Persons:</h2>
 
+                                                <p:dataTable id="attached-persons" 
+                                                             var="person" 
+                                                             value="#{occPermitApplicationManageBB.attachedPersons}" 
+                                                             scrollable="true" scrollHeight="300"
+                                                             >
+
+                                                    <p:column headerText="Exp.">
+                                                        <p:rowToggler/>
+                                                    </p:column>
+
+                                                    <p:column headerText="ID:">
+                                                        <h:outputText value="#{person.personID}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Last Name:">
+                                                        <h:outputText value="#{person.lastName}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="First Name">
+                                                        <h:outputText value="#{person.firstName}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Person type:">
+                                                        <h:outputText value="#{person.personType.label}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Applicant?:">
+                                                        <h:outputText value="#{person.applicant ? 'Yes' : 'No'}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Preferred contact?:">
+                                                        <h:outputText value="#{person.preferredContact ? 'Yes' : 'No'}" />
+                                                    </p:column>
+                                                    
+                                                    <p:column headerText="Under 18?:">
+                                                        <h:outputText value="#{person.under18 ? 'Yes' : 'No'}" />
+                                                    </p:column>
+
+                                                    <p:rowExpansion>
+
+                                                        <div class="outlinedBox">
+
+                                                            <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                         columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Phone (cell)" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.phoneCell}" />
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Phone (home)" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.phoneHome}" />
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Phone (work)" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.phoneWork}" />
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Email" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.email}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Street" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.addressStreet}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="City" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.addressCity}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="State" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.addressState}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Zip Code" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.addressZip}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <p:spacer height="5px"/>
+
+                                                                <h:outputText styleClass="bold" value="Mailing address:"/>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Uses seperate mailing address?" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes' : 'No'}" />
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Street" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.mailingAddressStreet}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Third line" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.mailingAddressThirdLine}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+                                                                
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="City" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.mailingAddressCity}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="State" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.mailingAddressState}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Zip Code" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.mailingAddressZip}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                            </h:panelGrid>
+
+                                                        </div>
+
+                                                    </p:rowExpansion>
+
+                                                </p:dataTable>
+
+                                                <p:spacer height="5px" />
+
+                                                <p:commandButton    id="edit-person-list-cb"
+                                                                    value="Edit attached persons"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
+                                                                    action="#{occPermitApplicationManageBB.editAttachedPersons()}"
+                                                                    icon="fa fa-gears"/>
+
+                                                <p:spacer height="5px" />
+                                                
                                             </h:form>
                                         </p:panel>
 
@@ -463,7 +733,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              >
 
                                                     <!--TODO: add note editing buttons and dialogues-->
-                                                    
+
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Submission Notes:"/>
                                                         <p:spacer height="5px"/>
@@ -472,7 +742,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-                                                    
+
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Internal Notes:"/>
                                                         <p:spacer height="5px"/>
@@ -481,7 +751,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-                                                    
+
                                                     <h:panelGroup>
                                                         <p:outputLabel value="External (Public) Notes:"/>
                                                         <p:spacer height="5px"/>

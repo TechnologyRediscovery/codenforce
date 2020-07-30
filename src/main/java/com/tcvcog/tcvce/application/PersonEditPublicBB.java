@@ -21,12 +21,10 @@ import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.List;
 import javax.annotation.PostConstruct;
 
 /**
@@ -78,7 +76,7 @@ public class PersonEditPublicBB extends BackingBeanUtils implements Serializable
     public String addCloneToApplicantPersons(Person clone) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         pi.updatePerson(clone);
-        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add(clone);
+        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add((PersonOccPeriod) clone);
         OccupancyCoordinator oc = getOccupancyCoordinator();
         oc.verifyOccPermitPersonsRequirement(getSessionBean().getSessOccPermitApplication());
         return "managePeople";

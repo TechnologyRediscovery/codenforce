@@ -70,6 +70,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
+import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -88,7 +89,7 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
  * @author ellen bascomb of apt 31y
  */
 public class OccupancyCoordinator extends BackingBeanUtils implements Serializable {
-
+    
     private final int MINIMUM_RANK_INSPECTOREVENTS = 5;
     private final int MINIMUM_RANK_STAFFEVENTS = 3;
     private final int DEFAULT_OCC_PERIOD_START_DATE_OFFSET = 30;
@@ -118,7 +119,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             System.out.println(ex);
         }
         return op;
-
+        
     }
 
     /**
@@ -135,15 +136,15 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oppu.setPropUnitProp(pc.getPropertyUnitWithProp(oppu.getPropertyUnitID()));
         return oppu;
     }
-
+    
     public List<OccPeriodPropertyUnitHeavy> getOccPeriodPropertyUnitHeavy(List<OccPeriod> perList) throws IntegrationException {
         List<OccPeriodPropertyUnitHeavy> oppuList = new ArrayList<>();
         for (OccPeriod op : perList) {
             oppuList.add(OccupancyCoordinator.this.getOccPeriodPropertyUnitHeavy(op.getPeriodID()));
         }
-
+        
         return oppuList;
-
+        
     }
 
     /**
@@ -158,14 +159,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         if (per == null || cred == null) {
             throw new BObStatusException("Cannot assemble an OccPeriod data heavy without base period or Credential");
         }
-
+        
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
         PaymentIntegrator pai = getPaymentIntegrator();
         WorkflowCoordinator chc = getWorkflowCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         EventCoordinator ec = getEventCoordinator();
-
+        
         OccPeriodDataHeavy opdh = new OccPeriodDataHeavy(per);
 
         // now get all the lists from their respective integrators
@@ -207,19 +208,19 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             opdh.setPermitList(oi.getOccPermitList(opdh));
             // BLOB LIST
             opdh.setBlobIDList(oi.getBlobList(opdh));
-
+            
             opdh.setGoverningInspection(designateGoverningInspection(opdh));
-
+            
         } catch (BObStatusException | SearchException | EventException | AuthorizationException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
         }
-
+        
         return opdh;
-
+        
     }
-
+    
     public List<OccPeriodType> getOccPeriodTypesFromProfileID(int profileID) {
-
+        
         OccupancyIntegrator oi = getOccupancyIntegrator();
         List<OccPeriodType> typeList = new ArrayList<>();
         try {
@@ -228,7 +229,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             System.out.println(ex.toString());
         }
         return typeList;
-
+        
     }
 
     /**
@@ -247,7 +248,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         // TODO: Write logic for occperiod status
         opdh.setStatus(OccPeriodStatusEnum.UNKNOWN);
-
+        
         return opdh;
     }
 
@@ -266,12 +267,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccPeriod configureOccPeriod(OccPeriod period)
             throws EventException, AuthorizationException, IntegrationException, BObStatusException, ViolationException {
         return period;
-
+        
     }
-
+    
     public List<OccPeriod> assembleOccPeriodHistoryList(Credential cred) {
         OccupancyIntegrator oi = getOccupancyIntegrator();
-
+        
         List<OccPeriod> opList = new ArrayList<>();
         try {
             for (Integer i : oi.getOccPeriodHistoryList(cred.getGoverningAuthPeriod().getUserID())) {
@@ -280,9 +281,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-
+        
         return opList;
-
+        
     }
 
     /**
@@ -298,7 +299,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 //            }
 //        }
     }
-
+    
     public OccInspection configureOccInspection(OccInspection inspection) {
         boolean allSpacesPassed = true;
         if (inspection != null) {
@@ -316,12 +317,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
         return inspection;
     }
-
+    
     public OccInspectedSpace configureOccInspectedSpace(OccInspectedSpace inSpace) {
         SystemIntegrator si = getSystemIntegrator();
         boolean atLeastOneElementInspected = false;
         boolean allElementsPass = true;
-
+        
         for (OccInspectedSpaceElement inSpaceEle : inSpace.getInspectedElementList()) {
             configureOccInspectedSpaceElement(inSpaceEle);
             if (inSpaceEle.getStatus().getStatusEnum() == OccInspectionStatusEnum.FAIL) {
@@ -330,11 +331,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 atLeastOneElementInspected = true;
             }
         }
-
+        
         int iconID = 0;
         try {
             if (!atLeastOneElementInspected) {
-
+                
                 inSpace.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.NOTINSPECTED));
                 iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()));
@@ -342,7 +343,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 //                System.out.println("OccupancyCoordinator.configureOccInspectedSpace | NOTINSPEC inspectedSpaceID: " + inSpace.getInspectedSpaceID());
 
             } else if (atLeastOneElementInspected && !allElementsPass) {
-
+                
                 inSpace.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.FAIL));
                 iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString(OccInspectionStatusEnum.FAIL.getIconPropertyLookup()));
@@ -350,7 +351,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 //                System.out.println("OccupancyCoordinator.configureOccInspectedSpace | FAIL inspectedSpaceID: " + inSpace.getInspectedSpaceID());
 
             } else {
-
+                
                 inSpace.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.PASS));
                 iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString(OccInspectionStatusEnum.PASS.getIconPropertyLookup()));
@@ -360,20 +361,20 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-
+        
         Collections.sort(inSpace.getInspectedElementList());
         return inSpace;
-
+        
     }
-
+    
     public OccInspectedSpaceElement configureOccInspectedSpaceElement(OccInspectedSpaceElement inSpaceEle) {
         SystemIntegrator si = getSystemIntegrator();
-
+        
         int iconID = 0;
-
+        
         try {
             if (inSpaceEle.getLastInspectedBy() != null && inSpaceEle.getComplianceGrantedTS() == null) {
-
+                
                 inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.FAIL));
                 iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString(OccInspectionStatusEnum.FAIL.getIconPropertyLookup()));
@@ -381,7 +382,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
 //                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | FAIL inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
             } else if (inSpaceEle.getLastInspectedBy() != null && inSpaceEle.getComplianceGrantedTS() != null) {
-
+                
                 inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.PASS));
                 iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString(OccInspectionStatusEnum.PASS.getIconPropertyLookup()));
@@ -389,7 +390,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 //                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | PASS inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
 
             } else {
-
+                
                 inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.NOTINSPECTED));
                 iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()));
@@ -402,26 +403,26 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
         return inSpaceEle;
     }
-
+    
     public List<EventType> getPermittedEventTypes(OccPeriod op, UserAuthorized u) {
         List<EventType> typeList = new ArrayList<>();
         int rnk = u.getRoleType().getRank();
-
+        
         if (rnk >= MINIMUM_RANK_INSPECTOREVENTS) {
             typeList.add(EventType.Action);
             typeList.add(EventType.Timeline);
         }
-
+        
         if (rnk >= MINIMUM_RANK_STAFFEVENTS) {
             typeList.add(EventType.Communication);
             typeList.add(EventType.Meeting);
             typeList.add(EventType.Custom);
             typeList.add(EventType.Occupancy);
         }
-
+        
         return typeList;
     }
-
+    
     public void updateOccPeriodPropUnit(OccPeriod period, PropertyUnit pu) throws IntegrationException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         period.setPropertyUnitID(pu.getUnitID());
@@ -455,41 +456,41 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             throw new AuthorizationException("Users must have enforcement official permissions to authorize an occupancy period");
         }
     }
-
+    
     public ReportConfigOccInspection getOccInspectionReportConfigDefault(OccInspection insp,
             OccPeriod period,
             User usr) throws IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
-
+        
         ReportConfigOccInspection rpt = new ReportConfigOccInspection();
         rpt.setGenerationTimestamp(LocalDateTime.now());
         rpt.setOccPeriod(period);
-
+        
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
         rpt.setCreator(usr);
         rpt.setMuni(getSessionBean().getSessMuni());
-
+        
         rpt.setDefaultItemIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()))));
-
+        
         rpt.setIncludeOccPeriodInfoHeader(true);
-
+        
         rpt.setIncludePhotos_pass(false);
         rpt.setIncludePhotos_fail(true);
-
+        
         rpt.setIncludeFullOrdText(false);
         rpt.setIncludeElementNotes(true);
-
+        
         rpt.setIncludeElementLastInspectedInfo(false);
         rpt.setIncludeElementComplianceInfo(false);
-
+        
         rpt.setIncludeRemedyInfo(false);
         rpt.setIncludeSignature(false);
-
+        
         rpt.setViewSetting(ViewOptionsOccChecklistItemsEnum.FAILED_ITEMS_ONLY);
         return rpt;
     }
-
+    
     public ReportConfigOccPermit getOccPermitReportConfigDefault(OccPermit permit,
             OccPeriod period,
             PropertyUnit propUnit,
@@ -497,7 +498,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         PropertyIntegrator pi = getPropertyIntegrator();
         ReportConfigOccPermit rpt = new ReportConfigOccPermit();
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occpermit_default_title"));
-
+        
         rpt.setPermit(permit);
         rpt.setPeriod(period);
         try {
@@ -506,30 +507,30 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             System.out.println(ex);
         }
         rpt.setCreator(u);
-
+        
         return rpt;
     }
-
+    
     public OccPermit getOccPermitSkeleton(User usr) {
         OccPermit permit = new OccPermit();
         permit.setDateIssued(LocalDateTime.now());
         permit.setIssuedBy(usr);
         return permit;
-
+        
     }
-
+    
     public OccLocationDescriptor getOccLocationDescriptorSkeleton() {
         return new OccLocationDescriptor();
     }
-
+    
     public int addNewLocationDescriptor(OccLocationDescriptor old) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         int freshLocID = 0;
         freshLocID = oii.insertLocationDescriptor(old);
-
+        
         return freshLocID;
     }
-
+    
     public OccInspection getOccInspectionSkeleton() {
         return new OccInspection();
     }
@@ -590,28 +591,28 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             MunicipalityDataHeavy muni) throws IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
         OccPeriod period = new OccPeriod();
-
+        
         period.setPropertyUnitID(pu.getUnitID());
         period.setType(perType);
-
+        
         period.setManager(u);
         period.setCreatedBy(u);
         period.setCreatedTS(LocalDateTime.now());
-
+        
         period.setStartDate(LocalDateTime.now().plusDays(DEFAULT_OCC_PERIOD_START_DATE_OFFSET));
         period.setStartDateCertifiedBy(null);
         period.setStartDateCertifiedTS(null);
-
+        
         if (period.getStartDate() != null) {
             period.setEndDate(period.getStartDate().plusDays(period.getType().getDefaultValidityPeriodDays()));
         }
         period.setEndDateCertifiedBy(null);
         period.setEndDateCertifiedTS(null);
-
+        
         period.setSource(si.getBOBSource(Integer.parseInt(
                 getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("occPeriodNewInternalBOBSourceID"))));
-
+        
         System.out.println("OccupancyCoordinator.intitializeNewOccPeriod | period: " + period);
         return period;
     }
@@ -639,7 +640,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccupancyIntegrator oi = getOccupancyIntegrator();
         EventIntegrator ei = getEventIntegrator();
         EventCoordinator ec = getEventCoordinator();
-
+        
         int freshOccPeriodID = oi.insertOccPeriod(op);
 
 //        OccPeriodDataHeavy opdh = oi.generateOccPeriodDataHeavy(oi.getOccPeriod(freshOccPeriodID));
@@ -649,7 +650,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 //            ec.rules_attachRuleSet(ers, opdh, u);
 //        }
         System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);
-
+        
         return freshOccPeriodID;
     }
 
@@ -674,10 +675,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             User user) throws InspectionException, IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccInspection inspec = null;
-
+        
         if (period.getType().isActive()
                 && period.getType().isInspectable()) {
-
+            
             if (in != null) {
                 inspec = in;
             } else {
@@ -763,7 +764,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 default:
                     inspEle.setLastInspectedBy(null);
                     inspEle.setLastInspectedTS(null);
-
+                
             }
             inElementList.add(inspEle);
             // each element in this space gets a reference to the same OccLocationDescriptor object
@@ -789,15 +790,15 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         // check sequence by retrieving new inspected space and displaying info
         inspSpace = inspecInt.getInspectedSpace(inspSpace.getSpaceID());
         System.out.println("OccucpancyCoordinator.inpectionAction_commenceSpaceInspection | retrievedInspectedSpaceid= " + inspSpace);
-
+        
         return inspection;
     }
-
+    
     public void inspectionAction_updateSpaceElementData(OccInspection inspection) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
+        
     }
-
+    
     public OccPermitApplication getNewOccPermitApplication() {
         OccPermitApplication occpermitapp = new OccPermitApplication();
         occpermitapp.setSubmissionDate(LocalDateTime.now());
@@ -814,11 +815,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      */
     public void editOccPeriod(OccPeriod period, UserAuthorized ua) throws IntegrationException, BObStatusException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
-
+        
         if (period.getAuthorizedTS() != null) {
             throw new BObStatusException("Cannot change period type or manager on an authorized period; the period must first be unauthorized");
         }
-
+        
         oi.updateOccPeriod(period);
     }
 
@@ -834,17 +835,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccupancyIntegrator oi = getOccupancyIntegrator();
         oi.updateOccPeriod(period);
     }
-
+    
     public void updateOccInspection(OccInspection is, User u) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         oii.updateOccInspection(is);
-
+        
     }
-
+    
     public void activateOccInspection(OccInspection is) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         oii.activateOccInspection(is);
-
+        
     }
 
     /**
@@ -858,7 +859,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         boolean isRequirementSatisfied = true;
         OccAppPersonRequirement pr = opa.getReason().getPersonsRequirement();
         List<PersonType> requiredPersonTypes = pr.getRequiredPersonTypes();
-        List<Person> applicationPersons = opa.getAttachedPersons();
+        List<Person> applicationPersons = new ArrayList<>();
+        for (PersonOccPeriod skeleton : opa.getAttachedPersons()) {
+            applicationPersons.add(skeleton);
+        }
         List<PersonType> applicationPersonTypes = new ArrayList<>();
         for (Person applicationPerson : applicationPersons) {
             applicationPersonTypes.add(applicationPerson.getPersonType());
@@ -881,14 +885,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.EventException
      */
-    public int insertOccPermitApplication(OccPermitApplication application) 
-            throws IntegrationException, AuthorizationException, 
+    public int insertOccPermitApplication(OccPermitApplication application)
+            throws IntegrationException, AuthorizationException,
             BObStatusException, EventException {
-
+        
         OccupancyIntegrator opi = getOccupancyIntegrator();
-
+        
         OccPeriod connectedPeriod = null;
-
+        
         if (getSessionBean().getSessUser() != null) {
             //if we are in the middle of an internal session, the muni will be stored in the SessMuni field.
             connectedPeriod = getOccPeriod(getSessionBean().getSessMuni().getDefaultOccPeriodID());
@@ -896,22 +900,22 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             //if sessUser is null, we're in an external session, which stores the current muni in sessMuniQueued
             MunicipalityCoordinator mc = getMuniCoordinator();
             UserCoordinator uc = getUserCoordinator();
-
+            
             MunicipalityDataHeavy temp = mc.assembleMuniDataHeavy(getSessionBean().getSessMuniQueued(), uc.getPublicUserAuthorized().getMyCredential());
-
+            
             connectedPeriod = getOccPeriod(temp.getDefaultOccPeriodID());
-
+            
         }
         application.setConnectedPeriod(connectedPeriod);
-
+        
         int applicationId = opi.insertOccPermitApplication(application);
-
+        
         application.setId(applicationId);
         
         opi.insertOccApplicationPersons(application);
-
+        
         return applicationId;
-
+        
     }
 
     /**
@@ -931,38 +935,38 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             throws IntegrationException, AuthorizationException,
             BObStatusException, EventException,
             InspectionException, ViolationException {
-
+        
         PropertyIntegrator pri = getPropertyIntegrator();
         MunicipalityCoordinator mc = getMuniCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
         UserAuthorized user = getSessionBean().getSessUser();
         OccupancyIntegrator oi = getOccupancyIntegrator();
-
+        
         Property prop = pri.getPropertyUnitWithProp(application.getApplicationPropertyUnit().getUnitID()).getProperty();
-
+        
         MunicipalityDataHeavy muni = mc.assembleMuniDataHeavy(prop.getMuni(), user.getMyCredential());
-
+        
         OccPeriod connectedPeriod = initOccPeriod(
                 prop,
                 application.getApplicationPropertyUnit(),
                 application.getReason().getProposalPeriodType(),
                 user,
                 muni);
-
+        
         connectedPeriod.setNotes(sc.formatAndAppendNote(user, notes, connectedPeriod.getNotes()));
-
+        
         connectedPeriod.setSource(si.getBOBSource(
                 Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("occPeriodPublicUserBOBSourceID"))));
-
+        
         int newPeriodID = addOccPeriod(connectedPeriod, user);
 
         //Now we need to update the Application with the fact that it was ttached
         connectedPeriod.setPeriodID(newPeriodID);
-
+        
         application.setConnectedPeriod(connectedPeriod);
-
+        
         MessageBuilderParams mcc = new MessageBuilderParams();
         mcc.setUser(getSessionBean().getSessUser());
         mcc.setExistingContent(application.getExternalPublicNotes());
@@ -975,56 +979,56 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             mcc.setExplanation(getResourceBundle(Constants.MESSAGE_TEXT).getString("acceptedExistingUnitOccPermitApplicationExplanation"));
         }
         mcc.setNewMessageContent(notes);
-
+        
         application.setExternalPublicNotes(sc.appendNoteBlock(mcc));
-
+        
         oi.updateOccPermitApplication(application);
-
+        
         return newPeriodID;
-
+        
     }
-
+    
     public void inspectionAction_removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         oii.deleteInspectedSpace(spc);
     }
-
+    
     public void inspectionAction_recordComplianceWithInspectedElement(OccInspectedSpaceElement oise,
             User u,
             OccInspection oi) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
+        
         oise.setComplianceGrantedBy(u);
         oise.setComplianceGrantedTS(LocalDateTime.now());
         oise.setLastInspectedTS(LocalDateTime.now());
         oise.setLastInspectedBy(u);
-
+        
         oii.updateInspectedSpaceElement(oise);
     }
-
+    
     public void clearInspectionOfElement(OccInspectedSpaceElement oise,
             User u,
             OccInspection oi) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
+        
         oise.setComplianceGrantedBy(null);
         oise.setComplianceGrantedTS(null);
         oise.setLastInspectedTS(null);
         oise.setLastInspectedBy(null);
-
+        
         oii.updateInspectedSpaceElement(oise);
     }
-
+    
     public void inspectionAction_inspectWithoutCompliance(OccInspectedSpaceElement oise,
             User u,
             OccInspection oi) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
+        
         oise.setComplianceGrantedBy(null);
         oise.setComplianceGrantedTS(null);
         oise.setLastInspectedTS(LocalDateTime.now());
         oise.setLastInspectedBy(u);
-
+        
         oii.updateInspectedSpaceElement(oise);
     }
 
@@ -1052,16 +1056,16 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         return oii.getOccChecklistTemplatelist();
     }
-
+    
     public List<OccSpaceTypeInspectionDirective> getOccSpaceTypeList(int checklistid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         return oii.getOccInspecTemplateSpaceTypeList(checklistid);
     }
-
+    
     public OccSpaceTypeInspectionDirective getOccSpaceTypeSkeleton() {
         return new OccSpaceTypeInspectionDirective(new OccSpaceType());
     }
-
+    
     public void addNewChecklistSpacetype(int checklistid, OccSpaceTypeInspectionDirective os) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccSpaceType st = (OccSpaceType) os;
@@ -1071,9 +1075,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         os.setSpaceTypeID(currentSpaceTypeId);
         //Inserting occchecklistspacetype table
         oii.insertOccChecklistSpaceType(checklistid, os);
-
+        
     }
-
+    
     public void updateChecklistSpacetype(OccSpaceTypeInspectionDirective os) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccSpaceType st = (OccSpaceType) os;
@@ -1082,10 +1086,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         //Updating occchecklistspacetype table
         oii.updateOccChecklistSpaceType(os);
     }
-
+    
     public void deleteChecklistSpacetype(OccSpaceTypeInspectionDirective os) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
+        
         for (OccSpace oss : os.getSpaceList()) {
             oii.detachElement(oss.getSpaceID());
         }
@@ -1096,13 +1100,13 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oii.deleteOccChecklistSpaceType(st);
         //Deleting occspacetype table
         oii.deleteSpaceType(st);
-
+        
     }
-
+    
     public OccSpace getOccSpaceSkeleton() {
         return new OccSpace();
     }
-
+    
     public void addNewChecklistSpace(OccSpace os, OccSpaceTypeInspectionDirective ost) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         int spacetypeid = ost.getSpaceTypeID();
@@ -1110,58 +1114,58 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         //Inserting space
         oii.insertSpace(os);
     }
-
+    
     public void updateChecklistSpace(OccSpace os) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         //Updating space
         oii.updateSpace(os);
     }
-
+    
     public void deleteChecklistSpace(OccSpace os) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
+        
         oii.detachElement(os.getSpaceID());
         //Deleting space
         oii.deleteSpace(os);
     }
-
+    
     public OccSpaceElement getOccSpaceElementSkeleton() {
         return new OccSpaceElement(new CodeElement());
     }
-
+    
     public void deleteChecklistElement(OccSpace os, int elementid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
         CodeElement ce = ci.getCodeElement(elementid);
         oii.detachCodeElementFromSpace(os, ce);
     }
-
+    
     public void createChecklistElement(OccSpace os, int elementid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
         CodeElement ce = ci.getCodeElement(elementid);
         oii.attachCodeElementToSpace(os, ce);
     }
-
+    
     public List<OccSpace> getSpacelist(int spacetypeid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         return oii.getOccSpaceList(spacetypeid);
     }
-
+    
     public OccSpace getSpace(int spaceid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         return oii.getOccSpace(spaceid);
     }
-
+    
     public OccChecklistTemplate getChecklistTemplate(int checklistid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         return oii.getChecklistTemplate(checklistid);
     }
-
+    
     public OccSpaceTypeInspectionDirective getSpaceType(int spacetypeid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         return oii.getOccInspecTemplateSpaceType(spacetypeid);
     }
-
+    
 } // close class
 

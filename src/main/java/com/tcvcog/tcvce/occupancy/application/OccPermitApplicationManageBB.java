@@ -25,7 +25,9 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
@@ -39,7 +41,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -78,7 +79,9 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     private OccPermitApplication selectedApplication;
 //    private QueryOccPermitApplication selectedQueryOccApplicaton;
     private List<OccPermitApplication> applicationList;
+
     private List<PropertyUnit> unitList;
+    private List<PersonOccPeriod> attachedPersons;
 
     public OccPermitApplicationManageBB() {
     }
@@ -100,9 +103,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         selectedApplication = getSessionBean().getSessOccPermitApplication();
 
         unitAlreadyDetermined = getSessionBean().isUnitDetermined();
-        
-        
-        
+
         try {
             PropertyCoordinator pc = getPropertyCoordinator();
             propertyForApplication = pc.getPropertyByPropUnitID(selectedApplication.getApplicationPropertyUnit().getUnitID());
@@ -111,7 +112,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         } catch (NullPointerException ex) {
             //do nothing, this is just to check if anything is null in the method call above
         }
-        
+
         allViewOptions = Arrays.asList(ViewOptionsActiveListsEnum.values());
 
         if (currentViewOption == null && propertyForApplication != null) {
@@ -215,10 +216,6 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
                 OccPermitApplication temp = (OccPermitApplication) itr.next();
 
-                //A variable that represents the result of a question we ask about an application.
-                //If the answer is different as the given search parameter, remove the application
-                boolean testCondition = false;
-
                 if (temp.getSubmissionDate().compareTo(queryBegin) < 0 || temp.getSubmissionDate().compareTo(queryEnd) > 0) {
                     itr.remove();
                 } else if (reason_ctl) {
@@ -233,7 +230,9 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
                     }
                 } else if (connectedOccPeriod_ctl) {
 
-                    testCondition = temp.getConnectedPeriod() != null && temp.getConnectedPeriod().getPeriodID() != 0; //test if an occperiod is connected
+                    //A variable that represents the result of a question we ask about an application.
+                    //If the answer is different as the given search parameter, remove the application
+                    boolean testCondition = temp.getConnectedPeriod() != null && temp.getConnectedPeriod().getPeriodID() != 0; //test if an occperiod is connected
 
                     if (testCondition != connectedOccPeriod_val) {
                         //if the test does not evaluate to our desired state, remove it
@@ -265,10 +264,14 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
             applicationList.add(application);
 
+            attachedPersons = application.getAttachedPersons();
+
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Currently Selected Application: " + application.getReason().getTitle() + "ID:(" + application.getId() + ")", ""));
         } else {
             defaultSetting();
+
+            attachedPersons = new ArrayList<>();
 
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Application: " + application.getReason().getTitle() + "ID:(" + application.getId() + ")", ""));
 
@@ -287,6 +290,26 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
             updateSelectedPermitStatus(newStatus);
             defaultSetting();
 
+        }
+
+    }
+
+    public String goToOccPeriod() {
+
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            getSessionBean().setSessOccPeriod(
+                    oc.assembleOccPeriodDataHeavy(
+                            selectedApplication.getConnectedPeriod(),
+                            getSessionBean().getSessUser().getMyCredential()));
+
+            return "occPeriodWorkflow";
+        } catch (BObStatusException | IntegrationException | SearchException ex) {
+            System.out.println("OccPermitApplicationManageBB.goToOccPeriod() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to redirect you to the Occ Period Workflow.", ""));
+            return "";
         }
 
     }
@@ -329,26 +352,25 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            
-            if(!unitAlreadyDetermined){
+
+            if (!unitAlreadyDetermined) {
 
                 //If we edited the unit list, let's save it to the database
-                
                 List<PropertyUnit> temp = pc.applyUnitList(unitList, propertyForApplication);
-            
-                for(PropertyUnit unit : temp){
-                    if (unit.getUnitNumber().contentEquals(selectedApplication.getApplicationPropertyUnit().getUnitNumber())){
+
+                for (PropertyUnit unit : temp) {
+                    if (unit.getUnitNumber().contentEquals(selectedApplication.getApplicationPropertyUnit().getUnitNumber())) {
                         selectedApplication.setApplicationPropertyUnit(unit);
                     }
                 }
             }
-            
+
             int newPeriodID = oc.attachApplicationToNewOccPeriod(selectedApplication, acceptApplicationMessage);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Application successfully attached to Occ Period!", ""));
-            
+
             selectedApplication.setConnectedPeriod(oc.getOccPeriod(newPeriodID));
-            
+
         } catch (AuthorizationException | EventException | InspectionException | IntegrationException | ViolationException ex) {
             System.out.println("OccPermitManageBB.attachToOccPeriod() | ERROR: " + ex);
             getFacesContext().addMessage(null,
@@ -377,34 +399,34 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         return getSessionBean().getNavStack().popLastPage();
     }
 
-    public String path1SpawnNewOccPeriod(){
-        
+    public String path1SpawnNewOccPeriod() {
+
         selectedApplication.setStatus(OccApplicationStatusEnum.OldUnit);
 
         getSessionBean().setSessOccPermitApplication(selectedApplication);
-        
+
         getSessionBean().getNavStack().pushCurrentPage();
-        
+
         getSessionBean().setUnitDetermined(true);
-        
+
         return "occPermitNewPeriod";
-        
+
     }
-    
-    public String path2NewUnitAndPeriod(){
-        
+
+    public String path2NewUnitAndPeriod() {
+
         selectedApplication.setStatus(OccApplicationStatusEnum.NewUnit);
 
         getSessionBean().setSessOccPermitApplication(selectedApplication);
-        
+
         getSessionBean().getNavStack().pushCurrentPage();
-        
+
         getSessionBean().setUnitDetermined(false);
-        
+
         return "occPermitNewPeriod";
-        
+
     }
-    
+
     public void path3AttachRejectionMessage(ActionEvent ev) {
 
         SystemCoordinator sc = getSystemCoordinator();
@@ -700,7 +722,14 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         }
 
-        
+    }
+
+    public List<PersonOccPeriod> getAttachedPersons() {
+        return attachedPersons;
+    }
+
+    public void setAttachedPersons(List<PersonOccPeriod> attachedPersons) {
+        this.attachedPersons = attachedPersons;
     }
 
     public List<PropertyUnit> getUnitList() {
@@ -710,5 +739,5 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     public void setUnitList(List<PropertyUnit> unitList) {
         this.unitList = unitList;
     }
-    
+
 }
