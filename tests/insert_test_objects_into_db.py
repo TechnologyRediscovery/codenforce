@@ -10,7 +10,7 @@ func_list = [
         )
         VALUES(
             1, 2, 3, 4
-        )
+        );
     """,
 
     """
@@ -19,7 +19,7 @@ func_list = [
         )
         VALUES(
             1, 2, 3, 4
-        )
+        );
     """,
 
 
@@ -29,7 +29,7 @@ func_list = [
         )
         VALUES(
             1, 2, 3, 4
-        )
+        );
     """,
 ]
 
@@ -38,7 +38,7 @@ func_list = [
 def main(port):
     with psycopg2.connect(port=port) as conn:
         with conn.cursor() as cursor:
-            [func() for func in func_list]
+            [cursor.execute(sql) for sql in func_list]
 
 
 if __name__ == "__main__":
