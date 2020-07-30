@@ -53,9 +53,11 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True):
         """
     global THE_PICKLER_COUNT
     initial_recursion = sys.getrecursionlimit()
-    with open(path.join(path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".pickle"), "wb") as f:
+    try:
         sys.setrecursionlimit(100000)
-        pickle.dump(obj, f)
-    if incr:
-        THE_PICKLER_COUNT += 1
-    sys.setrecursionlimit(initial_recursion)
+        with open(path.join(path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".pickle"), "wb") as f:
+            pickle.dump(obj, f)
+        if incr:
+            THE_PICKLER_COUNT += 1
+    finally:
+        sys.setrecursionlimit(initial_recursion)
