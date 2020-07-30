@@ -13,7 +13,6 @@ import _scrape as scrape
 import _events
 import _parse
 from _constants import Tally
-from _constants import GENERALINFO, BUILDING, TAX, SALES
 from _constants import DEFAULT_PROP_UNIT
 from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 

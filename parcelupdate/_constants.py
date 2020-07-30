@@ -1,5 +1,5 @@
 # TODO: Rename file. Or maybe move Tally to a new file. I don't want to because we already have too many files.
-# Allegheny County Property Assessment tabs
+# Allegheny County Property Assessment tabs.
 GENERALINFO = "GeneralInfo"
 BUILDING = "Building"
 TAX = "Tax"
