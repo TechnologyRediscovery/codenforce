@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Person info</title>
+        <title>Attach Period</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
@@ -81,7 +81,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         var="unit"
                                         value="#{occPermitApplicationManageBB.unitList}"
                                         selectionMode="single" tabindex="1"
-                                        selection="#{occPermitApplicationManageBB.unitForApplication}"
+                                        selection="#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit}"
                                         rowKey="#{unit.unitID}"
                                         editable="true">                                         
 
@@ -167,19 +167,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <p:column headerText="Remove?">
                                             <p:selectBooleanButton onLabel="Active" offLabel="Deactivated" id="button-editunits-deactivateunit" 
                                                                    value="#{unit.active}" 
-                                                                   disabled="#{unit.unitID==0}"
-                                                                   />                                      
+                                                                   rendered="#{unit.unitID!=0}" 
+                                                                   />
+                                            <p:commandButton ajax="true" value="Remove" 
+                                                             action="#{occPermitApplicationManageBB.removeSelectedUnit(unit)}"
+                                                             rendered="#{unit.unitID==0}"
+                                                             update="manage-units-info-form"/> 
                                         </p:column>
                                     </p:dataTable>
 
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
                                         <p:commandButton ajax="true" value="Add a unit" 
                                                          action="#{occPermitApplicationManageBB.addNewUnit()}"
-                                                         update="#{p:component('propertyUnits')}
-                                                         manage-units-info-form"/> 
+                                                         update="manage-units-info-form"/> 
                                     </div>
 
                                 </div>
+
+                                <script type="text/javascript">
+
+                                    $(function () {
+                                        $.extend(PF("datatable"), {
+                                            onKeyDown: function (e) {
+                                                var key = e.which,
+                                                        keyCode = $.ui.keyCode;
+
+                                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                    e.preventDefault();
+                                                }
+                                            },
+
+                                            onKeyUp: function (e, rowIndex) {
+                                                var key = e.which,
+                                                        keyCode = $.ui.keyCode;
+                                                //.ui-row-editor-check .ui-icon-check .ui-c
+                                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                    this.tbody
+                                                            .find('.ui-row-editor .ui-icon-check')
+                                                            .eq(rowIndex)
+                                                            .click();
+                                                }
+
+                                                if (key === keyCode.ESCAPE) {
+                                                    this.tbody
+                                                            .find('.ui-row-editor .ui-icon-close')
+                                                            .eq(rowIndex)
+                                                            .click();
+                                                }
+                                            }
+                                        });
+                                    });
+
+                                </script>
 
                             </h:form>
 
@@ -214,7 +253,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
                                 <p:commandButton action="#{occPermitApplicationManageBB.attachToOccPeriod()}"
-                                                 value="Accept Permit and Attach to OccPeriod" icon="fa fa-link"/>
+                                                 value="Accept Permit and Attach to OccPeriod" icon="fa fa-link"
+                                                 ajax="false"/>
                                 <p:commandButton value="Cancel" icon="fa fa-stop" 
                                                  action="#{occPermitApplicationManageBB.cancelAttachment()}"/>
 
@@ -231,42 +271,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </ui:composition>
 
     </h:body>
-
-    <script type="text/javascript">
-
-        $(function () {
-            $.extend(PF("datatable"), {
-                onKeyDown: function (e) {
-                    var key = e.which,
-                            keyCode = $.ui.keyCode;
-
-                    if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
-                        e.preventDefault();
-                    }
-                },
-
-                onKeyUp: function (e, rowIndex) {
-                    var key = e.which,
-                            keyCode = $.ui.keyCode;
-                    //.ui-row-editor-check .ui-icon-check .ui-c
-                    if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
-                        this.tbody
-                                .find('.ui-row-editor .ui-icon-check')
-                                .eq(rowIndex)
-                                .click();
-                    }
-
-                    if (key === keyCode.ESCAPE) {
-                        this.tbody
-                                .find('.ui-row-editor .ui-icon-close')
-                                .eq(rowIndex)
-                                .click();
-                    }
-                }
-            });
-        });
-
-    </script>
 
 </html>
 

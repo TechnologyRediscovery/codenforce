@@ -57,7 +57,6 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     private String currentMode;
     private boolean currentApplicationSelected;
     private boolean unitAlreadyDetermined; //used by occPermitNewPeriod.xhtml to flag whether or not the selected path has already determined a unit.
-    private PropertyUnit unitForApplication;
     private Property propertyForApplication;
     private List<ViewOptionsActiveListsEnum> allViewOptions;
     private ViewOptionsActiveListsEnum currentViewOption;
@@ -98,8 +97,6 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         statusList.addAll(Arrays.asList(OccApplicationStatusEnum.values()));
 
-        unitForApplication = getSessionBean().getSessPropertyUnit();
-
         selectedApplication = getSessionBean().getSessOccPermitApplication();
 
         unitAlreadyDetermined = getSessionBean().isUnitDetermined();
@@ -117,7 +114,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         if (currentViewOption == null && propertyForApplication != null) {
 
-            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
+            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ALL);
 
         }
 
@@ -338,7 +335,9 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     }
 
     public void removeSelectedUnit(PropertyUnit unit) {
+        if(unit.getUnitID() == 0) {
         propertyForApplication.getUnitList().remove(unit);
+        }
     }
 
     public void addNewUnit() {
@@ -351,6 +350,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     public String attachToOccPeriod() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
+
         try {
 
             if (!unitAlreadyDetermined) {
@@ -371,23 +371,23 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
             selectedApplication.setConnectedPeriod(oc.getOccPeriod(newPeriodID));
 
+            getSessionBean().setSessOccPermitApplication(selectedApplication);
+
+            return getSessionBean().getNavStack().popLastPage();
+
         } catch (AuthorizationException | EventException | InspectionException | IntegrationException | ViolationException ex) {
             System.out.println("OccPermitManageBB.attachToOccPeriod() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to attach the application to an Occ Period!", ""));
-            selectedApplication.setStatus(OccApplicationStatusEnum.Waiting);
+            return "";
         } catch (BObStatusException ex) {
             System.out.println("OccPermitManageBB.attachToOccPeriod() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to attach the application to an Occ Period: " + ex, ""));
-            selectedApplication.setStatus(OccApplicationStatusEnum.Waiting);
+            return "";
         }
-
-        getSessionBean().setSessOccPermitApplication(selectedApplication);
-
-        return getSessionBean().getNavStack().popLastPage();
     }
 
     public String cancelAttachment() {
@@ -487,6 +487,66 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
                             "Unable to write message to The Database",
                             "This is a system level error that must be corrected by a sys admin--sorries!."));
         }
+    }
+
+    public String editAttachedUnits() {
+
+        getSessionBean().setSessOccPermitApplication(selectedApplication);
+
+        getSessionBean().getNavStack().pushCurrentPage();
+
+        return "applicationUnitList";
+    }
+
+    public String acceptUnitListChanges() {
+
+        SystemCoordinator sc = getSystemCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+
+        if (selectedApplication.getApplicationPropertyUnit() == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a property unit for the application.", ""));
+            return "";
+        }
+
+        try {
+            //Let's first attach a message letting the user know the unit list at the property was changed.
+            MessageBuilderParams mcc = new MessageBuilderParams();
+            mcc.setUser(getSessionBean().getSessUser());
+            mcc.setExistingContent(selectedApplication.getExternalPublicNotes());
+            mcc.setHeader("UNITS CHANGED");
+            mcc.setExplanation("Some changes were made to the unit list of the property you filled out an application for. "
+                    + "The unit you applied for occupancy for may have been changed as well");
+            selectedApplication.setExternalPublicNotes(sc.appendNoteBlock(mcc));
+
+            List<PropertyUnit> temp = pc.applyUnitList(unitList, propertyForApplication);
+
+            for (PropertyUnit unit : temp) {
+                if (unit.getUnitNumber().contentEquals(selectedApplication.getApplicationPropertyUnit().getUnitNumber())) {
+                    selectedApplication.setApplicationPropertyUnit(unit);
+                }
+            }
+
+            oi.updateOccPermitApplication(selectedApplication);
+
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (IntegrationException ex) {
+            System.out.println("OccPermitManageBB.acceptUnitListChanges() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to save your changes.", ""));
+            return "";
+
+        } catch (BObStatusException ex) {
+            System.out.println("OccPermitManageBB.acceptUnitListChanges() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to save your changes: " + ex, ""));
+            return "";
+        }
+
     }
 
     public boolean isPathsDisabled() {
@@ -646,14 +706,6 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     public void setUnitAlreadyDetermined(boolean unitAlreadyDetermined) {
         this.unitAlreadyDetermined = unitAlreadyDetermined;
-    }
-
-    public PropertyUnit getUnitForApplication() {
-        return unitForApplication;
-    }
-
-    public void setUnitForApplication(PropertyUnit unitForApplication) {
-        this.unitForApplication = unitForApplication;
     }
 
     public Property getPropertyForApplication() {

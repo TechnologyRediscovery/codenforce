@@ -535,8 +535,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <p:commandButton    id="edit-unit-list-cb"
                                                                                 value="Edit"
                                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                                disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
-                                                                                onclick="PF('').show()"
+                                                                                disabled="#{occPermitApplicationManageBB.pathsDisabled}"
+                                                                                action="#{occPermitApplicationManageBB.editAttachedUnits()}"
                                                                                 icon="fa fa-gears"/>
                                                         </div>
                                                         <p:spacer height="10px"/>

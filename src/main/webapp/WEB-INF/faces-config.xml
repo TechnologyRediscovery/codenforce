@@ -1081,7 +1081,7 @@
         <from-view-id>*</from-view-id>
         <navigation-case>
             <from-outcome>occPermitApplications</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/occ/occPermitApplications.xhtml</to-view-id>
             <redirect />       
         </navigation-case>
         
@@ -1099,6 +1099,28 @@
         <navigation-case>
             <from-outcome>occInspectionAdd</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/occPeriodInspections.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>applicationUnitList</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occPermitApplicationUnitList.xhtml</to-view-id>
+            <redirect />       
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>applicationChangePeople</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occApplicationChangePeople.xhtml</to-view-id>
+            <redirect />       
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>occPeriodStatus</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occPeriodStatus.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>occInspectionAdd</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occInspectionAdd.xhtml</to-view-id>
         </navigation-case>
         
         <navigation-case>
@@ -1357,27 +1379,6 @@
             <redirect />       
         </navigation-case>
         
-        <navigation-case>
-            <from-outcome>occPeriodStatus</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/occPeriodStatus.xhtml</to-view-id>
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>occInspectionAdd</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/occInspectionAdd.xhtml</to-view-id>
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>occInspectionProfile</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/occProfile.xhtml</to-view-id>
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>checklists</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/checklists.xhtml</to-view-id>
-        </navigation-case>
-        
-  
         <navigation-case>
             <from-outcome>noticeOfViolationBuilder</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilder.xhtml</to-view-id>
