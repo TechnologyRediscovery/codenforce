@@ -154,7 +154,6 @@
                                                                          usercfg-umap-panel
                                                                          usercfg-panel-notes
                                                                          usercfg-panel-addupdate
-                                                                         usercfg-personlink-panel
                                                                          usercfg-remove-panel
                                                                          usercfg-umap-panel
                                                                          usercfg-pswd-panel
@@ -337,89 +336,29 @@
 
 
                                                     </div>
+                                                    
+                                                    <p>User-Person Mapping</p>
+                                                    
+                                                    <h:outputText   rendered="#{!(empty userConfigBB.userAuthorizedInConfig.person)}"
+                                                                    value="This user is currently mapped to: #{userConfigBB.userAuthorizedInConfig.person.firstName} #{userConfigBB.userAuthorizedInConfig.person.lastName} (ID: #{userConfigBB.userAuthorizedInConfig.person.personID})" />
+                                                    
+                                                    <h:outputText   rendered="#{empty userConfigBB.userAuthorizedInConfig.person}"
+                                                                    value="Map the User to a Person:" />
 
-
-
-                                                </div>
-
-
-
-                                                <p:commandButton    id="usercfg-add-addnew-commit-button-1"
-                                                                    icon="fa fa-thmubs-o-up"
-                                                                    ajax="false"
-                                                                    action="#{userConfigBB.onUserInsertCommitButtonChange}"
-                                                                    value="Create User"
-                                                                    rendered="#{userConfigBB.userAuthorizedInConfig.userID == 0}"
-                                                                    />
-
-                                                <p:commandButton    id="usercfg-add-update-commit-button-1"
-                                                                    icon="fa fa-edit"
-                                                                    ajax="false"
-                                                                    action="#{userConfigBB.onUserUpdateCommitButtonChange}"
-                                                                    value="Commit Updates"
-                                                                    rendered="#{userConfigBB.userAuthorizedInConfig.userID != 0}"
-                                                                    />
-
-                                                <p:commandButton    id="usercfg-add-discard-button-1"
-                                                                    icon="fa fa-trash-o"
-                                                                    ajax="true"
-                                                                    action="#{userConfigBB.onDiscardChangesButton}"
-                                                                    value="Discard changes"
-                                                                    />
-
-
-                                            </h:form>
-                                        </p:panel>
-
-
-                                        <p:panel id="usercfg-personlink-panel"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Person Link"
-                                                 rendered="#{userConfigBB.activeInsertUpdateMode}"
-                                                 >
-                                            <h:form id="usercfg-personlink-messages-form">
-
-                                                <h:messages id="usercfg-personlink-messages"
-                                                            globalOnly="true" showDetail="true" showSummary="true"
-                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                                </h:messages>
-                                            </h:form>
-
-                                            <h:form id="userconfig-personlink-form">
-
-
-                                                <f:subview  id="userconfig-personmap-subview"
-                                                            rendered="#{userConfigBB.userAuthorizedInConfig.userID != 0}"
-                                                            >
-                                                    <h3>User:Person mapping</h3>
-                                                    <h:outputText value="This user is currently mapped to: " />
-                                                    <p:spacer height="5px" />
-                                                    <h:outputText value="#{userConfigBB.userAuthorizedInConfig.person.firstName}" />
-                                                    <h:outputText value=" " />
-                                                    <h:outputText value="#{userConfigBB.userAuthorizedInConfig.person.lastName}" />
-                                                    <h:outputText value=" (ID: #{userConfigBB.userAuthorizedInConfig.person.personID})" />
-                                                    <h:outputText value=" " />
-
-                                                </f:subview>
-
-                                                <p:spacer height="5px" />
-                                                <div    id="usercfg-personlink-container-div"
-                                                        class="ui-g data-container">
+                                                    
 
                                                     <div    id="usercfg-personlink-chooselinkmethod-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
                                                         <p:outputLabel for="usercfg-personlink-chooselinkmethod-sbb"
                                                                        styleClass="data_field_label">
-                                                            <h:outputText value="Link user by userID?"/>
+                                                            <h:outputText value="Select a user-person selection method:"/>
                                                         </p:outputLabel>
                                                         <p:selectBooleanButton id="usercfg-personlink-chooselinkmethod-sbb"
                                                                                onLabel="Link by UserID" 
                                                                                offLabel="Link from Person List"
                                                                                styleClass="selectButton" 
                                                                                value="#{userConfigBB.personLinkUseID}"
-                                                                               
                                                                                >
                                                             <p:ajax update="userconfig-som-userpersons
                                                                     userconfig-addpersonbyid-it" />
@@ -475,18 +414,45 @@
 
                                                 </div>
 
-                                                <p:commandButton    id="userconfig-button-updatepersonlink"
+
+
+
+
+
+                                                <p:commandButton    id="usercfg-add-addnew-commit-button-1"
+                                                                    icon="fa fa-thmubs-o-up"
                                                                     ajax="true"
-                                                                    actionListener="#{userConfigBB.onUserPersonLinkUpdate}"
-                                                                    update="@form
-                                                                    usercfg-personlink-messages-form"
-                                                                    icon="fa fa-thumbs-0-up"
-                                                                    value="Update person link" 
-                                                                    tabindex="3"/>
+                                                                    actionListener="#{userConfigBB.onUserInsertCommitButtonChange}"
+                                                                    value="Create User"
+                                                                    oncomplete="PF('usercfg-newpassword-dialog-var').show()"
+                                                                    rendered="#{userConfigBB.userAuthorizedInConfig.userID == 0}"
+                                                                    update="    messages-addupdate-form
+                                                                                userconfig-messages-form-updatepassword
+                                                                                userconfig-form-updatepassword"
+                                                                    />
+
+                                                <p:commandButton    id="usercfg-add-update-commit-button-1"
+                                                                    icon="fa fa-edit"
+                                                                    ajax="true"
+                                                                    actionListener="#{userConfigBB.onUserUpdateCommitButtonChange}"
+                                                                    value="Commit Updates"
+                                                                    rendered="#{userConfigBB.userAuthorizedInConfig.userID != 0}"
+                                                                    update="messages-addupdate-form"
+                                                                    />
+
+                                                <p:commandButton    id="usercfg-add-discard-button-1"
+                                                                    icon="fa fa-trash-o"
+                                                                    ajax="true"
+                                                                    actionListener="#{userConfigBB.onDiscardChangesButton}"
+                                                                    value="Discard changes"
+                                                                    update="messages-addupdate-form"
+                                                                    />
+
 
                                             </h:form>
-
                                         </p:panel>
+
+
 
                                         <p:panel id="usercfg-remove-panel"
                                                  toggleable="true"
@@ -502,6 +468,8 @@
 
                                                 <p:commandButton icon="fa fa-trash-o"
                                                                  ajax="true"
+                                                                 actionListener="#{userConfigBB.onUserDeactivateInitButtonChange}"
+                                                                 
                                                                  oncomplete="PF('usercfg-userdeactivate-confirm-dialog-var').show()"
                                                                  value="Permanently deactivate user: #{userConfigBB.userAuthorizedInConfig.username} (ID: #{userConfigBB.userAuthorizedInConfig.userID})"
                                                                  />
@@ -818,24 +786,31 @@
 
                         <h:form id="usercfg-newpassword-form">
 
-                            <h:outputText value="User #{userConfigBB.userAuthorizedInConfig.username} has been assigned " />
-                            <h:outputText value="the following password. Please safely transfer this password" />
-                            <h:outputText value="by passing a paper slip directly and/or phoning it over. " />
-                            <h:outputText value="codeNforce passwords are all cAse SenSiTive." />
+                            <f:subview  id="usercfg-newpassword-subview"
+                                        rendered="#{!(empty userConfigBB.freshPasswordCleartext)}" >
+                                <h:outputText value="User #{userConfigBB.userAuthorizedInConfig.username} has been assigned " />
+                                <h:outputText value="the following password. Please safely transfer this password" />
+                                <h:outputText value="by passing a paper slip directly and/or phoning it over. " />
+                                <h:outputText value="codeNforce passwords are all cAse SenSiTive." />
 
-                            <div class="newpasswd-text">
+                                <div class="newpasswd-text">
 
-                                <h:outputText id="userconfig-newpass-ot"
-                                              value="#{userConfigBB.freshPasswordCleartext}"
-                                              styleClass="newpsswd" />
-                            </div>
+                                    <h:outputText id="userconfig-newpass-ot"
+                                                  value="#{userConfigBB.freshPasswordCleartext}"
+                                                  styleClass="newpsswd" />
+                                </div>
 
-                            <h:outputText value="(Please do not email or text the new password, and " />
-                            <h:outputText value="(generally seek to limit its entry into any computer." />
+                                <h:outputText value="(Please do not email or text the new password, and " />
+                                <h:outputText value="(generally seek to limit its entry into any computer." />
 
-                            <p:spacer height="5px" />
+                                <p:spacer height="5px" />
+                            </f:subview>
+                             <f:subview  id="usercfg-newpassword-subview-nopass"
+                                         rendered="#{(empty userConfigBB.freshPasswordCleartext)}" >
+                                 <p>There was an error in the user creation process that must be addressed by a coder, sorry!</p>
+                             </f:subview>
                             <p:commandButton ajax="true" 
-                                             value="Done! I've written it down" 
+                                             value="Close" 
                                              icon="fa thumbs-up" 
                                              onclick="PF('usercfg-newpassword-dialog-var').hide()"
                                              tabindex="4"/>

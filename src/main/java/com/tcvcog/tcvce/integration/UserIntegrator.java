@@ -667,10 +667,12 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         String query =  "INSERT INTO public.login(\n" +
-                        "            userid, username, notes, personlink, \n" +
-                        "             createdby, createdts, nologinvirtualonly \n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
-                        "            ?, now(), ?);";
+                        "            userid, username, password, notes, personlink, pswdlastupdated, \n" +
+                        "            forcepasswordreset, createdby, createdts, nologinvirtualonly, \n" +
+                        "            deactivatedts, deactivated_userid, lastupdatedts, userrole)\n" +
+                        "    VALUES (DEFAULT, ?, NULL, ?, ?, NULL, \n" +
+                        "            NULL, ?, now(), ?, \n" +
+                        "            NULL, NULL, now(), 'User'::role);";
         
         PreparedStatement stmt = null;
         
@@ -685,7 +687,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setInt(3, userToInsert.getPerson().getPersonID());
             }
             
-            stmt.setInt(4, userToInsert.getCreatedByUserId());
+            if(userToInsert.getCreatedByUserId() != 0){
+                stmt.setInt(4, userToInsert.getCreatedByUserId());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
             
             // created ts from db's now()
             stmt.setBoolean(5, userToInsert.isNoLoginVirtualUser());

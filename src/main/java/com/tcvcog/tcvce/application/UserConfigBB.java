@@ -41,6 +41,8 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -174,10 +176,7 @@ public class UserConfigBB extends BackingBeanUtils{
                     
             }
         }
-       
-
     }
-    
     
 
     //check if current mode == Lookup
@@ -197,8 +196,6 @@ public class UserConfigBB extends BackingBeanUtils{
         return PageModeEnum.REMOVE.equals(currentMode);
     }
 
-
-    
     
     /**
      * Primary listener method which copies a reference to the selected 
@@ -313,37 +310,75 @@ public class UserConfigBB extends BackingBeanUtils{
     public void onUserInsertCommitButtonChange(ActionEvent ev) {
          System.out.println("UserBB.commitInsert");
         UserCoordinator uc = getUserCoordinator();
-        String freshUserPswd = null;
+        PersonCoordinator pc = getPersonCoordinator();
+        
         int freshUserID;
         User usr;
-        
-        try {
-            freshUserID = uc.user_insertNewUser(userAuthorizedInConfig);
-            if(freshUserID != 0){
-                usr = uc.user_getUser(freshUserID);
-                freshUserPswd = uc.user_generateRandomPassword_SECURITYCRITICAL();
-                uc.user_updateUserPassword_SECURITYCRITICAL(usr, freshUserPswd);
-                
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Successfully added username " + usr.getUsername()
-                                + " to the system with an initial password of " + freshUserPswd, ""));
-                
-            }
+        if(personIDToLink != 0){
             
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
+             try {
+                 Person p = pc.getPerson(personIDToLink);
+                 userAuthorizedInConfig.setPerson(p);
+             } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Invalid person ID; please correct the person ID",
+                                ""));
+             }
+        }
+        if(userAuthorizedInConfig.getPerson() != null){
+            try {
+                freshUserID = uc.user_insertNewUser(userAuthorizedInConfig);
+                if(freshUserID != 0){
+                    usr = uc.user_getUser(freshUserID);
+                    if(usr != null){
+                        System.out.println("UserConfigBB.insertUser : retrieved new user");
+                    } else {
+                        System.out.println("UserConfigBB.insertUser : null new user!");
+                        
+                    }
+                    if(usr != null){
+                        reloadCurrentUser();
+                        if(!usr.isNoLoginVirtualUser()){
+
+                            freshPasswordCleartext = uc.user_generateRandomPassword_SECURITYCRITICAL();
+                            uc.user_updateUserPassword_SECURITYCRITICAL(usr, freshPasswordCleartext);
+
+                            getFacesContext().addMessage(null,
+                                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                            "Successfully added username " + usr.getUsername()
+                                            + " to the system with an initial password of " + freshPasswordCleartext, ""));
+                        } else {
+                            getFacesContext().addMessage(null,
+                                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                            "Successfully added username " + usr.getUsername()
+                                            + " to the system as a NO-Login type usr", ""));
+                        }
+
+                    }
+                }
+
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to add user to system, my apologies",
+                                "This is a system-level error that must be corrected by an administrator"));
+            } catch (AuthorizationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                ex.getMessage(),
+                                "This is an authroization be corrected by an administrator"));
+            }
+        } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to add user to system, my apologies",
-                            "This is a system-level error that must be corrected by an administrator"));
-        } catch (AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to add user to system, my apologies",
-                            "This is an authroization be corrected by an administrator"));
-        }//show successfully inserting message in p:messages box
+                            "You must create a user with a link to a person object! Please either"
+                                    + "select a person from the drop-down box or enter a valid Person ID",""));
+            
+        }
     }
 
     /**
@@ -358,6 +393,7 @@ public class UserConfigBB extends BackingBeanUtils{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));
+            reloadCurrentUser();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -365,12 +401,10 @@ public class UserConfigBB extends BackingBeanUtils{
                             "Could not update user", ""));
             
         }
-        //show successfully updating message in p:messages box
-        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Updated User", ""));
-        //reminder: set muniManageSample in faces-config.xml
-        //return to muniManage_sample.xhtml page
         
     }
+
+   
       /**
      * Listener for commencement of note writing process
      * @param ev 
@@ -403,6 +437,7 @@ public class UserConfigBB extends BackingBeanUtils{
             getFacesContext().addMessage(null, 
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Succesfully appended note!", ""));
+            reloadCurrentUser();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, 
@@ -415,15 +450,33 @@ public class UserConfigBB extends BackingBeanUtils{
         
     }
     
-    
 
+    /**
+     * Listener for user requests to start to remove the currently selected ERA;
+     * @param ev
+     */
+    public void onUserDeactivateInitButtonChange(ActionEvent ev) {
+        //  nothign to do here yet
+    }
+    
     /**
      * Listener for user requests to remove the currently selected ERA;
      * Delegates all work to internal, non-listener method.
      * @param ev
      */
     public void onUserRemoveCommitButtonChange(ActionEvent ev) {
-        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully removed user from active management", ""));
+        UserCoordinator uc = getUserCoordinator();
+        
+        try{
+            uc.user_deactivateUser(getSessionBean().getSessUser(), userAuthorizedInConfig);
+            getFacesContext().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully removed user from active management", ""));
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to deactivate due to Auth or DB error!", ""));
+            
+        }
     }
     
     /**
@@ -431,6 +484,8 @@ public class UserConfigBB extends BackingBeanUtils{
      * @param ev 
      */
     public void onDiscardChangesButton(ActionEvent ev){
+            getFacesContext().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Changes not saved!", ""));
         
     }
     
@@ -496,12 +551,17 @@ public class UserConfigBB extends BackingBeanUtils{
     }
     
     public void onInvalidateUserMuniAuthPeriodCommit(){
+        SystemCoordinator sc = getSystemCoordinator();
         UserCoordinator uc = getUserCoordinator();
         try {
             uc.auth_invalidateUserAuthPeriod(umapInConfig, getSessionBean().getSessUser(), formInvalidateRecordReason);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully invalidated auth period id" + umapInConfig.getUserMuniAuthPeriodID(), ""));
+              formInvalidateRecordReason = "";
+            userAuthorizedInConfig.setNotes(sc.formatAndAppendNote(getSessionBean().getSessUser(), 
+                                    formInvalidateRecordReason, 
+                                    userAuthorizedInConfig.getNotes()));
         } catch (IntegrationException | AuthorizationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -605,53 +665,7 @@ public class UserConfigBB extends BackingBeanUtils{
 
 
     
-    /**
-     * Finalizes updates to Users with the UserCoordinator
-     */
-    public void onUserPersonLinkUpdate(){
-        UserCoordinator uc = getUserCoordinator();
-        PersonCoordinator pc = getPersonCoordinator();
-        Person pers = null;
-        try {
-            if(!personLinkUseID){
-                if(selectedUserPerson != null){
-                    
-                uc.user_updateUserPersonLink(userAuthorizedInConfig, selectedUserPerson);
-                reloadCurrentUser();
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Successfully udpated user person link: see notes", ""));
-                } else {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Cannot link a User to a null Person!", ""));
-                    
-                }
-            } else {
-                pers = pc.getPerson(personIDToLink);
-                if(pers != null && pers.getPersonID() != 0){
-                    uc.user_updateUserPersonLink(userAuthorizedInConfig, pers);
-                    reloadCurrentUser();
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                    "Successfully udpated user person link: see notes", ""));
-                    
-                } else {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Could not find Person with ID" + personIDToLink, ""));
-                    
-                }
-            }
-        } catch (IntegrationException | AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update person link, sorry!" + ex.toString(), ""));
-        } 
-    }
-    
-    
+  
     
     
     /**
@@ -663,15 +677,12 @@ public class UserConfigBB extends BackingBeanUtils{
         freshPasswordCleartext = uc.user_generateRandomPassword_SECURITYCRITICAL();
         try {
             uc.user_updateUserPassword_SECURITYCRITICAL(userAuthorizedInConfig, freshPasswordCleartext);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Password reset success! New password for " 
-                                + userAuthorizedInConfig.getUsername() 
-                                + " is now " + freshPasswordCleartext, ""));
-            formInvalidateRecordReason = "";
-            userAuthorizedInConfig.setNotes(sc.formatAndAppendNote(getSessionBean().getSessUser(), 
-                                    formInvalidateRecordReason, 
-                                    userAuthorizedInConfig.getNotes()));
+//            getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+//                        "Password reset success! New password for " 
+//                                + userAuthorizedInConfig.getUsername() 
+//                                + " is now " + freshPasswordCleartext, ""));
+          
          } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -692,11 +703,11 @@ public class UserConfigBB extends BackingBeanUtils{
         freshPasswordCleartext = uc.user_generateRandomPassword_SECURITYCRITICAL();
         try {
             uc.user_updateUserPassword_SECURITYCRITICAL(userAuthorizedInConfig, freshPasswordCleartext);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Password reset success! New password for " 
-                                + userAuthorizedInConfig.getUsername() 
-                                + " is now " + freshPasswordCleartext, ""));
+//            getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+//                        "Password reset success! New password for " 
+//                                + userAuthorizedInConfig.getUsername() 
+//                                + " is now " + freshPasswordCleartext, ""));
             // TODO: get this in the right place
 //            formInvalidateRecordReason = "";
 //            userAuthorizedInConfig.setNotes(sc.formatAndAppendNote(getSessionBean().getSessUser(), 

@@ -95,15 +95,6 @@ INSERT INTO public.intensityclass(
 
 
 
---IF datepublished IS NULL the patch is still open and receiving changes
-INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (28, 'database/patches/dbpatch_beta28.sql', NULL, 'ecd', 'mid-july-launch');
---  LAUNCH DAY PATCH! (07/15/2020)
---      Added miscellaneous columns.
---      Added event category's.
---      Added function resetsequences to dynamically avoid id collisions.
---  AUTHOR: SNAPPER VIBES
--- ****************************************************************************
 
 
 ALTER TABLE person
@@ -231,3 +222,13 @@ $$ LANGUAGE plpgsql;
 --ALTER SEQUENCE person_personidseq
 --    START WITH 120000
 --    RESTART;
+
+--IF datepublished IS NULL the patch is still open and receiving changes
+INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
+    VALUES (28, 'database/patches/dbpatch_beta28.sql', '08-03-2020', 'ecd', 'mid-july-launch');
+--  LAUNCH DAY PATCH! (07/15/2020)
+--      Added miscellaneous columns.
+--      Added event category's.
+--      Added function resetsequences to dynamically avoid id collisions.
+--  AUTHOR: SNAPPER VIBES
+-- ****************************************************************************

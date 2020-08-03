@@ -36,12 +36,14 @@ public class UserAuthorizedForConfig extends UserAuthorized{
      */
     public UserAuthorizedForConfig(UserAuthorized u){
         super(u);
-        this.muniAuthPeriodsMap = u.muniAuthPeriodsMap;
-        this.pswdLastUpdated = u.pswdLastUpdated;
-        this.forcePasswordResetTS = u.forcePasswordResetTS;
-        this.lastUpdatedTS = u.lastUpdatedTS;
-        this.deactivatedByUserID = u.deactivatedByUserID;
-        this.deactivatedTS = u.deactivatedTS;
+        if(u != null){
+            this.muniAuthPeriodsMap = u.muniAuthPeriodsMap;
+            this.pswdLastUpdated = u.pswdLastUpdated;
+            this.forcePasswordResetTS = u.forcePasswordResetTS;
+            this.lastUpdatedTS = u.lastUpdatedTS;
+            this.deactivatedByUserID = u.deactivatedByUserID;
+            this.deactivatedTS = u.deactivatedTS;
+        }
     }
 
     /**

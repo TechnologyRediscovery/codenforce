@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * *** SECURITY SENSITIVE CLASS ***
@@ -100,10 +102,11 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public String user_generateRandomPassword_SECURITYCRITICAL(){
         java.math.BigInteger bigInt = new BigInteger(1024, new Random());
         String randB64 = Base64.encode(bigInt.toByteArray());
+        System.out.println("Randomly generated BigInt: " + randB64);
         StringBuilder sb = new StringBuilder();
         sb.append(randB64.substring(0,3));
         sb.append("-");
-        sb.append(randB64.substring(randB64.length()-3,randB64.length()));
+        sb.append(randB64.substring(4,7));
         sb.append("-");
         sb.append(randB64.substring(randB64.length()-3,randB64.length()));
         return sb.toString();
@@ -198,20 +201,21 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         Map<Municipality, List<UserMuniAuthPeriod>> tempMap = new HashMap<>();
         List<UserMuniAuthPeriod> tempUMAPList;
         
-          
-            for(UserMuniAuthPeriod umap: umapListRaw){
-                Municipality mu = umap.getMuni();
-                if(tempMap.containsKey(mu)){
-                    tempUMAPList = tempMap.get(mu); // pull out our authorized peridos
-                    tempUMAPList.add(umap); // add our new one
-                    Collections.sort(tempUMAPList); // sort based first on role rank, then assignment order ACROSS munis
-                } else {
-                    // no existing record for that muni, so make a list, inject, and put
-                    tempUMAPList = new ArrayList<>();
-                    tempUMAPList.add(umap);
-                }
-                tempMap.put(umap.getMuni(), tempUMAPList);
-            } // close for over periods
+          if(umapListRaw != null && !umapListRaw.isEmpty()){
+                for(UserMuniAuthPeriod umap: umapListRaw){
+                    Municipality mu = umap.getMuni();
+                    if(tempMap.containsKey(mu)){
+                        tempUMAPList = tempMap.get(mu); // pull out our authorized peridos
+                        tempUMAPList.add(umap); // add our new one
+                        Collections.sort(tempUMAPList); // sort based first on role rank, then assignment order ACROSS munis
+                    } else {
+                        // no existing record for that muni, so make a list, inject, and put
+                        tempUMAPList = new ArrayList<>();
+                        tempUMAPList.add(umap);
+                    }
+                    tempMap.put(umap.getMuni(), tempUMAPList);
+                } // close for over periods
+          }
             
             return tempMap;
         
@@ -599,11 +603,47 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param usr
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      */
-    public int user_insertNewUser(User usr) throws IntegrationException{
+    public int user_insertNewUser(User usr) throws IntegrationException, AuthorizationException{
+        int newUserID = 0;
         UserIntegrator ui = getUserIntegrator();
-        int newUserID = ui.insertUser(usr);
+        if(usr != null && usr.getUsername() != null){
+            if(user_checkUsernameAllowedForInsert(usr.getUsername())){
+                newUserID = ui.insertUser(usr);
+            } else {
+                throw new AuthorizationException("Non-unique username!");
+            }
+        } else {
+            throw new AuthorizationException("Cannot create new user from Null or without username");
+            
+        }
         return newUserID;
+    }
+    
+    /**
+     * Utility method for querying for an existing username
+     * @param uname
+     * @return true if the username is unique and user insert can proceed; false 
+     * if name is not unique--abort insert
+     */
+    private boolean user_checkUsernameAllowedForInsert(String uname){
+        UserIntegrator ui = getUserIntegrator();
+        boolean allowed = false;
+        try {
+            int checkID = ui.getUserID(uname);
+            if (checkID == 0) {
+                System.out.println("UserCoordinator.user_checkUsernameAllowedForInsert: no user found with name " + uname);
+                allowed = true; 
+            } else {
+                System.out.println("UserCoordinator.user_checkUsernameAllowedForInsert: DUPLICATE NAME: " + uname);
+                
+            }
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+                
+        return allowed;
         
     }
     
@@ -724,7 +764,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      */
     public void user_deactivateUser(UserAuthorized ua, UserAuthorizedForConfig ufcToDeac) throws AuthorizationException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();
-        if(ufcToDeac != null){
+        if(ufcToDeac != null && ua != null){
             if(auditUMAPList_allowDeactivation_freeOfDevCreds(ufcToDeac.getUmapList())){
                 ufcToDeac.setDeactivatedBy(ua.getUserID());
                 ui.updateUser(ua);
